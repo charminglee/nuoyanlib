@@ -4,8 +4,10 @@
 #   Copyright (c) 2023 Nuoyan
 #   nuoyanLib is licensed under Mulan PSL v2.
 #
+#   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
-#   Last Modified : 2023-01-13
+#   Gitee         : https://gitee.com/charming-lee
+#   Last Modified : 2023-01-14
 #
 # ====================================================
 
