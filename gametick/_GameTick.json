@@ -1,0 +1,32 @@
+{
+    "main": {
+        "bindings": [
+            {
+                "binding_condition": "always",
+                "binding_name": "#main.gametick"
+            }
+        ],
+        "type": "screen"
+    },
+    "namespace": "_GameTick"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
