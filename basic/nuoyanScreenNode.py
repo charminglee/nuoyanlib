@@ -13,8 +13,8 @@
 from collections import Callable as _Callable
 import mod.client.extraClientApi as _clientApi
 from nuoyanClientSystem import NuoyanClientSystem as _NuoyanClientSystem
-from ...nuoyanLib.client.setting import read_setting as _read_setting, save_setting as _save_setting
-from ...nuoyanLib.client.ui import get_parent_path as _get_parent_path
+from ..client.setting import read_setting as _read_setting, save_setting as _save_setting
+from ..client.ui import get_parent_path as _get_parent_path
 
 
 _ScreenNode = _clientApi.GetScreenNodeCls()
