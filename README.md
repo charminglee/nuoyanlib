@@ -1,8 +1,8 @@
 # nuoyanLib
 
 #### 介绍
-我的世界中国版ModSDK开发函数库，整合了众多开发中常用的算法，旨在提高开发者开发效率。欢迎广大开发者共同开发nuoyanLib！
-参考文档：https://gitee.com/charming-lee/nuoyanLib/wikis/%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3/base%EF%BC%9A%E5%9F%BA%E7%A1%80%E5%BA%93
+我的世界中国版ModSDK开发函数库，整合了众多开发中常用的算法，旨在提高开发者开发效率。欢迎广大开发者共同开发nuoyanLib！  
+参考文档：https://gitee.com/charming-lee/nuoyanLib/wikis/%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3/base%EF%BC%9A%E5%9F%BA%E7%A1%80%E5%BA%93  
 技术文档：
 
 
