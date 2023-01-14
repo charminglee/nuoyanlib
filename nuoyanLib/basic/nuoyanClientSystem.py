@@ -1204,7 +1204,7 @@ class NuoyanClientSystem(_ClientSystem):
     # todo:======================================= Basic Function ======================================================
 
     def BroadcastToAllClient(self, eventName, eventData):
-        # type: (str, Any) -> None
+        # type: (str, ...) -> None
         """
         广播事件到所有客户端。
         注：因为全局广播要经过服务端，所以监听时监听的是服务端而不是客户端。
@@ -1226,7 +1226,7 @@ class NuoyanClientSystem(_ClientSystem):
         })
 
     def ListenForEventV2(self, eventName, callback, t=0, namespace="", systemName="", priority=0):
-        # type: (str, _Callable[[Any], None], int, str, str, int) -> None
+        # type: (str, _Callable[[...], None], int, str, str, int) -> None
         """
         监听事件（简化版）。
         -----------------------------------------------------------

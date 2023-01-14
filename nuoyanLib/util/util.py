@@ -14,13 +14,23 @@
 
 from collections import Mapping as _Mapping
 from re import match as _match
-from random import randint as _randint
+from random import randint as _randint, uniform as _uniform
 import __builtin__
+from time import time as _time
+import mod.client.extraClientApi as _clientApi
+import mod.server.extraServerApi as _serverApi
 
 
-# noinspection PyUnresolvedReferences
+if _clientApi.GetLocalPlayerId() == "-1":
+    _CompFactory = _serverApi.GetEngineCompFactory()
+    _LEVEL_ID = _serverApi.GetLevelId()
+else:
+    _CompFactory = _clientApi.GetEngineCompFactory()
+    _LEVEL_ID = _clientApi.GetLevelId()
+
+
 def all_index(findList, *elements):
-    # type: (list, Any) -> list
+    # type: (list, ...) -> list
     """
     获取元素在列表中所有出现位置的下标。
     示例：
@@ -129,7 +139,6 @@ def turn_dict_value_to_tuple(origDict):
             origDict[key] = newValue
 
 
-# noinspection PyUnresolvedReferences
 def turn_list_to_tuple(lst):
     # type: (list) -> tuple
     """
@@ -152,9 +161,8 @@ def turn_list_to_tuple(lst):
     return tuple(newLst)
 
 
-# noinspection PyUnresolvedReferences
 def is_method_overridden(subclass, father, method):
-    # type: (Any, Any, str) -> bool
+    # type: (..., ..., str) -> bool
     """
     判断子类是否重写了父类的方法。
     示例：
@@ -182,7 +190,7 @@ def is_method_overridden(subclass, father, method):
 
 # noinspection PyUnresolvedReferences
 def nyeval(source, g=None, l=None):
-    # type: (str | unicode, dict[str, Any] | None, _Mapping[str, Any] | None) -> Any
+    # type: (str | unicode, dict[str, ...] | None, _Mapping[str, ...] | None) -> ...
     """
     用法与内置函数eval相同，可绕过机审。
     -----------------------------------------------------------
@@ -207,19 +215,19 @@ def translate_time(sec):
     return: str -> h/m/s格式
     """
     if sec <= 60:
-        return str(sec) + "s"
+        return "%ds" % sec
     elif 60 < sec < 3600:
         m = sec // 60
         s = sec - m * 60
-        return str(m) + "m" + str(s) + "s"
+        return "%dm%ds" % (m, s)
     else:
         h = sec // 3600
         m = (sec - h * 3600) // 60
         s = sec - h * 3600 - m * 60
-        return str(h) + "h" + str(m) + "m" + str(s) + "s"
+        return "%dh%dm%ds" % (h, m, s)
 
 
-def probability_true(n, d):
+def probability_true_i(n, d):
     # type: (int, int) -> bool
     """
     以指定概率返回True。
@@ -234,24 +242,62 @@ def probability_true(n, d):
     return n * d > 0 and _randint(1, d) <= n
 
 
+def probability_true_f(f):
+    # type: (float) -> bool
+    """
+    以指定概率返回True。
+    -----------------------------------------------------------
+    【f: float】 概率，范围为[0, 1]
+    -----------------------------------------------------------
+    return: bool -> 以f的概率返回True
+    """
+    return f > 0 and _uniform(0, 1) <= f
+
+
+def delay(sec):
+    # type: (float) -> ...
+    """
+    函数装饰器，用于函数的延迟执行。
+    示例：
+    @delay(2)
+    def func(args):
+        pass
+    timer = func(args)     # 函数将会在两秒后执行
+    LevelGameComp.CancelTimer(timer)     # 取消执行
+    -----------------------------------------------------------
+    【sec: float】 延迟秒数
+    -----------------------------------------------------------
+    return: CallLater @-> 装饰后的函数返回CallLater，可用于CancelTimer取消执行
+    """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            return _CompFactory.CreateGame(_LEVEL_ID).AddTimer(sec, func, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
 if __name__ == "__main__":
     print all_index([1, 1, 4, 5, 1, 4], 1)  # [0, 1, 4]
     print all_index([1, 1, 4, 5, 1, 4], 1, 4)  # [0, 1, 2, 4, 5]
+    print "=" * 50
     print check_string("11112222", "1", "2")  # True
     print check_string("11112222", "1")  # False
     print check_string("1234567890", "0-9")  # True
     print check_string2("abc123", "a", "c", "3")  # ["b", "1", "2"]
     print check_string2("abc123", "a-z")  # ["1", "2", "3"]
     print check_string2("abc123", "0-9")  # ["a", "b", "c"]
+    print "=" * 50
     print is_number("114514")  # True
     print is_number("114514abc")  # False
     print is_number("114e5")  # True
     print is_number("0x000000ff")  # True
+    print "=" * 50
     a = {'b': [1, 2, 3], 'c': "hahaha", 'd': [4, 5]}
     turn_dict_value_to_tuple(a)
     print a  # {'b': (1, 2, 3), 'c': "hahaha", 'd': (4, 5)}
     a = [1, [2, 3], "abc"]
     print turn_list_to_tuple(a)  # (1, (2, 3), "abc")
+    print "=" * 50
     class A:
         def printIn(self, s):
             print s
@@ -262,8 +308,24 @@ if __name__ == "__main__":
         pass
     print is_method_overridden(B, A, "printIn")  # True
     print is_method_overridden(C, A, "printIn")  # False
+    print "=" * 50
     print translate_time(4000)  # "1h6m40s"
+    print "=" * 50
+    print 2 / 3.0
+    p = [probability_true_i(2, 3) for _ in range(int(1e5))]
+    print p.count(True) / 1e5
+    print 0.34
+    p = [probability_true_f(0.34) for _ in range(int(1e5))]
+    print p.count(True) / 1e5
 
+
+def _test():
+    print _time()
+    @delay(5.5)
+    def myfunc(a1, a2):
+        print a1, a2
+        print _time()
+    myfunc()
 
 
 

@@ -275,7 +275,7 @@ class NuoyanServerSystem(_ServerSystem):
     # todo:======================================= Basic Function ======================================================
 
     def ListenForEventV2(self, eventName, callback, t=0, namespace="", systemName="", priority=0):
-        # type: (str, _Callable[[Any], None], int, str, str, int) -> None
+        # type: (str, _Callable[[...], None], int, str, str, int) -> None
         """
         监听事件（简化版）。
         -----------------------------------------------------------

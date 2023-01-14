@@ -15,9 +15,8 @@
 from mod.common.minecraftEnum import EntityType as _EntityType
 
 
-# noinspection PyUnresolvedReferences
 def search_data(data, lst):
-    # type: (Any, list) -> bool
+    # type: (..., list) -> bool
     """
     在列表中搜索数据。
     -----------------------------------------------------------
