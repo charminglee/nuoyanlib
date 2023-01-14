@@ -56,8 +56,8 @@ class NuoyanServerSystem(_ServerSystem):
     1. ListenForEventV2：监听事件（简化版）
     -----------------------------------------------------------
     【新增事件】
-    1. OnUiInitFinished：客户端玩家UI框架初始化完成时，服务端触发
-    2. OnGameTick：频率与游戏当前帧率同步的Tick事件
+    1. UiInitFinished：客户端玩家UI框架初始化完成时，服务端触发
+    2. GameTick：频率与游戏当前帧率同步的Tick事件
     -----------------------------------------------------------
     【新增属性】
     1. allPlayerData：用于保存所有玩家数据的字典，key为玩家实体ID，value为玩家数据字典，可自行添加数据；
