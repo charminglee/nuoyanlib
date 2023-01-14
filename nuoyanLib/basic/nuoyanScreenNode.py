@@ -35,20 +35,20 @@ class NuoyanScreenNode(_ScreenNode):
     【基础功能】
     -----------------------------------------------------------
     【新增方法】
-    SetButtonDoubleClickCallback：设置按钮双击监听
-    SetButtonMovable：设置按钮可拖动
-    CancelButtonMovable：取消按钮可拖动
-    SetButtonLongClickCallback：设置按钮长按监听
-    RemoveButtonLongClickCallback：移除按钮长按监听
-    SetLongClickVibrateTime：设置长按后震动反馈的时长
-    HasLongClicked：用于判断按钮在当次按下中是否已经触发了长按
-    SetButtonMovableAfterLongClick：设置按钮长按拖动
+    1. SetButtonDoubleClickCallback：设置按钮双击监听
+    2. SetButtonMovable：设置按钮可拖动
+    3. CancelButtonMovable：取消按钮可拖动
+    4. SetButtonLongClickCallback：设置按钮长按监听
+    5. RemoveButtonLongClickCallback：移除按钮长按监听
+    6. SetLongClickVibrateTime：设置长按后震动反馈的时长
+    7. HasLongClicked：用于判断按钮在当次按下中是否已经触发了长按
+    8. SetButtonMovableAfterLongClick：设置按钮长按拖动
     -----------------------------------------------------------
     【新增事件】
     -----------------------------------------------------------
     【新增属性】
-    cs：注册该UI的客户端系统实例，可直接使用该属性在UI类中调用客户端的接口、方法、属性等，如self.cs.NotifyToServer(...)、self.cs.xxx = ...
-    screenSize: 屏幕尺寸，元组，(宽度, 高度)；屏幕尺寸改变时，该属性也会改变
+    1. cs：注册该UI的ClientSystem实例，可直接使用该属性在UI类中调用客户端的接口、方法、属性等，如self.cs.NotifyToServer(...)、self.cs.xxx = ...
+    2. screenSize: 屏幕尺寸元组，(宽度, 高度)；屏幕尺寸改变时，该属性也会跟着改变
     -----------------------------------------------------------
     【注意事项】
     1. 重写Create和Update方法时请调用一次父类的同名方法，如：super(MyUI, self).Create()或NuoyanScreenNode.Create(self)；
@@ -301,11 +301,10 @@ class NuoyanScreenNode(_ScreenNode):
         # type: (str) -> bool
         """
         用于判断按钮在当次按下中是否已经触发了长按。
-        注：从按钮按下到触发长按前，该方法返回False；从触发长按到下次按钮按下前，该方法返回True。
         -----------------------------------------------------------
         【bp: str】 按钮路径
         -----------------------------------------------------------
-        return: bool -> 若按钮已经触发长按则返回True，否则返回False
+        return: bool -> 从按钮按下到触发长按前，该方法返回False；从触发长按到下次按钮按下前，该方法返回True
         """
         if bp in self._btnLongClickData:
             return self._btnLongClickData[bp]['hasLongClicked']
