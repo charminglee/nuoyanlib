@@ -45,7 +45,7 @@ class NuoyanServerSystem(_ServerSystem):
     ServerSystem扩展类。将自定义ServerSystem继承本类即可使用本类的全部功能。
     -----------------------------------------------------------
     【基础功能】
-    1. 所有官方文档中收录的服务端引擎事件均无需手动监听，只需重写对应事件的回调函数即可（支持热更）；
+    1. 所有官方文档中收录的服务端引擎事件以及新增事件均无需手动监听，只需重写对应事件的回调函数即可（支持热更）；
     回调函数的命名规则为：On+去掉“Server”、“Event”、“On”字眼的事件名；
     如：OnScriptTickServer -> OnScriptTick、OnCarriedNewItemChangedServerEvent -> OnCarriedNewItemChanged、EntityRemoveEvent -> OnEntityRemove等；
     2. 支持对在__init__方法中新增的事件监听或服务端属性（变量）执行热更；

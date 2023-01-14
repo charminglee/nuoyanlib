@@ -136,7 +136,7 @@ class NuoyanClientSystem(_ClientSystem):
     ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。
     -----------------------------------------------------------
     【基础功能】
-    1. 所有官方文档中收录的客户端引擎事件均无需手动监听，只需重写对应事件的回调函数即可（支持热更）；
+    1. 所有官方文档中收录的客户端引擎事件以及新增事件均无需手动监听，只需重写对应事件的回调函数即可（支持热更）；
     回调函数的命名规则为：On+去掉“Client”、“Event”、“On”字眼的事件名；
     如：OnScriptTickClient -> OnScriptTick、UiInitFinished -> OnUiInitFinished、AddEntityClientEvent -> OnAddEntity等；
     2. 支持对在__init__方法中新增的事件监听或客户端属性（变量）执行热更；
