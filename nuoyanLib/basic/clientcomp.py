@@ -13,6 +13,8 @@
 
 
 import mod.client.extraClientApi as _clientApi
+from nuoyanClientSystem import NuoyanClientSystem
+from nuoyanScreenNode import NuoyanScreenNode
 
 
 ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
