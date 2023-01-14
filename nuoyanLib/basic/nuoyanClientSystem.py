@@ -201,7 +201,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnTapBefore(self, args):
         """
@@ -218,7 +217,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【$cancel: bool】 设置为True可拦截原版的攻击或放置响应
         """
-        pass
 
     def OnRightClickRelease(self, args):
         """
@@ -228,7 +226,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnRightClickBefore(self, args):
         """
@@ -236,7 +233,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【$cancel: bool】 设置为True可拦截原版的物品使用/实体交互响应
         """
-        pass
 
     def OnMouseMiddleDown(self, args):
         """
@@ -247,7 +243,6 @@ class NuoyanClientSystem(_ClientSystem):
         【mousePositionX: float】 按下时的x坐标
         【mousePositionY: float】 按下时的y坐标
         """
-        pass
 
     def OnKeyPressInGame(self, args):
         """
@@ -257,7 +252,6 @@ class NuoyanClientSystem(_ClientSystem):
         【key: str】 键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见KeyBoardType枚举
         【isDown: str】 是否按下，按下为1，弹起为0
         """
-        pass
 
     def OnPlayerStopMove(self):
         """
@@ -265,7 +259,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnPlayerStartMove(self):
         """
@@ -273,7 +266,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnBackButtonRelease(self, args):
         """
@@ -281,7 +273,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnMouseWheel(self, args):
         """
@@ -289,7 +280,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【direction: int】 1为向上滚动，0为向下滚动
         """
-        pass
 
     def OnLeftClickRelease(self, args):
         """
@@ -297,7 +287,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnLeftClickBefore(self, args):
         """
@@ -305,7 +294,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【$cancel: bool】 设置为True可拦截原版的挖方块或攻击响应
         """
-        pass
 
     def OnHoldBefore(self, args):
         """
@@ -320,7 +308,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【$cancel: bool】 设置为True可拦截原版的挖方块/使用物品/与实体交互响应
         """
-        pass
 
     def OnGetEntityByCoordRelease(self, args):
         """
@@ -329,7 +316,6 @@ class NuoyanClientSystem(_ClientSystem):
         【x: int】 手指点击位置x坐标
         【y: int】 手指点击位置y坐标
         """
-        pass
 
     def OnGetEntityByCoord(self, args):
         """
@@ -337,7 +323,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnJumpButtonRelease(self, args):
         """
@@ -345,7 +330,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnJumpButtonPressDown(self, args):
         """
@@ -353,7 +337,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【$continueJump: bool】 设置是否执行跳跃逻辑
         """
-        pass
 
     def OnPlaySound(self, args):
         """
@@ -365,7 +348,6 @@ class NuoyanClientSystem(_ClientSystem):
         【pitch: float】 播放速度，正常速度为1
         【$cancel: bool】 设为True可屏蔽该次音效播放
         """
-        pass
 
     def OnPlayMusic(self, args):
         """
@@ -374,7 +356,6 @@ class NuoyanClientSystem(_ClientSystem):
         【name: str】 即资源包中sounds/music_definitions.json中的event_name，并且对应sounds/sound_definitions.json中的key
         【$cancel: bool】 设为True可屏蔽该次音效播放
         """
-        pass
 
     def OnMusicStop(self, args):
         """
@@ -382,7 +363,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【musicName: str】 音乐名称
         """
-        pass
 
     def OnScreenSizeChanged(self, args):
         """
@@ -394,7 +374,6 @@ class NuoyanClientSystem(_ClientSystem):
         【afterX: float】 屏幕大小改变后的宽度
         【afterY: float】 屏幕大小改变后的高度
         """
-        pass
 
     def OnPushScreen(self, args):
         """
@@ -402,7 +381,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【screenName: str】 UI名字
         """
-        pass
 
     def OnPopScreen(self, args):
         """
@@ -410,7 +388,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【screenName: str】 UI名字
         """
-        pass
 
     def OnPlayerChatButtonClick(self, args):
         """
@@ -418,7 +395,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnItemSlotButtonClicked(self, args):
         """
@@ -426,7 +402,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【slotIndex: int】 点击的物品槽的编号
         """
-        pass
 
     def OnGridComponentSizeChanged(self, args):
         """
@@ -434,7 +409,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnPlayerInventoryOpen(self, args):
         """
@@ -443,7 +417,6 @@ class NuoyanClientSystem(_ClientSystem):
         【isCreative: bool】 是否是创造模式背包界面
         【$cancel: bool】 是否取消打开物品背包界面。
         """
-        pass
 
     def OnPlayerInventoryClose(self, args):
         """
@@ -451,7 +424,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnChestOpen(self, args):
         """
@@ -462,7 +434,6 @@ class NuoyanClientSystem(_ClientSystem):
         【y: int】 箱子y坐标
         【z: int】 箱子z坐标
         """
-        pass
 
     def OnChestClose(self, args):
         """
@@ -470,7 +441,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnWalkAnimEnd(self, args):
         """
@@ -479,7 +449,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【id: str】 实体ID
         """
-        pass
 
     def OnWalkAnimBegin(self, args):
         """
@@ -488,7 +457,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【id: str】 实体ID
         """
-        pass
 
     def OnAttackAnimEnd(self, args):
         """
@@ -497,7 +465,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【id: str】 实体ID
         """
-        pass
 
     def OnAttackAnimBegin(self, args):
         """
@@ -506,7 +473,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【id: str】 实体ID
         """
-        pass
 
     def OnStopUsingItem(self, args):
         """
@@ -515,7 +481,6 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         【itemDict: dict】 物品信息字典
         """
-        pass
 
     def OnStartUsingItem(self, args):
         """
@@ -524,7 +489,6 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         【itemDict: dict】 物品信息字典
         """
-        pass
 
     def OnPlayerTryDropItem(self, args):
         """
@@ -534,7 +498,6 @@ class NuoyanClientSystem(_ClientSystem):
         【itemDict: dict】 物品信息字典
         【$cancel: bool】 是否取消此次操作
         """
-        pass
 
     def OnCarriedNewItemChanged(self, args):
         """
@@ -542,7 +505,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【itemDict: dict】 切换后的物品信息字典
         """
-        pass
 
     def OnItemReleaseUsing(self, args):
         """
@@ -554,7 +516,6 @@ class NuoyanClientSystem(_ClientSystem):
         【maxUseDuration: int】 最大蓄力时长
         【$cancel: bool】 设置为True可以取消，需要同时取消服务端事件ItemReleaseUsingServerEvent
         """
-        pass
 
     def OnInventoryItemChanged(self, args):
         """
@@ -568,7 +529,6 @@ class NuoyanClientSystem(_ClientSystem):
         【oldItemDict: dict】 变化前槽位中的物品信息字典
         【newItemDict: dict】 变化后槽位中的物品信息字典
         """
-        pass
 
     def OnGrindStoneRemovedEnchant(self, args):
         """
@@ -580,7 +540,6 @@ class NuoyanClientSystem(_ClientSystem):
         【newItemDict: dict】 合成后的物品物品信息字典
         【exp: int】 本次合成返还的经验
         """
-        pass
 
     def OnShapedRecipeTriggered(self, args):
         """
@@ -588,7 +547,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【recipeId: str】 配方ID，对应配方json文件中的identifier字段
         """
-        pass
 
     def OnItemUseOn(self, args):
         """
@@ -610,7 +568,6 @@ class NuoyanClientSystem(_ClientSystem):
         【clickZ: float】 点击点的z比例位置
         【$ret: bool】 设为True可取消物品的使用
         """
-        pass
 
     def OnItemTryUse(self, args):
         """
@@ -623,7 +580,6 @@ class NuoyanClientSystem(_ClientSystem):
         【itemDict: dict】 物品信息字典
         【$cancel: bool】 是否取消使用物品
         """
-        pass
 
     def OnAnvilCreateResultItemAfter(self, args):
         """
@@ -635,7 +591,6 @@ class NuoyanClientSystem(_ClientSystem):
         【oldItemDict: dict】 合成前的物品的物品信息字典（铁砧内第一个物品）
         【materialItemDict: dict】 合成所使用材料的物品信息字典（铁砧内第二个物品）
         """
-        pass
 
     def OnActorUseItem(self, args):
         """
@@ -645,7 +600,6 @@ class NuoyanClientSystem(_ClientSystem):
         【itemDict: dict】 物品信息字典
         【useMethod: int】 使用物品的方法，详见ItemUseMethodEnum枚举
         """
-        pass
 
     def OnActorAcquiredItem(self, args):
         """
@@ -656,7 +610,6 @@ class NuoyanClientSystem(_ClientSystem):
         【itemDict: dict】 获取到的物品的物品信息字典
         【acquireMethod: int】 获得物品的方法，详见ItemAcquisitionMethod
         """
-        pass
 
     def OnStepOnBlock(self, args):
         """
@@ -679,7 +632,6 @@ class NuoyanClientSystem(_ClientSystem):
         BlockInfoComponentClient.RegisterOnStepOn(blockName: str, sendPythonEvent: bool) -> bool
         BlockInfoComponentClient.UnRegisterOnStepOn(blockName: str) -> bool
         """
-        pass
 
     def OnStartDestroyBlock(self, args):
         """
@@ -692,7 +644,6 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         【$cancel: bool】 修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockServerEvent一起修改。
         """
-        pass
 
     def OnStepOffBlock(self, args):
         """
@@ -711,7 +662,6 @@ class NuoyanClientSystem(_ClientSystem):
         BlockInfoComponentClient.RegisterOnStepOff(blockName: str, sendPythonEvent: bool) -> bool
         BlockInfoComponentClient.UnRegisterOnStepOff(blockName: str) -> bool
         """
-        pass
 
     def OnShearsDestoryBlockBefore(self, args):
         """
@@ -729,7 +679,6 @@ class NuoyanClientSystem(_ClientSystem):
         【dimensionId: int】 玩家触发时的维度ID
         【$cancelShears: bool】 是否取消剪刀效果
         """
-        pass
 
     def OnPlayerTryDestroyBlock(self, args):
         """
@@ -745,7 +694,6 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 试图破坏方块的玩家的实体ID
         【$cancel: bool】 默认为False，在脚本层设置为True就能取消该方块的破坏
         """
-        pass
 
     def OnStandOnBlock(self, args):
         """
@@ -773,7 +721,6 @@ class NuoyanClientSystem(_ClientSystem):
         BlockInfoComponentClient.RegisterOnStandOn(blockName: str, sendPythonEvent: bool) -> bool
         BlockInfoComponentClient.UnRegisterOnStandOn(blockName: str) -> bool
         """
-        pass
 
     def OnModBlockNeteaseEffectCreated(self, args):
         """
@@ -785,7 +732,6 @@ class NuoyanClientSystem(_ClientSystem):
         【effectType: int】 该特效的类型，0为粒子特效，1为序列帧特效
         【blockPos: Tuple[float, float, float]】 该特效绑定的自定义方块实体的世界坐标
         """
-        pass
 
     def OnEntityInsideBlock(self, args):
         """
@@ -812,7 +758,6 @@ class NuoyanClientSystem(_ClientSystem):
         BlockInfoComponentClient.RegisterOnEntityInside(blockName: str, sendPythonEvent: bool) -> bool
         BlockInfoComponentClient.UnRegisterOnEntityInside(blockName: str) -> bool
         """
-        pass
 
     def OnAfterFallOnBlock(self, args):
         """
@@ -834,7 +779,6 @@ class NuoyanClientSystem(_ClientSystem):
         【blockName: str】 方块的identifier，包含命名空间及名称
         【$calculate: bool】 是否按脚本层传值计算力
         """
-        pass
 
     def OnFallingBlockCauseDamageBefore(self, args):
         """
@@ -855,7 +799,6 @@ class NuoyanClientSystem(_ClientSystem):
         【fallDamage: int】 对实体的伤害
         """
         # print args['fallingBlockId']
-        pass
 
     def OnBlockUse(self, args):
         """
@@ -871,7 +814,6 @@ class NuoyanClientSystem(_ClientSystem):
         【y: int】 方块y坐标
         【z: int】 方块z坐标
         """
-        pass
 
     def OnPerspChange(self, args):
         """
@@ -881,7 +823,6 @@ class NuoyanClientSystem(_ClientSystem):
         【from: int】 切换前的视角
         【to: int】 切换后的视角
         """
-        pass
 
     def OnPlayerHitBlock(self, args):
         """
@@ -900,7 +841,6 @@ class NuoyanClientSystem(_ClientSystem):
         PlayerCompClient.OpenPlayerHitBlockDetection(precision: float) -> bool
         PlayerCompClient.ClosePlayerHitBlockDetection() -> bool
         """
-        pass
 
     def OnGameTypeChanged(self, args):
         """
@@ -912,7 +852,6 @@ class NuoyanClientSystem(_ClientSystem):
         【oldGameType: int】 切换前的游戏模式
         【newGameType: int】 切换后的游戏模式
         """
-        pass
 
     def OnExtinguishFire(self, args):
         """
@@ -922,7 +861,6 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         【$cancel: bool】 修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireServerEvent一起修改。
         """
-        pass
 
     def OnDimensionChangeFinish(self, args):
         """
@@ -934,7 +872,6 @@ class NuoyanClientSystem(_ClientSystem):
         【toDimensionId: int】 维度改变后的维度
         【toPos: Tuple[float, float, float]】 改变后的位置(x,y,z)，其中y值为脚底加上角色的身高值
         """
-        pass
 
     def OnDimensionChange(self, args):
         """
@@ -951,7 +888,6 @@ class NuoyanClientSystem(_ClientSystem):
         【toY: float】 改变后的位置y
         【toZ: float】 改变后的位置z
         """
-        pass
 
     def OnCameraMotionStop(self, args):
         """
@@ -961,7 +897,6 @@ class NuoyanClientSystem(_ClientSystem):
         【motionId: int】 运动器ID
         【$remove: bool】 是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除
         """
-        pass
 
     def OnCameraMotionStart(self, args):
         """
@@ -969,7 +904,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【motionId: int】 运动器ID
         """
-        pass
 
     def OnLeaveEntity(self, args):
         """
@@ -978,7 +912,6 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         【entityId: str】 远离的生物的实体ID
         """
-        pass
 
     def OnStartRiding(self, args):
         """
@@ -988,7 +921,6 @@ class NuoyanClientSystem(_ClientSystem):
         【actorId: str】 骑乘者的实体ID
         【victimId: str】 被骑乘者的实体ID
         """
-        pass
 
     def OnMobHitMob(self, args):
         """
@@ -1003,7 +935,6 @@ class NuoyanClientSystem(_ClientSystem):
         PlayerCompClient.OpenPlayerHitMobDetection() -> bool
         PlayerCompClient.ClosePlayerHitMobDetection() -> bool
         """
-        pass
 
     def OnGround(self, args):
         """
@@ -1011,7 +942,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【id: str】 实体ID
         """
-        pass
 
     def OnHealthChange(self, args):
         """
@@ -1021,7 +951,6 @@ class NuoyanClientSystem(_ClientSystem):
         【from: float】 变化前的生命值
         【to: float】 变化后的生命值
         """
-        pass
 
     def OnEntityStopRiding(self, args):
         """
@@ -1043,7 +972,6 @@ class NuoyanClientSystem(_ClientSystem):
         【switchingRides: bool】 是否换乘坐骑
         【$cancel: bool】 设置为True可以取消（需要与服务端事件一同取消）
         """
-        pass
 
     def OnEntityModelChanged(self, args):
         """
@@ -1053,7 +981,6 @@ class NuoyanClientSystem(_ClientSystem):
         【newModel: str】 新的模型名字
         【oldModel: str】 旧的模型名字
         """
-        pass
 
     def OnApproachEntity(self, args):
         """
@@ -1062,7 +989,6 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         【entityId: str】 靠近的生物的实体ID
         """
-        pass
     
     def OnUnLoadClientAddonScriptsBefore(self, args):
         """
@@ -1070,7 +996,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnRemovePlayerAOI(self, args):
         """
@@ -1078,7 +1003,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         """
-        pass
 
     def OnRemoveEntity(self, args):
         """
@@ -1087,7 +1011,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【id: str】 移除的实体ID
         """
-        pass
 
     def OnLocalPlayerStopLoading(self, args):
         """
@@ -1095,7 +1018,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         """
-        pass
 
     def OnCommandOutput(self, args):
         """
@@ -1105,7 +1027,6 @@ class NuoyanClientSystem(_ClientSystem):
         【command: str】 命令名称
         【message: str】 命令返回的消息
         """
-        pass
 
     def OnLoadClientAddonScriptsAfter(self, args):
         """
@@ -1113,7 +1034,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnChunkLoaded(self, args):
         """
@@ -1123,7 +1043,6 @@ class NuoyanClientSystem(_ClientSystem):
         【chunkPosX: int】 区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
         【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
         """
-        pass
 
     def OnChunkAcquireDiscarded(self, args):
         """
@@ -1134,7 +1053,6 @@ class NuoyanClientSystem(_ClientSystem):
         【chunkPosX: int】 区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
         【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
         """
-        pass
 
     def OnAddPlayerCreated(self, args):
         """
@@ -1144,7 +1062,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         """
-        pass
 
     def OnAddPlayerAOI(self, args):
         """
@@ -1153,7 +1070,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         """
-        pass
 
     def OnAddEntity(self, args):
         """
@@ -1170,7 +1086,6 @@ class NuoyanClientSystem(_ClientSystem):
         【itemName: str】 物品identifier（仅当物品实体时存在该字段）
         【auxValue: int】 物品附加值（仅当物品实体时存在该字段）
         """
-        pass
 
     def OnScriptTick(self):
         """
@@ -1179,7 +1094,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     def OnUiInitFinished(self, args):
         """
@@ -1188,7 +1102,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     # todo:==================================== Custom Event Callback ==================================================
 
@@ -1201,7 +1114,6 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     # todo:======================================= Basic Function ======================================================
 

@@ -7,7 +7,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-14
+#   Last Modified : 2023-01-15
 #
 # ====================================================
 
@@ -139,7 +139,6 @@ class NuoyanServerSystem(_ServerSystem):
         【clickZ: float】 点击点的z比例位置
         【$ret: bool】 设为True可取消物品的使用
         """
-        pass
 
     def OnActorUseItem(self, args):
         """
@@ -153,7 +152,6 @@ class NuoyanServerSystem(_ServerSystem):
         【itemDict: dict】 物品信息字典
         【useMethod: int】 使用物品的方法，详见ItemUseMethodEnum枚举
         """
-        pass
 
     def OnActorAcquiredItem(self, args):
         """
@@ -179,7 +177,6 @@ class NuoyanServerSystem(_ServerSystem):
         【playerId: str】 破坏方块的玩家实体ID
         【dimensionId: int】 维度ID
         """
-        pass
 
     def OnDamage(self, args):
         """
@@ -200,7 +197,6 @@ class NuoyanServerSystem(_ServerSystem):
         【$knock: bool】 是否击退被攻击者，允许修改，设置该值为False则不产生击退
         【$ignite: bool】 是否点燃被伤害者，允许修改，设置该值为True产生点燃效果，反之亦然
         """
-        pass
 
     def OnExplosion(self, args):
         """
@@ -214,7 +210,6 @@ class NuoyanServerSystem(_ServerSystem):
         【explodePos: List[float, float, float]】 爆炸位置[x, y, z]
         【dimensionId: int】 维度ID
         """
-        pass
 
     def OnProjectileDoHitEffect(self, args):
         """
@@ -233,7 +228,6 @@ class NuoyanServerSystem(_ServerSystem):
         【srcId: str】 抛射物创建者的实体ID
         【$cancel: bool】 是否取消这个碰撞事件，若取消可以设置为True
         """
-        pass
 
     def OnCarriedNewItemChanged(self, args):
         """
@@ -244,7 +238,6 @@ class NuoyanServerSystem(_ServerSystem):
         【newItemDict: Optional[dict]】 新物品的物品信息字典，当新物品为空时，此项属性为None
         【playerId: str】 玩家的实体ID
         """
-        pass
 
     def OnEntityRemove(self, args):
         """
@@ -256,7 +249,6 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【id: str】 实体ID
         """
-        pass
 
     def OnScriptTick(self):
         """
@@ -265,7 +257,6 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     # todo:==================================== Custom Event Callback ==================================================
 
@@ -275,7 +266,6 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【__id__: str】 玩家的实体ID
         """
-        pass
 
     def OnPlayerLeave(self, args):
         """
@@ -283,7 +273,6 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         """
-        pass
 
     def OnGameTick(self, args):
         """
@@ -294,7 +283,6 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         无参数
         """
-        pass
 
     # todo:======================================= Basic Function ======================================================
 

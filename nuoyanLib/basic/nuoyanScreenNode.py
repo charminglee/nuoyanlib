@@ -7,7 +7,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-14
+#   Last Modified : 2023-01-15
 #
 # ====================================================
 
@@ -118,21 +118,18 @@ class NuoyanScreenNode(_ScreenNode):
         """
         UI生命周期函数，当UI销毁时调用。
         """
-        pass
 
     def OnDeactive(self):
         """
         UI生命周期函数，当栈顶UI有其他UI入栈时调用。
         不建议使用在OnDeactive函数中调用SetScreenVisible(False)，在OnActive函数中调用SetScreenVisible(True)的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用PushScreen，PopScreen接口实现。
         """
-        pass
 
     def OnActive(self):
         """
         UI生命周期函数，当UI重新回到栈顶时调用。
         不建议使用在OnDeactive函数中调用SetScreenVisible(False)，在OnActive函数中调用SetScreenVisible(True)的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用PushScreen，PopScreen接口实现。
         """
-        pass
 
     # todo:==================================== Custom Event Callback ==================================================
 
