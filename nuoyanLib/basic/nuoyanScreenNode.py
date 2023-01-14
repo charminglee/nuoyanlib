@@ -52,7 +52,7 @@ class NuoyanScreenNode(_ScreenNode):
     -----------------------------------------------------------
     【注意事项】
     1. 重写Create和Update方法时请调用一次父类的同名方法，如：super(MyUI, self).Create()或NuoyanScreenNode.Create(self)；
-    2. 带有*tick*标签的事件为帧事件，需要注意编写相关逻辑；
+    2. 带有*tick*标签的事件为帧事件，需要注意编写相关逻辑。
     """
 
     def __init__(self, namespace, name, param):
