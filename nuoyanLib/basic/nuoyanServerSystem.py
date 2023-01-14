@@ -36,6 +36,7 @@ ALL_SYSTEM_EVENTS = [
     ("DestroyBlockEvent", "OnDestroyBlock"),
     ("ActorAcquiredItemServerEvent", "OnActorAcquiredItem"),
     ("ActorUseItemServerEvent", "OnActorUseItem"),
+    ("ServerItemUseOnEvent", "OnItemUseOn"),
 ]
 
 
@@ -116,6 +117,29 @@ class NuoyanServerSystem(_ServerSystem):
         self.UnListenAllEvents()
 
     # todo:==================================== System Event Callback ==================================================
+
+    def OnItemUseOn(self, args):
+        """
+        *tick*
+        玩家在对方块使用物品之前服务端抛出的事件。
+        注：如果需要取消物品的使用需要同时在ClientItemUseOnEvent和ServerItemUseOnEvent中将ret设置为True才能正确取消。
+        当对原生方块进行使用时，如堆肥桶等类似有使用功能的方块使用物品时，不会触发该事件。而当原生方块加入监听后，ServerBlockUseEvent会触发。
+        该事件仅在鼠标模式下为帧事件。
+        -----------------------------------------------------------
+        【entityId: str】 玩家实体ID
+        【itemDict: dict】 物品信息字典
+        【x: int】 方块x坐标
+        【y: int】 方块y坐标
+        【z: int】 方块z坐标
+        【blockName: str】 方块的identifier，包含命名空间及名称
+        【blockAuxValue: int】 方块的附加值
+        【face: int】 点击方块的面，参考Facing枚举
+        【clickX: float】 点击点的x比例位置
+        【clickY: float】 点击点的y比例位置
+        【clickZ: float】 点击点的z比例位置
+        【$ret: bool】 设为True可取消物品的使用
+        """
+        pass
 
     def OnActorUseItem(self, args):
         """

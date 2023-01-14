@@ -7,7 +7,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-14
+#   Last Modified : 2023-01-15
 #
 # ====================================================
 
@@ -592,8 +592,10 @@ class NuoyanClientSystem(_ClientSystem):
 
     def OnItemUseOn(self, args):
         """
+        *tick*
         玩家在对方块使用物品时客户端抛出的事件。
         注：如果需要取消物品的使用需要同时在ClientItemUseOnEvent和ServerItemUseOnEvent中将ret设置为True才能正确取消。
+        该事件仅在鼠标模式下为帧事件。
         -----------------------------------------------------------
         【entityId: str】 玩家实体ID
         【itemDict: dict】 物品信息字典
