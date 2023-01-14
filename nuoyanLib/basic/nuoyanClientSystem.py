@@ -1277,7 +1277,7 @@ class NuoyanClientSystem(_ClientSystem):
             self._listenClientGameTick()
 
     def _onUiInitFinished(self, args):
-        self.NotifyToServer("_UiInitFinished", {})
+        self.NotifyToServer("UiInitFinished", {})
         self._uiInitFinished = True
         if self._handle == 1:
             self._listenClientGameTick()
@@ -1307,7 +1307,7 @@ class _GameTick(_ScreenNode):
     @_ViewBinder.binding(_ViewBinder.BF_BindString, "#main.gametick")
     def _OnGameTick(self):
         if self._notifySv:
-            self._cs.NotifyToServer("_GameTick", {})
+            self._cs.NotifyToServer("GameTick", {})
         if self._notifyCl:
             self._cs.OnGameTick()
 

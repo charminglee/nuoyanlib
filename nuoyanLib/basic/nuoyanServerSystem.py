@@ -103,9 +103,9 @@ class NuoyanServerSystem(_ServerSystem):
         for event, callback in ALL_SYSTEM_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanServerSystem, callback):
                 self.ListenForEventV2(event, getattr(self, callback), 1)
-        self.ListenForEventV2("_GameTick", self.OnGameTick)
-        self.ListenForEventV2("_UiInitFinished", self._onUiInitFinished, priority=1)
-        self.ListenForEventV2("_UiInitFinished", self.OnUiInitFinished)
+        self.ListenForEventV2("GameTick", self.OnGameTick)
+        self.ListenForEventV2("UiInitFinished", self._onUiInitFinished, priority=1)
+        self.ListenForEventV2("UiInitFinished", self.OnUiInitFinished)
         self.ListenForEventV2("_BroadcastToAllClient", self._broadcastToAllClient)
         self.ListenForEventV2("OnScriptTickServer", self._onTick, 1)
 
