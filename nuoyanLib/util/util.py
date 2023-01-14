@@ -27,6 +27,7 @@ if _clientApi.GetLocalPlayerId() == "-1":
 else:
     _CompFactory = _clientApi.GetEngineCompFactory()
     _LEVEL_ID = _clientApi.GetLevelId()
+_GameComp = _CompFactory.CreateGame(_LEVEL_ID)
 
 
 def all_index(findList, *elements):
@@ -271,7 +272,7 @@ def delay(sec):
     """
     def decorator(func):
         def wrapper(*args, **kwargs):
-            return _CompFactory.CreateGame(_LEVEL_ID).AddTimer(sec, func, *args, **kwargs)
+            return _GameComp.AddTimer(sec, func, *args, **kwargs)
         return wrapper
     return decorator
 
@@ -293,7 +294,7 @@ def repeat(sec):
     """
     def decorator(func):
         def wrapper(*args, **kwargs):
-            return _CompFactory.CreateGame(_LEVEL_ID).AddRepeatedTimer(sec, func, *args, **kwargs)
+            return _GameComp.AddRepeatedTimer(sec, func, *args, **kwargs)
         return wrapper
     return decorator
 
