@@ -276,6 +276,28 @@ def delay(sec):
     return decorator
 
 
+def repeat(sec):
+    # type: (float) -> ...
+    """
+    函数装饰器，用于函数的重复执行。
+    示例：
+    @repeat(2)
+    def func(args):
+        pass
+    timer = func(args)     # 函数每两秒执行一次
+    LevelGameComp.CancelTimer(timer)     # 取消执行
+    -----------------------------------------------------------
+    【sec: float】 重复间隔秒数
+    -----------------------------------------------------------
+    return: CallLater @-> 装饰后的函数返回CallLater，可用于CancelTimer取消执行
+    """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            return _CompFactory.CreateGame(_LEVEL_ID).AddRepeatedTimer(sec, func, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
 if __name__ == "__main__":
     print all_index([1, 1, 4, 5, 1, 4], 1)  # [0, 1, 4]
     print all_index([1, 1, 4, 5, 1, 4], 1, 4)  # [0, 1, 2, 4, 5]
@@ -322,10 +344,14 @@ if __name__ == "__main__":
 def _test():
     print _time()
     @delay(5.5)
-    def myfunc(a1, a2):
+    def df(a1, a2):
         print a1, a2
         print _time()
-    myfunc()
+    df()
+    @repeat(2)
+    def rf():
+        print "repeat"
+    rf()
 
 
 
