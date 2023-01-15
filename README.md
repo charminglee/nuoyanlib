@@ -5,10 +5,6 @@
 参考文档：https://gitee.com/charming-lee/nuoyanLib/wikis/%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3/base%EF%BC%9A%E5%9F%BA%E7%A1%80%E5%BA%93  
 技术文档：
 
-#### 下载方式
-
-1.  
-
 #### 使用说明
 
 1.  将nuoyanLib文件夹放至行为包脚本根目录（即scripts文件夹）下即可；
