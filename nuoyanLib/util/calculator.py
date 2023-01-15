@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-16
 #
 # ====================================================
 
@@ -553,6 +553,7 @@ def is_in_cube(obj, pos1, pos2, ignoreY=False):
 
 def perlin_noise(x, y, z):
     # type: (float, float, float) -> float
+    # 来源：https://blog.csdn.net/qq_41518277/article/details/82779516
     """
     柏林噪声算法。
     -----------------------------------------------------------

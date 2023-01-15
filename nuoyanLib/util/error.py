@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-16
 #
 # ====================================================
 
@@ -56,6 +56,22 @@ def print_error():
         _notify_message(text)
 
 
+class TimerDestroyedError(Exception):
+    """
+    自定义异常：Timer销毁后调用pause、execute等方法时抛出。
+    """
+
+    def __init__(self, m):
+        super(TimerDestroyedError, self).__init__()
+        self.m = m
+
+    def __str__(self):
+        return "This timer has been destroyed, you can no longer call '%s' method" % self.m
+
+
+def _test():
+    raise TimerDestroyedError("error message")
+# _test()
 
 
 

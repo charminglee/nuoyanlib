@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-16
 #
 # ====================================================
 
@@ -24,14 +24,23 @@ import __builtin__
 from time import time as _time
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
+from error import TimerDestroyedError
+from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, \
+    MOD_NAME as _MOD_NAME
 
 
 if _clientApi.GetLocalPlayerId() == "-1":
     _CompFactory = _serverApi.GetEngineCompFactory()
     _LEVEL_ID = _serverApi.GetLevelId()
+    _ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
+    _ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
+    _IS_CLIENT = False
 else:
     _CompFactory = _clientApi.GetEngineCompFactory()
     _LEVEL_ID = _clientApi.GetLevelId()
+    _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
+    _ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
+    _IS_CLIENT = True
 _GameComp = _CompFactory.CreateGame(_LEVEL_ID)
 
 
@@ -260,47 +269,198 @@ def probability_true_f(f):
     return f > 0 and _uniform(0, 1) <= f
 
 
-def delay(sec):
-    # type: (float) -> ...
+class Timer(object):
     """
-    函数装饰器，用于函数的延迟执行。
-    示例：
-    @delay(2)
-    def func(args):
-        pass
-    timer = func(args)     # 函数将会在两秒后执行
-    LevelGameComp.CancelTimer(timer)     # 取消执行
-    -----------------------------------------------------------
-    【sec: float】 延迟秒数
-    -----------------------------------------------------------
-    return: CallLater @-> 装饰后的函数返回CallLater，可用于CancelTimer取消执行
+    函数计时器，被delay或repeat装饰的函数将返回Timer对象。
+    非重复执行的Timer在执行完毕后会自动销毁（调用destroy方法）。
     """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            return _GameComp.AddTimer(sec, func, *args, **kwargs)
-        return wrapper
-    return decorator
+
+    def __init__(self, t, sec, func, *args, **kwargs):
+        self.type = t
+        self.sec = sec
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+        self.isCancel = False
+        self.isPause = False
+        self._timer = None
+        self._pauseTimer = None
+        self._construct()
+
+    @staticmethod
+    def delay(sec):
+        # type: (float) -> ...
+        """
+        函数装饰器，用于函数的延迟执行。
+        示例：
+        @Timer.delay(2)
+        def func(args):
+            pass
+        timer = func(args)     # 启动函数，两秒后执行
+        timer.cancel()     # 取消执行
+        -----------------------------------------------------------
+        【sec: float】 延迟秒数
+        -----------------------------------------------------------
+        return: Timer @-> 装饰后的函数返回Timer对象，用于执行后续操作
+        """
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                return Timer("d", sec, func, *args, **kwargs)
+            return wrapper
+        return decorator
+
+    @staticmethod
+    def repeat(sec):
+        # type: (float) -> ...
+        """
+        函数装饰器，用于函数的重复执行。
+        示例：
+        @Timer.repeat(2)
+        def func(args):
+            pass
+        timer = func(args)     # 启动函数，每两秒执行一次
+        timer.cancel()     # 取消执行
+        -----------------------------------------------------------
+        【sec: float】 重复间隔秒数
+        -----------------------------------------------------------
+        return: Timer @-> 装饰后的函数返回Timer对象，用于执行后续操作
+        """
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                return Timer("r", sec, func, *args, **kwargs)
+            return wrapper
+        return decorator
+
+    def _construct(self):
+        if self.type == "d":
+            def func():
+                self.execute()
+                self._release()
+            self._timer = _GameComp.AddTimer(self.sec, func)
+        else:
+            self._timer = _GameComp.AddRepeatedTimer(self.sec, self.func, *self.args, **self.kwargs)
+
+    def _release(self):
+        self.isCancel = True
+        self.isPause = False
+        self._timer = None
+        self._pauseTimer = None
+        self.type = None
+        self.sec = None
+        self.func = None
+        self.args = None
+        self.kwargs = None
+
+    def destroy(self):
+        # type: () -> None
+        """
+        销毁函数计时器，销毁后函数将停止执行，且不可再调用pause、execute等方法。
+        -----------------------------------------------------------
+        无参数
+        -----------------------------------------------------------
+        return -> None
+        """
+        if self.isCancel:
+            raise TimerDestroyedError("destroy")
+        if self._timer:
+            _GameComp.CancelTimer(self._timer)
+        if self._pauseTimer:
+            _GameComp.CancelTimer(self._pauseTimer)
+        self._release()
+
+    def pause(self, sec=-1.0):
+        # type: (float) -> Timer
+        """
+        暂停函数计时器，重复调用仅第一次有效。
+        -----------------------------------------------------------
+        【sec: float = -1.0】 暂停秒数，若为负数则无限期暂停
+        -----------------------------------------------------------
+        return: Timer -> 返回Timer对象自身
+        """
+        if self.isCancel:
+            raise TimerDestroyedError("pause")
+        if not self.isPause:
+            _GameComp.CancelTimer(self._timer)
+            self._timer = None
+            if sec >= 0:
+                self._pauseTimer = _GameComp.AddTimer(sec, self.go)
+            self.isPause = True
+        return self
+
+    def go(self):
+        # type: () -> Timer
+        """
+        继续执行函数计时器。
+        -----------------------------------------------------------
+        无参数
+        -----------------------------------------------------------
+        return: Timer -> 返回Timer对象自身
+        """
+        if self.isPause:
+            if self._pauseTimer:
+                _GameComp.CancelTimer(self._pauseTimer)
+                self._pauseTimer = None
+            self._construct()
+            self.isPause = False
+        return self
+
+    def execute(self):
+        # type: () -> Timer
+        """
+        立即执行一次函数。
+        -----------------------------------------------------------
+        无参数
+        -----------------------------------------------------------
+        return: Timer -> 返回Timer对象自身
+        """
+        if self.isCancel:
+            raise TimerDestroyedError("execute")
+        self.func(*self.args, **self.kwargs)
+        return self
 
 
-def repeat(sec):
-    # type: (float) -> ...
+def listen(eventName, t=0, namespace="", systemName="", priority=0):
+    # type: (str, int, str, str, int) -> ...
     """
-    函数装饰器，用于函数的重复执行。
+    函数装饰器，用于装饰事件的回调函数。
+    使用该装饰器监听与使用ListenForEventV2方法的区别是，使用装饰器对同一个函数只能监听一次，而使用ListenForEventV2可以监听多次。
+    只需监听一次时推荐使用装饰器。
     示例：
-    @repeat(2)
-    def func(args):
-        pass
-    timer = func(args)     # 函数每两秒执行一次
-    LevelGameComp.CancelTimer(timer)     # 取消执行
+    class MyServerSystem(ServerSystem):
+        # 监听客户端传来的自定义事件
+        @listen("MyCustomEvent")
+        def eventCallback(self, args):
+            pass
+
+        # 监听EntityRemoveEvent事件
+        @listen("EntityRemoveEvent", 1)
+        def OnEntityRemove(self, args):
+            pass
     -----------------------------------------------------------
-    【sec: float】 重复间隔秒数
+    【eventName: str】 事件名称
+    【t: int = 0】 0表示监听当前Mod自定义事件，1表示监听引擎事件，2表示监听其他Mod的事件
+    【namespace: str = ""】 其他Mod的命名空间
+    【systemName: str = ""】 其他Mod的系统名称
+    【priority: int = 0】 优先级
     -----------------------------------------------------------
-    return: CallLater @-> 装饰后的函数返回CallLater，可用于CancelTimer取消执行
+    return @-> Any
     """
+    if t == 0:
+        _namespace = _MOD_NAME
+        _systemName = _SERVER_SYSTEM_NAME if not _IS_CLIENT else _CLIENT_SYSTEM_NAME
+    elif t == 1:
+        _namespace = _ENGINE_NAMESPACE
+        _systemName = _ENGINE_SYSTEM_NAME
+    else:
+        _namespace = namespace
+        _systemName = systemName
+    if _IS_CLIENT:
+        system = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
+    else:
+        system = _serverApi.GetSystem(_MOD_NAME, _SERVER_SYSTEM_NAME)
     def decorator(func):
-        def wrapper(*args, **kwargs):
-            return _GameComp.AddRepeatedTimer(sec, func, *args, **kwargs)
-        return wrapper
+        system.ListenForEvent(_namespace, _systemName, eventName, func.__self__, func, priority)
+        return func
     return decorator
 
 
@@ -349,16 +509,16 @@ if __name__ == "__main__":
 
 def _test():
     print _time()
-    @delay(5.5)
+    @Timer.delay(5.5)
     def df(a1, a2):
         print a1, a2
         print _time()
     df()
-    @repeat(2)
+    @Timer.repeat(2)
     def rf():
         print "repeat"
     rf()
-
+# _test()
 
 
 
