@@ -135,7 +135,6 @@ ALL_SYSTEM_EVENTS = [
 ]
 
 
-# noinspection PyUnresolvedReferences
 class NuoyanClientSystem(_ClientSystem):
     """
     ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。

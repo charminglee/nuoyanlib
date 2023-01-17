@@ -12,13 +12,12 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-16
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as serverApi
-from ...nuoyanLib.basic.servercomp import *
+import mod.server.extraServerApi as _serverApi
 from ..mctypes.server.system.serverSystem import ServerSystem as _ServerSystem
 
 

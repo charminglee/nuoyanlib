@@ -46,7 +46,6 @@ ALL_SYSTEM_EVENTS = [
 ]
 
 
-# noinspection PyUnresolvedReferences
 class NuoyanServerSystem(_ServerSystem):
     """
     ServerSystem扩展类。将自定义ServerSystem继承本类即可使用本类的全部功能。

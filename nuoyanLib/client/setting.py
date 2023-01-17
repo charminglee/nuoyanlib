@@ -52,7 +52,6 @@ def read_setting(name, isGlobal=True):
     return _LevelConfigClientComp.GetConfigData(name, isGlobal)
 
 
-# noinspection PyUnresolvedReferences
 def check_setting(name, itemList, isGlobal=True):
     # type: (str, list, bool) -> list
     """

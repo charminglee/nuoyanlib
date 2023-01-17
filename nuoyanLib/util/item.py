@@ -39,7 +39,6 @@ def complete_item_namespace(name):
     return "minecraft:" + name
 
 
-# noinspection PyUnresolvedReferences
 def is_same_item(itemDict1, itemDict2):
     # type: (dict, dict) -> bool
     """
@@ -77,7 +76,6 @@ def is_same_item(itemDict1, itemDict2):
     return False
 
 
-# noinspection PyUnresolvedReferences
 def are_same_item(item, *otherItem):
     # type: (dict, dict) -> bool
     """
@@ -94,7 +92,6 @@ def are_same_item(item, *otherItem):
     return True
 
 
-# noinspection PyUnresolvedReferences
 def is_empty_item(itemDict, zeroCountIsEmp=True):
     # type: (dict, bool) -> bool
     """

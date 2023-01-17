@@ -17,7 +17,7 @@
 # ====================================================
 
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 __authorname__ = "诺言Nuoyan"
 __authorqq__ = "1279735247"
 __authoremail__ = "1279735247@qq.com"
@@ -29,14 +29,3 @@ MOD_NAME = "MyMod"
 CLIENT_SYSTEM_NAME = "MyClientSystem"
 # 服务端系统名称
 SERVER_SYSTEM_NAME = "MyServerSystem"
-
-
-
-
-
-
-
-
-
-
-

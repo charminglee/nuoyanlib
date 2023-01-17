@@ -20,7 +20,6 @@
 from ..mctypes.client.ui.screenNode import ScreenNode as _ScreenNode
 
 
-# noinspection PyUnresolvedReferences
 def get_ui_screen_pos(instance, path):
     # type: (_ScreenNode, str) -> tuple[float, float]
     """

@@ -12,9 +12,14 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-18
 #
 # ====================================================
+
+
+"""
+请使用Python2运行。
+"""
 
 
 import json
@@ -60,7 +65,8 @@ while not manifestPath:
     if manifestPath:
         print "找到清单文件：" + str(manifestPath)
         try:
-            manifestDict = json.load(open(manifestPath))
+            with open(manifestPath) as f:
+                manifestDict = json.load(f)
         except:
             print "ERROR: 清单文件解析失败！"
             raise
@@ -78,24 +84,21 @@ if manifestPath:
     try:
         print "正在写入_GameTick.json..."
         gtPath = rpPath + "/ui/_GameTick.json"
-        f = open(gtPath, "w+")
-        f.write(json.dumps(gameTickJson, indent=4))
-        f.close()
+        with open(gtPath, "w+") as f:
+            f.write(json.dumps(gameTickJson, indent=4))
         print "_GameTick.json写入成功！"
         print "正在写入_ui_defs.json..."
         defsPath = rpPath + "/ui/_ui_defs.json"
         if os.path.exists(defsPath):
-            defsDict = json.load(open(defsPath))
-            defs = "ui/_GameTick.json"
-            if defs not in defsDict['ui_defs']:
-                defsDict['ui_defs'].append(defs)
-                f = open(defsPath, "w+")
-                f.write(json.dumps(defsDict, indent=4))
-                f.close()
+            with open(defsPath, "w+") as f:
+                defsDict = json.load(f)
+                defs = "ui/_GameTick.json"
+                if defs not in defsDict['ui_defs']:
+                    defsDict['ui_defs'].append(defs)
+                    f.write(json.dumps(defsDict, indent=4))
         else:
-            f = open(defsPath, "w+")
-            f.write(json.dumps(gameTickJson, indent=4))
-            f.close()
+            with open(defsPath, "w") as f:
+                f.write(json.dumps(gameTickJson, indent=4))
         print "_ui_defs.json写入成功！"
     except:
         print "ERROR: GameTick模块安装失败！"

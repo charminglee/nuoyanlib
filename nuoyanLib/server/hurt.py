@@ -32,7 +32,6 @@ _LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
 _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
 
 
-# noinspection PyUnresolvedReferences
 def aoe_damage(damage, radius, pos, dim, attackerId="", childAttackerId="", cause=_ActorDamageCause.NONE, repel=True,
                filterIdList=None, filterTypeIdList=None, funcBeforeHurt=None, funcAfterHurt=None):
     # type: (int, float, tuple[float, float, float], int, str, str, str, bool, list[str] | None, list[int] | None, _Callable[[str, str, str], str | None] | None, _Callable[[str, str, str], str | None] | None) -> list[str]
@@ -112,7 +111,6 @@ def sector_aoe_damage(attackerId, sectorRadius, sectorAngle, damage, knocked=Tru
     return result
 
 
-# noinspection PyUnresolvedReferences
 def rectangle_aoe_damage(topPos1, topPos2, dim, damage, attackerId="", knocked=True, filterIdList=None,
                          filterTypeIdList=None):
     # type: (tuple[float, float, float], tuple[float, float, float], int, int, str, bool, list[str] | None, list[int] | None) -> list[str]

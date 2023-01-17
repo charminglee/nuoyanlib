@@ -35,7 +35,6 @@ else:
     _isClient = True
 
 
-# noinspection PyUnresolvedReferences
 def pos_distance(firstPoint, secondPoint):
     # type: (tuple[float, ...], tuple[float, ...]) -> float
     """
@@ -55,7 +54,6 @@ def pos_distance(firstPoint, secondPoint):
     return -1.0
 
 
-# noinspection PyUnresolvedReferences
 def to_relative_pos(entityPos1, entityPos2):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float, float] | None
     """
@@ -78,7 +76,6 @@ def to_relative_pos(entityPos1, entityPos2):
     return relativePos
 
 
-# noinspection PyUnresolvedReferences
 def to_screen_pos(entityPos, centerPos, screenSize, maxDistance, uiSize=0, playerRot=0.0):
     # type: (tuple[float, float, float], tuple[float, float, float], int, int, int, float) -> tuple[float, float] | None
     """
@@ -108,7 +105,6 @@ def to_screen_pos(entityPos, centerPos, screenSize, maxDistance, uiSize=0, playe
     return screenPos
 
 
-# noinspection PyUnresolvedReferences
 def rotate_pos(angle, pos):
     # type: (float, tuple[float, float]) -> tuple[float, float] | None
     """
@@ -127,7 +123,6 @@ def rotate_pos(angle, pos):
     return rotateX, rotateY
 
 
-# noinspection PyUnresolvedReferences
 def straight_pos_list(pos1, pos2, count, only=-1):
     # type: (tuple[float, float, float], tuple[float, float, float], int, int) -> list[tuple[float, float, float]]
     """
@@ -157,7 +152,6 @@ def straight_pos_list(pos1, pos2, count, only=-1):
     return result
 
 
-# noinspection PyUnresolvedReferences
 def midpoint(firstPoint, secondPoint):
     # type: (tuple[float, ...], tuple[float, ...]) -> tuple[float, ...] | None
     """
@@ -177,7 +171,6 @@ def midpoint(firstPoint, secondPoint):
         return tuple(midpos)
 
 
-# noinspection PyUnresolvedReferences
 def camera_rot_p2p(pos1, pos2):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float] | None
     """
@@ -203,7 +196,6 @@ def camera_rot_p2p(pos1, pos2):
     return verticalRot, horizontalRot
 
 
-# noinspection PyUnresolvedReferences
 def circle_pos_list(centerPos, radius, density):
     # type: (tuple[float, float, float], float, int) -> list[tuple[float, float, float]]
     """
@@ -228,7 +220,6 @@ def circle_pos_list(centerPos, radius, density):
     return result
 
 
-# noinspection PyUnresolvedReferences
 def pos_player_facing(playerId, dis, useZeroYaw=False):
     # type: (str, float, bool) -> tuple[float, float, float] | None
     """
@@ -256,7 +247,6 @@ def pos_player_facing(playerId, dis, useZeroYaw=False):
     return resultPos
 
 
-# noinspection PyUnresolvedReferences
 def pos_forward_rot(pos, rot, dis):
     # type: (tuple[float, float, float], tuple[float, float], float) -> tuple[float, float, float] | None
     """
@@ -279,7 +269,6 @@ def pos_forward_rot(pos, rot, dis):
     return resultPos
 
 
-# noinspection PyUnresolvedReferences
 def n_quantiles_index_list(n, data):
     # type: (int, _Sized) -> list[int]
     """
@@ -302,7 +291,6 @@ def n_quantiles_index_list(n, data):
     return result
 
 
-# noinspection PyUnresolvedReferences
 def cube_center(startPos, endPos):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float, float] | None
     """
@@ -321,7 +309,6 @@ def cube_center(startPos, endPos):
     return x, y, z
 
 
-# noinspection PyUnresolvedReferences
 def cube_longest_side_len(startPos, endPos):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> float
     """
@@ -340,7 +327,6 @@ def cube_longest_side_len(startPos, endPos):
     return max(xl, yl, zl)
 
 
-# noinspection PyUnresolvedReferences
 def random_pos(centerPos, grid, useTopBlockHeight=False, dimension=0):
     # type: (tuple[float, float, float], float, bool, int) -> tuple[float, float, float] | None
     """
@@ -371,7 +357,6 @@ def random_pos(centerPos, grid, useTopBlockHeight=False, dimension=0):
         return x, y, z
 
 
-# noinspection PyUnresolvedReferences
 def is_in_sector(testPos, vertexPos, radius, sectorAngle, sectorBisectorAngle):
     # type: (tuple[float, float, float], tuple[float, float, float], float, float, float) -> bool
     """
@@ -415,7 +400,6 @@ def is_in_sector(testPos, vertexPos, radius, sectorAngle, sectorBisectorAngle):
     return False
 
 
-# noinspection PyUnresolvedReferences
 def sphere_pos_list(centerPos, radius, density):
     # type: (tuple[float, float, float], float, int) -> list[tuple[float, float, float]]
     """
@@ -443,7 +427,6 @@ def sphere_pos_list(centerPos, radius, density):
     return result
 
 
-# noinspection PyUnresolvedReferences
 def cube_pos_list(pos1, pos2, step=1):
     # type: (tuple[float, float, float], tuple[float, float, float], int) -> list[tuple[float, float, float]]
     """
@@ -483,7 +466,6 @@ def cube_pos_list(pos1, pos2, step=1):
     return result
 
 
-# noinspection PyUnresolvedReferences
 def spiral_pos_list(startPos, iterations):
     # type: (tuple[float, float, float], int) -> list[tuple[float, float, float]]
     """
@@ -522,7 +504,6 @@ def spiral_pos_list(startPos, iterations):
     return result
 
 
-# noinspection PyUnresolvedReferences
 def is_in_cube(obj, pos1, pos2, ignoreY=False):
     # type: (str | tuple[float, float, float], tuple[float, float, float], tuple[float, float, float], bool) -> bool
     """

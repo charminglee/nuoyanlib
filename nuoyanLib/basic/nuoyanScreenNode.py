@@ -32,7 +32,6 @@ _LevelGameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
 _LevelDeviceComp = _ClientCompFactory.CreateDevice(_LEVEL_ID)
 
 
-# noinspection PyUnresolvedReferences
 class NuoyanScreenNode(_ScreenNode):
     """
     ScreenNode扩展类。将自定义UI类继承本类即可使用本类的全部功能。

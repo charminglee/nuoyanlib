@@ -25,7 +25,6 @@ _ClientCompFactory = _clientApi.GetEngineCompFactory()
 _CustomAudioComp = _ClientCompFactory.CreateCustomAudio(_LEVEL_ID)
 
 
-# noinspection PyUnresolvedReferences
 def play_custom_sound(soundName, pos=(0, 0, 0), volume=1.0, speed=1.0, isLoop=False, entityId=None):
     # type: (str, tuple[float, float, float], float, float, bool, str | None) -> str
     """

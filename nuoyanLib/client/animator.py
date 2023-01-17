@@ -52,7 +52,6 @@ class Animator(object):
         self._isTranslationFinished = False
         self._isPlaying = False
 
-    # noinspection PyUnresolvedReferences
     def _startAlphaAnimation(self):
         aa = self._animationArgs['alpha']
         if aa:
@@ -77,7 +76,6 @@ class Animator(object):
             self._isAlphaFinished = True
             self._onAnimationFinish()
 
-    # noinspection PyUnresolvedReferences
     def _startScaleAnimation(self):
         if self._animationArgs['scale']:
             self._isPlaying = True
@@ -85,7 +83,6 @@ class Animator(object):
             self._isScaleFinished = True
             self._onAnimationFinish()
 
-    # noinspection PyUnresolvedReferences
     def _startTranslationAnimation(self):
         ta = self._animationArgs['translation']
         if ta[0]:

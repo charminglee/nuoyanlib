@@ -30,7 +30,6 @@ _LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
 _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
 
 
-# noinspection PyUnresolvedReferences
 def entity_filter(entityList, *args):
     # type: (list[str], tuple[tuple[float, float, float], float] | int | list[str] | list[int]) -> list[str]
     """
@@ -109,7 +108,6 @@ def is_entity_type(entityId, typeId):
     return et & typeId == typeId
 
 
-# noinspection PyUnresolvedReferences
 def sort_entity_list_by_distance(pos, entityList):
     # type: (tuple[float, float, float], list[str]) -> None
     """
@@ -133,7 +131,6 @@ def sort_entity_list_by_distance(pos, entityList):
         entityList.remove(i)
 
 
-# noinspection PyUnresolvedReferences
 def launch_projectile(projectileName, spawnerId, power=None, damage=None, position=None, direction=None, gravity=None,
                       targetId="",  isDamageOwner=False, error=0.0):
     # type: (str, str, float | None, int | None, tuple[float, float, float] | None, tuple[float, float, float] | None, float | None, str, bool, float) -> str
@@ -198,7 +195,6 @@ def entity_plunge(entityId1, entityId2, speed):
     entity_plunge_by_rot(entityId1, rot, speed)
 
 
-# noinspection PyUnresolvedReferences
 def entity_plunge_by_dir(entityId, direction, speed):
     # type: (str, tuple[float, float, float], float) -> None
     """
@@ -214,7 +210,6 @@ def entity_plunge_by_dir(entityId, direction, speed):
     _ServerCompFactory.CreateActorMotion(entityId).SetMotion(motion)
 
 
-# noinspection PyUnresolvedReferences
 def entity_plunge_by_rot(entityId, rot, speed):
     # type: (str, tuple[float, float], float) -> None
     """
@@ -244,7 +239,6 @@ def get_all_entities():
     return ents + players
 
 
-# noinspection PyUnresolvedReferences
 def get_entities_in_area(pos, radius, dimension=0, filterIdList=None, filterTypeIdList=None, filterAbiotic=False):
     # type: (tuple[float, float, float], float, int, list[str] | None, list[int] | None, bool) -> list[str]
     """
@@ -269,7 +263,6 @@ def get_entities_in_area(pos, radius, dimension=0, filterIdList=None, filterType
     return entities
 
 
-# noinspection PyUnresolvedReferences
 def get_entities_by_type(typeId, pos=None, dimension=0, radius=0.0):
     # type: (int, tuple[float, float, float], int, float) -> list[str]
     """
@@ -339,7 +332,6 @@ def get_entities_by_locking(entityId, getDistance=-1, filterIdList=None, filterT
     return result
 
 
-# noinspection PyUnresolvedReferences
 def get_nearest_entity(obj, count=1, dim=0, radius=-1.0, filterIdList=None, filterTypeIdList=None, filterAbiotic=False):
     # type: (str | tuple[float, float, float], int, int, float, list[str] | None, list[int] | None, bool) -> str | list[str] | None
     """
@@ -377,7 +369,6 @@ def get_nearest_entity(obj, count=1, dim=0, radius=-1.0, filterIdList=None, filt
     return result if len(result) > 1 else result[0]
 
 
-# noinspection PyUnresolvedReferences
 def attack_nearest_mob(entityId, r=15.0, filterIdList=None, filterTypeIdList=None):
     # type: (str, float, list[str] | None, list[int] | None) -> str | None
     """
@@ -415,7 +406,6 @@ def has_effect(entityId, effectId):
     return False
 
 
-# noinspection PyUnresolvedReferences
 def set_entity_motion(entity, motion, serSysCls=None):
     # type: (str, tuple[float, float, float], _ServerSystem | None) -> None
     """
@@ -436,6 +426,7 @@ def set_entity_motion(entity, motion, serSysCls=None):
 
 def _test():
     pass
+# _test()
 
 
 

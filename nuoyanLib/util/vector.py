@@ -22,7 +22,6 @@ from mod.common.utils.mcmath import Vector3 as _Vector3
 from .calculator import pos_distance as _pos_distance
 
 
-# noinspection PyUnresolvedReferences
 def vector_rot_p2p(pos1, pos2):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float] | None
     """
@@ -48,7 +47,6 @@ def vector_rot_p2p(pos1, pos2):
     return verticalRot, horizontalRot
 
 
-# noinspection PyUnresolvedReferences
 def vector_p2p(pos1, pos2):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float, float] | None
     """
@@ -67,7 +65,6 @@ def vector_p2p(pos1, pos2):
     return vector.ToTuple()
 
 
-# noinspection PyUnresolvedReferences
 def vector_length(vector):
     # type: (tuple[float, float, float]) -> float
     """
@@ -80,7 +77,6 @@ def vector_length(vector):
     return _Vector3(vector).Length()
 
 
-# noinspection PyUnresolvedReferences
 def angle_between_vectors(v1, v2):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> float
     """
@@ -98,7 +94,6 @@ def angle_between_vectors(v1, v2):
     return _acos(cos)
 
 
-# noinspection PyUnresolvedReferences
 def rotate_vector(vector, xAngle, yAngle, zAngle):
     # type: (tuple[float, float, float], float, float, float) -> tuple[float, float, float]
     """
@@ -124,7 +119,6 @@ def rotate_vector(vector, xAngle, yAngle, zAngle):
     return x2, y2, z2
 
 
-# noinspection PyUnresolvedReferences
 def outgoing_vector(vector, normal):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float, float]
     """
@@ -141,7 +135,6 @@ def outgoing_vector(vector, normal):
     return reflexVector.ToTuple()
 
 
-# noinspection PyUnresolvedReferences
 def composite_vector(v1, *v2):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float, float]
     """

@@ -203,7 +203,6 @@ def is_method_overridden(subclass, father, method):
     return subclassMethod != fatherMethod
 
 
-# noinspection PyUnresolvedReferences
 def nyeval(source, g=None, l=None):
     # type: (str | unicode, dict[str, ...] | None, _Mapping[str, ...] | None) -> ...
     """
