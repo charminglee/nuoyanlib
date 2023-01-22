@@ -12,21 +12,20 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-16
+#   Last Modified : 2023-01-22
 #
 # ====================================================
 
 
+import __builtin__
 from collections import Mapping as _Mapping
 from re import match as _match
-from random import randint as _randint, uniform as _uniform
-import __builtin__
+from random import randint as _randint, uniform as _uniform, choice as _choice
 from time import time as _time
+from string import digits as _digits, ascii_lowercase as _ascii_lowercase, ascii_uppercase as _ascii_uppercase
+from error import TimerDestroyedError
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
-from error import TimerDestroyedError
-from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, \
-    MOD_NAME as _MOD_NAME
 
 
 if _clientApi.GetLocalPlayerId() == "-1":
@@ -418,49 +417,19 @@ class Timer(object):
         return self
 
 
-def listen(eventName, t=0, namespace="", systemName="", priority=0):
-    # type: (str, int, str, str, int) -> ...
+def random_string(length, lower=True, upper=True, num=True):
     """
-    函数装饰器，用于装饰事件的回调函数。
-    使用该装饰器监听与使用ListenForEventV2方法的区别是，使用装饰器对同一个函数只能监听一次，而使用ListenForEventV2可以监听多次。
-    只需监听一次时推荐使用装饰器。
-    示例：
-    class MyServerSystem(ServerSystem):
-        # 监听客户端传来的自定义事件
-        @listen("MyCustomEvent")
-        def eventCallback(self, args):
-            pass
-
-        # 监听EntityRemoveEvent事件
-        @listen("EntityRemoveEvent", 1)
-        def OnEntityRemove(self, args):
-            pass
+    生成随机字符串。
     -----------------------------------------------------------
-    【eventName: str】 事件名称
-    【t: int = 0】 0表示监听当前Mod自定义事件，1表示监听引擎事件，2表示监听其他Mod的事件
-    【namespace: str = ""】 其他Mod的命名空间
-    【systemName: str = ""】 其他Mod的系统名称
-    【priority: int = 0】 优先级
+    【length: int】 生成的字符串长度
+    【lower: bool = True】 是否包含小写字母
+    【upper: bool = True】 是否包含大写字母
+    【num: bool = True】 是否包含数字
     -----------------------------------------------------------
-    return @-> Any
+    return: str -> 随机字符串
     """
-    if t == 0:
-        _namespace = _MOD_NAME
-        _systemName = _SERVER_SYSTEM_NAME if not _IS_CLIENT else _CLIENT_SYSTEM_NAME
-    elif t == 1:
-        _namespace = _ENGINE_NAMESPACE
-        _systemName = _ENGINE_SYSTEM_NAME
-    else:
-        _namespace = namespace
-        _systemName = systemName
-    if _IS_CLIENT:
-        system = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
-    else:
-        system = _serverApi.GetSystem(_MOD_NAME, _SERVER_SYSTEM_NAME)
-    def decorator(func):
-        system.ListenForEvent(_namespace, _systemName, eventName, func.__self__, func, priority)
-        return func
-    return decorator
+    s = (_ascii_lowercase if lower else "") + (_ascii_uppercase if upper else "") + (_digits if num else "")
+    return "".join(_choice(s) for _ in range(length))
 
 
 if __name__ == "__main__":
@@ -504,6 +473,11 @@ if __name__ == "__main__":
     print 0.34
     p = [probability_true_f(0.34) for _ in range(int(1e5))]
     print p.count(True) / 1e5
+    print "=" * 50
+    print random_string(20)
+    print random_string(20, lower=False)
+    print random_string(20, upper=False)
+    print random_string(20, num=False)
 
 
 def _test():

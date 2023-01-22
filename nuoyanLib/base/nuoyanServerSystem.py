@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-19
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 from collections import Callable as _Callable
 import mod.server.extraServerApi as _serverApi
 from ..util.util import is_method_overridden as _is_method_overridden
-from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME
+from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 
 
 _ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
@@ -42,8 +42,49 @@ ALL_SYSTEM_EVENTS = [
     ("ActorAcquiredItemServerEvent", "OnActorAcquiredItem"),
     ("ActorUseItemServerEvent", "OnActorUseItem"),
     ("ServerItemUseOnEvent", "OnItemUseOn"),
-
 ]
+
+
+_lsn_func_args = []
+
+
+def listen(eventName, t=0, namespace="", systemName="", priority=0):
+    # type: (str, int, str, str, int) -> ...
+    """
+    函数装饰器，通过对函数进行装饰即可实现监听。
+    示例：
+    class MyServerSystem(ServerSystem):
+        # 监听客户端传来的自定义事件
+        @listen("MyCustomEvent")
+        def eventCallback(self, args):
+            pass
+
+        # 监听EntityRemoveEvent事件
+        @listen("EntityRemoveEvent", 1)
+        def OnEntityRemove(self, args):
+            pass
+    -----------------------------------------------------------
+    【eventName: str】 事件名称
+    【t: int = 0】 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
+    【namespace: str = ""】 其他Mod的命名空间
+    【systemName: str = ""】 其他Mod的系统名称
+    【priority: int = 0】 优先级
+    -----------------------------------------------------------
+    return @-> Any
+    """
+    if t == 0:
+        _namespace = _MOD_NAME
+        _systemName = _CLIENT_SYSTEM_NAME
+    elif t == 1:
+        _namespace = _ENGINE_NAMESPACE
+        _systemName = _ENGINE_SYSTEM_NAME
+    else:
+        _namespace = namespace
+        _systemName = systemName
+    def decorator(func):
+        _lsn_func_args.append([eventName, func, t, _namespace, _systemName, priority])
+        return func
+    return decorator
 
 
 class NuoyanServerSystem(_ServerSystem):
@@ -55,11 +96,12 @@ class NuoyanServerSystem(_ServerSystem):
     回调函数的命名规则为：On+去掉“Server”、“Event”、“On”字眼的事件名；
     如：OnScriptTickServer -> OnScriptTick、OnCarriedNewItemChangedServerEvent -> OnCarriedNewItemChanged、EntityRemoveEvent -> OnEntityRemove等；
     2. 支持对在__init__方法中新增的事件监听或服务端属性（变量）执行热更；
-    3. 一键调用客户端属性（变量）、方法（函数）；
-    4. 无需重写Destroy方法进行事件的反监听。
+    3. 无需重写Destroy方法进行事件的反监听。
     -----------------------------------------------------------
     【新增方法】
     1. ListenForEventV2：监听事件（简化版）
+    2. CallClient：调用客户端属性（包括变量和函数）
+    3. TestMode：开启或关闭服务端测试模式
     -----------------------------------------------------------
     【新增事件】
     1. UiInitFinished：客户端玩家UI框架初始化完成时，服务端触发
@@ -79,15 +121,14 @@ class NuoyanServerSystem(_ServerSystem):
         super(NuoyanServerSystem, self).__init__(namespace, systemName)
         self._namespace = namespace
         self._systemName = systemName
-        self._listen()
         self.allPlayerData = {}
         self._listenGameTick = False
         self.homeownerPlayerId = None
-        self._checkOnGameTick()
         self._tick = 0
         self._oldInitFunc = self.__init__
-        self.test()
         self._initFinished = 1
+        self._listen()
+        self._checkOnGameTick()
 
     # def __setattr__(self, name, value):
     #     callFunc = _stack()[1][3]
@@ -104,16 +145,6 @@ class NuoyanServerSystem(_ServerSystem):
     #     if callFunc == "__init__":
     #         print "__getattribute__: " + name
     #     return object.__getattribute__(self, name)
-
-    def _listen(self):
-        for event, callback in ALL_SYSTEM_EVENTS:
-            if _is_method_overridden(self.__class__, NuoyanServerSystem, callback):
-                self.ListenForEventV2(event, getattr(self, callback), 1)
-        self.ListenForEventV2("GameTick", self.OnGameTick)
-        self.ListenForEventV2("UiInitFinished", self._onUiInitFinished, priority=1)
-        self.ListenForEventV2("UiInitFinished", self.OnUiInitFinished)
-        self.ListenForEventV2("_BroadcastToAllClient", self._broadcastToAllClient)
-        self.ListenForEventV2("OnScriptTickServer", self._onTick, 1)
 
     def Destroy(self):
         """
@@ -265,6 +296,7 @@ class NuoyanServerSystem(_ServerSystem):
 
     # todo:==================================== Custom Event Callback ==================================================
 
+    @listen("UiInitFinished")
     def OnUiInitFinished(self, args):
         """
         客户端玩家UI框架初始化完成时，服务端触发。
@@ -279,6 +311,7 @@ class NuoyanServerSystem(_ServerSystem):
         【playerId: str】 玩家的实体ID
         """
 
+    @listen("GameTick")
     def OnGameTick(self, args):
         """
         *tick*
@@ -298,7 +331,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【eventName: str】 事件名称
         【callback: (Any) -> None】 回调函数
-        【t: int = 0】 0表示监听当前Mod客户端传来的自定义事件，1表示监听当前Mod服务端引擎事件，2表示监听其他Mod的事件
+        【t: int = 0】 0表示监听当前Mod客户端传来的自定义事件，1表示监听服务端引擎事件，2表示监听其他Mod的事件
         【namespace: str = ""】 其他Mod的命名空间
         【systemName: str = ""】 其他Mod的系统名称
         【priority: int = 0】 优先级
@@ -313,14 +346,54 @@ class NuoyanServerSystem(_ServerSystem):
             systemName = _ENGINE_SYSTEM_NAME
         self.ListenForEvent(namespace, systemName, eventName, callback.__self__, callback, priority)
 
+    def CallClient(self, playerId, name, callback=None, *args):
+        # type: (str, str, _Callable[[...], None] | None, ...) -> None
+        """
+        调用客户端属性（包括变量和函数）。
+        示例：
+
+        -----------------------------------------------------------
+        【playerId: str】 客户端对应的玩家实体ID
+        【name: str】 客户端属性名
+        【callback: Optional[(Any) -> None] = None】 回调函数，调用客户端成功后客户端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
+        【*args: Any】 调用参数；如果调用的客户端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的客户端属性为函数，则args会作为参数传入该函数
+        -----------------------------------------------------------
+        return -> None
+        """
+
     # todo:====================================== Internal Method ======================================================
 
+    @listen("_BroadcastToAllClient")
     def _broadcastToAllClient(self, args):
         eventName = args['eventName']
         eventData = args['eventData']
         if isinstance(eventData, dict) and '__id__' in args:
             eventData['__id__'] = args['__id__']
         self.BroadcastToAllClient(eventName, eventData)
+
+    @listen("UiInitFinished", priority=1)
+    def _onUiInitFinished(self, args):
+        playerId = args['__id__']
+        self.allPlayerData[playerId] = {}
+        if not self.homeownerPlayerId:
+            self.homeownerPlayerId = playerId
+            if self._listenGameTick:
+                self.NotifyToClient(self.homeownerPlayerId, "_ListenServerGameTick", {})
+
+    @listen("OnScriptTickServer", 1)
+    def _onTick(self):
+        self._tick += 1
+        if not self._tick % 30 and self.__init__ != self._oldInitFunc:
+            self.__init__(self._namespace, self._systemName)
+            self._oldInitFunc = self.__init__
+            print "_onTick"
+
+    def _listen(self):
+        for args in _lsn_func_args:
+            self.ListenForEventV2(*args)
+        for event, callback in ALL_SYSTEM_EVENTS:
+            if _is_method_overridden(self.__class__, NuoyanServerSystem, callback):
+                self.ListenForEventV2(event, getattr(self, callback), 1)
 
     def _listenForGameTickEvent(self):
         if self._listenGameTick:
@@ -333,27 +406,12 @@ class NuoyanServerSystem(_ServerSystem):
         if _is_method_overridden(self.__class__, NuoyanServerSystem, "OnGameTick"):
             self._listenForGameTickEvent()
 
-    def _onUiInitFinished(self, args):
-        playerId = args['__id__']
-        self.allPlayerData[playerId] = {}
-        if not self.homeownerPlayerId:
-            self.homeownerPlayerId = playerId
-            if self._listenGameTick:
-                self.NotifyToClient(self.homeownerPlayerId, "_ListenServerGameTick", {})
-
     def _onPlayerLeave(self, args):
         playerId = args['playerId']
         if playerId in self.allPlayerData:
             del self.allPlayerData[playerId]
 
-    def _onTick(self):
-        self._tick += 1
-        if not self._tick % 30 and self.__init__ != self._oldInitFunc:
-            self.__init__(self._namespace, self._systemName)
-            self._oldInitFunc = self.__init__
-            print "_onTick"
-
-    def test(self):
+    def _test(self):
         print "test"
 
     def _emptyFunc(self, *args, **kwargs):

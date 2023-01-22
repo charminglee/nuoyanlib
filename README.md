@@ -8,13 +8,6 @@
 感谢大家支持作者、支持该项目，喜欢的话可以点个Star噢，您的支持是作者最大的动力！  
 > 项目地址：https://gitee.com/charming-lee/nuoyanLib
 
-## 使用说明
-
-1. 点击页面上方“克隆/下载”按钮，或在右侧发行版处选择一个版本下载；
-2. 解压后将“nuoyanLib”文件夹放至行为包脚本根目录（即scripts文件夹）下；
-3. 打开nuoyanLib/_config.py文件，将您的模组名称、客户端系统名称和服务端系统名称填入对应位置即可。  
-    > 请确保填入_config.py的信息与您的模组对应，否则部分功能将无法使用。
-
 ## 功能一览
 
 - [**base（基础库）**](/nuoyanLib/basic)  
@@ -48,6 +41,13 @@
 - [**mctypes（MC类型注解库）**](/nuoyanLib/mctypes)  
 没有实际功能，来源于官方ModSDK补全库文件，包含ModSDK中的所有类型（如BaseUIControl、BookManager、ServerSystem等），主要用于类型注解，让IDE帮助您检查代码中可能出现的类型错误。
 
+## 使用说明
+
+1. 点击页面上方“克隆/下载”按钮，或在右侧发行版处选择一个版本下载；
+2. 解压后将“nuoyanLib”文件夹放至行为包脚本根目录（即scripts文件夹）下；
+3. 打开nuoyanLib/_config.py文件，将您的模组名称、客户端系统名称和服务端系统名称填入对应位置即可。  
+    > 请确保填入_config.py的信息与您的模组对应，否则部分功能将无法使用。
+
 ## 相关文档
 
 - 参考文档：https://gitee.com/charming-lee/nuoyanLib/wikis/%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3/base%EF%BC%9A%E5%9F%BA%E7%A1%80%E5%BA%93  
@@ -65,7 +65,8 @@
 2. 完成服务端引擎事件的自动监听；
 3. 增加更多实用功能；
 4. 重新整理函数文档注释；
-5. ...
+5. 优化代码；
+6. ...
 
 ## 版权说明
 

@@ -12,14 +12,14 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-19
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
 import mod.client.extraClientApi as _clientApi
-from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
+from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from ..util.util import is_method_overridden as _is_method_overridden
 
 
@@ -135,6 +135,48 @@ ALL_SYSTEM_EVENTS = [
 ]
 
 
+_lsn_func_args = []
+
+
+def listen(eventName, t=0, namespace="", systemName="", priority=0):
+    # type: (str, int, str, str, int) -> ...
+    """
+    函数装饰器，通过对函数进行装饰即可实现监听。
+    示例：
+    class MyClientSystem(ClientSystem):
+        # 监听服务端传来的自定义事件
+        @listen("MyCustomEvent")
+        def eventCallback(self, args):
+            pass
+
+        # 监听AddEntityClientEvent事件
+        @listen("AddEntityClientEvent", 1)
+        def OnAddEntity(self, args):
+            pass
+    -----------------------------------------------------------
+    【eventName: str】 事件名称
+    【t: int = 0】 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
+    【namespace: str = ""】 其他Mod的命名空间
+    【systemName: str = ""】 其他Mod的系统名称
+    【priority: int = 0】 优先级
+    -----------------------------------------------------------
+    return @-> Any
+    """
+    if t == 0:
+        _namespace = _MOD_NAME
+        _systemName = _SERVER_SYSTEM_NAME
+    elif t == 1:
+        _namespace = _ENGINE_NAMESPACE
+        _systemName = _ENGINE_SYSTEM_NAME
+    else:
+        _namespace = namespace
+        _systemName = systemName
+    def decorator(func):
+        _lsn_func_args.append([eventName, func, t, _namespace, _systemName, priority])
+        return func
+    return decorator
+
+
 class NuoyanClientSystem(_ClientSystem):
     """
     ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。
@@ -144,12 +186,14 @@ class NuoyanClientSystem(_ClientSystem):
     回调函数的命名规则为：On+去掉“Client”、“Event”、“On”字眼的事件名；
     如：OnScriptTickClient -> OnScriptTick、UiInitFinished -> OnUiInitFinished、AddEntityClientEvent -> OnAddEntity等；
     2. 支持对在__init__方法中新增的事件监听或客户端属性（变量）执行热更；
-    3. 一键调用服务端属性（变量）、方法（函数）；
-    4. 无需重写Destroy方法进行事件的反监听。
+    3. 无需重写Destroy方法进行事件的反监听。
     -----------------------------------------------------------
     【新增方法】
-    1. BroadcastToAllClient：广播事件到所有客户端
+    1. BroadcastToAllClient：广播事件到所有玩家的客户端
     2. ListenForEventV2：监听事件（简化版）
+    3. RegisterAndCreateUI：注册并创建UI
+    4. CallServer：调用服务端属性（包括变量和函数）
+    5. TestMode：开启或关闭客户端测试模式
     -----------------------------------------------------------
     【新增事件】
     1. GameTick：频率与游戏实时帧率同步的Tick事件
@@ -163,30 +207,19 @@ class NuoyanClientSystem(_ClientSystem):
 
     def __init__(self, namespace, systemName):
         super(NuoyanClientSystem, self).__init__(namespace, systemName)
-        self._namespace = namespace
-        self._systemName = systemName
-        self._listen()
         self._gameTickNode = None
         self._uiInitFinished = False
         self._handle = 0
-        self._checkOnGameTick()
         self._tick = 0
         self._oldInitFunc = self.__init__
+        self._listen()
+        self._checkOnGameTick()
 
     # def __setattr__(self, name, value):
     #     callFunc = _stack()[1][3]
     #     if callFunc == "__init__" and name in self.__dict__:
     #         return
     #     self.__dict__[name] = value
-
-    def _listen(self):
-        for event, callback in ALL_SYSTEM_EVENTS:
-            if _is_method_overridden(self.__class__, NuoyanClientSystem, callback):
-                self.ListenForEventV2(event, getattr(self, callback), 1)
-        self.ListenForEventV2("_ListenServerGameTick", self._listenServerGameTick)
-        self.ListenForEventV2("UiInitFinished", self._onUiInitFinished, 1)
-        self.ListenForEventV2("_SetMotion", self._setMotion)
-        self.ListenForEventV2("OnScriptTickClient", self._onTick)
 
     def Destroy(self):
         """
@@ -1124,14 +1157,14 @@ class NuoyanClientSystem(_ClientSystem):
     def BroadcastToAllClient(self, eventName, eventData):
         # type: (str, ...) -> None
         """
-        广播事件到所有客户端。
-        注：因为全局广播要经过服务端，所以监听时监听的是服务端而不是客户端。
+        广播事件到所有玩家的客户端。
+        注：因为全局广播要经过服务端，所以监听事件时监听的是服务端而不是客户端。
         若传递的数据为字典，则客户端接收到的字典会内置一个key：__id__，其value为发送广播的玩家实体ID
         示例：
         self.BroadcastToAllClient("MyEvent", {'num': 123})
         def func(self, args):
             print args     # {'num': 123, '__id__': "..."}
-        self.ListenForEventV2("MyEvent", self.func)
+        self.ListenForEvent(serverNamespace, serverSystemName, "MyEvent", self, self.func)
         -----------------------------------------------------------
         【eventName: str】 事件名称
         【eventData: Any】 数据
@@ -1150,7 +1183,7 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         【eventName: str】 事件名称
         【callback: (Any) -> None】 回调函数
-        【t: int = 0】 0表示监听当前Mod服务端传来的自定义事件，1表示监听当前Mod客户端引擎事件，2表示监听其他Mod的事件
+        【t: int = 0】 0表示监听当前Mod服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
         【namespace: str = ""】 其他Mod的命名空间
         【systemName: str = ""】 其他Mod的系统名称
         【priority: int = 0】 优先级
@@ -1158,21 +1191,91 @@ class NuoyanClientSystem(_ClientSystem):
         return -> None
         """
         if t == 0:
-            namespace = self._namespace
+            namespace = _MOD_NAME
             systemName = _SERVER_SYSTEM_NAME
         elif t == 1:
             namespace = _ENGINE_NAMESPACE
             systemName = _ENGINE_SYSTEM_NAME
         self.ListenForEvent(namespace, systemName, eventName, callback.__self__, callback, priority)
 
+    def RegisterAndCreateUI(self, namespace, clsPath, uiScreenDef, param=None):
+        # type: (str, str, str, dict | None) -> _ScreenNode
+        """
+        注册并创建UI。
+        实例：
+        self.myUiNode = self.RegisterAndCreateUI(namespace, clsPath, uiScreenDef)
+        -----------------------------------------------------------
+        【namespace: str】 UI的名称，对应UI的json文件中“namespace”的值
+        【clsPath: str】 UI的类路径
+        【uiScreenDef: str】 UI画布路径，格式为“namespace.screenName”，screenName对应想打开的画布的名称（一般为main）
+        【param: dict = None】 创建UI的参数，会传到UI类的__init__方法中，默认为{'isHud': 1}
+        -----------------------------------------------------------
+        return: ScreenNode -> UI类实例
+        """
+        _clientApi.RegisterUI(_MOD_NAME, namespace, clsPath, uiScreenDef)
+        if not param:
+            param = {
+                'isHud': 1,
+                'cs': self
+            }
+        else:
+            param['cs'] = self
+        return _clientApi.CreateUI(_MOD_NAME, namespace, param)
+
+    def CallServer(self, name, callback=None, *args):
+        # type: (str, _Callable[[...], None] | None, ...) -> None
+        """
+        调用服务端属性（包括变量和函数）。
+        示例：
+
+        -----------------------------------------------------------
+        【name: str】 服务端属性名
+        【callback: Optional[(Any) -> None] = None】 回调函数，调用服务端成功后服务端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
+        【*args: Any】 调用参数；如果调用的服务端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的服务端属性为函数，则args会作为参数传入该函数
+        -----------------------------------------------------------
+        return -> None
+        """
+
     # todo:====================================== Internal Method ======================================================
 
+    @listen("_ListenServerGameTick")
+    def _listenServerGameTick(self, args=None):
+        if self._uiInitFinished:
+            if not self._gameTickNode:
+                self._startGameTick()
+            self._gameTickNode.notifyToServer()
+        else:
+            self._handle = 2
+
+    @listen("UiInitFinished", 1)
+    def _onUiInitFinished(self, args):
+        self.NotifyToServer("UiInitFinished", {})
+        self._uiInitFinished = True
+        if self._handle == 1:
+            self._listenClientGameTick()
+        elif self._handle == 2:
+            self._listenServerGameTick()
+
+    @listen("_SetMotion")
+    def _setMotion(self, motion):
+        _PlayerActorMotionComp.SetMotion(motion)
+
+    # @listen("OnScriptTickClient", 1)
+    # def _onTick(self):
+    #     self._tick += 1
+    #     if not self._tick % 30 and self.__init__ != self._oldInitFunc:
+    #         self.__init__(_MOD_NAME, _CLIENT_SYSTEM_NAME)
+    #         self._oldInitFunc = self.__init__
+
+    def _listen(self):
+        for args in _lsn_func_args:
+            self.ListenForEventV2(*args)
+        for event, callback in ALL_SYSTEM_EVENTS:
+            if _is_method_overridden(self.__class__, NuoyanClientSystem, callback):
+                self.ListenForEventV2(event, getattr(self, callback), 1)
+
     def _startGameTick(self):
-        _clientApi.RegisterUI(self._namespace, _UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)
-        self._gameTickNode = _clientApi.CreateUI(self._namespace, _UI_NAMESPACE_GAME_TICK, {
-            'isHud': 1,
-            'cs': self
-        })
+        self._gameTickNode = self.RegisterAndCreateUI(_UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)
 
     def _listenClientGameTick(self):
         if self._uiInitFinished:
@@ -1182,37 +1285,12 @@ class NuoyanClientSystem(_ClientSystem):
         else:
             self._handle = 1
 
-    def _listenServerGameTick(self, args=None):
-        if self._uiInitFinished:
-            if not self._gameTickNode:
-                self._startGameTick()
-            self._gameTickNode.notifyToServer()
-        else:
-            self._handle = 2
-
     def _checkOnGameTick(self):
         if _is_method_overridden(self.__class__, NuoyanClientSystem, "OnGameTick"):
             self._listenClientGameTick()
 
-    def _onUiInitFinished(self, args):
-        self.NotifyToServer("UiInitFinished", {})
-        self._uiInitFinished = True
-        if self._handle == 1:
-            self._listenClientGameTick()
-        elif self._handle == 2:
-            self._listenServerGameTick()
-
-    def _setMotion(self, motion):
-        _PlayerActorMotionComp.SetMotion(motion)
-
-    def _onTick(self):
-        self._tick += 1
-        if not self._tick % 30 and self.__init__ != self._oldInitFunc:
-            self.__init__(self._namespace, self._systemName)
-            self._oldInitFunc = self.__init__
-
-    def _emptyFunc(self, *args, **kwargs):
-        pass
+    def _test(self):
+        print "test"
 
 
 class _GameTick(_ScreenNode):

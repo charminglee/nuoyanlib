@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-18
+#   Last Modified : 2023-01-23
 #
 # ====================================================
 
@@ -29,7 +29,7 @@ import tkMessageBox
 import os
 
 
-gameTickJson = {
+gt_ui_json = {
     'main': {
         'bindings': [
             {
@@ -41,20 +41,21 @@ gameTickJson = {
     },
     'namespace': "_GameTick"
 }
+gt_def = "ui/_GameTick.json"
 
 
-path = "/".join(re.split("[\\\\/]", __file__))
-initialDir = "/".join(path.split("/")[:-4])
-manifestPath = ""
-rpPath = ""
-while not manifestPath:
-    rpPath = tkFileDialog.askdirectory(initialdir=initialDir, title="请选择您的资源包（resource_pack）根目录并点击确认：")
-    if rpPath:
-        print "选择目录：" + str(rpPath)
+path = "/".join(re.split(r"[\\/]", __file__))
+initial_dir = "/".join(path.split("/")[:-4])
+manifest_path = ""
+rp_path = ""
+while not manifest_path:
+    rp_path = tkFileDialog.askdirectory(initialdir=initial_dir, title="请选择您的资源包（resource_pack）根目录并点击确认：")
+    if rp_path:
+        print "选择目录：" + str(rp_path)
     try:
-        for fileName in os.walk(rpPath).next()[2]:
-            if "manifest" in fileName:
-                manifestPath = rpPath + "/" + fileName
+        for file_name in os.walk(rp_path).next()[2]:
+            if "manifest" in file_name:
+                manifest_path = rp_path + "/" + file_name
                 break
         else:
             print "资源包打开失败。"
@@ -62,43 +63,42 @@ while not manifestPath:
     except StopIteration:
         print "程序退出。"
         break
-    if manifestPath:
-        print "找到清单文件：" + str(manifestPath)
+    if manifest_path:
+        print "找到清单文件：" + str(manifest_path)
         try:
-            with open(manifestPath) as f:
-                manifestDict = json.load(f)
+            with open(manifest_path) as f:
+                manifest_dict = json.load(f)
         except:
             print "ERROR: 清单文件解析失败！"
             raise
-        isRp = (manifestDict['modules'][0]['type'] == "resources")
-        if isRp:
+        is_rp = (manifest_dict['modules'][0]['type'] == "resources")
+        if is_rp:
             print "确认资源包路径。"
         else:
             print "资源包打开失败。"
             tkMessageBox.showwarning("资源包打开失败", "该目录不是资源包，请选择资源包根目录！")
-            manifestPath = ""
+            manifest_path = ""
 
 
-if manifestPath:
+if manifest_path:
     print "开始安装GameTick模块"
     try:
         print "正在写入_GameTick.json..."
-        gtPath = rpPath + "/ui/_GameTick.json"
-        with open(gtPath, "w+") as f:
-            f.write(json.dumps(gameTickJson, indent=4))
+        gt_path = rp_path + "/ui/_GameTick.json"
+        with open(gt_path, "w+") as f:
+            f.write(json.dumps(gt_ui_json, indent=4))
         print "_GameTick.json写入成功！"
         print "正在写入_ui_defs.json..."
-        defsPath = rpPath + "/ui/_ui_defs.json"
-        if os.path.exists(defsPath):
-            with open(defsPath, "w+") as f:
-                defsDict = json.load(f)
-                defs = "ui/_GameTick.json"
-                if defs not in defsDict['ui_defs']:
-                    defsDict['ui_defs'].append(defs)
-                    f.write(json.dumps(defsDict, indent=4))
+        defs_path = rp_path + "/ui/_ui_defs.json"
+        if os.path.exists(defs_path):
+            with open(defs_path, "w+") as f:
+                defs_dict = json.load(f)
+                if gt_def not in defs_dict['ui_defs']:
+                    defs_dict['ui_defs'].append(gt_def)
+                    f.write(json.dumps(defs_dict, indent=4))
         else:
-            with open(defsPath, "w") as f:
-                f.write(json.dumps(gameTickJson, indent=4))
+            with open(defs_path, "w") as f:
+                f.write(json.dumps(gt_ui_json, indent=4))
         print "_ui_defs.json写入成功！"
     except:
         print "ERROR: GameTick模块安装失败！"

@@ -12,16 +12,20 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-19
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
 import mod.client.extraClientApi as _clientApi
-from nuoyanClientSystem import NuoyanClientSystem as _NuoyanClientSystem
 from ..client.setting import read_setting as _read_setting, save_setting as _save_setting
 from ..client.ui import get_parent_path as _get_parent_path
+from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
+
+
+_ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
+_ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
 
 
 _ScreenNode = _clientApi.GetScreenNodeCls()
@@ -51,7 +55,7 @@ class NuoyanScreenNode(_ScreenNode):
     【新增事件】
     -----------------------------------------------------------
     【新增属性】
-    1. cs：注册该UI的ClientSystem实例，可直接使用该属性在UI类中调用客户端的接口、方法、属性等，如self.cs.NotifyToServer(...)、self.cs.xxx = ...
+    1. cs：客户端系统实例，可直接使用该属性在UI类中调用客户端的接口、方法、属性等，如self.cs.NotifyToServer(...)、self.cs.xxx = ...
     2. screenSize: 屏幕尺寸元组，(宽度, 高度)；屏幕尺寸改变时，该属性也会跟着改变
     -----------------------------------------------------------
     【注意事项】
@@ -61,7 +65,7 @@ class NuoyanScreenNode(_ScreenNode):
 
     def __init__(self, namespace, name, param):
         super(NuoyanScreenNode, self).__init__(namespace, name, param)
-        self.cs = param['cs'] # type: _NuoyanClientSystem
+        self.cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         self.screenSize = _LevelGameComp.GetScreenSize()
         self._listen()
         self._doubleClickTick = 0
@@ -83,8 +87,8 @@ class NuoyanScreenNode(_ScreenNode):
         self._uiPosKey = self.__class__.__name__ + "_ui_pos_data"
 
     def _listen(self):
-        self.cs.ListenForEventV2("GetEntityByCoordReleaseClientEvent", self._onCoordRelease, 1)
-        self.cs.ListenForEventV2("ScreenSizeChangedClientEvent", self._onScreenSizeChanged, 1)
+        self.cs.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "GetEntityByCoordReleaseClientEvent", self, self._onCoordRelease)
+        self.cs.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "ScreenSizeChangedClientEvent", self, self._onScreenSizeChanged)
 
     def Create(self):
         """
@@ -448,7 +452,7 @@ class NuoyanScreenNode(_ScreenNode):
             touchMoveCallback(args)
 
     def _onScreenSizeChanged(self, args):
-        self.screenSize = (args['afterX'], args['afterY'])
+        self.screenSize = args['afterX'], args['afterY']
 
 
 

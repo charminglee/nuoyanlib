@@ -19,7 +19,7 @@
 
 from math import atan as _atan, acos as _acos, pi as _pi, sin as _sin, cos as _cos
 from mod.common.utils.mcmath import Vector3 as _Vector3
-from .calculator import pos_distance as _pos_distance
+from calculator import pos_distance as _pos_distance
 
 
 def vector_rot_p2p(pos1, pos2):
