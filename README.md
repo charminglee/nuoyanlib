@@ -34,12 +34,14 @@
   提供了多种数学计算函数、更多的枚举值、错误报告管理等实用工具。
 
 
-- [**gametick**](/nuoyanLib/gametick)  
-主要用于实现超过30帧的tick事件。[查看详细介绍](/nuoyanLib/gametick)
-
-
 - [**mctypes（MC类型注解库）**](/nuoyanLib/mctypes)  
-没有实际功能，来源于官方ModSDK补全库文件，包含ModSDK中的所有类型（如BaseUIControl、BookManager、ServerSystem等），主要用于类型注解，让IDE帮助您检查代码中可能出现的类型错误。
+  没有实际功能，来源于官方ModSDK补全库文件，包含ModSDK中的所有类型（如BaseUIControl、BookManager、ServerSystem等），主要用于类型注解，让IDE帮助您检查代码中可能出现的类型错误。
+
+
+- [**gametick**](/gametick)  
+  主要用于实现超过30帧的tick事件。[查看详细介绍](/gametick/README.md)
+
+
 
 ## 使用说明
 
@@ -56,7 +58,7 @@
 ## 贡献
 
 - 本项目欢迎全体开发者共同参与开发，如果您有好的算法或修改建议，可将您修改后的项目文件进行推送或直接进行在线编辑，成为本项目的贡献者。
-- 如果您对本项目有任何意见或建议，比如想要新增什么功能，欢迎通过issue提出。
+- 如果您对本项目有任何意见或建议，比如想要新增什么功能，欢迎在[Issues](https://gitee.com/charming-lee/nuoyanLib/issues)提出。
 > 具体方法请自行搜索gitee和git相关教程。
 
 ## 未来计划
@@ -71,7 +73,7 @@
 ## 版权说明
 
 nuoyanLib遵循《木兰宽松许可证第2版》，您可以将nuoyanLib应用于任何项目中，修改与否由您决定，但请保留nuoyanLib中每个文件头部的版权注释。
-> 更多内容请自行查阅LICENSE文件。
+> 更多内容请自行查阅[LICENSE](/LICENSE)文件。
 
 ## 联系作者
 
