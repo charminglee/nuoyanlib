@@ -17,6 +17,10 @@
 # ====================================================
 
 
+import mod.client.extraClientApi as _clientApi
+import mod.server.extraServerApi as _serverApi
+
+
 _AIR = ["minecraft:air", "air"]
 
 
@@ -106,6 +110,34 @@ def is_empty_item(itemDict, zeroCountIsEmp=True):
            or (zeroCountIsEmp and itemDict.get('count', 1) <= 0) \
            or itemDict.get('newItemName') in _AIR  \
            or itemDict.get('itemName') in _AIR
+
+
+def _get_level_id():
+    return _clientApi.GetLevelId() or _serverApi.GetLevelId()
+
+
+def _is_server():
+    return _clientApi.GetLocalPlayerId() == "-1"
+
+
+def get_max_stack(itemDict):
+    """
+    获取物品最大堆叠数量。
+    -----------------------------------------------------------
+    【itemDict: dict】 物品信息字典
+    -----------------------------------------------------------
+    return: int -> 最大堆叠数量，获取不到返回-1
+    """
+    name = itemDict['newItemName']
+    aux = itemDict.get('newAuxValue', 0)
+    if _is_server():
+        comp = _serverApi.GetEngineCompFactory().CreateItem(_get_level_id())
+    else:
+        comp = _clientApi.GetEngineCompFactory().CreateItem(_get_level_id())
+    try:
+        return comp.GetItemBasicInfo(name, aux)['maxStackSize']
+    except KeyError:
+        return -1
 
 
 if __name__ == "__main__":
