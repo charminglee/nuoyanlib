@@ -12,12 +12,12 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-16
+#   Last Modified : 2023-01-31
 #
 # ====================================================
 
 
-from collections import Sized as _Sized
+from collections import Sequence as _Sequence
 from random import randint as _randint
 from math import atan as _atan, degrees as _degrees, atan2 as _atan2, sqrt as _sqrt, pi as _pi, sin as _sin, \
     cos as _cos, fmod as _fmod, floor as _floor
@@ -270,14 +270,14 @@ def pos_forward_rot(pos, rot, dis):
 
 
 def n_quantiles_index_list(n, data):
-    # type: (int, _Sized) -> list[int]
+    # type: (int, _Sequence) -> list[int]
     """
     计算一串数据的n分位数的位置。
     示例：
     n_quantiles_index_list(4, range(11))     # [2, 5, 8]
     -----------------------------------------------------------
     【n: int】 n分位
-    【data: Sized】 元组、列表、集合等
+    【data: Sequence】 元组、列表、集合等
     -----------------------------------------------------------
     return: List[int] -> n分位数的位置列表
     """
@@ -534,7 +534,7 @@ def is_in_cube(obj, pos1, pos2, ignoreY=False):
 
 def perlin_noise(x, y, z):
     # type: (float, float, float) -> float
-    # 来源：https://blog.csdn.net/qq_41518277/article/details/82779516
+    # 出处：https://blog.csdn.net/qq_41518277/article/details/82779516
     """
     柏林噪声算法。
     -----------------------------------------------------------

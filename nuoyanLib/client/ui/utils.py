@@ -17,7 +17,7 @@
 # ====================================================
 
 
-from ..mctypes.client.ui.screenNode import ScreenNode as _ScreenNode
+from nuoyanLib.mctypes.client.ui.screenNode import ScreenNode as _ScreenNode
 
 
 def get_ui_screen_pos(instance, path):

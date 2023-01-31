@@ -21,9 +21,9 @@
 
 ## 安装方法
 
-为了方便大家使用GameTick，作者已经帮大家写好了相关的json和py代码逻辑，您可以选择使用本函数库附带的GameTickInstaller一键安装，也可以选择手动安装。
-- 使用GameTickInstaller安装步骤：  
-  - 将GameTickInstaller.py用Pycharm或VS Code等软件打开并运行，或直接使用Python解释器运行（请使用Python2运行）；  
+为了方便大家使用GameTick，作者已经帮大家写好了相关的json和py代码逻辑，您可以选择使用本函数库附带的installer一键安装，也可以选择手动安装。
+- 使用installer安装步骤：  
+  - 将installer.py用Pycharm或VS Code等软件打开并运行，或直接使用Python解释器运行（注意：请使用Python2运行）；  
   - 在弹出的窗口中找到您的资源包（resource_pack）根目录，将其选中并点击确认即可。
 
 
@@ -34,7 +34,7 @@
 
 ## 使用方法
 
-- 客户端：将您的客户端继承NuoyanClientSystem，并重写OnGameTick方法。
+- 客户端：将您的客户端继承NuoyanClientSystem，重写OnGameTick方法。
 ```python
 class MyClientSystem(NuoyanClientSystem):
     def __init__(self, namespace, systemName):
@@ -43,7 +43,7 @@ class MyClientSystem(NuoyanClientSystem):
     def OnGameTick(self):
         pass
 ```
-- 服务端：将您的服务端继承NuoyanServerSystem，并重写OnGameTick方法。
+- 服务端：将您的服务端继承NuoyanServerSystem，重写OnGameTick方法。
 ```python
 class MyServerSystem(NuoyanServerSystem):
     def __init__(self, namespace, systemName):

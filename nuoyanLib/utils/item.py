@@ -12,35 +12,42 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-31
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
+try:
+    import mod.client.extraClientApi as _clientApi
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
 
 
 _AIR = ["minecraft:air", "air"]
 
 
-def complete_item_namespace(name):
-    # type: (str) -> str
+def set_namespace(name, namespace="minecraft"):
+    # type: (str, str) -> str
     """
-    在物品名称开头补充minecraft命名空间。如果已存在命名空间则返回原物品名称。
+    设置物品的命名空间。
     示例：
-    complete_item_namespace("apple")
-    # "minecraft:apple"
-    complete_item_namespace("minecraft:apple")
-    # "minecraft:apple"
+    set_namespace("apple")     # "minecraft:apple"
+    set_namespace("apple", "nuoyan")     # "nuoyan:apple"
+    set_namespace("minecraft:apple", "nuoyan")     # "nuoyan:apple"
     -----------------------------------------------------------
     【name: str】 物品名称
+    【namespace: str = "minecraft"】 命名空间
     -----------------------------------------------------------
-    return: str -> 补全后的物品名称
+    return: str -> 新的物品名称
     """
-    if ":" in name:
-        return name
-    return "minecraft:" + name
+    if not name:
+        return ""
+    nameLst = name.split(":")
+    if ":" not in name:
+        nameLst.insert(0, "")
+    nameLst[0] = namespace
+    return ":".join(nameLst)
 
 
 def is_same_item(itemDict1, itemDict2):
@@ -63,10 +70,10 @@ def is_same_item(itemDict1, itemDict2):
     newItemData2 = [itemDict2.get('newItemName'), itemDict2.get('newAuxValue', 0)]
     itemData1 = [itemDict1.get('itemName'), itemDict1.get('auxValue', 0)]
     itemData2 = [itemDict2.get('itemName'), itemDict2.get('auxValue', 0)]
-    newItemData1[0] = complete_item_namespace(newItemData1[0])
-    newItemData2[0] = complete_item_namespace(newItemData2[0])
-    itemData1[0] = complete_item_namespace(itemData1[0])
-    itemData2[0] = complete_item_namespace(itemData2[0])
+    newItemData1[0] = set_namespace(newItemData1[0])
+    newItemData2[0] = set_namespace(newItemData2[0])
+    itemData1[0] = set_namespace(itemData1[0])
+    itemData2[0] = set_namespace(itemData2[0])
     if (not newItemData1[0] and not itemData1[0]) or (not newItemData2[0] and not itemData2[0]):
         return False
     if newItemData1[0] and newItemData2[0] and newItemData1 == newItemData2:
@@ -155,6 +162,7 @@ if __name__ == "__main__":
     print is_same_item(item1, item4)  # False
     print are_same_item(item1, item2, item3, item4)  # False
     print are_same_item(item1, item2, item5, item6)  # True
+    print "-" * 50
     emp1 = {'newItemName': "minecraft:air"}
     emp2 = {'newItemName': "minecraft:apple", 'count': 0}
     emp3 = {}
@@ -167,8 +175,9 @@ if __name__ == "__main__":
     print is_empty_item(item2)  # False
     print is_empty_item(item3)  # False
     print is_empty_item(item4)  # False
-    print complete_item_namespace("apple")  # "minecraft:apple"
-    print complete_item_namespace("minecraft:apple")  # "minecraft:apple"
+    print "-" * 50
+    print set_namespace("apple")  # "minecraft:apple"
+    print set_namespace("minecraft:apple", "nuoyan")  # "nuoyan:apple"
 
 
 

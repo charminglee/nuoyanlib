@@ -12,16 +12,16 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-19
+#   Last Modified : 2023-01-31
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
 import mod.client.extraClientApi as _clientApi
-from ..client.setting import read_setting as _read_setting, save_setting as _save_setting
-from ..client.ui import get_parent_path as _get_parent_path
-from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
+from ..setting import read_setting as _read_setting, save_setting as _save_setting
+from utils import get_parent_path as _get_parent_path
+from ..._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 
 
 _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()

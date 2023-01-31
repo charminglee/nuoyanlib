@@ -12,14 +12,14 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-16
+#   Last Modified : 2023-01-31
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
-from util import Timer as _Timer
+from utils import Timer as _Timer
 from mod.common.minecraftEnum import EffectType as _EffectType
 
 

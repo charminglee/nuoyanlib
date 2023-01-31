@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-31
 #
 # ====================================================
 
@@ -22,7 +22,7 @@ from copy import copy as _copy
 import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import EntityType as _EntityType, GameType as _GameType, AttrType as _AttrType, \
     ActorDamageCause as _ActorDamageCause
-from ..util.calculator import is_in_sector as _is_in_sector
+from ..utils.calculator import is_in_sector as _is_in_sector
 from entity import entity_filter as _entity_filter, get_entities_in_area as _get_entities_in_area
 
 

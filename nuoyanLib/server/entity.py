@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-01-31
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 from copy import copy as _copy
 import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import EntityType as _EntityType
-from ..util.calculator import pos_distance as _pos_distance, perlin_noise as _perlin_noise
+from ..utils.calculator import pos_distance as _pos_distance, perlin_noise as _perlin_noise
 from ..mctypes.server.system.serverSystem import ServerSystem as _ServerSystem
 
 

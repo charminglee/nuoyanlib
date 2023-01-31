@@ -18,7 +18,6 @@
 
 
 import mod.server.extraServerApi as _serverApi
-from nuoyanServerSystem import NuoyanServerSystem
 
 
 ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()

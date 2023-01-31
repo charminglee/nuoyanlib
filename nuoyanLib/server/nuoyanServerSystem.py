@@ -12,14 +12,14 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-19
+#   Last Modified : 2023-01-31
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
 import mod.server.extraServerApi as _serverApi
-from ..util.util import is_method_overridden as _is_method_overridden
+from ..utils.utils import is_method_overridden as _is_method_overridden
 from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 
 
@@ -45,7 +45,7 @@ ALL_SYSTEM_EVENTS = [
 ]
 
 
-_lsn_func_args = []
+_lsnFuncArgs = []
 
 
 def listen(eventName, t=0, namespace="", systemName="", priority=0):
@@ -69,8 +69,6 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
     【namespace: str = ""】 其他Mod的命名空间
     【systemName: str = ""】 其他Mod的系统名称
     【priority: int = 0】 优先级
-    -----------------------------------------------------------
-    return @-> Any
     """
     if t == 0:
         _namespace = _MOD_NAME
@@ -82,7 +80,7 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
         _namespace = namespace
         _systemName = systemName
     def decorator(func):
-        _lsn_func_args.append([eventName, func, t, _namespace, _systemName, priority])
+        _lsnFuncArgs.append([eventName, func, t, _namespace, _systemName, priority])
         return func
     return decorator
 
@@ -389,7 +387,7 @@ class NuoyanServerSystem(_ServerSystem):
             print "_onTick"
 
     def _listen(self):
-        for args in _lsn_func_args:
+        for args in _lsnFuncArgs:
             self.ListenForEventV2(*args)
         for event, callback in ALL_SYSTEM_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanServerSystem, callback):
