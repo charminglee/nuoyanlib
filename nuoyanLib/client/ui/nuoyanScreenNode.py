@@ -67,7 +67,6 @@ class NuoyanScreenNode(_ScreenNode):
         super(NuoyanScreenNode, self).__init__(namespace, name, param)
         self.cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         self.screenSize = _LevelGameComp.GetScreenSize()
-        self._listen()
         self._doubleClickTick = 0
         self._btnDoubleClickData = {}
         self._doubleClickBtnPath = ""
@@ -85,10 +84,11 @@ class NuoyanScreenNode(_ScreenNode):
         self._moveAfterLCData = {}
         self._savePosUis = []
         self._uiPosKey = self.__class__.__name__ + "_ui_pos_data"
+        self._listen()
 
     def _listen(self):
-        self.cs.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "GetEntityByCoordReleaseClientEvent", self, self._onCoordRelease)
-        self.cs.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "ScreenSizeChangedClientEvent", self, self._onScreenSizeChanged)
+        self.cs.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "GetEntityByCoordReleaseClientEvent", self, self._OnCoordRelease)
+        self.cs.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "ScreenSizeChangedClientEvent", self, self._OnScreenSizeChanged)
 
     def Create(self):
         """
@@ -323,7 +323,7 @@ class NuoyanScreenNode(_ScreenNode):
             for func in self._btnTouchUpCallbackData[bp]:
                 func(args)
 
-    def _onCoordRelease(self, args):
+    def _OnCoordRelease(self, args):
         self._saveUiPosition()
 
     def _saveUiPosition(self):
@@ -451,7 +451,7 @@ class NuoyanScreenNode(_ScreenNode):
         if touchMoveCallback:
             touchMoveCallback(args)
 
-    def _onScreenSizeChanged(self, args):
+    def _OnScreenSizeChanged(self, args):
         self.screenSize = args['afterX'], args['afterY']
 
 

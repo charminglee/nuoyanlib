@@ -1171,7 +1171,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         self.NotifyToServer("_BroadcastToAllClient", {
             'eventName': eventName,
-            'eventData': eventData
+            'eventData': eventData,
         })
 
     def ListenForEventV2(self, eventName, callback, t=0, namespace="", systemName="", priority=0):
@@ -1214,7 +1214,7 @@ class NuoyanClientSystem(_ClientSystem):
         if not param:
             param = {
                 'isHud': 1,
-                '__cs__': self
+                '__cs__': self,
             }
         else:
             param['__cs__'] = self
@@ -1237,29 +1237,37 @@ class NuoyanClientSystem(_ClientSystem):
     # todo:====================================== Internal Method ======================================================
 
     @listen("_ListenServerGameTick")
-    def _listenServerGameTick(self, args=None):
+    def _OnListenServerGameTick(self, args=None):
         if self._uiInitFinished:
             if not self._gameTickNode:
                 self._startGameTick()
-            self._gameTickNode.notifyToServer()
+            self._gameTickNode.notifySv = True
         else:
             self._handle = 2
 
+    def _listenClientGameTick(self):
+        if self._uiInitFinished:
+            if not self._gameTickNode:
+                self._startGameTick()
+            self._gameTickNode.notifyCl = True
+        else:
+            self._handle = 1
+
     @listen("UiInitFinished", 1)
-    def _onUiInitFinished(self, args):
+    def _OnUiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
         self._uiInitFinished = True
         if self._handle == 1:
             self._listenClientGameTick()
         elif self._handle == 2:
-            self._listenServerGameTick()
+            self._OnListenServerGameTick()
 
     @listen("_SetMotion")
-    def _setMotion(self, motion):
+    def _OnSetMotion(self, motion):
         _PlayerActorMotionComp.SetMotion(motion)
 
     # @listen("OnScriptTickClient", 1)
-    # def _onTick(self):
+    # def _OnTick(self):
     #     self._tick += 1
     #     if not self._tick % 30 and self.__init__ != self._oldInitFunc:
     #         self.__init__(_MOD_NAME, _CLIENT_SYSTEM_NAME)
@@ -1275,14 +1283,6 @@ class NuoyanClientSystem(_ClientSystem):
     def _startGameTick(self):
         self._gameTickNode = self.RegisterAndCreateUI(_UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)
 
-    def _listenClientGameTick(self):
-        if self._uiInitFinished:
-            if not self._gameTickNode:
-                self._startGameTick()
-            self._gameTickNode.notifyToClient()
-        else:
-            self._handle = 1
-
     def _checkOnGameTick(self):
         if _is_method_overridden(self.__class__, NuoyanClientSystem, "OnGameTick"):
             self._listenClientGameTick()
@@ -1294,22 +1294,18 @@ class NuoyanClientSystem(_ClientSystem):
 class _GameTick(_ScreenNode):
     def __init__(self, namespace, name, param):
         super(_GameTick, self).__init__(namespace, name, param)
-        self._cs = param['cs']
-        self._notifySv = False
-        self._notifyCl = False
+        self.cs = param['__cs__']
+        self.notifySv = False
+        self.notifyCl = False
 
     @_ViewBinder.binding(_ViewBinder.BF_BindString, "#main.gametick")
-    def _OnGameTick(self):
-        if self._notifySv:
-            self._cs.NotifyToServer("GameTick", {})
-        if self._notifyCl:
-            self._cs.OnGameTick()
+    def OnGameTick(self):
+        if self.notifySv:
+            self.cs.NotifyToServer("GameTick", {})
+        if self.notifyCl:
+            self.cs.OnGameTick()
 
-    def notifyToServer(self):
-        self._notifySv = True
 
-    def notifyToClient(self):
-        self._notifyCl = True
 
 
 

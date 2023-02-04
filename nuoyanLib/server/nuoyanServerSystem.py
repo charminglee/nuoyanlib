@@ -108,7 +108,7 @@ class NuoyanServerSystem(_ServerSystem):
     【新增属性】
     1. allPlayerData：用于保存所有玩家数据的字典，key为玩家实体ID，value为玩家数据字典，可自行添加数据；
     玩家加入游戏时（UiInitFinished后）会自动把玩家加入字典，玩家退出游戏时则会自动从字典中删除玩家及其数据；初始值为空字典
-    2. homeownerPlayerId：房主玩家的实体ID；初始值为None
+    2. homeownerPlayerId：房主玩家的实体ID；初始值为"-1"
     -----------------------------------------------------------
     【注意事项】
     1. 带有*tick*标签的事件为帧事件，需要注意编写相关逻辑；
@@ -121,7 +121,7 @@ class NuoyanServerSystem(_ServerSystem):
         self._systemName = systemName
         self.allPlayerData = {}
         self._listenGameTick = False
-        self.homeownerPlayerId = None
+        self.homeownerPlayerId = "-1"
         self._tick = 0
         self._oldInitFunc = self.__init__
         self._initFinished = 1
@@ -362,7 +362,7 @@ class NuoyanServerSystem(_ServerSystem):
     # todo:====================================== Internal Method ======================================================
 
     @listen("_BroadcastToAllClient")
-    def _broadcastToAllClient(self, args):
+    def _OnBroadcastToAllClient(self, args):
         eventName = args['eventName']
         eventData = args['eventData']
         if isinstance(eventData, dict) and '__id__' in args:
@@ -370,16 +370,16 @@ class NuoyanServerSystem(_ServerSystem):
         self.BroadcastToAllClient(eventName, eventData)
 
     @listen("UiInitFinished", priority=1)
-    def _onUiInitFinished(self, args):
+    def _OnUiInitFinished(self, args):
         playerId = args['__id__']
         self.allPlayerData[playerId] = {}
-        if not self.homeownerPlayerId:
+        if self.homeownerPlayerId == "-1":
             self.homeownerPlayerId = playerId
             if self._listenGameTick:
                 self.NotifyToClient(self.homeownerPlayerId, "_ListenServerGameTick", {})
 
     @listen("OnScriptTickServer", 1)
-    def _onTick(self):
+    def _OnTick(self):
         self._tick += 1
         if not self._tick % 30 and self.__init__ != self._oldInitFunc:
             self.__init__(self._namespace, self._systemName)
@@ -397,7 +397,7 @@ class NuoyanServerSystem(_ServerSystem):
         if self._listenGameTick:
             return
         self._listenGameTick = True
-        if self.homeownerPlayerId:
+        if self.homeownerPlayerId != "-1":
             self.NotifyToClient(self.homeownerPlayerId, "_ListenServerGameTick", {})
 
     def _checkOnGameTick(self):

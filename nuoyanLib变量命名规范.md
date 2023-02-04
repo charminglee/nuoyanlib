@@ -1,5 +1,7 @@
 ## nuoyanLib变量命名规范
 
+在nuoyanLib的开发过程中，应当遵循以下命名规范：
+
 ### **一般变量名（包括函数名、函数参数等）：小驼峰**
 
 ```python
@@ -29,7 +31,7 @@ class ClassName(...):
     ...
 ```
 
-### **类属性、类方法：小驼峰**
+### **属性名、方法名：小驼峰**
 
 ```python
 class ...(...):
@@ -38,8 +40,15 @@ class ...(...):
     def __init__(...):
         self.classAttr = ...
 
-    def classMethod(self, ...):
+    def classMethod(...):
         ...
+```
+
+### **接口名：大驼峰**
+
+```python
+class ...(...):
+    def InterfaceName(...):
 ```
 
 ### **回调函数名：On+大驼峰**

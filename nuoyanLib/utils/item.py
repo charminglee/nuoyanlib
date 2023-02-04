@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-31
+#   Last Modified : 2023-02-04
 #
 # ====================================================
 
@@ -66,25 +66,33 @@ def is_same_item(itemDict1, itemDict2):
         return False
     if isEmp1 and isEmp2:
         return True
-    newItemData1 = [itemDict1.get('newItemName'), itemDict1.get('newAuxValue', 0)]
-    newItemData2 = [itemDict2.get('newItemName'), itemDict2.get('newAuxValue', 0)]
-    itemData1 = [itemDict1.get('itemName'), itemDict1.get('auxValue', 0)]
-    itemData2 = [itemDict2.get('itemName'), itemDict2.get('auxValue', 0)]
+    newItemData1 = [itemDict1.get('newItemName', ""), itemDict1.get('newAuxValue', 0)]
+    newItemData2 = [itemDict2.get('newItemName', ""), itemDict2.get('newAuxValue', 0)]
+    itemData1 = [itemDict1.get('itemName', ""), itemDict1.get('auxValue', 0)]
+    itemData2 = [itemDict2.get('itemName', ""), itemDict2.get('auxValue', 0)]
     newItemData1[0] = set_namespace(newItemData1[0])
     newItemData2[0] = set_namespace(newItemData2[0])
     itemData1[0] = set_namespace(itemData1[0])
     itemData2[0] = set_namespace(itemData2[0])
+    extraId1, extraId2 = itemDict1.get('extraId'), itemDict2.get('extraId')
+    userData1, userData2 = itemDict1.get('userData'), itemDict2.get('userData')
+    if not _same(extraId1, extraId2) or not _same(userData1, userData2):
+        return False
     if (not newItemData1[0] and not itemData1[0]) or (not newItemData2[0] and not itemData2[0]):
         return False
-    if newItemData1[0] and newItemData2[0] and newItemData1 == newItemData2:
+    if newItemData1 == newItemData2:
         return True
-    if itemData1[0] and itemData2[0] and itemData1 == itemData2:
+    if itemData1 == itemData2:
         return True
-    if newItemData1[0] and itemData2[0] and newItemData1 == itemData2:
+    if newItemData1 == itemData2:
         return True
-    if itemData1[0] and newItemData2[0] and itemData1 == newItemData2:
+    if itemData1 == newItemData2:
         return True
     return False
+
+
+def _same(what1, what2):
+    return (not what1 and not what2) or what1 == what2
 
 
 def are_same_item(item, *otherItem):
