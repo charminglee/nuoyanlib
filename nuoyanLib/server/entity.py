@@ -12,22 +12,48 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-31
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
 from copy import copy as _copy
-import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import EntityType as _EntityType
 from ..utils.calculator import pos_distance as _pos_distance, perlin_noise as _perlin_noise
 from ..mctypes.server.system.serverSystem import ServerSystem as _ServerSystem
+try:
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
 
 
-_LEVEL_ID = _serverApi.GetLevelId()
-_ServerCompFactory = _serverApi.GetEngineCompFactory()
-_LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
-_LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
+__all__ = [
+    "entity_filter",
+    "is_entity_type",
+    "sort_entity_list_by_distance",
+    "launch_projectile",
+    "entity_plunge",
+    "entity_plunge_by_dir",
+    "entity_plunge_by_rot",
+    "get_all_entities",
+    "get_entities_by_name",
+    "get_entities_by_type",
+    "get_entities_in_area",
+    "get_entities_by_locking",
+    "get_nearest_entity",
+    "attack_nearest_mob",
+    "has_effect",
+    "set_entity_motion",
+]
+
+
+try:
+    _LEVEL_ID = _serverApi.GetLevelId()
+    _ServerCompFactory = _serverApi.GetEngineCompFactory()
+    _LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
+    _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
+except:
+    pass
 
 
 def entity_filter(entityList, *args):
@@ -426,7 +452,6 @@ def set_entity_motion(entity, motion, serSysCls=None):
 
 def _test():
     pass
-# _test()
 
 
 

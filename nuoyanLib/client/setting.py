@@ -12,17 +12,30 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _clientApi
+try:
+    import mod.client.extraClientApi as _clientApi
+except:
+    pass
 
 
-_LEVEL_ID = _clientApi.GetLevelId()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_LevelConfigClientComp = _ClientCompFactory.CreateConfigClient(_LEVEL_ID)
+__all__ = [
+    "save_setting",
+    "read_setting",
+    "check_setting",
+]
+
+
+try:
+    _LEVEL_ID = _clientApi.GetLevelId()
+    _ClientCompFactory = _clientApi.GetEngineCompFactory()
+    _LevelConfigClientComp = _ClientCompFactory.CreateConfigClient(_LEVEL_ID)
+except:
+    pass
 
 
 def save_setting(name, dataDict, isGlobal=True):

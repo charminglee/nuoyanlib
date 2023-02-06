@@ -12,14 +12,28 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
-#
+#   Last Modified : 2023-02-06
+
 # ====================================================
 
 
 from math import atan as _atan, acos as _acos, pi as _pi, sin as _sin, cos as _cos
-from mod.common.utils.mcmath import Vector3 as _Vector3
 from calculator import pos_distance as _pos_distance
+try:
+    from mod.common.utils.mcmath import Vector3 as _Vector3
+except:
+    pass
+
+
+__all__ = [
+    "vector_length",
+    "vector_rot_p2p",
+    "vector_p2p",
+    "rotate_vector",
+    "outgoing_vector",
+    "composite_vector",
+    "angle_between_vectors",
+]
 
 
 def vector_rot_p2p(pos1, pos2):

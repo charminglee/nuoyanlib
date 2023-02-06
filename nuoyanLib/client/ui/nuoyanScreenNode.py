@@ -12,28 +12,37 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-31
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
-import mod.client.extraClientApi as _clientApi
 from ..setting import read_setting as _read_setting, save_setting as _save_setting
 from utils import get_parent_path as _get_parent_path
 from ..._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
+try:
+    import mod.client.extraClientApi as _clientApi
+except:
+    pass
 
 
-_ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
-_ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
+__all__ = [
+    "NuoyanScreenNode",
+]
 
 
-_ScreenNode = _clientApi.GetScreenNodeCls()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_PLAYER_ID = _clientApi.GetLocalPlayerId()
-_LEVEL_ID = _clientApi.GetLevelId()
-_LevelGameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
-_LevelDeviceComp = _ClientCompFactory.CreateDevice(_LEVEL_ID)
+try:
+    _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
+    _ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
+    _ScreenNode = _clientApi.GetScreenNodeCls()
+    _ClientCompFactory = _clientApi.GetEngineCompFactory()
+    _PLAYER_ID = _clientApi.GetLocalPlayerId()
+    _LEVEL_ID = _clientApi.GetLevelId()
+    _LevelGameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
+    _LevelDeviceComp = _ClientCompFactory.CreateDevice(_LEVEL_ID)
+except:
+    _ScreenNode = type("ScreenNode", (), {})
 
 
 class NuoyanScreenNode(_ScreenNode):

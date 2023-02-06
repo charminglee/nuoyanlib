@@ -12,13 +12,21 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-16
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as _serverApi
+try:
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
 from ..mctypes.server.system.serverSystem import ServerSystem as _ServerSystem
+
+
+__all__ = [
+    "GlobalPlayerManager",
+]
 
 
 class GlobalPlayerManager(object):

@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-04
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
@@ -22,6 +22,15 @@ try:
     import mod.server.extraServerApi as _serverApi
 except:
     pass
+
+
+__all__ = [
+    "set_namespace",
+    "is_same_item",
+    "is_empty_item",
+    "are_same_item",
+    "get_max_stack",
+]
 
 
 _AIR = ["minecraft:air", "air"]
@@ -145,6 +154,8 @@ def get_max_stack(itemDict):
     """
     name = itemDict['newItemName']
     aux = itemDict.get('newAuxValue', 0)
+    if aux == -1:
+        aux = 0
     if _is_server():
         comp = _serverApi.GetEngineCompFactory().CreateItem(_get_level_id())
     else:
@@ -155,7 +166,7 @@ def get_max_stack(itemDict):
         return -1
 
 
-if __name__ == "__main__":
+def _test():
     item1 = {'newItemName': "minecraft:apple"}
     item2 = {'itemName': "minecraft:apple"}
     item3 = {'newItemName': "minecraft:apple", 'newAuxValue': 1}

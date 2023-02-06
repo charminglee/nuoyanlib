@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-31
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
@@ -21,18 +21,49 @@ from collections import Sequence as _Sequence
 from random import randint as _randint
 from math import atan as _atan, degrees as _degrees, atan2 as _atan2, sqrt as _sqrt, pi as _pi, sin as _sin, \
     cos as _cos, fmod as _fmod, floor as _floor
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
+try:
+    import mod.client.extraClientApi as _clientApi
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
 
 
-if _clientApi.GetLocalPlayerId() == "-1":
-    _CompFactory = _serverApi.GetEngineCompFactory()
-    _GetDirFromRot = _serverApi.GetDirFromRot
-    _isClient = False
-else:
-    _CompFactory = _clientApi.GetEngineCompFactory()
-    _GetDirFromRot = _clientApi.GetDirFromRot
-    _isClient = True
+__all__ = [
+    "pos_distance",
+    "to_relative_pos",
+    "to_screen_pos",
+    "rotate_pos",
+    "straight_pos_list",
+    "midpoint",
+    "camera_rot_p2p",
+    "circle_pos_list",
+    "pos_player_facing",
+    "pos_forward_rot",
+    "n_quantiles_index_list",
+    "cube_center",
+    "cube_longest_side_len",
+    "random_pos",
+    "is_in_sector",
+    "sphere_pos_list",
+    "cube_pos_list",
+    "spiral_pos_list",
+    "is_in_cube",
+    "perlin_noise",
+    "rot_diff",
+]
+
+
+try:
+    if _clientApi.GetLocalPlayerId() == "-1":
+        _CompFactory = _serverApi.GetEngineCompFactory()
+        _GetDirFromRot = _serverApi.GetDirFromRot
+        _isClient = False
+    else:
+        _CompFactory = _clientApi.GetEngineCompFactory()
+        _GetDirFromRot = _clientApi.GetDirFromRot
+        _isClient = True
+except:
+    pass
 
 
 def pos_distance(firstPoint, secondPoint):

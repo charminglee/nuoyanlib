@@ -12,26 +12,39 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-31
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
-import mod.server.extraServerApi as _serverApi
 from ..utils.utils import is_method_overridden as _is_method_overridden
 from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
+try:
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
 
 
-_ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
-_ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
-_LEVEL_ID = _serverApi.GetLevelId()
+__all__ = [
+    "listen",
+    "NuoyanServerSystem",
+    "ALL_ENGINE_EVENTS",
+]
 
 
-_ServerSystem = _serverApi.GetServerSystemCls()
+try:
+    _ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
+    _ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
+    _LEVEL_ID = _serverApi.GetLevelId()
+    _ServerSystem = _serverApi.GetServerSystemCls()
+except:
+    _ServerSystem = type("ServerSystem", (), {})
+    _ENGINE_NAMESPACE = ""
+    _ENGINE_SYSTEM_NAME = ""
 
 
-ALL_SYSTEM_EVENTS = [
+ALL_ENGINE_EVENTS = (
     ("OnScriptTickServer", "OnScriptTick"),
     ("EntityRemoveEvent", "OnEntityRemove"),
     ("OnCarriedNewItemChangedServerEvent", "OnCarriedNewItemChanged"),
@@ -42,7 +55,7 @@ ALL_SYSTEM_EVENTS = [
     ("ActorAcquiredItemServerEvent", "OnActorAcquiredItem"),
     ("ActorUseItemServerEvent", "OnActorUseItem"),
     ("ServerItemUseOnEvent", "OnItemUseOn"),
-]
+)
 
 
 _lsnFuncArgs = []
@@ -80,7 +93,7 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
         _namespace = namespace
         _systemName = systemName
     def decorator(func):
-        _lsnFuncArgs.append([eventName, func, t, _namespace, _systemName, priority])
+        _lsnFuncArgs.append((eventName, func, t, _namespace, _systemName, priority))
         return func
     return decorator
 
@@ -389,7 +402,7 @@ class NuoyanServerSystem(_ServerSystem):
     def _listen(self):
         for args in _lsnFuncArgs:
             self.ListenForEventV2(*args)
-        for event, callback in ALL_SYSTEM_EVENTS:
+        for event, callback in ALL_ENGINE_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanServerSystem, callback):
                 self.ListenForEventV2(event, getattr(self, callback), 1)
 

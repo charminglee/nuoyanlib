@@ -12,17 +12,29 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _clientApi
+try:
+    import mod.client.extraClientApi as _clientApi
+except:
+    pass
 
 
-_LEVEL_ID = _clientApi.GetLevelId()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_CustomAudioComp = _ClientCompFactory.CreateCustomAudio(_LEVEL_ID)
+__all__ = [
+    "play_custom_sound",
+    "stop_custom_sound",
+]
+
+
+try:
+    _LEVEL_ID = _clientApi.GetLevelId()
+    _ClientCompFactory = _clientApi.GetEngineCompFactory()
+    _CustomAudioComp = _ClientCompFactory.CreateCustomAudio(_LEVEL_ID)
+except:
+    pass
 
 
 def play_custom_sound(soundName, pos=(0, 0, 0), volume=1.0, speed=1.0, isLoop=False, entityId=None):

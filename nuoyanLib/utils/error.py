@@ -12,15 +12,24 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-16
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
 from traceback import format_exc as _format_exc
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
 from .._config import MOD_NAME as _MOD_NAME
+try:
+    import mod.client.extraClientApi as _clientApi
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
+
+
+__all__ = [
+    "print_error",
+    "TimerDestroyedError",
+]
 
 
 def _notify_message(message):
@@ -58,7 +67,7 @@ def print_error():
 
 class TimerDestroyedError(Exception):
     """
-    自定义异常：Timer销毁后调用pause、execute等方法时抛出。
+    自定义异常：McTimer销毁后调用pause、run等方法时抛出。
     """
 
     def __init__(self, m):
@@ -71,7 +80,6 @@ class TimerDestroyedError(Exception):
 
 def _test():
     raise TimerDestroyedError("error message")
-# _test()
 
 
 

@@ -12,18 +12,30 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as _serverApi
+try:
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType, GameType as _GameType
 
 
-_LEVEL_ID = _serverApi.GetLevelId()
-_ServerCompFactory = _serverApi.GetEngineCompFactory()
-_LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
+__all__ = [
+    "get_item_pos",
+    "change_player_item_count",
+]
+
+
+try:
+    _LEVEL_ID = _serverApi.GetLevelId()
+    _ServerCompFactory = _serverApi.GetEngineCompFactory()
+    _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
+except:
+    pass
 
 
 def get_item_pos(entityId, posType, itemId, itemAux=-1, count=1):

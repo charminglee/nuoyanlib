@@ -12,25 +12,48 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-31
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
-import mod.client.extraClientApi as _clientApi
 from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from ..utils.utils import is_method_overridden as _is_method_overridden
+try:
+    import mod.client.extraClientApi as _clientApi
+except:
+    pass
 
 
-_ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
-_ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
-_PLAYER_ID = _clientApi.GetLocalPlayerId()
+__all__ = [
+    "ALL_ENGINE_EVENTS",
+    "listen",
+    "NuoyanClientSystem",
+]
 
 
-_ClientSystem = _clientApi.GetClientSystemCls()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_PlayerActorMotionComp = _ClientCompFactory.CreateActorMotion(_PLAYER_ID)
+try:
+    _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
+    _ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
+    _ScreenNode = _clientApi.GetScreenNodeCls()
+    _ViewBinder = _clientApi.GetViewBinderCls()
+    _PLAYER_ID = _clientApi.GetLocalPlayerId()
+    _ClientSystem = _clientApi.GetClientSystemCls()
+    _ClientCompFactory = _clientApi.GetEngineCompFactory()
+    _PlayerActorMotionComp = _ClientCompFactory.CreateActorMotion(_PLAYER_ID)
+except:
+    _ScreenNode = type("ScreenNode", (), {})
+    _ClientSystem = type("ClientSystem", (), {})
+    _ENGINE_NAMESPACE = ""
+    _ENGINE_SYSTEM_NAME = ""
+    class _ViewBinder:
+        @staticmethod
+        def binding(*a):
+            def decorator(func):
+                return func
+            return decorator
+        BF_BindString = ""
 
 
 if "/" in __file__:
@@ -40,11 +63,9 @@ else:
 _UI_NAMESPACE_GAME_TICK = "_GameTick"
 _UI_PATH_GAME_TICK = _PATH + "._GameTick"
 _UI_DEF_GAME_TICK = "_GameTick.main"
-_ScreenNode = _clientApi.GetScreenNodeCls()
-_ViewBinder = _clientApi.GetViewBinderCls()
 
 
-ALL_SYSTEM_EVENTS = [
+ALL_ENGINE_EVENTS = (
     ("OnScriptTickClient", "OnScriptTick"),
     ("UiInitFinished", "OnUiInitFinished"),
     ("AddEntityClientEvent", "OnAddEntity"),
@@ -132,7 +153,7 @@ ALL_SYSTEM_EVENTS = [
     ("RightClickReleaseClientEvent", "OnRightClickRelease"),
     ("TapBeforeClientEvent", "OnTapBefore"),
     ("TapOrHoldReleaseClientEvent", "OnTapOrHoldRelease"),
-]
+)
 
 
 _lsnFuncArgs = []
@@ -170,7 +191,7 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
         _namespace = namespace
         _systemName = systemName
     def decorator(func):
-        _lsnFuncArgs.append([eventName, func, t, _namespace, _systemName, priority])
+        _lsnFuncArgs.append((eventName, func, t, _namespace, _systemName, priority))
         return func
     return decorator
 
@@ -1276,7 +1297,7 @@ class NuoyanClientSystem(_ClientSystem):
     def _listen(self):
         for args in _lsnFuncArgs:
             self.ListenForEventV2(*args)
-        for event, callback in ALL_SYSTEM_EVENTS:
+        for event, callback in ALL_ENGINE_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanClientSystem, callback):
                 self.ListenForEventV2(event, getattr(self, callback), 1)
 

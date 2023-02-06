@@ -12,51 +12,75 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-22
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
 import __builtin__
-from collections import Mapping as _Mapping
+from collections import Mapping as _Mapping, Sequence as _Sequence
 from re import match as _match
 from random import randint as _randint, uniform as _uniform, choice as _choice
 from time import time as _time
 from string import digits as _digits, ascii_lowercase as _ascii_lowercase, ascii_uppercase as _ascii_uppercase
 from error import TimerDestroyedError
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
+try:
+    import mod.client.extraClientApi as _clientApi
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
 
 
-if _clientApi.GetLocalPlayerId() == "-1":
-    _CompFactory = _serverApi.GetEngineCompFactory()
-    _LEVEL_ID = _serverApi.GetLevelId()
-    _ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
-    _ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
-    _IS_CLIENT = False
-else:
-    _CompFactory = _clientApi.GetEngineCompFactory()
-    _LEVEL_ID = _clientApi.GetLevelId()
-    _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
-    _ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
-    _IS_CLIENT = True
-_GameComp = _CompFactory.CreateGame(_LEVEL_ID)
+__all__ = [
+    "all_indexes",
+    "check_string",
+    "check_string2",
+    "is_number",
+    "turn_dict_value_to_tuple",
+    "turn_list_to_tuple",
+    "is_method_overridden",
+    "nyeval",
+    "translate_time",
+    "probability_true_i",
+    "probability_true_f",
+    "McTimer",
+    "random_string",
+]
 
 
-def all_index(findList, *elements):
-    # type: (list, ...) -> list
+try:
+    if _clientApi.GetLocalPlayerId() == "-1":
+        _CompFactory = _serverApi.GetEngineCompFactory()
+        _LEVEL_ID = _serverApi.GetLevelId()
+        _ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
+        _ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
+        _IS_CLIENT = False
+    else:
+        _CompFactory = _clientApi.GetEngineCompFactory()
+        _LEVEL_ID = _clientApi.GetLevelId()
+        _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
+        _ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
+        _IS_CLIENT = True
+    _GameComp = _CompFactory.CreateGame(_LEVEL_ID)
+except:
+    pass
+
+
+def all_indexes(seq, *elements):
+    # type: (_Sequence, ...) -> list
     """
-    获取元素在列表中所有出现位置的下标。
+    获取元素在序列中所有出现位置的下标。
     示例：
-    all_index([1, 1, 4, 5, 1, 4], 1)     # [0, 1, 4]
-    all_index([1, 1, 4, 5, 1, 4], 1, 4)     # [0, 1, 2, 4, 5]
+    all_indexes([1, 1, 4, 5, 1, 4], 1)     # [0, 1, 4]
+    all_indexes([1, 1, 4, 5, 1, 4], 1, 4)     # [0, 1, 2, 4, 5]
+    all_indexes("abcdefg", "c", "g")     # [2, 6]
     -----------------------------------------------------------
-    【findList: list】 列表
-    【*elements: Any】 元素
+    【seq: Sequence】 序列，可以是列表、元组、字符串等
+    【*elements: Any】 待查找元素
     -----------------------------------------------------------
     return: list -> 元素所有出现位置的下标列表
     """
-    return [i for i, e in enumerate(findList) if e in elements]
+    return [i for i, e in enumerate(seq) if e in elements]
 
 
 def check_string(string, *check):
@@ -269,10 +293,10 @@ def probability_true_f(f):
     return f > 0 and _uniform(0, 1) <= f
 
 
-class Timer(object):
+class McTimer(object):
     """
-    函数计时器，被delay或repeat装饰的函数将返回Timer对象。
-    非重复执行的Timer在执行完毕后会自动销毁（调用destroy方法）。
+    函数计时器，被delay或repeat装饰的函数将返回McTimer对象。
+    非重复执行的McTimer在执行完毕后会自动销毁（调用destroy方法）。
     """
 
     def __init__(self, t, sec, func, *args, **kwargs):
@@ -292,8 +316,9 @@ class Timer(object):
         # type: (float) -> ...
         """
         函数装饰器，用于函数的延迟执行。
+        注：被装饰函数的返回值会变成McTimer实例。
         示例：
-        @Timer.delay(2)
+        @McTimer.delay(2)
         def func(args):
             pass
         timer = func(args)     # 启动函数，两秒后执行
@@ -301,11 +326,11 @@ class Timer(object):
         -----------------------------------------------------------
         【sec: float】 延迟秒数
         -----------------------------------------------------------
-        return: Timer @-> 装饰后的函数返回Timer对象，用于执行后续操作
+        return: McTimer @-> 装饰后的函数返回McTimer对象，用于执行后续操作
         """
         def decorator(func):
             def wrapper(*args, **kwargs):
-                return Timer("d", sec, func, *args, **kwargs)
+                return McTimer("d", sec, func, *args, **kwargs)
             return wrapper
         return decorator
 
@@ -314,27 +339,26 @@ class Timer(object):
         # type: (float) -> ...
         """
         函数装饰器，用于函数的重复执行。
+        注：被装饰函数的返回值会变成McTimer实例。
         示例：
-        @Timer.repeat(2)
+        @McTimer.repeat(2)
         def func(args):
             pass
-        timer = func(args)     # 启动函数，每两秒执行一次
+        timer = func(args)     # 启动计时器，每两秒执行一次
         timer.cancel()     # 取消执行
         -----------------------------------------------------------
         【sec: float】 重复间隔秒数
-        -----------------------------------------------------------
-        return: Timer @-> 装饰后的函数返回Timer对象，用于执行后续操作
         """
         def decorator(func):
             def wrapper(*args, **kwargs):
-                return Timer("r", sec, func, *args, **kwargs)
+                return McTimer("r", sec, func, *args, **kwargs)
             return wrapper
         return decorator
 
     def _construct(self):
         if self.type == "d":
             def func():
-                self.execute()
+                self.run()
                 self._release()
             self._timer = _GameComp.AddTimer(self.sec, func)
         else:
@@ -354,7 +378,7 @@ class Timer(object):
     def destroy(self):
         # type: () -> None
         """
-        销毁函数计时器，销毁后函数将停止执行，且不可再调用pause、execute等方法。
+        销毁函数计时器，销毁后函数将停止执行，且不可再调用pause、run等方法。
         -----------------------------------------------------------
         无参数
         -----------------------------------------------------------
@@ -369,13 +393,13 @@ class Timer(object):
         self._release()
 
     def pause(self, sec=-1.0):
-        # type: (float) -> Timer
+        # type: (float) -> McTimer
         """
         暂停函数计时器，重复调用仅第一次有效。
         -----------------------------------------------------------
         【sec: float = -1.0】 暂停秒数，若为负数则无限期暂停
         -----------------------------------------------------------
-        return: Timer -> 返回Timer对象自身
+        return: McTimer -> 返回McTimer对象自身
         """
         if self.isCancel:
             raise TimerDestroyedError("pause")
@@ -388,13 +412,13 @@ class Timer(object):
         return self
 
     def go(self):
-        # type: () -> Timer
+        # type: () -> McTimer
         """
         继续执行函数计时器。
         -----------------------------------------------------------
         无参数
         -----------------------------------------------------------
-        return: Timer -> 返回Timer对象自身
+        return: McTimer -> 返回McTimer对象自身
         """
         if self.isPause:
             if self._pauseTimer:
@@ -404,17 +428,17 @@ class Timer(object):
             self.isPause = False
         return self
 
-    def execute(self):
-        # type: () -> Timer
+    def run(self):
+        # type: () -> McTimer
         """
         立即执行一次函数。
         -----------------------------------------------------------
         无参数
         -----------------------------------------------------------
-        return: Timer -> 返回Timer对象自身
+        return: McTimer -> 返回McTimer对象自身
         """
         if self.isCancel:
-            raise TimerDestroyedError("execute")
+            raise TimerDestroyedError("run")
         self.func(*self.args, **self.kwargs)
         return self
 
@@ -434,28 +458,29 @@ def random_string(length, lower=True, upper=True, num=True):
     return "".join(_choice(s) for _ in range(length))
 
 
-if __name__ == "__main__":
-    print all_index([1, 1, 4, 5, 1, 4], 1)  # [0, 1, 4]
-    print all_index([1, 1, 4, 5, 1, 4], 1, 4)  # [0, 1, 2, 4, 5]
-    print "=" * 50
+def _test():
+    print all_indexes([1, 1, 4, 5, 1, 4], 1)  # [0, 1, 4]
+    print all_indexes([1, 1, 4, 5, 1, 4], 1, 4)  # [0, 1, 2, 4, 5]
+    print all_indexes("abcdefg", "c", "g")  # [2, 6]
+    print "-" * 50
     print check_string("11112222", "1", "2")  # True
     print check_string("11112222", "1")  # False
     print check_string("1234567890", "0-9")  # True
     print check_string2("abc123", "a", "c", "3")  # ["b", "1", "2"]
     print check_string2("abc123", "a-z")  # ["1", "2", "3"]
     print check_string2("abc123", "0-9")  # ["a", "b", "c"]
-    print "=" * 50
+    print "-" * 50
     print is_number("114514")  # True
     print is_number("114514abc")  # False
     print is_number("114e5")  # True
     print is_number("0x000000ff")  # True
-    print "=" * 50
+    print "-" * 50
     a = {'b': [1, 2, 3], 'c': "hahaha", 'd': [4, 5]}
     turn_dict_value_to_tuple(a)
     print a  # {'b': (1, 2, 3), 'c': "hahaha", 'd': (4, 5)}
     a = [1, [2, 3], "abc"]
     print turn_list_to_tuple(a)  # (1, (2, 3), "abc")
-    print "=" * 50
+    print "-" * 50
     class A:
         def printIn(self, s):
             print s
@@ -466,34 +491,30 @@ if __name__ == "__main__":
         pass
     print is_method_overridden(B, A, "printIn")  # True
     print is_method_overridden(C, A, "printIn")  # False
-    print "=" * 50
+    print "-" * 50
     print translate_time(4000)  # "1h6m40s"
-    print "=" * 50
+    print "-" * 50
     print 2 / 3.0
     p = [probability_true_i(2, 3) for _ in range(int(1e5))]
     print p.count(True) / 1e5
     print 0.34
     p = [probability_true_f(0.34) for _ in range(int(1e5))]
     print p.count(True) / 1e5
-    print "=" * 50
+    print "-" * 50
     print random_string(20)
     print random_string(20, lower=False)
     print random_string(20, upper=False)
     print random_string(20, num=False)
-
-
-def _test():
-    print _time()
-    @Timer.delay(5.5)
-    def df(a1, a2):
-        print a1, a2
-        print _time()
-    df()
-    @Timer.repeat(2)
-    def rf():
-        print "repeat"
-    rf()
-# _test()
+    # print _time()
+    # @McTimer.delay(5.5)
+    # def df(a1, a2):
+    #     print a1, a2
+    #     print _time()
+    # df()
+    # @McTimer.repeat(2)
+    # def rf():
+    #     print "repeat"
+    # rf()
 
 
 

@@ -12,15 +12,26 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _clientApi
+try:
+    import mod.client.extraClientApi as _clientApi
+except:
+    pass
 
 
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
+__all__ = [
+    "EffectController",
+]
+
+
+try:
+    _ClientCompFactory = _clientApi.GetEngineCompFactory()
+except:
+    pass
 
 
 class EffectController(object):

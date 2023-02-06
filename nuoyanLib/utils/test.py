@@ -12,30 +12,42 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-31
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
-from utils import Timer as _Timer
+from utils import McTimer as _McTimer
 from mod.common.minecraftEnum import EffectType as _EffectType
+try:
+    import mod.client.extraClientApi as _clientApi
+    import mod.server.extraServerApi as _serverApi
+except:
+    pass
 
 
-if _clientApi.GetLocalPlayerId() == "-1":
-    _IS_CLIENT = False
-    _CompFactory = _serverApi.GetEngineCompFactory()
-    _LEVEL_ID = _serverApi.GetLevelId()
-else:
-    _IS_CLIENT = True
-    _CompFactory = _clientApi.GetEngineCompFactory()
-    _LEVEL_ID = _clientApi.GetLevelId()
-    _PLAYER_ID = _clientApi.GetLocalPlayerId()
-    _ItemComp = _CompFactory.CreateItem(_PLAYER_ID)
-    _CameraComp = _CompFactory.CreateCamera(_PLAYER_ID)
-_GameComp = _CompFactory.CreateGame(_LEVEL_ID)
-_BlockInfoComp = _CompFactory.CreateBlockInfo(_LEVEL_ID)
+__all__ = [
+    "test_mode_server",
+    "test_mode_client",
+]
+
+
+try:
+    if _clientApi.GetLocalPlayerId() == "-1":
+        _IS_CLIENT = False
+        _CompFactory = _serverApi.GetEngineCompFactory()
+        _LEVEL_ID = _serverApi.GetLevelId()
+    else:
+        _IS_CLIENT = True
+        _CompFactory = _clientApi.GetEngineCompFactory()
+        _LEVEL_ID = _clientApi.GetLevelId()
+        _PLAYER_ID = _clientApi.GetLocalPlayerId()
+        _ItemComp = _CompFactory.CreateItem(_PLAYER_ID)
+        _CameraComp = _CompFactory.CreateCamera(_PLAYER_ID)
+    _GameComp = _CompFactory.CreateGame(_LEVEL_ID)
+    _BlockInfoComp = _CompFactory.CreateBlockInfo(_LEVEL_ID)
+except:
+    pass
 
 
 _timer = None
@@ -63,7 +75,7 @@ def test_mode_server(enable):
         for p in _serverApi.GetPlayerList():
             _CompFactory.CreateGame(p).SetDisableHunger(False)
     if enable:
-        @_Timer.repeat(1)
+        @_McTimer.repeat(1)
         def func():
             for _p in _serverApi.GetPlayerList():
                 _CompFactory.CreateEffect(_p).AddEffectToEntity(_EffectType.NIGHT_VISION, 12, 0, False)
@@ -100,7 +112,7 @@ def test_mode_client(enable):
         _timer1.destroy()
         _timer1 = None
     if enable:
-        @_Timer.repeat(0.25)
+        @_McTimer.repeat(0.25)
         def func():
             carried = _ItemComp.GetCarriedItem()
             if carried:

@@ -12,12 +12,18 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
-from nuoyanLib.mctypes.client.ui.screenNode import ScreenNode as _ScreenNode
+from ...mctypes.client.ui.screenNode import ScreenNode as _ScreenNode
+
+
+__all__ = [
+    "get_ui_screen_pos",
+    "get_parent_path",
+]
 
 
 def get_ui_screen_pos(instance, path):

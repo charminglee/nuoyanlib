@@ -12,16 +12,27 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-02-06
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _clientApi
+try:
+    import mod.client.extraClientApi as _clientApi
+except:
+    pass
 
 
-_PLAYER_ID = _clientApi.GetLocalPlayerId()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
+__all__ = [
+    "player_plunge",
+]
+
+
+try:
+    _PLAYER_ID = _clientApi.GetLocalPlayerId()
+    _ClientCompFactory = _clientApi.GetEngineCompFactory()
+except:
+    pass
 
 
 def player_plunge(playerId, speed):
