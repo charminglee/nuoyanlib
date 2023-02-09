@@ -76,7 +76,7 @@ def change_player_item_count(playerId, posType=_ItemPosType.CARRIED, pos=0, chan
     【pos: int = 0】 槽位
     【change: int = -1】 改变量
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     if _LevelGameComp.GetPlayerGameType(playerId) == _GameType.Creative:
         return

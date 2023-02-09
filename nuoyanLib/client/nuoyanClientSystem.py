@@ -12,14 +12,17 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-02-09
 #
 # ====================================================
 
 
+from types import MethodType as _MethodType
 from collections import Callable as _Callable
-from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
+from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME, \
+    CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME
 from ..utils.utils import is_method_overridden as _is_method_overridden
+from clientTimer import ClientTimer as _ClientTimer
 try:
     import mod.client.extraClientApi as _clientApi
 except:
@@ -39,21 +42,30 @@ try:
     _ScreenNode = _clientApi.GetScreenNodeCls()
     _ViewBinder = _clientApi.GetViewBinderCls()
     _PLAYER_ID = _clientApi.GetLocalPlayerId()
+    _LEVEL_ID = _clientApi.GetLevelId()
     _ClientSystem = _clientApi.GetClientSystemCls()
-    _ClientCompFactory = _clientApi.GetEngineCompFactory()
-    _PlayerActorMotionComp = _ClientCompFactory.CreateActorMotion(_PLAYER_ID)
+    _CompFactory = _clientApi.GetEngineCompFactory()
+    _PlayerActorMotionComp = _CompFactory.CreateActorMotion(_PLAYER_ID)
+    _LevelGameComp = _CompFactory.CreateGame(_LEVEL_ID)
+    _PlayerItemComp = _CompFactory.CreateItem(_PLAYER_ID)
+    _PlayerCameraComp = _CompFactory.CreateCamera(_PLAYER_ID)
+    _LevelBlockInfoComp = _CompFactory.CreateBlockInfo(_PLAYER_ID)
+    _PlayerPosComp = _CompFactory.CreatePos(_PLAYER_ID)
 except:
-    _ScreenNode = type("ScreenNode", (), {})
-    _ClientSystem = type("ClientSystem", (), {})
-    _ENGINE_NAMESPACE = ""
-    _ENGINE_SYSTEM_NAME = ""
+    from ..mctypes.client.system.clientSystem import ClientSystem
+    from ..mctypes.client.ui.screenNode import ScreenNode
+    _ScreenNode = ScreenNode  # type: type[ScreenNode]
+    _ClientSystem = ClientSystem  # type: type[ClientSystem]
     class _ViewBinder:
+        BF_BindString = ""
         @staticmethod
         def binding(*a):
-            def decorator(func):
-                return func
-            return decorator
-        BF_BindString = ""
+            def w(f):
+                return f
+            return w
+    _ENGINE_NAMESPACE = ""
+    _ENGINE_SYSTEM_NAME = ""
+    _LevelGameComp = None
 
 
 if "/" in __file__:
@@ -191,7 +203,7 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
         _namespace = namespace
         _systemName = systemName
     def decorator(func):
-        _lsnFuncArgs.append((eventName, func, t, _namespace, _systemName, priority))
+        _lsnFuncArgs.append([eventName, func.__name__, t, _namespace, _systemName, priority])
         return func
     return decorator
 
@@ -201,13 +213,11 @@ class NuoyanClientSystem(_ClientSystem):
     ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。
     -----------------------------------------------------------
     【基础功能】
-    1. 所有官方文档中收录的客户端引擎事件以及新增事件均无需手动监听，只需重写对应事件的回调函数即可（支持热更）；
-    回调函数的命名规则为：On+去掉“Client”、“Event”、“On”字眼的事件名；
-    如：OnScriptTickClient -> OnScriptTick、UiInitFinished -> OnUiInitFinished、AddEntityClientEvent -> OnAddEntity等；
+    1. 所有官方文档中收录的客户端引擎事件以及新增事件均无需手动监听，只需重写对应事件的同名方法即可（支持热更）；
     2. 支持对在__init__方法中新增的事件监听或客户端属性（变量）执行热更；
     3. 无需重写Destroy方法进行事件的反监听。
     -----------------------------------------------------------
-    【新增方法】
+    【新增接口】
     1. BroadcastToAllClient：广播事件到所有玩家的客户端
     2. ListenForEventV2：监听事件（简化版）
     3. RegisterAndCreateUI：注册并创建UI
@@ -215,7 +225,8 @@ class NuoyanClientSystem(_ClientSystem):
     5. TestMode：开启或关闭客户端测试模式
     -----------------------------------------------------------
     【新增事件】
-    1. GameTick：频率与游戏实时帧率同步的Tick事件
+    1. OnGameTick：频率与游戏实时帧率同步的Tick事件
+    2. OnHotUpdate：客户端热更时触发
     -----------------------------------------------------------
     【新增属性】
     -----------------------------------------------------------
@@ -228,17 +239,11 @@ class NuoyanClientSystem(_ClientSystem):
         super(NuoyanClientSystem, self).__init__(namespace, systemName)
         self._gameTickNode = None
         self._uiInitFinished = False
-        self._handle = 0
-        self._tick = 0
-        self._oldInitFunc = self.__init__
-        self._listen()
+        self.__handle = 0
+        self.__timer = None  # type: _ClientTimer
+        self.__lastPos = None
+        self.__listen()
         self._checkOnGameTick()
-
-    # def __setattr__(self, name, value):
-    #     callFunc = _stack()[1][3]
-    #     if callFunc == "__init__" and name in self.__dict__:
-    #         return
-    #     self.__dict__[name] = value
 
     def Destroy(self):
         """
@@ -246,7 +251,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         self.UnListenAllEvents()
 
-    # todo:==================================== System Event Callback ==================================================
+    # todo:==================================== Engine Event Callback ==================================================
 
     def OnTapOrHoldRelease(self, args):
         """
@@ -1171,7 +1176,60 @@ class NuoyanClientSystem(_ClientSystem):
         无参数
         """
 
+    def OnHotUpdate(self):
+        """
+        客户端热更时触发。
+        -----------------------------------------------------------
+        无参数
+        """
+
     # todo:======================================= Basic Function ======================================================
+
+    # def TestMode(self, enable):
+    #     # type: (bool) -> None
+    #     """
+    #     开启或关闭客户端测试模式。
+    #     内容包括：
+    #     1. 显示准星处生物或方块的信息；
+    #     2. 显示手持物品信息；
+    #     3. 显示玩家当前运动速度。
+    #     -----------------------------------------------------------
+    #     【enable: bool】 是否开启
+    #     -----------------------------------------------------------
+    #     NoReturn
+    #     """
+    #     if self.__timer:
+    #         self.__timer.Destroy()
+    #         self.__timer = None
+    #     if enable:
+    #         @_ClientTimer.Repeat(1)
+    #         def func():
+    #             carried = _PlayerItemComp.GetCarriedItem()
+    #             if carried:
+    #                 text = "carried: %s:%d" % (carried['newItemName'], carried['newAuxValue'])
+    #             else:
+    #                 text = "carried: None"
+    #             facing = _PlayerCameraComp.PickFacing()
+    #             if facing and facing['type'] != "None":
+    #                 text += "\n" + "-" * 30
+    #                 text += "\ntype: %s" % facing['type']
+    #                 if 'entityId' in facing:
+    #                     entityId = facing['entityId']
+    #                     pos = _CompFactory.CreatePos(entityId).GetFootPos()
+    #                     text += "\nentityId: " + entityId
+    #                     text += "\ntypeStr: " + _CompFactory.CreateEngineType(entityId).GetEngineTypeStr()
+    #                 else:
+    #                     pos = facing['x'], facing['y'], facing['z']
+    #                     blockInfo = _LevelBlockInfoComp.GetBlock(pos)
+    #                     text += "\nblock: %s:%d" % blockInfo
+    #                 text += "\npos: (%d, %d, %d)" % pos
+    #             text += "\n" + "-" * 30
+    #             pos = _PlayerPosComp.GetFootPos()
+    #             speed = _pos_distance(self.__lastPos, pos) if self.__lastPos else 0.0
+    #             self.__lastPos = pos
+    #             text += "\nspeed: {:.2f}".format(speed)
+    #             _LevelGameComp.SetTipMessage(text)
+    #         self.__timer = func()
 
     def BroadcastToAllClient(self, eventName, eventData):
         # type: (str, ...) -> None
@@ -1188,7 +1246,7 @@ class NuoyanClientSystem(_ClientSystem):
         【eventName: str】 事件名称
         【eventData: Any】 数据
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         self.NotifyToServer("_BroadcastToAllClient", {
             'eventName': eventName,
@@ -1196,18 +1254,18 @@ class NuoyanClientSystem(_ClientSystem):
         })
 
     def ListenForEventV2(self, eventName, callback, t=0, namespace="", systemName="", priority=0):
-        # type: (str, _Callable[[...], None], int, str, str, int) -> None
+        # type: (str, _MethodType, int, str, str, int) -> None
         """
         监听事件（简化版）。
         -----------------------------------------------------------
         【eventName: str】 事件名称
-        【callback: (Any) -> None】 回调函数
+        【callback: Method】 回调函数（方法）
         【t: int = 0】 0表示监听当前Mod服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
         【namespace: str = ""】 其他Mod的命名空间
         【systemName: str = ""】 其他Mod的系统名称
         【priority: int = 0】 优先级
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         if t == 0:
             namespace = _MOD_NAME
@@ -1252,7 +1310,7 @@ class NuoyanClientSystem(_ClientSystem):
         【callback: Optional[(Any) -> None] = None】 回调函数，调用服务端成功后服务端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
         【*args: Any】 调用参数；如果调用的服务端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的服务端属性为函数，则args会作为参数传入该函数
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
 
     # todo:====================================== Internal Method ======================================================
@@ -1264,7 +1322,7 @@ class NuoyanClientSystem(_ClientSystem):
                 self._startGameTick()
             self._gameTickNode.notifySv = True
         else:
-            self._handle = 2
+            self.__handle = 2
 
     def _listenClientGameTick(self):
         if self._uiInitFinished:
@@ -1272,30 +1330,24 @@ class NuoyanClientSystem(_ClientSystem):
                 self._startGameTick()
             self._gameTickNode.notifyCl = True
         else:
-            self._handle = 1
+            self.__handle = 1
 
     @listen("UiInitFinished", 1)
     def _OnUiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
         self._uiInitFinished = True
-        if self._handle == 1:
+        if self.__handle == 1:
             self._listenClientGameTick()
-        elif self._handle == 2:
+        elif self.__handle == 2:
             self._OnListenServerGameTick()
 
     @listen("_SetMotion")
     def _OnSetMotion(self, motion):
         _PlayerActorMotionComp.SetMotion(motion)
 
-    # @listen("OnScriptTickClient", 1)
-    # def _OnTick(self):
-    #     self._tick += 1
-    #     if not self._tick % 30 and self.__init__ != self._oldInitFunc:
-    #         self.__init__(_MOD_NAME, _CLIENT_SYSTEM_NAME)
-    #         self._oldInitFunc = self.__init__
-
-    def _listen(self):
+    def __listen(self):
         for args in _lsnFuncArgs:
+            args[1] = getattr(self, args[1])
             self.ListenForEventV2(*args)
         for event, callback in ALL_ENGINE_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanClientSystem, callback):
@@ -1308,8 +1360,13 @@ class NuoyanClientSystem(_ClientSystem):
         if _is_method_overridden(self.__class__, NuoyanClientSystem, "OnGameTick"):
             self._listenClientGameTick()
 
-    def _test(self):
-        print "test"
+
+try:
+    _ins = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)  # type: NuoyanClientSystem
+    if _ins:
+        _LevelGameComp.AddTimer(0, _ins.OnHotUpdate)
+except:
+    pass
 
 
 class _GameTick(_ScreenNode):
@@ -1322,12 +1379,22 @@ class _GameTick(_ScreenNode):
     @_ViewBinder.binding(_ViewBinder.BF_BindString, "#main.gametick")
     def OnGameTick(self):
         if self.notifySv:
-            self.cs.NotifyToServer("GameTick", {})
+            self.cs.NotifyToServer("OnGameTick", {})
         if self.notifyCl:
             self.cs.OnGameTick()
 
 
-
+def _test():
+    global _lsnFuncArgs
+    _lsnFuncArgs = []
+    class Test:
+        def __init__(self):
+            for args in _lsnFuncArgs:
+                print args
+        @listen("Event")
+        def event(self):
+            print "111"
+    Test()
 
 
 

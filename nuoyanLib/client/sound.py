@@ -62,7 +62,7 @@ def stop_custom_sound(soundId, fadeOutTime):
     【soundId: str】 音效ID
     【fadeOutTime: float】 音效淡出时间
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     _CustomAudioComp.StopCustomMusicById(soundId, fadeOutTime)
 

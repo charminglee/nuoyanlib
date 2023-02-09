@@ -52,7 +52,7 @@ def print_error():
     -----------------------------------------------------------
     无参数
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     errorInfo = _format_exc()
     errorLine = errorInfo.split("\n")

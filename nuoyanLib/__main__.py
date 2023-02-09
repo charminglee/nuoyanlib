@@ -12,36 +12,21 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-02-08
 #
 # ====================================================
 
 
-import client
-import server
-import utils
+from client import nuoyanClientSystem
+from utils import utils
 
 
-print "【utils.utils】"
-print "=" * 50
-utils.utils._test()
-print "=" * 50
+def _test(module):
+    print module.__name__
+    print "=" * 50
+    module._test()
+    print "\n\n"
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+_test(utils)
+_test(nuoyanClientSystem)

@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-02-08
 #
 # ====================================================
 
@@ -21,14 +21,7 @@ import __builtin__
 from collections import Mapping as _Mapping, Sequence as _Sequence
 from re import match as _match
 from random import randint as _randint, uniform as _uniform, choice as _choice
-from time import time as _time
 from string import digits as _digits, ascii_lowercase as _ascii_lowercase, ascii_uppercase as _ascii_uppercase
-from error import TimerDestroyedError
-try:
-    import mod.client.extraClientApi as _clientApi
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
 
 
 __all__ = [
@@ -43,27 +36,8 @@ __all__ = [
     "translate_time",
     "probability_true_i",
     "probability_true_f",
-    "McTimer",
     "random_string",
 ]
-
-
-try:
-    if _clientApi.GetLocalPlayerId() == "-1":
-        _CompFactory = _serverApi.GetEngineCompFactory()
-        _LEVEL_ID = _serverApi.GetLevelId()
-        _ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
-        _ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
-        _IS_CLIENT = False
-    else:
-        _CompFactory = _clientApi.GetEngineCompFactory()
-        _LEVEL_ID = _clientApi.GetLevelId()
-        _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
-        _ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
-        _IS_CLIENT = True
-    _GameComp = _CompFactory.CreateGame(_LEVEL_ID)
-except:
-    pass
 
 
 def all_indexes(seq, *elements):
@@ -169,7 +143,7 @@ def turn_dict_value_to_tuple(origDict):
     -----------------------------------------------------------
     【origDict: dict】 字典
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     for key, value in origDict.items():
         if isinstance(value, list):
@@ -293,156 +267,6 @@ def probability_true_f(f):
     return f > 0 and _uniform(0, 1) <= f
 
 
-class McTimer(object):
-    """
-    函数计时器，被delay或repeat装饰的函数将返回McTimer对象。
-    非重复执行的McTimer在执行完毕后会自动销毁（调用destroy方法）。
-    """
-
-    def __init__(self, t, sec, func, *args, **kwargs):
-        self.type = t
-        self.sec = sec
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
-        self.isCancel = False
-        self.isPause = False
-        self._timer = None
-        self._pauseTimer = None
-        self._construct()
-
-    @staticmethod
-    def delay(sec):
-        # type: (float) -> ...
-        """
-        函数装饰器，用于函数的延迟执行。
-        注：被装饰函数的返回值会变成McTimer实例。
-        示例：
-        @McTimer.delay(2)
-        def func(args):
-            pass
-        timer = func(args)     # 启动函数，两秒后执行
-        timer.cancel()     # 取消执行
-        -----------------------------------------------------------
-        【sec: float】 延迟秒数
-        -----------------------------------------------------------
-        return: McTimer @-> 装饰后的函数返回McTimer对象，用于执行后续操作
-        """
-        def decorator(func):
-            def wrapper(*args, **kwargs):
-                return McTimer("d", sec, func, *args, **kwargs)
-            return wrapper
-        return decorator
-
-    @staticmethod
-    def repeat(sec):
-        # type: (float) -> ...
-        """
-        函数装饰器，用于函数的重复执行。
-        注：被装饰函数的返回值会变成McTimer实例。
-        示例：
-        @McTimer.repeat(2)
-        def func(args):
-            pass
-        timer = func(args)     # 启动计时器，每两秒执行一次
-        timer.cancel()     # 取消执行
-        -----------------------------------------------------------
-        【sec: float】 重复间隔秒数
-        """
-        def decorator(func):
-            def wrapper(*args, **kwargs):
-                return McTimer("r", sec, func, *args, **kwargs)
-            return wrapper
-        return decorator
-
-    def _construct(self):
-        if self.type == "d":
-            def func():
-                self.run()
-                self._release()
-            self._timer = _GameComp.AddTimer(self.sec, func)
-        else:
-            self._timer = _GameComp.AddRepeatedTimer(self.sec, self.func, *self.args, **self.kwargs)
-
-    def _release(self):
-        self.isCancel = True
-        self.isPause = False
-        self._timer = None
-        self._pauseTimer = None
-        self.type = None
-        self.sec = None
-        self.func = None
-        self.args = None
-        self.kwargs = None
-
-    def destroy(self):
-        # type: () -> None
-        """
-        销毁函数计时器，销毁后函数将停止执行，且不可再调用pause、run等方法。
-        -----------------------------------------------------------
-        无参数
-        -----------------------------------------------------------
-        return -> None
-        """
-        if self.isCancel:
-            raise TimerDestroyedError("destroy")
-        if self._timer:
-            _GameComp.CancelTimer(self._timer)
-        if self._pauseTimer:
-            _GameComp.CancelTimer(self._pauseTimer)
-        self._release()
-
-    def pause(self, sec=-1.0):
-        # type: (float) -> McTimer
-        """
-        暂停函数计时器，重复调用仅第一次有效。
-        -----------------------------------------------------------
-        【sec: float = -1.0】 暂停秒数，若为负数则无限期暂停
-        -----------------------------------------------------------
-        return: McTimer -> 返回McTimer对象自身
-        """
-        if self.isCancel:
-            raise TimerDestroyedError("pause")
-        if not self.isPause:
-            _GameComp.CancelTimer(self._timer)
-            self._timer = None
-            if sec >= 0:
-                self._pauseTimer = _GameComp.AddTimer(sec, self.go)
-            self.isPause = True
-        return self
-
-    def go(self):
-        # type: () -> McTimer
-        """
-        继续执行函数计时器。
-        -----------------------------------------------------------
-        无参数
-        -----------------------------------------------------------
-        return: McTimer -> 返回McTimer对象自身
-        """
-        if self.isPause:
-            if self._pauseTimer:
-                _GameComp.CancelTimer(self._pauseTimer)
-                self._pauseTimer = None
-            self._construct()
-            self.isPause = False
-        return self
-
-    def run(self):
-        # type: () -> McTimer
-        """
-        立即执行一次函数。
-        -----------------------------------------------------------
-        无参数
-        -----------------------------------------------------------
-        return: McTimer -> 返回McTimer对象自身
-        """
-        if self.isCancel:
-            raise TimerDestroyedError("run")
-        self.func(*self.args, **self.kwargs)
-        return self
-
-
 def random_string(length, lower=True, upper=True, num=True):
     """
     生成随机字符串。
@@ -505,16 +329,6 @@ def _test():
     print random_string(20, lower=False)
     print random_string(20, upper=False)
     print random_string(20, num=False)
-    # print _time()
-    # @McTimer.delay(5.5)
-    # def df(a1, a2):
-    #     print a1, a2
-    #     print _time()
-    # df()
-    # @McTimer.repeat(2)
-    # def rf():
-    #     print "repeat"
-    # rf()
 
 
 

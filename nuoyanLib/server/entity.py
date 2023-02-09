@@ -142,7 +142,7 @@ def sort_entity_list_by_distance(pos, entityList):
     【pos: Tuple[float, float, float]】 参照坐标
     【entityList: List[str]】 实体ID列表
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     if not entityList or not pos:
         return []
@@ -213,7 +213,7 @@ def entity_plunge(entityId1, entityId2, speed):
     【entityId2: str】 实体2ID
     【speed: float】 突进速度
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     rot = _ServerCompFactory.CreateRot(entityId2).GetRot()
     if not rot:
@@ -230,7 +230,7 @@ def entity_plunge_by_dir(entityId, direction, speed):
     【direction: Tuple[float, float, float]】 方向的单位向量
     【speed: float】 速度
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     motion = tuple(map(lambda x: x * speed, direction))
     _ServerCompFactory.CreateActorMotion(entityId).SetMotion(motion)
@@ -245,7 +245,7 @@ def entity_plunge_by_rot(entityId, rot, speed):
     【rot: Tuple[float, float]】 视角
     【speed: float】 速度
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     direction = _serverApi.GetDirFromRot(rot)
     entity_plunge_by_dir(entityId, direction, speed)
@@ -442,7 +442,7 @@ def set_entity_motion(entity, motion, serSysCls=None):
     【motion: Tuple[float, float, float]】 瞬时速度向量
     【serSysCls: Optional[ServerSystem] = None】 服务端实例（控制玩家时传入）
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     t = _ServerCompFactory.CreateEngineType(entity).GetEngineType()
     if t == _EntityType.Player and serSysCls:

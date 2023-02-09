@@ -43,7 +43,7 @@ def player_plunge(playerId, speed):
     【playerId: str】 玩家实体ID
     【speed: float】 突进初始速度
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     rot = _ClientCompFactory.CreateRot(playerId).GetRot()
     dirRot = _clientApi.GetDirFromRot(rot)

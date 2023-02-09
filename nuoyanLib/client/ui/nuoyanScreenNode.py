@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-02-09
 #
 # ====================================================
 
@@ -20,7 +20,8 @@
 from collections import Callable as _Callable
 from ..setting import read_setting as _read_setting, save_setting as _save_setting
 from utils import get_parent_path as _get_parent_path
-from ..._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
+from ..._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME, \
+    SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
 try:
     import mod.client.extraClientApi as _clientApi
 except:
@@ -42,16 +43,59 @@ try:
     _LevelGameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
     _LevelDeviceComp = _ClientCompFactory.CreateDevice(_LEVEL_ID)
 except:
-    _ScreenNode = type("ScreenNode", (), {})
+    from ...mctypes.client.ui.screenNode import ScreenNode
+    _ScreenNode = ScreenNode  # type: type[ScreenNode]
+    _ENGINE_NAMESPACE = ""
+    _ENGINE_SYSTEM_NAME = ""
 
 
-class NuoyanScreenNode(_ScreenNode):
+_lsnFuncArgs = []
+
+
+def listen(eventName, t=0, namespace="", systemName="", priority=0):
+    # type: (str, int, str, str, int) -> ...
+    """
+    函数装饰器，通过对函数进行装饰即可实现监听。
+    示例：
+    class MyUI(ScreenNode):
+        # 监听服务端传来的自定义事件
+        @listen("MyCustomEvent")
+        def eventCallback(self, args):
+            pass
+
+        # 监听AddEntityClientEvent事件
+        @listen("AddEntityClientEvent", 1)
+        def OnAddEntity(self, args):
+            pass
+    -----------------------------------------------------------
+    【eventName: str】 事件名称
+    【t: int = 0】 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
+    【namespace: str = ""】 其他Mod的命名空间
+    【systemName: str = ""】 其他Mod的系统名称
+    【priority: int = 0】 优先级
+    """
+    if t == 0:
+        _namespace = _MOD_NAME
+        _systemName = _SERVER_SYSTEM_NAME
+    elif t == 1:
+        _namespace = _ENGINE_NAMESPACE
+        _systemName = _ENGINE_SYSTEM_NAME
+    else:
+        _namespace = namespace
+        _systemName = systemName
+    def decorator(func):
+        _lsnFuncArgs.append([eventName, func.__name__, t, _namespace, _systemName, priority])
+        return func
+    return decorator
+
+
+class NuoyanScreenNode(_ScreenNode):  # type:
     """
     ScreenNode扩展类。将自定义UI类继承本类即可使用本类的全部功能。
     -----------------------------------------------------------
     【基础功能】
     -----------------------------------------------------------
-    【新增方法】
+    【新增接口】
     1. SetButtonDoubleClickCallback：设置按钮双击监听
     2. SetButtonMovable：设置按钮可拖动
     3. CancelButtonMovable：取消按钮可拖动
@@ -96,8 +140,8 @@ class NuoyanScreenNode(_ScreenNode):
         self._listen()
 
     def _listen(self):
-        self.cs.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "GetEntityByCoordReleaseClientEvent", self, self._OnCoordRelease)
-        self.cs.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "ScreenSizeChangedClientEvent", self, self._OnScreenSizeChanged)
+        for eventName, funcName, t, namespace, systemName, priority in _lsnFuncArgs:
+            self.cs.ListenForEvent(namespace, systemName, eventName, self, getattr(self, funcName), priority)
 
     def Create(self):
         """
@@ -161,7 +205,7 @@ class NuoyanScreenNode(_ScreenNode):
         【doubleClickCallback: (dict) -> None】 DoubleClick回调函数
         【touchUpCallback: Optional[(dict) -> None] = None】 TouchUp回调函数
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         self._btnDoubleClickData[buttonPath] = {
             'doubleClickCallback': doubleClickCallback,
@@ -186,7 +230,7 @@ class NuoyanScreenNode(_ScreenNode):
         【associatedWidgetPath: Union[str, Tuple[str, ...]] = ()】 关联拖动的其他控件的路径，多个控件请使用元组
         【touchMoveCallback: Optional[(dict) -> None] = None】 TouchMove回调函数
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         self._isMoving = False
         self._fingerPos = None
@@ -208,7 +252,7 @@ class NuoyanScreenNode(_ScreenNode):
         -----------------------------------------------------------
         【btnPath: str】 按钮路径
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         if btnPath in self._btnMovableData:
             del self._btnMovableData[btnPath]
@@ -232,7 +276,7 @@ class NuoyanScreenNode(_ScreenNode):
         【touchDownFunc: Optional[(dict) -> None] = None】 TouchDown回调函数
         【touchCancelFunc: Optional[(dict) -> None] = None】 TouchCancel回调函数
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         if isinstance(associatedWidgetPath, str):
             associatedWidgetPath = (associatedWidgetPath,)
@@ -265,7 +309,7 @@ class NuoyanScreenNode(_ScreenNode):
         【touchDownFunc：Optional[(dict) -> None] = None】 TouchDown回调函数
         【touchCancelFunc：Optional[(dict) -> None] = None】 TouchCancel回调函数
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         self._btnLongClickData[btnPath] = {
             'longClickFunc': longClickFunc,
@@ -295,7 +339,7 @@ class NuoyanScreenNode(_ScreenNode):
         -----------------------------------------------------------
         【btnPath: str】 按钮路径
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         if btnPath in self._btnLongClickData:
             del self._btnLongClickData[btnPath]
@@ -307,7 +351,7 @@ class NuoyanScreenNode(_ScreenNode):
         -----------------------------------------------------------
         【time: int】 毫秒
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         self._vibrateTime = time
 
@@ -332,6 +376,7 @@ class NuoyanScreenNode(_ScreenNode):
             for func in self._btnTouchUpCallbackData[bp]:
                 func(args)
 
+    @listen("GetEntityByCoordReleaseClientEvent", 1)
     def _OnCoordRelease(self, args):
         self._saveUiPosition()
 
@@ -460,12 +505,13 @@ class NuoyanScreenNode(_ScreenNode):
         if touchMoveCallback:
             touchMoveCallback(args)
 
+    @listen("ScreenSizeChangedClientEvent", 1)
     def _OnScreenSizeChanged(self, args):
         self.screenSize = args['afterX'], args['afterY']
 
 
-
-
+def _test():
+    pass
 
 
 

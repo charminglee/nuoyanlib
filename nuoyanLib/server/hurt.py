@@ -166,7 +166,7 @@ def hurt_by_set_health(entityId, damage):
     【entityId: str】 实体ID
     【damage: int】 伤害
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     if _ServerCompFactory.CreateEngineType(entityId).GetEngineTypeStr() == "minecraft:player" \
             and _LevelGameComp.GetPlayerGameType(entityId) == _GameType.Creative:
@@ -190,7 +190,7 @@ def hurt(entityId, damage, cause=_ActorDamageCause.Override, attacker="", childA
     【childAttackerId: str = ""】 伤害来源的子实体ID
     【knocked: bool = True】 是否造成击退
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     hurtResult = _ServerCompFactory.CreateHurt(entityId).Hurt(damage, cause, attacker, childAttackerId, knocked)
     if not hurtResult:
@@ -220,7 +220,7 @@ def percent_damage(entityId, percent, typeName, cause=_ActorDamageCause.Override
     【childAttackerId: str = ""】 伤害来源的子实体ID
     【knocked: bool = True】 是否造成击退
     -----------------------------------------------------------
-    return -> None
+    NoReturn
     """
     attr = _ServerCompFactory.CreateAttr(entityId)
     value = 0

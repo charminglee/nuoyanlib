@@ -12,14 +12,17 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-02-08
 #
 # ====================================================
 
 
+from types import MethodType as _MethodType
 from collections import Callable as _Callable
 from ..utils.utils import is_method_overridden as _is_method_overridden
-from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
+from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME, \
+    SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
+from serverTimer import ServerTimer as _ServerTimer
 try:
     import mod.server.extraServerApi as _serverApi
 except:
@@ -38,10 +41,14 @@ try:
     _ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
     _LEVEL_ID = _serverApi.GetLevelId()
     _ServerSystem = _serverApi.GetServerSystemCls()
+    _CompFactory = _serverApi.GetEngineCompFactory()
+    _LevelGameComp = _CompFactory.CreateGame(_LEVEL_ID)
 except:
-    _ServerSystem = type("ServerSystem", (), {})
+    from ..mctypes.server.system.serverSystem import ServerSystem
+    _ServerSystem = ServerSystem  # type: type[ServerSystem]
     _ENGINE_NAMESPACE = ""
     _ENGINE_SYSTEM_NAME = ""
+    _LevelGameComp = None
 
 
 ALL_ENGINE_EVENTS = (
@@ -55,6 +62,11 @@ ALL_ENGINE_EVENTS = (
     ("ActorAcquiredItemServerEvent", "OnActorAcquiredItem"),
     ("ActorUseItemServerEvent", "OnActorUseItem"),
     ("ServerItemUseOnEvent", "OnItemUseOn"),
+    ("EntityStartRidingEvent", "OnEntityStartRiding"),
+    ("EntityStopRidingEvent", "OnEntityStopRiding"),
+    ("OnEntityInsideBlockServerEvent", "OnEntityInsideBlock"),
+    ("OnMobHitBlockServerEvent", "OnMobHitBlock"),
+    ("AddEntityServerEvent", "OnAddEntity"),
 )
 
 
@@ -93,7 +105,7 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
         _namespace = namespace
         _systemName = systemName
     def decorator(func):
-        _lsnFuncArgs.append((eventName, func, t, _namespace, _systemName, priority))
+        _lsnFuncArgs.append([eventName, func.__name__, t, _namespace, _systemName, priority])
         return func
     return decorator
 
@@ -103,24 +115,22 @@ class NuoyanServerSystem(_ServerSystem):
     ServerSystem扩展类。将自定义ServerSystem继承本类即可使用本类的全部功能。
     -----------------------------------------------------------
     【基础功能】
-    1. 所有官方文档中收录的服务端引擎事件以及新增事件均无需手动监听，只需重写对应事件的回调函数即可（支持热更）；
-    回调函数的命名规则为：On+去掉“Server”、“Event”、“On”字眼的事件名；
-    如：OnScriptTickServer -> OnScriptTick、OnCarriedNewItemChangedServerEvent -> OnCarriedNewItemChanged、EntityRemoveEvent -> OnEntityRemove等；
+    1. 所有官方文档中收录的服务端引擎事件以及新增事件均无需手动监听，只需重写对应事件的同名方法即可（支持热更）；
     2. 支持对在__init__方法中新增的事件监听或服务端属性（变量）执行热更；
     3. 无需重写Destroy方法进行事件的反监听。
     -----------------------------------------------------------
-    【新增方法】
+    【新增接口】
     1. ListenForEventV2：监听事件（简化版）
     2. CallClient：调用客户端属性（包括变量和函数）
     3. TestMode：开启或关闭服务端测试模式
     -----------------------------------------------------------
     【新增事件】
     1. UiInitFinished：客户端玩家UI框架初始化完成时，服务端触发
-    2. GameTick：频率与游戏当前帧率同步的Tick事件
+    2. OnGameTick：频率与游戏当前帧率同步的Tick事件
+    3. OnHotUpdate：服务端热更时触发
     -----------------------------------------------------------
     【新增属性】
-    1. allPlayerData：用于保存所有玩家数据的字典，key为玩家实体ID，value为玩家数据字典，可自行添加数据；
-    玩家加入游戏时（UiInitFinished后）会自动把玩家加入字典，玩家退出游戏时则会自动从字典中删除玩家及其数据；初始值为空字典
+    1. allPlayerData：用于保存所有玩家数据的字典，key为玩家实体ID，value为玩家数据字典，可自行添加数据；玩家加入游戏时（UiInitFinished后）会自动把玩家加入字典，玩家退出游戏时则会自动从字典中删除玩家及其数据；初始值为空字典
     2. homeownerPlayerId：房主玩家的实体ID；初始值为"-1"
     -----------------------------------------------------------
     【注意事项】
@@ -130,32 +140,13 @@ class NuoyanServerSystem(_ServerSystem):
 
     def __init__(self, namespace, systemName):
         super(NuoyanServerSystem, self).__init__(namespace, systemName)
-        self._namespace = namespace
-        self._systemName = systemName
         self.allPlayerData = {}
         self._listenGameTick = False
         self.homeownerPlayerId = "-1"
-        self._tick = 0
-        self._oldInitFunc = self.__init__
         self._initFinished = 1
-        self._listen()
+        self.__timer = None  # type: _ServerTimer
+        self.__listen()
         self._checkOnGameTick()
-
-    # def __setattr__(self, name, value):
-    #     callFunc = _stack()[1][3]
-    #     if callFunc == "__init__" and name in self.__dict__:
-    #         return
-    #     self.__dict__[name] = value
-    #     if callFunc == "__init__":
-    #         print "__setattr__: " + name
-    #
-    # def __getattribute__(self, name):
-    #     callFunc = _stack()[1][3]
-    #     if callFunc == "__init__" and '_initFinished' in object.__getattribute__(self, "__dict__"):
-    #         return object.__getattribute__(self, "_emptyFunc")
-    #     if callFunc == "__init__":
-    #         print "__getattribute__: " + name
-    #     return object.__getattribute__(self, name)
 
     def Destroy(self):
         """
@@ -163,7 +154,94 @@ class NuoyanServerSystem(_ServerSystem):
         """
         self.UnListenAllEvents()
 
-    # todo:==================================== System Event Callback ==================================================
+    # todo:==================================== Engine Event Callback ==================================================
+
+    def OnAddEntity(self, args):
+        """
+        服务端侧创建新实体，或实体从存档加载时触发。
+        创建玩家时不会触发该事件。
+        -----------------------------------------------------------
+        【id: str】 实体ID
+        【posX: float】 实体位置x
+        【posY: float】 实体位置y
+        【posZ: float】 实体位置z
+        【dimensionId: int】 维度ID
+        【isBaby: bool】 是否为幼儿
+        【engineTypeStr: str】 实体类型，即实体identifier
+        【itemName: str】 物品identifier（仅当物品实体时存在该字段）
+        【auxValue: int】 物品附加值（仅当物品实体时存在该字段）
+        """
+
+    def OnMobHitBlock(self, args):
+        """
+        通过OpenMobHitBlockDetection打开方块碰撞检测后，当生物（不包括玩家）碰撞到方块时触发该事件。
+        -----------------------------------------------------------
+        【entityId: str】 实体ID
+        【posX: int】 碰撞方块x坐标
+        【posY: int】 碰撞方块y坐标
+        【posZ: int】 碰撞方块z坐标
+        【blockId: str】 碰撞方块的identifier
+        【auxValue: int】 碰撞方块的附加值
+        【dimensionId: int】 维度ID
+        -----------------------------------------------------------
+        【相关接口】
+        GameComponentServer.OpenMobHitBlockDetection(entityId: str, precision: float) -> bool
+        GameComponentServer.CloseMobHitBlockDetection(entityId: str) -> bool
+        """
+
+    def OnEntityInsideBlock(self, args):
+        """
+        *tick*
+        当实体碰撞盒所在区域有方块时，服务端持续触发。
+        不是所有方块都会触发该事件，需要在json中先配置触发开关，原版方块需要先通过RegisterOnEntityInside接口注册才能触发。
+        如果需要修改slowdownMulti/cancel，强烈建议与客户端事件同步修改，避免出现客户端表现不一致等非预期现象。
+        如果要在脚本层修改slowdownMulti，回传的一定要是浮点型，例如需要赋值1.0而不是1。
+        有任意slowdownMulti参数被传回非0值时生效减速比例。
+        slowdownMulti参数更像是一个Buff，例如并不是立刻计算，而是先保存在实体属性里延后计算。在已经有slowdownMulti属性的情况下会取最低的值、免疫掉落伤害等，与原版蜘蛛网逻辑基本一致。
+        -----------------------------------------------------------
+        【entityId: str】 实体ID
+        【$slowdownMultiX: float】 实体移速x方向的减速比例，可在脚本层被修改
+        【$slowdownMultiY: float】 实体移速y方向的减速比例，可在脚本层被修改
+        【$slowdownMultiZ: float】 实体移速z方向的减速比例，可在脚本层被修改
+        【blockX: int】 方块位置x
+        【blockY: int】 方块位置y
+        【blockZ: int】 方块位置z
+        【blockName: str】 方块的identifier，包含命名空间及名称
+        【$cancel: bool】 可由脚本层回传True给引擎，阻止触发后续原版逻辑
+        -----------------------------------------------------------
+        【相关接口】
+        BlockInfoComponentServer.RegisterOnEntityInside(blockName: str) -> bool
+        BlockInfoComponentServer.UnRegisterOnEntityInside(blockName: str) -> bool
+        """
+
+    def OnEntityStartRiding(self, args):
+        """
+        当实体骑乘上另一个实体时触发。
+        -----------------------------------------------------------
+        【id: str】 骑乘者实体ID
+        【rideId: str】 坐骑实体ID
+        """
+
+    def OnEntityStopRiding(self, args):
+        """
+        当实体停止骑乘时触发。
+        以下情况不允许取消：
+        1. ride组件StopEntityRiding接口
+        2. 玩家传送时；
+        3. 坐骑死亡时；
+        4. 玩家睡觉时；
+        5. 玩家死亡时；
+        6. 未驯服的马；
+        7. 怕水的生物坐骑进入水里；
+        8. 切换维度。
+        -----------------------------------------------------------
+        【id: str】 实体ID
+        【rideId: str】 坐骑的实体ID
+        【exitFromRider: bool】 是否下坐骑
+        【entityIsBeingDestroyed: bool】 坐骑是否将要销毁
+        【switchingRides: bool】 是否换乘坐骑
+        【$cancel: bool】 设置为True可以取消（需要与客户端事件一同取消）
+        """
 
     def OnItemUseOn(self, args):
         """
@@ -307,6 +385,13 @@ class NuoyanServerSystem(_ServerSystem):
 
     # todo:==================================== Custom Event Callback ==================================================
 
+    def OnHotUpdate(self):
+        """
+        服务端热更时触发。
+        -----------------------------------------------------------
+        无参数
+        """
+
     @listen("UiInitFinished")
     def OnUiInitFinished(self, args):
         """
@@ -322,7 +407,7 @@ class NuoyanServerSystem(_ServerSystem):
         【playerId: str】 玩家的实体ID
         """
 
-    @listen("GameTick")
+    @listen("OnGameTick")
     def OnGameTick(self, args):
         """
         *tick*
@@ -335,22 +420,62 @@ class NuoyanServerSystem(_ServerSystem):
 
     # todo:======================================= Basic Function ======================================================
 
+    # def TestMode(self, enable):
+    #     # type: (bool) -> None
+    #     """
+    #     开启或关闭服务端测试模式。
+    #     内容包括：
+    #     1. 显示玩家坐标；
+    #     2. 开启终为白日、保留物品栏、立即重生、作弊；
+    #     3. 关闭天气更替；
+    #     4. 屏蔽饥饿度；
+    #     5. 夜视。
+    #     -----------------------------------------------------------
+    #     【enable: bool】 是否开启
+    #     -----------------------------------------------------------
+    #     NoReturn
+    #     """
+    #     if self.__timer:
+    #         self.__timer.Destroy()
+    #         self.__timer = None
+    #         for p in _serverApi.GetPlayerList():
+    #             _CompFactory.CreateGame(p).SetDisableHunger(False)
+    #     if enable:
+    #         @_ServerTimer.Repeat(1)
+    #         def func():
+    #             for _p in _serverApi.GetPlayerList():
+    #                 _CompFactory.CreateEffect(_p).AddEffectToEntity(_EffectType.NIGHT_VISION, 12, 0, False)
+    #                 _CompFactory.CreateGame(_p).SetDisableHunger(True)
+    #         self.__timer = func()
+    #     _LevelGameComp.SetGameRulesInfoServer({
+    #         'option_info': {
+    #             'show_coordinates': enable,
+    #             'immediate_respawn': enable,
+    #         },
+    #         'cheat_info': {
+    #             'always_day': enable,
+    #             'keep_inventory': enable,
+    #             'weather_cycle': not enable,
+    #             'enable': enable,
+    #         }
+    #     })
+
     def ListenForEventV2(self, eventName, callback, t=0, namespace="", systemName="", priority=0):
-        # type: (str, _Callable[[...], None], int, str, str, int) -> None
+        # type: (str, _MethodType, int, str, str, int) -> None
         """
         监听事件（简化版）。
         -----------------------------------------------------------
         【eventName: str】 事件名称
-        【callback: (Any) -> None】 回调函数
+        【callback: Method】 回调函数（方法）
         【t: int = 0】 0表示监听当前Mod客户端传来的自定义事件，1表示监听服务端引擎事件，2表示监听其他Mod的事件
         【namespace: str = ""】 其他Mod的命名空间
         【systemName: str = ""】 其他Mod的系统名称
         【priority: int = 0】 优先级
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
         if t == 0:
-            namespace = self._namespace
+            namespace = _MOD_NAME
             systemName = _CLIENT_SYSTEM_NAME
         elif t == 1:
             namespace = _ENGINE_NAMESPACE
@@ -369,7 +494,7 @@ class NuoyanServerSystem(_ServerSystem):
         【callback: Optional[(Any) -> None] = None】 回调函数，调用客户端成功后客户端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
         【*args: Any】 调用参数；如果调用的客户端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的客户端属性为函数，则args会作为参数传入该函数
         -----------------------------------------------------------
-        return -> None
+        NoReturn
         """
 
     # todo:====================================== Internal Method ======================================================
@@ -391,16 +516,9 @@ class NuoyanServerSystem(_ServerSystem):
             if self._listenGameTick:
                 self.NotifyToClient(self.homeownerPlayerId, "_ListenServerGameTick", {})
 
-    @listen("OnScriptTickServer", 1)
-    def _OnTick(self):
-        self._tick += 1
-        if not self._tick % 30 and self.__init__ != self._oldInitFunc:
-            self.__init__(self._namespace, self._systemName)
-            self._oldInitFunc = self.__init__
-            print "_onTick"
-
-    def _listen(self):
+    def __listen(self):
         for args in _lsnFuncArgs:
+            args[1] = getattr(self, args[1])
             self.ListenForEventV2(*args)
         for event, callback in ALL_ENGINE_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanServerSystem, callback):
@@ -422,12 +540,17 @@ class NuoyanServerSystem(_ServerSystem):
         if playerId in self.allPlayerData:
             del self.allPlayerData[playerId]
 
-    def _test(self):
-        print "test"
 
-    def _emptyFunc(self, *args, **kwargs):
-        pass
+try:
+    _ins = _serverApi.GetSystem(_MOD_NAME, _SERVER_SYSTEM_NAME)  # type: NuoyanServerSystem
+    if _ins:
+        _LevelGameComp.AddTimer(0, _ins.OnHotUpdate)
+except:
+    pass
 
+
+def _test():
+    pass
 
 
 
