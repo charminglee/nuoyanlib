@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-02-26
 #
 # ====================================================
 
@@ -60,6 +60,9 @@ def entity_filter(entityList, *args):
     # type: (list[str], tuple[tuple[float, float, float], float] | int | list[str] | list[int]) -> list[str]
     """
     实体ID过滤器。
+    自动过滤无法获取坐标的实体。
+    请自行检查传入的过滤参数是否存在冲突，若存在冲突，可能会返回错误的结果。
+    过滤参数的优先级从左至右递减。
     过滤参数说明及示例：
     1. 传入一个tuple，tuple的第一个元素为坐标，第二个元素为半径，表示保留该坐标半径范围内的所有实体；
     entity_filter(entityList, (pos, 60))     # 保留以pos为中心60格半径内的实体
@@ -76,12 +79,9 @@ def entity_filter(entityList, *args):
     entity_filter(entityList, [EntityType.Pig, EntityType.Wolf])     # 抛弃所有猪和狼
     6. 以上5种过滤参数均可混合使用；
     entity_filter(entityList, {"0"}, (pos, 60), {EntityType.Mob})     # 保留主世界中以pos为中心60格半径内的所有生物
-    7. 自动过滤无法获取坐标的实体；
-    8. 请自行检查传入的过滤参数是否存在冲突，若存在冲突，可能会返回错误的结果；
-    9. 过滤参数的优先级从左至右递减。
     -----------------------------------------------------------
     【entityList: List[str]】 实体ID列表
-    【args: Union[Tuple[Tuple[float, float, float], float], int, List[str], List[int]]】 过滤参数
+    【args: Union[Tuple[tuple, float], int, List[str], List[int]]】 过滤参数
     -----------------------------------------------------------
     return: List[str] -> 过滤后的实体ID列表
     """
@@ -260,9 +260,7 @@ def get_all_entities():
     -----------------------------------------------------------
     return: List[str] -> 实体ID列表
     """
-    players = _serverApi.GetPlayerList()
-    ents = _serverApi.GetEngineActor().keys()
-    return ents + players
+    return _serverApi.GetEngineActor().keys() + _serverApi.GetPlayerList()
 
 
 def get_entities_in_area(pos, radius, dimension=0, filterIdList=None, filterTypeIdList=None, filterAbiotic=False):
@@ -388,11 +386,11 @@ def get_nearest_entity(obj, count=1, dim=0, radius=-1.0, filterIdList=None, filt
     sort_entity_list_by_distance(pos, allEnts)
     r = (pos, radius) if radius != -1 else None
     fa = {_EntityType.Mob} if filterAbiotic else None
-    allEnts = entity_filter(r, fa, filterIdList, filterTypeIdList, {str(dim)})
+    allEnts = entity_filter(allEnts, r, fa, filterIdList, filterTypeIdList, {str(dim)})
     if not allEnts:
         return
     result = allEnts[:count]
-    return result if len(result) > 1 else result[0]
+    return result if count > 1 else result[0]
 
 
 def attack_nearest_mob(entityId, r=15.0, filterIdList=None, filterTypeIdList=None):

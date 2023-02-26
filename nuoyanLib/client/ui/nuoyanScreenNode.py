@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-09
+#   Last Modified : 2023-02-26
 #
 # ====================================================
 
@@ -22,6 +22,7 @@ from ..setting import read_setting as _read_setting, save_setting as _save_setti
 from utils import get_parent_path as _get_parent_path
 from ..._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME, \
     SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
+from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl
 try:
     import mod.client.extraClientApi as _clientApi
 except:
@@ -140,17 +141,20 @@ class NuoyanScreenNode(_ScreenNode):  # type:
         self._listen()
 
     def _listen(self):
+        global _lsnFuncArgs
         for eventName, funcName, t, namespace, systemName, priority in _lsnFuncArgs:
             self.cs.ListenForEvent(namespace, systemName, eventName, self, getattr(self, funcName), priority)
+        _lsnFuncArgs = []
 
     def Create(self):
         """
         UI生命周期函数，当UI创建成功时调用。
         若重写该方法，请调用一次NuoyanScreenNode的同名方法，否则部分功能将不可用。如：
         def Create(self):
-            super(MyUI, self).Create()  # 或者：NuoyanScreenNode.Create(self)
+            super(MyUI, self).Create()
+            # 或者：NuoyanScreenNode.Create(self)
         """
-        uiPosData = _read_setting(self._uiPosKey)
+        uiPosData = _read_setting(self._uiPosKey, False)
         if uiPosData:
             for bp, pos in uiPosData.items():
                 self.GetBaseUIControl(bp).SetPosition(tuple(pos))
@@ -261,7 +265,7 @@ class NuoyanScreenNode(_ScreenNode):  # type:
     def SetButtonMovableAfterLongClick(self, btnPath, moveParent=False, associatedWidgetPath=(), touchUpFunc=None,
                                        longClickFunc=None, touchMoveCallback=None, touchMoveOutFunc=None,
                                        touchDownFunc=None, touchCancelFunc=None):
-        # type: (str, bool, str | tuple[str, ...], _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None) -> None
+        # type: (str, bool, str | tuple[str, ...], _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None) -> ButtonUIControl
         """
         设置按钮长按拖动。
         该方法设置的按钮拖动会自动保存位置，下次启动游戏时按钮会恢复到上次游戏时的位置。
@@ -276,11 +280,11 @@ class NuoyanScreenNode(_ScreenNode):  # type:
         【touchDownFunc: Optional[(dict) -> None] = None】 TouchDown回调函数
         【touchCancelFunc: Optional[(dict) -> None] = None】 TouchCancel回调函数
         -----------------------------------------------------------
-        NoReturn
+        return: ButtonUIControl -> 按钮的ButtonUIControl实例
         """
         if isinstance(associatedWidgetPath, str):
             associatedWidgetPath = (associatedWidgetPath,)
-        self.SetButtonLongClickCallback(
+        btn = self.SetButtonLongClickCallback(
             btnPath, self._onLongClick, touchUpFunc, touchMoveOutFunc, self._onDown, touchCancelFunc
         )
         self._moveAfterLCData[btnPath] = {
@@ -295,10 +299,11 @@ class NuoyanScreenNode(_ScreenNode):  # type:
             self._savePosUis.append(_get_parent_path(btnPath))
         else:
             self._savePosUis.append(btnPath)
+        return btn
 
     def SetButtonLongClickCallback(self, btnPath, longClickFunc, touchUpFunc=None, touchMoveOutFunc=None,
                                    touchDownFunc=None, touchCancelFunc=None):
-        # type: (str, _Callable[[dict], None], _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None) -> None
+        # type: (str, _Callable[[dict], None], _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None, _Callable[[dict], None] | None) -> ButtonUIControl
         """
         设置按钮长按监听。
         -----------------------------------------------------------
@@ -309,7 +314,7 @@ class NuoyanScreenNode(_ScreenNode):  # type:
         【touchDownFunc：Optional[(dict) -> None] = None】 TouchDown回调函数
         【touchCancelFunc：Optional[(dict) -> None] = None】 TouchCancel回调函数
         -----------------------------------------------------------
-        NoReturn
+        return: ButtonUIControl -> 按钮的ButtonUIControl实例
         """
         self._btnLongClickData[btnPath] = {
             'longClickFunc': longClickFunc,
@@ -331,6 +336,7 @@ class NuoyanScreenNode(_ScreenNode):  # type:
         self._btnTouchUpCallbackData[btnPath].append(self._onTouchUp)
         if touchUpFunc and touchUpFunc not in self._btnTouchUpCallbackData[btnPath]:
             self._btnTouchUpCallbackData[btnPath].append(touchUpFunc)
+        return btn
 
     def RemoveButtonLongClickCallback(self, btnPath):
         # type: (str) -> None
@@ -381,10 +387,13 @@ class NuoyanScreenNode(_ScreenNode):  # type:
         self._saveUiPosition()
 
     def _saveUiPosition(self):
-        data = {
-            bp: self.GetBaseUIControl(bp).GetPosition() for bp in self._savePosUis
-        }
-        _save_setting(self._uiPosKey, data)
+        data = {}
+        for bp in self._savePosUis:
+            pos = self.GetBaseUIControl(bp).GetPosition()
+            if pos[0] < 0 or pos[1] < 0:
+                continue
+            data[bp] = pos
+        _save_setting(self._uiPosKey, data, False)
 
     def _onBtnTouchUp(self, args):
         bp = args['ButtonPath']

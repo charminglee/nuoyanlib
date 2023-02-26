@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-02-26
 #
 # ====================================================
 
@@ -130,7 +130,8 @@ def is_empty_item(itemDict, zeroCountIsEmp=True):
     -----------------------------------------------------------
     return: bool -> 空物品则返回True，否则返回False
     """
-    return ('newItemName' not in itemDict and 'itemName' not in itemDict) \
+    return not itemDict \
+           or ('newItemName' not in itemDict and 'itemName' not in itemDict) \
            or (zeroCountIsEmp and itemDict.get('count', 1) <= 0) \
            or itemDict.get('newItemName') in _AIR  \
            or itemDict.get('itemName') in _AIR

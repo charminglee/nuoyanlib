@@ -59,12 +59,13 @@ https://gitee.com/charming-lee/nuoyanLib/wikis/%E5%8F%82%E8%80%83%E6%96%87%E6%A1
 
 ## 版权说明
 
-nuoyanLib遵循《木兰宽松许可证第2版》，您可以将nuoyanLib应用于任何项目中，修改与否由您决定，但请保留nuoyanLib中每个文件头部的版权注释。
+本项目遵循《木兰宽松许可证第2版》，您可以将nuoyanLib应用于任何项目中，修改与否由您决定，但请保留nuoyanLib中每个文件头部的版权注释。
 > 更多内容请自行查阅[LICENSE](/LICENSE)文件。
 
 ## 联系作者
 
 如在使用过程中遇到问题，可通过以下方式联系作者：  
+- 微信：
 - QQ：1279735247
 - 邮箱：1279735247@qq.com
 - gitee：https://gitee.com/charming-lee

@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-08
+#   Last Modified : 2023-02-26
 #
 # ====================================================
 
@@ -67,6 +67,16 @@ ALL_ENGINE_EVENTS = (
     ("OnEntityInsideBlockServerEvent", "OnEntityInsideBlock"),
     ("OnMobHitBlockServerEvent", "OnMobHitBlock"),
     ("AddEntityServerEvent", "OnAddEntity"),
+    ("MobDieEvent", "OnMobDie"),
+    ("PlayerInteractServerEvent", "OnPlayerInteract"),
+    ("PlayerDoInteractServerEvent", "OnPlayerDoInteract"),
+    ("EntityDefinitionsEventServerEvent", "OnEntityDefinitionsEvent"),
+    ("DimensionChangeFinishServerEvent", "OnDimensionChangeFinish"),
+    ("HealthChangeBeforeServerEvent", "OnHealthChangeBefore"),
+    ("ActuallyHurtServerEvent", "OnActuallyHurt"),
+    ("EntityDieLoottableServerEvent", "OnEntityDieLoottable"),
+    ("SpawnProjectileServerEvent", "OnSpawnProjectile"),
+    ("OnGroundServerEvent", "OnGround"),
 )
 
 
@@ -155,6 +165,109 @@ class NuoyanServerSystem(_ServerSystem):
         self.UnListenAllEvents()
 
     # todo:==================================== Engine Event Callback ==================================================
+
+    def OnGround(self, args):
+        """
+        实体着地事件。实体，掉落的物品，点燃的TNT掉落地面时触发。
+        -----------------------------------------------------------
+        【id: str】 实体ID
+        """
+
+    def OnSpawnProjectile(self, args):
+        """
+        抛射物生成时触发。
+        该事件里无法获取弹射物实体的auxvalue。如有需要可以延迟一帧获取，或者在ProjectileDoHitEffectEvent获取。
+        -----------------------------------------------------------
+        【projectileId: str】 抛射物的实体ID
+        【projectileIdentifier: str】 抛射物的identifier
+        【spawnerId: str】 发射者的实体ID，没有发射者时为-1
+        """
+
+    def OnEntityDieLoottable(self, args):
+        """
+        生物死亡掉落物品时触发。
+        只有当dirty为True时才会重新读取item列表并生成对应的掉落物，如果不需要修改掉落结果的话请勿随意修改dirty值。
+        -----------------------------------------------------------
+        【dieEntityId: str】 死亡实体ID
+        【attacker: str】 伤害来源实体ID
+        【itemList: List[dict]】 掉落物品列表，每个元素为一个itemDict，格式可参考物品信息字典
+        【dirty: bool】 默认为False，如果需要修改掉落列表需将该值设为True
+        """
+
+    def OnActuallyHurt(self, args):
+        """
+        实体实际受到伤害时触发，相比于DamageEvent，该伤害为经过护甲及buff计算后，实际的扣血量。
+        药水与状态效果造成的伤害不触发，可以使用ActorHurtServerEvent。
+        为了游戏运行效率请尽可能避免将火的伤害设置为0，因为这样会导致大量触发该事件。
+        若要修改damage或damage_f的值，请确保修改后的值与原值不同，且需要使用原来的数据类型(int/float)，否则引擎会忽略这次修改。
+        -----------------------------------------------------------
+        【srcId: str】 伤害源实体ID
+        【projectileId: str】 抛射物实体ID
+        【entityId: str】 受伤的实体ID
+        【damage: int】 伤害值（被伤害吸收后的值），允许修改，设置为0则此次造成的伤害为0，若设置数值和原来一样则视为没有修改
+        【damage_f: float】 伤害值（被伤害吸收后的值），允许修改，若修改该值，则会覆盖damage的修改效果
+        【cause: str】 伤害来源，详见Minecraft枚举值文档的ActorDamageCause
+        """
+
+    def OnHealthChangeBefore(self, args):
+        """
+        生物生命值发生变化之前触发。
+        -----------------------------------------------------------
+        【entityId: str】 实体ID
+        【from: float】 变化前的生命值
+        【to: float】 将要变化到的生命值，cancel设置为True时可以取消该变化，但是此参数不变
+        【byScript: bool】 是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
+        【$cancel: bool】 是否取消该变化
+        """
+
+    def OnDimensionChangeFinish(self, args):
+        """
+        玩家维度改变完成后服务端抛出。
+        当通过传送门从末地回到主世界时，toPos的y值为32767，其他情况一般会比设置值高1.62。
+        -----------------------------------------------------------
+        【playerId: str】 玩家的实体ID
+        【fromDimensionId: int】 维度改变前的维度
+        【toDimensionId: int】 维度改变后的维度
+        【toPos: Tuple[float, float, float]】 改变后的位置，其中y值为脚底加上角色的身高值
+        """
+
+    def OnEntityDefinitionsEvent(self, args):
+        """
+        生物定义json文件中设置的event触发时同时触发。
+        -----------------------------------------------------------
+        【entityId: str】 实体ID
+        【eventName: str】 触发的事件名称
+        """
+
+    def OnPlayerDoInteract(self, args):
+        """
+        玩家与有minecraft:interact组件的生物交互时触发该事件，例如玩家手持空桶对牛挤奶、玩家手持打火石点燃苦力怕。
+        -----------------------------------------------------------
+        【playerId: str】 玩家的实体ID
+        【itemDict: dict】 物品信息字典
+        【interactEntityId: str】 交互生物的实体ID
+        """
+
+    def OnPlayerInteract(self, args):
+        """
+        玩家可以与实体交互时触发。
+        如果是鼠标控制模式，则当准心对着实体时触发。如果是触屏模式，则触发时机与屏幕下方的交互按钮显示的时机相同。
+        玩家真正与实体发生交互的事件见PlayerDoInteractServerEvent。
+        -----------------------------------------------------------
+        【$cancel: bool】 是否取消触发，默认为False，若设为True，可阻止触发后续的实体交互事件
+        【playerId: str】 玩家的实体ID
+        【itemDict: dict】 玩家手持物品的物品信息字典
+        【victimId: str】 交互生物的实体ID
+        """
+
+    def OnMobDie(self, args):
+        """
+        生物死亡时触发。
+        注意：不能在该事件回调中对攻击者手持物品进行修改，如SpawnItemToPlayerCarried、ChangePlayerItemTipsAndExtraId等接口。
+        -----------------------------------------------------------
+        【id: str】 实体ID
+        【attacker: str】 攻击者实体ID
+        """
 
     def OnAddEntity(self, args):
         """

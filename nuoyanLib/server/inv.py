@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-02-26
 #
 # ====================================================
 
@@ -22,6 +22,7 @@ try:
 except:
     pass
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType, GameType as _GameType
+from ..utils.item import is_empty_item as _is_empty_item
 
 
 __all__ = [
@@ -88,7 +89,56 @@ def change_player_item_count(playerId, posType=_ItemPosType.CARRIED, pos=0, chan
     itemComp.SetPlayerAllItems({(posType, pos): item})
 
 
+def cal_item_count(playerId, name, aux=-1):
+    """
+    计算玩家背包中指定物品的总数量。
+    -----------------------------------------------------------
+    【playerId: str】 玩家的实体ID
+    【name: str】 物品名称
+    【aux: int = -1】 物品特殊值（-1表示任意特殊值）
+    -----------------------------------------------------------
+    return: int -> 指定物品在背包中的总数
+    """
+    count = 0
+    items = _ServerCompFactory.CreateItem(playerId).GetPlayerAllItems(_ItemPosType.INVENTORY)
+    for item in items:
+        if _is_empty_item(item):
+            continue
+        if item['newItemName'] == name and (aux == -1 or item['newAuxValue'] == aux):
+            count += item['count']
+    return count
 
+
+def deduct_item(playerId, name, aux, count):
+    """
+    从玩家背包中扣除指定数量的物品。
+    -----------------------------------------------------------
+    【playerId: str】 玩家的实体ID
+    【name: str】 物品名称
+    【aux: int】 物品特殊值（-1表示任意特殊值）
+    【count: int】 扣除数量
+    -----------------------------------------------------------
+    return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
+    """
+    totalCount = cal_item_count(playerId, name, aux)
+    if totalCount < count:
+        return False
+    comp = _ServerCompFactory.CreateItem(playerId)
+    items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY)
+    for i, item in enumerate(items[:]):
+        if _is_empty_item(item) or item['newItemName'] != name or item['newAuxValue'] != aux:
+            continue
+        c = item['count']
+        item['count'] -= count
+        count -= c
+        if item['count'] <= 0:
+            items[i] = None
+        if count <= 0:
+            break
+    comp.SetPlayerAllItems({
+        (_ItemPosType.INVENTORY, i): item for i, item in enumerate(items)
+    })
+    return True
 
 
 
