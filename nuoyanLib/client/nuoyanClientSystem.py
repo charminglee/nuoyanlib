@@ -12,21 +12,17 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-09
+#   Last Modified : 2023-03-18
 #
 # ====================================================
 
 
 from types import MethodType as _MethodType
 from collections import Callable as _Callable
-from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME, \
-    CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME
+from .._config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from ..utils.utils import is_method_overridden as _is_method_overridden
 from clientTimer import ClientTimer as _ClientTimer
-try:
-    import mod.client.extraClientApi as _clientApi
-except:
-    pass
+import mod.client.extraClientApi as _clientApi
 
 
 __all__ = [
@@ -36,36 +32,20 @@ __all__ = [
 ]
 
 
-try:
-    _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
-    _ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
-    _ScreenNode = _clientApi.GetScreenNodeCls()
-    _ViewBinder = _clientApi.GetViewBinderCls()
-    _PLAYER_ID = _clientApi.GetLocalPlayerId()
-    _LEVEL_ID = _clientApi.GetLevelId()
-    _ClientSystem = _clientApi.GetClientSystemCls()
-    _CompFactory = _clientApi.GetEngineCompFactory()
-    _PlayerActorMotionComp = _CompFactory.CreateActorMotion(_PLAYER_ID)
-    _LevelGameComp = _CompFactory.CreateGame(_LEVEL_ID)
-    _PlayerItemComp = _CompFactory.CreateItem(_PLAYER_ID)
-    _PlayerCameraComp = _CompFactory.CreateCamera(_PLAYER_ID)
-    _LevelBlockInfoComp = _CompFactory.CreateBlockInfo(_PLAYER_ID)
-    _PlayerPosComp = _CompFactory.CreatePos(_PLAYER_ID)
-except:
-    from ..mctypes.client.system.clientSystem import ClientSystem
-    from ..mctypes.client.ui.screenNode import ScreenNode
-    _ScreenNode = ScreenNode  # type: type[ScreenNode]
-    _ClientSystem = ClientSystem  # type: type[ClientSystem]
-    class _ViewBinder:
-        BF_BindString = ""
-        @staticmethod
-        def binding(*a):
-            def w(f):
-                return f
-            return w
-    _ENGINE_NAMESPACE = ""
-    _ENGINE_SYSTEM_NAME = ""
-    _LevelGameComp = None
+_ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
+_ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
+_ScreenNode = _clientApi.GetScreenNodeCls()
+_ViewBinder = _clientApi.GetViewBinderCls()
+_PLAYER_ID = _clientApi.GetLocalPlayerId()
+_LEVEL_ID = _clientApi.GetLevelId()
+_ClientSystem = _clientApi.GetClientSystemCls()
+_CompFactory = _clientApi.GetEngineCompFactory()
+_PlayerActorMotionComp = _CompFactory.CreateActorMotion(_PLAYER_ID)
+_LevelGameComp = _CompFactory.CreateGame(_LEVEL_ID)
+_PlayerItemComp = _CompFactory.CreateItem(_PLAYER_ID)
+_PlayerCameraComp = _CompFactory.CreateCamera(_PLAYER_ID)
+_LevelBlockInfoComp = _CompFactory.CreateBlockInfo(_PLAYER_ID)
+_PlayerPosComp = _CompFactory.CreatePos(_PLAYER_ID)
 
 
 if "/" in __file__:
@@ -175,6 +155,13 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
     # type: (str, int, str, str, int) -> ...
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
+    -----------------------------------------------------------
+    【eventName: str】 事件名称
+    【t: int = 0】 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
+    【namespace: str = ""】 其他Mod的命名空间
+    【systemName: str = ""】 其他Mod的系统名称
+    【priority: int = 0】 优先级
+    -----------------------------------------------------------
     示例：
     class MyClientSystem(ClientSystem):
         # 监听服务端传来的自定义事件
@@ -186,12 +173,6 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
         @listen("AddEntityClientEvent", 1)
         def OnAddEntity(self, args):
             pass
-    -----------------------------------------------------------
-    【eventName: str】 事件名称
-    【t: int = 0】 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
-    【namespace: str = ""】 其他Mod的命名空间
-    【systemName: str = ""】 其他Mod的系统名称
-    【priority: int = 0】 优先级
     """
     if t == 0:
         _namespace = _MOD_NAME
@@ -223,10 +204,11 @@ class NuoyanClientSystem(_ClientSystem):
     3. RegisterAndCreateUI：注册并创建UI
     4. CallServer：调用服务端属性（包括变量和函数）
     5. TestMode：开启或关闭客户端测试模式
+    6. AddPlayerRenderResources：一键添加玩家渲染资源，包括模型、贴图、材质、渲染控制器、动画、动画控制器、音效和粒子特效
+    7. SetQueryVar：设置指定实体query.mod变量的值，支持全局同步（即所有客户端同步设置该变量的值）
     -----------------------------------------------------------
     【新增事件】
     1. OnGameTick：频率与游戏实时帧率同步的Tick事件
-    2. OnHotUpdate：客户端热更时触发
     -----------------------------------------------------------
     【新增属性】
     -----------------------------------------------------------
@@ -242,6 +224,7 @@ class NuoyanClientSystem(_ClientSystem):
         self.__handle = 0
         self.__timer = None  # type: _ClientTimer
         self.__lastPos = None
+        self._3dItemRes = {}
         self.__listen()
         self._checkOnGameTick()
 
@@ -1176,14 +1159,86 @@ class NuoyanClientSystem(_ClientSystem):
         无参数
         """
 
-    def OnHotUpdate(self):
-        """
-        客户端热更时触发。
-        -----------------------------------------------------------
-        无参数
-        """
-
     # todo:======================================= Basic Function ======================================================
+
+    def SetQueryVar(self, entityId, name, value, sync=True):
+        """
+        设置指定实体query.mod变量的值，支持全局同步（即所有客户端同步设置该变量的值）。
+        若不进行全局同步，则本次设置只对当前客户端有效。
+        若设置的变量未注册，则自动进行注册。
+        -----------------------------------------------------------
+        【entityId: str】 实体ID
+        【name: str】 变量名
+        【value: float】 设置的值
+        【sync: bool = True】 是否进行全局同步
+        -----------------------------------------------------------
+        NoReturn
+        """
+        if sync:
+            self.BroadcastToAllClient("_SetQueryVar", {'entityId': entityId, 'name': name, 'value': value})
+        else:
+            self._setQuery({'entityId': entityId, 'name': name, 'value': value})
+
+    def AddPlayerRenderResources(self, playerId, *resTuple):
+        # type: (str, *tuple[str, str]) -> tuple[bool, ...]
+        """
+        一键添加玩家渲染资源，包括模型、贴图、材质、渲染控制器、动画、动画控制器、音效和粒子特效。
+        注意：如需添加音效，音效名称必须至少包含一个“.”，如“sound.abc”，否则本接口将无法识别。
+        -----------------------------------------------------------
+        【playerId: str】 玩家实体ID
+        【*resTuple: Tuple[str, str]】 可变位置参数，渲染资源元组，格式详见示例
+        -----------------------------------------------------------
+        return: Tuple[bool, ...] -> 返回添加结果的元组，每个元素为一个bool，与传入的resTuple参数相对应
+        -----------------------------------------------------------
+        示例：
+        self.AddPlayerRenderResources(
+            playerId,
+            ("my_geo", "geometry.abc"),     # 模型：(Key, 模型名称)
+            ("my_tex", "textures/entity/abc"),     # 贴图：(Key, 贴图所在路径)
+            ("my_mat", "abc"),     # 材质：(Key, 材质名称)
+            ("controller.render.abc", "1.0"),     # 渲染控制器：(渲染控制器名称, 生效条件)
+            ("my_anim", "animation.abc"),     # 动画：(Key, 动画名称)
+            ("my_ctrler", "controller.animation.abc"),     # 动画控制器：(Key, 动画控制器名称)
+            ("my_sound", "my_sound.abc"),     # 音效：(Key, 音效名称)
+            ("my_eff", "nuoyan:my_particle"),     # 粒子特效：(Key, 粒子特效名称)
+        )
+        """
+        res = []
+        comp = _CompFactory.CreateActorRender(playerId)
+        for arg in resTuple:
+            if arg[1].startswith("geometry."):
+                res.append(comp.AddPlayerGeometry(*arg))
+            elif arg[1].startswith("textures/"):
+                res.append(comp.AddPlayerTexture(*arg))
+            elif arg[0].startswith("controller.render."):
+                res.append(comp.AddPlayerRenderController(*arg))
+            elif arg[1].startswith("animation."):
+                res.append(comp.AddPlayerAnimation(*arg))
+            elif arg[1].startswith("controller.animation."):
+                res.append(comp.AddPlayerAnimationController(*arg))
+            elif ":" in arg[1]:
+                res.append(comp.AddPlayerParticleEffect(*arg))
+            elif "." in arg[1]:
+                res.append(comp.AddPlayerSoundEffect(*arg))
+            else:
+                res.append(comp.AddPlayerRenderMaterial(*arg))
+        comp.RebuildPlayerRender()
+        return tuple(res)
+
+    def CallServer(self, name, callback=None, *args):
+        # type: (str, _Callable[[...], None] | None, ...) -> None
+        """
+        调用服务端属性（包括变量和函数）。
+        -----------------------------------------------------------
+        【name: str】 服务端属性名
+        【callback: Optional[(Any) -> None] = None】 回调函数，调用服务端成功后服务端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
+        【*args: Any】 调用参数；如果调用的服务端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的服务端属性为函数，则args会作为参数传入该函数
+        -----------------------------------------------------------
+        NoReturn
+        -----------------------------------------------------------
+        示例：
+
+        """
 
     # def TestMode(self, enable):
     #     # type: (bool) -> None
@@ -1237,16 +1292,17 @@ class NuoyanClientSystem(_ClientSystem):
         广播事件到所有玩家的客户端。
         注：因为全局广播要经过服务端，所以监听事件时监听的是服务端而不是客户端。
         若传递的数据为字典，则客户端接收到的字典会内置一个key：__id__，其value为发送广播的玩家实体ID
-        示例：
-        self.BroadcastToAllClient("MyEvent", {'num': 123})
-        def func(self, args):
-            print args     # {'num': 123, '__id__': "..."}
-        self.ListenForEvent(serverNamespace, serverSystemName, "MyEvent", self, self.func)
         -----------------------------------------------------------
         【eventName: str】 事件名称
         【eventData: Any】 数据
         -----------------------------------------------------------
         NoReturn
+        -----------------------------------------------------------
+        示例：
+        self.BroadcastToAllClient("MyEvent", {'num': 123})
+        def func(self, args):
+            print args     # {'num': 123, '__id__': "..."}
+        self.ListenForEvent(serverNamespace, serverSystemName, "MyEvent", self, self.func)
         """
         self.NotifyToServer("_BroadcastToAllClient", {
             'eventName': eventName,
@@ -1279,7 +1335,7 @@ class NuoyanClientSystem(_ClientSystem):
         # type: (str, str, str, dict | None) -> _ScreenNode
         """
         注册并创建UI。
-        实例：
+        示例：
         self.myUiNode = self.RegisterAndCreateUI(namespace, clsPath, uiScreenDef)
         -----------------------------------------------------------
         【namespace: str】 UI的名称，对应UI的json文件中“namespace”的值
@@ -1299,21 +1355,17 @@ class NuoyanClientSystem(_ClientSystem):
             param['__cs__'] = self
         return _clientApi.CreateUI(_MOD_NAME, namespace, param)
 
-    def CallServer(self, name, callback=None, *args):
-        # type: (str, _Callable[[...], None] | None, ...) -> None
-        """
-        调用服务端属性（包括变量和函数）。
-        示例：
-
-        -----------------------------------------------------------
-        【name: str】 服务端属性名
-        【callback: Optional[(Any) -> None] = None】 回调函数，调用服务端成功后服务端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
-        【*args: Any】 调用参数；如果调用的服务端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的服务端属性为函数，则args会作为参数传入该函数
-        -----------------------------------------------------------
-        NoReturn
-        """
-
     # todo:====================================== Internal Method ======================================================
+
+    @listen("_SetQueryVar")
+    def _setQuery(self, args):
+        entityId = args['entityId']
+        name = args['name']
+        value = args['value']
+        comp = _CompFactory.CreateQueryVariable(entityId)
+        if comp.Get(name) == -1.0:
+            comp.Register(name, 0.0)
+        comp.Set(name, value)
 
     @listen("_ListenServerGameTick")
     def _OnListenServerGameTick(self, args=None):
@@ -1361,14 +1413,6 @@ class NuoyanClientSystem(_ClientSystem):
             self._listenClientGameTick()
 
 
-try:
-    _ins = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)  # type: NuoyanClientSystem
-    if _ins:
-        _LevelGameComp.AddTimer(0, _ins.OnHotUpdate)
-except:
-    pass
-
-
 class _GameTick(_ScreenNode):
     def __init__(self, namespace, name, param):
         super(_GameTick, self).__init__(namespace, name, param)
@@ -1384,17 +1428,7 @@ class _GameTick(_ScreenNode):
             self.cs.OnGameTick()
 
 
-def _test():
-    global _lsnFuncArgs
-    _lsnFuncArgs = []
-    class Test:
-        def __init__(self):
-            for args in _lsnFuncArgs:
-                print args
-        @listen("Event")
-        def event(self):
-            print "111"
-    Test()
+
 
 
 

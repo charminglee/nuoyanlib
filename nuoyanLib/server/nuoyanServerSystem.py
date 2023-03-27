@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-26
+#   Last Modified : 2023-03-18
 #
 # ====================================================
 
@@ -20,13 +20,9 @@
 from types import MethodType as _MethodType
 from collections import Callable as _Callable
 from ..utils.utils import is_method_overridden as _is_method_overridden
-from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME, \
-    SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
+from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from serverTimer import ServerTimer as _ServerTimer
-try:
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
+import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
@@ -36,19 +32,12 @@ __all__ = [
 ]
 
 
-try:
-    _ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
-    _ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
-    _LEVEL_ID = _serverApi.GetLevelId()
-    _ServerSystem = _serverApi.GetServerSystemCls()
-    _CompFactory = _serverApi.GetEngineCompFactory()
-    _LevelGameComp = _CompFactory.CreateGame(_LEVEL_ID)
-except:
-    from ..mctypes.server.system.serverSystem import ServerSystem
-    _ServerSystem = ServerSystem  # type: type[ServerSystem]
-    _ENGINE_NAMESPACE = ""
-    _ENGINE_SYSTEM_NAME = ""
-    _LevelGameComp = None
+_ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
+_ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
+_LEVEL_ID = _serverApi.GetLevelId()
+_ServerSystem = _serverApi.GetServerSystemCls()
+_CompFactory = _serverApi.GetEngineCompFactory()
+_LevelGameComp = _CompFactory.CreateGame(_LEVEL_ID)
 
 
 ALL_ENGINE_EVENTS = (
@@ -77,6 +66,9 @@ ALL_ENGINE_EVENTS = (
     ("EntityDieLoottableServerEvent", "OnEntityDieLoottable"),
     ("SpawnProjectileServerEvent", "OnSpawnProjectile"),
     ("OnGroundServerEvent", "OnGround"),
+    ("ServerBlockUseEvent", "OnBlockUse"),
+    ("ServerSpawnMobEvent", "OnSpawnMob"),
+    ("PlayerAttackEntityEvent", "OnPlayerAttackEntity"),
 )
 
 
@@ -137,7 +129,6 @@ class NuoyanServerSystem(_ServerSystem):
     【新增事件】
     1. UiInitFinished：客户端玩家UI框架初始化完成时，服务端触发
     2. OnGameTick：频率与游戏当前帧率同步的Tick事件
-    3. OnHotUpdate：服务端热更时触发
     -----------------------------------------------------------
     【新增属性】
     1. allPlayerData：用于保存所有玩家数据的字典，key为玩家实体ID，value为玩家数据字典，可自行添加数据；玩家加入游戏时（UiInitFinished后）会自动把玩家加入字典，玩家退出游戏时则会自动从字典中删除玩家及其数据；初始值为空字典
@@ -155,6 +146,7 @@ class NuoyanServerSystem(_ServerSystem):
         self.homeownerPlayerId = "-1"
         self._initFinished = 1
         self.__timer = None  # type: _ServerTimer
+        self._3dItems = []
         self.__listen()
         self._checkOnGameTick()
 
@@ -165,6 +157,56 @@ class NuoyanServerSystem(_ServerSystem):
         self.UnListenAllEvents()
 
     # todo:==================================== Engine Event Callback ==================================================
+
+    def OnPlayerAttackEntity(self, args):
+        """
+        当玩家攻击时触发该事件。
+        -----------------------------------------------------------
+        【playerId: str】 玩家的实体ID
+        【victimId: str】 受击者的实体ID
+        【$damage: int】 伤害值，引擎传过来的值是0，允许脚本层修改为其他数
+        【isValid: int】 脚本是否设置伤害值：1表示是，0表示否
+        【$cancel: bool】 是否取消该次攻击，默认不取消
+        【$isKnockBack: bool】 是否支持击退效果，默认支持，当不支持时将屏蔽武器击退附魔效果
+        """
+
+    def OnSpawnMob(self, args):
+        """
+        游戏内自动生成生物，以及使用api生成生物时触发。
+        -----------------------------------------------------------
+        【entityId: str】 实体ID
+        【identifier: str】 生物的identifier，如果通过MOD API生成，identifier命名空间为custom
+        【type: int】 生物的类型，参考EntityType
+        【baby: bool】 生物是否是幼年
+        【x: int】 生物的坐标x
+        【y: int】 生物的坐标y
+        【z: int】 生物的坐标z
+        【dimensionId: int】 维度ID
+        【realIdentifier: str】 生物的identifier，通过MOD API生成的生物在这个参数也能获取到真正的命名空间，而不是以custom开头的
+        【$cancel: bool】 是否取消生成该生物
+        """
+
+    def OnBlockUse(self, args):
+        """
+        *tick*
+        玩家右键点击新版自定义方块（或者通过接口AddBlockItemListenForUseEvent增加监听的MC原生游戏方块）时服务端抛出该事件（该事件tick执行，需要注意效率问题）。
+        当对原生方块进行使用时，如堆肥桶等类似有使用功能的方块使用物品时，会触发该事件，而ServerItemUseOnEvent则不会被触发。
+        有的方块是在ServerBlockUseEvent中设置cancel生效，但是有部分方块是在ClientBlockUseEvent中设置cancel才生效，如有需求建议在两个事件中同时设置cancel以保证生效。
+        -----------------------------------------------------------
+        【playerId: str】 玩家的实体ID
+        【blockName: str】 方块的identifier，包含命名空间及名称
+        【aux: int】 方块附加值
+        【$cancel: bool】 设置为True可拦截与方块交互的逻辑
+        【x: int】 方块x坐标
+        【y: int】 方块y坐标
+        【z: int】 方块z坐标
+        【dimensionId: int】 维度ID
+        -----------------------------------------------------------
+        【相关接口】
+        BlockUseEventWhiteListComponentServer.AddBlockItemListenForUseEvent(blockName) -> bool
+        BlockUseEventWhiteListComponentServer.RemoveBlockItemListenForUseEvent(blockName) -> bool
+        BlockUseEventWhiteListComponentServer.ClearAllListenForBlockUseEventItems() -> bool
+        """
 
     def OnGround(self, args):
         """
@@ -498,13 +540,6 @@ class NuoyanServerSystem(_ServerSystem):
 
     # todo:==================================== Custom Event Callback ==================================================
 
-    def OnHotUpdate(self):
-        """
-        服务端热更时触发。
-        -----------------------------------------------------------
-        无参数
-        """
-
     @listen("UiInitFinished")
     def OnUiInitFinished(self, args):
         """
@@ -654,16 +689,8 @@ class NuoyanServerSystem(_ServerSystem):
             del self.allPlayerData[playerId]
 
 
-try:
-    _ins = _serverApi.GetSystem(_MOD_NAME, _SERVER_SYSTEM_NAME)  # type: NuoyanServerSystem
-    if _ins:
-        _LevelGameComp.AddTimer(0, _ins.OnHotUpdate)
-except:
-    pass
 
 
-def _test():
-    pass
 
 
 

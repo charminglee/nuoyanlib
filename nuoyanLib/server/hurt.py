@@ -119,7 +119,7 @@ def sector_aoe_damage(attackerId, sectorRadius, sectorAngle, damage, knocked=Tru
     result = []
     for eid in entityList:
         pos = _ServerCompFactory.CreatePos(eid).GetFootPos()
-        test = _is_in_sector(attackerPos, sectorRadius, sectorAngle, attackerRot, (pos[0], attackerPos[1], pos[2]))
+        test = _is_in_sector((pos[0], attackerPos[1], pos[2]), attackerPos, sectorRadius, sectorAngle, attackerRot)
         if test:
             if not _ServerCompFactory.CreateHurt(eid).Hurt(damage, "entity_attack", attackerId, knocked):
                 hurt_by_set_health(eid, damage)

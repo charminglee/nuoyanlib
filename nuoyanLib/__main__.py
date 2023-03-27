@@ -17,7 +17,6 @@
 # ====================================================
 
 
-from client import nuoyanClientSystem
 from utils import utils
 
 
@@ -29,4 +28,3 @@ def _test(module):
 
 
 _test(utils)
-_test(nuoyanClientSystem)

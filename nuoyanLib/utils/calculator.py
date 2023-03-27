@@ -291,7 +291,9 @@ def pos_forward_rot(pos, rot, dis):
     """
     if not rot or not pos:
         return
-    dirRot = _GetDirFromRot(rot)
+    dirRot = _serverApi.GetDirFromRot(rot)
+    if not dirRot:
+        dirRot = _clientApi.GetDirFromRot(rot)
     resultPos = (
         pos[0] + dirRot[0] * dis,
         pos[1] + dirRot[1] * dis,
