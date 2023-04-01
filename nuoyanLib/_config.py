@@ -12,12 +12,12 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-03-27
+#   Last Modified : 2023-04-02
 #
 # ====================================================
 
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 __authorname__ = "诺言Nuoyan"
 __authorqq__ = "1279735247"
 __authoremail__ = "1279735247@qq.com"
