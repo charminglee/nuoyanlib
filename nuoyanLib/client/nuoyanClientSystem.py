@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-03-18
+#   Last Modified : 2023-04-01
 #
 # ====================================================
 
@@ -57,95 +57,95 @@ _UI_PATH_GAME_TICK = _PATH + "._GameTick"
 _UI_DEF_GAME_TICK = "_GameTick.main"
 
 
-ALL_ENGINE_EVENTS = (
-    ("OnScriptTickClient", "OnScriptTick"),
-    ("UiInitFinished", "OnUiInitFinished"),
-    ("AddEntityClientEvent", "OnAddEntity"),
-    ("AddPlayerAOIClientEvent", "OnAddPlayerAOI"),
-    ("AddPlayerCreatedClientEvent", "OnAddPlayerCreated"),
-    ("ChunkAcquireDiscardedClientEvent", "OnChunkAcquireDiscarded"),
-    ("ChunkLoadedClientEvent", "OnChunkLoaded"),
-    ("LoadClientAddonScriptsAfter", "OnLoadClientAddonScriptsAfter"),
-    ("OnCommandOutputClientEvent", "OnCommandOutput"),
-    ("OnLocalPlayerStopLoading", "OnLocalPlayerStopLoading"),
-    ("RemoveEntityClientEvent", "OnRemoveEntity"),
-    ("RemovePlayerAOIClientEvent", "OnRemovePlayerAOI"),
-    ("UnLoadClientAddonScriptsBefore", "OnUnLoadClientAddonScriptsBefore"),
-    ("ApproachEntityClientEvent", "OnApproachEntity"),
-    ("EntityModelChangedClientEvent", "OnEntityModelChanged"),
-    ("EntityStopRidingEvent", "OnEntityStopRiding"),
-    ("HealthChangeClientEvent", "OnHealthChange"),
-    ("OnGroundClientEvent", "OnGround"),
-    ("OnMobHitMobClientEvent", "OnMobHitMob"),
-    ("StartRidingClientEvent", "OnStartRiding"),
-    ("LeaveEntityClientEvent", "OnLeaveEntity"),
-    ("CameraMotionStartClientEvent", "OnCameraMotionStart"),
-    ("CameraMotionStopClientEvent", "OnCameraMotionStop"),
-    ("DimensionChangeClientEvent", "OnDimensionChange"),
-    ("DimensionChangeFinishClientEvent", "OnDimensionChangeFinish"),
-    ("ExtinguishFireClientEvent", "OnExtinguishFire"),
-    ("GameTypeChangedClientEvent", "OnGameTypeChanged"),
-    ("OnPlayerHitBlockClientEvent", "OnPlayerHitBlock"),
-    ("PerspChangeClientEvent", "OnPerspChange"),
-    ("ClientBlockUseEvent", "OnBlockUse"),
-    ("FallingBlockCauseDamageBeforeClientEvent", "OnFallingBlockCauseDamageBefore"),
-    ("OnAfterFallOnBlockClientEvent", "OnAfterFallOnBlock"),
-    ("OnEntityInsideBlockClientEvent", "OnEntityInsideBlock"),
-    ("OnModBlockNeteaseEffectCreatedClientEvent", "OnModBlockNeteaseEffectCreated"),
-    ("OnStandOnBlockClientEvent", "OnStandOnBlock"),
-    ("PlayerTryDestroyBlockClientEvent", "OnPlayerTryDestroyBlock"),
-    ("ShearsDestoryBlockBeforeClientEvent", "OnShearsDestoryBlockBefore"),
-    ("StepOffBlockClientEvent", "OnStepOffBlock"),
-    ("StartDestroyBlockClientEvent", "OnStartDestroyBlock"),
-    ("StepOnBlockClientEvent", "OnStepOnBlock"),
-    ("ActorAcquiredItemClientEvent", "OnActorAcquiredItem"),
-    ("ActorUseItemClientEvent", "OnActorUseItem"),
-    ("AnvilCreateResultItemAfterClientEvent", "OnAnvilCreateResultItemAfter"),
-    ("ClientItemTryUseEvent", "OnItemTryUse"),
-    ("ClientItemUseOnEvent", "OnItemUseOn"),
-    ("ClientShapedRecipeTriggeredEvent", "OnShapedRecipeTriggered"),
-    ("GrindStoneRemovedEnchantClientEvent", "OnGrindStoneRemovedEnchant"),
-    ("InventoryItemChangedClientEvent", "OnInventoryItemChanged"),
-    ("ItemReleaseUsingClientEvent", "OnItemReleaseUsing"),
-    ("OnCarriedNewItemChangedClientEvent", "OnCarriedNewItemChanged"),
-    ("PlayerTryDropItemClientEvent", "OnPlayerTryDropItem"),
-    ("StartUsingItemClientEvent", "OnStartUsingItem"),
-    ("StopUsingItemClientEvent", "OnStopUsingItem"),
-    ("AttackAnimBeginClientEvent", "OnAttackAnimBegin"),
-    ("AttackAnimEndClientEvent", "OnAttackAnimEnd"),
-    ("WalkAnimBeginClientEvent", "OnWalkAnimBegin"),
-    ("WalkAnimEndClientEvent", "OnWalkAnimEnd"),
-    ("ClientChestCloseEvent", "OnChestClose"),
-    ("ClientChestOpenEvent", "OnChestOpen"),
-    ("ClientPlayerInventoryCloseEvent", "OnPlayerInventoryClose"),
-    ("ClientPlayerInventoryOpenEvent", "OnPlayerInventoryOpen"),
-    ("GridComponentSizeChangedClientEvent", "OnGridComponentSizeChanged"),
-    ("OnItemSlotButtonClickedEvent", "OnItemSlotButtonClicked"),
-    ("PlayerChatButtonClickClientEvent", "OnPlayerChatButtonClick"),
-    ("PopScreenEvent", "OnPopScreen"),
-    ("PushScreenEvent", "OnPushScreen"),
-    ("ScreenSizeChangedClientEvent", "OnScreenSizeChanged"),
-    ("OnMusicStopClientEvent", "OnMusicStop"),
-    ("PlayMusicClientEvent", "OnPlayMusic"),
-    ("PlaySoundClientEvent", "OnPlaySound"),
-    ("ClientJumpButtonPressDownEvent", "OnJumpButtonPressDown"),
-    ("ClientJumpButtonReleaseEvent", "OnJumpButtonRelease"),
-    ("GetEntityByCoordEvent", "OnGetEntityByCoord"),
-    ("GetEntityByCoordReleaseClientEvent", "OnGetEntityByCoordRelease"),
-    ("HoldBeforeClientEvent", "OnHoldBefore"),
-    ("LeftClickBeforeClientEvent", "OnLeftClickBefore"),
-    ("LeftClickReleaseClientEvent", "OnLeftClickRelease"),
-    ("MouseWheelClientEvent", "OnMouseWheel"),
-    ("OnBackButtonReleaseClientEvent", "OnBackButtonRelease"),
-    ("OnClientPlayerStartMove", "OnPlayerStartMove"),
-    ("OnClientPlayerStopMove", "OnPlayerStopMove"),
-    ("OnKeyPressInGame", "OnKeyPressInGame"),
-    ("OnMouseMiddleDownClientEvent", "OnMouseMiddleDown"),
-    ("RightClickBeforeClientEvent", "OnRightClickBefore"),
-    ("RightClickReleaseClientEvent", "OnRightClickRelease"),
-    ("TapBeforeClientEvent", "OnTapBefore"),
-    ("TapOrHoldReleaseClientEvent", "OnTapOrHoldRelease"),
-)
+ALL_ENGINE_EVENTS = [
+    "OnScriptTickClient",
+    "UiInitFinished",
+    "AddEntityClientEvent",
+    "AddPlayerAOIClientEvent",
+    "AddPlayerCreatedClientEvent",
+    "ChunkAcquireDiscardedClientEvent",
+    "ChunkLoadedClientEvent",
+    "LoadClientAddonScriptsAfter",
+    "OnCommandOutputClientEvent",
+    "OnLocalPlayerStopLoading",
+    "RemoveEntityClientEvent",
+    "RemovePlayerAOIClientEvent",
+    "UnLoadClientAddonScriptsBefore",
+    "ApproachEntityClientEvent",
+    "EntityModelChangedClientEvent",
+    "EntityStopRidingEvent",
+    "HealthChangeClientEvent",
+    "OnGroundClientEvent",
+    "OnMobHitMobClientEvent",
+    "StartRidingClientEvent",
+    "LeaveEntityClientEvent",
+    "CameraMotionStartClientEvent",
+    "CameraMotionStopClientEvent",
+    "DimensionChangeClientEvent",
+    "DimensionChangeFinishClientEvent",
+    "ExtinguishFireClientEvent",
+    "GameTypeChangedClientEvent",
+    "OnPlayerHitBlockClientEvent",
+    "PerspChangeClientEvent",
+    "ClientBlockUseEvent",
+    "FallingBlockCauseDamageBeforeClientEvent",
+    "OnAfterFallOnBlockClientEvent",
+    "OnEntityInsideBlockClientEvent",
+    "OnModBlockNeteaseEffectCreatedClientEvent",
+    "OnStandOnBlockClientEvent",
+    "PlayerTryDestroyBlockClientEvent",
+    "ShearsDestoryBlockBeforeClientEvent",
+    "StepOffBlockClientEvent",
+    "StartDestroyBlockClientEvent",
+    "StepOnBlockClientEvent",
+    "ActorAcquiredItemClientEvent",
+    "ActorUseItemClientEvent",
+    "AnvilCreateResultItemAfterClientEvent",
+    "ClientItemTryUseEvent",
+    "ClientItemUseOnEvent",
+    "ClientShapedRecipeTriggeredEvent",
+    "GrindStoneRemovedEnchantClientEvent",
+    "InventoryItemChangedClientEvent",
+    "ItemReleaseUsingClientEvent",
+    "OnCarriedNewItemChangedClientEvent",
+    "PlayerTryDropItemClientEvent",
+    "StartUsingItemClientEvent",
+    "StopUsingItemClientEvent",
+    "AttackAnimBeginClientEvent",
+    "AttackAnimEndClientEvent",
+    "WalkAnimBeginClientEvent",
+    "WalkAnimEndClientEvent",
+    "ClientChestCloseEvent",
+    "ClientChestOpenEvent",
+    "ClientPlayerInventoryCloseEvent",
+    "ClientPlayerInventoryOpenEvent",
+    "GridComponentSizeChangedClientEvent",
+    "OnItemSlotButtonClickedEvent",
+    "PlayerChatButtonClickClientEvent",
+    "PopScreenEvent",
+    "PushScreenEvent",
+    "ScreenSizeChangedClientEvent",
+    "OnMusicStopClientEvent",
+    "PlayMusicClientEvent",
+    "PlaySoundClientEvent",
+    "ClientJumpButtonPressDownEvent",
+    "ClientJumpButtonReleaseEvent",
+    "GetEntityByCoordEvent",
+    "GetEntityByCoordReleaseClientEvent",
+    "HoldBeforeClientEvent",
+    "LeftClickBeforeClientEvent",
+    "LeftClickReleaseClientEvent",
+    "MouseWheelClientEvent",
+    "OnBackButtonReleaseClientEvent",
+    "OnClientPlayerStartMove",
+    "OnClientPlayerStopMove",
+    "OnKeyPressInGame",
+    "OnMouseMiddleDownClientEvent",
+    "RightClickBeforeClientEvent",
+    "RightClickReleaseClientEvent",
+    "TapBeforeClientEvent",
+    "TapOrHoldReleaseClientEvent",
+]
 
 
 _lsnFuncArgs = []
@@ -236,7 +236,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     # todo:==================================== Engine Event Callback ==================================================
 
-    def OnTapOrHoldRelease(self, args):
+    def TapOrHoldReleaseClientEvent(self, args):
         """
         玩家点击屏幕后松手时触发。
         仅在移动端或pc的F11模式下触发。
@@ -246,7 +246,7 @@ class NuoyanClientSystem(_ClientSystem):
         无参数
         """
 
-    def OnTapBefore(self, args):
+    def TapBeforeClientEvent(self, args):
         """
         玩家点击屏幕并松手，即将响应到游戏内时触发。
         仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用LeftClickBeforeClientEvent事件监听鼠标左键。
@@ -262,7 +262,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 设置为True可拦截原版的攻击或放置响应
         """
 
-    def OnRightClickRelease(self, args):
+    def RightClickReleaseClientEvent(self, args):
         """
         玩家松开鼠标右键时触发。
         仅在pc的普通控制模式（即非F11模式）下触发。
@@ -271,14 +271,14 @@ class NuoyanClientSystem(_ClientSystem):
         无参数
         """
 
-    def OnRightClickBefore(self, args):
+    def RightClickBeforeClientEvent(self, args):
         """
         玩家按下鼠标右键时触发。仅在pc下触发（普通控制模式及F11模式都会触发）。
         -----------------------------------------------------------
         【$cancel: bool】 设置为True可拦截原版的物品使用/实体交互响应
         """
 
-    def OnMouseMiddleDown(self, args):
+    def OnMouseMiddleDownClientEvent(self, args):
         """
         鼠标按下中键时触发。
         仅通过PushScreen创建的界面能够正常返回坐标，开启F11模式的时候，返回最后点击屏幕时的坐标。
@@ -297,49 +297,49 @@ class NuoyanClientSystem(_ClientSystem):
         【isDown: str】 是否按下，按下为1，弹起为0
         """
 
-    def OnPlayerStopMove(self):
+    def OnClientPlayerStopMove(self):
         """
         移动按钮按下释放时触发事件，同时按下多个方向键，需要释放所有的方向键才会触发事件。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnPlayerStartMove(self):
+    def OnClientPlayerStartMove(self):
         """
         移动按钮按下触发事件，在按住一个方向键的同时，去按另外一个方向键，不会触发第二次。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnBackButtonRelease(self, args):
+    def OnBackButtonReleaseClientEvent(self, args):
         """
         返回按钮（目前特指安卓系统导航中的返回按钮）松开时触发。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnMouseWheel(self, args):
+    def MouseWheelClientEvent(self, args):
         """
         鼠标滚轮滚动时触发。
         -----------------------------------------------------------
         【direction: int】 1为向上滚动，0为向下滚动
         """
 
-    def OnLeftClickRelease(self, args):
+    def LeftClickReleaseClientEvent(self, args):
         """
         玩家松开鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnLeftClickBefore(self, args):
+    def LeftClickBeforeClientEvent(self, args):
         """
         玩家按下鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
         -----------------------------------------------------------
         【$cancel: bool】 设置为True可拦截原版的挖方块或攻击响应
         """
 
-    def OnHoldBefore(self, args):
+    def HoldBeforeClientEvent(self, args):
         """
         玩家长按屏幕，即将响应到游戏内时触发。
         仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用RightClickBeforeClientEvent事件监听鼠标右键。
@@ -353,7 +353,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 设置为True可拦截原版的挖方块/使用物品/与实体交互响应
         """
 
-    def OnGetEntityByCoordRelease(self, args):
+    def GetEntityByCoordReleaseClientEvent(self, args):
         """
         玩家点击屏幕后松开时触发，多个手指点在屏幕上时，只有最后一个手指松开时触发。
         -----------------------------------------------------------
