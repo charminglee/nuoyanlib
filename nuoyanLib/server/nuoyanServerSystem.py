@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-01
+#   Last Modified : 2023-04-03
 #
 # ====================================================
 
@@ -730,30 +730,6 @@ class NuoyanServerSystem(_ServerSystem):
         【blockZ: int】 方块z坐标
         【blockName: str】 方块的identifier，包含命名空间及名称
         【$cancel: bool】 可由脚本层回传True给引擎，阻止触发后续原版逻辑
-        """
-
-    def OnEntityInsideBlockServerEvent(self, args):
-        """
-        当实体碰撞盒所在区域有方块时，服务端持续触发。
-        不是所有方块都会触发该事件，需要在json中先配置触发开关，原版方块需要先通过RegisterOnEntityInside接口注册才能触发。
-        如果需要修改slowdownMulti/cancel，强烈建议与客户端事件同步修改，避免出现客户端表现不一致等非预期现象。
-        如果要在脚本层修改slowdownMulti，回传的一定要是浮点型，例如需要赋值1.0而不是1。
-        有任意slowdownMulti参数被传回非0值时生效减速比例。
-        slowdownMulti参数更像是一个Buff，例如并不是立刻计算，而是先保存在实体属性里延后计算、在已经有slowdownMulti属性的情况下会取最低的值、免疫掉落伤害等，与原版蜘蛛网逻辑基本一致。
-        -----------------------------------------------------------
-        【entityId: str】 实体ID
-        【$slowdownMultiX: str】 实体移速X方向的减速比例，可在脚本层被修改
-        【$slowdownMultiY: str】 实体移速Y方向的减速比例，可在脚本层被修改
-        【$slowdownMultiZ: str】 实体移速Z方向的减速比例，可在脚本层被修改
-        【blockX: int】 方块x坐标
-        【blockY: int】 方块y坐标
-        【blockZ: int】 方块z坐标
-        【blockName: str】 方块的identifier，包含命名空间及名称
-        【$cancel: bool】 可由脚本层回传True给引擎，阻止触发后续原版逻辑
-        -----------------------------------------------------------
-        【相关接口】
-        BlockInfoComponentServer.RegisterOnEntityInside(blockName) -> bool
-        BlockInfoComponentServer.UnRegisterOnEntityInside(blockName) -> bool
         """
 
     def OnBeforeFallOnBlockServerEvent(self, args):
@@ -1792,22 +1768,6 @@ class NuoyanServerSystem(_ServerSystem):
         【isValid: int】 脚本是否设置伤害值：1表示是，0表示否
         【$cancel: bool】 是否取消该次攻击，默认不取消
         【$isKnockBack: bool】 是否支持击退效果，默认支持，当不支持时将屏蔽武器击退附魔效果
-        """
-
-    def ServerSpawnMobEvent(self, args):
-        """
-        游戏内自动生成生物，以及使用api生成生物时触发。
-        -----------------------------------------------------------
-        【entityId: str】 实体ID
-        【identifier: str】 生物的identifier，如果通过MOD API生成，identifier命名空间为custom
-        【type: int】 生物的类型，参考EntityType
-        【baby: bool】 生物是否是幼年
-        【x: int】 生物的坐标x
-        【y: int】 生物的坐标y
-        【z: int】 生物的坐标z
-        【dimensionId: int】 维度ID
-        【realIdentifier: str】 生物的identifier，通过MOD API生成的生物在这个参数也能获取到真正的命名空间，而不是以custom开头的
-        【$cancel: bool】 是否取消生成该生物
         """
 
     def ServerBlockUseEvent(self, args):
