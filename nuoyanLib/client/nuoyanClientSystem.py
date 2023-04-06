@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-01
+#   Last Modified : 2023-04-03
 #
 # ====================================================
 
@@ -361,28 +361,28 @@ class NuoyanClientSystem(_ClientSystem):
         【y: int】 手指点击位置y坐标
         """
 
-    def OnGetEntityByCoord(self, args):
+    def GetEntityByCoordEvent(self, args):
         """
         玩家点击屏幕时触发，多个手指点在屏幕上时，只有第一个会触发。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnJumpButtonRelease(self, args):
+    def ClientJumpButtonReleaseEvent(self, args):
         """
         跳跃按钮按下释放事件。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnJumpButtonPressDown(self, args):
+    def ClientJumpButtonPressDownEvent(self, args):
         """
         跳跃按钮按下事件，返回值设置参数只对当次按下事件起作用。
         -----------------------------------------------------------
         【$continueJump: bool】 设置是否执行跳跃逻辑
         """
 
-    def OnPlaySound(self, args):
+    def PlaySoundClientEvent(self, args):
         """
         播放场景音效或UI音效时触发。
         -----------------------------------------------------------
@@ -393,7 +393,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 设为True可屏蔽该次音效播放
         """
 
-    def OnPlayMusic(self, args):
+    def PlayMusicClientEvent(self, args):
         """
         播放背景音乐时触发。
         -----------------------------------------------------------
@@ -401,14 +401,14 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 设为True可屏蔽该次音效播放
         """
 
-    def OnMusicStop(self, args):
+    def OnMusicStopClientEvent(self, args):
         """
         音乐停止时，当玩家调用StopCustomMusic来停止自定义背景音乐时，会触发该事件。
         -----------------------------------------------------------
         【musicName: str】 音乐名称
         """
 
-    def OnScreenSizeChanged(self, args):
+    def ScreenSizeChangedClientEvent(self, args):
         """
         改变屏幕大小时会触发的事件。
         该事件仅支持PC。
@@ -419,42 +419,42 @@ class NuoyanClientSystem(_ClientSystem):
         【afterY: float】 屏幕大小改变后的高度
         """
 
-    def OnPushScreen(self, args):
+    def PushScreenEvent(self, args):
         """
         screen创建触发。
         -----------------------------------------------------------
         【screenName: str】 UI名字
         """
 
-    def OnPopScreen(self, args):
+    def PopScreenEvent(self, args):
         """
         screen移除触发。
         -----------------------------------------------------------
         【screenName: str】 UI名字
         """
 
-    def OnPlayerChatButtonClick(self, args):
+    def PlayerChatButtonClickClientEvent(self, args):
         """
         玩家点击聊天按钮或回车键触发呼出聊天窗口时客户端抛出的事件。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnItemSlotButtonClicked(self, args):
+    def OnItemSlotButtonClickedEvent(self, args):
         """
         点击快捷栏和背包栏的物品槽时触发。
         -----------------------------------------------------------
         【slotIndex: int】 点击的物品槽的编号
         """
 
-    def OnGridComponentSizeChanged(self, args):
+    def GridComponentSizeChangedClientEvent(self, args):
         """
         UI grid组件里格子数目发生变化时触发。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnPlayerInventoryOpen(self, args):
+    def ClientPlayerInventoryOpenEvent(self, args):
         """
         打开物品背包界面时触发。
         -----------------------------------------------------------
@@ -462,14 +462,14 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 是否取消打开物品背包界面。
         """
 
-    def OnPlayerInventoryClose(self, args):
+    def ClientPlayerInventoryCloseEvent(self, args):
         """
         关闭物品背包界面时触发。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnChestOpen(self, args):
+    def ClientChestOpenEvent(self, args):
         """
         打开箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
         -----------------------------------------------------------
@@ -479,14 +479,14 @@ class NuoyanClientSystem(_ClientSystem):
         【z: int】 箱子z坐标
         """
 
-    def OnChestClose(self, args):
+    def ClientChestCloseEvent(self, args):
         """
         关闭箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnWalkAnimEnd(self, args):
+    def WalkAnimEndClientEvent(self, args):
         """
         走路动作结束时触发。
         使用SetModel替换骨骼模型后，该事件才生效。
@@ -494,7 +494,7 @@ class NuoyanClientSystem(_ClientSystem):
         【id: str】 实体ID
         """
 
-    def OnWalkAnimBegin(self, args):
+    def WalkAnimBeginClientEvent(self, args):
         """
         走路动作开始时触发。
         使用SetModel替换骨骼模型后，该事件才生效。
@@ -502,7 +502,7 @@ class NuoyanClientSystem(_ClientSystem):
         【id: str】 实体ID
         """
 
-    def OnAttackAnimEnd(self, args):
+    def AttackAnimEndClientEvent(self, args):
         """
         攻击动作结束时触发。
         使用SetModel替换骨骼模型后，该事件才生效。
@@ -510,7 +510,7 @@ class NuoyanClientSystem(_ClientSystem):
         【id: str】 实体ID
         """
 
-    def OnAttackAnimBegin(self, args):
+    def AttackAnimBeginClientEvent(self, args):
         """
         攻击动作开始时触发。
         使用SetModel替换骨骼模型后，该事件才生效。
@@ -518,7 +518,7 @@ class NuoyanClientSystem(_ClientSystem):
         【id: str】 实体ID
         """
 
-    def OnStopUsingItem(self, args):
+    def StopUsingItemClientEvent(self, args):
         """
         玩家停止使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
         -----------------------------------------------------------
@@ -526,7 +526,7 @@ class NuoyanClientSystem(_ClientSystem):
         【itemDict: dict】 物品信息字典
         """
 
-    def OnStartUsingItem(self, args):
+    def StartUsingItemClientEvent(self, args):
         """
         玩家使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
         -----------------------------------------------------------
@@ -534,7 +534,7 @@ class NuoyanClientSystem(_ClientSystem):
         【itemDict: dict】 物品信息字典
         """
 
-    def OnPlayerTryDropItem(self, args):
+    def PlayerTryDropItemClientEvent(self, args):
         """
         玩家丢弃物品时触发。
         -----------------------------------------------------------
@@ -543,14 +543,14 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 是否取消此次操作
         """
 
-    def OnCarriedNewItemChanged(self, args):
+    def OnCarriedNewItemChangedClientEvent(self, args):
         """
         手持物品发生变化时，触发该事件；数量改变不会通知。
         -----------------------------------------------------------
         【itemDict: dict】 切换后的物品信息字典
         """
 
-    def OnItemReleaseUsing(self, args):
+    def ItemReleaseUsingClientEvent(self, args):
         """
         释放正在使用的物品时触发。
         -----------------------------------------------------------
@@ -561,7 +561,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 设置为True可以取消，需要同时取消服务端事件ItemReleaseUsingServerEvent
         """
 
-    def OnInventoryItemChanged(self, args):
+    def InventoryItemChangedClientEvent(self, args):
         """
         玩家背包物品变化时客户端抛出的事件。
         如果槽位变空，变化后槽位中物品为空气。
@@ -574,7 +574,7 @@ class NuoyanClientSystem(_ClientSystem):
         【newItemDict: dict】 变化后槽位中的物品信息字典
         """
 
-    def OnGrindStoneRemovedEnchant(self, args):
+    def GrindStoneRemovedEnchantClientEvent(self, args):
         """
         玩家点击砂轮合成得到的物品时抛出的事件。
         -----------------------------------------------------------
@@ -585,14 +585,14 @@ class NuoyanClientSystem(_ClientSystem):
         【exp: int】 本次合成返还的经验
         """
 
-    def OnShapedRecipeTriggered(self, args):
+    def ClientShapedRecipeTriggeredEvent(self, args):
         """
         玩家合成物品时触发。
         -----------------------------------------------------------
         【recipeId: str】 配方ID，对应配方json文件中的identifier字段
         """
 
-    def OnItemUseOn(self, args):
+    def ClientItemUseOnEvent(self, args):
         """
         *tick*
         玩家在对方块使用物品时客户端抛出的事件。
@@ -613,7 +613,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$ret: bool】 设为True可取消物品的使用
         """
 
-    def OnItemTryUse(self, args):
+    def ClientItemTryUseEvent(self, args):
         """
         玩家点击右键尝试使用物品时客户端抛出的事件，可以通过设置cancel为True取消使用物品。
         注：如果需要取消物品的使用需要同时在ClientItemTryUseEvent和ServerItemTryUseEvent中将cancel设置为True才能正确取消。
@@ -625,7 +625,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 是否取消使用物品
         """
 
-    def OnAnvilCreateResultItemAfter(self, args):
+    def AnvilCreateResultItemAfterClientEvent(self, args):
         """
         玩家点击铁砧合成得到的物品时抛出的事件。
         -----------------------------------------------------------
@@ -636,7 +636,7 @@ class NuoyanClientSystem(_ClientSystem):
         【materialItemDict: dict】 合成所使用材料的物品信息字典（铁砧内第二个物品）
         """
 
-    def OnActorUseItem(self, args):
+    def ActorUseItemClientEvent(self, args):
         """
         玩家使用物品时客户端抛出的事件（比较特殊不走该事件的例子：1.喝牛奶；2.染料对有水的炼药锅使用；3.盔甲架装备盔甲）。
         -----------------------------------------------------------
@@ -645,7 +645,7 @@ class NuoyanClientSystem(_ClientSystem):
         【useMethod: int】 使用物品的方法，详见ItemUseMethodEnum枚举
         """
 
-    def OnActorAcquiredItem(self, args):
+    def ActorAcquiredItemClientEvent(self, args):
         """
         玩家获得物品时客户端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
         -----------------------------------------------------------
@@ -655,7 +655,7 @@ class NuoyanClientSystem(_ClientSystem):
         【acquireMethod: int】 获得物品的方法，详见ItemAcquisitionMethod
         """
 
-    def OnStepOnBlock(self, args):
+    def StepOnBlockClientEvent(self, args):
         """
         实体刚移动至一个新实心方块时触发。
         在合并微软更新之后，本事件触发时机与微软molang实验性玩法组件"minecraft:on_step_on"一致。
@@ -677,7 +677,7 @@ class NuoyanClientSystem(_ClientSystem):
         BlockInfoComponentClient.UnRegisterOnStepOn(blockName: str) -> bool
         """
 
-    def OnStartDestroyBlock(self, args):
+    def StartDestroyBlockClientEvent(self, args):
         """
         玩家开始挖方块时触发。创造模式下不触发。
         如果是隔着火焰挖方块，即使将该事件cancel掉，火焰也会被扑灭。如果要阻止火焰扑灭，需要配合ExtinguishFireClientEvent使用。
@@ -689,7 +689,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockServerEvent一起修改。
         """
 
-    def OnStepOffBlock(self, args):
+    def StepOffBlockClientEvent(self, args):
         """
         实体移动离开一个实心方块时触发。
         不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关，原版方块需要先通过RegisterOnStepOff接口注册才能触发。
@@ -707,7 +707,7 @@ class NuoyanClientSystem(_ClientSystem):
         BlockInfoComponentClient.UnRegisterOnStepOff(blockName: str) -> bool
         """
 
-    def OnShearsDestoryBlockBefore(self, args):
+    def ShearsDestoryBlockBeforeClientEvent(self, args):
         """
         玩家手持剪刀破坏方块时，有剪刀特殊效果的方块会在客户端线程触发该事件。
         目前仅绊线会触发，需要取消剪刀效果得配合ShearsDestoryBlockBeforeServerEvent同时使用。
@@ -724,7 +724,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancelShears: bool】 是否取消剪刀效果
         """
 
-    def OnPlayerTryDestroyBlock(self, args):
+    def PlayerTryDestroyBlockClientEvent(self, args):
         """
         当玩家即将破坏方块时，客户端线程触发该事件。
         主要用于床，旗帜，箱子这些根据方块实体数据进行渲染的方块，一般情况下请使用ServerPlayerTryDestroyBlockEvent。
@@ -739,7 +739,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 默认为False，在脚本层设置为True就能取消该方块的破坏
         """
 
-    def OnStandOnBlock(self, args):
+    def OnStandOnBlockClientEvent(self, args):
         """
         *tick*
         当实体站立到方块上时客户端持续触发。
@@ -766,7 +766,7 @@ class NuoyanClientSystem(_ClientSystem):
         BlockInfoComponentClient.UnRegisterOnStandOn(blockName: str) -> bool
         """
 
-    def OnModBlockNeteaseEffectCreated(self, args):
+    def OnModBlockNeteaseEffectCreatedClientEvent(self, args):
         """
         自定义方块实体绑定的特效创建成功事件。
         以及使用接口CreateFrameEffectForBlockEntity或CreateParticleEffectForBlockEntity为自定义方块实体添加特效成功时触发。
@@ -777,7 +777,7 @@ class NuoyanClientSystem(_ClientSystem):
         【blockPos: Tuple[float, float, float]】 该特效绑定的自定义方块实体的世界坐标
         """
 
-    def OnEntityInsideBlock(self, args):
+    def OnEntityInsideBlockClientEvent(self, args):
         """
         *tick*
         当实体碰撞盒所在区域有方块时，客户端持续触发。
@@ -803,7 +803,7 @@ class NuoyanClientSystem(_ClientSystem):
         BlockInfoComponentClient.UnRegisterOnEntityInside(blockName: str) -> bool
         """
 
-    def OnAfterFallOnBlock(self, args):
+    def OnAfterFallOnBlockClientEvent(self, args):
         """
         *tick*
         当实体降落到方块后客户端触发，主要用于力的计算。
@@ -824,7 +824,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$calculate: bool】 是否按脚本层传值计算力
         """
 
-    def OnFallingBlockCauseDamageBefore(self, args):
+    def FallingBlockCauseDamageBeforeClientEvent(self, args):
         """
         当下落的方块开始计算砸到实体的伤害时，客户端触发该事件。
         不是所有下落的方块都会触发该事件，需要在json中先配置触发开关。
@@ -844,7 +844,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         # print args['fallingBlockId']
 
-    def OnBlockUse(self, args):
+    def ClientBlockUseEvent(self, args):
         """
         *tick*
         玩家右键点击新版自定义方块（或者通过接口AddBlockItemListenForUseEvent增加监听的MC原生游戏方块）时客户端抛出该事件。
@@ -859,7 +859,7 @@ class NuoyanClientSystem(_ClientSystem):
         【z: int】 方块z坐标
         """
 
-    def OnPerspChange(self, args):
+    def PerspChangeClientEvent(self, args):
         """
         视角切换时会触发的事件。
         视角数字代表含义 0: 第一人称 1: 第三人称背面 2: 第三人称正面。
@@ -868,7 +868,7 @@ class NuoyanClientSystem(_ClientSystem):
         【to: int】 切换后的视角
         """
 
-    def OnPlayerHitBlock(self, args):
+    def OnPlayerHitBlockClientEvent(self, args):
         """
         通过OpenPlayerHitBlockDetection打开方块碰撞检测后，当玩家碰撞到方块时触发该事件。
         玩家着地时会触发OnGroundClientEvent，而不是该事件。
@@ -886,7 +886,7 @@ class NuoyanClientSystem(_ClientSystem):
         PlayerCompClient.ClosePlayerHitBlockDetection() -> bool
         """
 
-    def OnGameTypeChanged(self, args):
+    def GameTypeChangedClientEvent(self, args):
         """
         个人游戏模式发生变化时客户端触发。
         游戏模式：生存，创造，冒险分别为0~2。
@@ -897,7 +897,7 @@ class NuoyanClientSystem(_ClientSystem):
         【newGameType: int】 切换后的游戏模式
         """
 
-    def OnExtinguishFire(self, args):
+    def ExtinguishFireClientEvent(self, args):
         """
         玩家扑灭火焰时触发。下雨，倒水等方式熄灭火焰不会触发。
         -----------------------------------------------------------
@@ -906,7 +906,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireServerEvent一起修改。
         """
 
-    def OnDimensionChangeFinish(self, args):
+    def DimensionChangeFinishClientEvent(self, args):
         """
         玩家维度改变完成后触发。
         当通过传送门从末地回到主世界时，toPos的y值为32767，其他情况一般会比设置值高1.62
@@ -917,7 +917,7 @@ class NuoyanClientSystem(_ClientSystem):
         【toPos: Tuple[float, float, float]】 改变后的位置(x,y,z)，其中y值为脚底加上角色的身高值
         """
 
-    def OnDimensionChange(self, args):
+    def DimensionChangeClientEvent(self, args):
         """
         玩家维度改变时触发。
         当通过传送门从末地回到主世界时，toY值为32767，其他情况一般会比设置值高1.62
@@ -933,7 +933,7 @@ class NuoyanClientSystem(_ClientSystem):
         【toZ: float】 改变后的位置z
         """
 
-    def OnCameraMotionStop(self, args):
+    def CameraMotionStopClientEvent(self, args):
         """
         相机运动器停止事件。相机添加运动器并开始运行后，运动器自动停止时触发。
         注意：该事件触发表示运动器播放顺利完成，手动调用的StopCameraMotion、RemoveCameraMotion不会触发该事件。
@@ -942,14 +942,14 @@ class NuoyanClientSystem(_ClientSystem):
         【$remove: bool】 是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除
         """
 
-    def OnCameraMotionStart(self, args):
+    def CameraMotionStartClientEvent(self, args):
         """
         相机运动器开始事件。相机添加运动器后，运动器开始运行时触发。
         -----------------------------------------------------------
         【motionId: int】 运动器ID
         """
 
-    def OnLeaveEntity(self, args):
+    def LeaveEntityClientEvent(self, args):
         """
         玩家远离生物时触发。
         -----------------------------------------------------------
@@ -957,7 +957,7 @@ class NuoyanClientSystem(_ClientSystem):
         【entityId: str】 远离的生物的实体ID
         """
 
-    def OnStartRiding(self, args):
+    def StartRidingClientEvent(self, args):
         """
         一个实体即将骑乘另外一个实体时触发。
         如果需要修改cancel，请通过服务端事件StartRidingServerEvent修改，客户端触发该事件时，实体已经骑乘成功。
@@ -966,7 +966,7 @@ class NuoyanClientSystem(_ClientSystem):
         【victimId: str】 被骑乘者的实体ID
         """
 
-    def OnMobHitMob(self, args):
+    def OnMobHitMobClientEvent(self, args):
         """
         通过OpenPlayerHitMobDetection打开生物碰撞检测后，当生物间（包含玩家）碰撞时触发该事件。
         注：客户端和服务端分别作碰撞检测，可能两个事件返回的略有差异。
@@ -980,14 +980,14 @@ class NuoyanClientSystem(_ClientSystem):
         PlayerCompClient.ClosePlayerHitMobDetection() -> bool
         """
 
-    def OnGround(self, args):
+    def OnGroundClientEvent(self, args):
         """
         实体着地事件。玩家，沙子，铁砧，掉落的物品，点燃的TNT掉落地面时触发，其余实体着地不触发。
         -----------------------------------------------------------
         【id: str】 实体ID
         """
 
-    def OnHealthChange(self, args):
+    def HealthChangeClientEvent(self, args):
         """
         生物生命值发生变化时触发。
         -----------------------------------------------------------
@@ -996,7 +996,7 @@ class NuoyanClientSystem(_ClientSystem):
         【to: float】 变化后的生命值
         """
 
-    def OnEntityStopRiding(self, args):
+    def EntityStopRidingEvent(self, args):
         """
         当实体停止骑乘时触发。
         以下情况不允许取消：
@@ -1017,7 +1017,7 @@ class NuoyanClientSystem(_ClientSystem):
         【$cancel: bool】 设置为True可以取消（需要与服务端事件一同取消）
         """
 
-    def OnEntityModelChanged(self, args):
+    def EntityModelChangedClientEvent(self, args):
         """
         实体模型切换时触发。
         -----------------------------------------------------------
@@ -1026,7 +1026,7 @@ class NuoyanClientSystem(_ClientSystem):
         【oldModel: str】 旧的模型名字
         """
 
-    def OnApproachEntity(self, args):
+    def ApproachEntityClientEvent(self, args):
         """
         玩家靠近生物时触发。
         -----------------------------------------------------------
@@ -1034,21 +1034,21 @@ class NuoyanClientSystem(_ClientSystem):
         【entityId: str】 靠近的生物的实体ID
         """
     
-    def OnUnLoadClientAddonScriptsBefore(self, args):
+    def UnLoadClientAddonScriptsBefore(self, args):
         """
         客户端卸载mod之前触发。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnRemovePlayerAOI(self, args):
+    def RemovePlayerAOIClientEvent(self, args):
         """
         玩家离开当前玩家同一个区块时触发AOI事件。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         """
 
-    def OnRemoveEntity(self, args):
+    def RemoveEntityClientEvent(self, args):
         """
         客户端侧实体被移除时触发。
         客户端接收服务端AOI事件时触发，原事件名 RemoveEntityPacketEvent。
@@ -1063,7 +1063,7 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         """
 
-    def OnCommandOutput(self, args):
+    def OnCommandOutputClientEvent(self, args):
         """
         当command命令有成功消息输出时触发。
         部分命令在返回的时候没有命令名称，命令组件需要showOutput参数为True时才会有返回。
@@ -1072,14 +1072,14 @@ class NuoyanClientSystem(_ClientSystem):
         【message: str】 命令返回的消息
         """
 
-    def OnLoadClientAddonScriptsAfter(self, args):
+    def LoadClientAddonScriptsAfter(self, args):
         """
         客户端加载mod完成事件。
         -----------------------------------------------------------
         无参数
         """
 
-    def OnChunkLoaded(self, args):
+    def ChunkLoadedClientEvent(self, args):
         """
         客户端区块加载完成时触发。
         -----------------------------------------------------------
@@ -1088,7 +1088,7 @@ class NuoyanClientSystem(_ClientSystem):
         【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
         """
 
-    def OnChunkAcquireDiscarded(self, args):
+    def ChunkAcquireDiscardedClientEvent(self, args):
         """
         客户端区块即将被卸载时触发。
         区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载。
@@ -1098,7 +1098,7 @@ class NuoyanClientSystem(_ClientSystem):
         【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
         """
 
-    def OnAddPlayerCreated(self, args):
+    def AddPlayerCreatedClientEvent(self, args):
         """
         玩家进入当前玩家所在的区块AOI后，玩家皮肤数据异步加载完成后触发的事件。
         由于玩家皮肤是异步加载的原因，该事件触发时机比AddPlayerAOIClientEvent晚，触发该事件后可以对该玩家调用相关玩家渲染接口。
@@ -1107,7 +1107,7 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         """
 
-    def OnAddPlayerAOI(self, args):
+    def AddPlayerAOIClientEvent(self, args):
         """
         玩家加入游戏或者其余玩家进入当前玩家所在的区块时触发的AOI事件，替换AddPlayerEvent。
         该事件触发只表明在服务端数据中接收到了新玩家，并不能代表此时玩家在客户端中可见，若想在玩家进入AOI后立马调用玩家渲染相关接口，建议使用AddPlayerCreatedClientEvent。
@@ -1115,7 +1115,7 @@ class NuoyanClientSystem(_ClientSystem):
         【playerId: str】 玩家的实体ID
         """
 
-    def OnAddEntity(self, args):
+    def AddEntityClientEvent(self, args):
         """
         客户端侧创建新实体时触发。
         创建玩家时不会触发该事件。
@@ -1131,7 +1131,7 @@ class NuoyanClientSystem(_ClientSystem):
         【auxValue: int】 物品附加值（仅当物品实体时存在该字段）
         """
 
-    def OnScriptTick(self):
+    def OnScriptTickClient(self):
         """
         *tick*
         客户端tick事件，1秒30次。
@@ -1139,7 +1139,7 @@ class NuoyanClientSystem(_ClientSystem):
         无参数
         """
 
-    def OnUiInitFinished(self, args):
+    def UiInitFinished(self, args):
         """
         UI初始化框架完成，此时可以创建UI。
         切换维度后会重新初始化UI并触发该事件。
@@ -1401,9 +1401,9 @@ class NuoyanClientSystem(_ClientSystem):
         for args in _lsnFuncArgs:
             args[1] = getattr(self, args[1])
             self.ListenForEventV2(*args)
-        for event, callback in ALL_ENGINE_EVENTS:
-            if _is_method_overridden(self.__class__, NuoyanClientSystem, callback):
-                self.ListenForEventV2(event, getattr(self, callback), 1)
+        for event in ALL_ENGINE_EVENTS:
+            if _is_method_overridden(self.__class__, NuoyanClientSystem, event):
+                self.ListenForEventV2(event, getattr(self, event), 1)
 
     def _startGameTick(self):
         self._gameTickNode = self.RegisterAndCreateUI(_UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)

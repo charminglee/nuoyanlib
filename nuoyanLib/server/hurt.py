@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-04-06
 #
 # ====================================================
 
@@ -48,7 +48,24 @@ except:
     pass
 
 
-def aoe_damage(damage, radius, pos, dim, attackerId="", childAttackerId="", cause=_ActorDamageCause.NONE, repel=True,
+def hurt_mobs(entityIdList, damage, attackerId="", childAttackerId="", cause=_ActorDamageCause.NONE, knocked=True):
+    """
+    对多个生物造成伤害。（无视攻击冷却）
+    -----------------------------------------------------------
+    【entityIdList: List[str]】 实体ID列表
+    【damage: int】 伤害
+    【attackerId: str = ""】 攻击者实体ID
+    【childAttackerId: str = ""】 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID
+    【cause: str = ActorDamageCause.NONE】 伤害类型，ActorDamageCause枚举
+    【knocked: bool = True】 是否产生击退
+    -----------------------------------------------------------
+    NoReturn
+    """
+    for entityId in entityIdList:
+        hurt(entityId, damage, cause, attackerId, childAttackerId, knocked)
+
+
+def aoe_damage(damage, radius, pos, dim, attackerId="", childAttackerId="", cause=_ActorDamageCause.NONE, knocked=True,
                filterIdList=None, filterTypeIdList=None, funcBeforeHurt=None, funcAfterHurt=None):
     # type: (int, float, tuple[float, float, float], int, str, str, str, bool, list[str] | None, list[int] | None, _Callable[[str, str, str], str | None] | None, _Callable[[str, str, str], str | None] | None) -> list[str]
     """
@@ -61,7 +78,7 @@ def aoe_damage(damage, radius, pos, dim, attackerId="", childAttackerId="", caus
     【attackerId: str = ""】 攻击者实体ID
     【childAttackerId: str = ""】 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID
     【cause: str = ActorDamageCause.NONE】 伤害类型，ActorDamageCause枚举
-    【repel: bool = True】 是否产生击退
+    【knocked: bool = True】 是否产生击退
     【filterIdList: Optional[List[str]] = None】 过滤的实体ID列表，列表中的实体将不会受到伤害
     【filterTypeIdList: Optional[List[int]] = None】 过滤的实体类型ID（网易版）列表，这些类型的实体将不会受到伤害
     【funcBeforeHurt: Optional[(str, str, str) -> Optional[str]] = None】 对生物造成伤害之前调用的函数，该函数第一个参数为受伤生物的实体ID，第二个为攻击者的实体ID，第三个参数为攻击者的子实体ID；该函数可返回一个新的实体ID，新的实体ID将会替换原受伤生物的实体ID进入最终返回的受伤生物实体ID列表中
@@ -86,7 +103,7 @@ def aoe_damage(damage, radius, pos, dim, attackerId="", childAttackerId="", caus
             retEid = funcBeforeHurt(eid, attackerId, childAttackerId)
             if retEid:
                 eid = retEid
-        if not _ServerCompFactory.CreateHurt(eid).Hurt(damage, cause, attackerId, childAttackerId, repel):
+        if not _ServerCompFactory.CreateHurt(eid).Hurt(damage, cause, attackerId, childAttackerId, knocked):
             hurt_by_set_health(eid, damage)
         if funcAfterHurt:
             retEid = funcAfterHurt(eid, attackerId, childAttackerId)
@@ -115,6 +132,10 @@ def sector_aoe_damage(attackerId, sectorRadius, sectorAngle, damage, knocked=Tru
     dim = _ServerCompFactory.CreateDimension(attackerId).GetEntityDimensionId()
     attackerPos = _ServerCompFactory.CreatePos(attackerId).GetFootPos()
     attackerRot = _ServerCompFactory.CreateRot(attackerId).GetRot()[1]
+    if filterIdList is None:
+        filterIdList = []
+    filterIdList = _copy(filterIdList)
+    filterIdList.append(attackerId)
     entityList = _get_entities_in_area(attackerPos, sectorRadius, dim, filterIdList, filterTypeIdList, True)
     result = []
     for eid in entityList:
@@ -192,6 +213,8 @@ def hurt(entityId, damage, cause=_ActorDamageCause.Override, attacker="", childA
     -----------------------------------------------------------
     NoReturn
     """
+    if _ServerCompFactory.CreateEngineType(entityId).GetEngineType() & _EntityType.Mob != _EntityType.Mob:
+        return
     hurtResult = _ServerCompFactory.CreateHurt(entityId).Hurt(damage, cause, attacker, childAttackerId, knocked)
     if not hurtResult:
         hurt_by_set_health(entityId, damage)

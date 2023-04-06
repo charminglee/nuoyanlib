@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-26
+#   Last Modified : 2023-04-05
 #
 # ====================================================
 
@@ -44,6 +44,9 @@ __all__ = [
     "attack_nearest_mob",
     "has_effect",
     "set_entity_motion",
+    "is_mob",
+    "all_mob",
+    "has_mob",
 ]
 
 
@@ -54,6 +57,43 @@ try:
     _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
 except:
     pass
+
+
+def is_mob(entityId):
+    # type: (str) -> bool
+    """
+    判断实体是否为生物。
+    -----------------------------------------------------------
+    【entityId: str】 实体ID
+    -----------------------------------------------------------
+    return: bool -> 是生物返回True，否则返回False
+    """
+    typeStr = _ServerCompFactory.CreateEngineType(entityId).GetEngineType()
+    return typeStr & _EntityType.Mob == _EntityType.Mob
+
+
+def all_mob(entityIdList):
+    # type: (list[str]) -> bool
+    """
+    判断一个实体ID列表内的实体是否均为生物。
+    -----------------------------------------------------------
+    【entityIdList: List[str]】 实体ID列表
+    -----------------------------------------------------------
+    return: bool -> 均为生物返回True，否则返回False
+    """
+    return all(is_mob(i) for i in entityIdList)
+
+
+def has_mob(entityIdList):
+    # type: (list[str]) -> bool
+    """
+    判断一个实体ID列表内的实体是否含有生物。
+    -----------------------------------------------------------
+    【entityIdList: List[str]】 实体ID列表
+    -----------------------------------------------------------
+    return: bool -> 含有生物返回True，否则返回False
+    """
+    return any(is_mob(i) for i in entityIdList)
 
 
 def entity_filter(entityList, *args):
@@ -88,6 +128,7 @@ def entity_filter(entityList, *args):
     def _filter(eid):
         entPos = _ServerCompFactory.CreatePos(eid).GetFootPos()
         entType = _ServerCompFactory.CreateEngineType(eid).GetEngineType()
+        entTypeStr = _ServerCompFactory.CreateEngineType(eid).GetEngineTypeStr()
         entDim = str(_ServerCompFactory.CreateDimension(eid).GetEntityDimensionId())
         if not entPos:
             return False
@@ -98,16 +139,22 @@ def entity_filter(entityList, *args):
                 return False
             if isinstance(arg, set):
                 for i in arg:
-                    if isinstance(i, str) and i == entDim:
-                        break
+                    if isinstance(i, str):
+                        if ":" in i and i == entTypeStr:
+                            break
+                        if ":" not in i and i == entDim:
+                            break
                     if isinstance(i, int) and entType & i == i:
                         break
                 else:
                     return False
             if isinstance(arg, list):
                 for i in arg:
-                    if isinstance(i, str) and i == eid:
-                        return False
+                    if isinstance(i, str):
+                        if ":" in i and i == entTypeStr:
+                            return False
+                        if ":" not in i and i == eid:
+                            return False
                     if isinstance(i, int) and entType & i == i:
                         return False
         return True
@@ -263,8 +310,9 @@ def get_all_entities():
     return _serverApi.GetEngineActor().keys() + _serverApi.GetPlayerList()
 
 
-def get_entities_in_area(pos, radius, dimension=0, filterIdList=None, filterTypeIdList=None, filterAbiotic=False):
-    # type: (tuple[float, float, float], float, int, list[str] | None, list[int] | None, bool) -> list[str]
+def get_entities_in_area(pos, radius, dimension=0, filterIdList=None, filterTypeIdList=None, filterTypeStrList=None,
+                         filterAbiotic=False):
+    # type: (tuple[float, float, float], float, int, list[str] | None, list[int] | None, list[str] | None, bool) -> list[str]
     """
     获取给定区域内的所有实体。
     -----------------------------------------------------------
@@ -273,6 +321,7 @@ def get_entities_in_area(pos, radius, dimension=0, filterIdList=None, filterType
     【dimension: int = 0】 维度
     【filterIdList: Optional[List[str]] = None】 过滤的实体ID列表
     【filterTypeIdList: Optional[List[int]] = None】 过滤的实体类型ID（网易版）列表
+    【filterTypeStrList: Optional[List[str]] = None】 过滤的实体类型ID列表
     【filterAbiotic: bool = False】 是否过滤非生物实体
     -----------------------------------------------------------
     return: List[str] -> 实体ID列表
@@ -283,7 +332,7 @@ def get_entities_in_area(pos, radius, dimension=0, filterIdList=None, filterType
     endPos = tuple(i + radius for i in pos)
     entities = _LevelGameComp.GetEntitiesInSquareArea(None, startPos, endPos, dimension)
     fa = {_EntityType.Mob} if filterAbiotic else None
-    entities = entity_filter(entities, (pos, radius), fa, filterIdList, filterTypeIdList)
+    entities = entity_filter(entities, (pos, radius), fa, filterIdList, filterTypeIdList, filterTypeStrList)
     return entities
 
 

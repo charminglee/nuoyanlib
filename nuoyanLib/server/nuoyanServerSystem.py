@@ -217,7 +217,7 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
             pass
     -----------------------------------------------------------
     【eventName: str】 事件名称
-    【t: int = 0】 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
+    【t: int = 0】 0表示监听客户端传来的自定义事件，1表示监听服务端引擎事件，2表示监听其他Mod的事件
     【namespace: str = ""】 其他Mod的命名空间
     【systemName: str = ""】 其他Mod的系统名称
     【priority: int = 0】 优先级
