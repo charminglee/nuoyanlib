@@ -1174,10 +1174,9 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         NoReturn
         """
+        self._setQuery({'entityId': entityId, 'name': name, 'value': value})
         if sync:
             self.BroadcastToAllClient("_SetQueryVar", {'entityId': entityId, 'name': name, 'value': value})
-        else:
-            self._setQuery({'entityId': entityId, 'name': name, 'value': value})
 
     def AddPlayerRenderResources(self, playerId, *resTuple):
         # type: (str, *tuple[str, str]) -> tuple[bool, ...]
@@ -1193,14 +1192,22 @@ class NuoyanClientSystem(_ClientSystem):
         示例：
         self.AddPlayerRenderResources(
             playerId,
-            ("my_geo", "geometry.abc"),     # 模型：(Key, 模型名称)
-            ("my_tex", "textures/entity/abc"),     # 贴图：(Key, 贴图所在路径)
-            ("my_mat", "abc"),     # 材质：(Key, 材质名称)
-            ("controller.render.abc", "1.0"),     # 渲染控制器：(渲染控制器名称, 生效条件)
-            ("my_anim", "animation.abc"),     # 动画：(Key, 动画名称)
-            ("my_ctrler", "controller.animation.abc"),     # 动画控制器：(Key, 动画控制器名称)
-            ("my_sound", "my_sound.abc"),     # 音效：(Key, 音效名称)
-            ("my_eff", "nuoyan:my_particle"),     # 粒子特效：(Key, 粒子特效名称)
+            # 模型：(Key, 模型名称)
+            ("my_geo", "geometry.abc"),
+            # 贴图：(Key, 贴图所在路径)
+            ("my_tex", "textures/entity/abc"),
+            # 材质：(Key, 材质名称)
+            ("my_mat", "abc"),
+            # 渲染控制器：(渲染控制器名称, 生效条件)
+            ("controller.render.abc", "1.0"),
+            # 动画：(Key, 动画名称)
+            ("my_anim", "animation.abc"),
+            # 动画控制器：(Key, 动画控制器名称)
+            ("my_ctrler", "controller.animation.abc"),
+            # 音效：(Key, 音效名称)
+            ("my_sound", "my_sound.abc"),
+             # 粒子特效：(Key, 粒子特效名称)
+            ("my_eff", "nuoyan:my_particle"),
         )
         """
         res = []
@@ -1335,8 +1342,6 @@ class NuoyanClientSystem(_ClientSystem):
         # type: (str, str, str, dict | None) -> _ScreenNode
         """
         注册并创建UI。
-        示例：
-        self.myUiNode = self.RegisterAndCreateUI(namespace, clsPath, uiScreenDef)
         -----------------------------------------------------------
         【namespace: str】 UI的名称，对应UI的json文件中“namespace”的值
         【clsPath: str】 UI的类路径
@@ -1344,6 +1349,9 @@ class NuoyanClientSystem(_ClientSystem):
         【param: dict = None】 创建UI的参数，会传到UI类的__init__方法中，默认为{'isHud': 1}
         -----------------------------------------------------------
         return: ScreenNode -> UI类实例
+        -----------------------------------------------------------
+        【示例】
+        self.myUiNode = self.RegisterAndCreateUI(namespace, clsPath, uiScreenDef)
         """
         _clientApi.RegisterUI(_MOD_NAME, namespace, clsPath, uiScreenDef)
         if not param:

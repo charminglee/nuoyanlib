@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-26
+#   Last Modified : 2023-04-06
 #
 # ====================================================
 
@@ -23,10 +23,7 @@ from utils import get_parent_path as _get_parent_path
 from ..._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME, \
     SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
 from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl
-try:
-    import mod.client.extraClientApi as _clientApi
-except:
-    pass
+import mod.client.extraClientApi as _clientApi
 
 
 __all__ = [
@@ -34,20 +31,14 @@ __all__ = [
 ]
 
 
-try:
-    _ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
-    _ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
-    _ScreenNode = _clientApi.GetScreenNodeCls()
-    _ClientCompFactory = _clientApi.GetEngineCompFactory()
-    _PLAYER_ID = _clientApi.GetLocalPlayerId()
-    _LEVEL_ID = _clientApi.GetLevelId()
-    _LevelGameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
-    _LevelDeviceComp = _ClientCompFactory.CreateDevice(_LEVEL_ID)
-except:
-    from ...mctypes.client.ui.screenNode import ScreenNode
-    _ScreenNode = ScreenNode  # type: type[ScreenNode]
-    _ENGINE_NAMESPACE = ""
-    _ENGINE_SYSTEM_NAME = ""
+_ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
+_ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
+_ScreenNode = _clientApi.GetScreenNodeCls()
+_ClientCompFactory = _clientApi.GetEngineCompFactory()
+_PLAYER_ID = _clientApi.GetLocalPlayerId()
+_LEVEL_ID = _clientApi.GetLevelId()
+_LevelGameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
+_LevelDeviceComp = _ClientCompFactory.CreateDevice(_LEVEL_ID)
 
 
 _lsnFuncArgs = []
@@ -90,7 +81,7 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
     return decorator
 
 
-class NuoyanScreenNode(_ScreenNode):  # type:
+class NuoyanScreenNode(_ScreenNode):
     """
     ScreenNode扩展类。将自定义UI类继承本类即可使用本类的全部功能。
     -----------------------------------------------------------
@@ -518,9 +509,6 @@ class NuoyanScreenNode(_ScreenNode):  # type:
     def _OnScreenSizeChanged(self, args):
         self.screenSize = args['afterX'], args['afterY']
 
-
-def _test():
-    pass
 
 
 

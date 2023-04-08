@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-04-07
 #
 # ====================================================
 
@@ -64,6 +64,18 @@ try:
         _isClient = True
 except:
     pass
+
+
+def floor_pos(pos):
+    # type: (tuple[float, float, float]) -> tuple[int, int, int]
+    """
+    对坐标进行向下取整。
+    -----------------------------------------------------------
+    【pos: Tuple[float, float, float]】 坐标
+    -----------------------------------------------------------
+    return: Tuple[int, int, int] -> 取整后的坐标
+    """
+    return tuple(int(_floor(p)) for p in pos)
 
 
 def pos_distance(firstPoint, secondPoint):
