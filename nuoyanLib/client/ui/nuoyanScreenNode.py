@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-06
+#   Last Modified : 2023-04-09
 #
 # ====================================================
 
@@ -39,6 +39,7 @@ _PLAYER_ID = _clientApi.GetLocalPlayerId()
 _LEVEL_ID = _clientApi.GetLevelId()
 _LevelGameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
 _LevelDeviceComp = _ClientCompFactory.CreateDevice(_LEVEL_ID)
+_ViewBinder = _clientApi.GetViewBinderCls()
 
 
 _lsnFuncArgs = []

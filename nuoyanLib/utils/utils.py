@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-26
+#   Last Modified : 2023-04-09
 #
 # ====================================================
 
@@ -28,7 +28,6 @@ __all__ = [
     "all_indexes",
     "check_string",
     "check_string2",
-    "is_number",
     "turn_dict_value_to_tuple",
     "turn_list_to_tuple",
     "is_method_overridden",
@@ -110,26 +109,6 @@ def check_string2(string, *check):
             continue
         result.append(i)
     return result
-
-
-def is_number(string):
-    # type: (str) -> bool
-    """
-    检测字符串是否是一个数字。
-    示例：
-    is_number("114514")     # True
-    is_number("114514abc")     # False
-    is_number("114e5")     # True
-    -----------------------------------------------------------
-    【string: str】 字符串
-    -----------------------------------------------------------
-    return: bool -> 是则返回True，否则返回False
-    """
-    try:
-        int(nyeval(string))
-        return True
-    except:
-        return False
 
 
 def turn_dict_value_to_tuple(origDict):
@@ -293,11 +272,6 @@ def _test():
     print check_string2("abc123", "a", "c", "3")  # ["b", "1", "2"]
     print check_string2("abc123", "a-z")  # ["1", "2", "3"]
     print check_string2("abc123", "0-9")  # ["a", "b", "c"]
-    print "-" * 50
-    print is_number("114514")  # True
-    print is_number("114514abc")  # False
-    print is_number("114e5")  # True
-    print is_number("0x000000ff")  # True
     print "-" * 50
     a = {'b': [1, 2, 3], 'c': "hahaha", 'd': [4, 5]}
     turn_dict_value_to_tuple(a)

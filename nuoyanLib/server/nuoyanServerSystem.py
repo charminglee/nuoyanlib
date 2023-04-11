@@ -12,7 +12,7 @@
 #   Author        : Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-03
+#   Last Modified : 2023-04-09
 #
 # ====================================================
 
@@ -23,6 +23,7 @@ from ..utils.utils import is_method_overridden as _is_method_overridden
 from .._config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from serverTimer import ServerTimer as _ServerTimer
 import mod.server.extraServerApi as _serverApi
+from mod.common.minecraftEnum import ItemPosType as _ItemPosType
 
 
 __all__ = [
@@ -272,6 +273,7 @@ class NuoyanServerSystem(_ServerSystem):
         self._initFinished = 1
         self.__timer = None  # type: _ServerTimer
         self._3dItems = []
+        self.itemsData = {}
         self.__listen()
         self._checkOnGameTick()
 
@@ -2222,6 +2224,71 @@ class NuoyanServerSystem(_ServerSystem):
 
     # todo:====================================== Internal Method ======================================================
 
+    @listen("_InitItemGrid")
+    def _OnInitItemGrid(self, args):
+        playerId = args['__id__']
+        key = args['key']
+        count = args['count']
+        namespace = args['namespace']
+        self.itemsData[playerId][(namespace, key)] = [None] * count
+
+    @listen("_ThrowItem")
+    def _OnThrowItem(self, args):
+        itemDict = args
+        playerId = args['__id__']
+        dim = _CompFactory.CreateDimension(playerId).GetEntityDimensionId()
+        pos = _CompFactory.CreatePos(playerId).GetPos()
+        if not pos:
+            return
+        itemEnt = self.CreateEngineItemEntity(itemDict, dim, pos)
+        if itemEnt:
+            rot = _CompFactory.CreateRot(playerId).GetRot()
+            rot = (-15, rot[1])
+            direction = _serverApi.GetDirFromRot(rot)
+            motion = tuple(i * 0.3 for i in direction)
+            _CompFactory.CreateActorMotion(itemEnt).SetMotion(motion)
+
+    @listen("_SyncItems")
+    def _OnSyncItems(self, args):
+        playerId = args['__id__']
+        namespace = args['namespace']
+        keys = args['keys']
+        data = {}
+        for (ns, key), items in self.itemsData[playerId].items():
+            if ns != namespace or key not in keys:
+                continue
+            data[key] = items
+        invItems = _CompFactory.CreateItem(playerId).GetPlayerAllItems(_ItemPosType.INVENTORY, True)
+        if "inv27" in keys:
+            data['inv27'] = invItems[9:]
+        if "shortcut" in keys:
+            data['shortcut'] = invItems[:9]
+        if "inv36" in keys:
+            data['inv36'] = invItems
+        self.NotifyToClient(playerId, "_SyncItems", {
+            'data': data,
+            'namespace': namespace,
+        })
+
+    @listen("_UpdateItemsData")
+    def _OnUpdateItemsData(self, args):
+        playerId = args['__id__']
+        data = args['data']
+        namespace = args['namespace']
+        comp = _CompFactory.CreateItem(playerId)
+        invItems = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
+        for key, items in data.items():
+            if key == "inv27":
+                comp.SetPlayerAllItems({
+                    (_ItemPosType.INVENTORY, i + 9): item for i, item in enumerate(items) if item != invItems[i + 9]
+                })
+            elif key in ["shortcut", "inv36"]:
+                comp.SetPlayerAllItems({
+                    (_ItemPosType.INVENTORY, i): item for i, item in enumerate(items) if item != invItems[i]
+                })
+            else:
+                self.itemsData[playerId][(namespace, key)] = items
+
     @listen("_BroadcastToAllClient")
     def _OnBroadcastToAllClient(self, args):
         eventName = args['eventName']
@@ -2234,6 +2301,7 @@ class NuoyanServerSystem(_ServerSystem):
     def _OnUiInitFinished(self, args):
         playerId = args['__id__']
         self.allPlayerData[playerId] = {}
+        self.itemsData[playerId] = {}
         if self.homeownerPlayerId == "-1":
             self.homeownerPlayerId = playerId
             if self._listenGameTick:
