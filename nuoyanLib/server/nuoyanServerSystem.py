@@ -9,10 +9,10 @@
 #   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 #   See the Mulan PSL v2 for more details.
 #
-#   Author        : Nuoyan
+#   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-09
+#   Last Modified : 2023-04-21
 #
 # ====================================================
 
@@ -274,6 +274,7 @@ class NuoyanServerSystem(_ServerSystem):
         self.__timer = None  # type: _ServerTimer
         self._3dItems = []
         self.itemsData = {}
+        self._queryCache = {}
         self.__listen()
         self._checkOnGameTick()
 
@@ -2224,6 +2225,24 @@ class NuoyanServerSystem(_ServerSystem):
 
     # todo:====================================== Internal Method ======================================================
 
+    @listen("_SetQueryVar")
+    def _OnSetQueryVar(self, args):
+        entityId = args['entityId']
+        name = args['name']
+        value = args['value']
+        if entityId not in self._queryCache:
+            self._queryCache[entityId] = {}
+        self._queryCache[entityId][name] = value
+        self.BroadcastToAllClient("_SetQueryVar", args)
+
+    @listen("_ButtonCallbackTriggered")
+    def _OnButtonCallbackTriggered(self, args):
+        funcName = args['__name__']
+        del args['__name__']
+        func = getattr(self, funcName, None)
+        if func:
+            func(args)
+
     @listen("_InitItemGrid")
     def _OnInitItemGrid(self, args):
         playerId = args['__id__']
@@ -2306,6 +2325,8 @@ class NuoyanServerSystem(_ServerSystem):
             self.homeownerPlayerId = playerId
             if self._listenGameTick:
                 self.NotifyToClient(self.homeownerPlayerId, "_ListenServerGameTick", {})
+        if self._queryCache:
+            self.NotifyToClient(playerId, "_SetQueryCache", self._queryCache)
 
     def __listen(self):
         for args in _lsnFuncArgs:

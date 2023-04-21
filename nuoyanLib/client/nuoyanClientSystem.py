@@ -9,10 +9,10 @@
 #   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 #   See the Mulan PSL v2 for more details.
 #
-#   Author        : Nuoyan
+#   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-03
+#   Last Modified : 2023-04-21
 #
 # ====================================================
 
@@ -842,7 +842,6 @@ class NuoyanClientSystem(_ClientSystem):
         【isHarmful: bool】 客户端始终为false，因为客户端不会计算伤害值
         【fallDamage: int】 对实体的伤害
         """
-        # print args['fallingBlockId']
 
     def ClientBlockUseEvent(self, args):
         """
@@ -1174,9 +1173,11 @@ class NuoyanClientSystem(_ClientSystem):
         -----------------------------------------------------------
         NoReturn
         """
-        self._setQuery({'entityId': entityId, 'name': name, 'value': value})
+        data = {'entityId': entityId, 'name': name, 'value': value}
         if sync:
-            self.BroadcastToAllClient("_SetQueryVar", {'entityId': entityId, 'name': name, 'value': value})
+            self.NotifyToServer("_SetQueryVar", data)
+        else:
+            self._setQuery(data)
 
     def AddPlayerRenderResources(self, playerId, *resTuple):
         # type: (str, *tuple[str, str]) -> tuple[bool, ...]
@@ -1364,6 +1365,15 @@ class NuoyanClientSystem(_ClientSystem):
         return _clientApi.CreateUI(_MOD_NAME, namespace, param)
 
     # todo:====================================== Internal Method ======================================================
+
+    @listen("_SetQueryCache")
+    def _OnSetQueryCache(self, args):
+        for entityId, queries in args.items():
+            for name, value in queries.items():
+                comp = _CompFactory.CreateQueryVariable(entityId)
+                if comp.Get(name) == -1.0:
+                    comp.Register(name, 0.0)
+                comp.Set(name, value)
 
     @listen("_SetQueryVar")
     def _setQuery(self, args):

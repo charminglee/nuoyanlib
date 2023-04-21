@@ -9,10 +9,10 @@
 #   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 #   See the Mulan PSL v2 for more details.
 #
-#   Author        : Nuoyan
+#   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-09
+#   Last Modified : 2023-04-22
 #
 # ====================================================
 
@@ -28,6 +28,8 @@ import mod.client.extraClientApi as _clientApi
 
 __all__ = [
     "NuoyanScreenNode",
+    "listen",
+    "notify_to_server",
 ]
 
 
@@ -45,11 +47,43 @@ _ViewBinder = _clientApi.GetViewBinderCls()
 _lsnFuncArgs = []
 
 
+def notify_to_server(func):
+    """
+    函数装饰器，用于按钮的回调函数。
+    被装饰的按钮回调函数每触发一次，服务端的同名函数也会触发一次。
+    服务端同名函数的参数与按钮回调函数的参数相同，且自带一个名为__id__的key，其value为触发按钮的玩家实体ID。
+    可通过args['cancelNotify'] = False的方式取消触发服务端函数。
+    若对按钮回调参数进行修改（如增加或删除某个key），服务端得到的参数为修改后的参数，可通过该方式向服务端传递更多信息。
+    -----------------------------------------------------------
+    【示例】
+    """
+    funcName = func.__name__
+    def wrapper(self, args):
+        args['cancelNotify'] = False
+        ret = func(self, args)
+        if not args['cancelNotify']:
+            del args['cancelNotify']
+            cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
+            if cs:
+                args['__name__'] = funcName
+                cs.NotifyToServer("_ButtonCallbackTriggered", args)
+        return ret
+    wrapper.__name__ = funcName
+    return wrapper
+
+
 def listen(eventName, t=0, namespace="", systemName="", priority=0):
     # type: (str, int, str, str, int) -> ...
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
-    示例：
+    -----------------------------------------------------------
+    【eventName: str】 事件名称
+    【t: int = 0】 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
+    【namespace: str = ""】 其他Mod的命名空间
+    【systemName: str = ""】 其他Mod的系统名称
+    【priority: int = 0】 优先级
+    -----------------------------------------------------------
+    【示例】
     class MyUI(ScreenNode):
         # 监听服务端传来的自定义事件
         @listen("MyCustomEvent")
@@ -60,12 +94,6 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
         @listen("AddEntityClientEvent", 1)
         def OnAddEntity(self, args):
             pass
-    -----------------------------------------------------------
-    【eventName: str】 事件名称
-    【t: int = 0】 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件
-    【namespace: str = ""】 其他Mod的命名空间
-    【systemName: str = ""】 其他Mod的系统名称
-    【priority: int = 0】 优先级
     """
     if t == 0:
         _namespace = _MOD_NAME
