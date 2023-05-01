@@ -12,14 +12,11 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-11
+#   Last Modified : 2023-05-02
 #
 # ====================================================
 
 
-from time import sleep as _sleep
-from threading import Timer as _Timer
-from random import randrange as _randrange
 from copy import deepcopy as _deepcopy
 import mod.client.extraClientApi as _clientApi
 from ....nuoyanLib.utils.item import is_same_item as _is_same_item, is_empty_item as _is_empty_item, \
@@ -27,7 +24,9 @@ from ....nuoyanLib.utils.item import is_same_item as _is_same_item, is_empty_ite
 from ....nuoyanLib.client.ui.utils import get_ui_screen_pos as _get_ui_screen_pos
 from itemFlyAnim import ItemFlyAnim as _ItemFlyAnim
 from itemTipsBox import ItemTipsBox as _ItemTipsBox
-from ..._config import MOD_NAME, SERVER_SYSTEM_NAME
+from ..._config import MOD_NAME as _MOD_NAME, SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
+from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl as _ButtonUIControl
+from collections import Callable as _Callable
 
 
 _ClientSystem = _clientApi.GetClientSystemCls()
@@ -37,8 +36,8 @@ _PlayerItemComp = _ClientCompFactory.CreateItem(_PLAYER_ID)
 _PlayerGameComp = _ClientCompFactory.CreateGame(_PLAYER_ID)
 
 
-IMAGE_PATH_ITEM_CELL_SELECTED = "textures/ui/recipe_book_button_borderless_lightpressed"
-IMAGE_PATH_ITEM_CELL_DEFAULT = "textures/ui/item_cell"
+_IMAGE_PATH_ITEM_CELL_SELECTED = "textures/ui/recipe_book_button_borderless_lightpressed"
+_IMAGE_PATH_ITEM_CELL_DEFAULT = "textures/ui/item_cell"
 
 
 _SHORTCUT = "shortcut"
@@ -96,15 +95,9 @@ def _listen_item_changes(func):
         new = _deepcopy(self.gridItemsData)
         changes = _analyze_changes(old, new)
         if changes:
-            if self._lsnTimer:
-                _PlayerGameComp.CancelTimer(self._lsnTimer)
             _update_changes(self._changes, changes)
-            def delayFunc(self_):
-                if self_._changes:
-                    self_.OnGridItemChanged(self_._changes)
-                    self_._changes = {}
-                self_._lsnTimer = None
-            self._lsnTimer = _PlayerGameComp.AddTimer(_DELAY, delayFunc, self)
+            self.OnGridItemChanged({'changes': self._changes})
+            self._changes = {}
         return res
     return wrapper
 
@@ -143,28 +136,26 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         self.itemHeapData = {}
         self.selectedItem = {}
         self.gridPaths = {}
-        self.gridKeys = set()
+        self.gridKeys = []
         self.blockPaths = {}
         self.blockPoses = {}
+        self.blockUiCtrls = {}
         self._moveInGridList = []
-        self._inited = set()
+        self._inited = []
         self.__tick = 0
         self._orgItem = {}
         self.__namespace = self.__class__.__name__
         self._changes = {}
-        self._lsnTimer = None
         self.__listen()
 
     def __listen(self):
         clientNamespace = _clientApi.GetEngineNamespace()
         clientSystemName = _clientApi.GetEngineSystemName()
         self.cs.ListenForEvent(clientNamespace, clientSystemName, "GetEntityByCoordReleaseClientEvent", self, self._OnCoordRelease)
-        self.cs.ListenForEvent(clientNamespace, clientSystemName, "OnScriptTickClient", self, self._OnTick)
-        self.cs.ListenForEvent(MOD_NAME, SERVER_SYSTEM_NAME, "_SyncItems", self, self._receiveItemsData)
+        self.cs.ListenForEvent(_MOD_NAME, _SERVER_SYSTEM_NAME, "_SyncItems", self, self._receiveItemsData)
 
-    # todo:==================================== System Event Callback ==================================================
-
-    def _OnTick(self):
+    def Update(self):
+        super(ItemGridManager, self).Update()
         # 物品分堆
         self.__tick += 1
         if self.itemHeapData and self.itemHeapData['animating']:
@@ -177,6 +168,8 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                     self.itemHeapData['selectedCount'] += 1
                     barCtrl = self.itemHeapData['barCtrl']
                     barCtrl.SetValue(float(self.itemHeapData['selectedCount']) / count)
+
+    # todo:==================================== System Event Callback ==================================================
 
     def _OnCoordRelease(self, args):
         if len(self._moveInGridList) >= 2:
@@ -251,7 +244,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if _is_empty_item(itemDict):
             return
         name = itemDict['newItemName']
-        aux = itemDict['newAuxValue']
+        aux = itemDict.get('newAuxValue', 0)
         maxStack = _PlayerItemComp.GetItemBasicInfo(name, aux)['maxStackSize']
         if itemDict['count'] < maxStack:
             self.MergeItems(bp)
@@ -294,17 +287,29 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
 
     # todo:=========================================== UI操作 ===========================================================
 
-    def InitItemGrids(self, keys=(), finishedFunc=None, *args, **kwargs):
+    def GetAllBlockUIControls(self, key):
+        # type: (str) -> list[_ButtonUIControl]
+        """
+        获取指定网格中所有方格的ButtonUIControl实例。
+        """
+        if not self.AllItemGridsInited(key):
+            return
+        return self.blockUiCtrls[key]
+
+    def InitItemGrids(self, keys=None, finishedFunc=None, *args, **kwargs):
+        # type: (str | tuple[str, ...] | None, _Callable | None, ..., ...) -> None
         """
         初始化网格。
         """
         if not keys:
             keys = self.gridKeys
+        elif isinstance(keys, str):
+            keys = (keys,)
         _PlayerGameComp.AddTimer(0, self._initItemGrids, keys, finishedFunc, args, kwargs)
 
     def _initItemGrids(self, keys, finishedFunc, args, kwargs):
         for key, (gp, single) in self.gridPaths.items():
-            if key not in keys:
+            if key not in keys or key in self._inited:
                 continue
             if single:
                 allChildren = [gp]
@@ -316,7 +321,8 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                         p = "/variables_button_mappings_and_controls" + p
                     if len(p.split("/")) == gpLen + 1:
                         allChildren.append(p)
-            self.blockPaths[key] = allChildren
+            self.blockPaths[key] = tuple(allChildren)
+            self.blockUiCtrls[key] = []
             for i, path in enumerate(allChildren):
                 self.SetButtonDoubleClickCallback(
                     path, self.OnBlockButtonDoubleClick, self.OnBlockButtonTouchUp
@@ -329,22 +335,26 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                 btn.SetButtonTouchMoveInCallback(self.OnBlockButtonTouchMoveIn)
                 btn.SetButtonTouchMoveCallback(self.OnBlockButtonTouchMove)
                 btn.GetChildByName("heap").SetVisible(False)
-                self.blockPoses[path] = key, i
+                pos = (key, i)
+                self.SetItemRenderer(pos, None)
+                self.SetItemCountLabel(pos, None)
+                self.SetItemDurationBar(pos, None)
+                self.blockPoses[path] = pos
                 self.gridItemsData[key].append(None)
-                self.SetItemRenderer((key, i), None)
-                self.SetItemCountLabel((key, i), None)
-                self.SetItemDurationBar((key, i), None)
+                self.blockUiCtrls[key].append(btn)
+            self.blockUiCtrls[key] = tuple(self.blockUiCtrls[key])
             if key not in _RESERVED_KEYS:
                 self.cs.NotifyToServer("_InitItemGrid", {
                     'key': key,
                     'count': len(allChildren),
                     'namespace': self.__namespace
                 })
-            self._inited.add(key)
+            self._inited.append(key)
         if finishedFunc:
             finishedFunc(*args, **kwargs)
 
     def SetItemDurationBar(self, block, itemDict):
+        # type: (str | tuple[str, int], dict) -> None
         """
         设置物品耐久显示。
         """
@@ -353,7 +363,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if not _is_empty_item(itemDict):
             dur = float(itemDict.get('durability', 0))
             itemName = itemDict['newItemName']
-            aux = itemDict['newAuxValue']
+            aux = itemDict.get('newAuxValue', 0)
             isEnchanted = bool(itemDict.get('enchantData') or itemDict.get('modEnchantData'))
             basicInfo = _PlayerItemComp.GetItemBasicInfo(itemName, aux, isEnchanted)
             maxDur = float(basicInfo['maxDurability'])
@@ -366,6 +376,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             durCtrl.SetVisible(False)
 
     def SetItemRenderer(self, block, itemDict):
+        # type: (str | tuple[str, int], dict) -> None
         """
         设置物品渲染器显示物品。
         """
@@ -374,7 +385,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if not _is_empty_item(itemDict):
             itemRenderer.SetVisible(True)
             name = itemDict['newItemName']
-            aux = itemDict['newAuxValue']
+            aux = itemDict.get('newAuxValue', 0)
             isEnchanted = bool(itemDict.get('enchantData') or itemDict.get('modEnchantData'))
             userData = itemDict.get('userData')
             itemRenderer.SetUiItem(name, aux, isEnchanted, userData)
@@ -382,24 +393,27 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             itemRenderer.SetVisible(False)
 
     def SetItemCountLabel(self, block, itemDict):
+        # type: (str | tuple[str, int], dict) -> None
         """
         物品数量文本显示。
         """
         bp = self.GetBlockPath(block)
         label = self.GetBaseUIControl(bp).GetChildByName("count").asLabel()
-        if not _is_empty_item(itemDict) and itemDict['count'] > 1:
+        count = itemDict.get('count', 1) if not _is_empty_item(itemDict) else 0
+        if count > 1:
             label.SetVisible(True)
-            label.SetText(str(int(itemDict['count'])))
+            label.SetText(str(int(count)))
         else:
             label.SetVisible(False)
 
     def UpdateAndSyncGrid(self, *keys):
+        # type: (str) -> None
         """
         刷新网格并向服务端同步数据。
         """
         if not self.AllItemGridsInited():
             return
-        keys = set(keys) if keys else _deepcopy(self.gridKeys)
+        keys = set(keys if keys else self.gridKeys)
         if _INV27 in keys or _SHORTCUT in keys:
             keys.add(_INV36)
         keys = {k for k in keys if k in self.gridItemsData}
@@ -417,13 +431,14 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         })
 
     def ClearGridsState(self):
+        # type: () -> None
         """
         清除网格状态（如物品选中状态等）。
         """
         if self.selectedItem:
             bp = self.selectedItem['bp']
             defaultImg = self.GetBaseUIControl(bp).GetChildByName("default").asImage()
-            defaultImg.SetSprite(IMAGE_PATH_ITEM_CELL_DEFAULT)
+            defaultImg.SetSprite(_IMAGE_PATH_ITEM_CELL_DEFAULT)
             self.selectedItem = {}
         if self.itemHeapData:
             self.itemHeapData['barCtrl'].SetVisible(False)
@@ -438,8 +453,9 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         self.SetOneItemFlyAnim(itemDict, fromPos, toPos, uiSize)
 
     def StartItemHeapProgressBar(self):
+        # type: () -> None
         """
-        开始物品分堆进度条。
+        开始物品分堆进度条动画。
         """
         if self.itemHeapData:
             self.itemHeapData['barCtrl'].SetVisible(True)
@@ -447,8 +463,9 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self.__tick = 0
 
     def StopItemHeapProgressBar(self):
+        # type: () -> None
         """
-        停止物品分堆进度条。
+        停止物品分堆进度条动画。
         """
         if self.itemHeapData:
             self.itemHeapData['animating'] = False
@@ -456,52 +473,56 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
     # todo:=========================================== 物品操作 ==========================================================
 
     def SetGridItems(self, itemDictList, key, sync=True):
+        # type: (list[dict], str, bool) -> None
         """
         将物品一键设置到网格的每个方格上。
         """
         if not self.AllItemGridsInited(key):
             return
         for i, itemDict in enumerate(itemDictList):
-            self.SetBlockItem((key, i), itemDict, False)
+            self._setBlockItem((key, i), itemDict)
         if sync:
             self.UpdateAndSyncGrid(key)
 
     def GetGridItems(self, key):
+        # type: (str) -> list[dict]
         """
         获取网格内的所有物品。
         """
-        return self.gridItemsData[key] if key in self.gridItemsData else []
+        return _deepcopy(self.gridItemsData[key]) if key in self.gridItemsData else []
 
     @_listen_item_changes
     def SetBlockItem(self, block, itemDict, sync=True):
+        # type: (str | tuple[str, int], dict, bool) -> None
         """
         将物品显示在指定方格上。
         """
         if not self.AllItemGridsInited():
             return
+        self._setBlockItem(block, itemDict)
+        if sync:
+            self.UpdateAndSyncGrid(self.GetGridKey(block))
+
+    def _setBlockItem(self, block, itemDict):
         key, index = self.GetBlockPos(block)
-        itemList = self.gridItemsData[key]
-        itemList[index] = itemDict
+        self.gridItemsData[key][index] = _deepcopy(itemDict)
         self.SetItemRenderer(block, itemDict)
         self.SetItemCountLabel(block, itemDict)
         self.SetItemDurationBar(block, itemDict)
-        if sync:
-            self.UpdateAndSyncGrid(key)
 
     def GetBlockItem(self, block):
+        # type: (str | tuple[str, int]) -> dict | None
         """
         获取方格的物品信息字典。
         """
-        if isinstance(block, str):
-            key, index = self.GetBlockPos(block)
-        else:
-            key, index = block
         try:
-            return self.gridItemsData[key][index]
+            key, index = self.GetBlockPos(block)
+            return _deepcopy(self.gridItemsData[key][index])
         except:
             return None
 
     def MoveItems(self, fromBlock, toBlock, moveCount, sync=True, flyAnim=True, force=False):
+        # type: (str | tuple[str, int], str | tuple[str, int], int, bool, bool, bool) -> None
         """
         移动物品。
         """
@@ -523,7 +544,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self._moveItemsToEmpty(fromBlock, toBlock, moveCount)
         elif _is_same_item(fromItem, toItem):
             if fromBlock != toBlock:
-                self._moveItemsToSame(fromBlock, toBlock, fromItem['count'])
+                self._moveItemsToSame(fromBlock, toBlock, moveCount)
         else:
             self._exchangeItems(fromBlock, toBlock)
             if flyAnim:
@@ -536,54 +557,60 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
     def _exchangeItems(self, fromBlock, toBlock):
         fromItem = self.GetBlockItem(fromBlock)
         toItem = self.GetBlockItem(toBlock)
-        self.SetBlockItem(fromBlock, toItem, False)
-        self.SetBlockItem(toBlock, fromItem, False)
+        self._setBlockItem(fromBlock, toItem)
+        self._setBlockItem(toBlock, fromItem)
 
     def _moveItemsToEmpty(self, fromBlock, toBlock, count):
         fromItem = self.GetBlockItem(fromBlock)
-        self.SetBlockItem(toBlock, _deepcopy(fromItem), False)
-        self.SetBlockItemCount(toBlock, count, 1, False)
-        self.SetBlockItemCount(fromBlock, -count, 0, False)
+        fromNewCount = fromItem['count'] - count
+        fromItem['count'] = count
+        self._setBlockItem(toBlock, fromItem)
+        fromItem['count'] = fromNewCount
+        if fromItem['count'] <= 0:
+            fromItem = None
+        self._setBlockItem(fromBlock, fromItem)
 
     def _moveItemsToSame(self, fromBlock, toBlock, count):
-        overflowCount = self.SetBlockItemCount(toBlock, count, 0, False)
-        self.SetBlockItemCount(fromBlock, -count + overflowCount, 0, False)
+        overflowCount = self.SetBlockItemCount(toBlock, +count, sync=False)
+        self.SetBlockItemCount(fromBlock, -count + overflowCount, sync=False)
 
     def MergeItems(self, toBlock, sync=True, flyAnim=True):
+        # type: (str | tuple[str, int], bool, bool) -> None
         """
         物品合堆。
         """
         if not self.AllItemGridsInited():
             return
         toBlock = self.GetBlockPos(toBlock)
-        fromTypes = []
+        fromKeys = []
         toItem = self.GetBlockItem(toBlock)
         if _is_empty_item(toItem):
             return
         maxStack = _get_max_stack(toItem)
-        for fromType, fromAllItems in self.gridItemsData.items():
+        for fromKey, fromAllItems in self.gridItemsData.items():
             if toItem['count'] == maxStack:
                 break
             for fromIndex, fromItem in enumerate(fromAllItems):
-                fromBlock = (fromType, fromIndex)
+                fromBlock = (fromKey, fromIndex)
                 if fromBlock == toBlock:
                     continue
                 if toItem['count'] == maxStack:
                     break
                 if _is_empty_item(fromItem) or not _is_same_item(fromItem, toItem):
                     continue
-                if fromItem['count'] == maxStack:
+                fromCount = fromItem['count']
+                if fromCount == maxStack:
                     continue
-                overflow = self.SetBlockItemCount(toBlock, fromItem['count'], 0, False)
-                self.SetBlockItemCount(fromBlock, overflow, 1, False)
+                self._moveItemsToSame(fromBlock, toBlock, fromCount)
                 if flyAnim:
                     self._setItemFlyAnim(fromItem, fromBlock, toBlock)
-                fromTypes.append(fromType)
+                fromKeys.append(fromKey)
         if sync:
-            self.UpdateAndSyncGrid(self.GetGridKey(toBlock), *fromTypes)
+            self.UpdateAndSyncGrid(self.GetGridKey(toBlock), *fromKeys)
 
     @_listen_item_changes
     def SeparateItemsEvenly(self, fromBlock, fromOrgItem, toBlockList, sync=True):
+        # type: (str | tuple[str, int], dict, list[str | tuple[str, int]], bool) -> None
         """
         物品均分。
         """
@@ -591,16 +618,16 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             return
         if _is_empty_item(fromOrgItem):
             return
-        fromType, fromIndex = self.GetBlockPos(fromBlock)
-        fromAllItems = self.gridItemsData[fromType]
+        fromKey, fromIndex = self.GetBlockPos(fromBlock)
+        fromAllItems = self.gridItemsData[fromKey]
         fromCount = fromOrgItem['count']
         gridCount = len(toBlockList)
         toCount = fromCount / gridCount
         if toCount <= 0:
             return
-        for toPath in toBlockList:
-            toType, toIndex = self.GetBlockPos(toPath)
-            toAllItems = self.gridItemsData[toType]
+        for toBlock in toBlockList:
+            toKey, toIndex = self.GetBlockPos(toBlock)
+            toAllItems = self.gridItemsData[toKey]
             toAllItems[toIndex] = _deepcopy(fromOrgItem)
             toAllItems[toIndex]['count'] = toCount
         remainCount = fromCount % gridCount
@@ -609,18 +636,20 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             fromAllItems[fromIndex]['count'] = remainCount
         else:
             fromAllItems[fromIndex] = None
-        toTypes = [self.GetGridKey(i) for i in toBlockList]
+        toKeys = [self.GetGridKey(i) for i in toBlockList]
         if sync:
-            self.UpdateAndSyncGrid(fromType, *toTypes)
+            self.UpdateAndSyncGrid(fromKey, *toKeys)
 
     @_listen_item_changes
     def SetBlockItemCount(self, block, count, absolute=0, sync=True):
+        # type: (str | tuple[str, int], int, int, bool) -> int
         """
         设置指定方格内的物品的数量。
         """
         if not self.AllItemGridsInited():
             return 0
-        item = self.GetBlockItem(block)
+        key, index = self.GetBlockPos(block)
+        item = self.gridItemsData[key][index]
         if _is_empty_item(item):
             return 0
         maxStack = _get_max_stack(item)
@@ -633,20 +662,21 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             overflowCount = item['count'] - maxStack
             item['count'] = maxStack
         if item['count'] <= 0:
-            key, index = self.GetBlockPos(block)
             self.gridItemsData[key][index] = None
         if sync:
-            self.UpdateAndSyncGrid(self.GetGridKey(block))
+            self.UpdateAndSyncGrid(key)
         return overflowCount
 
     def GetBlockItemCount(self, block):
+        # type: (str | tuple[str, int]) -> int
         """
         获取指定方格内的物品的数量。
         """
         item = self.GetBlockItem(block)
-        return item['count'] if item else 0
+        return item['count'] if item else -1
 
     def ReturnItemsToInv(self, items=None, *keys):
+        # type: (list[dict] | None, str) -> None
         """
         将所有背包外的物品返还给背包。
         """
@@ -688,30 +718,29 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         """
         if not self.AllItemGridsInited():
             return []
-        putIndex = []
+        putPoses = []
         if isinstance(putItem, dict):
             fromBlock = None
-            putItem = _deepcopy(putItem)
+            putItemDict = _deepcopy(putItem)
         else:
             fromBlock = putItem
-            putItem = _deepcopy(self.GetBlockItem(putItem))
+            putItemDict = self.GetBlockItem(putItem)
+            self._setBlockItem(fromBlock, None)
         if isinstance(keys, str):
             keys = [keys]
         for key in keys:
-            index = self._putItem(putItem, key)
-            putIndex.extend(index)
-            if putItem['count'] <= 0:
+            poses = self._putItem(putItemDict, key)
+            putPoses.extend(poses)
+            if putItemDict['count'] <= 0:
                 break
         else:
-            self.ThrowItem(putItem, sync=False)
-        if fromBlock:
-            self.SetBlockItem(fromBlock, None, False)
-        if putIndex and sync:
+            self.ThrowItem(putItemDict, sync=False)
+        if putPoses and sync:
             self.UpdateAndSyncGrid(fromBlock, *_RESERVED_KEYS)
-        return putIndex
+        return putPoses
 
     def _putItem(self, putItem, key):
-        putIndex = []
+        putPoses = []
         maxStack = _get_max_stack(putItem)
         emptyIndex = []
         if key not in self.gridItemsData:
@@ -732,7 +761,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             else:
                 item['count'] = maxStack
                 putItem['count'] -= canPutCount
-            putIndex.append((key, index))
+            putPoses.append((key, index))
             if putItem['count'] <= 0:
                 break
         else:
@@ -743,34 +772,34 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                 newItem['count'] = count
                 putItem['count'] -= count
                 itemList[index] = newItem
-                putIndex.append((key, index))
+                putPoses.append((key, index))
                 if putItem['count'] <= 0:
                     break
-        return putIndex
+        return putPoses
 
     def ThrowItem(self, what, count=-1, sync=True):
+        # type: (dict | str | tuple[str, int], int, bool) -> None
         """
         将物品丢弃到世界。
         """
         if isinstance(what, dict):
-            item = what
+            item = _deepcopy(what)
         else:
             item = self.GetBlockItem(what)
-        if _is_empty_item(item):
-            return
-        throwItem = _deepcopy(item)
-        if count != -1:
-            throwItem['count'] = count
-        self.cs.NotifyToServer("_ThrowItem", throwItem)
-        if isinstance(what, (str, tuple)):
             self.SetBlockItemCount(
                 what,
                 -count if count != -1 else 0,
                 0 if count != -1 else 1,
                 sync
             )
+        if _is_empty_item(item):
+            return
+        if count != -1:
+            item['count'] = count
+        self.cs.NotifyToServer("_ThrowItem", item)
 
     def SyncAllItemsFromServer(self, *keys):
+        # type: (str) -> None
         """
         从服务端同步所有物品数据到客户端。
         """
@@ -778,7 +807,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             return
         self.cs.NotifyToServer("_SyncItems", {
             'namespace': self.__namespace,
-            'keys': keys if keys else tuple(self.gridKeys)
+            'keys': keys if keys else self.gridKeys
         })
 
     def _receiveItemsData(self, args):
@@ -790,6 +819,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self.SetGridItems(itemList, key, False)
 
     def SetSelectedItem(self, block, value):
+        # type: (str | tuple[str, int], bool) -> None
         """
         设置指定物品的选中状态。
         """
@@ -808,24 +838,24 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             }
             self.OnSelectedItem(args)
             if not args['cancel']:
-                defaultImg.SetSprite(IMAGE_PATH_ITEM_CELL_SELECTED)
+                defaultImg.SetSprite(_IMAGE_PATH_ITEM_CELL_SELECTED)
                 self.selectedItem = {
                     'itemDict': itemDict,
                     'bp': bp,
-                    'gridType': pos[0],
-                    'index': pos[1],
                 }
         else:
-            defaultImg.SetSprite(IMAGE_PATH_ITEM_CELL_DEFAULT)
+            defaultImg.SetSprite(_IMAGE_PATH_ITEM_CELL_DEFAULT)
             self.ClearGridsState()
 
     def GetSelectedItem(self):
+        # type: () -> dict
         """
         获取当前选中的物品的数据。
         """
         return self.selectedItem
 
     def SetItemHeapData(self, block, count):
+        # type: (str | tuple[str, int], int) -> None
         """
         设置物品分堆。
         """
@@ -844,6 +874,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         }
 
     def GetItemHeapData(self):
+        # type: () -> dict
         """
         获取当前选中物品的分堆数据。
         """
@@ -852,12 +883,12 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
     # todo:======================================= Basic Function ======================================================
 
     def RegisterItemGrid(self, key, path, single=0):
+        # type: (str, str, int) -> None
         """
         注册网格。
         """
-        self.gridPaths[key] = path, single
-        self.blockPaths[key] = []
-        self.gridKeys.add(key)
+        self.gridPaths[key] = (path, single)
+        self.gridKeys.append(key)
         if key == _INV27 or key == _SHORTCUT:
             if _INV36 not in self.gridItemsData:
                 self.gridItemsData[key] = []
@@ -866,29 +897,32 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         elif key == _INV36:
             shortcut = self.gridItemsData.get(_SHORTCUT, [])
             inv27 = self.gridItemsData.get(_INV27, [])
-            self.gridItemsData[key] = _Inv36ItemList(shortcut, inv27)
+            self.gridItemsData[_INV36] = _Inv36ItemList(shortcut, inv27)
         else:
             self.gridItemsData[key] = []
 
     def AllItemGridsInited(self, *keys):
+        # type: (str) -> bool
         """
-        判断所有注册的网格是否均已完成初始化。
+        判断所有已注册的网格是否全部完成初始化。
         """
         if not keys:
             keys = self.gridKeys
         return all((key in self._inited) for key in keys)
 
     def GetGridKey(self, block):
+        # type: (str | tuple[str, int]) -> str | None
         """
         获取方格所在网格的key。
         """
         if isinstance(block, tuple):
             return block[0]
-        for k, (gp, _) in self.gridPaths.items():
-            if gp in block:
+        for k, (path, _) in self.gridPaths.items():
+            if path in block:
                 return k
 
     def GetBlockPath(self, block):
+        # type: (str | tuple[str, int]) -> str | None
         """
         获取方格路径。
         """
@@ -899,91 +933,19 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         except (KeyError, IndexError):
             return None
 
-    def GetBlockPos(self, path):
+    def GetBlockPos(self, block):
+        # type: (str | tuple[str, int]) -> tuple[str, int] | None
         """
         获取方格位置。
         """
-        if isinstance(path, tuple):
-            return path
+        if isinstance(block, tuple):
+            return block
         try:
-            return self.blockPoses[path]
+            return self.blockPoses[block]
         except KeyError:
             return None
 
 
-def _test_listen_item_changes(func):
-    def wrapper(self, *args, **kwargs):
-        old = _deepcopy(self.gridItemsData)
-        res = func(self, *args, **kwargs)
-        new = _deepcopy(self.gridItemsData)
-        changes = _analyze_changes(old, new)
-        if changes:
-            if self._lsnTimer and self._lsnTimer.isAlive():
-                self._lsnTimer.cancel()
-            else:
-                self._changes = {}
-            _update_changes(self._changes, changes)
-            self._lsnTimer = _Timer(_DELAY, self.OnGridItemChanged, (self._changes,))
-            self._lsnTimer.start()
-        return res
-    return wrapper
-
-
-def _test():
-    lst1 = [1, 2]
-    lst2 = [1, 2, 3]
-    inv36 = _Inv36ItemList(lst1, lst2)
-    print inv36[0], inv36[3], inv36[-1]  # 1, 2, 3
-    print "=" * 50
-
-    lst1.append("a")
-    lst2.append("b")
-    print inv36.ToList()  # [1, 2, "a", 1, 2, 3, "b"]
-    print "=" * 50
-
-    inv36[0] = 11
-    inv36[3] = 11
-    inv36[-3] = 22
-    inv36[-6] = 22
-    print lst1, lst2  # [11, 22, "a"], [11, 22, 3, "b"]
-    print "=" * 50
-
-    for i in inv36:
-        print i  # 11, 22, "a", 11, 22, 3, "b"
-    print "=" * 50
-
-    inv36.append("test")
-    print lst1, lst2  # [11, 22, "a", "test"], [11, 22, 3, "b"]
-    print "test" in inv36, "a" in inv36  # True, True
-    print "=" * 50
-
-    class Test(object):
-        def __init__(self):
-            self._changes = {}
-            self._lsnTimer = None
-            self.gridItemsData = {
-                'k1': [None] * 9,
-                'k2': [None] * 27,
-            }
-
-        def OnGridItemChanged(self, args):
-            print args
-
-        @_test_listen_item_changes
-        def change(self):
-            r1, r2, r3, r4 = _randrange(9), _randrange(27), _randrange(100), _randrange(100)
-            self.gridItemsData['k1'][r1] = r3
-            self.gridItemsData['k2'][r2] = r4
-            return "k1:%d -> %d; k2:%d -> %d" % (r1, r3, r2, r4)
-
-    t = Test()
-    for i in range(3):
-        # noinspection PyArgumentList
-        print t.change()
-        if i == 2:
-            _sleep(1)
-            # noinspection PyArgumentList
-            print t.change()
 
 
 

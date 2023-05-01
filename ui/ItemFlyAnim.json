@@ -1,40 +1,46 @@
 {
-   "main" : {
-      "controls" : [
-         {
-            "item_fly_panel" : {
-               "controls" : [
-                  {
-                     "item_renderer1" : {
-                        "layer" : 1,
-                        "property_bag" : {
-                           "#item_id_aux" : 131072
-                        },
-                        "renderer" : "inventory_item_renderer",
-                        "size" : [ 100, 100 ],
-                        "type" : "custom",
-                        "visible" : false
-                     }
-                  },
-                  {
-                     "item_renderer2" : {
-                        "layer" : 2,
-                        "property_bag" : {
-                           "#item_id_aux" : 131072
-                        },
-                        "renderer" : "inventory_item_renderer",
-                        "size" : [ 100, 100 ],
-                        "type" : "custom",
-                        "visible" : false
-                     }
-                  }
-               ],
-               "layer" : 6000,
-               "type" : "panel"
+    "main": {
+        "bindings": [
+            {
+                "binding_condition": "always",
+                "binding_name": "#main.gametick"
             }
-         }
-      ],
-      "type" : "screen"
-   },
-   "namespace" : "ItemFlyAnim"
+        ],
+        "controls": [
+            {
+                "item_fly_panel": {
+                    "controls": [
+                        {
+                            "item_renderer1": {
+                                "layer": 1,
+                                "property_bag": {
+                                    "#item_id_aux": 131072
+                                },
+                                "renderer": "inventory_item_renderer",
+                                "size": [ 100, 100 ],
+                                "type": "custom",
+                                "visible": false
+                            }
+                        },
+                        {
+                            "item_renderer2": {
+                                "layer": 2,
+                                "property_bag": {
+                                    "#item_id_aux": 131072
+                                },
+                                "renderer": "inventory_item_renderer",
+                                "size": [ 100, 100 ],
+                                "type": "custom",
+                                "visible": false
+                            }
+                        }
+                    ],
+                    "layer": 6000,
+                    "type": "panel"
+                }
+            }
+        ],
+        "type": "screen"
+    },
+    "namespace": "ItemFlyAnim"
 }

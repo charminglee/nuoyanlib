@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-09
+#   Last Modified : 2023-04-29
 #
 # ====================================================
 
@@ -112,7 +112,7 @@ class _ItemFlyAnimUI(_NuoyanScreenNode):
                 self.flyIRs.append(newIR)
         # 配置ItemRenderer
         itemName = itemDict['newItemName']
-        aux = itemDict['newAuxValue']
+        aux = itemDict.get('newAuxValue', 0)
         isEnchanted = bool(itemDict.get('enchantData') or itemDict.get('modEnchantData'))
         userData = itemDict.get('userData')
         ir = self.flyIRs[num]

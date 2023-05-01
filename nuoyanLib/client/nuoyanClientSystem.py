@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-21
+#   Last Modified : 2023-05-02
 #
 # ====================================================
 
@@ -1354,6 +1354,9 @@ class NuoyanClientSystem(_ClientSystem):
         【示例】
         self.myUiNode = self.RegisterAndCreateUI(namespace, clsPath, uiScreenDef)
         """
+        node = _clientApi.GetUI(_MOD_NAME, namespace)
+        if node:
+            return node
         _clientApi.RegisterUI(_MOD_NAME, namespace, clsPath, uiScreenDef)
         if not param:
             param = {
