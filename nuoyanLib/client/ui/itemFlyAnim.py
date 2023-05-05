@@ -12,14 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-29
+#   Last Modified : 2023-05-05
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _clientApi
 from nuoyanScreenNode import NuoyanScreenNode as _NuoyanScreenNode
-from ....nuoyanLib.utils.item import is_empty_item as _is_empty_item
+from ...utils.item import is_empty_item as _is_empty_item
 from ..._config import MOD_NAME
 
 

@@ -12,16 +12,16 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-02
+#   Last Modified : 2023-05-05
 #
 # ====================================================
 
 
 from copy import deepcopy as _deepcopy
 import mod.client.extraClientApi as _clientApi
-from ....nuoyanLib.utils.item import is_same_item as _is_same_item, is_empty_item as _is_empty_item, \
+from ...utils.item import is_same_item as _is_same_item, is_empty_item as _is_empty_item, \
     get_max_stack as _get_max_stack
-from ....nuoyanLib.client.ui.utils import get_ui_screen_pos as _get_ui_screen_pos
+from .utils import get_ui_screen_pos as _get_ui_screen_pos
 from itemFlyAnim import ItemFlyAnim as _ItemFlyAnim
 from itemTipsBox import ItemTipsBox as _ItemTipsBox
 from ..._config import MOD_NAME as _MOD_NAME, SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
@@ -532,12 +532,6 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if _is_empty_item(fromItem):
             return
         toItem = self.GetBlockItem(toBlock)
-        fromPath = self.GetBlockPath(fromBlock)
-        toPath = self.GetBlockPath(toBlock)
-        fromUiPos = _get_ui_screen_pos(self, fromPath)
-        toUiPos = _get_ui_screen_pos(self, toPath)
-        fromUiSize = self.GetBaseUIControl(fromPath).GetSize()
-        toUiSize = self.GetBaseUIControl(toPath).GetSize()
         if moveCount == -1:
             moveCount = fromItem['count']
         if force or _is_empty_item(toItem):
@@ -548,11 +542,11 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         else:
             self._exchangeItems(fromBlock, toBlock)
             if flyAnim:
-                self.SetOneItemFlyAnim(toItem, toUiPos, fromUiPos, toUiSize)
+                self._setItemFlyAnim(toItem, toBlock, fromBlock)
         if sync:
             self.UpdateAndSyncGrid(self.GetGridKey(fromBlock), self.GetGridKey(toBlock))
         if flyAnim:
-            self.SetOneItemFlyAnim(fromItem, fromUiPos, toUiPos, fromUiSize)
+            self._setItemFlyAnim(fromItem, fromBlock, toBlock)
 
     def _exchangeItems(self, fromBlock, toBlock):
         fromItem = self.GetBlockItem(fromBlock)
