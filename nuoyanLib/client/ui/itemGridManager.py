@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-05
+#   Last Modified : 2023-05-11
 #
 # ====================================================
 
@@ -54,7 +54,7 @@ class _Inv36ItemList(list):
         self.inv27 = inv27
 
     def __getitem__(self, index):
-        return self.ToList()[index]
+        return self.toList()[index]
 
     def __setitem__(self, index, val):
         len1 = len(self.shortcut)
@@ -69,22 +69,22 @@ class _Inv36ItemList(list):
                 self.inv27[index] = val
             else:
                 self.shortcut[index + len2] = val
-        list.__init__(self, self.ToList())
+        list.__init__(self, self.toList())
 
     def __contains__(self, y):
-        return y in self.ToList()
+        return y in self.toList()
 
     def __len__(self):
-        return len(self.ToList())
+        return len(self.toList())
 
     def append(self, obj):
         if len(self.shortcut) < 9:
             self.shortcut.append(obj)
         elif len(self.inv27) < 27:
             self.inv27.append(obj)
-        list.__init__(self, self.ToList())
+        list.__init__(self, self.toList())
 
-    def ToList(self):
+    def toList(self):
         return self.shortcut + self.inv27
 
 
@@ -96,7 +96,7 @@ def _listen_item_changes(func):
         changes = _analyze_changes(old, new)
         if changes:
             _update_changes(self._changes, changes)
-            self.OnGridItemChanged({'changes': self._changes})
+            self.OnItemGridChanged({'changes': self._changes})
             self._changes = {}
         return res
     return wrapper
@@ -146,6 +146,8 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         self._orgItem = {}
         self.__namespace = self.__class__.__name__
         self._changes = {}
+        self._lockedBlocks = set()
+        self._lockedGrids = set()
         self.__listen()
 
     def __listen(self):
@@ -179,30 +181,35 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
 
     # todo:==================================== Custom Event Callback ==================================================
 
-    def OnGridItemChanged(self, args):
+    def OnItemGridChanged(self, args):
         """
-        网格内的物品改变时触发。
+        网格内的物品发生改变时触发。
         -----------------------------------------------------------
         【changes: Dict[Tuple[str, int], Dict[str, dict]]】 字典，key为发生改变的方格的位置元组，value为另一个字典，结构为：{'old': 改变前的物品信息字典, 'new': 改变后的物品信息字典}
         """
 
-    def OnSelectedItem(self, args):
+    def OnItemGridSelectedItem(self, args):
         """
-        选中物品时触发。
+        网格内的物品被选中时触发。
         -----------------------------------------------------------
         【itemDict: dict】 物品信息字典
-        【blockPath: str】 所选方格的路径
+        【blockPath: str】 方格路径
         【blockPos: Tuple[str, int]】 方格位置元组
         【$cancel: bool】 是否取消选中
         """
 
     # todo:========================================= UI Callback =======================================================
 
-    def OnBlockButtonTouchUp(self, args):
+    def OnItemBlockTouchUp(self, args):
         """
-        方格按下后抬起触发的回调函数。
+        方格抬起时触发的回调函数。
         """
+
+    def _onItemBlockTouchUp(self, args):
+        self.OnItemBlockTouchUp(args)
         bp = args['ButtonPath']
+        if self.IsItemBlockLocked(bp):
+            return
         itemDict = self.GetBlockItem(bp)
         if self.selectedItem:
             fromPath = self.selectedItem['bp']
@@ -213,18 +220,21 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self.SetSelectedItem(bp, True)
         self.StopItemHeapProgressBar()
 
-    def OnBlockButtonTouchMoveIn(self, args):
+    def OnItemBlockTouchMoveIn(self, args):
         """
         手指移动到方格内时触发的回调函数
         """
+
+    def _onItemBlockTouchMoveIn(self, args):
+        self.OnItemBlockTouchMoveIn(args)
+        bp = args['ButtonPath']
+        if self.IsItemBlockLocked(bp):
+            return
         if self.itemHeapData or not self.selectedItem:
             return
-        bp = args['ButtonPath']
         fromPath = self.selectedItem['bp']
         itemDict = self.GetBlockItem(bp)
-        if bp == fromPath:
-            return
-        if not _is_empty_item(itemDict):
+        if bp == fromPath or not _is_empty_item(itemDict):
             return
         if not self._moveInGridList:
             self._orgItem = self.selectedItem['itemDict']
@@ -233,13 +243,18 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if len(self._moveInGridList) >= 2:
             self.SeparateItemsEvenly(fromPath, self._orgItem, self._moveInGridList)
 
-    def OnBlockButtonDoubleClick(self, args):
+    def OnItemBlockDoubleClick(self, args):
         """
         双击方格触发的回调函数。
         """
+
+    def _onItemBlockDoubleClick(self, args):
+        self.OnItemBlockDoubleClick(args)
+        bp = args['ButtonPath']
+        if self.IsItemBlockLocked(bp):
+            return
         if self.itemHeapData:
             return
-        bp = args['ButtonPath']
         itemDict = self.GetBlockItem(bp)
         if _is_empty_item(itemDict):
             return
@@ -250,11 +265,16 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self.MergeItems(bp)
         self.SetSelectedItem(bp, False)
 
-    def OnBlockButtonLongClick(self, args):
+    def OnItemBlockLongClick(self, args):
         """
         长按方格触发的回调函数。
         """
+
+    def _onItemBlockLongClick(self, args):
+        self.OnItemBlockLongClick(args)
         bp = args['ButtonPath']
+        if self.IsItemBlockLocked(bp):
+            return
         itemDict = self.GetBlockItem(bp)
         if self.selectedItem:
             self.SetSelectedItem(self.selectedItem['bp'], False)
@@ -262,32 +282,35 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self.SetItemHeapData(bp, 1)
             self.StartItemHeapProgressBar()
 
-    def OnBlockButtonTouchDown(self, args):
+    def OnItemBlockTouchDown(self, args):
         """
         方格按下时触发的回调函数。
         """
+
+    def _onItemBlockTouchDown(self, args):
+        self.OnItemBlockTouchDown(args)
         bp = args['ButtonPath']
         itemDict = self.GetBlockItem(bp)
         self.ShowItemTipsBox(itemDict)
 
-    def OnBlockButtonTouchMove(self, args):
+    def OnItemBlockTouchMove(self, args):
         """
         手指在方格上移动时每帧触发的回调函数。
         """
 
-    def OnBlockButtonTouchMoveOut(self, args):
+    def OnItemBlockTouchMoveOut(self, args):
         """
         手指移出方格时触发的回调函数。
         """
 
-    def OnBlockButtonTouchCancel(self, args):
+    def OnItemBlockTouchCancel(self, args):
         """
         方格取消按下时触发的回调函数。
         """
 
     # todo:=========================================== UI操作 ===========================================================
 
-    def GetAllBlockUIControls(self, key):
+    def GetAllItemBlockUIControls(self, key):
         # type: (str) -> list[_ButtonUIControl]
         """
         获取指定网格中所有方格的ButtonUIControl实例。
@@ -325,20 +348,20 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self.blockUiCtrls[key] = []
             for i, path in enumerate(allChildren):
                 self.SetButtonDoubleClickCallback(
-                    path, self.OnBlockButtonDoubleClick, self.OnBlockButtonTouchUp
+                    path, self._onItemBlockDoubleClick, self._onItemBlockTouchUp
                 )
                 self.SetButtonLongClickCallback(
-                    path, self.OnBlockButtonLongClick, self.OnBlockButtonTouchUp, self.OnBlockButtonTouchMoveOut,
-                    self.OnBlockButtonTouchDown, self.OnBlockButtonTouchCancel
+                    path, self._onItemBlockLongClick, self._onItemBlockTouchUp, self.OnItemBlockTouchMoveOut,
+                    self._onItemBlockTouchDown, self.OnItemBlockTouchCancel
                 )
                 btn = self.GetBaseUIControl(path).asButton()
-                btn.SetButtonTouchMoveInCallback(self.OnBlockButtonTouchMoveIn)
-                btn.SetButtonTouchMoveCallback(self.OnBlockButtonTouchMove)
+                btn.SetButtonTouchMoveInCallback(self._onItemBlockTouchMoveIn)
+                btn.SetButtonTouchMoveCallback(self.OnItemBlockTouchMove)
                 btn.GetChildByName("heap").SetVisible(False)
                 pos = (key, i)
-                self.SetItemRenderer(pos, None)
-                self.SetItemCountLabel(pos, None)
-                self.SetItemDurationBar(pos, None)
+                self.SetItemBlockRenderer(pos, None)
+                self.SetItemBlockCountLabel(pos, None)
+                self.SetItemBlockDurationBar(pos, None)
                 self.blockPoses[path] = pos
                 self.gridItemsData[key].append(None)
                 self.blockUiCtrls[key].append(btn)
@@ -353,12 +376,12 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if finishedFunc:
             finishedFunc(*args, **kwargs)
 
-    def SetItemDurationBar(self, block, itemDict):
+    def SetItemBlockDurationBar(self, block, itemDict):
         # type: (str | tuple[str, int], dict) -> None
         """
         设置物品耐久显示。
         """
-        bp = self.GetBlockPath(block)
+        bp = self.GetItemBlockPath(block)
         durCtrl = self.GetBaseUIControl(bp).GetChildByName("durability").asProgressBar()
         if not _is_empty_item(itemDict):
             dur = float(itemDict.get('durability', 0))
@@ -375,12 +398,12 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         else:
             durCtrl.SetVisible(False)
 
-    def SetItemRenderer(self, block, itemDict):
+    def SetItemBlockRenderer(self, block, itemDict):
         # type: (str | tuple[str, int], dict) -> None
         """
         设置物品渲染器显示物品。
         """
-        bp = self.GetBlockPath(block)
+        bp = self.GetItemBlockPath(block)
         itemRenderer = self.GetBaseUIControl(bp).GetChildByName("item_renderer").asItemRenderer()
         if not _is_empty_item(itemDict):
             itemRenderer.SetVisible(True)
@@ -392,12 +415,12 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         else:
             itemRenderer.SetVisible(False)
 
-    def SetItemCountLabel(self, block, itemDict):
+    def SetItemBlockCountLabel(self, block, itemDict):
         # type: (str | tuple[str, int], dict) -> None
         """
         物品数量文本显示。
         """
-        bp = self.GetBlockPath(block)
+        bp = self.GetItemBlockPath(block)
         label = self.GetBaseUIControl(bp).GetChildByName("count").asLabel()
         count = itemDict.get('count', 1) if not _is_empty_item(itemDict) else 0
         if count > 1:
@@ -406,7 +429,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         else:
             label.SetVisible(False)
 
-    def UpdateAndSyncGrid(self, *keys):
+    def UpdateAndSyncItemGrids(self, *keys):
         # type: (str) -> None
         """
         刷新网格并向服务端同步数据。
@@ -424,13 +447,13 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             if k != _INV36:
                 data[k] = items
             else:
-                data[k] = items.ToList()
+                data[k] = items.toList()
         self.cs.NotifyToServer("_UpdateItemsData", {
             'data': data,
             'namespace': self.__namespace,
         })
 
-    def ClearGridsState(self):
+    def ClearItemGridState(self):
         # type: () -> None
         """
         清除网格状态（如物品选中状态等）。
@@ -445,10 +468,10 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self.itemHeapData = {}
 
     def _setItemFlyAnim(self, itemDict, fromBlock, toBlock):
-        fromPath = self.GetBlockPath(fromBlock)
+        fromPath = self.GetItemBlockPath(fromBlock)
         fromPos = _get_ui_screen_pos(self, fromPath)
         uiSize = self.GetBaseUIControl(fromPath).GetSize()
-        toPath = self.GetBlockPath(toBlock)
+        toPath = self.GetItemBlockPath(toBlock)
         toPos = _get_ui_screen_pos(self, toPath)
         self.SetOneItemFlyAnim(itemDict, fromPos, toPos, uiSize)
 
@@ -472,6 +495,42 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
 
     # todo:=========================================== 物品操作 ==========================================================
 
+    def LockItemGrid(self, key, lock):
+        # type: (str, bool) -> None
+        """
+        锁定或解锁指定网格，锁定后该网格内的所有方格将屏蔽物品点击选中、移动、长按分堆、滑动分堆、双击合堆操作。
+        """
+        if lock:
+            self._lockedGrids.add(key)
+        else:
+            self._lockedGrids.discard(key)
+
+    def IsItemGridLocked(self, key):
+        # type: (str) -> bool
+        """
+        获取指定网格是否被锁定。
+        """
+        return key in self._lockedGrids
+
+    def LockItemBlock(self, block, lock):
+        # type: (str | tuple[str, int], bool) -> None
+        """
+        锁定或解锁指定方格，锁定后该方格将屏蔽物品点击选中、移动、长按分堆、滑动分堆、双击合堆操作。
+        """
+        blockPos = self.GetItemBlockPos(block)
+        if lock:
+            self._lockedBlocks.add(blockPos)
+        else:
+            self._lockedBlocks.discard(blockPos)
+
+    def IsItemBlockLocked(self, block):
+        # type: (str | tuple[str, int]) -> bool
+        """
+        获取指定方格是否被锁定。
+        """
+        blockPos = self.GetItemBlockPos(block)
+        return blockPos in self._lockedBlocks or blockPos[0] in self._lockedGrids
+
     def SetGridItems(self, itemDictList, key, sync=True):
         # type: (list[dict], str, bool) -> None
         """
@@ -482,7 +541,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         for i, itemDict in enumerate(itemDictList):
             self._setBlockItem((key, i), itemDict)
         if sync:
-            self.UpdateAndSyncGrid(key)
+            self.UpdateAndSyncItemGrids(key)
 
     def GetGridItems(self, key):
         # type: (str) -> list[dict]
@@ -491,7 +550,6 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         """
         return _deepcopy(self.gridItemsData[key]) if key in self.gridItemsData else []
 
-    @_listen_item_changes
     def SetBlockItem(self, block, itemDict, sync=True):
         # type: (str | tuple[str, int], dict, bool) -> None
         """
@@ -501,14 +559,15 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             return
         self._setBlockItem(block, itemDict)
         if sync:
-            self.UpdateAndSyncGrid(self.GetGridKey(block))
+            self.UpdateAndSyncItemGrids(self.GetItemGridKey(block))
 
+    @_listen_item_changes
     def _setBlockItem(self, block, itemDict):
-        key, index = self.GetBlockPos(block)
+        key, index = self.GetItemBlockPos(block)
         self.gridItemsData[key][index] = _deepcopy(itemDict)
-        self.SetItemRenderer(block, itemDict)
-        self.SetItemCountLabel(block, itemDict)
-        self.SetItemDurationBar(block, itemDict)
+        self.SetItemBlockRenderer(block, itemDict)
+        self.SetItemBlockCountLabel(block, itemDict)
+        self.SetItemBlockDurationBar(block, itemDict)
 
     def GetBlockItem(self, block):
         # type: (str | tuple[str, int]) -> dict | None
@@ -516,7 +575,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         获取方格的物品信息字典。
         """
         try:
-            key, index = self.GetBlockPos(block)
+            key, index = self.GetItemBlockPos(block)
             return _deepcopy(self.gridItemsData[key][index])
         except:
             return None
@@ -544,7 +603,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             if flyAnim:
                 self._setItemFlyAnim(toItem, toBlock, fromBlock)
         if sync:
-            self.UpdateAndSyncGrid(self.GetGridKey(fromBlock), self.GetGridKey(toBlock))
+            self.UpdateAndSyncItemGrids()
         if flyAnim:
             self._setItemFlyAnim(fromItem, fromBlock, toBlock)
 
@@ -565,8 +624,8 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         self._setBlockItem(fromBlock, fromItem)
 
     def _moveItemsToSame(self, fromBlock, toBlock, count):
-        overflowCount = self.SetBlockItemCount(toBlock, +count, sync=False)
-        self.SetBlockItemCount(fromBlock, -count + overflowCount, sync=False)
+        overflowCount = self.SetItemBlockCount(toBlock, +count, sync=False)
+        self.SetItemBlockCount(fromBlock, -count + overflowCount, sync=False)
 
     def MergeItems(self, toBlock, sync=True, flyAnim=True):
         # type: (str | tuple[str, int], bool, bool) -> None
@@ -575,7 +634,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         """
         if not self.AllItemGridsInited():
             return
-        toBlock = self.GetBlockPos(toBlock)
+        toBlock = self.GetItemBlockPos(toBlock)
         fromKeys = []
         toItem = self.GetBlockItem(toBlock)
         if _is_empty_item(toItem):
@@ -585,11 +644,13 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             if toItem['count'] == maxStack:
                 break
             for fromIndex, fromItem in enumerate(fromAllItems):
-                fromBlock = (fromKey, fromIndex)
-                if fromBlock == toBlock:
-                    continue
                 if toItem['count'] == maxStack:
                     break
+                fromBlock = (fromKey, fromIndex)
+                if self.IsItemBlockLocked(fromBlock):
+                    continue
+                if fromBlock == toBlock:
+                    continue
                 if _is_empty_item(fromItem) or not _is_same_item(fromItem, toItem):
                     continue
                 fromCount = fromItem['count']
@@ -600,7 +661,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                     self._setItemFlyAnim(fromItem, fromBlock, toBlock)
                 fromKeys.append(fromKey)
         if sync:
-            self.UpdateAndSyncGrid(self.GetGridKey(toBlock), *fromKeys)
+            self.UpdateAndSyncItemGrids()
 
     @_listen_item_changes
     def SeparateItemsEvenly(self, fromBlock, fromOrgItem, toBlockList, sync=True):
@@ -612,7 +673,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             return
         if _is_empty_item(fromOrgItem):
             return
-        fromKey, fromIndex = self.GetBlockPos(fromBlock)
+        fromKey, fromIndex = self.GetItemBlockPos(fromBlock)
         fromAllItems = self.gridItemsData[fromKey]
         fromCount = fromOrgItem['count']
         gridCount = len(toBlockList)
@@ -620,7 +681,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if toCount <= 0:
             return
         for toBlock in toBlockList:
-            toKey, toIndex = self.GetBlockPos(toBlock)
+            toKey, toIndex = self.GetItemBlockPos(toBlock)
             toAllItems = self.gridItemsData[toKey]
             toAllItems[toIndex] = _deepcopy(fromOrgItem)
             toAllItems[toIndex]['count'] = toCount
@@ -630,19 +691,18 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             fromAllItems[fromIndex]['count'] = remainCount
         else:
             fromAllItems[fromIndex] = None
-        toKeys = [self.GetGridKey(i) for i in toBlockList]
         if sync:
-            self.UpdateAndSyncGrid(fromKey, *toKeys)
+            self.UpdateAndSyncItemGrids()
 
     @_listen_item_changes
-    def SetBlockItemCount(self, block, count, absolute=0, sync=True):
+    def SetItemBlockCount(self, block, count, absolute=0, sync=True):
         # type: (str | tuple[str, int], int, int, bool) -> int
         """
         设置指定方格内的物品的数量。
         """
         if not self.AllItemGridsInited():
             return 0
-        key, index = self.GetBlockPos(block)
+        key, index = self.GetItemBlockPos(block)
         item = self.gridItemsData[key][index]
         if _is_empty_item(item):
             return 0
@@ -658,10 +718,10 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if item['count'] <= 0:
             self.gridItemsData[key][index] = None
         if sync:
-            self.UpdateAndSyncGrid(key)
+            self.UpdateAndSyncItemGrids()
         return overflowCount
 
-    def GetBlockItemCount(self, block):
+    def GetItemBlockCount(self, block):
         # type: (str | tuple[str, int]) -> int
         """
         获取指定方格内的物品的数量。
@@ -695,11 +755,11 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                     if self.PutItemToGrids((key, i), _RESERVED_KEYS, False):
                         update = True
         if update:
-            self.UpdateAndSyncGrid()
+            self.UpdateAndSyncItemGrids()
 
     @_listen_item_changes
-    def PutItemToGrids(self, putItem, keys, sync=True):
-        # type: (dict | str | tuple[str, int], str | tuple[str, ...], bool) -> list[tuple[str, int]]
+    def PutItemToGrids(self, putItem, keys, sync=True, flyAnim=True):
+        # type: (dict | str | tuple[str, int], str | tuple[str, ...], bool, bool) -> list[tuple[str, int]]
         """
         将物品放入指定网格。
         优先与未达到最大堆叠的同种物品进行合堆，若没有同种物品或合堆后仍有剩余则放入空格子，若没有空格子则丢弃到世界（或尝试放入下一个网格）。
@@ -714,12 +774,10 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             return []
         putPoses = []
         if isinstance(putItem, dict):
-            fromBlock = None
             putItemDict = _deepcopy(putItem)
         else:
-            fromBlock = putItem
             putItemDict = self.GetBlockItem(putItem)
-            self._setBlockItem(fromBlock, None)
+            self._setBlockItem(putItem, None)
         if isinstance(keys, str):
             keys = [keys]
         for key in keys:
@@ -729,8 +787,11 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                 break
         else:
             self.ThrowItem(putItemDict, sync=False)
-        if putPoses and sync:
-            self.UpdateAndSyncGrid(fromBlock, *_RESERVED_KEYS)
+        if flyAnim and isinstance(putItem, (str, tuple)):
+            for toPos in putPoses:
+                self._setItemFlyAnim(putItemDict, putItem, toPos)
+        if sync and putPoses:
+            self.UpdateAndSyncItemGrids()
         return putPoses
 
     def _putItem(self, putItem, key):
@@ -740,7 +801,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if key not in self.gridItemsData:
             return []
         itemList = self.gridItemsData[key]
-        # 寻找背包同种物品放入
+        # 寻找同种物品放入
         for index, item in enumerate(itemList):
             if _is_empty_item(item):
                 emptyIndex.append((key, index))
@@ -780,7 +841,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             item = _deepcopy(what)
         else:
             item = self.GetBlockItem(what)
-            self.SetBlockItemCount(
+            self.SetItemBlockCount(
                 what,
                 -count if count != -1 else 0,
                 0 if count != -1 else 1,
@@ -819,8 +880,8 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         """
         if not self.AllItemGridsInited():
             return
-        bp = self.GetBlockPath(block)
-        pos = self.GetBlockPos(block)
+        bp = self.GetItemBlockPath(block)
+        pos = self.GetItemBlockPos(block)
         itemDict = self.GetBlockItem(block)
         defaultImg = self.GetBaseUIControl(bp).GetChildByName("default").asImage()
         if value:
@@ -830,7 +891,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                 'blockPos': pos,
                 'cancel': False,
             }
-            self.OnSelectedItem(args)
+            self.OnItemGridSelectedItem(args)
             if not args['cancel']:
                 defaultImg.SetSprite(_IMAGE_PATH_ITEM_CELL_SELECTED)
                 self.selectedItem = {
@@ -839,7 +900,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                 }
         else:
             defaultImg.SetSprite(_IMAGE_PATH_ITEM_CELL_DEFAULT)
-            self.ClearGridsState()
+            self.ClearItemGridState()
 
     def GetSelectedItem(self):
         # type: () -> dict
@@ -856,7 +917,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if not self.AllItemGridsInited():
             return
         itemDict = self.GetBlockItem(block)
-        bp = self.GetBlockPath(block)
+        bp = self.GetItemBlockPath(block)
         heapBar = self.GetBaseUIControl(bp).GetChildByName("heap").asProgressBar()
         heapBar.SetVisible(True)
         heapBar.SetValue(float(count) / itemDict['count'])
@@ -904,7 +965,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             keys = self.gridKeys
         return all((key in self._inited) for key in keys)
 
-    def GetGridKey(self, block):
+    def GetItemGridKey(self, block):
         # type: (str | tuple[str, int]) -> str | None
         """
         获取方格所在网格的key。
@@ -915,7 +976,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             if path in block:
                 return k
 
-    def GetBlockPath(self, block):
+    def GetItemBlockPath(self, block):
         # type: (str | tuple[str, int]) -> str | None
         """
         获取方格路径。
@@ -927,7 +988,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         except (KeyError, IndexError):
             return None
 
-    def GetBlockPos(self, block):
+    def GetItemBlockPos(self, block):
         # type: (str | tuple[str, int]) -> tuple[str, int] | None
         """
         获取方格位置。

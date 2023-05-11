@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-26
+#   Last Modified : 2023-05-11
 #
 # ====================================================
 
@@ -59,6 +59,10 @@ def set_namespace(name, namespace="minecraft"):
     return ":".join(nameLst)
 
 
+def _same(what1, what2):
+    return (not what1 and not what2) or what1 == what2
+
+
 def is_same_item(itemDict1, itemDict2):
     # type: (dict, dict) -> bool
     """
@@ -71,37 +75,25 @@ def is_same_item(itemDict1, itemDict2):
     """
     isEmp1 = is_empty_item(itemDict1)
     isEmp2 = is_empty_item(itemDict2)
-    if (isEmp1 and not isEmp2) or (not isEmp1 and isEmp2):
+    if isEmp1 != isEmp2:
         return False
     if isEmp1 and isEmp2:
         return True
-    newItemData1 = [itemDict1.get('newItemName', ""), itemDict1.get('newAuxValue', 0)]
-    newItemData2 = [itemDict2.get('newItemName', ""), itemDict2.get('newAuxValue', 0)]
-    itemData1 = [itemDict1.get('itemName', ""), itemDict1.get('auxValue', 0)]
-    itemData2 = [itemDict2.get('itemName', ""), itemDict2.get('auxValue', 0)]
-    newItemData1[0] = set_namespace(newItemData1[0])
-    newItemData2[0] = set_namespace(newItemData2[0])
+    if 'newItemName' in itemDict1:
+        itemData1 = [itemDict1['newItemName'], itemDict1.get('newAuxValue', 0)]
+    else:
+        itemData1 = [itemDict1['itemName'], itemDict1.get('auxValue', 0)]
+    if 'newItemName' in itemDict2:
+        itemData2 = [itemDict2['newItemName'], itemDict2.get('newAuxValue', 0)]
+    else:
+        itemData2 = [itemDict2['itemName'], itemDict2.get('auxValue', 0)]
     itemData1[0] = set_namespace(itemData1[0])
     itemData2[0] = set_namespace(itemData2[0])
     extraId1, extraId2 = itemDict1.get('extraId'), itemDict2.get('extraId')
     userData1, userData2 = itemDict1.get('userData'), itemDict2.get('userData')
     if not _same(extraId1, extraId2) or not _same(userData1, userData2):
         return False
-    if (not newItemData1[0] and not itemData1[0]) or (not newItemData2[0] and not itemData2[0]):
-        return False
-    if newItemData1 == newItemData2:
-        return True
-    if itemData1 == itemData2:
-        return True
-    if newItemData1 == itemData2:
-        return True
-    if itemData1 == newItemData2:
-        return True
-    return False
-
-
-def _same(what1, what2):
-    return (not what1 and not what2) or what1 == what2
+    return itemData1 == itemData2
 
 
 def are_same_item(item, *otherItem):
