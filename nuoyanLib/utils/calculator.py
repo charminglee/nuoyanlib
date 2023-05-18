@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-07
+#   Last Modified : 2023-05-18
 #
 # ====================================================
 
@@ -21,11 +21,8 @@ from collections import Sequence as _Sequence
 from random import randint as _randint
 from math import atan as _atan, degrees as _degrees, atan2 as _atan2, sqrt as _sqrt, pi as _pi, sin as _sin, \
     cos as _cos, fmod as _fmod, floor as _floor
-try:
-    import mod.client.extraClientApi as _clientApi
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
+import mod.client.extraClientApi as _clientApi
+import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
@@ -53,17 +50,33 @@ __all__ = [
 ]
 
 
-try:
-    if _clientApi.GetLocalPlayerId() == "-1":
-        _CompFactory = _serverApi.GetEngineCompFactory()
-        _GetDirFromRot = _serverApi.GetDirFromRot
-        _isClient = False
-    else:
-        _CompFactory = _clientApi.GetEngineCompFactory()
-        _GetDirFromRot = _clientApi.GetDirFromRot
-        _isClient = True
-except:
-    pass
+if _clientApi.GetLocalPlayerId() == "-1":
+    _CompFactory = _serverApi.GetEngineCompFactory()
+    _GetDirFromRot = _serverApi.GetDirFromRot
+    _isClient = False
+else:
+    _CompFactory = _clientApi.GetEngineCompFactory()
+    _GetDirFromRot = _clientApi.GetDirFromRot
+    _isClient = True
+
+
+def pos_distance_to_line(pos1, pos2, pos3):
+    """
+    计算pos1到pos2和pos3的连线的距离。
+    -----------------------------------------------------------
+    【pos1: Tuple[float, float, float]】 要计算距离的坐标
+    【pos2: Tuple[float, float, float]】 连线上的坐标1
+    【pos3: Tuple[float, float, float]】 连线上的坐标2
+    -----------------------------------------------------------
+    return: float -> pos1到pos2和pos3的连线的距离
+    """
+    a = pos_distance(pos1, pos2)
+    b = pos_distance(pos1, pos3)
+    c = pos_distance(pos2, pos3)
+    p = (a + b + c) / 2
+    s = _sqrt(p * (p - a) * (p - b) * (p - c))
+    h = s / c * 2
+    return h
 
 
 def floor_pos(pos):
