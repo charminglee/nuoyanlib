@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-18
+#   Last Modified : 2023-05-19
 #
 # ====================================================
 
@@ -22,6 +22,7 @@ from copy import copy as _copy
 from mod.common.minecraftEnum import EntityType as _EntityType, GameType as _GameType, AttrType as _AttrType, \
     ActorDamageCause as _ActorDamageCause
 from ..utils.calculator import is_in_sector as _is_in_sector, pos_distance_to_line as _pos_distance_to_line
+from ..utils.vector import angle_between_vectors as _angle_between_vectors
 from entity import entity_filter as _entity_filter, get_entities_in_area as _get_entities_in_area, \
     get_all_entities as _get_all_entities
 import mod.server.extraServerApi as _serverApi
@@ -79,6 +80,10 @@ def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttac
         ep = _ServerCompFactory.CreatePos(eid).GetFootPos()
         dis = _pos_distance_to_line(ep, startPos, endPos)
         if dis > radius:
+            continue
+        v1 = tuple(a - b for a, b in zip(startPos, ep))
+        v2 = tuple(a - b for a, b in zip(endPos, ep))
+        if _angle_between_vectors(v1, v2) < 1.57:
             continue
         if funcBeforeHurt:
             retEid = funcBeforeHurt(eid, attackerId, childAttackerId)

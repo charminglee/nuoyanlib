@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-05-19
 
 # ====================================================
 
@@ -101,9 +101,11 @@ def angle_between_vectors(v1, v2):
     -----------------------------------------------------------
     return: float -> 夹角（弧度值）
     """
-    v1Len = vector_length(v1)
-    v2Len = vector_length(v2)
-    v1v2 = sum(i * j for i, j in zip(v1, v2))
+    v1 = _Vector3(v1)
+    v2 = _Vector3(v2)
+    v1Len = v1.Length()
+    v2Len = v2.Length()
+    v1v2 = _Vector3.Dot(v1, v2)
     cos = v1v2 / (v1Len * v2Len)
     return _acos(cos)
 
