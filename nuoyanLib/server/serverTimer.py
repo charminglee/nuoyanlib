@@ -12,16 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-08
+#   Last Modified : 2023-05-20
 #
 # ====================================================
 
 
 from ..utils.error import TimerDestroyedError
-try:
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
+import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
@@ -29,12 +26,9 @@ __all__ = [
 ]
 
 
-try:
-    _LEVEL_ID = _serverApi.GetLevelId()
-    _CompFactory = _serverApi.GetEngineCompFactory()
-    _GameComp = _CompFactory.CreateGame(_LEVEL_ID)
-except:
-    pass
+_LEVEL_ID = _serverApi.GetLevelId()
+_CompFactory = _serverApi.GetEngineCompFactory()
+_GameComp = _CompFactory.CreateGame(_LEVEL_ID)
 
 
 class ServerTimer(object):

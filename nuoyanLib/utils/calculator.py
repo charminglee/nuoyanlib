@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-18
+#   Last Modified : 2023-05-20
 #
 # ====================================================
 
@@ -26,6 +26,8 @@ import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
+    "pos_distance_to_line",
+    "floor_pos",
     "pos_distance",
     "to_relative_pos",
     "to_screen_pos",
@@ -50,16 +52,6 @@ __all__ = [
 ]
 
 
-if _clientApi.GetLocalPlayerId() == "-1":
-    _CompFactory = _serverApi.GetEngineCompFactory()
-    _GetDirFromRot = _serverApi.GetDirFromRot
-    _isClient = False
-else:
-    _CompFactory = _clientApi.GetEngineCompFactory()
-    _GetDirFromRot = _clientApi.GetDirFromRot
-    _isClient = True
-
-
 def pos_distance_to_line(pos1, pos2, pos3):
     """
     计算pos1到pos2和pos3的连线的距离。
@@ -77,6 +69,14 @@ def pos_distance_to_line(pos1, pos2, pos3):
     s = _sqrt(p * (p - a) * (p - b) * (p - c))
     h = s / c * 2
     return h
+
+
+def _is_client():
+    return _clientApi.GetLocalPlayerId() != "-1"
+
+
+def _get_comp_factory():
+    return _clientApi.GetEngineCompFactory() if _is_client() else _serverApi.GetEngineCompFactory()
 
 
 def floor_pos(pos):
@@ -287,13 +287,14 @@ def pos_player_facing(playerId, dis, useZeroYaw=False):
     -----------------------------------------------------------
     return: Optional[Tuple[float, float, float]] -> 坐标
     """
-    rot = _CompFactory.CreateRot(playerId).GetRot()
+    compFactory = _get_comp_factory()
+    rot = compFactory.CreateRot(playerId).GetRot()
     if not rot:
         return
     if useZeroYaw:
         rot = (0, rot[1])
-    dirRot = _GetDirFromRot(rot)
-    playerPos = _CompFactory.CreatePos(playerId).GetFootPos()
+    dirRot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
+    playerPos = compFactory.CreatePos(playerId).GetFootPos()
     playerPos = (playerPos[0], playerPos[1] + 1.6, playerPos[2])
     resultPos = (
         playerPos[0] + dirRot[0] * dis,
@@ -403,8 +404,10 @@ def random_pos(centerPos, grid, useTopBlockHeight=False, dimension=0):
     ranZ = _randint(-grid, grid)
     x = centerPos[0] + ranX
     z = centerPos[2] + ranZ
-    if useTopBlockHeight and not _isClient:
-        y = _CompFactory.CreateBlockInfo(_serverApi.GetLevelId()).GetTopBlockHeight((x, z), dimension)
+    if useTopBlockHeight and not _is_client():
+        compFactory = _serverApi.GetEngineCompFactory()
+        levelId = _serverApi.GetLevelId()
+        y = compFactory.CreateBlockInfo(levelId).GetTopBlockHeight((x, z), dimension)
         if y is not None:
             return x, y, z
         else:
@@ -575,7 +578,7 @@ def is_in_cube(obj, pos1, pos2, ignoreY=False):
     return: bool -> 在立方体区域内返回True，否则返回False
     """
     if isinstance(obj, str):
-        targetPos = _CompFactory.CreatePos(obj).GetFootPos()
+        targetPos = _get_comp_factory().CreatePos(obj).GetFootPos()
     else:
         targetPos = obj
     if not targetPos or not pos1 or not pos2:

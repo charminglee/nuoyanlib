@@ -12,15 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-26
+#   Last Modified : 2023-05-20
 #
 # ====================================================
 
 
-try:
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
+import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType, GameType as _GameType
 from ..utils.item import is_empty_item as _is_empty_item
 
@@ -31,12 +28,9 @@ __all__ = [
 ]
 
 
-try:
-    _LEVEL_ID = _serverApi.GetLevelId()
-    _ServerCompFactory = _serverApi.GetEngineCompFactory()
-    _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
-except:
-    pass
+_LEVEL_ID = _serverApi.GetLevelId()
+_ServerCompFactory = _serverApi.GetEngineCompFactory()
+_LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
 
 
 def get_item_pos(entityId, posType, itemId, itemAux=-1, count=1):

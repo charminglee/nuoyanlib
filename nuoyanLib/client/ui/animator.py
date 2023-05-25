@@ -12,15 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-05-20
 #
 # ====================================================
 
 
-try:
-    import mod.client.extraClientApi as _clientApi
-except:
-    pass
+import mod.client.extraClientApi as _clientApi
 
 
 __all__ = [
@@ -28,12 +25,9 @@ __all__ = [
 ]
 
 
-try:
-    _PLAYER_ID = _clientApi.GetLocalPlayerId()
-    _ClientCompFactory = _clientApi.GetEngineCompFactory()
-    _PlayerGameComp = _ClientCompFactory.CreateGame(_PLAYER_ID)
-except:
-    pass
+_PLAYER_ID = _clientApi.GetLocalPlayerId()
+_ClientCompFactory = _clientApi.GetEngineCompFactory()
+_PlayerGameComp = _ClientCompFactory.CreateGame(_PLAYER_ID)
 
 
 class Animator(object):

@@ -12,18 +12,15 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-05-20
 #
 # ====================================================
 
 
 from traceback import format_exc as _format_exc
 from .._config import MOD_NAME as _MOD_NAME
-try:
-    import mod.client.extraClientApi as _clientApi
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
+import mod.client.extraClientApi as _clientApi
+import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
@@ -78,8 +75,6 @@ class TimerDestroyedError(Exception):
         return "This timer has been destroyed, you can no longer call '%s' method" % self.m
 
 
-def _test():
-    raise TimerDestroyedError("error message")
 
 
 

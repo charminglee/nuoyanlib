@@ -21,10 +21,7 @@ from copy import copy as _copy
 from mod.common.minecraftEnum import EntityType as _EntityType
 from ..utils.calculator import pos_distance as _pos_distance, perlin_noise as _perlin_noise
 from ..mctypes.server.system.serverSystem import ServerSystem as _ServerSystem
-try:
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
+import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
@@ -50,13 +47,10 @@ __all__ = [
 ]
 
 
-try:
-    _LEVEL_ID = _serverApi.GetLevelId()
-    _ServerCompFactory = _serverApi.GetEngineCompFactory()
-    _LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
-    _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
-except:
-    pass
+_LEVEL_ID = _serverApi.GetLevelId()
+_ServerCompFactory = _serverApi.GetEngineCompFactory()
+_LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
+_LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
 
 
 def is_mob(entityId):
@@ -269,18 +263,19 @@ def entity_plunge(entityId1, entityId2, speed):
 
 
 def entity_plunge_by_dir(entityId, direction, speed):
-    # type: (str, tuple[float, float, float], float) -> None
+    # type: (str, tuple[float, float, float], float) -> tuple[float, float, float]
     """
     使实体以指定方向和速度突进。
     -----------------------------------------------------------
     【entityId: str】 实体ID
     【direction: Tuple[float, float, float]】 方向的单位向量
-    【speed: float】 速度
+    【speed: float】 速度大小
     -----------------------------------------------------------
-    NoReturn
+    return: Tuple[float, float, float] -> 突进速度向量
     """
     motion = tuple(map(lambda x: x * speed, direction))
     _ServerCompFactory.CreateActorMotion(entityId).SetMotion(motion)
+    return motion
 
 
 def entity_plunge_by_rot(entityId, rot, speed):

@@ -12,16 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-11
+#   Last Modified : 2023-05-20
 #
 # ====================================================
 
 
-try:
-    import mod.client.extraClientApi as _clientApi
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
+import mod.client.extraClientApi as _clientApi
+import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [

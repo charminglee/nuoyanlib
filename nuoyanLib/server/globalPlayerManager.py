@@ -12,16 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-06
+#   Last Modified : 2023-05-20
 #
 # ====================================================
 
 
-try:
-    import mod.server.extraServerApi as _serverApi
-except:
-    pass
-from ..mctypes.server.system.serverSystem import ServerSystem as _ServerSystem
+import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [

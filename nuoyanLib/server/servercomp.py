@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-05-23
 #
 # ====================================================
 
@@ -63,7 +63,8 @@ LevelRecipeComp = ServerCompFactory.CreateRecipe(LEVEL_ID)
 LevelRedStoneComp = ServerCompFactory.CreateRedStone(LEVEL_ID)
 LevelRideComp = ServerCompFactory.CreateRide(LEVEL_ID)
 LevelTameComp = ServerCompFactory.CreateTame(LEVEL_ID)
-
+LevelEntityEventComp = ServerCompFactory.CreateEntityEvent(LEVEL_ID)
+LevelScaleComp = ServerCompFactory.CreateScale(LEVEL_ID)
 
 
 

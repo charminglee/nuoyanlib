@@ -12,14 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-19
+#   Last Modified : 2023-05-20
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
 from copy import copy as _copy
-from mod.common.minecraftEnum import EntityType as _EntityType, GameType as _GameType, AttrType as _AttrType, \
+from mod.common.minecraftEnum import EntityType as _EntityType, AttrType as _AttrType, \
     ActorDamageCause as _ActorDamageCause
 from ..utils.calculator import is_in_sector as _is_in_sector, pos_distance_to_line as _pos_distance_to_line
 from ..utils.vector import angle_between_vectors as _angle_between_vectors
@@ -66,7 +66,7 @@ def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttac
     -----------------------------------------------------------
     return: List[str] -> 受伤生物的实体ID列表
     """
-    if not startPos or not endPos or radius <= 0 or damage == 0:
+    if not startPos or not endPos or radius <= 0 or damage <= 0:
         return []
     if filterIdList is None:
         filterIdList = []
@@ -136,15 +136,15 @@ def aoe_damage(damage, radius, pos, dim, attackerId="", childAttackerId="", caus
     -----------------------------------------------------------
     return: List[str] -> 受伤生物的实体ID列表
     """
-    if not pos or radius <= 0 or damage == 0:
+    if not pos or radius <= 0 or damage <= 0:
         return []
-    startPos = tuple(i - radius for i in pos)
-    endPos = tuple(i + radius for i in pos)
     if filterIdList is None:
         filterIdList = []
     if attackerId:
         filterIdList = _copy(filterIdList)
         filterIdList.append(attackerId)
+    startPos = tuple(i - radius for i in pos)
+    endPos = tuple(i + radius for i in pos)
     entities = _LevelGameComp.GetEntitiesInSquareArea(None, startPos, endPos, dim)
     entities = _entity_filter(entities, (pos, radius), {_EntityType.Mob}, filterIdList, filterTypeIdList)
     hurtEnt = []
@@ -229,21 +229,18 @@ def rectangle_aoe_damage(topPos1, topPos2, dim, damage, attackerId="", knocked=T
 def hurt_by_set_health(entityId, damage):
     # type: (str, int) -> None
     """
-    通过设置Health的方式对实体造成伤害。（对创造模式下的玩家无效）
+    通过设置生命值的方式对实体造成伤害。
     -----------------------------------------------------------
     【entityId: str】 实体ID
     【damage: int】 伤害
     -----------------------------------------------------------
     NoReturn
     """
-    if _ServerCompFactory.CreateEngineType(entityId).GetEngineTypeStr() == "minecraft:player" \
-            and _LevelGameComp.GetPlayerGameType(entityId) == _GameType.Creative:
-        return
     attr = _ServerCompFactory.CreateAttr(entityId)
     health = attr.GetAttrValue(0)
     if health:
         newHealth = health - damage
-        attr.SetAttrValue(0, int(newHealth))
+        attr.SetAttrValue(_AttrType.HEALTH, int(newHealth))
 
 
 def hurt(entityId, damage, cause=_ActorDamageCause.NONE, attacker="", childAttackerId="", knocked=True):

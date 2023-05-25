@@ -251,6 +251,7 @@ class NuoyanServerSystem(_ServerSystem):
     1. ListenForEventV2：监听事件（简化版）
     2. CallClient：调用客户端属性（包括变量和函数）
     3. TestMode：开启或关闭服务端测试模式
+    4. SetQueryVar：设置指定实体query.mod变量的值，全局同步
     -----------------------------------------------------------
     【新增事件】
     1. UiInitFinished：客户端玩家UI框架初始化完成时，服务端触发
@@ -2147,6 +2148,19 @@ class NuoyanServerSystem(_ServerSystem):
         """
 
     # todo:======================================= Basic Function ======================================================
+
+    def SetQueryVar(self, entityId, name, value):
+        """
+        设置指定实体query.mod变量的值，全局同步。
+        若设置的变量未注册，则自动进行注册。
+        -----------------------------------------------------------
+        【entityId: str】 实体ID
+        【name: str】 变量名
+        【value: float】 设置的值
+        -----------------------------------------------------------
+        NoReturn
+        """
+        self._OnSetQueryVar({'entityId': entityId, 'name': name, 'value': value})
 
     # def TestMode(self, enable):
     #     # type: (bool) -> None

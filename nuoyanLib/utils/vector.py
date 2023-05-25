@@ -12,17 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-19
+#   Last Modified : 2023-05-20
 
 # ====================================================
 
 
 from math import atan as _atan, acos as _acos, pi as _pi, sin as _sin, cos as _cos
 from calculator import pos_distance as _pos_distance
-try:
-    from mod.common.utils.mcmath import Vector3 as _Vector3
-except:
-    pass
+from mod.common.utils.mcmath import Vector3 as _Vector3
 
 
 __all__ = [
