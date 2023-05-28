@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-21
+#   Last Modified : 2023-05-27
 #
 # ====================================================
 
@@ -278,6 +278,7 @@ class NuoyanServerSystem(_ServerSystem):
         self._queryCache = {}
         self.__listen()
         self._checkOnGameTick()
+        self._setPrintLog()
 
     def Destroy(self):
         """
@@ -2238,6 +2239,9 @@ class NuoyanServerSystem(_ServerSystem):
         """
 
     # todo:====================================== Internal Method ======================================================
+
+    def _setPrintLog(self):
+        _serverApi.SetMcpModLogCanPostDump(True)
 
     @listen("_SetQueryVar")
     def _OnSetQueryVar(self, args):

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-02
+#   Last Modified : 2023-05-28
 #
 # ====================================================
 
@@ -58,6 +58,8 @@ _UI_DEF_GAME_TICK = "_GameTick.main"
 
 
 ALL_ENGINE_EVENTS = [
+    "CloseNeteaseShopEvent",
+    "PopScreenAfterClientEvent",
     "OnScriptTickClient",
     "UiInitFinished",
     "AddEntityClientEvent",
@@ -227,6 +229,7 @@ class NuoyanClientSystem(_ClientSystem):
         self._3dItemRes = {}
         self.__listen()
         self._checkOnGameTick()
+        self._setPrintLog()
 
     def Destroy(self):
         """
@@ -235,6 +238,21 @@ class NuoyanClientSystem(_ClientSystem):
         self.UnListenAllEvents()
 
     # todo:==================================== Engine Event Callback ==================================================
+
+    def CloseNeteaseShopEvent(self, args):
+        """
+        关闭商城界面时触发，包括脚本商城和Apollo插件商城。
+        -----------------------------------------------------------
+        无参数
+        """
+
+    def PopScreenAfterClientEvent(self, args):
+        """
+        screen移除触发。
+        与PopScreenEvent不同，PopScreenAfterClientEvent触发时机是在完全把UI弹出后，返回的screenName是弹出后最顶层UI的Screen名。
+        -----------------------------------------------------------
+        【screenName: str】 UI名字
+        """
 
     def TapOrHoldReleaseClientEvent(self, args):
         """
@@ -1174,10 +1192,9 @@ class NuoyanClientSystem(_ClientSystem):
         NoReturn
         """
         data = {'entityId': entityId, 'name': name, 'value': value}
+        self._setQuery(data)
         if sync:
             self.NotifyToServer("_SetQueryVar", data)
-        else:
-            self._setQuery(data)
 
     def AddPlayerRenderResources(self, playerId, *resTuple):
         # type: (str, *tuple[str, str]) -> tuple[bool, ...]
@@ -1369,6 +1386,9 @@ class NuoyanClientSystem(_ClientSystem):
 
     # todo:====================================== Internal Method ======================================================
 
+    def _setPrintLog(self):
+        _clientApi.SetMcpModLogCanPostDump(True)
+
     @listen("_SetQueryCache")
     def _OnSetQueryCache(self, args):
         for entityId, queries in args.items():
@@ -1383,6 +1403,8 @@ class NuoyanClientSystem(_ClientSystem):
         entityId = args['entityId']
         name = args['name']
         value = args['value']
+        if '__id__' in args and args['__id__'] == _PLAYER_ID:
+            return
         comp = _CompFactory.CreateQueryVariable(entityId)
         if comp.Get(name) == -1.0:
             comp.Register(name, 0.0)
