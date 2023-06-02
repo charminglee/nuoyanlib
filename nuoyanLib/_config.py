@@ -32,5 +32,5 @@ __authoremail__ = "1279735247@qq.com"
 
 
 if MOD_NAME == "MyMod" or CLIENT_SYSTEM_NAME == "MyClientSystem" or SERVER_SYSTEM_NAME == "MyServerSystem":
-    from utils.error import ConfigError
-    raise ConfigError
+    from utils.error import ConfigError as _ConfigError
+    raise _ConfigError

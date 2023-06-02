@@ -18,8 +18,8 @@
 
 
 from traceback import format_exc as _format_exc
-# import mod.client.extraClientApi as _clientApi
-# import mod.server.extraServerApi as _serverApi
+import mod.client.extraClientApi as _clientApi
+import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
