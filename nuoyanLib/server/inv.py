@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-20
+#   Last Modified : 2023-07-02
 #
 # ====================================================
 
@@ -23,6 +23,7 @@ from ..utils.item import is_empty_item as _is_empty_item
 
 
 __all__ = [
+    "clear_items",
     "get_item_pos",
     "change_player_item_count",
 ]
@@ -31,6 +32,27 @@ __all__ = [
 _LEVEL_ID = _serverApi.GetLevelId()
 _ServerCompFactory = _serverApi.GetEngineCompFactory()
 _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
+
+
+_ITEM_POS_SIZE = (36, 1, 1, 4)
+
+
+def clear_items(playerId, itemPosType=_ItemPosType.INVENTORY, pos=-1):
+    # type: (str, int, int) -> None
+    """
+    清空玩家指定位置的物品。
+    -----------------------------------------------------------
+    【playerId: str】 玩家的实体ID
+    【itemPosType: int】 槽位类型，ItemPosType枚举，默认为背包
+    【pos: int】 槽位编号，默认为-1，表示清空全部物品
+    -----------------------------------------------------------
+    NoReturn
+    """
+    comp = _ServerCompFactory.CreateItem(playerId)
+    if pos == -1:
+        comp.SetPlayerAllItems({(itemPosType, i): None for i in range(_ITEM_POS_SIZE[itemPosType])})
+    else:
+        comp.SetPlayerAllItems({(itemPosType, pos): None})
 
 
 def get_item_pos(entityId, posType, itemId, itemAux=-1, count=1):

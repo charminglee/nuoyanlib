@@ -12,25 +12,25 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-06-02
+#   Last Modified : 2023-07-02
 #
 # ====================================================
 
 
 # 在modMain注册时填写的模组名称（命名空间）
-MOD_NAME = "MyMod"
+MOD_NAME = ""
 # 客户端系统名称
-CLIENT_SYSTEM_NAME = "MyClientSystem"
+CLIENT_SYSTEM_NAME = ""
 # 服务端系统名称
-SERVER_SYSTEM_NAME = "MyServerSystem"
+SERVER_SYSTEM_NAME = ""
 
 
-__version__ = "0.5.4"
+__version__ = "0.5.6"
 __authorname__ = "诺言Nuoyan"
 __authorqq__ = "1279735247"
 __authoremail__ = "1279735247@qq.com"
 
 
-if MOD_NAME == "MyMod" or CLIENT_SYSTEM_NAME == "MyClientSystem" or SERVER_SYSTEM_NAME == "MyServerSystem":
+if not MOD_NAME or not CLIENT_SYSTEM_NAME or not SERVER_SYSTEM_NAME:
     from utils.error import ConfigError as _ConfigError
     raise _ConfigError

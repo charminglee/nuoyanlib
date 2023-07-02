@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-20
+#   Last Modified : 2023-06-17
 
 # ====================================================
 
@@ -148,18 +148,18 @@ def outgoing_vector(vector, normal):
     return reflexVector.ToTuple()
 
 
-def composite_vector(v1, *v2):
+def composite_vector(vec, *moreVec):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float, float]
     """
     向量的合成。
     -----------------------------------------------------------
     【v1: Tuple[float, float, float]】 向量
-    【*v2: Tuple[float, float, float]】 向量
+    【*v2: Tuple[float, float, float]】 一个或多个向量
     -----------------------------------------------------------
     return: Tuple[float, float, float] -> 合向量
     """
-    resVec = _Vector3(v1)
-    for v in v2:
+    resVec = _Vector3(vec)
+    for v in moreVec:
         resVec += _Vector3(v)
     return resVec.ToTuple()
 

@@ -18,7 +18,7 @@
 
 
 from utils import utils
-from _config import MOD_NAME, CLIENT_SYSTEM_NAME, SERVER_SYSTEM_NAME
+# from _config import MOD_NAME, CLIENT_SYSTEM_NAME, SERVER_SYSTEM_NAME
 
 
 def _test(module):

@@ -12,19 +12,26 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-05
+#   Last Modified : 2023-07-02
 #
 # ====================================================
 
 
 from copy import copy as _copy
-from mod.common.minecraftEnum import EntityType as _EntityType
-from ..utils.calculator import pos_distance as _pos_distance, perlin_noise as _perlin_noise
-from ..mctypes.server.system.serverSystem import ServerSystem as _ServerSystem
 import mod.server.extraServerApi as _serverApi
+from mod.common.minecraftEnum import EntityType as _EntityType
+from ..mctypes.server.system.serverSystem import ServerSystem as _ServerSystem
+from ..utils.calculator import pos_distance as _pos_distance, perlin_noise as _perlin_noise
+from ..utils.vector import vector_p2p as _vector_p2p, composite_vector as _composite_vector
 
 
 __all__ = [
+    "clear_effects",
+    "bounce_entities",
+    "attract_entities",
+    "is_mob",
+    "all_mob",
+    "has_mob",
     "entity_filter",
     "is_entity_type",
     "sort_entity_list_by_distance",
@@ -41,9 +48,6 @@ __all__ = [
     "attack_nearest_mob",
     "has_effect",
     "set_entity_motion",
-    "is_mob",
-    "all_mob",
-    "has_mob",
 ]
 
 
@@ -51,6 +55,75 @@ _LEVEL_ID = _serverApi.GetLevelId()
 _ServerCompFactory = _serverApi.GetEngineCompFactory()
 _LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
 _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
+
+
+def clear_effects(entityId):
+    # type: (str) -> None
+    """
+    清除指定实体的全部药水效果。
+    -----------------------------------------------------------
+    【entityId: str】 实体ID
+    -----------------------------------------------------------
+    NoReturn
+    """
+    comp = _ServerCompFactory.CreateEffect(entityId)
+    effects = comp.GetAllEffects()
+    if not effects:
+        return
+    for eff in effects:
+        comp.RemoveEffectFromEntity(eff['effectName'])
+
+def bounce_entities(pos, dim, radius, power, filterIdList=None, filterTypeIdList=None, filterTypeStrList=None,
+                    filterAbiotic=False):
+    # type: (tuple[float, float, float], int, float, float, list[str] | None, list[int] | None, list[str] | None, bool) -> list[str]
+    """
+    从中心弹开指定范围内的实体。
+    -----------------------------------------------------------
+    【pos: Tuple[float, float, float]】 弹开中心坐标
+    【dim: int】 维度ID
+    【radius: float】 弹开半径
+    【power: float】 弹开强度
+    【filterIdList: Optional[List[str]] = None】 过滤的实体ID列表
+    【filterTypeIdList: Optional[List[int]] = None】 过滤的实体类型ID（网易版）列表
+    【filterTypeStrList: Optional[List[str]] = None】 过滤的实体类型ID列表
+    【filterAbiotic: bool = False】 是否过滤非生物实体
+    -----------------------------------------------------------
+    return: List[str] -> 被弹开的实体ID列表
+    """
+    return attract_entities(pos, dim, radius, -power, filterIdList, filterTypeIdList, filterTypeStrList, filterAbiotic)
+
+
+def attract_entities(pos, dim, radius, power, filterIdList=None, filterTypeIdList=None, filterTypeStrList=None,
+                     filterAbiotic=False):
+    # type: (tuple[float, float, float], int, float, float, list[str] | None, list[int] | None, list[str] | None, bool) -> list[str]
+    """
+    吸引指定范围内的实体到中心。
+    -----------------------------------------------------------
+    【pos: Tuple[float, float, float]】 吸引中心坐标
+    【dim: int】 维度ID
+    【radius: float】 吸引半径
+    【power: float】 吸引强度
+    【filterIdList: Optional[List[str]] = None】 过滤的实体ID列表
+    【filterTypeIdList: Optional[List[int]] = None】 过滤的实体类型ID（网易版）列表
+    【filterTypeStrList: Optional[List[str]] = None】 过滤的实体类型ID列表
+    【filterAbiotic: bool = False】 是否过滤非生物实体
+    -----------------------------------------------------------
+    return: List[str] -> 被吸引的实体ID列表
+    """
+    ents = get_entities_in_area(pos, radius, dim, filterIdList, filterTypeIdList, filterTypeStrList, filterAbiotic)
+    res = []
+    for eid in ents:
+        epos = _ServerCompFactory.CreatePos(eid).GetFootPos()
+        if not epos:
+            continue
+        comp = _ServerCompFactory.CreateActorMotion(eid)
+        origMotion = comp.GetMotion()
+        vec = _vector_p2p(epos, pos)
+        vec = tuple(i * power for i in vec)
+        resMotion = _composite_vector(origMotion, vec)
+        if comp.SetMotion(resMotion):
+            res.append(eid)
+    return res
 
 
 def is_mob(entityId):
@@ -492,8 +565,6 @@ def set_entity_motion(entity, motion, serSysCls=None):
     _ServerCompFactory.CreateActorMotion(entity).SetMotion(motion)
 
 
-def _test():
-    pass
 
 
 

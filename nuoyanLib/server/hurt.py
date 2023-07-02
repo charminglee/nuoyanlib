@@ -12,23 +12,24 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-20
+#   Last Modified : 2023-06-17
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
 from copy import copy as _copy
+import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import EntityType as _EntityType, AttrType as _AttrType, \
     ActorDamageCause as _ActorDamageCause
 from ..utils.calculator import is_in_sector as _is_in_sector, pos_distance_to_line as _pos_distance_to_line
 from ..utils.vector import angle_between_vectors as _angle_between_vectors
 from entity import entity_filter as _entity_filter, get_entities_in_area as _get_entities_in_area, \
     get_all_entities as _get_all_entities
-import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
+    "explode_hurt",
     "aoe_damage",
     "sector_aoe_damage",
     "rectangle_aoe_damage",
@@ -43,10 +44,43 @@ _LEVEL_ID = _serverApi.GetLevelId()
 _ServerCompFactory = _serverApi.GetEngineCompFactory()
 _LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
 _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
+_LevelExplosionComp = _ServerCompFactory.CreateExplosion(_LEVEL_ID)
+_ServerSystem = _serverApi.GetServerSystemCls()
+
+
+def explode_hurt(radius, pos, sourceId, playerId, fire=False, breaks=True, tileDrops=True, mobLoot=True,
+                 hurtPlayer=False):
+    """
+    造成爆炸伤害。
+    -----------------------------------------------------------
+    【radius: float】 爆炸强度
+    【pos: Tuple[float, float, float]】 爆炸中心坐标
+    【sourceId: str】 爆炸伤害源的实体ID
+    【playerId: str】 创造爆炸的实体ID
+    【fire: bool = False】 是否造成火焰
+    【breaks: bool = True】 是否破坏方块
+    【tileDrops: bool = True】 破坏方块后是否生成掉落物
+    【mobLoot: bool = True】 生物被炸死后是否生成掉落物
+    【hurtPlayer: bool = False】 是否对爆炸创造者造成伤害
+    -----------------------------------------------------------
+    NoReturn
+    """
+    origRule = _LevelGameComp.GetGameRulesInfoServer()
+    _LevelGameComp.SetGameRulesInfoServer({'option_info': {'tile_drops': tileDrops, 'mob_loot': mobLoot}})
+    comp = _ServerCompFactory.CreateHurt(playerId)
+    try:
+        if not hurtPlayer:
+            comp.ImmuneDamage(True)
+        _LevelExplosionComp.CreateExplosion(pos, radius, fire, breaks, sourceId, playerId)
+    finally:
+        _LevelGameComp.SetGameRulesInfoServer(origRule)
+        if not hurtPlayer:
+            comp.ImmuneDamage(False)
 
 
 def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttackerId="", cause=_ActorDamageCause.NONE,
-                knocked=True, filterIdList=None, filterTypeIdList=None, funcBeforeHurt=None, funcAfterHurt=None):
+                knocked=True, filterIdList=None, filterTypeIdList=None, filterTypeStrList=None, funcBeforeHurt=None,
+                funcAfterHurt=None):
     """
     对一条线段上的生物造成伤害。（无视攻击冷却）
     -----------------------------------------------------------
@@ -61,6 +95,7 @@ def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttac
     【knocked: bool = True】 是否产生击退
     【filterIdList: Optional[List[str]] = None】 过滤的实体ID列表，列表中的实体将不会受到伤害
     【filterTypeIdList: Optional[List[int]] = None】 过滤的实体类型ID（网易版）列表，这些类型的实体将不会受到伤害
+    【filterTypeStrList: Optional[List[str]] = None】 过滤的实体类型ID列表，这些类型的实体将不会受到伤害
     【funcBeforeHurt: Optional[(str, str, str) -> Optional[str]] = None】 对生物造成伤害之前调用的函数，该函数第一个参数为受伤生物的实体ID，第二个为攻击者的实体ID，第三个参数为攻击者的子实体ID；该函数可返回一个新的实体ID，新的实体ID将会替换原受伤生物的实体ID进入最终返回的受伤生物实体ID列表中
     【funcAfterHurt: Optional[(str, str, str) -> Optional[str]] = None】 对生物造成伤害之后调用的函数，功能同上
     -----------------------------------------------------------
@@ -74,7 +109,9 @@ def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttac
         filterIdList = _copy(filterIdList)
         filterIdList.append(attackerId)
     entities = _get_all_entities()
-    entities = _entity_filter(entities, {_EntityType.Mob}, {str(dim)}, filterIdList, filterTypeIdList)
+    entities = _entity_filter(
+        entities, {_EntityType.Mob}, {str(dim)}, filterIdList, filterTypeIdList, filterTypeStrList
+    )
     hurtEnt = []
     for eid in entities:
         ep = _ServerCompFactory.CreatePos(eid).GetFootPos()
@@ -99,6 +136,7 @@ def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttac
 
 
 def hurt_mobs(entityIdList, damage, attackerId="", childAttackerId="", cause=_ActorDamageCause.NONE, knocked=True):
+    # type: (list[str], int, str, str, str, bool) -> None
     """
     对多个生物造成伤害。（无视攻击冷却）
     -----------------------------------------------------------
@@ -237,10 +275,9 @@ def hurt_by_set_health(entityId, damage):
     NoReturn
     """
     attr = _ServerCompFactory.CreateAttr(entityId)
-    health = attr.GetAttrValue(0)
-    if health:
-        newHealth = health - damage
-        attr.SetAttrValue(_AttrType.HEALTH, int(newHealth))
+    health = attr.GetAttrValue(_AttrType.HEALTH)
+    newHealth = int(health) - int(damage)
+    attr.SetAttrValue(_AttrType.HEALTH, newHealth)
 
 
 def hurt(entityId, damage, cause=_ActorDamageCause.NONE, attacker="", childAttackerId="", knocked=True):
@@ -257,7 +294,7 @@ def hurt(entityId, damage, cause=_ActorDamageCause.NONE, attacker="", childAttac
     -----------------------------------------------------------
     NoReturn
     """
-    hurtResult = _ServerCompFactory.CreateHurt(entityId).Hurt(damage, cause, attacker, childAttackerId, knocked)
+    hurtResult = _ServerCompFactory.CreateHurt(entityId).Hurt(int(damage), cause, attacker, childAttackerId, knocked)
     if not hurtResult:
         hurt_by_set_health(entityId, damage)
 

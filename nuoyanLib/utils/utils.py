@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-09
+#   Last Modified : 2023-07-03
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 import __builtin__
 from collections import Mapping as _Mapping, Sequence as _Sequence
 from re import match as _match
-from random import randint as _randint, uniform as _uniform, choice as _choice
+from random import randint as _randint, uniform as _uniform, Random as _Random
 from string import digits as _digits, ascii_lowercase as _ascii_lowercase, ascii_uppercase as _ascii_uppercase
 
 
@@ -220,7 +220,7 @@ def translate_time(sec):
 def probability_true_i(n, d):
     # type: (int, int) -> bool
     """
-    以指定概率返回True。
+    以指定概率返回True。（分数版本）
     示例：
     probability_true_i(2, 3)     # 2/3的概率返回True
     -----------------------------------------------------------
@@ -235,7 +235,7 @@ def probability_true_i(n, d):
 def probability_true_f(f):
     # type: (float) -> bool
     """
-    以指定概率返回True。
+    以指定概率返回True。（浮点数版本）
     示例：
     probability_true_f(0.6)     # 0.6的概率返回True
     -----------------------------------------------------------
@@ -246,7 +246,15 @@ def probability_true_f(f):
     return f > 0 and _uniform(0, 1) <= f
 
 
-def random_string(length, lower=True, upper=True, num=True):
+def _gen_str(choice, s, l):
+    return "".join(choice(s) for _ in range(l))
+
+
+_random_ins = {}
+
+
+def random_string(length, lower=True, upper=True, num=True, seed=None, generateNum=1):
+    # type: (int, bool, bool, bool, ..., int) -> str | list[str]
     """
     生成随机字符串。
     -----------------------------------------------------------
@@ -254,11 +262,17 @@ def random_string(length, lower=True, upper=True, num=True):
     【lower: bool = True】 是否包含小写字母
     【upper: bool = True】 是否包含大写字母
     【num: bool = True】 是否包含数字
+    【seed: Any = None】 随机数种子
+    【generateNum: int = 1】 生成数量，默认为1，大于1时将以列表返回
     -----------------------------------------------------------
-    return: str -> 随机字符串
+    return: Union[str, List[str]] -> 随机字符串
     """
     s = (_ascii_lowercase if lower else "") + (_ascii_uppercase if upper else "") + (_digits if num else "")
-    return "".join(_choice(s) for _ in range(length))
+    random = _random_ins.setdefault(seed, _Random(seed))
+    if generateNum == 1:
+        return _gen_str(random.choice, s, length)
+    else:
+        return [_gen_str(random.choice, s, length) for _ in range(generateNum)]
 
 
 def _test():
@@ -299,13 +313,16 @@ def _test():
     p = [probability_true_f(0.34) for _ in range(int(1e5))]
     print p.count(True) / 1e5
     print "-" * 50
-    print random_string(20)
     print random_string(20, lower=False)
     print random_string(20, upper=False)
     print random_string(20, num=False)
+    print random_string(20, num=False, seed=20230315, generateNum=5)
+    for i in range(5):
+        print random_string(20, num=False, seed=20230315)
 
 
-
+if __name__ == "__main__":
+    _test()
 
 
 

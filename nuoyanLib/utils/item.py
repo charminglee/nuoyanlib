@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-20
+#   Last Modified : 2023-07-02
 #
 # ====================================================
 
@@ -189,7 +189,8 @@ def _test():
     print set_namespace("minecraft:apple", "nuoyan")  # "nuoyan:apple"
 
 
-
+if __name__ == "__main__":
+    _test()
 
 
 

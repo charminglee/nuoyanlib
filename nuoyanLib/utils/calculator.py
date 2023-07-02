@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-20
+#   Last Modified : 2023-06-16
 #
 # ====================================================
 
@@ -36,7 +36,7 @@ __all__ = [
     "midpoint",
     "camera_rot_p2p",
     "circle_pos_list",
-    "pos_player_facing",
+    "pos_entity_facing",
     "pos_forward_rot",
     "n_quantiles_index_list",
     "cube_center",
@@ -53,6 +53,7 @@ __all__ = [
 
 
 def pos_distance_to_line(pos1, pos2, pos3):
+    # type: (tuple[float, float, float], tuple[float, float, float], tuple[float, float, float]) -> float
     """
     计算pos1到pos2和pos3的连线的距离。
     -----------------------------------------------------------
@@ -276,32 +277,29 @@ def circle_pos_list(centerPos, radius, density):
     return result
 
 
-def pos_player_facing(playerId, dis, useZeroYaw=False):
-    # type: (str, float, bool) -> tuple[float, float, float] | None
+def pos_entity_facing(entityId, dis, use0Yaw=False, heightOffset=0.0):
+    # type: (str, float, bool, float) -> tuple[float, float, float] | None
     """
-    计算玩家准星方向上、给定距离上的位置的坐标。
+    计算实体视角方向上、给定距离上的位置的坐标。
     -----------------------------------------------------------
-    【playerId: str】 玩家ID
+    【entityId: str】 实体ID
     【dis: float】 距离
-    【useZeroYaw: bool = False】 是否使用0作为玩家竖直方向上的视角
+    【use0Yaw: bool = False】 是否使用0作为实体竖直方向上的视角
+    【heightOffset: float = 0.0】 高度偏移量（如实体为玩家建议使用1.6，其他实体建议使用其头部到脚底的距离）
     -----------------------------------------------------------
     return: Optional[Tuple[float, float, float]] -> 坐标
     """
     compFactory = _get_comp_factory()
-    rot = compFactory.CreateRot(playerId).GetRot()
+    rot = compFactory.CreateRot(entityId).GetRot()
     if not rot:
         return
-    if useZeroYaw:
+    if use0Yaw:
         rot = (0, rot[1])
     dirRot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
-    playerPos = compFactory.CreatePos(playerId).GetFootPos()
-    playerPos = (playerPos[0], playerPos[1] + 1.6, playerPos[2])
-    resultPos = (
-        playerPos[0] + dirRot[0] * dis,
-        playerPos[1] + dirRot[1] * dis,
-        playerPos[2] + dirRot[2] * dis
-    )
-    return resultPos
+    ep = compFactory.CreatePos(entityId).GetFootPos()
+    ep = (ep[0], ep[1] + heightOffset, ep[2])
+    result = tuple(ep[i] + dirRot[i] * dis for i in range(3))
+    return result
 
 
 def pos_forward_rot(pos, rot, dis):
@@ -317,14 +315,8 @@ def pos_forward_rot(pos, rot, dis):
     """
     if not rot or not pos:
         return
-    dirRot = _serverApi.GetDirFromRot(rot)
-    if not dirRot:
-        dirRot = _clientApi.GetDirFromRot(rot)
-    resultPos = (
-        pos[0] + dirRot[0] * dis,
-        pos[1] + dirRot[1] * dis,
-        pos[2] + dirRot[2] * dis
-    )
+    dirRot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
+    resultPos = tuple(pos[i] + dirRot[i] * dis for i in range(3))
     return resultPos
 
 
