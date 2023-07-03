@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-06-16
+#   Last Modified : 2023-07-03
 #
 # ====================================================
 
@@ -41,7 +41,6 @@ __all__ = [
     "n_quantiles_index_list",
     "cube_center",
     "cube_longest_side_len",
-    "random_pos",
     "is_in_sector",
     "sphere_pos_list",
     "cube_pos_list",
@@ -104,11 +103,7 @@ def pos_distance(firstPoint, secondPoint):
     """
     if not firstPoint or not secondPoint:
         return -1.0
-    if len(firstPoint) == len(secondPoint):
-        zipPos = zip(firstPoint, secondPoint)
-        squareDis = sum(map(lambda (n1, n2): (n1 - n2)**2, zipPos))
-        return _sqrt(squareDis)
-    return -1.0
+    return _sqrt(sum((firstPoint[i] - secondPoint[i])**2 for i in range(len(firstPoint))))
 
 
 def to_relative_pos(entityPos1, entityPos2):
@@ -376,38 +371,6 @@ def cube_longest_side_len(startPos, endPos):
     yl = abs(startPos[1] - endPos[1])
     zl = abs(startPos[2] - endPos[2])
     return max(xl, yl, zl)
-
-
-def random_pos(centerPos, grid, useTopBlockHeight=False, dimension=0):
-    # type: (tuple[float, float, float], float, bool, int) -> tuple[float, float, float] | None
-    """
-    在指定区域内随机获取一点坐标。
-    -----------------------------------------------------------
-    【centerPos: Tuple[float, float, float]】 区域中心坐标
-    【grid: float】 区域半径
-    【useTopBlockHeight: bool = False】 是否以最高的非空气方块的高度作为返回坐标的Y值（只适用于服务端）
-    【dimension: int = 0】 维度
-    -----------------------------------------------------------
-    return: Optional[Tuple[float, float, float]] -> 坐标
-    """
-    if not centerPos:
-        return
-    ranX = _randint(-grid, grid)
-    ranZ = _randint(-grid, grid)
-    x = centerPos[0] + ranX
-    z = centerPos[2] + ranZ
-    if useTopBlockHeight and not _is_client():
-        compFactory = _serverApi.GetEngineCompFactory()
-        levelId = _serverApi.GetLevelId()
-        y = compFactory.CreateBlockInfo(levelId).GetTopBlockHeight((x, z), dimension)
-        if y is not None:
-            return x, y, z
-        else:
-            return None
-    else:
-        ranY = _randint(-grid, grid)
-        y = centerPos[1] + ranY
-        return x, y, z
 
 
 def is_in_sector(testPos, vertexPos, radius, sectorAngle, sectorBisectorAngle):
