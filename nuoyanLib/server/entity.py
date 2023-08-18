@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-07-02
+#   Last Modified : 2023-08-02
 #
 # ====================================================
 
@@ -121,8 +121,13 @@ def attract_entities(pos, dim, radius, power, filterIdList=None, filterTypeIdLis
         vec = _vector_p2p(epos, pos)
         vec = tuple(i * power for i in vec)
         resMotion = _composite_vector(origMotion, vec)
-        if comp.SetMotion(resMotion):
-            res.append(eid)
+        etype = _ServerCompFactory.CreateEngineType(eid).GetEngineType()
+        if etype == _EntityType.Player:
+            if comp.SetPlayerMotion(resMotion):
+                res.append(eid)
+        else:
+            if comp.SetMotion(resMotion):
+                res.append(eid)
     return res
 
 
@@ -281,7 +286,7 @@ def launch_projectile(projectileName, spawnerId, power=None, damage=None, positi
     【spawnerId: str】 发射者的实体ID
     【power: Optional[float]】 抛射物威力（速度），默认为json配置中的值
     【damage: Optional[int]】 抛射物伤害，默认为json配置中的值
-    【position: Optional[Tuple[float, float, float]] = None】 初始位置，默认为比发射者脚底高1.5格的位置
+    【position: Optional[Tuple[float, float, float]] = None】 初始位置，默认为比发射者脚底高1.6格的位置
     【direction: Optional[Tuple[float, float, float]] = None】 初始朝向，默认为发射者准星方向
     【gravity: Optional[float] = None】 抛射物重力，默认为json配置中的值
     【targetId: str = ""】 抛射物目标（指定了targetId之后，会和潜影贝导弹是一个效果）
@@ -294,14 +299,14 @@ def launch_projectile(projectileName, spawnerId, power=None, damage=None, positi
         position = _ServerCompFactory.CreatePos(spawnerId).GetFootPos()
         if not position:
             return "-1"
-        position = (position[0], position[1] + 1.5, position[2])
+        position = (position[0], position[1] + 1.6, position[2])
     if not direction:
         rot = _ServerCompFactory.CreateRot(spawnerId).GetRot()
         if not rot:
             return "-1"
         direction = _serverApi.GetDirFromRot(rot)
-    noise = (_perlin_noise(*direction) * error for _ in range(3))
-    direction = tuple(map(lambda (x, y): x + y, zip(direction, noise)))
+    # noise = (_perlin_noise(*direction) * error for _ in range(3))
+    # direction = tuple(map(lambda (x, y): x + y, zip(direction, noise)))
     param = {
         'position': position,
         'direction': direction,
@@ -347,7 +352,12 @@ def entity_plunge_by_dir(entityId, direction, speed):
     return: Tuple[float, float, float] -> 突进速度向量
     """
     motion = tuple(map(lambda x: x * speed, direction))
-    _ServerCompFactory.CreateActorMotion(entityId).SetMotion(motion)
+    comp = _ServerCompFactory.CreateActorMotion(entityId)
+    etype = _ServerCompFactory.CreateEngineType(entityId).GetEngineType()
+    if etype == _EntityType.Player:
+        comp.SetPlayerMotion(motion)
+    else:
+        comp.SetMotion(motion)
     return motion
 
 

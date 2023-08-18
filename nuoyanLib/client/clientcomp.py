@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-01-15
+#   Last Modified : 2023-07-04
 #
 # ====================================================
 
@@ -79,6 +79,7 @@ LevelPostProcessComp = ClientCompFactory.CreatePostProcess(LEVEL_ID)
 LevelRecipeComp = ClientCompFactory.CreateRecipe(LEVEL_ID)
 LevelTextBoardComp = ClientCompFactory.CreateTextBoard(LEVEL_ID)
 LevelVirtualWorldComp = ClientCompFactory.CreateVirtualWorld(LEVEL_ID)
+LevelQueryVariableComp = ClientCompFactory.CreateQueryVariable(LEVEL_ID)
 
 
 ParticleSystemComp = ClientCompFactory.CreateParticleSystem(None)

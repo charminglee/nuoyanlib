@@ -12,12 +12,11 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-07-03
+#   Last Modified : 2023-08-11
 #
 # ====================================================
 
 
-import __builtin__
 from collections import Mapping as _Mapping, Sequence as _Sequence
 from re import match as _match
 from random import randint as _randint, uniform as _uniform
@@ -30,7 +29,6 @@ __all__ = [
     "turn_dict_value_to_tuple",
     "turn_list_to_tuple",
     "is_method_overridden",
-    "nyeval",
     "translate_time",
     "probability_true_i",
     "probability_true_f",
@@ -175,20 +173,6 @@ def is_method_overridden(subclass, father, method):
     subclassMethod = getattr(subclass, method)
     fatherMethod = getattr(father, method)
     return subclassMethod != fatherMethod
-
-
-def nyeval(source, g=None, l=None):
-    # type: (str | unicode, dict[str, ...] | None, _Mapping[str, ...] | None) -> ...
-    """
-    用法与内置函数eval相同，可绕过机审。
-    -----------------------------------------------------------
-    【source: Union[str, unicode]】 源代码字符串
-    【g: Optional[Dict[str, Any]] = None】 全局命名空间
-    【l: Optional[Mapping[str, Any]] = None】 局部命名空间
-    -----------------------------------------------------------
-    return: Any -> 源代码运行结果
-    """
-    return getattr(__builtin__, "".join(["e", "v", "a", "l"]))(source, g, l)
 
 
 def translate_time(sec):

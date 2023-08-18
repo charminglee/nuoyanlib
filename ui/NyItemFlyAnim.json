@@ -42,5 +42,5 @@
         ],
         "type": "screen"
     },
-    "namespace": "ItemFlyAnim"
+    "namespace": "NyItemFlyAnim"
 }

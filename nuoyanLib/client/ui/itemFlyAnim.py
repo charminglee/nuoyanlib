@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-05
+#   Last Modified : 2023-08-15
 #
 # ====================================================
 
@@ -20,7 +20,6 @@
 import mod.client.extraClientApi as _clientApi
 from nuoyanScreenNode import NuoyanScreenNode as _NuoyanScreenNode
 from ...utils.item import is_empty_item as _is_empty_item
-from ..._config import MOD_NAME
 
 
 _ClientSystem = _clientApi.GetClientSystemCls()
@@ -35,9 +34,10 @@ if "/" in __file__:
     _PATH = __file__[:-3].replace("/", ".")
 else:
     _PATH = __file__
-UI_NAME_ITEM_FLY_ANIM = "ItemFlyAnim"
+NAMESPACE = "NuoyanLib"
+UI_NAME_ITEM_FLY_ANIM = "NyItemFlyAnim"
 UI_PATH_ITEM_FLY_ANIM = _PATH + "._ItemFlyAnimUI"
-UI_DEF_ITEM_FLY_ANIM = "ItemFlyAnim.main"
+UI_DEF_ITEM_FLY_ANIM = "NyItemFlyAnim.main"
 UI_PATH_FLY_ITEM_1 = "/item_fly_panel/item_renderer1"
 UI_PATH_FLY_ITEM_2 = "/item_fly_panel/item_renderer2"
 
@@ -49,12 +49,15 @@ class ItemFlyAnim(_NuoyanScreenNode):
         self._registerItemFlyAnimUI()
 
     def _registerItemFlyAnimUI(self):
-        uiNode = _clientApi.GetUI(MOD_NAME, UI_NAME_ITEM_FLY_ANIM)
+        uiNode = _clientApi.GetUI(NAMESPACE, UI_NAME_ITEM_FLY_ANIM)
         if uiNode:
             self._itemFlyAnimNode = uiNode
         else:
-            self._itemFlyAnimNode = self.cs.RegisterAndCreateUI(
-                UI_NAME_ITEM_FLY_ANIM, UI_PATH_ITEM_FLY_ANIM, UI_DEF_ITEM_FLY_ANIM
+            _clientApi.RegisterUI(
+                NAMESPACE, UI_NAME_ITEM_FLY_ANIM, UI_PATH_ITEM_FLY_ANIM, UI_DEF_ITEM_FLY_ANIM
+            )
+            self._itemFlyAnimNode = _clientApi.CreateUI(
+                NAMESPACE, UI_NAME_ITEM_FLY_ANIM, {'isHud': 1, '__cs__': self}
             )
 
     def SetOneItemFlyAnim(self, itemDict, fromPos, toPos, uiSize):

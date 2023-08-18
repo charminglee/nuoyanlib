@@ -12,17 +12,18 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-07-02
+#   Last Modified : 2023-07-10
 #
 # ====================================================
 
 
 import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType, GameType as _GameType
-from ..utils.item import is_empty_item as _is_empty_item
+from ..utils.item import is_empty_item as _is_empty_item, get_item_count as _get_item_count
 
 
 __all__ = [
+    "deduct_item",
     "clear_items",
     "get_item_pos",
     "change_player_item_count",
@@ -37,22 +38,21 @@ _LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
 _ITEM_POS_SIZE = (36, 1, 1, 4)
 
 
-def clear_items(playerId, itemPosType=_ItemPosType.INVENTORY, pos=-1):
-    # type: (str, int, int) -> None
+def clear_items(playerId, itemPosType, pos):
+    # type: (str, int, int) -> dict
     """
-    清空玩家指定位置的物品。
+    清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
     -----------------------------------------------------------
     【playerId: str】 玩家的实体ID
-    【itemPosType: int】 槽位类型，ItemPosType枚举，默认为背包
-    【pos: int】 槽位编号，默认为-1，表示清空全部物品
+    【itemPosType: int】 槽位类型，ItemPosType枚举
+    【pos: int】 槽位编号
     -----------------------------------------------------------
-    NoReturn
+    return: dict -> 该位置被清除前的物品信息字典
     """
     comp = _ServerCompFactory.CreateItem(playerId)
-    if pos == -1:
-        comp.SetPlayerAllItems({(itemPosType, i): None for i in range(_ITEM_POS_SIZE[itemPosType])})
-    else:
-        comp.SetPlayerAllItems({(itemPosType, pos): None})
+    item = comp.GetPlayerItem(itemPosType, pos, True)
+    comp.SetPlayerAllItems({(itemPosType, pos): None})
+    return item
 
 
 def get_item_pos(entityId, posType, itemId, itemAux=-1, count=1):
@@ -105,55 +105,40 @@ def change_player_item_count(playerId, posType=_ItemPosType.CARRIED, pos=0, chan
     itemComp.SetPlayerAllItems({(posType, pos): item})
 
 
-def cal_item_count(playerId, name, aux=-1):
-    """
-    计算玩家背包中指定物品的总数量。
-    -----------------------------------------------------------
-    【playerId: str】 玩家的实体ID
-    【name: str】 物品名称
-    【aux: int = -1】 物品特殊值（-1表示任意特殊值）
-    -----------------------------------------------------------
-    return: int -> 指定物品在背包中的总数
-    """
-    count = 0
-    items = _ServerCompFactory.CreateItem(playerId).GetPlayerAllItems(_ItemPosType.INVENTORY)
-    for item in items:
-        if _is_empty_item(item):
-            continue
-        if item['newItemName'] == name and (aux == -1 or item['newAuxValue'] == aux):
-            count += item['count']
-    return count
-
-
-def deduct_item(playerId, name, aux, count):
+def deduct_item(playerId, name, aux=-1, count=1):
     """
     从玩家背包中扣除指定数量的物品。
     -----------------------------------------------------------
     【playerId: str】 玩家的实体ID
     【name: str】 物品名称
-    【aux: int】 物品特殊值（-1表示任意特殊值）
-    【count: int】 扣除数量
+    【aux: int = -1】 物品特殊值（-1表示任意特殊值）
+    【count: int = 1】 扣除数量
     -----------------------------------------------------------
     return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
     """
-    totalCount = cal_item_count(playerId, name, aux)
+    totalCount = _get_item_count(playerId, name, aux)
     if totalCount < count:
         return False
     comp = _ServerCompFactory.CreateItem(playerId)
-    items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY)
+    items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
+    itemsDictMap = {}
     for i, item in enumerate(items[:]):
-        if _is_empty_item(item) or item['newItemName'] != name or item['newAuxValue'] != aux:
+        if _is_empty_item(item):
+            continue
+        if item['newItemName'] != name:
+            continue
+        if aux != -1 and item['newAuxValue'] != aux:
             continue
         c = item['count']
         item['count'] -= count
         count -= c
         if item['count'] <= 0:
             items[i] = None
+        itemsDictMap[(_ItemPosType.INVENTORY, i)] = items[i]
         if count <= 0:
             break
-    comp.SetPlayerAllItems({
-        (_ItemPosType.INVENTORY, i): item for i, item in enumerate(items)
-    })
+    if itemsDictMap:
+        comp.SetPlayerAllItems(itemsDictMap)
     return True
 
 

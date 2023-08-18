@@ -56,5 +56,5 @@
       ],
       "type" : "screen"
    },
-   "namespace" : "ItemTipsBox"
+   "namespace" : "NyItemTipsBox"
 }

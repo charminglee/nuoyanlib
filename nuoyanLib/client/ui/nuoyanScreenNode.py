@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-04-22
+#   Last Modified : 2023-08-11
 #
 # ====================================================
 
@@ -156,7 +156,7 @@ class NuoyanScreenNode(_ScreenNode):
         self._btnMovableData = {}
         self._btnTouchUpCallbackData = {}
         self._moveAfterLCData = {}
-        self._savePosUis = []
+        self._savePosUis = set()
         self._uiPosKey = self.__class__.__name__ + "_ui_pos_data"
         self._listen()
 
@@ -177,7 +177,9 @@ class NuoyanScreenNode(_ScreenNode):
         uiPosData = _read_setting(self._uiPosKey, False)
         if uiPosData:
             for bp, pos in uiPosData.items():
-                self.GetBaseUIControl(bp).SetPosition(tuple(pos))
+                ui = self.GetBaseUIControl(bp)
+                if ui:
+                    ui.SetPosition(tuple(pos))
 
     def Update(self):
         """
@@ -236,7 +238,6 @@ class NuoyanScreenNode(_ScreenNode):
             'touchUpCallback': touchUpCallback
         }
         btnCtrl = self.GetBaseUIControl(buttonPath).asButton()
-        btnCtrl.AddTouchEventParams()
         btnCtrl.SetButtonTouchUpCallback(self._runTouchUpList)
         if buttonPath not in self._btnTouchUpCallbackData:
             self._btnTouchUpCallbackData[buttonPath] = []
@@ -266,8 +267,12 @@ class NuoyanScreenNode(_ScreenNode):
             'touchMoveCallback': touchMoveCallback
         }
         btn = self.GetBaseUIControl(btnPath).asButton()
-        btn.AddTouchEventParams()
         btn.SetButtonTouchMoveCallback(self._onMove)
+        self._savePosUis.update(associatedWidgetPath)
+        if moveParent:
+            self._savePosUis.add(_get_parent_path(btnPath))
+        else:
+            self._savePosUis.add(btnPath)
 
     def CancelButtonMovable(self, btnPath):
         # type: (str) -> None
@@ -279,8 +284,9 @@ class NuoyanScreenNode(_ScreenNode):
         NoReturn
         """
         if btnPath in self._btnMovableData:
+            origCallback = self._btnMovableData[btnPath]['touchMoveCallback']
+            self.GetBaseUIControl(btnPath).asButton().SetButtonTouchMoveCallback(origCallback)
             del self._btnMovableData[btnPath]
-        self.GetBaseUIControl(btnPath).asButton().SetButtonTouchMoveCallback(None)
 
     def SetButtonMovableAfterLongClick(self, btnPath, moveParent=False, associatedWidgetPath=(), touchUpFunc=None,
                                        longClickFunc=None, touchMoveCallback=None, touchMoveOutFunc=None,
@@ -314,11 +320,6 @@ class NuoyanScreenNode(_ScreenNode):
             'longClickFunc': longClickFunc,
             'touchDownFunc': touchDownFunc
         }
-        self._savePosUis.extend(associatedWidgetPath)
-        if moveParent:
-            self._savePosUis.append(_get_parent_path(btnPath))
-        else:
-            self._savePosUis.append(btnPath)
         return btn
 
     def SetButtonLongClickCallback(self, btnPath, longClickFunc, touchUpFunc=None, touchMoveOutFunc=None,
@@ -346,7 +347,6 @@ class NuoyanScreenNode(_ScreenNode):
             'touchCancelFunc': touchCancelFunc
         }
         btn = self.GetBaseUIControl(btnPath).asButton()
-        btn.AddTouchEventParams()
         btn.SetButtonTouchMoveOutCallback(self._onTouchCancel)
         btn.SetButtonTouchDownCallback(self._onTouchDown)
         btn.SetButtonTouchCancelCallback(self._onTouchMoveOut)
@@ -405,6 +405,7 @@ class NuoyanScreenNode(_ScreenNode):
     @listen("GetEntityByCoordReleaseClientEvent", 1)
     def _OnCoordRelease(self, args):
         self._saveUiPosition()
+        self._fingerPos = None
 
     def _saveUiPosition(self):
         data = {}
@@ -497,10 +498,10 @@ class NuoyanScreenNode(_ScreenNode):
         if pos[0] + buttonSize[0] > self.screenSize[0]:
             pos[0] = self.screenSize[0] - buttonSize[0]
 
-    def _setWidgetPosition(self, widgetControl, offset, widgetSize):
+    def _setWidgetPosition(self, widgetControl, offset):
         origPos = widgetControl.GetPosition()
         newPos = [origPos[0] + offset[0], origPos[1] + offset[1]]
-        self._testPosIsOut(newPos, widgetSize)
+        self._testPosIsOut(newPos, widgetControl.GetSize())
         widgetControl.SetPosition(tuple(newPos))
 
     def _onMove(self, args):
@@ -509,9 +510,10 @@ class NuoyanScreenNode(_ScreenNode):
         buttonPath = args['ButtonPath']
         if buttonPath not in self._btnMovableData:
             return
-        moveParent = self._btnMovableData[buttonPath]['moveParent']
-        associatedWidgetPath = self._btnMovableData[buttonPath]['associatedWidgetPath']
-        touchMoveCallback = self._btnMovableData[buttonPath]['touchMoveCallback']
+        data = self._btnMovableData[buttonPath]
+        moveParent = data['moveParent']
+        associatedWidgetPath = data['associatedWidgetPath']
+        touchMoveCallback = data['touchMoveCallback']
         self._isMoving = True
         if not self._fingerPos:
             self._fingerPos = (touchX, touchY)
@@ -519,18 +521,14 @@ class NuoyanScreenNode(_ScreenNode):
         self._fingerPos = (touchX, touchY)
         if not moveParent:
             buttonControl = self.GetBaseUIControl(buttonPath)
-            buttonSize = buttonControl.GetSize()
-            self._setWidgetPosition(buttonControl, offset, buttonSize)
+            self._setWidgetPosition(buttonControl, offset)
         else:
-            buttonName = buttonPath.split("/")[-1]
-            parentPath = buttonPath.split("/" + buttonName)[0]
+            parentPath = _get_parent_path(buttonPath)
             parentControl = self.GetBaseUIControl(parentPath)
-            parentSize = parentControl.GetSize()
-            self._setWidgetPosition(parentControl, offset, parentSize)
+            self._setWidgetPosition(parentControl, offset)
         for path in associatedWidgetPath:
             associatedWidgetControl = self.GetBaseUIControl(path)
-            associatedWidgetSize = associatedWidgetControl.GetSize()
-            self._setWidgetPosition(associatedWidgetControl, offset, associatedWidgetSize)
+            self._setWidgetPosition(associatedWidgetControl, offset)
         if touchMoveCallback:
             touchMoveCallback(args)
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-28
+#   Last Modified : 2023-08-01
 #
 # ====================================================
 
@@ -1179,6 +1179,7 @@ class NuoyanClientSystem(_ClientSystem):
     # todo:======================================= Basic Function ======================================================
 
     def SetQueryVar(self, entityId, name, value, sync=True):
+        # type: (str, str, float, bool) -> None
         """
         设置指定实体query.mod变量的值，支持全局同步（即所有客户端同步设置该变量的值）。
         若不进行全局同步，则本次设置只对当前客户端有效。
@@ -1316,7 +1317,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         广播事件到所有玩家的客户端。
         注：因为全局广播要经过服务端，所以监听事件时监听的是服务端而不是客户端。
-        若传递的数据为字典，则客户端接收到的字典会内置一个key：__id__，其value为发送广播的玩家实体ID
+        若传递的数据为字典，则客户端接收到的字典会内置一个key：__id__，其value为发送广播的玩家实体ID。
         -----------------------------------------------------------
         【eventName: str】 事件名称
         【eventData: Any】 数据

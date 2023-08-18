@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-11
+#   Last Modified : 2023-08-15
 #
 # ====================================================
 
@@ -347,6 +347,11 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             self.blockPaths[key] = tuple(allChildren)
             self.blockUiCtrls[key] = []
             for i, path in enumerate(allChildren):
+                btn = self.GetBaseUIControl(path).asButton()
+                btn.AddTouchEventParams()
+                btn.SetButtonTouchMoveInCallback(self._onItemBlockTouchMoveIn)
+                btn.SetButtonTouchMoveCallback(self.OnItemBlockTouchMove)
+                btn.GetChildByName("heap").SetVisible(False)
                 self.SetButtonDoubleClickCallback(
                     path, self._onItemBlockDoubleClick, self._onItemBlockTouchUp
                 )
@@ -354,10 +359,6 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
                     path, self._onItemBlockLongClick, self._onItemBlockTouchUp, self.OnItemBlockTouchMoveOut,
                     self._onItemBlockTouchDown, self.OnItemBlockTouchCancel
                 )
-                btn = self.GetBaseUIControl(path).asButton()
-                btn.SetButtonTouchMoveInCallback(self._onItemBlockTouchMoveIn)
-                btn.SetButtonTouchMoveCallback(self.OnItemBlockTouchMove)
-                btn.GetChildByName("heap").SetVisible(False)
                 pos = (key, i)
                 self.SetItemBlockRenderer(pos, None)
                 self.SetItemBlockCountLabel(pos, None)

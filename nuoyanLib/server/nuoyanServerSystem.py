@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-27
+#   Last Modified : 2023-08-01
 #
 # ====================================================
 
@@ -2151,6 +2151,7 @@ class NuoyanServerSystem(_ServerSystem):
     # todo:======================================= Basic Function ======================================================
 
     def SetQueryVar(self, entityId, name, value):
+        # type: (str, str, float) -> None
         """
         设置指定实体query.mod变量的值，全局同步。
         若设置的变量未注册，则自动进行注册。

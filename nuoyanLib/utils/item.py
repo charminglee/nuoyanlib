@@ -12,16 +12,18 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-07-02
+#   Last Modified : 2023-07-09
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
+from mod.common.minecraftEnum import ItemPosType as _ItemPosType
 
 
 __all__ = [
+    "get_item_count",
     "set_namespace",
     "is_same_item",
     "is_empty_item",
@@ -31,6 +33,34 @@ __all__ = [
 
 
 _AIR = ["minecraft:air", "air"]
+
+
+def _is_client():
+    return _clientApi.GetLocalPlayerId() != "-1"
+
+
+def _get_comp_factory():
+    return _clientApi.GetEngineCompFactory() if _is_client() else _serverApi.GetEngineCompFactory()
+
+
+def get_item_count(playerId, name, aux=-1):
+    """
+    获取玩家背包中指定物品的总数量。
+    -----------------------------------------------------------
+    【playerId: str】 玩家的实体ID
+    【name: str】 物品名称
+    【aux: int = -1】 物品特殊值（-1表示任意特殊值）
+    -----------------------------------------------------------
+    return: int -> 指定物品在背包中的总数
+    """
+    count = 0
+    items = _get_comp_factory().CreateItem(playerId).GetPlayerAllItems(_ItemPosType.INVENTORY)
+    for item in items:
+        if is_empty_item(item):
+            continue
+        if item['newItemName'] == name and (aux == -1 or item['newAuxValue'] == aux):
+            count += item['count']
+    return count
 
 
 def set_namespace(name, namespace="minecraft"):

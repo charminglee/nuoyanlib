@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-05-05
+#   Last Modified : 2023-08-15
 #
 # ====================================================
 
@@ -20,7 +20,6 @@
 import mod.client.extraClientApi as _clientApi
 from nuoyanScreenNode import NuoyanScreenNode as _NuoyanScreenNode
 from ...utils.item import is_empty_item as _is_empty_item
-from ..._config import MOD_NAME
 
 
 _ScreenNode = _clientApi.GetScreenNodeCls()
@@ -34,9 +33,10 @@ if "/" in __file__:
     _PATH = __file__[:-3].replace("/", ".")
 else:
     _PATH = __file__
-UI_NAME_ITEM_TIPS_BOX = "ItemTipsBox"
+NAMESPACE = "NuoyanLib"
+UI_NAME_ITEM_TIPS_BOX = "NyItemTipsBox"
 UI_PATH_ITEM_TIPS_BOX = _PATH + "._ItemTipsBoxUI"
-UI_DEF_ITEM_TIPS_BOX = "ItemTipsBox.main"
+UI_DEF_ITEM_TIPS_BOX = "NyItemTipsBox.main"
 UI_PATH_TIPS_IMAGE = "/tips_panel/image"
 UI_PATH_TIPS = "/tips_panel"
 UI_PATH_TIPS_LABEL = "/tips_panel/image/label"
@@ -49,12 +49,15 @@ class ItemTipsBox(_NuoyanScreenNode):
         self._registerItemTipsBoxUI()
 
     def _registerItemTipsBoxUI(self):
-        uiNode = _clientApi.GetUI(MOD_NAME, UI_NAME_ITEM_TIPS_BOX)
+        uiNode = _clientApi.GetUI(NAMESPACE, UI_NAME_ITEM_TIPS_BOX)
         if uiNode:
             self._itemTipsBoxNode = uiNode
         else:
-            self._itemTipsBoxNode = self.cs.RegisterAndCreateUI(
-                UI_NAME_ITEM_TIPS_BOX, UI_PATH_ITEM_TIPS_BOX, UI_DEF_ITEM_TIPS_BOX
+            _clientApi.RegisterUI(
+                NAMESPACE, UI_NAME_ITEM_TIPS_BOX, UI_PATH_ITEM_TIPS_BOX, UI_DEF_ITEM_TIPS_BOX
+            )
+            self._itemTipsBoxNode = _clientApi.CreateUI(
+                NAMESPACE, UI_NAME_ITEM_TIPS_BOX, {'isHud': 1, '__cs__': self}
             )
 
     def ShowItemTipsBox(self, itemDict):
