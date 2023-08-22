@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-15
+#   Last Modified : 2023-08-17
 #
 # ====================================================
 
@@ -181,6 +181,13 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
 
     # todo:==================================== Custom Event Callback ==================================================
 
+    def OnReceiveItemsDataFromServer(self, args):
+        """
+        从服务端接收到物品数据，网格刷新物品数据前触发。
+        -----------------------------------------------------------
+        【data: Dict[str, List[dict]]】 物品数据字典，字典键为网格的key，值为该网格所有物品的物品信息字典列表
+        """
+
     def OnItemGridChanged(self, args):
         """
         网格内的物品发生改变时触发。
@@ -291,7 +298,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         self.OnItemBlockTouchDown(args)
         bp = args['ButtonPath']
         itemDict = self.GetBlockItem(bp)
-        self.ShowItemTipsBox(itemDict)
+        self.ShowItemHoverTipsBox(itemDict)
 
     def OnItemBlockTouchMove(self, args):
         """
@@ -318,6 +325,14 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         if not self.AllItemGridsInited(key):
             return
         return self.blockUiCtrls[key]
+
+    def GetItemBlockUIControl(self, block):
+        # type: (str | tuple[str, int]) -> ...
+        """
+        获取指定方格的ButtonUIControl。
+        """
+        key, index = self.GetItemBlockPos(block)
+        return self.blockUiCtrls[key][index]
 
     def InitItemGrids(self, keys=None, finishedFunc=None, *args, **kwargs):
         # type: (str | tuple[str, ...] | None, _Callable | None, ..., ...) -> None
@@ -871,6 +886,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
         namespace = args['namespace']
         if namespace != self.__namespace:
             return
+        self.OnReceiveItemsDataFromServer({'data': data})
         for key, itemList in data.items():
             self.SetGridItems(itemList, key, False)
 
@@ -1000,6 +1016,22 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox):
             return self.blockPoses[block]
         except KeyError:
             return None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

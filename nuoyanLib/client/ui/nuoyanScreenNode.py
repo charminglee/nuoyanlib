@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-11
+#   Last Modified : 2023-08-17
 #
 # ====================================================
 
@@ -61,7 +61,7 @@ def notify_to_server(func):
     def wrapper(self, args):
         args['cancelNotify'] = False
         ret = func(self, args)
-        if not args['cancelNotify']:
+        if 'cancelNotify' in args and not args['cancelNotify'] and ret != -1:
             del args['cancelNotify']
             cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
             if cs:

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-15
+#   Last Modified : 2023-08-16
 #
 # ====================================================
 
@@ -60,23 +60,35 @@ class ItemTipsBox(_NuoyanScreenNode):
                 NAMESPACE, UI_NAME_ITEM_TIPS_BOX, {'isHud': 1, '__cs__': self}
             )
 
-    def ShowItemTipsBox(self, itemDict):
+    def ShowItemHoverTipsBox(self, itemDict):
         """
         显示物品格式化hover文本提示框。
+        -----------------------------------------------------------
+        【itemDict: dict】 物品信息字典
+        -----------------------------------------------------------
+        NoReturn
         """
-        self._itemTipsBoxNode.ShowItemTipsBox(itemDict)
+        self._itemTipsBoxNode.ShowItemHoverTipsBox(itemDict)
 
     def ShowTipsBox(self, text):
         """
-        显示文本提示框。
+        显示自定义内容的文本提示框。
+        -----------------------------------------------------------
+        【text: str】 文本内容
+        -----------------------------------------------------------
+        NoReturn
         """
         self._itemTipsBoxNode.ShowTipsBox(text)
 
-    def HideItemTipsBox(self):
+    def HideTipsBox(self):
         """
-        隐藏物品信息文本框。
+        隐藏文本提示框。
+        -----------------------------------------------------------
+        无参数
+        -----------------------------------------------------------
+        NoReturn
         """
-        self._itemTipsBoxNode.HideItemTipsBox()
+        self._itemTipsBoxNode.HideTipsBox()
 
 
 class _ItemTipsBoxUI(_NuoyanScreenNode):
@@ -103,9 +115,6 @@ class _ItemTipsBoxUI(_NuoyanScreenNode):
 
     # todo:==================================== System Event Callback ==================================================
 
-    def OnGameTick(self):
-        pass
-
     def OnScriptTick(self):
         # tips透明度动画
         if self.alphaTick:
@@ -116,7 +125,7 @@ class _ItemTipsBoxUI(_NuoyanScreenNode):
 
     # todo:====================================== Basic Function =======================================================
 
-    def ShowItemTipsBox(self, itemDict):
+    def ShowItemHoverTipsBox(self, itemDict):
         if _is_empty_item(itemDict):
             return
         name = itemDict['newItemName']
@@ -146,11 +155,11 @@ class _ItemTipsBoxUI(_NuoyanScreenNode):
         self.timer1 = _PlayerGameComp.AddTimer(1, func1)
         # 两秒后隐藏文本框并恢复初始状态
         def func2():
-            self.HideItemTipsBox()
+            self.HideTipsBox()
             self.timer2 = None
         self.timer2 = _PlayerGameComp.AddTimer(2, func2)
 
-    def HideItemTipsBox(self):
+    def HideTipsBox(self):
         if self.timer1:
             _PlayerGameComp.CancelTimer(self.timer1)
             self.timer1 = None
