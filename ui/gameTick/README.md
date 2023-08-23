@@ -12,29 +12,22 @@
 
 ## 原理
 
-监听GameTick的原理很简单。既然是游戏帧率，那当然也包括了UI的帧率，因此我们可以通过UI来监听GameTick。  
+监听GameTick的原理很简单，UI可以获取到一些引擎的相关信息，因此我们可以通过UI来监听GameTick。  
 
-通过在UI的main画布中绑定变量#main.gametick，并在py中绑定对应的回调函数，即完成了对GameTick的监听。 
+新建一个空白UI，然后在main画布中绑定引擎变量#main.gametick，并在Python代码中绑定对应的回调函数，即完成了对GameTick的监听。 随后在UiInitFinished事件中注册并创建该UI，我们就能观察到刚刚绑定的回调函数开始运行了。  
 
-随后在UiInitFinished事件中注册并创建UI，我们就能观察到刚刚绑定的回调函数开始运行了。  
 > 详见：https://pd.qq.com/s/dnm1v9ax8?shareSource=5
 
 ## 安装方法
 
-为了方便大家使用GameTick，作者已经帮大家写好了相关的json和py代码逻辑，您可以选择使用本函数库附带的installer一键安装，也可以选择手动安装。
-- 使用installer安装步骤：  
-  - 将installer.py用Pycharm或VS Code等软件打开并运行，或直接使用Python解释器运行（注意：请使用Python2运行）；  
-  - 在弹出的窗口中找到您的资源包（resource_pack）根目录，将其选中并点击确认即可。
-
-
-- 手动安装步骤：  
-  - 将_GameTick.json复制到您的resource_pack/ui目录下；  
-  - 如果您的resource_pack/ui目录下没有_ui_defs.json文件，将_ui_defs.json一并复制过去即可；  
-  - 如果您的resource_pack/ui目录下已存在_ui_defs.json文件，将其打开并添加一行 `ui/_GameTick.json` 即可。
+- 将`_GameTick.json`复制到您的`RP/ui`目录下；  
+- 如果您的`RP/ui`目录下没有`_ui_defs.json`文件，将`_ui_defs.json`一并复制过去即可；  
+- 如果您的`RP/ui`目录下已存在`_ui_defs.json`文件，将其打开并添加一行`ui/_GameTick.json`即可。
 
 ## 使用方法
 
 - 客户端：将您的客户端继承NuoyanClientSystem，重写OnGameTick方法。
+
 ```python
 class MyClientSystem(NuoyanClientSystem):
     def __init__(self, namespace, systemName):
@@ -43,7 +36,9 @@ class MyClientSystem(NuoyanClientSystem):
     def OnGameTick(self):
         pass
 ```
+
 - 服务端：将您的服务端继承NuoyanServerSystem，重写OnGameTick方法。
+
 ```python
 class MyServerSystem(NuoyanServerSystem):
     def __init__(self, namespace, systemName):
