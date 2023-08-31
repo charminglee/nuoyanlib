@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/nuoyanLib.iml" filepath="$PROJECT_DIR$/.idea/nuoyanLib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/nuoyanlib.iml" filepath="$PROJECT_DIR$/.idea/nuoyanlib.iml" />
     </modules>
   </component>
 </project>
