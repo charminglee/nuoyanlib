@@ -110,7 +110,7 @@ def to_relative_pos(entityPos1, entityPos2):
     # type: (tuple[float, float, float], tuple[float, float, float]) -> tuple[float, float, float] | None
     """
     将实体1的绝对坐标转换为相对实体2的坐标。
-    示例：
+    【示例】
     to_relative_pos((1, 1, 4), (5, 1, 4))     # (-4, 0, 0)
     -----------------------------------------------------------
     【entityPos1: Tuple[float, float, float]】 实体1坐标
@@ -319,7 +319,7 @@ def n_quantiles_index_list(n, data):
     # type: (int, _Sequence) -> list[int]
     """
     计算一串数据的n分位数的位置。
-    示例：
+    【示例】
     n_quantiles_index_list(4, range(11))     # [2, 5, 8]
     -----------------------------------------------------------
     【n: int】 n分位
@@ -631,7 +631,7 @@ def rot_diff(r1, r2):
     # type: (float, float) -> float
     """
     计算两个角度之间的实际差值。
-    示例：
+    【示例】
     rot_diff(-170, 20)     # 170
     -----------------------------------------------------------
     【r1: float】 角度1

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-09-02
 #
 # ====================================================
 
@@ -27,7 +27,7 @@ setting
 """
 
 
-import mod.client.extraClientApi as _clientApi
+from clientComps import LevelComps as _LevelComps
 
 
 __all__ = [
@@ -35,11 +35,6 @@ __all__ = [
     "read_setting",
     "check_setting",
 ]
-
-
-_LEVEL_ID = _clientApi.GetLevelId()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_LevelConfigClientComp = _ClientCompFactory.CreateConfigClient(_LEVEL_ID)
 
 
 def save_setting(name, dataDict, isGlobal=True):
@@ -55,7 +50,7 @@ def save_setting(name, dataDict, isGlobal=True):
     :return: 是否保存成功
     :rtype: bool
     """
-    return _LevelConfigClientComp.SetConfigData(name, dataDict, isGlobal)
+    return _LevelComps.ConfigClient.SetConfigData(name, dataDict, isGlobal)
 
 
 def read_setting(name, isGlobal=True):
@@ -70,7 +65,7 @@ def read_setting(name, isGlobal=True):
     :return: 数据字典
     :rtype: dict
     """
-    return _LevelConfigClientComp.GetConfigData(name, isGlobal)
+    return _LevelComps.ConfigClient.GetConfigData(name, isGlobal)
 
 
 def check_setting(name, itemList, isGlobal=True):
@@ -79,7 +74,7 @@ def check_setting(name, itemList, isGlobal=True):
 
     -----
 
-    示例：
+    【示例】
 
     >>> import nuoyanlib as nyl
     >>> d = {'name': "nuoyan", 'qq': "1279735247"}

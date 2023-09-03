@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-29
+#   Last Modified : 2023-09-02
 #
 # ====================================================
 
@@ -27,16 +27,13 @@ uiutils
 """
 
 
-import mod.client.extraClientApi as _clientApi
+from ..clientComps import ScreenNode as _ScreenNode
 
 
 __all__ = [
     "get_parent_path",
     "get_grid_direct_children",
 ]
-
-
-_ScreenNode = _clientApi.GetScreenNodeCls()
 
 
 def get_grid_direct_children(path, uiSelf):
@@ -48,7 +45,7 @@ def get_grid_direct_children(path, uiSelf):
     :param str path: 网格路径
     :param _ScreenNode uiSelf: UI类实例，在UI类里调用该函数直接传self即可
 
-    :return: 网格的所有直接子控件的路径，获取不到返回空字典
+    :return: 网格的所有直接子控件的路径，获取不到返回空列表
     :rtype: list[str]
     """
     if not path.startswith("/"):

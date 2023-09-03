@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-09-01
 #
 # ====================================================
 
@@ -26,7 +26,7 @@ clientComps
 
 -----
 
-模块变量说明：
+【模块变量说明】
 
 1、ENGINE_NAMESPACE：引擎事件的命名空间。
 
@@ -52,7 +52,7 @@ clientComps
 
 -----
 
-示例：
+【示例】
 
 >>> from nuoyanlib import PlayerComps as pc, LevelComps as lc
 
@@ -180,13 +180,6 @@ class PlayerComps(CompPool):
 class LevelComps(CompPool):
     _cache = {}
     _target = LEVEL_ID
-
-
-
-
-
-
-
 
 
 

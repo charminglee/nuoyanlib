@@ -12,16 +12,28 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-30
+#   Last Modified : 2023-09-01
 #
 # ====================================================
 
 
-from itemFlyAnim import ItemFlyAnim
-from itemGridManager import ItemGridManager
-from itemTipsBox import ItemTipsBox
-from nuoyanScreenNode import NuoyanScreenNode, notify_to_server
-from uiutils import get_grid_direct_children, get_parent_path
+from itemFlyAnim import (
+    ItemFlyAnim,
+)
+from itemGridManager import (
+    ItemGridManager,
+)
+from itemTipsBox import (
+    ItemTipsBox,
+)
+from nuoyanScreenNode import (
+    NuoyanScreenNode,
+    notify_server,
+)
+from uiutils import (
+    get_grid_direct_children,
+    get_parent_path,
+)
 
 
 __all__ = [
@@ -29,7 +41,7 @@ __all__ = [
     "ItemGridManager",
     "ItemTipsBox",
     "NuoyanScreenNode",
-    "notify_to_server",
+    "notify_server",
     "get_grid_direct_children",
     "get_parent_path",
 ]

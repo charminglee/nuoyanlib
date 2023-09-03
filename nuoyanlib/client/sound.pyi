@@ -12,6 +12,37 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-09-03
 #
 # ====================================================
+
+
+from typing import Tuple, Optional
+
+
+def play_custom_sound(
+    soundName: str,
+    pos: Tuple[float, float, float] = (0, 0, 0),
+    volume: float = 1.0,
+    speed: float = 1.0,
+    isLoop: bool = False,
+    entityId: Optional[str] = None,
+) -> str: ...
+def stop_custom_sound(soundId: str, fadeOutTime: float = 0.0) -> bool: ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

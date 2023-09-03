@@ -12,6 +12,28 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-09-02
 #
 # ====================================================
+
+
+def save_setting(name: str, dataDict: dict, isGlobal: bool = True) -> bool: ...
+def read_setting(name: str, isGlobal: bool = True) -> dict: ...
+def check_setting(name: str, itemList: list, isGlobal: bool = True) -> list: ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

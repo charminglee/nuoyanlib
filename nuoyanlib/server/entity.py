@@ -237,7 +237,7 @@ def is_entity_type(entityId, typeId):
     # type: (str, int) -> bool
     """
     判断实体是否是某一类型。
-    示例：
+    【示例】
     pigEntityId = ...
     is_entity_type(pigEntityId, EntityType.Pig)     # True
     is_entity_type(pigEntityId, EntityType.Mob)     # True

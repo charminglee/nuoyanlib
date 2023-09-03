@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-29
+#   Last Modified : 2023-09-02
 #
 # ====================================================
 
@@ -35,38 +35,31 @@ nuoyanScreenNode
 
 from functools import wraps as _wraps
 import mod.client.extraClientApi as _clientApi
-from ..setting import read_setting as _read_setting, save_setting as _save_setting
+from ..setting import (
+    read_setting as _read_setting,
+    save_setting as _save_setting,
+)
 from uiutils import get_parent_path as _get_parent_path
 from ...config import (
     MOD_NAME as _MOD_NAME,
     CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
-    SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
 )
+from ...utils._error import ClientNotFoundError as _ClientNotFoundError
 from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl as _ButtonUIControl
+from ..nuoyanClientSystem import listen_server as _listen_server
+from ..clientComps import (
+    LevelComps as _LevelComps,
+    ScreenNode as _ScreenNode,
+)
 
 
 __all__ = [
     "NuoyanScreenNode",
-    "listen",
-    "notify_to_server",
+    "notify_server",
 ]
 
 
-_ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
-_ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
-_ScreenNode = _clientApi.GetScreenNodeCls()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_PLAYER_ID = _clientApi.GetLocalPlayerId()
-_LEVEL_ID = _clientApi.GetLevelId()
-_LevelGameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
-_LevelDeviceComp = _ClientCompFactory.CreateDevice(_LEVEL_ID)
-_ViewBinder = _clientApi.GetViewBinderCls()
-
-
-_lsnFuncArgs = []
-
-
-def notify_to_server(func):
+def notify_server(func):
     """
     函数装饰器，用于按钮的回调函数。
 
@@ -77,13 +70,6 @@ def notify_to_server(func):
     可通过args['cancelNotify'] = False或return -1的方式取消触发服务端函数。
 
     若对按钮回调参数进行修改（如增加、修改或删除某个key或value），服务端得到的参数为修改后的参数，可通过该方式向服务端传递更多信息。
-
-    -----
-
-    :param function func: 被装饰函数
-
-    :return: 装饰后的新函数
-    :rtype: function
     """
     @_wraps(func)
     def wrapper(self, args):
@@ -97,49 +83,6 @@ def notify_to_server(func):
             cs.NotifyToServer("_ButtonCallbackTriggered", args)
         return ret
     return wrapper
-
-
-def listen(eventName, t=0, namespace="", systemName="", priority=0):
-    """
-    带参数的函数装饰器，用于UI类，通过对函数进行装饰即可实现监听。
-
-    -----
-
-    示例：
-
-    >>> class MyUI(ScreenNode):
-    ...     @listen("MyCustomEvent")  # 监听服务端传来的自定义事件
-    ...     def eventCallback(self, args):
-    ...         pass
-    ...
-    ...     @listen("AddEntityClientEvent", 1)  # 监听AddEntityClientEvent事件
-    ...     def OnAddEntity(self, args):
-    ...         pass
-
-    -----
-
-    :param str eventName: 事件名称
-    :param int t: 0表示监听服务端传来的自定义事件，1表示监听客户端引擎事件，2表示监听其他Mod的事件，默认为0
-    :param str namespace: 指定命名空间，默认为空字符串
-    :param str systemName: 指定系统名称，默认为空字符串
-    :param int priority: 优先级，默认为0
-
-    :return: 装饰器函数
-    :rtype: (function)->function
-    """
-    if t == 0:
-        _namespace = _MOD_NAME
-        _systemName = _SERVER_SYSTEM_NAME
-    elif t == 1:
-        _namespace = _ENGINE_NAMESPACE
-        _systemName = _ENGINE_SYSTEM_NAME
-    else:
-        _namespace = namespace
-        _systemName = systemName
-    def decorator(func):
-        _lsnFuncArgs.append([eventName, func.__name__, t, _namespace, _systemName, priority])
-        return func
-    return decorator
 
 
 class NuoyanScreenNode(_ScreenNode):
@@ -180,13 +123,17 @@ class NuoyanScreenNode(_ScreenNode):
 
     1、重写Create或Update方法时请调用一次父类的同名方法，如：super(MyUI, self).Create()或NuoyanScreenNode.Create(self)。
 
-    2、带有 *[tick]* 标签的事件为帧事件，需要注意相关逻辑的编写。
+    2、带有 *[event]* 标签的方法为事件，重写该方法即可使用该事件。
+
+    3、带有 *[tick]* 标签的事件为帧事件，需要注意相关逻辑的编写。
     """
 
     def __init__(self, namespace, name, param):
         super(NuoyanScreenNode, self).__init__(namespace, name, param)
         self.cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
-        self.screenSize = _LevelGameComp.GetScreenSize()
+        if not self.cs:
+            raise _ClientNotFoundError
+        self.screenSize = _LevelComps.Game.GetScreenSize()
         self._btnDoubleClickData = {}
         self._doubleClickArgs = None
         self._vibrateTime = 100
@@ -204,22 +151,25 @@ class NuoyanScreenNode(_ScreenNode):
         self.__touchingButtonPath = ""
         self.__tick = 0
         self.__uiPosKey = self.__class__.__name__ + "_ui_pos_data"
-        self.__listen()
-
-    def __listen(self):
-        global _lsnFuncArgs
-        for eventName, funcName, t, namespace, systemName, priority in _lsnFuncArgs:
-            self.cs.ListenForEvent(namespace, systemName, eventName, self, getattr(self, funcName), priority)
-        _lsnFuncArgs = []
 
     def Create(self):
         """
+        *[event]*
+
         UI生命周期函数，当UI创建成功时调用。
 
         若重写该方法，请调用一次NuoyanScreenNode的同名方法，否则部分功能将不可用。如：
 
-        >>> def Create(self):
-        ...     super(MyUI, self).Create()  # 或者：NuoyanScreenNode.Create(self)
+        >>> class MyUI(NuoyanScreenNode):
+        ...     def __init__(self, namespace, name, param):
+        ...         pass
+        ...     def Create(self):
+        ...         super(MyUI, self).Create()  # 或者：NuoyanScreenNode.Create(self)
+
+        -----
+
+        :return: 无
+        :rtype: None
         """
         uiPosData = _read_setting(self.__uiPosKey, False)
         if uiPosData:
@@ -230,13 +180,22 @@ class NuoyanScreenNode(_ScreenNode):
 
     def Update(self):
         """
-        *[tick]*
+        *[event]* *[tick]*
 
         客户端每帧调用，1秒有30帧。
+
         若重写该方法，请调用一次NuoyanScreenNode的同名方法，否则部分功能将不可用。如：
 
-        >>> def Update(self):
-        ...     super(MyUI, self).Update()  # 或者：NuoyanScreenNode.Update(self)
+        >>> class MyUI(NuoyanScreenNode):
+        ...     def __init__(self, namespace, name, param):
+        ...         pass
+        ...     def Update(self):
+        ...         super(MyUI, self).Update()  # 或者：NuoyanScreenNode.Update(self)
+
+        -----
+
+        :return: 无
+        :rtype: None
         """
         if self.__doubleClickTick:
             self.__doubleClickTick += 1
@@ -252,21 +211,42 @@ class NuoyanScreenNode(_ScreenNode):
 
     def Destroy(self):
         """
+        *[event]*
+
         UI生命周期函数，当UI销毁时调用。
+
+        -----
+
+        :return: 无
+        :rtype: None
         """
 
     def OnDeactive(self):
         """
+        *[event]*
+
         UI生命周期函数，当栈顶UI有其他UI入栈时调用。
 
         不建议使用在OnDeactive函数中调用SetScreenVisible(False)，在OnActive函数中调用SetScreenVisible(True)的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用PushScreen，PopScreen接口实现。
+
+        -----
+
+        :return: 无
+        :rtype: None
         """
 
     def OnActive(self):
         """
+        *[event]*
+
         UI生命周期函数，当UI重新回到栈顶时调用。
 
         不建议使用在OnDeactive函数中调用SetScreenVisible(False)，在OnActive函数中调用SetScreenVisible(True)的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用PushScreen，PopScreen接口实现。
+
+        -----
+
+        :return: 无
+        :rtype: None
         """
 
     # ========================================== Basic Function ========================================================
@@ -278,8 +258,8 @@ class NuoyanScreenNode(_ScreenNode):
         -----
 
         :param str buttonPath: 按钮路径
-        :param (dict)->Any doubleClickCallback: DoubleClick回调函数
-        :param ((dict)->Any)|None touchUpCallback: TouchUp回调函数，默认为None
+        :param function doubleClickCallback: DoubleClick回调函数
+        :param function|None touchUpCallback: TouchUp回调函数，默认为None
 
         :return: 无
         :rtype: None
@@ -305,7 +285,7 @@ class NuoyanScreenNode(_ScreenNode):
         :param str btnPath: 按钮路径
         :param bool moveParent: 是否同时拖动父控件，默认为False
         :param str|tuple[str]|None associatedPath: 关联拖动的其他控件的路径，多个控件请使用元组，默认为None
-        :param ((dict)->Any)|None touchMoveCallback: TouchMove回调函数，默认为None
+        :param function|None touchMoveCallback: TouchMove回调函数，默认为None
 
         :return: 无
         :rtype: None
@@ -363,15 +343,15 @@ class NuoyanScreenNode(_ScreenNode):
         :param str btnPath: 按钮路径
         :param bool moveParent: 是否同时拖动父控件，默认为False
         :param str|tuple[str]|None associatedPath: 关联拖动的其他控件的路径，多个控件请使用元组，默认为None
-        :param ((dict)->Any)|None touchUpFunc: TouchUp回调函数，默认为None
-        :param ((dict)->Any)|None longClickFunc: LongClick回调函数，默认为None
-        :param ((dict)->Any)|None touchMoveCallback: TouchMove回调函数，默认为None
-        :param ((dict)->Any)|None touchMoveOutFunc: TouchMoveOut回调函数，默认为None
-        :param ((dict)->Any)|None touchDownFunc: TouchDown回调函数，默认为None
-        :param ((dict)->Any)|None touchCancelFunc: TouchCancel回调函数，默认为None
+        :param function|None touchUpFunc: TouchUp回调函数，默认为None
+        :param function|None longClickFunc: LongClick回调函数，默认为None
+        :param function|None touchMoveCallback: TouchMove回调函数，默认为None
+        :param function|None touchMoveOutFunc: TouchMoveOut回调函数，默认为None
+        :param function|None touchDownFunc: TouchDown回调函数，默认为None
+        :param function|None touchCancelFunc: TouchCancel回调函数，默认为None
 
-        :return: 按钮的ButtonUIControl实例
-        :rtype: _ButtonUIControl
+        :return: 按钮的ButtonUIControl实例，设置失败时返回None
+        :rtype: _ButtonUIControl|None
         """
         if not associatedPath:
             associatedPath = ()
@@ -404,14 +384,14 @@ class NuoyanScreenNode(_ScreenNode):
         -----
 
         :param str btnPath: 按钮路径
-        :param (dict)->Any longClickFunc: LongClick回调函数
-        :param ((dict)->Any)|None touchUpFunc: TouchUp回调函数，默认为None
-        :param ((dict)->Any)|None touchMoveOutFunc: TouchMoveOut回调函数，默认为None
-        :param ((dict)->Any)|None touchDownFunc: TouchDown回调函数，默认为None
-        :param ((dict)->Any)|None touchCancelFunc: TouchCancel回调函数，默认为None
+        :param function longClickFunc: LongClick回调函数
+        :param function|None touchUpFunc: TouchUp回调函数，默认为None
+        :param function|None touchMoveOutFunc: TouchMoveOut回调函数，默认为None
+        :param function|None touchDownFunc: TouchDown回调函数，默认为None
+        :param function|None touchCancelFunc: TouchCancel回调函数，默认为None
 
-        :return: 按钮的ButtonUIControl实例
-        :rtype: _ButtonUIControl
+        :return: 按钮的ButtonUIControl实例，设置失败时返回None
+        :rtype: _ButtonUIControl|None
         """
         self._btnLongClickData[btnPath] = {
             'longClickFunc': longClickFunc,
@@ -484,7 +464,7 @@ class NuoyanScreenNode(_ScreenNode):
             for func in self._btnTouchUpCallbackData[bp]:
                 func(args)
 
-    @listen("GetEntityByCoordReleaseClientEvent", 1)
+    @_listen_server("GetEntityByCoordReleaseClientEvent")
     def _OnCoordRelease(self, args):
         self._saveUiPosition()
         self.__fingerPos = None
@@ -547,7 +527,7 @@ class NuoyanScreenNode(_ScreenNode):
                 touchData['touchDownFunc'](args)
 
     def _vibrate(self):
-        _LevelDeviceComp.SetDeviceVibrate(self._vibrateTime)
+        _LevelComps.Device.SetDeviceVibrate(self._vibrateTime)
 
     def _onLongClick(self, args):
         bp = args['ButtonPath']
@@ -614,7 +594,7 @@ class NuoyanScreenNode(_ScreenNode):
         if touchMoveCallback:
             touchMoveCallback(args)
 
-    @listen("ScreenSizeChangedClientEvent", 1)
+    @_listen_server("ScreenSizeChangedClientEvent")
     def _OnScreenSizeChanged(self, args):
         self.screenSize = args['afterX'], args['afterY']
 

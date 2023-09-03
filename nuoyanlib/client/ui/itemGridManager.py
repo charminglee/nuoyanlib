@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-30
+#   Last Modified : 2023-09-02
 #
 # ====================================================
 
@@ -25,7 +25,7 @@ itemGridManager
 
 -----
 
-名词解释：
+【名词解释】
 
 1、网格：即Grid控件，一种能够对模板控件多次克隆并排列成网状的控件。
 
@@ -65,7 +65,7 @@ itemGridManager
 
 -----
 
-使用方法：
+【使用方法】
 
 1、将您的服务端继承NuoyanServerSystem，此后无需再继承ServerSystem。
 
@@ -79,7 +79,7 @@ itemGridManager
 
 -----
 
-注意事项：
+【注意事项】
 
 1、如果您的UI类重写了Update方法，请在该方法内调用一次父类同名方法，例如：super(你的UI类, self).Update()或ItemGridManager.Update()。
 
@@ -88,7 +88,6 @@ itemGridManager
 
 from functools import wraps as _wraps
 from copy import deepcopy as _deepcopy
-import mod.client.extraClientApi as _clientApi
 from ...utils.item import (
     is_same_item as _is_same_item,
     is_empty_item as _is_empty_item,
@@ -97,21 +96,19 @@ from ...utils.item import (
 from itemFlyAnim import ItemFlyAnim as _ItemFlyAnim
 from itemTipsBox import ItemTipsBox as _ItemTipsBox
 from nuoyanScreenNode import NuoyanScreenNode as _NuoyanScreenNode
-from ...config import MOD_NAME as _MOD_NAME, SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
+from ...config import (
+    MOD_NAME as _MOD_NAME,
+    SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME,
+)
 from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl as _ButtonUIControl
 from ...mctypes.client.ui.controls.progressBarUIControl import ProgressBarUIControl as _ProgressBarUIControl
 from uiutils import get_grid_direct_children as _get_grid_direct_children
+from ..clientComps import LevelComps as _LevelComps
 
 
 __all__ = [
     "ItemGridManager",
 ]
-
-
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_LEVEL_ID = _clientApi.GetLevelId()
-_ItemComp = _ClientCompFactory.CreateItem(_LEVEL_ID)
-_GameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
 
 
 _IMAGE_PATH_ITEM_CELL_SELECTED = "textures/ui/recipe_book_button_borderless_lightpressed"
@@ -197,7 +194,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
     -----
 
-    事件一览：
+    【事件一览】
 
     1、OnReceiveItemsDataFromServerBefore：从服务端接收到物品数据，网格刷新物品数据前触发。
 
@@ -223,7 +220,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
     -----
 
-    接口一览：
+    【接口一览】
 
     1、GetAllItemCellUIControls：获取指定网格中所有方格的ButtonUIControl实例。
 
@@ -319,16 +316,29 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         self.__listen()
 
     def __listen(self):
-        clientNamespace = _clientApi.GetEngineNamespace()
-        clientSystemName = _clientApi.GetEngineSystemName()
-        self.cs.ListenForEvent(
-            clientNamespace, clientSystemName, "GetEntityByCoordReleaseClientEvent", self, self._OnCoordRelease
-        )
         self.cs.ListenForEvent(
             _MOD_NAME, _SERVER_SYSTEM_NAME, "_SyncItems", self, self._receiveItemsData
         )
 
     def Update(self):
+        """
+        *[event]* *[tick]*
+
+        客户端每帧调用，1秒有30帧。
+
+        若重写该方法，请调用一次ItemGridManager的同名方法，否则部分功能将不可用。如：
+
+        >>> class MyUI(ItemGridManager):
+        ...     def __init__(self, namespace, name, param):
+        ...         pass
+        ...     def Update(self):
+        ...         super(MyUI, self).Update()  # 或者：ItemGridManager.Update(self)
+
+        -----
+
+        :return: 无
+        :rtype: None
+        """
         super(ItemGridManager, self).Update()
         # 物品分堆
         self.__tick += 1
@@ -343,15 +353,16 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
                     barCtrl = self._itemHeapData['barCtrl']
                     barCtrl.SetValue(float(self._itemHeapData['selectedCount']) / count)
 
-    # todo:==================================== System Event Callback ==================================================
+    # ======================================= System Event Callback ====================================================
 
     def _OnCoordRelease(self, args):
+        super(ItemGridManager, self)._OnCoordRelease(args)
         if len(self.__moveInGridList) >= 2:
             self.SetSelectedItem(self._selectedItem['bp'], False)
         self.__moveInGridList = []
         self.__orgItem = {}
 
-    # todo:==================================== Custom Event Callback ==================================================
+    # ======================================= Custom Event Callback ====================================================
 
     def OnReceiveItemsDataFromServerBefore(self, args):
         """
@@ -386,7 +397,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         【$cancel: bool】 是否取消选中
         """
 
-    # todo:========================================= UI Callback =======================================================
+    # ============================================ UI Callback =========================================================
 
     def OnItemCellTouchUp(self, args):
         """
@@ -448,7 +459,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
             return
         name = itemDict['newItemName']
         aux = itemDict.get('newAuxValue', 0)
-        maxStack = _ItemComp.GetItemBasicInfo(name, aux)['maxStackSize']
+        maxStack = _LevelComps.Item.GetItemBasicInfo(name, aux)['maxStackSize']
         if itemDict['count'] < maxStack:
             self.MergeItems(bp)
         self.SetSelectedItem(bp, False)
@@ -496,7 +507,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         方格取消按下时触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
         """
 
-    # todo:=========================================== UI操作 ===========================================================
+    # ============================================== UI操作 =============================================================
 
     def GetAllItemCellUIControls(self, key):
         """
@@ -550,7 +561,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         itemName = itemDict['newItemName']
         aux = itemDict.get('newAuxValue', 0)
         isEnchanted = bool(itemDict.get('enchantData') or itemDict.get('modEnchantData'))
-        basicInfo = _ItemComp.GetItemBasicInfo(itemName, aux, isEnchanted)
+        basicInfo = _LevelComps.Item.GetItemBasicInfo(itemName, aux, isEnchanted)
         maxDurability = basicInfo['maxDurability']
         if durability <= 0 or durability >= maxDurability:
             durCtrl.SetVisible(False)
@@ -739,7 +750,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         :param bool lock: 是否锁定
 
         :return: 是否成功
-        :rtype: cell
+        :rtype: bool
         """
         if not self._is_cell_exist(cell):
             return False
@@ -764,7 +775,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         pos = self.GetItemCellPos(cell)
         return pos and (pos in self._lockedCells or pos[0] in self._lockedGrids)
 
-    # todo:=========================================== 物品操作 ==========================================================
+    # ============================================== 物品操作 ============================================================
 
     def _is_cell_exist(self, *cell):
         return all(self.GetItemCellPath(c) in self._cellPaths for c in cell)
@@ -807,7 +818,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         :param str key: 网格的key
 
         :return: 物品信息字典列表，获取不到时返回空列表
-        :rtype: list[dict]
+        :rtype: list[dict|None]
         """
         return _deepcopy(self._gridItemsData[key]) if key in self._gridItemsData else []
 
@@ -1301,7 +1312,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         return self._itemHeapData
 
-    # todo:======================================= Basic Function ======================================================
+    # ========================================== Basic Function ========================================================
 
     def RegisterItemGrid(self, key, path, isSingle=False):
         """
@@ -1362,7 +1373,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
                 keys = (keys,)
             if not all(i in self._gridKeys for i in keys):
                 return False
-        _GameComp.AddTimer(0, self._initItemGrids, keys, finishedFunc, args, kwargs)
+        _LevelComps.Game.AddTimer(0, self._initItemGrids, keys, finishedFunc, args, kwargs)
         return True
 
     def _initItemGrids(self, keys, finishedFunc, args, kwargs):
@@ -1376,7 +1387,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
             else:
                 allChildren = tuple(_get_grid_direct_children(gp, self))
             # 初始化操作
-            self._cellUiCtrls[key] = []
+            cellUiCtrls = []
             for i, path in enumerate(allChildren):
                 btn = self.GetBaseUIControl(path).asButton()
                 btn.AddTouchEventParams()
@@ -1384,11 +1395,17 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
                 btn.SetButtonTouchMoveCallback(self.OnItemCellTouchMove)
                 btn.GetChildByName("heap").SetVisible(False)
                 self.SetButtonDoubleClickCallback(
-                    path, self._onItemCellDoubleClick, self._onItemCellTouchUp
+                    path,
+                    self._onItemCellDoubleClick,
+                    self._onItemCellTouchUp,
                 )
                 self.SetButtonLongClickCallback(
-                    path, self._onItemCellLongClick, self._onItemCellTouchUp, self.OnItemCellTouchMoveOut,
-                    self._onItemCellTouchDown, self.OnItemCellTouchCancel
+                    path,
+                    self._onItemCellLongClick,
+                    self._onItemCellTouchUp,
+                    self.OnItemCellTouchMoveOut,
+                    self._onItemCellTouchDown,
+                    self.OnItemCellTouchCancel,
                 )
                 pos = (key, i)
                 self.SetItemCellRenderer(pos, None)
@@ -1397,8 +1414,8 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
                 self._cellPoses[path] = pos
                 self._cellPaths[pos] = path
                 self._gridItemsData[key].append(None)
-                self._cellUiCtrls[key].append(btn)
-            self._cellUiCtrls[key] = tuple(self._cellUiCtrls[key])
+                cellUiCtrls.append(btn)
+            self._cellUiCtrls[key] = tuple(cellUiCtrls)
             if key not in _RESERVED_KEYS:
                 self.cs.NotifyToServer("_InitItemGrid", {
                     'key': key,
@@ -1472,8 +1489,6 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         if isinstance(cell, tuple):
             return cell
         return self._cellPoses.get(cell)
-
-
 
 
 

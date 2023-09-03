@@ -39,7 +39,7 @@ def all_indexes(seq, *elements):
     # type: (_Sequence, ...) -> list
     """
     获取元素在序列中所有出现位置的下标。
-    示例：
+    【示例】
     all_indexes([1, 1, 4, 5, 1, 4], 1)     # [0, 1, 4]
     all_indexes([1, 1, 4, 5, 1, 4], 1, 4)     # [0, 1, 2, 4, 5]
     all_indexes("abcdefg", "c", "g")     # [2, 6]
@@ -56,7 +56,7 @@ def check_string(string, *check):
     # type: (str, str) -> bool
     """
     检测字符串是否只含有指定字符。
-    示例：
+    【示例】
     check_string("11112222", "1", "2")     # True
     check_string("11112222", "1")     # False
     check_string("1234567890", "0-9")     # True
@@ -83,7 +83,7 @@ def check_string2(string, *check):
     # type: (str, str) -> list[str]
     """
     返回字符串中指定字符之外的字符的列表。
-    示例：
+    【示例】
     check_string2("abc123", "a", "c", "3")     # ["b", "1", "2"]
     check_string2("abc123", "a-z")     # ["1", "2", "3"]
     check_string2("abc123", "0-9")     # ["a", "b", "c"]
@@ -111,7 +111,7 @@ def turn_dict_value_to_tuple(origDict):
     # type: (dict) -> None
     """
     将字典值中的列表全部转换为元组。（改变原字典）
-    示例：
+    【示例】
     a = {'b': [1, 2, 3], 'c': "hahaha", 'd': [4, 5]}
     turn_dict_value_to_tuple(a)
     # a == {'b': (1, 2, 3), 'c': "hahaha", 'd': (4, 5)}
@@ -130,7 +130,7 @@ def turn_list_to_tuple(lst):
     # type: (list) -> tuple
     """
     将一个列表及其元素中的列表转换成元组。
-    示例：
+    【示例】
     a = [1, [2, 3], "abc"]
     a = turn_list_to_tuple(a)
     # a == (1, (2, 3), "abc")
@@ -152,7 +152,7 @@ def is_method_overridden(subclass, father, method):
     # type: (..., ..., str) -> bool
     """
     判断子类是否重写了父类的方法。
-    示例：
+    【示例】
     class A:
         def printIn(self, s):
             print s
@@ -179,7 +179,7 @@ def translate_time(sec):
     # type: (int) -> str
     """
     将秒数转换成h/m/s的格式。
-    示例：
+    【示例】
     translate_time(4000)     # "1h6m40s"
     -----------------------------------------------------------
     【sec: int】 秒数
@@ -203,7 +203,7 @@ def probability_true_i(n, d):
     # type: (int, int) -> bool
     """
     以指定概率返回True。（分数版本）
-    示例：
+    【示例】
     probability_true_i(2, 3)     # 2/3的概率返回True
     -----------------------------------------------------------
     【n: int】 概率分子
@@ -218,7 +218,7 @@ def probability_true_f(f):
     # type: (float) -> bool
     """
     以指定概率返回True。（浮点数版本）
-    示例：
+    【示例】
     probability_true_f(0.6)     # 0.6的概率返回True
     -----------------------------------------------------------
     【f: float】 概率，范围为[0, 1]

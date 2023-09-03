@@ -85,7 +85,7 @@ def change_player_item_count(playerId, posType=_ItemPosType.CARRIED, pos=0, chan
     # type: (str, int, int, int) -> None
     """
     改变玩家指定槽位物品的数量。（创造模式下不生效）
-    示例：
+    【示例】
     change_player_item_count(playerId)     # 玩家手持物品数量-1
     -----------------------------------------------------------
     【playerId: str】 玩家实体ID

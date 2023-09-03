@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-29
+#   Last Modified : 2023-09-02
 #
 # ====================================================
 
@@ -26,7 +26,7 @@ itemTipsBox
 
 -----
 
-使用方法：
+【使用方法】
 
 1、将NyItemTipsBox.json放到资源包的ui文件夹内，然后在_ui_def.json中填入"ui/NyItemTipsBox.json"。
 
@@ -36,7 +36,7 @@ itemTipsBox
 
 -----
 
-注意事项：
+【注意事项】
 
 1、目前暂不支持通过堆栈管理方式创建的UI。
 
@@ -45,6 +45,10 @@ itemTipsBox
 
 import mod.client.extraClientApi as _clientApi
 from ...utils.item import is_empty_item as _is_empty_item
+from ..clientComps import (
+    LevelComps as _LevelComps,
+    ScreenNode as _ScreenNode,
+)
 
 
 __all__ = [
@@ -52,14 +56,7 @@ __all__ = [
 ]
 
 
-_ScreenNode = _clientApi.GetScreenNodeCls()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_LEVEL_ID = _clientApi.GetLevelId()
-_ItemComp = _ClientCompFactory.CreateItem(_LEVEL_ID)
-_GameComp = _ClientCompFactory.CreateGame(_LEVEL_ID)
-
-
-_PATH = __file__[:-3].replace("/", ".") if "/" in __file__ else __file__
+_PATH = __file__.replace(".py", "").replace("/", ".") if "/" in __file__ else __file__
 _NAMESPACE = "NuoyanLib"
 _UI_NAME_ITEM_TIPS_BOX = "NyItemTipsBox"
 _UI_PATH_ITEM_TIPS_BOX = _PATH + "._ItemTipsBoxUI"
@@ -75,7 +72,7 @@ class ItemTipsBox(_ScreenNode):
 
     -----
 
-    接口一览：
+    【接口一览】
 
     1、ShowItemHoverTipsBox：显示物品悬浮文本框。
 
@@ -173,7 +170,7 @@ class _ItemTipsBoxUI(_ScreenNode):
         if aux == -1:
             aux = 0
         userData = itemDict.get('userData')
-        text = _ItemComp.GetItemFormattedHoverText(name, aux, True, userData)
+        text = _LevelComps.Item.GetItemFormattedHoverText(name, aux, True, userData)
         self.ShowTipsBox(text)
 
     def ShowTipsBox(self, text):
@@ -185,26 +182,26 @@ class _ItemTipsBoxUI(_ScreenNode):
         self.tipsLabel.SetText(text)
         # 取消正在执行的timer
         if self.timer1:
-            _GameComp.CancelTimer(self.timer1)
+            _LevelComps.Game.CancelTimer(self.timer1)
         if self.timer2:
-            _GameComp.CancelTimer(self.timer2)
+            _LevelComps.Game.CancelTimer(self.timer2)
         # 一秒后执行渐出动画
         def func1():
             self.alphaTick = 30
             self.timer1 = None
-        self.timer1 = _GameComp.AddTimer(1, func1)
+        self.timer1 = _LevelComps.Game.AddTimer(1, func1)
         # 两秒后隐藏文本框并恢复初始状态
         def func2():
             self.HideTipsBox()
             self.timer2 = None
-        self.timer2 = _GameComp.AddTimer(2, func2)
+        self.timer2 = _LevelComps.Game.AddTimer(2, func2)
 
     def HideTipsBox(self):
         if self.timer1:
-            _GameComp.CancelTimer(self.timer1)
+            _LevelComps.Game.CancelTimer(self.timer1)
             self.timer1 = None
         if self.timer2:
-            _GameComp.CancelTimer(self.timer2)
+            _LevelComps.Game.CancelTimer(self.timer2)
             self.timer2 = None
         self.alphaTick = 0
         self.tipsImg.SetAlpha(1.0)

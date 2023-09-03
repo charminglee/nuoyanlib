@@ -1,6 +1,7 @@
 <h1 align="center" style="line-height: 0;">「nuoyanlib」</h1>
 <h1 align="center" style="line-height: 0;">🐱</h1>
 <h1 align="center" style="line-height: 0;">ModSDK开发工具</h1>
+<h2 align="center" style="line-height: 0.5;">v0.1.0-beta</h2>
 
 <br></br>
 
@@ -16,7 +17,9 @@
 「nuoyanlib」是基于我的世界中国版ModSDK开发的开源函数库，整合了众多开发中常用的算法，封装了部分常用的官方接口。  
 「nuoyanlib」目前仅由 _**诺言Nuoyan**_ 一人开发，所有代码均为原创。  
 「nuoyanlib」可供大家学习参考，也可以直接应用于您个人/团队的项目中，希望「nuoyanlib」能提高大家的代码编写效率以及更轻松地实现复杂的效果！  
-感谢大家支持作者、支持该项目，喜欢的话可以点个Star噢，您的支持是作者最大的动力！
+感谢大家支持作者、支持该项目，喜欢的话可以点个Star噢，您的支持是作者最大的动力！  
+
+**_兼容的ModSDK版本：2.8_**
 
 <br></br>
 
@@ -76,9 +79,18 @@
 ---
 
 1. 解压下载的文件，将`nuoyanlib`文件夹放至您的行为包根目录下（即`entities`文件夹所在目录）。
-2. 打开`nuoyanlib/_config.py`配置文件，将您的模组名称、客户端系统名称和服务端系统名称填入对应位置。 
+2. 打开`nuoyanlib/config.py`配置文件，将您的模组名称、客户端系统名称和服务端系统名称填入对应位置。 
     > **[注意]**  
-    请确保填入`_config.py`的信息与您的模组对应，否则部分功能将无法使用。
+    请确保填入`config.py`的信息与您的模组对应，否则部分功能将无法使用。
+    
+    ```python
+    # 在modMain注册时填写的模组名称（命名空间）
+    MOD_NAME = "MyMod"
+    # 客户端系统名称
+    CLIENT_SYSTEM_NAME = "MyClientSystem"
+    # 服务端系统名称
+    SERVER_SYSTEM_NAME = "MyServerSystem"
+    ```
 3. 随后在您的Python文件顶部导入「nuoyanlib」即可：
     ```python
     import nuoyanlib as nyl
@@ -91,6 +103,14 @@
 ---
 
 详见：https://gitee.com/charming-lee/nuoyanlib/tree/master/%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3
+
+<br></br>
+
+## 🎉 更新信息
+
+---
+
+更多信息详见：
 
 <br></br>
 

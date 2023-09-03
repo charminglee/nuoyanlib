@@ -115,7 +115,7 @@ def set_namespace(name, namespace="minecraft"):
     # type: (str, str) -> str
     """
     设置物品的命名空间。
-    示例：
+    【示例】
     set_namespace("apple")     # "minecraft:apple"
     set_namespace("apple", "nuoyan")     # "nuoyan:apple"
     set_namespace("minecraft:apple", "nuoyan")     # "nuoyan:apple"

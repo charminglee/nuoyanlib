@@ -204,7 +204,7 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
     # type: (str, int, str, str, int) -> ...
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
-    示例：
+    【示例】
     class MyServerSystem(ServerSystem):
         # 监听客户端传来的自定义事件
         @listen("MyCustomEvent")
@@ -261,7 +261,7 @@ class NuoyanServerSystem(_ServerSystem):
     2. homeownerPlayerId：房主玩家的实体ID；初始值为"-1"
     -----------------------------------------------------------
     【注意事项】
-    1. 带有*tick*标签的事件为帧事件，需要注意编写相关逻辑；
+    1. 带有 *[tick]* 标签的事件为帧事件，需要注意编写相关逻辑；
     2. 事件回调参数中，参数名前面的美元符号“$”表示该参数可进行修改。
     """
 

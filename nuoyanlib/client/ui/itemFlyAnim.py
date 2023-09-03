@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-29
+#   Last Modified : 2023-09-02
 #
 # ====================================================
 
@@ -26,7 +26,7 @@ itemFlyAnim
 
 -----
 
-使用方法：
+【使用方法】
 
 1、将NyItemFlyAnim.json放到资源包的ui文件夹内，然后在_ui_def.json中填入"ui/NyItemFlyAnim.json"。
 
@@ -36,7 +36,7 @@ itemFlyAnim
 
 -----
 
-注意事项：
+【注意事项】
 
 1、建议不要同时运行较多物品飞行动画，否则可能会造成性能问题。
 
@@ -47,6 +47,11 @@ itemFlyAnim
 
 import mod.client.extraClientApi as _clientApi
 from ...utils.item import is_empty_item as _is_empty_item
+from ..clientComps import (
+    ScreenNode as _ScreenNode,
+    ViewBinder as _ViewBinder,
+    LevelComps as _LevelComps,
+)
 
 
 __all__ = [
@@ -54,13 +59,7 @@ __all__ = [
 ]
 
 
-_ScreenNode = _clientApi.GetScreenNodeCls()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_GameComp = _ClientCompFactory.CreateGame(_clientApi.GetLevelId())
-_ViewBinder = _clientApi.GetViewBinderCls()
-
-
-_PATH = __file__[:-3].replace("/", ".") if "/" in __file__ else __file__
+_PATH = __file__.replace(".py", "").replace("/", ".") if "/" in __file__ else __file__
 _NAMESPACE = "NuoyanLib"
 _UI_NAME_ITEM_FLY_ANIM = "NyItemFlyAnim"
 _UI_PATH_ITEM_FLY_ANIM = _PATH + "._ItemFlyAnimUI"
@@ -75,7 +74,7 @@ class ItemFlyAnim(_ScreenNode):
 
     -----
 
-    接口一览：
+    【接口一览】
 
     1、SetOneItemFlyAnim：设置单个物品飞行动画。
 
@@ -106,9 +105,9 @@ class ItemFlyAnim(_ScreenNode):
         -----
 
         :param dict itemDict: 物品信息字典
-        :param tuple[float, float] fromPos: 动画起点坐标
-        :param tuple[float, float] toPos: 动画终点坐标
-        :param float|tuple[float, float] uiSize: 物品图标尺寸，传入float时，图标长宽均设置为该值，传入tuple时，图标长宽设置为该元组对应值
+        :param tuple[float,float] fromPos: 动画起点坐标
+        :param tuple[float,float] toPos: 动画终点坐标
+        :param float|tuple[float,float] uiSize: 物品图标尺寸，传入float时，图标长宽均设置为该值，传入tuple时，图标长宽设置为该元组对应值
 
         :return: 无
         :rtype: None
@@ -121,7 +120,7 @@ class ItemFlyAnim(_ScreenNode):
 
         -----
 
-        :param list[dict[str, Any]] itemAnimDataList: 动画数据列表，列表每个元素为一个字典，字典的key分别为itemDict、fromPos、toPos、uiSize，对应的value的含义与SetOneItemFlyAnim方法中的参数相同。
+        :param list[dict[str,Any]] itemAnimDataList: 动画数据列表，列表每个元素为一个字典，字典的key分别为itemDict、fromPos、toPos、uiSize，对应的value的含义与SetOneItemFlyAnim方法中的参数相同。
 
         :return: 无
         :rtype: None
@@ -196,7 +195,7 @@ class _ItemFlyAnimUI(_ScreenNode):
         ir.SetPosition(fromPos)
         ir.SetSize(uiSize if isinstance(uiSize, tuple) else (uiSize,) * 2)
         # 动画持续帧数
-        dur = int(_GameComp.GetFps() * 0.175)
+        dur = int(_LevelComps.Game.GetFps() * 0.175)
         # x轴上每帧的偏移量
         xOff = (toPos[0] - fromPos[0]) / dur
         # y轴上每帧的偏移量
@@ -212,7 +211,6 @@ class _ItemFlyAnimUI(_ScreenNode):
     def SetItemsFlyAnim(self, itemAnimDataList):
         for data in itemAnimDataList:
             self.SetOneItemFlyAnim(**data)
-
 
 
 

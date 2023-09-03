@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-09-02
 #
 # ====================================================
 
@@ -27,18 +27,13 @@ sound
 """
 
 
-import mod.client.extraClientApi as _clientApi
+from clientComps import LevelComps as _LevelComps
 
 
 __all__ = [
     "play_custom_sound",
     "stop_custom_sound",
 ]
-
-
-_LEVEL_ID = _clientApi.GetLevelId()
-_ClientCompFactory = _clientApi.GetEngineCompFactory()
-_CustomAudioComp = _ClientCompFactory.CreateCustomAudio(_LEVEL_ID)
 
 
 def play_custom_sound(soundName, pos=(0, 0, 0), volume=1.0, speed=1.0, isLoop=False, entityId=None):
@@ -57,7 +52,7 @@ def play_custom_sound(soundName, pos=(0, 0, 0), volume=1.0, speed=1.0, isLoop=Fa
     :return: 音效ID
     :rtype: str
     """
-    return _CustomAudioComp.PlayCustomMusic(soundName, pos, volume, speed, isLoop, entityId)
+    return _LevelComps.CustomAudio.PlayCustomMusic(soundName, pos, volume, speed, isLoop, entityId)
 
 
 def stop_custom_sound(soundId, fadeOutTime=0.0):
@@ -72,7 +67,7 @@ def stop_custom_sound(soundId, fadeOutTime=0.0):
     :return: 是否成功
     :rtype: bool
     """
-    return _CustomAudioComp.StopCustomMusicById(soundId, fadeOutTime)
+    return _LevelComps.CustomAudio.StopCustomMusicById(soundId, fadeOutTime)
 
 
 

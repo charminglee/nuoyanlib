@@ -54,7 +54,7 @@ class ServerTimer(object):
         """
         函数装饰器，用于函数的延迟执行。
         注：被装饰函数的返回值会变成ServerTimer实例。
-        示例：
+        【示例】
         @ServerTimer.Delay(2)
         def func(args):
             pass
@@ -75,7 +75,7 @@ class ServerTimer(object):
         """
         函数装饰器，用于函数的重复执行。
         注：被装饰函数的返回值会变成ServerTimer实例。
-        示例：
+        【示例】
         @ServerTimer.Repeat(2)
         def func(args):
             pass

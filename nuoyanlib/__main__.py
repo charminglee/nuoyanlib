@@ -12,13 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-06-02
+#   Last Modified : 2023-08-31
 #
 # ====================================================
 
 
 from utils import utils
-# from _config import MOD_NAME, CLIENT_SYSTEM_NAME, SERVER_SYSTEM_NAME
+# from config import MOD_NAME, CLIENT_SYSTEM_NAME, SERVER_SYSTEM_NAME
 
 
 def _test(module):

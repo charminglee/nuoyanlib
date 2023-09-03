@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-30
+#   Last Modified : 2023-08-31
 #
 # ====================================================
 
@@ -20,11 +20,18 @@
 from traceback import format_exc as _format_exc
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
+from config import (
+    MOD_NAME as _MOD_NAME,
+    CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
+    SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME,
+)
 
 
 __all__ = [
     "print_error",
     "ConfigError",
+    "ClientNotFoundError",
+    "ServerNotFoundError",
 ]
 
 
@@ -66,12 +73,29 @@ def print_error(modName=""):
 
 class ConfigError(Exception):
     """
-    未修改_config.py配置文件而抛出的异常。
+    未修改config.py配置文件而抛出的异常。
     """
 
     def __str__(self):
-        return "You haven't modified \"_config.py\"."
+        return "You haven't modified \"config.py\"."
 
+
+class ClientNotFoundError(Exception):
+    """
+    没有找到config.py中配置的客户端系统而抛出的异常。
+    """
+
+    def __str__(self):
+        return "MOD_NAME='%s', CLIENT_SYSTEM_NAME='%s'." % (_MOD_NAME, _CLIENT_SYSTEM_NAME)
+
+
+class ServerNotFoundError(Exception):
+    """
+    没有找到config.py中配置的服务端系统而抛出的异常。
+    """
+
+    def __str__(self):
+        return "MOD_NAME='%s', SERVER_SYSTEM_NAME='%s'." % (_MOD_NAME, _SERVER_SYSTEM_NAME)
 
 
 
