@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-01
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -36,8 +36,8 @@ from clientComps import (
     ViewRequest,
     PLAYER_ID,
     LEVEL_ID,
-    PlayerComps,
-    LevelComps,
+    ClientPlayerComps,
+    ClientLevelComps,
 )
 from effector import (
     NeteaseParticle,
@@ -79,8 +79,8 @@ __all__ = [
     "ViewRequest",
     "PLAYER_ID",
     "LEVEL_ID",
-    "PlayerComps",
-    "LevelComps",
+    "ClientPlayerComps",
+    "ClientLevelComps",
     "NeteaseParticle",
     "NeteaseFrameAnim",
     "listen_server",

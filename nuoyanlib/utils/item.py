@@ -12,12 +12,11 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
-from inspect import getargspec as _getargspec
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType

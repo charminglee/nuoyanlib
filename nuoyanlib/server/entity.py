@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-2
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -21,7 +21,15 @@ from copy import copy as _copy
 import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import EntityType as _EntityType
 from ..utils.calculator import pos_distance as _pos_distance
-from ..utils.vector import vector_p2p as _vector_p2p, composite_vector as _composite_vector
+from ..utils.vector import (
+    vector_p2p as _vector_p2p,
+    composite_vector as _composite_vector,
+)
+from serverComps import (
+    CompFactory as _CompFactory,
+    ServerSystem as _ServerSystem,
+    ServerLevelComps as _ServerLevelComps,
+)
 
 
 __all__ = [
@@ -50,13 +58,6 @@ __all__ = [
 ]
 
 
-_LEVEL_ID = _serverApi.GetLevelId()
-_ServerCompFactory = _serverApi.GetEngineCompFactory()
-_LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
-_LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
-_ServerSystem = _serverApi.GetServerSystemCls()
-
-
 def clear_effects(entityId):
     # type: (str) -> None
     """
@@ -66,7 +67,7 @@ def clear_effects(entityId):
     -----------------------------------------------------------
     NoReturn
     """
-    comp = _ServerCompFactory.CreateEffect(entityId)
+    comp = _CompFactory.CreateEffect(entityId)
     effects = comp.GetAllEffects()
     if not effects:
         return
@@ -113,15 +114,15 @@ def attract_entities(pos, dim, radius, power, filterIdList=None, filterTypeIdLis
     ents = get_entities_in_area(pos, radius, dim, filterIdList, filterTypeIdList, filterTypeStrList, filterAbiotic)
     res = []
     for eid in ents:
-        epos = _ServerCompFactory.CreatePos(eid).GetFootPos()
+        epos = _CompFactory.CreatePos(eid).GetFootPos()
         if not epos:
             continue
-        comp = _ServerCompFactory.CreateActorMotion(eid)
+        comp = _CompFactory.CreateActorMotion(eid)
         origMotion = comp.GetMotion()
         vec = _vector_p2p(epos, pos)
         vec = tuple(i * power for i in vec)
         resMotion = _composite_vector(origMotion, vec)
-        etype = _ServerCompFactory.CreateEngineType(eid).GetEngineType()
+        etype = _CompFactory.CreateEngineType(eid).GetEngineType()
         if etype == _EntityType.Player:
             if comp.SetPlayerMotion(resMotion):
                 res.append(eid)
@@ -140,7 +141,7 @@ def is_mob(entityId):
     -----------------------------------------------------------
     return: bool -> 是生物返回True，否则返回False
     """
-    typeStr = _ServerCompFactory.CreateEngineType(entityId).GetEngineType()
+    typeStr = _CompFactory.CreateEngineType(entityId).GetEngineType()
     return typeStr & _EntityType.Mob == _EntityType.Mob
 
 
@@ -198,10 +199,10 @@ def entity_filter(entityList, *args):
     return: List[str] -> 过滤后的实体ID列表
     """
     def _filter(eid):
-        entPos = _ServerCompFactory.CreatePos(eid).GetFootPos()
-        entType = _ServerCompFactory.CreateEngineType(eid).GetEngineType()
-        entTypeStr = _ServerCompFactory.CreateEngineType(eid).GetEngineTypeStr()
-        entDim = str(_ServerCompFactory.CreateDimension(eid).GetEntityDimensionId())
+        entPos = _CompFactory.CreatePos(eid).GetFootPos()
+        entType = _CompFactory.CreateEngineType(eid).GetEngineType()
+        entTypeStr = _CompFactory.CreateEngineType(eid).GetEngineTypeStr()
+        entDim = str(_CompFactory.CreateDimension(eid).GetEntityDimensionId())
         if not entPos:
             return False
         for arg in args:
@@ -249,7 +250,7 @@ def is_entity_type(entityId, typeId):
     -----------------------------------------------------------
     return: bool -> 是则返回True，否则返回False
     """
-    et = _ServerCompFactory.CreateEngineType(entityId).GetEngineType()
+    et = _CompFactory.CreateEngineType(entityId).GetEngineType()
     return et & typeId == typeId
 
 
@@ -267,7 +268,7 @@ def sort_entity_list_by_distance(pos, entityList):
         return []
     notExist = []
     def func(eid):
-        ep = _ServerCompFactory.CreatePos(eid).GetFootPos()
+        ep = _CompFactory.CreatePos(eid).GetFootPos()
         if not ep:
             notExist.append(eid)
         return _pos_distance(ep, pos)
@@ -296,12 +297,12 @@ def launch_projectile(projectileName, spawnerId, power=None, damage=None, positi
     return: str -> 抛射物ID；创建失败返回"-1"
     """
     if not position:
-        position = _ServerCompFactory.CreatePos(spawnerId).GetFootPos()
+        position = _CompFactory.CreatePos(spawnerId).GetFootPos()
         if not position:
             return "-1"
         position = (position[0], position[1] + 1.6, position[2])
     if not direction:
-        rot = _ServerCompFactory.CreateRot(spawnerId).GetRot()
+        rot = _CompFactory.CreateRot(spawnerId).GetRot()
         if not rot:
             return "-1"
         direction = _serverApi.GetDirFromRot(rot)
@@ -320,7 +321,7 @@ def launch_projectile(projectileName, spawnerId, power=None, damage=None, positi
         param['gravity'] = gravity
     if targetId:
         param['targetId'] = targetId
-    return _LevelProjectileComp.CreateProjectileEntity(spawnerId, projectileName, param)
+    return _ServerLevelComps.Projectile.CreateProjectileEntity(spawnerId, projectileName, param)
 
 
 def entity_plunge(entityId1, entityId2, speed):
@@ -334,7 +335,7 @@ def entity_plunge(entityId1, entityId2, speed):
     -----------------------------------------------------------
     NoReturn
     """
-    rot = _ServerCompFactory.CreateRot(entityId2).GetRot()
+    rot = _CompFactory.CreateRot(entityId2).GetRot()
     if not rot:
         return
     entity_plunge_by_rot(entityId1, rot, speed)
@@ -352,8 +353,8 @@ def entity_plunge_by_dir(entityId, direction, speed):
     return: Tuple[float, float, float] -> 突进速度向量
     """
     motion = tuple(map(lambda x: x * speed, direction))
-    comp = _ServerCompFactory.CreateActorMotion(entityId)
-    etype = _ServerCompFactory.CreateEngineType(entityId).GetEngineType()
+    comp = _CompFactory.CreateActorMotion(entityId)
+    etype = _CompFactory.CreateEngineType(entityId).GetEngineType()
     if etype == _EntityType.Player:
         comp.SetPlayerMotion(motion)
     else:
@@ -408,9 +409,11 @@ def get_entities_in_area(pos, radius, dimension=0, filterIdList=None, filterType
         return []
     startPos = tuple(i - radius for i in pos)
     endPos = tuple(i + radius for i in pos)
-    entities = _LevelGameComp.GetEntitiesInSquareArea(None, startPos, endPos, dimension)
+    entities = _ServerLevelComps.Game.GetEntitiesInSquareArea(None, startPos, endPos, dimension)
     fa = {_EntityType.Mob} if filterAbiotic else None
-    entities = entity_filter(entities, (pos, radius), fa, filterIdList, filterTypeIdList, filterTypeStrList)
+    entities = entity_filter(
+        entities, (pos, radius), fa, filterIdList, filterTypeIdList, filterTypeStrList
+    )
     return entities
 
 
@@ -429,7 +432,7 @@ def get_entities_by_type(typeId, pos=None, dimension=0, radius=0.0):
     if pos:
         startPos = tuple(i - radius for i in pos)
         endPos = tuple(i + radius for i in pos)
-        entities = _LevelGameComp.GetEntitiesInSquareArea(None, startPos, endPos, dimension)
+        entities = _ServerLevelComps.Game.GetEntitiesInSquareArea(None, startPos, endPos, dimension)
         entities = entity_filter(entities, {typeId}, (pos, radius))
     else:
         entities = get_all_entities()
@@ -448,7 +451,7 @@ def get_entities_by_name(name):
     """
     result = []
     for i in get_all_entities():
-        en = _ServerCompFactory.CreateName(i).GetName()
+        en = _CompFactory.CreateName(i).GetName()
         if en == name:
             result.append(i)
     return result
@@ -466,7 +469,7 @@ def get_entities_by_locking(entityId, getDistance=-1, filterIdList=None, filterT
     -----------------------------------------------------------
     return: List[str] -> 实体ID列表
     """
-    pos = _ServerCompFactory.CreatePos(entityId).GetFootPos()
+    pos = _CompFactory.CreatePos(entityId).GetFootPos()
     if not pos:
         return []
     if filterIdList is None:
@@ -477,7 +480,7 @@ def get_entities_by_locking(entityId, getDistance=-1, filterIdList=None, filterT
     ents = entity_filter(ents, r, _EntityType.Mob, filterIdList, filterTypeIdList)
     result = []
     for eid in ents:
-        target = _ServerCompFactory.CreateAction(eid).GetAttackTarget()
+        target = _CompFactory.CreateAction(eid).GetAttackTarget()
         if target == entityId:
             result.append(eid)
     return result
@@ -499,8 +502,8 @@ def get_nearest_entity(obj, count=1, dim=0, radius=-1.0, filterIdList=None, filt
     return: Union[str, List[str], None] -> 若count==1，返回实体ID；若count>1，返回实体ID列表；获取不到实体返回None
     """
     if isinstance(obj, str):
-        pos = _ServerCompFactory.CreatePos(obj).GetFootPos()
-        dim = _ServerCompFactory.CreateDimension(obj).GetEntityDimensionId()
+        pos = _CompFactory.CreatePos(obj).GetFootPos()
+        dim = _CompFactory.CreateDimension(obj).GetEntityDimensionId()
         if filterIdList is None:
             filterIdList = []
         filterIdList = _copy(filterIdList)
@@ -536,7 +539,7 @@ def attack_nearest_mob(entityId, r=15.0, filterIdList=None, filterTypeIdList=Non
         entityId, radius=r, filterIdList=filterIdList, filterTypeIdList=filterTypeIdList, filterAbiotic=True
     )
     if nearest:
-        _ServerCompFactory.CreateAction(entityId).SetAttackTarget(nearest)
+        _CompFactory.CreateAction(entityId).SetAttackTarget(nearest)
     return nearest
 
 
@@ -550,7 +553,7 @@ def has_effect(entityId, effectId):
     -----------------------------------------------------------
     return: bool -> 存在返回True，否则返回False
     """
-    effects = _ServerCompFactory.CreateEffect(entityId).GetAllEffects()
+    effects = _CompFactory.CreateEffect(entityId).GetAllEffects()
     for effDict in effects:
         if effDict['effectName'] == effectId:
             return True
@@ -569,10 +572,10 @@ def set_entity_motion(entity, motion, serSysCls=None):
     -----------------------------------------------------------
     NoReturn
     """
-    t = _ServerCompFactory.CreateEngineType(entity).GetEngineType()
+    t = _CompFactory.CreateEngineType(entity).GetEngineType()
     if t == _EntityType.Player and serSysCls:
         serSysCls.NotifyToClient(entity, "_SetMotion", motion)
-    _ServerCompFactory.CreateActorMotion(entity).SetMotion(motion)
+    _CompFactory.CreateActorMotion(entity).SetMotion(motion)
 
 
 

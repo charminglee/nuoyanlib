@@ -12,17 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-02-11
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as _serverApi
+from serverComps import ServerLevelComps as _ServerLevelComps
 
 
-_ServerCompFactory = _serverApi.GetEngineCompFactory()
-_LEVEL_ID = _serverApi.GetLevelId()
-_LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
+__all__ = [
+    "place_large_structure",
+]
 
 
 def place_large_structure(self, pos, dimensionId, jsonList, namespace):
@@ -43,7 +43,9 @@ def place_large_structure(self, pos, dimensionId, jsonList, namespace):
         thisPos = i['pos']
         placePos = tuple(pos[p] + thisPos[p] - orgPos[p] for p in range(3))
         structureName = "%s:%s" % (namespace, name)
-        result[structureName] = _LevelGameComp.PlaceStructure(None, placePos, structureName, dimensionId)
+        result[structureName] = _ServerLevelComps.Game.PlaceStructure(
+            None, placePos, structureName, dimensionId
+        )
     return result
 
 

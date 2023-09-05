@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -103,7 +103,7 @@ from ...config import (
 from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl as _ButtonUIControl
 from ...mctypes.client.ui.controls.progressBarUIControl import ProgressBarUIControl as _ProgressBarUIControl
 from uiutils import get_grid_direct_children as _get_grid_direct_children
-from ..clientComps import LevelComps as _LevelComps
+from ..clientComps import ClientLevelComps as _ClientLevelComps
 
 
 __all__ = [
@@ -459,7 +459,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
             return
         name = itemDict['newItemName']
         aux = itemDict.get('newAuxValue', 0)
-        maxStack = _LevelComps.Item.GetItemBasicInfo(name, aux)['maxStackSize']
+        maxStack = _ClientLevelComps.Item.GetItemBasicInfo(name, aux)['maxStackSize']
         if itemDict['count'] < maxStack:
             self.MergeItems(bp)
         self.SetSelectedItem(bp, False)
@@ -561,7 +561,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         itemName = itemDict['newItemName']
         aux = itemDict.get('newAuxValue', 0)
         isEnchanted = bool(itemDict.get('enchantData') or itemDict.get('modEnchantData'))
-        basicInfo = _LevelComps.Item.GetItemBasicInfo(itemName, aux, isEnchanted)
+        basicInfo = _ClientLevelComps.Item.GetItemBasicInfo(itemName, aux, isEnchanted)
         maxDurability = basicInfo['maxDurability']
         if durability <= 0 or durability >= maxDurability:
             durCtrl.SetVisible(False)
@@ -1373,7 +1373,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
                 keys = (keys,)
             if not all(i in self._gridKeys for i in keys):
                 return False
-        _LevelComps.Game.AddTimer(0, self._initItemGrids, keys, finishedFunc, args, kwargs)
+        _ClientLevelComps.Game.AddTimer(0, self._initItemGrids, keys, finishedFunc, args, kwargs)
         return True
 
     def _initItemGrids(self, keys, finishedFunc, args, kwargs):

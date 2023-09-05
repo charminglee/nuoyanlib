@@ -12,15 +12,24 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-07-03
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
 from collections import Sequence as _Sequence
 from random import randint as _randint
-from math import atan as _atan, degrees as _degrees, atan2 as _atan2, sqrt as _sqrt, pi as _pi, sin as _sin, \
-    cos as _cos, fmod as _fmod, floor as _floor
+from math import (
+    atan as _atan,
+    degrees as _degrees,
+    atan2 as _atan2,
+    sqrt as _sqrt,
+    pi as _pi,
+    sin as _sin,
+    cos as _cos,
+    fmod as _fmod,
+    floor as _floor,
+)
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
 

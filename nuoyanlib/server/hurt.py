@@ -12,20 +12,32 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-07-26
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
 from collections import Callable as _Callable
 from copy import copy as _copy
-import mod.server.extraServerApi as _serverApi
-from mod.common.minecraftEnum import EntityType as _EntityType, AttrType as _AttrType, \
-    ActorDamageCause as _ActorDamageCause
-from ..utils.calculator import is_in_sector as _is_in_sector, pos_distance_to_line as _pos_distance_to_line
-from ..utils.vector import angle_between_vectors as _angle_between_vectors
-from entity import entity_filter as _entity_filter, get_entities_in_area as _get_entities_in_area, \
-    get_all_entities as _get_all_entities
+from mod.common.minecraftEnum import (
+    EntityType as _EntityType,
+    AttrType as _AttrType,
+    ActorDamageCause as _ActorDamageCause,
+)
+from ..utils.calculator import (
+    is_in_sector as _is_in_sector,
+    pos_distance_to_line as _pos_distance_to_line,
+)
+from ..utils.vector import vector_angle as _vector_angle
+from entity import (
+    entity_filter as _entity_filter,
+    get_entities_in_area as _get_entities_in_area,
+    get_all_entities as _get_all_entities,
+)
+from serverComps import (
+    CompFactory as _CompFactory,
+    ServerLevelComps as _ServerLevelComps,
+)
 
 
 __all__ = [
@@ -38,14 +50,6 @@ __all__ = [
     "percent_damage",
     "line_damage",
 ]
-
-
-_LEVEL_ID = _serverApi.GetLevelId()
-_ServerCompFactory = _serverApi.GetEngineCompFactory()
-_LevelProjectileComp = _ServerCompFactory.CreateProjectile(_LEVEL_ID)
-_LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
-_LevelExplosionComp = _ServerCompFactory.CreateExplosion(_LEVEL_ID)
-_ServerSystem = _serverApi.GetServerSystemCls()
 
 
 def explode_hurt(radius, pos, sourceId, playerId, fire=False, breaks=True, tileDrops=True, mobLoot=True,
@@ -65,15 +69,15 @@ def explode_hurt(radius, pos, sourceId, playerId, fire=False, breaks=True, tileD
     -----------------------------------------------------------
     NoReturn
     """
-    origRule = _LevelGameComp.GetGameRulesInfoServer()
-    _LevelGameComp.SetGameRulesInfoServer({'option_info': {'tile_drops': tileDrops, 'mob_loot': mobLoot}})
-    comp = _ServerCompFactory.CreateHurt(playerId)
+    origRule = _ServerLevelComps.Game.GetGameRulesInfoServer()
+    _ServerLevelComps.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tileDrops, 'mob_loot': mobLoot}})
+    comp = _CompFactory.CreateHurt(playerId)
     try:
         if not hurtPlayer:
             comp.ImmuneDamage(True)
-        _LevelExplosionComp.CreateExplosion(pos, radius, fire, breaks, sourceId, playerId)
+        _ServerLevelComps.Explosion.CreateExplosion(pos, radius, fire, breaks, sourceId, playerId)
     finally:
-        _LevelGameComp.SetGameRulesInfoServer(origRule)
+        _ServerLevelComps.Game.SetGameRulesInfoServer(origRule)
         if not hurtPlayer:
             comp.ImmuneDamage(False)
 
@@ -115,13 +119,13 @@ def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttac
     )
     hurtEnt = []
     for eid in entities:
-        ep = _ServerCompFactory.CreatePos(eid).GetFootPos()
+        ep = _CompFactory.CreatePos(eid).GetFootPos()
         dis = _pos_distance_to_line(ep, startPos, endPos)
         if dis > radius:
             continue
         v1 = tuple(a - b for a, b in zip(startPos, ep))
         v2 = tuple(a - b for a, b in zip(endPos, ep))
-        if _angle_between_vectors(v1, v2) < 1.57:
+        if _vector_angle(v1, v2) < 1.57:
             continue
         if funcBeforeHurt:
             retEid = funcBeforeHurt(eid, attackerId, childAttackerId)
@@ -187,7 +191,7 @@ def aoe_damage(damage, radius, pos, dim, attackerId="", childAttackerId="", caus
         filterIdList.append(attackerId)
     startPos = tuple(i - radius for i in pos)
     endPos = tuple(i + radius for i in pos)
-    entities = _LevelGameComp.GetEntitiesInSquareArea(None, startPos, endPos, dim)
+    entities = _ServerLevelComps.Game.GetEntitiesInSquareArea(None, startPos, endPos, dim)
     entities = _entity_filter(entities, (pos, radius), {_EntityType.Mob}, filterIdList, filterTypeIdList)
     hurtEnt = []
     for eid in entities:
@@ -225,13 +229,13 @@ def sector_aoe_damage(attackerId, sectorRadius, sectorAngle, damage, knocked=Tru
         filterIdList = []
     filterIdList = _copy(filterIdList)
     filterIdList.append(attackerId)
-    attackerPos = _ServerCompFactory.CreatePos(attackerId).GetFootPos()
-    attackerRot = _ServerCompFactory.CreateRot(attackerId).GetRot()[1]
-    dim = _ServerCompFactory.CreateDimension(attackerId).GetEntityDimensionId()
+    attackerPos = _CompFactory.CreatePos(attackerId).GetFootPos()
+    attackerRot = _CompFactory.CreateRot(attackerId).GetRot()[1]
+    dim = _CompFactory.CreateDimension(attackerId).GetEntityDimensionId()
     entityList = _get_entities_in_area(attackerPos, sectorRadius, dim, filterIdList, filterTypeIdList, True)
     result = []
     for eid in entityList:
-        pos = _ServerCompFactory.CreatePos(eid).GetFootPos()
+        pos = _CompFactory.CreatePos(eid).GetFootPos()
         test = _is_in_sector((pos[0], attackerPos[1], pos[2]), attackerPos, sectorRadius, sectorAngle, attackerRot)
         if test:
             hurt(eid, damage, "entity_attack", attackerId, "", knocked, force)
@@ -262,7 +266,7 @@ def rectangle_aoe_damage(topPos1, topPos2, dim, damage, attackerId="", knocked=T
     if attackerId:
         filterIdList.append(attackerId)
     result = []
-    entitiesList = _LevelGameComp.GetEntitiesInSquareArea(None, topPos1, topPos2, dim)
+    entitiesList = _ServerLevelComps.Game.GetEntitiesInSquareArea(None, topPos1, topPos2, dim)
     entitiesList = _entity_filter(entitiesList, _EntityType.Mob, filterIdList, filterTypeIdList)
     for eid in entitiesList:
         hurt(eid, damage, "entity_attack", attackerId, "", knocked, force)
@@ -280,7 +284,7 @@ def hurt_by_set_health(entityId, damage):
     -----------------------------------------------------------
     NoReturn
     """
-    attr = _ServerCompFactory.CreateAttr(entityId)
+    attr = _CompFactory.CreateAttr(entityId)
     health = attr.GetAttrValue(_AttrType.HEALTH)
     newHealth = int(health) - int(damage)
     attr.SetAttrValue(_AttrType.HEALTH, newHealth)
@@ -301,7 +305,7 @@ def hurt(entityId, damage, cause=_ActorDamageCause.NONE, attacker="", childAttac
     -----------------------------------------------------------
     NoReturn
     """
-    hurtResult = _ServerCompFactory.CreateHurt(entityId).Hurt(int(damage), cause, attacker, childAttackerId, knocked)
+    hurtResult = _CompFactory.CreateHurt(entityId).Hurt(int(damage), cause, attacker, childAttackerId, knocked)
     if not hurtResult and force:
         hurt_by_set_health(entityId, damage)
 
@@ -333,7 +337,7 @@ def percent_damage(entityId, percent, typeName, cause=_ActorDamageCause.NONE, at
     # 对生物造成攻击者攻击力两倍的伤害
     percent_damage(entityId, 2.0, "attacker_damage", attacker=attackerId)
     """
-    attr = _ServerCompFactory.CreateAttr(entityId)
+    attr = _CompFactory.CreateAttr(entityId)
     value = 0
     if typeName == "max_health":
         value = attr.GetAttrMaxValue(_AttrType.HEALTH)
@@ -342,7 +346,7 @@ def percent_damage(entityId, percent, typeName, cause=_ActorDamageCause.NONE, at
     elif typeName == "hunger":
         value = attr.GetAttrValue(_AttrType.HUNGER)
     elif typeName == "attacker_damage" and attacker:
-        value = _ServerCompFactory.CreateAttr(attacker).GetAttrValue(_AttrType.DAMAGE)
+        value = _CompFactory.CreateAttr(attacker).GetAttrValue(_AttrType.DAMAGE)
     if value > 0:
         damage = int(value * percent)
         if damage > 999999999:

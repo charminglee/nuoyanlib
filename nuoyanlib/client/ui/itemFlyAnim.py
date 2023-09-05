@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -50,7 +50,7 @@ from ...utils.item import is_empty_item as _is_empty_item
 from ..clientComps import (
     ScreenNode as _ScreenNode,
     ViewBinder as _ViewBinder,
-    LevelComps as _LevelComps,
+    ClientLevelComps as _ClientLevelComps,
 )
 
 
@@ -195,7 +195,7 @@ class _ItemFlyAnimUI(_ScreenNode):
         ir.SetPosition(fromPos)
         ir.SetSize(uiSize if isinstance(uiSize, tuple) else (uiSize,) * 2)
         # 动画持续帧数
-        dur = int(_LevelComps.Game.GetFps() * 0.175)
+        dur = int(_ClientLevelComps.Game.GetFps() * 0.175)
         # x轴上每帧的偏移量
         xOff = (toPos[0] - fromPos[0]) / dur
         # y轴上每帧的偏移量

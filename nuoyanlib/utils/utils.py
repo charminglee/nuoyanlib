@@ -12,14 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-11
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
-from collections import Mapping as _Mapping, Sequence as _Sequence
+from collections import Sequence as _Sequence
 from re import match as _match
-from random import randint as _randint, uniform as _uniform
+from random import (
+    randint as _randint,
+    uniform as _uniform,
+)
 
 
 __all__ = [

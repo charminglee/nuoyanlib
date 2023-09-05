@@ -68,7 +68,7 @@
 
 - [**utils（通用工具库）**](/nuoyanlib/utils)  
 
-  > 包含calculator、enum、error、item、mcRandom、utils、vector模块。
+  > 包含calculator、enum、error、item、random、utils、vector模块。
 
   提供了多种数学计算函数、更多的枚举值等实用工具。
 
@@ -109,6 +109,8 @@
 ## 🎉 更新信息
 
 ---
+
+【v0.1.0-beta】
 
 更多信息详见：
 

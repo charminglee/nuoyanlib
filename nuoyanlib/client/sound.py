@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -27,7 +27,7 @@ sound
 """
 
 
-from clientComps import LevelComps as _LevelComps
+from clientComps import ClientLevelComps as _ClientLevelComps
 
 
 __all__ = [
@@ -52,7 +52,7 @@ def play_custom_sound(soundName, pos=(0, 0, 0), volume=1.0, speed=1.0, isLoop=Fa
     :return: 音效ID
     :rtype: str
     """
-    return _LevelComps.CustomAudio.PlayCustomMusic(soundName, pos, volume, speed, isLoop, entityId)
+    return _ClientLevelComps.CustomAudio.PlayCustomMusic(soundName, pos, volume, speed, isLoop, entityId)
 
 
 def stop_custom_sound(soundId, fadeOutTime=0.0):
@@ -67,7 +67,7 @@ def stop_custom_sound(soundId, fadeOutTime=0.0):
     :return: 是否成功
     :rtype: bool
     """
-    return _LevelComps.CustomAudio.StopCustomMusicById(soundId, fadeOutTime)
+    return _ClientLevelComps.CustomAudio.StopCustomMusicById(soundId, fadeOutTime)
 
 
 

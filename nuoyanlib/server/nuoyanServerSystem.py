@@ -12,17 +12,26 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-30
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
 from types import MethodType as _MethodType
 from collections import Callable as _Callable
-from ..utils.utils import is_method_overridden as _is_method_overridden
-from ..config import CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 import mod.server.extraServerApi as _serverApi
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
+from ..utils.utils import is_method_overridden as _is_method_overridden
+from ..config import (
+    CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
+    MOD_NAME as _MOD_NAME,
+)
+from serverComps import (
+    CompFactory as _CompFactory,
+    ENGINE_NAMESPACE as _ENGINE_NAMESPACE,
+    ENGINE_SYSTEM_NAME as _ENGINE_SYSTEM_NAME,
+    ServerSystem as _ServerSystem,
+)
 
 
 __all__ = [
@@ -30,14 +39,6 @@ __all__ = [
     "NuoyanServerSystem",
     "ALL_ENGINE_EVENTS",
 ]
-
-
-_ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
-_ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
-_LEVEL_ID = _serverApi.GetLevelId()
-_ServerSystem = _serverApi.GetServerSystemCls()
-_CompFactory = _serverApi.GetEngineCompFactory()
-_LevelGameComp = _CompFactory.CreateGame(_LEVEL_ID)
 
 
 ALL_ENGINE_EVENTS = [
@@ -282,7 +283,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         self.UnListenAllEvents()
 
-    # todo:==================================== Engine Event Callback ==================================================
+    # ==================================== Engine Event Callback =============================================
 
     def lobbyGoodBuySucServerEvent(self, args):
         """
@@ -357,9 +358,9 @@ class NuoyanServerSystem(_ServerSystem):
         储物容器(箱子，潜影箱)，熔炉，酿造台，发射器，投掷器，漏斗，炼药锅，唱片机，高炉，烟熏炉中物品发生变化不会触发此事件，此类容器可通过ContainerItemChangedServerEvent监听。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
-        【slot: int】 容器槽位，含义见：PlayerUISlot枚举
-        【oldItemDict: dict】 旧物品信息字典
-        【newItemDict: dict】 生成的物品信息字典
+        【slot: int】 容器槽位，含义见： `PlayerUISlot枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerUISlot.html>`_
+        【oldItemDict: dict】 旧 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【newItemDict: dict】 生成的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         """
 
     def ShearsUseToBlockBeforeServerEvent(self, args):
@@ -388,7 +389,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         【entityId: str】 物品的实体ID
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【$cancel: bool】 设置为True时将取消本次拾取
         【pickupDelay: int】 取消拾取后重新设置该物品的拾取cd，小于15帧将视作15帧，大于等于97813帧将视作无法拾取
         """
@@ -400,7 +401,7 @@ class NuoyanServerSystem(_ServerSystem):
         ServerItemTryUseEvent/ClientItemTryUseEvent不能取消对方块使用物品的行为，如使用生物蛋，使用桶倒出/收集，使用打火石点燃草等；如果想要取消这种行为，请使用ClientItemUseOnEvent和ServerItemUseOnEvent。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【$cancel: bool】 设为True可取消物品的使用
         """
 
@@ -419,7 +420,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         【sourceId: str】 伤害来源实体ID，没有实体返回"-1"
-        【itemDict: dict】 盾牌物品字典物品信息字典
+        【itemDict: dict】 盾牌 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【damage: dict】 抵挡的伤害数值
         """
 
@@ -429,7 +430,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         【sourceId: str】 伤害来源实体ID，没有实体返回"-1"
-        【itemDict: dict】 盾牌物品字典物品信息字典
+        【itemDict: dict】 盾牌 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【damage: dict】 抵挡的伤害数值
         """
 
@@ -439,7 +440,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         【isActive: str】 True:尝试激活，False:尝试取消激活
-        【itemDict: dict】 盾牌物品的物品信息字典
+        【itemDict: dict】 盾牌 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【cancelable: dict】 是否可以取消。如果玩家在潜行状态切换盾牌，则无法取消
         【$cancel: bool】 是否取消这次激活
         """
@@ -450,8 +451,8 @@ class NuoyanServerSystem(_ServerSystem):
         当原有的物品槽内容为空时，oldItemName值为'minecraft:air'，且oldItem其余字段不存在。
         当切换原有物品，且新物品为空时，参数值同理。
         -----------------------------------------------------------
-        【oldArmorDict: Optional[dict]】 旧物品的物品信息字典，当旧物品为空时，此项属性为None
-        【newArmorDict: Optional[dict]】 新物品的物品信息字典，当新物品为空时，此项属性为None
+        【oldArmorDict: Optional[dict]】 旧物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_，当旧物品为空时，此项属性为None
+        【newArmorDict: Optional[dict]】 新物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_，当新物品为空时，此项属性为None
         【playerId: str】 玩家的实体ID
         """
 
@@ -459,11 +460,12 @@ class NuoyanServerSystem(_ServerSystem):
         """
         玩家切换盔甲时触发该事件。
         当玩家登录时，每个盔甲槽位会触发两次该事件，第一次为None切换到身上的装备，第二次的old和new都为身上装备。如果槽位为空，则是触发两次从None切换到None的事件。
+        注意：避免在该事件回调中对玩家修改盔甲栏装备，如 `SetEntityItem <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%83%8C%E5%8C%85.html#setentityitem>`_ 接口，会导致事件循环触发造成堆栈溢出。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         【slot: int】 槽位ID
-        【oldArmorDict: Optional[dict]】 旧装备的物品信息字典，当旧装备为空时，此项属性为None
-        【newArmorDict: Optional[dict]】 新装备的物品信息字典，当新装备为空时，此项属性为None
+        【oldArmorDict: Optional[dict]】 旧装备的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_，当旧装备为空时，此项属性为None
+        【newArmorDict: Optional[dict]】 新装备的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_，当新装备为空时，此项属性为None
         """
 
     def OnItemPutInEnchantingModelServerEvent(self, args):
@@ -483,11 +485,11 @@ class NuoyanServerSystem(_ServerSystem):
         在ServerItemUseOnEvent和原版物品使用事件（例如StartUsingItemClientEvent）之后触发。
         -----------------------------------------------------------
         【entityId: str】 实体ID
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【x: int】 方块x坐标
         【y: int】 方块y坐标
         【z: int】 方块z坐标
-        【face: int】 点击方块的面，参考Facing枚举
+        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
         【clickX: float】 点击点的x比例位置
         【clickY: float】 点击点的y比例位置
         【clickZ: float】 点击点的z比例位置
@@ -502,7 +504,7 @@ class NuoyanServerSystem(_ServerSystem):
         做出使用物品这个动作之后触发，一些需要蓄力的物品使用事件(ActorUseItemServerEvent)会在之后触发。如投掷三叉戟，先触发本事件，投出去之后再触发ActorUseItemServerEvent。
         -----------------------------------------------------------
         【entityId: str】 玩家的实体ID
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         """
 
     def ItemReleaseUsingServerEvent(self, args):
@@ -511,9 +513,10 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         【durationLeft: float】 蓄力剩余时间(当物品缺少"minecraft:maxduration"组件时,蓄力剩余时间为负数)
-        【itemDict: dict】 使用的物品的物品信息字典
+        【itemDict: dict】 使用的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【maxUseDuration: int】 最大蓄力时长
         【$cancel: bool】 设置为True可以取消，需要同时取消客户端事件ItemReleaseUsingClientEvent
+        【$changeItem: bool】 如果要在该事件的回调中修改当前使用槽位的物品，需设置这个参数为True，否则将修改物品失败，例如修改耐久度或者替换成新物品
         """
 
     def InventoryItemChangedServerEvent(self, args):
@@ -526,8 +529,8 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         【slot: int】 背包槽位
-        【oldItemDict: dict】 变化前的物品信息字典
-        【newItemDict: dict】 变化后的物品信息字典
+        【oldItemDict: dict】 变化前的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【newItemDict: dict】 变化后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         """
 
     def FurnaceBurnFinishedServerEvent(self, args):
@@ -538,7 +541,7 @@ class NuoyanServerSystem(_ServerSystem):
         【posX: float】 位置x
         【posY: float】 位置y
         【posZ: float】 位置z
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         """
 
     def CraftItemOutputChangeServerEvent(self, args):
@@ -551,8 +554,8 @@ class NuoyanServerSystem(_ServerSystem):
         cancel=True时铁砧无法修复或重命名物品，但仍会扣除经验值。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
-        【itemDict: dict】 物品信息字典
-        【itemDict: dict】 当前界面类型，类型含义见：ContainerType枚举枚举
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】 当前界面类型，类型含义见： `ContainerType枚举枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ContainerType.html>`_
         【$cancel: bool】 是否取消生成物品
         """
 
@@ -565,11 +568,11 @@ class NuoyanServerSystem(_ServerSystem):
         唱片机只在从漏斗放入唱片触发此事件。
         -----------------------------------------------------------
         【pos: Optional[Tuple[int, int, int]]】 容器坐标
-        【containerType: int】 容器类型，类型含义见：ContainerType枚举
+        【containerType: int】 容器类型，类型含义见： `ContainerType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ContainerType.html>`_
         【slot: int】 容器槽位
         【dimensionId: int】 维度ID
-        【oldItemDict: dict】 旧物品信息字典
-        【newItemDict: dict】 新物品信息字典
+        【oldItemDict: dict】 旧 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【newItemDict: dict】 新 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         """
 
     def StepOnBlockServerEvent(self, args):
@@ -577,7 +580,7 @@ class NuoyanServerSystem(_ServerSystem):
         实体刚移动至一个新实心方块时触发。
         在合并微软更新之后，本事件触发时机与微软molang实验性玩法组件"minecraft:on_step_on"一致。
         压力板与绊线钩在过去的版本的事件是可以触发的，但在更新后这种非实心方块并不会触发，有需要的可以使用OnEntityInsideBlockServerEvent事件。
-        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关，原版方块需要先通过RegisterOnStepOn接口注册才能触发。原版的红石矿默认注册了，但深层红石矿没有默认注册。
+        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStepOn接口注册才能触发。原版的红石矿默认注册了，但深层红石矿没有默认注册。
         如果需要修改cancel，强烈建议配合客户端事件同步修改，避免出现客户端表现不一致等非预期现象。
         -----------------------------------------------------------
         【$cancel: bool】 是否允许触发，默认为False，若设为True，可阻止触发后续物理交互事件
@@ -592,7 +595,7 @@ class NuoyanServerSystem(_ServerSystem):
     def StepOffBlockServerEvent(self, args):
         """
         实体移动离开一个实心方块时触发。
-        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关，原版方块需要先通过RegisterOnStepOff接口注册才能触发。
+        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStepOff接口注册才能触发。
         压力板与绊线钩这种非实心方块不会触发。
         -----------------------------------------------------------
         【blockX: int】 方块x坐标
@@ -611,6 +614,8 @@ class NuoyanServerSystem(_ServerSystem):
         """
         玩家开始挖方块时触发。创造模式下不触发。
         如果是隔着火焰挖方块，即使将该事件cancel掉，火焰也会被扑灭。如果要阻止火焰扑灭，需要配合ExtinguishFireServerEvent使用。
+        该服务端事件触发于服务端收到玩家破坏操作时，当方块为秒破方块时（破坏方块所需时间为0或未设置破坏时间），ServerPlayerTryDestroyBlockEvent事件触发在本事件之前；当方块为非秒破方块时，ServerPlayerTryDestroyBlockEvent事件触发在本事件之后。
+        秒破方块在本事件触发前已经被服务端删除，此时本事件获取到的blockName为minecraft:air，且无法通过本事件进行取消操作，以下是两个解决方法：（1）用ServerPlayerTryDestroyBlockEvent获取到正确的方块信息或取消操作。（2）通过 `minecraft:destroy_time <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html#minecraft_destroy_time>`_ 方块组件来修改方块的破坏时间。
         -----------------------------------------------------------
         【pos: Tuple[float, float, float]】 方块坐标
         【blockName: str】 方块的identifier，包含命名空间及名称
@@ -647,7 +652,7 @@ class NuoyanServerSystem(_ServerSystem):
         【x: int】 方块x坐标
         【y: int】 方块y坐标
         【z: int】 方块z坐标
-        【face: int】 方块被敲击的面向id，参考Facing枚举
+        【face: int】 方块被敲击的面向id，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
         【fullName: str】 方块的identifier，包含命名空间及名称
         【auxData: int】 方块附加值
         【playerId: str】 试图破坏方块的玩家的实体ID
@@ -679,7 +684,7 @@ class NuoyanServerSystem(_ServerSystem):
         【auxData: int】 方块附加值
         【entityId: str】 试图放置方块的生物的实体ID
         【dimensionId: int】 维度ID
-        【face: int】 点击方块的面，参考Facing枚举
+        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
         【$cancel: bool】 默认为False，在脚本层设置为True就能取消该方块的放置
         """
 
@@ -703,8 +708,8 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【$cancel: bool】 是否允许触发，默认为False，若设为True，可阻止触发后续的事件
         【action: str】 推送时=expanding；缩回时=retracting
-        【pistonFacing: int】 活塞的朝向，参考Facing枚举
-        【pistonMoveFacing: int】 活塞的运动方向，参考Facing枚举
+        【pistonFacing: int】 活塞的朝向，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
+        【pistonMoveFacing: int】 活塞的运动方向，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
         【dimensionId: int】 维度ID
         【pistonX: int】 活塞方块的x坐标
         【pistonY: int】 活塞方块的y坐标
@@ -717,6 +722,9 @@ class NuoyanServerSystem(_ServerSystem):
     def OnStandOnBlockServerEvent(self, args):
         """
         当实体站立到方块上时服务端持续触发。
+        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStandOn接口注册才能触发。
+        如果需要修改motion/cancel，强烈建议配合客户端事件同步修改，避免出现客户端表现不一致等现象。
+        如果要在脚本层修改motion，回传的一定要是浮点型，例如需要赋值0.0而不是0。
         -----------------------------------------------------------
         【entityId: str】 实体ID
         【dimensionId: int】 维度ID
@@ -736,7 +744,7 @@ class NuoyanServerSystem(_ServerSystem):
     def OnBeforeFallOnBlockServerEvent(self, args):
         """
         当实体刚降落到方块上时服务端触发，主要用于伤害计算。
-        不是所有方块都会触发该事件，需要在json中先配置触发开关。
+        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
         如果要在脚本层修改fallDistance，回传的一定要是浮点型，例如需要赋值0.0而不是0。
         可能会因为轻微的反弹触发多次，可在脚本层针对fallDistance的值进行判断。
         -----------------------------------------------------------
@@ -752,7 +760,7 @@ class NuoyanServerSystem(_ServerSystem):
     def OnAfterFallOnBlockServerEvent(self, args):
         """
         当实体降落到方块后服务端触发，主要用于力的计算。
-        不是所有方块都会触发该事件，需要在json中先配置触发开关。
+        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
         如果要在脚本层修改motion，回传的需要是浮点型，例如需要赋值0.0而不是0。
         如果需要修改实体的力，最好配合客户端事件同步修改，避免产生非预期现象。
         因为引擎最后一定会按照原版方块规则计算力（普通方块置0，床、粘液块等反弹），所以脚本层如果想直接修改当前力需要将calculate设为true取消原版计算，按照传回值计算。
@@ -800,7 +808,7 @@ class NuoyanServerSystem(_ServerSystem):
     def HeavyBlockStartFallingServerEvent(self, args):
         """
         当重力方块变为下落的方块实体后，服务端触发该事件。
-        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关。
+        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
         -----------------------------------------------------------
         【fallingBlockId: str】 下落的方块实体ID
         【blockX: int】 方块x坐标
@@ -830,13 +838,13 @@ class NuoyanServerSystem(_ServerSystem):
         【x: int】 方块x坐标
         【y: int】 方块y坐标
         【z: int】 方块z坐标
-        【setBlockType: int】 耕地退化为泥土的原因，参考SetBlockType枚举
+        【setBlockType: int】 耕地退化为泥土的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html>`_
         """
 
     def FallingBlockReturnHeavyBlockServerEvent(self, args):
         """
         当下落的方块实体变回普通重力方块时，服务端触发该事件。
-        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关。
+        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
         -----------------------------------------------------------
         【fallingBlockId: str】 下落的方块实体ID
         【blockX: int】 方块x坐标
@@ -851,7 +859,7 @@ class NuoyanServerSystem(_ServerSystem):
     def FallingBlockCauseDamageBeforeServerEvent(self, args):
         """
         当下落的方块开始计算砸到实体的伤害时，服务端触发该事件。
-        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关。
+        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
         服务端通常触发在客户端之后，而且有时会相差一个tick，这就意味着可能发生以下现象：服务端fallTickAmount比配置强制破坏时间多1tick，下落的距离、下落的伤害计算出来比客户端时间多1tick的误差。
         -----------------------------------------------------------
         【fallingBlockId: str】 下落的方块实体ID
@@ -870,7 +878,7 @@ class NuoyanServerSystem(_ServerSystem):
     def FallingBlockBreakServerEvent(self, args):
         """
         当下落的方块实体被破坏时，服务端触发该事件。
-        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关。
+        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
         -----------------------------------------------------------
         【fallingBlockId: str】 下落的方块实体ID
         【fallingBlockX: float】 下落的方块实体位置x
@@ -894,7 +902,7 @@ class NuoyanServerSystem(_ServerSystem):
         【auxData: int】 方块附加值
         【entityId: str】 实体ID
         【dimensionId: int】 维度ID
-        【face: int】 点击方块的面，参考Facing枚举
+        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
         """
 
     def DirtBlockToGrassBlockServerEvent(self, args):
@@ -973,7 +981,7 @@ class NuoyanServerSystem(_ServerSystem):
         【y: int】 方块y坐标
         【z: int】 方块z坐标
         【turnSnow: bool】 是否转为含雪，true则转为含雪，false则脱离含雪
-        【setBlockType: int】 方块进入脱离含雪的原因，参考SetBlockType枚举
+        【setBlockType: int】 方块进入脱离含雪的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html>`_
         """
 
     def BlockSnowStateChangeAfterServerEvent(self, args):
@@ -985,12 +993,12 @@ class NuoyanServerSystem(_ServerSystem):
         【y: int】 方块y坐标
         【z: int】 方块z坐标
         【turnSnow: bool】 是否转为含雪，true则转为含雪，false则脱离含雪
-        【setBlockType: int】 方块进入脱离含雪的原因，参考SetBlockType枚举
+        【setBlockType: int】 方块进入脱离含雪的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html>`_
         """
 
     def BlockRemoveServerEvent(self, args):
         """
-        监听该事件的方块在销毁时触发，可以通过ListenOnBlockRemoveEvent方法进行监听，或者通过json组件netease:listen_block_remove进行配置。
+        监听该事件的方块在销毁时触发，可以通过 `ListenOnBlockRemoveEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?catalog=1#listenonblockremoveevent>`_ 方法进行监听，或者通过json组件 `netease:listen_block_remove <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html#netease-listen-block-remove>`_ 进行配置。
         -----------------------------------------------------------
         【x: int】 方块x坐标
         【y: int】 方块y坐标
@@ -1150,7 +1158,7 @@ class NuoyanServerSystem(_ServerSystem):
         吃蛋糕以及喝牛奶不触发该事件。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
-        【itemDict: dict】 食物的物品信息字典
+        【itemDict: dict】 食物的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【$hunger: int】 食物增加的饥饿值，可修改
         【$nutrition: float】 食物的营养价值，回复饱和度 = 食物增加的饥饿值 * 食物的营养价值 * 2，饱和度最大不超过当前饥饿值，可修改
         """
@@ -1188,7 +1196,7 @@ class NuoyanServerSystem(_ServerSystem):
         游戏模式：Survival，Creative，Adventure分别为0~2。
         默认游戏模式发生变化时最后反映在个人游戏模式之上。
         -----------------------------------------------------------
-        【playerId: str】 玩家的实体ID，SetDefaultGameType接口改变游戏模式时该参数为空字符串
+        【playerId: str】 玩家的实体ID， `SetDefaultGameType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%8E%A5%E5%8F%A3/%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E8%A7%84%E5%88%99.html#SetDefaultGameType>`_ 接口改变游戏模式时该参数为空字符串
         【oldGameType: int】 切换前的游戏模式
         【newGameType: int】 切换后的游戏模式
         """
@@ -1393,7 +1401,7 @@ class NuoyanServerSystem(_ServerSystem):
         有minecraft:behavior.pickup_items行为的生物拾取物品时触发该事件，例如村民拾取面包、猪灵拾取金锭。
         -----------------------------------------------------------
         【entityId: str】 实体ID
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【secondaryActor: str】 物品给予者的实体ID（一般是玩家），如果不存在给予者的话，这里为空字符串
         """
 
@@ -1429,7 +1437,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【entityId: str】 实体ID
         【damage: int】 伤害值（伤害吸收后实际扣血量），负数表示生命回复量
-        【attributeBuffType: int】 状态类型，参考AttributeBuffType
+        【attributeBuffType: int】 状态类型，参考 `AttributeBuffType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/AttributeBuffType.html>`_
         【duration: float】 状态持续时间，单位秒
         【lifeTimer: float】 状态生命时间，单位秒
         【isInstantaneous: bool】 是否为立即生效状态
@@ -1440,7 +1448,7 @@ class NuoyanServerSystem(_ServerSystem):
         生物扔出物品时触发。
         -----------------------------------------------------------
         【entityId: str】 生物的实体ID
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【itemEntityId: str】 物品的实体ID
         """
 
@@ -1487,7 +1495,7 @@ class NuoyanServerSystem(_ServerSystem):
         生物（包括玩家）受伤时触发。
         -----------------------------------------------------------
         【entityId: str】 实体ID
-        【cause: str】 伤害来源，详见Minecraft枚举值文档的ActorDamageCause
+        【cause: str】 伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
         【damage: int】 伤害值（被伤害吸收后的值），不可修改
         【damage_f: float】 伤害值（被伤害吸收后的值），不可修改
         【absorbedDamage: int】 被伤害吸收效果吸收的伤害值
@@ -1501,7 +1509,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【entityId: str】 实体ID
         【identifier: str】 生成实体的命名空间
-        【type: str】 生成实体的类型，参考EntityType
+        【type: str】 生成实体的类型，参考 `EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html>`_
         【baby: str】 生成怪物是否是幼年怪
         【x: str】 生成实体坐标x
         【y: str】 生成实体坐标y
@@ -1643,7 +1651,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【loottable: str】 奖励箱子所读取的loottable的json路径
         【playerId: str】 打开奖励箱子的玩家的实体ID
-        【itemList: List[dict]】 掉落物品列表，每个元素为一个itemDict，格式可参考物品信息字典
+        【itemList: List[dict]】 掉落物品列表，每个元素为一个itemDict，格式可参考 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【$dirty: bool】 默认为False，如果需要修改掉落列表需将该值设为True
         """
 
@@ -1706,10 +1714,12 @@ class NuoyanServerSystem(_ServerSystem):
     def ChunkLoadedServerEvent(self, args):
         """
         服务端区块加载完成时。
+        注意：服务端的自定义方块实体加载完成时对应的客户端的自定义方块实体并没有初始化完成，无法使用该事件对客户端的自定义方块实体进行相关操作。
         -----------------------------------------------------------
         【dimension: int】 维度ID
         【chunkPosX: int】 区块的x坐标，对应方块x坐标区间为[x * 16, x * 16 + 15]
         【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z * 16, z * 16 + 15]
+        【blockEntities: List[Dict[str, Union[int, str]]]】 随区块加载而加载进世界的自定义方块实体的坐标的列表，列表元素dict包含posX，posY，posZ三个int表示自定义方块实体的坐标，blockName表示方块的identifier，包含命名空间及名称
         """
 
     def ChunkGeneratedServerEvent(self, args):
@@ -1777,6 +1787,7 @@ class NuoyanServerSystem(_ServerSystem):
         玩家右键点击新版自定义方块（或者通过接口AddBlockItemListenForUseEvent增加监听的MC原生游戏方块）时服务端抛出该事件（该事件tick执行，需要注意效率问题）。
         当对原生方块进行使用时，如堆肥桶等类似有使用功能的方块使用物品时，会触发该事件，而ServerItemUseOnEvent则不会被触发。
         有的方块是在ServerBlockUseEvent中设置cancel生效，但是有部分方块是在ClientBlockUseEvent中设置cancel才生效，如有需求建议在两个事件中同时设置cancel以保证生效。
+        部分工具对方块的使用效果，如锹犁地，不一定能通过该事件cancel，还需同时使用ItemUseOnServerEvent进行取消，目前已知有：锹犁地相关的方块：草地、泥土、砂土、菌丝体、灰化土、缠根泥土，均需同时通过ServerBlockUseEvent和ItemUseOnServerEvent进行取消。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
         【blockName: str】 方块的identifier，包含命名空间及名称
@@ -1785,6 +1796,8 @@ class NuoyanServerSystem(_ServerSystem):
         【x: int】 方块x坐标
         【y: int】 方块y坐标
         【z: int】 方块z坐标
+        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
+        【itemDict: dict】 使用的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【dimensionId: int】 维度ID
         -----------------------------------------------------------
         【相关接口】
@@ -1817,7 +1830,7 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【dieEntityId: str】 死亡实体ID
         【attacker: str】 伤害来源实体ID
-        【itemList: List[dict]】 掉落物品列表，每个元素为一个itemDict，格式可参考物品信息字典
+        【itemList: List[dict]】 掉落物品列表，每个元素为一个itemDict，格式可参考 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【dirty: bool】 默认为False，如果需要修改掉落列表需将该值设为True
         """
 
@@ -1833,7 +1846,7 @@ class NuoyanServerSystem(_ServerSystem):
         【entityId: str】 受伤的实体ID
         【damage: int】 伤害值（被伤害吸收后的值），允许修改，设置为0则此次造成的伤害为0，若设置数值和原来一样则视为没有修改
         【damage_f: float】 伤害值（被伤害吸收后的值），允许修改，若修改该值，则会覆盖damage的修改效果
-        【cause: str】 伤害来源，详见Minecraft枚举值文档的ActorDamageCause
+        【cause: str】 伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
         """
 
     def HealthChangeBeforeServerEvent(self, args):
@@ -1871,7 +1884,7 @@ class NuoyanServerSystem(_ServerSystem):
         玩家与有minecraft:interact组件的生物交互时触发该事件，例如玩家手持空桶对牛挤奶、玩家手持打火石点燃苦力怕。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体ID
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【interactEntityId: str】 交互生物的实体ID
         """
 
@@ -1879,11 +1892,11 @@ class NuoyanServerSystem(_ServerSystem):
         """
         玩家可以与实体交互时触发。
         如果是鼠标控制模式，则当准心对着实体时触发。如果是触屏模式，则触发时机与屏幕下方的交互按钮显示的时机相同。
-        玩家真正与实体发生交互的事件见PlayerDoInteractServerEvent。
+        玩家真正与实体发生交互的事件见 `PlayerDoInteractServerEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?catalog=1#playerdointeractserverevent>`_ 。
         -----------------------------------------------------------
         【$cancel: bool】 是否取消触发，默认为False，若设为True，可阻止触发后续的实体交互事件
         【playerId: str】 玩家的实体ID
-        【itemDict: dict】 玩家手持物品的物品信息字典
+        【itemDict: dict】 玩家手持物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【victimId: str】 交互生物的实体ID
         """
 
@@ -1933,7 +1946,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *tick*
         当实体碰撞盒所在区域有方块时，服务端持续触发。
-        不是所有方块都会触发该事件，需要在json中先配置触发开关，原版方块需要先通过RegisterOnEntityInside接口注册才能触发。
+        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnEntityInside接口注册才能触发。
         如果需要修改slowdownMulti/cancel，强烈建议与客户端事件同步修改，避免出现客户端表现不一致等非预期现象。
         如果要在脚本层修改slowdownMulti，回传的一定要是浮点型，例如需要赋值1.0而不是1。
         有任意slowdownMulti参数被传回非0值时生效减速比例。
@@ -1992,13 +2005,13 @@ class NuoyanServerSystem(_ServerSystem):
         该事件仅在鼠标模式下为帧事件。
         -----------------------------------------------------------
         【entityId: str】 玩家实体ID
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
         【x: int】 方块x坐标
         【y: int】 方块y坐标
         【z: int】 方块z坐标
         【blockName: str】 方块的identifier，包含命名空间及名称
         【blockAuxValue: int】 方块的附加值
-        【face: int】 点击方块的面，参考Facing枚举
+        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
         【clickX: float】 点击点的x比例位置
         【clickY: float】 点击点的y比例位置
         【clickZ: float】 点击点的z比例位置
@@ -2014,8 +2027,8 @@ class NuoyanServerSystem(_ServerSystem):
         3. 盔甲架装备盔甲。
         -----------------------------------------------------------
         【playerId: str】 玩家的实体id
-        【itemDict: dict】 物品信息字典
-        【useMethod: int】 使用物品的方法，详见ItemUseMethodEnum枚举
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【useMethod: int】 使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html>`_
         """
 
     def ActorAcquiredItemServerEvent(self, args):
@@ -2024,8 +2037,8 @@ class NuoyanServerSystem(_ServerSystem):
         -----------------------------------------------------------
         【actor: str】 获得物品玩家实体ID
         【secondaryActor: str】 物品给予者玩家实体ID，如果不存在给予者的话，这里为空字符串
-        【itemDict: dict】 获得的物品的物品信息字典
-        【acquireMethod: int】 获得物品的方法，详见ItemAcquisitionMethod枚举
+        【itemDict: dict】 获得的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【acquireMethod: int】 获得物品的方法，详见 `ItemAcquisitionMethod枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html>`_
         """
 
     def DestroyBlockEvent(self, args):
@@ -2036,7 +2049,7 @@ class NuoyanServerSystem(_ServerSystem):
         【x: int】 方块x坐标
         【y: int】 方块y坐标
         【z: int】 方块z坐标
-        【face: int】 方块被敲击的面向id，参考Facing枚举
+        【face: int】 方块被敲击的面向id，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
         【fullName: str】 方块的identifier，包含命名空间及名称
         【auxData: int】 方块附加值
         【playerId: str】 破坏方块的玩家实体ID
@@ -2057,8 +2070,8 @@ class NuoyanServerSystem(_ServerSystem):
         【entityId: str】 受伤实体ID
         【$damage: int】 伤害值（被伤害吸收前的值），允许修改，设置为0则此次造成的伤害为0
         【damage_f: float】 伤害值（被伤害吸收前的值），不允许修改
-        【absorption: int】 伤害吸收生命值，详见AttrType枚举的ABSORPTION
-        【cause: str】 伤害来源，详见ActorDamageCause枚举
+        【absorption: int】 伤害吸收生命值，详见 `AttrType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/AttrType.html>`_ 枚举的ABSORPTION
+        【cause: str】 伤害来源，详见 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_ 枚举
         【$knock: bool】 是否击退被攻击者，允许修改，设置该值为False则不产生击退
         【$ignite: bool】 是否点燃被伤害者，允许修改，设置该值为True产生点燃效果，反之亦然
         """
@@ -2083,7 +2096,7 @@ class NuoyanServerSystem(_ServerSystem):
         【id: str】 子弹的实体ID
         【hitTargetType: str】 碰撞目标类型，"ENTITY"或"BLOCK"
         【targetId: str】 碰撞目标的实体ID
-        【hitFace: int】 撞击在方块上的面ID，参考Facing枚举
+        【hitFace: int】 撞击在方块上的面ID，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
         【x: float】 碰撞x坐标
         【y: float】 碰撞y坐标
         【z: float】 碰撞z坐标
@@ -2099,15 +2112,15 @@ class NuoyanServerSystem(_ServerSystem):
         玩家切换主手物品时触发该事件。
         切换耐久度不同的相同物品，不会触发该事件。
         -----------------------------------------------------------
-        【oldItemDict: Optional[dict]】 旧物品的物品信息字典，当旧物品为空时，此项属性为None
-        【newItemDict: Optional[dict]】 新物品的物品信息字典，当新物品为空时，此项属性为None
+        【oldItemDict: Optional[dict]】 旧物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_，当旧物品为空时，此项属性为None
+        【newItemDict: Optional[dict]】 新物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_，当新物品为空时，此项属性为None
         【playerId: str】 玩家的实体ID
         """
 
     def EntityRemoveEvent(self, args):
         """
         实体被删除时触发。
-        触发情景：实体从场景中被删除，例如：生物死亡，生物被清除 (opens new window)，玩家退出游戏，船/盔甲架被破坏，掉落物/经验球被捡起或清除。
+        触发情景：实体从场景中被删除，例如：生物死亡，生物被 `清除 <https://minecraft.fandom.com/zh/wiki/%E7%94%9F%E6%88%90#.E6.B8.85.E9.99.A4>`_，玩家退出游戏，船/盔甲架被破坏，掉落物/经验球被捡起或清除。
         当生物随区块卸载时，不会触发该事件，而是ChunkAcquireDiscardedServerEvent事件。
         关于生物的清除：当生物离玩家大于wiki所说的距离，并且还在玩家的模拟距离内时，会被清除。也就是说，如果玩家瞬间传送到远处，原处的生物马上离开了模拟距离，并不会被清除。
         玩家退出游戏时，EntityRemoveEvent，DelServerPlayerEvent按顺序依次触发。
@@ -2123,7 +2136,7 @@ class NuoyanServerSystem(_ServerSystem):
         无参数
         """
 
-    # todo:====================================== New Event Callback ===================================================
+    # ====================================== New Event Callback ==============================================
 
     @listen("UiInitFinished")
     def UiInitFinished(self, args):
@@ -2144,7 +2157,7 @@ class NuoyanServerSystem(_ServerSystem):
         无参数
         """
 
-    # todo:======================================= Basic Function ======================================================
+    # ======================================= Basic Function =================================================
 
     def SetQueryVar(self, entityId, name, value):
         # type: (str, str, float) -> None
@@ -2195,7 +2208,7 @@ class NuoyanServerSystem(_ServerSystem):
         NoReturn
         """
 
-    # todo:====================================== Internal Method ======================================================
+    # ====================================== Internal Method =================================================
 
     def _setPrintLog(self):
         _serverApi.SetMcpModLogCanPostDump(True)

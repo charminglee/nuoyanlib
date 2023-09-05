@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -27,7 +27,7 @@ setting
 """
 
 
-from clientComps import LevelComps as _LevelComps
+from clientComps import ClientLevelComps as _ClientLevelComps
 
 
 __all__ = [
@@ -50,7 +50,7 @@ def save_setting(name, dataDict, isGlobal=True):
     :return: 是否保存成功
     :rtype: bool
     """
-    return _LevelComps.ConfigClient.SetConfigData(name, dataDict, isGlobal)
+    return _ClientLevelComps.ConfigClient.SetConfigData(name, dataDict, isGlobal)
 
 
 def read_setting(name, isGlobal=True):
@@ -65,7 +65,7 @@ def read_setting(name, isGlobal=True):
     :return: 数据字典
     :rtype: dict
     """
-    return _LevelComps.ConfigClient.GetConfigData(name, isGlobal)
+    return _ClientLevelComps.ConfigClient.GetConfigData(name, isGlobal)
 
 
 def check_setting(name, itemList, isGlobal=True):

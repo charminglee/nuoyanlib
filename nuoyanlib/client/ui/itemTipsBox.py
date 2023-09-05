@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -46,7 +46,7 @@ itemTipsBox
 import mod.client.extraClientApi as _clientApi
 from ...utils.item import is_empty_item as _is_empty_item
 from ..clientComps import (
-    LevelComps as _LevelComps,
+    ClientLevelComps as _ClientLevelComps,
     ScreenNode as _ScreenNode,
 )
 
@@ -170,7 +170,7 @@ class _ItemTipsBoxUI(_ScreenNode):
         if aux == -1:
             aux = 0
         userData = itemDict.get('userData')
-        text = _LevelComps.Item.GetItemFormattedHoverText(name, aux, True, userData)
+        text = _ClientLevelComps.Item.GetItemFormattedHoverText(name, aux, True, userData)
         self.ShowTipsBox(text)
 
     def ShowTipsBox(self, text):
@@ -182,26 +182,26 @@ class _ItemTipsBoxUI(_ScreenNode):
         self.tipsLabel.SetText(text)
         # 取消正在执行的timer
         if self.timer1:
-            _LevelComps.Game.CancelTimer(self.timer1)
+            _ClientLevelComps.Game.CancelTimer(self.timer1)
         if self.timer2:
-            _LevelComps.Game.CancelTimer(self.timer2)
+            _ClientLevelComps.Game.CancelTimer(self.timer2)
         # 一秒后执行渐出动画
         def func1():
             self.alphaTick = 30
             self.timer1 = None
-        self.timer1 = _LevelComps.Game.AddTimer(1, func1)
+        self.timer1 = _ClientLevelComps.Game.AddTimer(1, func1)
         # 两秒后隐藏文本框并恢复初始状态
         def func2():
             self.HideTipsBox()
             self.timer2 = None
-        self.timer2 = _LevelComps.Game.AddTimer(2, func2)
+        self.timer2 = _ClientLevelComps.Game.AddTimer(2, func2)
 
     def HideTipsBox(self):
         if self.timer1:
-            _LevelComps.Game.CancelTimer(self.timer1)
+            _ClientLevelComps.Game.CancelTimer(self.timer1)
             self.timer1 = None
         if self.timer2:
-            _LevelComps.Game.CancelTimer(self.timer2)
+            _ClientLevelComps.Game.CancelTimer(self.timer2)
             self.timer2 = None
         self.alphaTick = 0
         self.tipsImg.SetAlpha(1.0)

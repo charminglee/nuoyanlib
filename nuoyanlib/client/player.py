@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -28,7 +28,7 @@ player
 
 
 import mod.client.extraClientApi as _clientApi
-from clientComps import PlayerComps as _PlayerComps
+from clientComps import ClientPlayerComps as _ClientPlayerComps
 
 
 __all__ = [
@@ -47,10 +47,10 @@ def player_plunge(speed):
     :return: 无
     :rtype: None
     """
-    rot = _PlayerComps.Rot.GetRot()
+    rot = _ClientPlayerComps.Rot.GetRot()
     dirRot = _clientApi.GetDirFromRot(rot)
     motion = tuple(map(lambda x: x * speed, dirRot))
-    _PlayerComps.ActorMotion.SetMotion(motion)
+    _ClientPlayerComps.ActorMotion.SetMotion(motion)
 
 
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -48,7 +48,7 @@ from ...utils._error import ClientNotFoundError as _ClientNotFoundError
 from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl as _ButtonUIControl
 from ..nuoyanClientSystem import listen_server as _listen_server
 from ..clientComps import (
-    LevelComps as _LevelComps,
+    ClientLevelComps as _ClientLevelComps,
     ScreenNode as _ScreenNode,
 )
 
@@ -133,7 +133,7 @@ class NuoyanScreenNode(_ScreenNode):
         self.cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if not self.cs:
             raise _ClientNotFoundError
-        self.screenSize = _LevelComps.Game.GetScreenSize()
+        self.screenSize = _ClientLevelComps.Game.GetScreenSize()
         self._btnDoubleClickData = {}
         self._doubleClickArgs = None
         self._vibrateTime = 100
@@ -527,7 +527,7 @@ class NuoyanScreenNode(_ScreenNode):
                 touchData['touchDownFunc'](args)
 
     def _vibrate(self):
-        _LevelComps.Device.SetDeviceVibrate(self._vibrateTime)
+        _ClientLevelComps.Device.SetDeviceVibrate(self._vibrateTime)
 
     def _onLongClick(self, args):
         bp = args['ButtonPath']

@@ -12,16 +12,24 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-07-03
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
-from random import uniform as _uniform, Random as _Random, randint as _randint
-from string import digits as _digits, ascii_lowercase as _ascii_lowercase, ascii_uppercase as _ascii_uppercase
-from calculator import pos_distance as _pos_distance
+from random import (
+    uniform as _uniform,
+    Random as _Random,
+    randint as _randint,
+)
+from string import (
+    digits as _digits,
+    ascii_lowercase as _ascii_lowercase,
+    ascii_uppercase as _ascii_uppercase,
+)
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
+from calculator import pos_distance as _pos_distance
 
 
 __all__ = [

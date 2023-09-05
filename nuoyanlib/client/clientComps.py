@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-01
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 """
 
 clientComps
-==========
+===========
 
 该模块提供了使用存档ID（Level Id）和本地玩家ID创建客户端组件的快捷方法，同时，还提供了一些常用的变量，直接导入即可使用，无需再使用接口获取，节省了大量编写代码的时间。
 
@@ -28,7 +28,7 @@ clientComps
 
 【模块变量说明】
 
-1、ENGINE_NAMESPACE：引擎事件的命名空间。
+1、ENGINE_NAMESPACE：客户端引擎事件的命名空间。
 
 2、ENGINE_SYSTEM_NAME：客户端引擎系统名。
 
@@ -46,25 +46,25 @@ clientComps
 
 9、LEVEL_ID：存档ID。
 
-10、PlayerComps：保存了使用本地玩家ID创建的所有组件。
+10、ClientPlayerComps：保存了使用本地玩家ID创建的所有客户端组件。
 
-11、LevelComps：保存了使用存档ID创建的所有组件。
+11、ClientLevelComps：保存了使用存档ID创建的所有客户端组件。
 
 -----
 
 【示例】
 
->>> from nuoyanlib import PlayerComps as pc, LevelComps as lc
+>>> from nuoyanlib import ClientPlayerComps as cpc, ClientLevelComps as clc
 
 调用Item组件获取本地玩家手持物品，等价于clientApi.GetEngineCompFactory().CreateItem(clientApi.GetLocalPlayerId()).GetPlayerItem(2)。
 
->>> pc.Item.GetPlayerItem(2)
+>>> cpc.Item.GetPlayerItem(2)
 
 调用Game组件添加定时器，等价于clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLevelId()).AddTimer(1, func)。
 
 >>> def func():
 ...     print("hello")
->>> lc.Game.AddTimer(1, func)
+>>> clc.Game.AddTimer(1, func)
 
 """
 
@@ -82,8 +82,8 @@ __all__ = [
     "ViewRequest",
     "PLAYER_ID",
     "LEVEL_ID",
-    "PlayerComps",
-    "LevelComps",
+    "ClientPlayerComps",
+    "ClientLevelComps",
 ]
 
 
@@ -111,11 +111,12 @@ class _CompDescr(object):
     def __get__(self, ins, cls):
         if self.compName not in cls._cache:
             comp = getattr(CompFactory, "Create" + self.compName)(cls._target)
+            # comp = self.compName
             cls._cache[self.compName] = comp
         return cls._cache[self.compName]
 
 
-class CompPool(object):
+class ClientCompPool(object):
     Action = _CompDescr("Action")
     ActorCollidable = _CompDescr("ActorCollidable")
     ActorMotion = _CompDescr("ActorMotion")
@@ -172,17 +173,23 @@ class CompPool(object):
     VirtualWorld = _CompDescr("VirtualWorld")
 
 
-class PlayerComps(CompPool):
+class ClientPlayerComps(ClientCompPool):
     _cache = {}
     _target = PLAYER_ID
 
 
-class LevelComps(CompPool):
+class ClientLevelComps(ClientCompPool):
     _cache = {}
     _target = LEVEL_ID
 
 
-
+if __name__ == "__main__":
+    l = []
+    for k, v in ClientCompPool.__dict__.items():
+        if k.startswith("__"):
+            continue
+        l.append(k == v.compName)
+    assert all(l)
 
 
 

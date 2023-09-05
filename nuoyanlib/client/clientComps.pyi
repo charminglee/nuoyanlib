@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
@@ -92,10 +92,10 @@ LEVEL_ID: str
 
 class _CompDescr(object):
     def __init__(self, compName: str) -> None: ...
-    def __get__(self, ins: CompPool, cls: Type[CompPool]) -> BaseComponent: ...
+    def __get__(self, ins: ClientCompPool, cls: Type[ClientCompPool]) -> BaseComponent: ...
 
 
-class CompPool(object):
+class ClientCompPool(object):
     Action: ActionCompClient
     ActorCollidable: Any
     ActorMotion: ActorMotionComponentClient
@@ -152,12 +152,12 @@ class CompPool(object):
     VirtualWorld: VirtualWorldCompClient
 
 
-class PlayerComps(CompPool):
+class ClientPlayerComps(ClientCompPool):
     _cache: Dict[str, BaseComponent]
     _target: str
 
 
-class LevelComps(CompPool):
+class ClientLevelComps(ClientCompPool):
     _cache: Dict[str, BaseComponent]
     _target: str
     

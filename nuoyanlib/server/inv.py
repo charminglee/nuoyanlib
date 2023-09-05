@@ -12,14 +12,23 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-07-10
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as _serverApi
-from mod.common.minecraftEnum import ItemPosType as _ItemPosType, GameType as _GameType
-from ..utils.item import is_empty_item as _is_empty_item, get_item_count as _get_item_count
+from mod.common.minecraftEnum import (
+    ItemPosType as _ItemPosType,
+    GameType as _GameType,
+)
+from ..utils.item import (
+    is_empty_item as _is_empty_item,
+    get_item_count as _get_item_count,
+)
+from serverComps import (
+    CompFactory as _CompFactory,
+    ServerLevelComps as _ServerLevelComps,
+)
 
 
 __all__ = [
@@ -28,11 +37,6 @@ __all__ = [
     "get_item_pos",
     "change_player_item_count",
 ]
-
-
-_LEVEL_ID = _serverApi.GetLevelId()
-_ServerCompFactory = _serverApi.GetEngineCompFactory()
-_LevelGameComp = _ServerCompFactory.CreateGame(_LEVEL_ID)
 
 
 _ITEM_POS_SIZE = (36, 1, 1, 4)
@@ -49,7 +53,7 @@ def clear_items(playerId, itemPosType, pos):
     -----------------------------------------------------------
     return: dict -> 该位置被清除前的物品信息字典
     """
-    comp = _ServerCompFactory.CreateItem(playerId)
+    comp = _CompFactory.CreateItem(playerId)
     item = comp.GetPlayerItem(itemPosType, pos, True)
     comp.SetPlayerAllItems({(itemPosType, pos): None})
     return item
@@ -68,8 +72,8 @@ def get_item_pos(entityId, posType, itemId, itemAux=-1, count=1):
     -----------------------------------------------------------
     return: List[int] -> 物品所在槽位的列表
     """
-    isPlayer = (_ServerCompFactory.CreateEngineType(entityId).GetEngineTypeStr() == "minecraft:player")
-    itemComp = _ServerCompFactory.CreateItem(entityId)
+    isPlayer = (_CompFactory.CreateEngineType(entityId).GetEngineTypeStr() == "minecraft:player")
+    itemComp = _CompFactory.CreateItem(entityId)
     num = 1 if posType == 1 or posType == 2 else (4 if posType == 3 else 36)
     result = []
     for i in range(num):
@@ -95,9 +99,9 @@ def change_player_item_count(playerId, posType=_ItemPosType.CARRIED, pos=0, chan
     -----------------------------------------------------------
     NoReturn
     """
-    if _LevelGameComp.GetPlayerGameType(playerId) == _GameType.Creative:
+    if _ServerLevelComps.Game.GetPlayerGameType(playerId) == _GameType.Creative:
         return
-    itemComp = _ServerCompFactory.CreateItem(playerId)
+    itemComp = _CompFactory.CreateItem(playerId)
     item = itemComp.GetPlayerItem(posType, pos)
     item['count'] += change
     if item['count'] <= 0:
@@ -119,7 +123,7 @@ def deduct_item(playerId, name, aux=-1, count=1):
     totalCount = _get_item_count(playerId, name, aux)
     if totalCount < count:
         return False
-    comp = _ServerCompFactory.CreateItem(playerId)
+    comp = _CompFactory.CreateItem(playerId)
     items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
     itemsDictMap = {}
     for i, item in enumerate(items[:]):

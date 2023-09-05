@@ -12,14 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
+import mod.client.extraClientApi as _clientApi
 from ..config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from ..utils.utils import is_method_overridden as _is_method_overridden
-import mod.client.extraClientApi as _clientApi
 from clientComps import (
     ENGINE_NAMESPACE as _ENGINE_NAMESPACE,
     ENGINE_SYSTEM_NAME as _ENGINE_SYSTEM_NAME,
@@ -28,7 +28,7 @@ from clientComps import (
     PLAYER_ID as _PLAYER_ID,
     ClientSystem as _ClientSystem,
     CompFactory as _CompFactory,
-    PlayerComps as _PlayerComps,
+    ClientPlayerComps as _ClientPlayerComps,
 )
 
 
@@ -46,6 +46,12 @@ _UI_DEF_GAME_TICK = "_GameTick.main"
 
 
 ALL_ENGINE_EVENTS = {
+    "OnKeyboardControllerLayoutChangeClientEvent",
+    "OnGamepadControllerLayoutChangeClientEvent",
+    "OnGamepadTriggerClientEvent",
+    "OnGamepadStickClientEvent",
+    "OnGamepadKeyPressClientEvent",
+    "ModBlockEntityLoadedClientEvent",
     "CloseNeteaseShopEvent",
     "PopScreenAfterClientEvent",
     "OnScriptTickClient",
@@ -309,21 +315,157 @@ class NuoyanClientSystem(_ClientSystem):
         :rtype: None
         """
 
-    # ======================================= Engine Event Callback ====================================================
+    # ======================================= Engine Event Callback ==========================================
+
+    def OnKeyboardControllerLayoutChangeClientEvent(self, args):
+        """
+        *[event]*
+
+        键盘按键映射改变事件。
+
+        -----
+
+        【action: str】 行为
+
+        【newKey: int】 修改后的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html>`_
+
+        【oldKey: int】 修改前的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html>`_
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def OnGamepadControllerLayoutChangeClientEvent(self, args):
+        """
+        *[event]*
+
+        游戏手柄按键映射改变事件。
+
+        -----
+
+        【action: str】 行为
+
+        【newKey: int】 修改后的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+
+        【oldKey: int】 修改前的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def OnGamepadTriggerClientEvent(self, args):
+        """
+        *[event]*
+
+        游戏手柄扳机事件。当扣动扳机的力度发生改变时触发。
+
+        -----
+
+        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+
+        【magnitude: float】 扣动扳机的力度，取值为 0 ~ 1.0
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def OnGamepadStickClientEvent(self, args):
+        """
+        *[event]*
+
+        游戏手柄摇杆事件。当摇杆摇动位置发生改变时触发。
+
+        -----
+
+        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+
+        【x: float】摇杆水平方向的值，从左到右取值为 -1.0 ~ 1.0
+
+        【y: float】摇杆竖直方向的值，从下到上取值为 -1.0 ~ 1.0
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def OnGamepadKeyPressClientEvent(self, args):
+        """
+        *[event]*
+
+        游戏手柄按键事件。
+
+        -----
+
+        【screenName: str】 当前screenName
+
+        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+
+        【isDown: str】 是否按下，按下为1，弹起为0
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def ModBlockEntityLoadedClientEvent(self, args):
+        """
+        *[event]*
+
+        客户端自定义方块实体加载完成后第一次出现在玩家视野中时触发。
+
+        只有在客户端自定义方块实体加载完成后，第一次出现在玩家视野中时才会触发该事件。注意：只有添加了自定义方块实体扩展功能的自定义方块实体才能触发该事件（见 `自定义方块实体外观 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4.1-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93%E5%A4%96%E8%A7%82.html>`_ ）；出生点是常加载区域，来回传送不会重复触发此事件。
+
+        -----
+
+        【posX: int】 自定义方块实体的位置X
+
+        【posY: int】 自定义方块实体的位置Y
+
+        【posZ: int】 自定义方块实体的位置Z
+
+        【dimensionId: int】 维度ID
+
+        【blockName: str】 方块的identifier，包含命名空间及名称
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
 
     def CloseNeteaseShopEvent(self, args):
         """
         *[event]*
 
         关闭商城界面时触发，包括脚本商城和Apollo插件商城。
-        
+
         -----
 
         无参数
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -343,7 +485,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -365,7 +507,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -401,7 +543,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -416,6 +558,8 @@ class NuoyanClientSystem(_ClientSystem):
         仅在pc的普通控制模式（即非F11模式）下触发。
 
         在F11下右键，按下会触发RightClickBeforeClientEvent，松开时会触发TapOrHoldReleaseClientEvent。
+
+        pc的普通控制模式下的鼠标点击流程见TapOrHoldReleaseClientEvent备注中的 `配图 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E4%BA%8B%E4%BB%B6/%E6%8E%A7%E5%88%B6.html?catalog=1#taporholdreleaseclientevent>`_。
         
         -----
 
@@ -423,7 +567,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -441,7 +585,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -465,7 +609,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|float] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -481,13 +625,13 @@ class NuoyanClientSystem(_ClientSystem):
 
         【screenName: str】 当前screenName
 
-        【key: str】 键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见KeyBoardType枚举
+        【key: str】 键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html>`_
 
         【isDown: str】 是否按下，按下为1，弹起为0
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -537,7 +681,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -555,7 +699,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -573,7 +717,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -591,7 +735,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -623,7 +767,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -643,7 +787,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -661,7 +805,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -679,7 +823,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -697,7 +841,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -723,7 +867,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|tuple[float,float,float]|float|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -743,7 +887,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -761,7 +905,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -785,7 +929,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,float] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -803,7 +947,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -821,7 +965,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -839,7 +983,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -857,7 +1001,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -875,7 +1019,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -895,7 +1039,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -913,7 +1057,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -937,7 +1081,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -955,7 +1099,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -973,7 +1117,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -991,7 +1135,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1009,7 +1153,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1027,7 +1171,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1043,11 +1187,11 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         -----
 
-        :param dict[str,str|dict] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1063,11 +1207,11 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         -----
 
-        :param dict[str,str|dict] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1083,13 +1227,13 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         【$cancel: bool】 是否取消此次操作
 
         -----
 
-        :param dict[str,str|dict|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1103,11 +1247,11 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【itemDict: dict】 切换后的物品信息字典
+        【itemDict: dict】 切换后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         -----
 
-        :param dict[str,dict] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1125,7 +1269,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【durationLeft: float】 蓄力剩余时间（当物品缺少"minecraft:maxduration"组件时，蓄力剩余时间为负数）
 
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         【maxUseDuration: int】 最大蓄力时长
 
@@ -1133,7 +1277,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|float|dict|int|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1157,13 +1301,13 @@ class NuoyanClientSystem(_ClientSystem):
 
         【slot: int】 背包槽位
 
-        【oldItemDict: dict】 变化前槽位中的物品信息字典
+        【oldItemDict: dict】 变化前槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
-        【newItemDict: dict】 变化后槽位中的物品信息字典
+        【newItemDict: dict】 变化后槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         -----
 
-        :param dict[str,str|int|dict] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1179,17 +1323,17 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【oldItemDict: dict】 合成前的物品物品信息字典（砂轮内第一个物品）
+        【oldItemDict: dict】 合成前的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_（砂轮内第一个物品）
 
-        【additionalItemDict: dict】 作为合成材料的物品物品信息字典（砂轮内第二个物品）
+        【additionalItemDict: dict】 作为合成材料的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_（砂轮内第二个物品）
 
-        【newItemDict: dict】 合成后的物品物品信息字典
+        【newItemDict: dict】 合成后的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         【exp: int】 本次合成返还的经验
 
         -----
 
-        :param dict[str,str|dict|int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1207,7 +1351,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1227,7 +1371,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【entityId: str】 玩家实体ID
 
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         【x: int】 方块x坐标
 
@@ -1239,7 +1383,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【blockAuxValue: int】 方块的附加值
 
-        【face: int】 点击方块的面，参考Facing枚举
+        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
 
         【clickX: float】 点击点的x比例位置
 
@@ -1251,7 +1395,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|dict|int|float|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1273,13 +1417,13 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
         【$cancel: bool】 是否取消使用物品
 
         -----
 
-        :param dict[str,str|dict|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1297,15 +1441,15 @@ class NuoyanClientSystem(_ClientSystem):
 
         【itemShowName: str】 合成后的物品显示名称
 
-        【itemDict: dict】 合成后的物品的物品信息字典
+        【itemDict: dict】 合成后的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
-        【oldItemDict: dict】 合成前的物品的物品信息字典（铁砧内第一个物品）
+        【oldItemDict: dict】 合成前的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_（铁砧内第一个物品）
 
-        【materialItemDict: dict】 合成所使用材料的物品信息字典（铁砧内第二个物品）
+        【materialItemDict: dict】 合成所使用材料的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_（铁砧内第二个物品）
 
         -----
 
-        :param dict[str,str|dict|] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1321,13 +1465,13 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】 物品信息字典
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
-        【useMethod: int】 使用物品的方法，详见ItemUseMethodEnum枚举
+        【useMethod: int】 使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html>`_
 
         -----
 
-        :param dict[str,str|dict|int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1345,13 +1489,13 @@ class NuoyanClientSystem(_ClientSystem):
 
         【secondaryActor: str】 物品给予者玩家实体ID，如果不存在给予者的话，这里为空字符串
 
-        【itemDict: dict】 获取到的物品的物品信息字典
+        【itemDict: dict】 获取到的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
 
-        【acquireMethod: int】 获得物品的方法，详见ItemAcquisitionMethod
+        【acquireMethod: int】 获得物品的方法，详见 `ItemAcquisitionMethod <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html>`_
 
         -----
 
-        :param dict[str,str|dict|int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1367,7 +1511,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         压力板与绊线钩在过去的版本的事件是可以触发的，但在更新后这种非实心方块并不会触发，有需要的可以使用OnEntityInsideBlockClientEvent事件。
 
-        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关，原版方块需要先通过RegisterOnStepOn接口注册才能触发。
+        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStepOn接口注册才能触发。
 
         原版的红石矿默认注册了，但深层红石矿没有默认注册。
 
@@ -1399,7 +1543,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,bool|int|str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1427,7 +1571,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,tuple[float,float,float]|str|int|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1439,7 +1583,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         实体移动离开一个实心方块时触发。
 
-        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关，原版方块需要先通过RegisterOnStepOff接口注册才能触发。
+        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStepOff接口注册才能触发。
 
         压力板与绊线钩这种非实心方块不会触发。
         
@@ -1467,7 +1611,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int|str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1505,7 +1649,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int|str|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1527,7 +1671,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【z: int】 方块z坐标
 
-        【face: int】 方块被敲击的面向ID，参考Facing枚举
+        【face: int】 方块被敲击的面向ID，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
 
         【blockName: str】 方块的identifier，包含命名空间及名称
 
@@ -1539,7 +1683,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int|str|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1551,7 +1695,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         当实体站立到方块上时客户端持续触发。
 
-        不是所有方块都会触发该事件，需要在json中先配置触发开关，原版方块需要先通过RegisterOnStandOn接口注册才能触发。
+        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStandOn接口注册才能触发。
 
         如果要在脚本层修改motion/cancel，强烈建议配合OnStandOnBlockServerEvent服务端事件同步修改，避免出现被服务端矫正等非预期现象。
 
@@ -1595,7 +1739,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int|float|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1621,7 +1765,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int|tuple[float,float,float]] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1633,7 +1777,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         当实体碰撞盒所在区域有方块时，客户端持续触发。
 
-        不是所有方块都会触发该事件，需要在json中先配置触发开关，原版方块需要先通过RegisterOnEntityInside接口注册才能触发。
+        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnEntityInside接口注册才能触发。
 
         如果需要修改slowdownMulti/cancel，强烈建议与服务端事件同步修改，避免出现被服务端矫正等非预期现象。
 
@@ -1675,7 +1819,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int|float|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1687,7 +1831,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         当实体降落到方块后客户端触发，主要用于力的计算。
 
-        不是所有方块都会触发该事件，需要在json中先配置触发开关。
+        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
 
         如果要在脚本层修改motion，回传的需要是浮点型，例如需要赋值0.0而不是0。
 
@@ -1719,7 +1863,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|float|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1731,7 +1875,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         当下落的方块开始计算砸到实体的伤害时，客户端触发该事件。
 
-        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关。
+        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
 
         当该事件的参数数据与服务端事件FallingBlockCauseDamageBeforeServerEvent数据有差异时，请以服务端事件数据为准。
         
@@ -1761,7 +1905,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|float|int|list[str]|bool|None] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1793,7 +1937,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1815,7 +1959,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1855,7 +1999,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1881,7 +2025,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1903,7 +2047,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,tuple[float,float,float]|str|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1929,7 +2073,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int|tuple[float,float,float]] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1965,7 +2109,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|int|float] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -1987,7 +2131,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2005,7 +2149,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2025,7 +2169,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2047,7 +2191,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2079,7 +2223,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|list[str]] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2097,7 +2241,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2119,7 +2263,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|float] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2165,7 +2309,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2187,7 +2331,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2207,7 +2351,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2225,7 +2369,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2243,7 +2387,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2263,7 +2407,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2281,7 +2425,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2303,7 +2447,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2321,7 +2465,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2343,7 +2487,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2355,7 +2499,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         客户端区块即将被卸载时触发。
 
-        区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载。
+        区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载，参考 `区块介绍 <https://minecraft.fandom.com/zh/wiki/%E5%8C%BA%E5%9D%97>`_。
         
         -----
 
@@ -2367,7 +2511,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,int] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2389,7 +2533,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2409,7 +2553,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2443,7 +2587,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict[str,str|float|int|bool] args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
@@ -2479,13 +2623,13 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param dict args: 参数字典
+        :param dict args: 参数字典，参数解释见上方
 
         :return: 无
         :rtype: None
         """
 
-    # ======================================= Custom Event Callback ====================================================
+    # ======================================== New Event Callback ============================================
 
     def OnGameTick(self):
         """
@@ -2507,7 +2651,7 @@ class NuoyanClientSystem(_ClientSystem):
         :rtype: None
         """
 
-    # ========================================== Basic Function ========================================================
+    # ========================================== Basic Function ==============================================
 
     def SetQueryVar(self, entityId, name, value, sync=True):
         """
@@ -2664,7 +2808,7 @@ class NuoyanClientSystem(_ClientSystem):
             param['__cs__'] = self
         return _clientApi.CreateUI(_MOD_NAME, namespace, param)
 
-    # ========================================= Internal Method ========================================================
+    # ========================================= Internal Method ==============================================
 
     def _setPrintLog(self):
         _clientApi.SetMcpModLogCanPostDump(True)
@@ -2718,7 +2862,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     @listen_server("_SetMotion")
     def _OnSetMotion(self, motion):
-        _PlayerComps.ActorMotion.SetMotion(motion)
+        _ClientPlayerComps.ActorMotion.SetMotion(motion)
 
     def __listen(self):
         for kwargs in _lsnFuncArgs:
@@ -2750,6 +2894,7 @@ class _GameTick(_ScreenNode):
             self.cs.NotifyToServer("OnGameTick", {})
         if self.notifyCl:
             self.cs.OnGameTick()
+
 
 
 
