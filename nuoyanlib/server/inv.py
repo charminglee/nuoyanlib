@@ -21,21 +21,18 @@ from mod.common.minecraftEnum import (
     ItemPosType as _ItemPosType,
     GameType as _GameType,
 )
-from ..utils.item import (
-    is_empty_item as _is_empty_item,
-    get_item_count as _get_item_count,
-)
+from ..utils.item import is_empty_item as _is_empty_item
 from serverComps import (
-    CompFactory as _CompFactory,
+    ServerCompFactory as _ServerCompFactory,
     ServerLevelComps as _ServerLevelComps,
 )
 
 
 __all__ = [
-    "deduct_item",
+    "deduct_inv_item",
     "clear_items",
     "get_item_pos",
-    "change_player_item_count",
+    "change_item_count",
 ]
 
 
@@ -43,65 +40,85 @@ _ITEM_POS_SIZE = (36, 1, 1, 4)
 
 
 def clear_items(playerId, itemPosType, pos):
-    # type: (str, int, int) -> dict
     """
     清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
-    -----------------------------------------------------------
-    【playerId: str】 玩家的实体ID
-    【itemPosType: int】 槽位类型，ItemPosType枚举
-    【pos: int】 槽位编号
-    -----------------------------------------------------------
-    return: dict -> 该位置被清除前的物品信息字典
+
+    -----
+
+    :param str playerId: 玩家的实体ID
+    :param int itemPosType: 槽位类型，ItemPosType枚举
+    :param int pos: 槽位编号
+
+    :return: 该位置被清除前的物品信息字典
+    :rtype: dict
     """
-    comp = _CompFactory.CreateItem(playerId)
+    comp = _ServerCompFactory.CreateItem(playerId)
     item = comp.GetPlayerItem(itemPosType, pos, True)
     comp.SetPlayerAllItems({(itemPosType, pos): None})
     return item
 
 
 def get_item_pos(entityId, posType, itemId, itemAux=-1, count=1):
-    # type: (str, int, str, int, int) -> list[int]
     """
     获取物品所在槽位。
-    -----------------------------------------------------------
-    【entityId: str】 生物的实体ID
-    【posType: int】 ItemPosType枚举
-    【itemId: str】 物品ID
-    【itemAux: int = -1】 物品特殊值，-1表示任意特殊值
-    【count: int = 1】 返回数量，比如1表示只返回第一个搜索到的物品的槽位
-    -----------------------------------------------------------
-    return: List[int] -> 物品所在槽位的列表
+
+    -----
+
+    :param str entityId: 生物的实体ID
+    :param int posType: ItemPosType枚举
+    :param str itemId: 物品ID
+    :param int itemAux: 物品特殊值，默认为-1，表示任意特殊值
+    :param int count: 返回数量，比如1表示只返回第一个搜索到的物品的槽位，默认为1
+
+    :return: 物品所在槽位的列表，获取不到返回空列表
+    :rtype: list[int]
     """
-    isPlayer = (_CompFactory.CreateEngineType(entityId).GetEngineTypeStr() == "minecraft:player")
-    itemComp = _CompFactory.CreateItem(entityId)
-    num = 1 if posType == 1 or posType == 2 else (4 if posType == 3 else 36)
+    isPlayer = (_ServerCompFactory.CreateEngineType(entityId).GetEngineTypeStr() == "minecraft:player")
+    itemComp = _ServerCompFactory.CreateItem(entityId)
+    num = _ITEM_POS_SIZE[posType - 1]
     result = []
     for i in range(num):
         if len(result) >= count:
             break
         itemDict = itemComp.GetPlayerItem(posType, i) if isPlayer else itemComp.GetEntityItem(posType, i)
-        if itemDict and itemDict['newItemName'] == itemId and (itemAux == -1 or itemDict['newAuxValue'] == itemAux):
+        if (
+                itemDict
+                and itemDict['newItemName'] == itemId
+                and (itemAux == -1 or itemDict['newAuxValue'] == itemAux)
+        ):
             result.append(i)
     return result
 
 
-def change_player_item_count(playerId, posType=_ItemPosType.CARRIED, pos=0, change=-1):
-    # type: (str, int, int, int) -> None
+def change_item_count(playerId, posType=_ItemPosType.CARRIED, pos=0, change=-1):
     """
     改变玩家指定槽位物品的数量。（创造模式下不生效）
+
+    -----
+
     【示例】
-    change_player_item_count(playerId)     # 玩家手持物品数量-1
-    -----------------------------------------------------------
-    【playerId: str】 玩家实体ID
-    【posType: int = ItemPosType.CARRIED】 槽位类型
-    【pos: int = 0】 槽位
-    【change: int = -1】 改变量
-    -----------------------------------------------------------
-    NoReturn
+
+    玩家手持物品数量减1：
+
+    >>> change_item_count(playerId)
+
+    玩家背包槽位10的物品数量加2：
+
+    >>> change_item_count(playerId, ItemPosType.INVENTORY, 10, 2)
+
+    -----
+
+    :param str playerId: 玩家实体ID
+    :param int posType: 槽位类型，默认为ItemPosType.CARRIED
+    :param int pos: 槽位，默认为0
+    :param int change: 改变量，默认为-1
+
+    :return: 无
+    :rtype: None
     """
     if _ServerLevelComps.Game.GetPlayerGameType(playerId) == _GameType.Creative:
         return
-    itemComp = _CompFactory.CreateItem(playerId)
+    itemComp = _ServerCompFactory.CreateItem(playerId)
     item = itemComp.GetPlayerItem(posType, pos)
     item['count'] += change
     if item['count'] <= 0:
@@ -109,24 +126,26 @@ def change_player_item_count(playerId, posType=_ItemPosType.CARRIED, pos=0, chan
     itemComp.SetPlayerAllItems({(posType, pos): item})
 
 
-def deduct_item(playerId, name, aux=-1, count=1):
+def deduct_inv_item(playerId, name, aux=-1, count=1):
     """
     从玩家背包中扣除指定数量的物品。
-    -----------------------------------------------------------
-    【playerId: str】 玩家的实体ID
-    【name: str】 物品名称
-    【aux: int = -1】 物品特殊值（-1表示任意特殊值）
-    【count: int = 1】 扣除数量
-    -----------------------------------------------------------
-    return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
+
+    该函数无需传入物品所在位置，而是自动从背包中寻找指定物品，找到了则扣除指定数量。
+
+    -----
+
+    :param str playerId: 玩家的实体ID
+    :param str name: 物品名称
+    :param int aux: 物品特殊值，默认为-1，表示任意特殊值
+    :param int count: 扣除数量，默认为1
+
+    :return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
+    :rtype: bool
     """
-    totalCount = _get_item_count(playerId, name, aux)
-    if totalCount < count:
-        return False
-    comp = _CompFactory.CreateItem(playerId)
+    comp = _ServerCompFactory.CreateItem(playerId)
     items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
     itemsDictMap = {}
-    for i, item in enumerate(items[:]):
+    for i, item in enumerate(items):
         if _is_empty_item(item):
             continue
         if item['newItemName'] != name:
@@ -137,10 +156,12 @@ def deduct_item(playerId, name, aux=-1, count=1):
         item['count'] -= count
         count -= c
         if item['count'] <= 0:
-            items[i] = None
-        itemsDictMap[(_ItemPosType.INVENTORY, i)] = items[i]
+            item = None
+        itemsDictMap[(_ItemPosType.INVENTORY, i)] = item
         if count <= 0:
             break
+    else:
+        return False
     if itemsDictMap:
         comp.SetPlayerAllItems(itemsDictMap)
     return True

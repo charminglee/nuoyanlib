@@ -79,10 +79,10 @@ from mod.client.component.playerAnimCompClient import PlayerAnimCompClient
 from mod.common.component.baseComponent import BaseComponent
 
 
-ENGINE_NAMESPACE: str
-ENGINE_SYSTEM_NAME: str
+CLIENT_ENGINE_NAMESPACE: str
+CLIENT_ENGINE_SYSTEM_NAME: str
 ClientSystem: Type[ClientSystem]
-CompFactory: EngineCompFactoryClient
+ClientCompFactory: EngineCompFactoryClient
 ScreenNode: Type[ScreenNode]
 ViewBinder: Type[ViewBinder]
 ViewRequest: Type[ViewRequest]

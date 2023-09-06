@@ -28,13 +28,13 @@ clientComps
 
 【模块变量说明】
 
-1、ENGINE_NAMESPACE：客户端引擎事件的命名空间。
+1、CLIENT_ENGINE_NAMESPACE：客户端引擎事件的命名空间。
 
-2、ENGINE_SYSTEM_NAME：客户端引擎系统名。
+2、CLIENT_ENGINE_SYSTEM_NAME：客户端引擎系统名。
 
 3、ClientSystem：客户端system基类。
 
-4、CompFactory：客户端引擎组件工厂。
+4、ClientCompFactory：客户端引擎组件工厂。
 
 5、ScreenNode：ScreenNode类。
 
@@ -73,10 +73,10 @@ import mod.client.extraClientApi as _clientApi
 
 
 __all__ = [
-    "ENGINE_NAMESPACE",
-    "ENGINE_SYSTEM_NAME",
+    "CLIENT_ENGINE_NAMESPACE",
+    "CLIENT_ENGINE_SYSTEM_NAME",
     "ClientSystem",
-    "CompFactory",
+    "ClientCompFactory",
     "ScreenNode",
     "ViewBinder",
     "ViewRequest",
@@ -87,12 +87,12 @@ __all__ = [
 ]
 
 
-ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
-ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
+CLIENT_ENGINE_NAMESPACE = _clientApi.GetEngineNamespace()
+CLIENT_ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
 
 
 ClientSystem = _clientApi.GetClientSystemCls()
-CompFactory = _clientApi.GetEngineCompFactory()
+ClientCompFactory = _clientApi.GetEngineCompFactory()
 
 
 ScreenNode = _clientApi.GetScreenNodeCls()
@@ -110,7 +110,7 @@ class _CompDescr(object):
 
     def __get__(self, ins, cls):
         if self.compName not in cls._cache:
-            comp = getattr(CompFactory, "Create" + self.compName)(cls._target)
+            comp = getattr(ClientCompFactory, "Create" + self.compName)(cls._target)
             # comp = self.compName
             cls._cache[self.compName] = comp
         return cls._cache[self.compName]

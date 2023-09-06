@@ -21,20 +21,20 @@ import mod.client.extraClientApi as _clientApi
 from ..config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from ..utils.utils import is_method_overridden as _is_method_overridden
 from clientComps import (
-    ENGINE_NAMESPACE as _ENGINE_NAMESPACE,
-    ENGINE_SYSTEM_NAME as _ENGINE_SYSTEM_NAME,
+    CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
+    CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
     ScreenNode as _ScreenNode,
     ViewBinder as _ViewBinder,
     PLAYER_ID as _PLAYER_ID,
     ClientSystem as _ClientSystem,
-    CompFactory as _CompFactory,
+    ClientCompFactory as _ClientCompFactory,
     ClientPlayerComps as _ClientPlayerComps,
 )
 
 
 __all__ = [
-    "ALL_ENGINE_EVENTS",
-    "listen_server",
+    "ALL_CLIENT_ENGINE_EVENTS",
+    "client_listener",
     "NuoyanClientSystem",
 ]
 
@@ -45,7 +45,7 @@ _UI_PATH_GAME_TICK = _PATH + "._GameTick"
 _UI_DEF_GAME_TICK = "_GameTick.main"
 
 
-ALL_ENGINE_EVENTS = {
+ALL_CLIENT_ENGINE_EVENTS = {
     "OnKeyboardControllerLayoutChangeClientEvent",
     "OnGamepadControllerLayoutChangeClientEvent",
     "OnGamepadTriggerClientEvent",
@@ -147,7 +147,7 @@ ALL_ENGINE_EVENTS = {
 _lsnFuncArgs = []
 
 
-def listen_server(eventName="", namespace="", systemName="", priority=0):
+def client_listener(eventName="", namespace="", systemName="", priority=0):
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
 
@@ -162,23 +162,23 @@ def listen_server(eventName="", namespace="", systemName="", priority=0):
     【示例】
 
     >>> class MyClientSystem(ClientSystem):
-    ...     @listen_server("MyCustomEvent1")  # 监听当前服务端传来的自定义事件
+    ...     @client_listener("MyCustomEvent1")  # 监听当前服务端传来的自定义事件
     ...     def eventCallback1(self, args):
     ...         pass
     ...
-    ...     @listen_server("MyCustomEvent2", "OtherNamespace", "OtherServer")  # 监听其他服务端传来的自定义事件
+    ...     @client_listener("MyCustomEvent2", "OtherNamespace", "OtherServer")  # 监听其他服务端传来的自定义事件
     ...     def eventCallback2(self, args):
     ...         pass
     ...
-    ...     @listen_server  # 监听当前服务端传来的与函数同名的事件
+    ...     @client_listener  # 监听当前服务端传来的与函数同名的事件
     ...     def SomeEvent1(self, args):
     ...         pass
     ...
-    ...     @listen_server(namespace="OtherNamespace", systemName="OtherServer")  # 监听其他服务端传来的与函数同名的事件
+    ...     @client_listener(namespace="OtherNamespace", systemName="OtherServer")  # 监听其他服务端传来的与函数同名的事件
     ...     def SomeEvent2(self, args):
     ...         pass
     ...
-    ...     @listen_server("AddEntityClientEvent")  # 监听引擎事件
+    ...     @client_listener("AddEntityClientEvent")  # 监听引擎事件
     ...     def OnAddEntity(self, args):
     ...         pass
 
@@ -189,7 +189,7 @@ def listen_server(eventName="", namespace="", systemName="", priority=0):
     :param str systemName: 指定系统名称，默认为空字符串，表示当前服务端的系统名称
     :param int priority: 优先级，默认为0
     """
-    # @listen_server
+    # @client_listener
     if callable(eventName):
         funcName = eventName.__name__
         global _lsnFuncArgs
@@ -201,12 +201,12 @@ def listen_server(eventName="", namespace="", systemName="", priority=0):
             'priority': priority,
         })
         return eventName
-    # @listen_server(...)
+    # @client_listener(...)
     else:
         if not namespace and not systemName:
-            if eventName in ALL_ENGINE_EVENTS:
-                namespace = _ENGINE_NAMESPACE
-                systemName = _ENGINE_SYSTEM_NAME
+            if eventName in ALL_CLIENT_ENGINE_EVENTS:
+                namespace = _CLIENT_ENGINE_NAMESPACE
+                systemName = _CLIENT_ENGINE_SYSTEM_NAME
             else:
                 namespace = _MOD_NAME
                 systemName = _SERVER_SYSTEM_NAME
@@ -2708,7 +2708,7 @@ class NuoyanClientSystem(_ClientSystem):
         :rtype: tuple[bool]
         """
         res = []
-        comp = _CompFactory.CreateActorRender(playerId)
+        comp = _ClientCompFactory.CreateActorRender(playerId)
         for arg in resTuple:
             if arg[1].startswith("geometry."):
                 res.append(comp.AddPlayerGeometry(*arg))
@@ -2813,28 +2813,28 @@ class NuoyanClientSystem(_ClientSystem):
     def _setPrintLog(self):
         _clientApi.SetMcpModLogCanPostDump(True)
 
-    @listen_server("_SetQueryCache")
+    @client_listener("_SetQueryCache")
     def _OnSetQueryCache(self, args):
         for entityId, queries in args.items():
             for name, value in queries.items():
-                comp = _CompFactory.CreateQueryVariable(entityId)
+                comp = _ClientCompFactory.CreateQueryVariable(entityId)
                 if comp.Get(name) == -1.0:
                     comp.Register(name, 0.0)
                 comp.Set(name, value)
 
-    @listen_server("_SetQueryVar")
+    @client_listener("_SetQueryVar")
     def _setQuery(self, args):
         entityId = args['entityId']
         name = args['name']
         value = args['value']
         if '__id__' in args and args['__id__'] == _PLAYER_ID:
             return
-        comp = _CompFactory.CreateQueryVariable(entityId)
+        comp = _ClientCompFactory.CreateQueryVariable(entityId)
         if comp.Get(name) == -1.0:
             comp.Register(name, 0.0)
         comp.Set(name, value)
 
-    @listen_server("_ListenServerGameTick")
+    @client_listener("_ListenServerGameTick")
     def _OnListenServerGameTick(self, args=None):
         if self._uiInitFinished:
             if not self.__gameTickNode:
@@ -2851,7 +2851,7 @@ class NuoyanClientSystem(_ClientSystem):
         else:
             self.__handle = 1
 
-    @listen_server("UiInitFinished")
+    @client_listener("UiInitFinished")
     def _OnUiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
         self._uiInitFinished = True
@@ -2860,7 +2860,7 @@ class NuoyanClientSystem(_ClientSystem):
         elif self.__handle == 2:
             self._OnListenServerGameTick()
 
-    @listen_server("_SetMotion")
+    @client_listener("_SetMotion")
     def _OnSetMotion(self, motion):
         _ClientPlayerComps.ActorMotion.SetMotion(motion)
 
@@ -2868,10 +2868,10 @@ class NuoyanClientSystem(_ClientSystem):
         for kwargs in _lsnFuncArgs:
             kwargs['func'] = getattr(self, kwargs['func'])
             self.ListenForEvent(instance=self, **kwargs)
-        for event in ALL_ENGINE_EVENTS:
+        for event in ALL_CLIENT_ENGINE_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanClientSystem, event):
                 func = getattr(self, event)
-                self.ListenForEvent(_ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, event, self, func)
+                self.ListenForEvent(_CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, event, self, func)
 
     def _startGameTick(self):
         self.__gameTickNode = self.RegisterAndCreateUI(_UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)

@@ -46,7 +46,7 @@ from ...config import (
 )
 from ...utils._error import ClientNotFoundError as _ClientNotFoundError
 from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl as _ButtonUIControl
-from ..nuoyanClientSystem import listen_server as _listen_server
+from ..nuoyanClientSystem import client_listener as _client_listener
 from ..clientComps import (
     ClientLevelComps as _ClientLevelComps,
     ScreenNode as _ScreenNode,
@@ -464,7 +464,7 @@ class NuoyanScreenNode(_ScreenNode):
             for func in self._btnTouchUpCallbackData[bp]:
                 func(args)
 
-    @_listen_server("GetEntityByCoordReleaseClientEvent")
+    @_client_listener("GetEntityByCoordReleaseClientEvent")
     def _OnCoordRelease(self, args):
         self._saveUiPosition()
         self.__fingerPos = None
@@ -594,7 +594,7 @@ class NuoyanScreenNode(_ScreenNode):
         if touchMoveCallback:
             touchMoveCallback(args)
 
-    @_listen_server("ScreenSizeChangedClientEvent")
+    @_client_listener("ScreenSizeChangedClientEvent")
     def _OnScreenSizeChanged(self, args):
         self.screenSize = args['afterX'], args['afterY']
 

@@ -87,10 +87,10 @@ from mod.server.component.blockUseEventWhiteListCompServer import BlockUseEventW
 from mod.server.component.actorLootCompServer import ActorLootComponentServer
 
 
-ENGINE_NAMESPACE: str
-ENGINE_SYSTEM_NAME: str
+SERVER_ENGINE_NAMESPACE: str
+SERVER_ENGINE_SYSTEM_NAME: str
 ServerSystem: Type[ServerSystem]
-CompFactory: EngineCompFactoryServer
+ServerCompFactory: EngineCompFactoryServer
 LEVEL_ID: str
 
 

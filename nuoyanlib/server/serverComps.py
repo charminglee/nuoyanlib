@@ -28,13 +28,13 @@ serverComps
 
 【模块变量说明】
 
-1、ENGINE_NAMESPACE：服务端引擎事件的命名空间。
+1、SERVER_ENGINE_NAMESPACE：服务端引擎事件的命名空间。
 
-2、ENGINE_SYSTEM_NAME：服务端引擎系统名。
+2、SERVER_ENGINE_SYSTEM_NAME：服务端引擎系统名。
 
 3、ClientSystem：服务端system基类。
 
-4、CompFactory：服务端引擎组件工厂。
+4、ServerCompFactory：服务端引擎组件工厂。
 
 5、LEVEL_ID：存档ID。
 
@@ -59,21 +59,21 @@ import mod.server.extraServerApi as _serverApi
 
 
 __all__ = [
-    "ENGINE_NAMESPACE",
-    "ENGINE_SYSTEM_NAME",
+    "SERVER_ENGINE_NAMESPACE",
+    "SERVER_ENGINE_SYSTEM_NAME",
     "ServerSystem",
-    "CompFactory",
+    "ServerCompFactory",
     "LEVEL_ID",
     "ServerLevelComps",
 ]
 
 
-ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
-ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
+SERVER_ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
+SERVER_ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
 
 
 ServerSystem = _serverApi.GetServerSystemCls()
-CompFactory = _serverApi.GetEngineCompFactory()
+ServerCompFactory = _serverApi.GetEngineCompFactory()
 
 
 LEVEL_ID = _serverApi.GetLevelId()
@@ -85,7 +85,7 @@ class _CompDescr(object):
 
     def __get__(self, ins, cls):
         if self.compName not in cls._cache:
-            comp = getattr(CompFactory, "Create" + self.compName)(LEVEL_ID)
+            comp = getattr(ServerCompFactory, "Create" + self.compName)(LEVEL_ID)
             # comp = self.compName
             cls._cache[self.compName] = comp
         return cls._cache[self.compName]

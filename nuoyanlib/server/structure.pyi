@@ -12,11 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-07
+#   Last Modified : 2023-09-06
 #
 # ====================================================
 
 
-__all__ = [
+from typing import Tuple, List, Dict
 
-]
+
+def place_large_structure(
+    pos: Tuple[float, float, float],
+    dimensionId: int,
+    jsonList: List[dict],
+    namespace: str,
+) -> Dict[str, bool]: ...

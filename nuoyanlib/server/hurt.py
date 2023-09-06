@@ -35,7 +35,7 @@ from entity import (
     get_all_entities as _get_all_entities,
 )
 from serverComps import (
-    CompFactory as _CompFactory,
+    ServerCompFactory as _ServerCompFactory,
     ServerLevelComps as _ServerLevelComps,
 )
 
@@ -71,7 +71,7 @@ def explode_hurt(radius, pos, sourceId, playerId, fire=False, breaks=True, tileD
     """
     origRule = _ServerLevelComps.Game.GetGameRulesInfoServer()
     _ServerLevelComps.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tileDrops, 'mob_loot': mobLoot}})
-    comp = _CompFactory.CreateHurt(playerId)
+    comp = _ServerCompFactory.CreateHurt(playerId)
     try:
         if not hurtPlayer:
             comp.ImmuneDamage(True)
@@ -119,7 +119,7 @@ def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttac
     )
     hurtEnt = []
     for eid in entities:
-        ep = _CompFactory.CreatePos(eid).GetFootPos()
+        ep = _ServerCompFactory.CreatePos(eid).GetFootPos()
         dis = _pos_distance_to_line(ep, startPos, endPos)
         if dis > radius:
             continue
@@ -229,13 +229,13 @@ def sector_aoe_damage(attackerId, sectorRadius, sectorAngle, damage, knocked=Tru
         filterIdList = []
     filterIdList = _copy(filterIdList)
     filterIdList.append(attackerId)
-    attackerPos = _CompFactory.CreatePos(attackerId).GetFootPos()
-    attackerRot = _CompFactory.CreateRot(attackerId).GetRot()[1]
-    dim = _CompFactory.CreateDimension(attackerId).GetEntityDimensionId()
+    attackerPos = _ServerCompFactory.CreatePos(attackerId).GetFootPos()
+    attackerRot = _ServerCompFactory.CreateRot(attackerId).GetRot()[1]
+    dim = _ServerCompFactory.CreateDimension(attackerId).GetEntityDimensionId()
     entityList = _get_entities_in_area(attackerPos, sectorRadius, dim, filterIdList, filterTypeIdList, True)
     result = []
     for eid in entityList:
-        pos = _CompFactory.CreatePos(eid).GetFootPos()
+        pos = _ServerCompFactory.CreatePos(eid).GetFootPos()
         test = _is_in_sector((pos[0], attackerPos[1], pos[2]), attackerPos, sectorRadius, sectorAngle, attackerRot)
         if test:
             hurt(eid, damage, "entity_attack", attackerId, "", knocked, force)
@@ -284,7 +284,7 @@ def hurt_by_set_health(entityId, damage):
     -----------------------------------------------------------
     NoReturn
     """
-    attr = _CompFactory.CreateAttr(entityId)
+    attr = _ServerCompFactory.CreateAttr(entityId)
     health = attr.GetAttrValue(_AttrType.HEALTH)
     newHealth = int(health) - int(damage)
     attr.SetAttrValue(_AttrType.HEALTH, newHealth)
@@ -305,7 +305,7 @@ def hurt(entityId, damage, cause=_ActorDamageCause.NONE, attacker="", childAttac
     -----------------------------------------------------------
     NoReturn
     """
-    hurtResult = _CompFactory.CreateHurt(entityId).Hurt(int(damage), cause, attacker, childAttackerId, knocked)
+    hurtResult = _ServerCompFactory.CreateHurt(entityId).Hurt(int(damage), cause, attacker, childAttackerId, knocked)
     if not hurtResult and force:
         hurt_by_set_health(entityId, damage)
 
@@ -337,7 +337,7 @@ def percent_damage(entityId, percent, typeName, cause=_ActorDamageCause.NONE, at
     # 对生物造成攻击者攻击力两倍的伤害
     percent_damage(entityId, 2.0, "attacker_damage", attacker=attackerId)
     """
-    attr = _CompFactory.CreateAttr(entityId)
+    attr = _ServerCompFactory.CreateAttr(entityId)
     value = 0
     if typeName == "max_health":
         value = attr.GetAttrMaxValue(_AttrType.HEALTH)
@@ -346,7 +346,7 @@ def percent_damage(entityId, percent, typeName, cause=_ActorDamageCause.NONE, at
     elif typeName == "hunger":
         value = attr.GetAttrValue(_AttrType.HUNGER)
     elif typeName == "attacker_damage" and attacker:
-        value = _CompFactory.CreateAttr(attacker).GetAttrValue(_AttrType.DAMAGE)
+        value = _ServerCompFactory.CreateAttr(attacker).GetAttrValue(_AttrType.DAMAGE)
     if value > 0:
         damage = int(value * percent)
         if damage > 999999999:

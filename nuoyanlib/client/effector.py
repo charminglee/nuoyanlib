@@ -52,7 +52,7 @@ True
 import mod.client.extraClientApi as _clientApi
 from ..config import MOD_NAME as _MOD_NAME, CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME
 from ..utils._error import ClientNotFoundError as _ClientNotFoundError
-from clientComps import CompFactory as _CompFactory
+from clientComps import ClientCompFactory as _ClientCompFactory
 
 
 __all__ = [
@@ -144,10 +144,10 @@ class NeteaseParticle(object):
         self._id = self.__cs.CreateEngineParticle(jsonPath, pos)
         if not self._id:
             raise RuntimeError("Create particle failed. jsonPath='%s'." % jsonPath)
-        self._ctrl = _CompFactory.CreateParticleControl(self._id)
-        self._trans = _CompFactory.CreateParticleTrans(self._id)
-        self._bindEntComp = _CompFactory.CreateParticleEntityBind(self._id)
-        self._bindSkelComp = _CompFactory.CreateParticleSkeletonBind(self._id)
+        self._ctrl = _ClientCompFactory.CreateParticleControl(self._id)
+        self._trans = _ClientCompFactory.CreateParticleTrans(self._id)
+        self._bindEntComp = _ClientCompFactory.CreateParticleEntityBind(self._id)
+        self._bindSkelComp = _ClientCompFactory.CreateParticleSkeletonBind(self._id)
         self._bindEntId = ""
         self._bindEntOffset = (0.0, 0.0, 0.0)
         self._bindEntRot = (0.0, 0.0, 0.0)
@@ -660,10 +660,10 @@ class NeteaseFrameAnim(object):
             raise AssertionError("Parameters 'jsonPath' or 'texPath' must be given.")
         if not self._id:
             raise RuntimeError("Create frame animation failed. path='%s'." % (jsonPath or texPath))
-        self._ctrl = _CompFactory.CreateFrameAniControl(self._id)
-        self._trans = _CompFactory.CreateFrameAniTrans(self._id)
-        self._bindEntComp = _CompFactory.CreateFrameAniEntityBind(self._id)
-        self._bindSkelComp = _CompFactory.CreateFrameAniSkeletonBind(self._id)
+        self._ctrl = _ClientCompFactory.CreateFrameAniControl(self._id)
+        self._trans = _ClientCompFactory.CreateFrameAniTrans(self._id)
+        self._bindEntComp = _ClientCompFactory.CreateFrameAniEntityBind(self._id)
+        self._bindSkelComp = _ClientCompFactory.CreateFrameAniSkeletonBind(self._id)
         self._bindEntId = ""
         self._bindEntOffset = (0.0, 0.0, 0.0)
         self._bindEntRot = (0.0, 0.0, 0.0)

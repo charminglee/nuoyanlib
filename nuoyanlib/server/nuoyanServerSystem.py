@@ -27,21 +27,21 @@ from ..config import (
     MOD_NAME as _MOD_NAME,
 )
 from serverComps import (
-    CompFactory as _CompFactory,
-    ENGINE_NAMESPACE as _ENGINE_NAMESPACE,
-    ENGINE_SYSTEM_NAME as _ENGINE_SYSTEM_NAME,
+    ServerCompFactory as _ServerCompFactory,
+    SERVER_ENGINE_NAMESPACE as _SERVER_ENGINE_NAMESPACE,
+    SERVER_ENGINE_SYSTEM_NAME as _SERVER_ENGINE_SYSTEM_NAME,
     ServerSystem as _ServerSystem,
 )
 
 
 __all__ = [
-    "listen",
+    "server_listener",
     "NuoyanServerSystem",
-    "ALL_ENGINE_EVENTS",
+    "ALL_SERVER_ENGINE_EVENTS",
 ]
 
 
-ALL_ENGINE_EVENTS = [
+ALL_SERVER_ENGINE_EVENTS = [
     "OnScriptTickServer",
     "EntityRemoveEvent",
     "OnCarriedNewItemChangedServerEvent",
@@ -201,19 +201,19 @@ ALL_ENGINE_EVENTS = [
 _lsnFuncArgs = []
 
 
-def listen(eventName, t=0, namespace="", systemName="", priority=0):
+def server_listener(eventName, t=0, namespace="", systemName="", priority=0):
     # type: (str, int, str, str, int) -> ...
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
     【示例】
     class MyServerSystem(ServerSystem):
         # 监听客户端传来的自定义事件
-        @listen("MyCustomEvent")
+        @server_listener("MyCustomEvent")
         def eventCallback(self, args):
             pass
 
         # 监听EntityRemoveEvent事件
-        @listen("EntityRemoveEvent", 1)
+        @server_listener("EntityRemoveEvent", 1)
         def OnEntityRemove(self, args):
             pass
     -----------------------------------------------------------
@@ -227,8 +227,8 @@ def listen(eventName, t=0, namespace="", systemName="", priority=0):
         _namespace = _MOD_NAME
         _systemName = _CLIENT_SYSTEM_NAME
     elif t == 1:
-        _namespace = _ENGINE_NAMESPACE
-        _systemName = _ENGINE_SYSTEM_NAME
+        _namespace = _SERVER_ENGINE_NAMESPACE
+        _systemName = _SERVER_ENGINE_SYSTEM_NAME
     else:
         _namespace = namespace
         _systemName = systemName
@@ -2138,7 +2138,7 @@ class NuoyanServerSystem(_ServerSystem):
 
     # ====================================== New Event Callback ==============================================
 
-    @listen("UiInitFinished")
+    @server_listener("UiInitFinished")
     def UiInitFinished(self, args):
         """
         客户端玩家UI框架初始化完成时，服务端触发。
@@ -2146,7 +2146,7 @@ class NuoyanServerSystem(_ServerSystem):
         【__id__: str】 玩家的实体ID
         """
 
-    @listen("OnGameTick")
+    @server_listener("OnGameTick")
     def OnGameTick(self, args):
         """
         *tick*
@@ -2191,8 +2191,8 @@ class NuoyanServerSystem(_ServerSystem):
             namespace = _MOD_NAME
             systemName = _CLIENT_SYSTEM_NAME
         elif t == 1:
-            namespace = _ENGINE_NAMESPACE
-            systemName = _ENGINE_SYSTEM_NAME
+            namespace = _SERVER_ENGINE_NAMESPACE
+            systemName = _SERVER_ENGINE_SYSTEM_NAME
         self.ListenForEvent(namespace, systemName, eventName, callback.__self__, callback, priority)
 
     def CallClient(self, playerId, name, callback=None, *args):
@@ -2213,7 +2213,7 @@ class NuoyanServerSystem(_ServerSystem):
     def _setPrintLog(self):
         _serverApi.SetMcpModLogCanPostDump(True)
 
-    @listen("_SetQueryVar")
+    @server_listener("_SetQueryVar")
     def _OnSetQueryVar(self, args):
         entityId = args['entityId']
         name = args['name']
@@ -2223,7 +2223,7 @@ class NuoyanServerSystem(_ServerSystem):
         self._queryCache[entityId][name] = value
         self.BroadcastToAllClient("_SetQueryVar", args)
 
-    @listen("_ButtonCallbackTriggered")
+    @server_listener("_ButtonCallbackTriggered")
     def _OnButtonCallbackTriggered(self, args):
         funcName = args['__name__']
         del args['__name__']
@@ -2231,7 +2231,7 @@ class NuoyanServerSystem(_ServerSystem):
         if func:
             func(args)
 
-    @listen("_InitItemGrid")
+    @server_listener("_InitItemGrid")
     def _OnInitItemGrid(self, args):
         playerId = args['__id__']
         key = args['key']
@@ -2239,23 +2239,23 @@ class NuoyanServerSystem(_ServerSystem):
         namespace = args['namespace']
         self.itemsData[playerId][(namespace, key)] = [None] * count
 
-    @listen("_ThrowItem")
+    @server_listener("_ThrowItem")
     def _OnThrowItem(self, args):
         itemDict = args
         playerId = args['__id__']
-        dim = _CompFactory.CreateDimension(playerId).GetEntityDimensionId()
-        pos = _CompFactory.CreatePos(playerId).GetPos()
+        dim = _ServerCompFactory.CreateDimension(playerId).GetEntityDimensionId()
+        pos = _ServerCompFactory.CreatePos(playerId).GetPos()
         if not pos:
             return
         itemEnt = self.CreateEngineItemEntity(itemDict, dim, pos)
         if itemEnt:
-            rot = _CompFactory.CreateRot(playerId).GetRot()
+            rot = _ServerCompFactory.CreateRot(playerId).GetRot()
             rot = (-15, rot[1])
             direction = _serverApi.GetDirFromRot(rot)
             motion = tuple(i * 0.3 for i in direction)
-            _CompFactory.CreateActorMotion(itemEnt).SetMotion(motion)
+            _ServerCompFactory.CreateActorMotion(itemEnt).SetMotion(motion)
 
-    @listen("_SyncItems")
+    @server_listener("_SyncItems")
     def _OnSyncItems(self, args):
         playerId = args['__id__']
         namespace = args['namespace']
@@ -2265,7 +2265,7 @@ class NuoyanServerSystem(_ServerSystem):
             if ns != namespace or key not in keys:
                 continue
             data[key] = items
-        invItems = _CompFactory.CreateItem(playerId).GetPlayerAllItems(_ItemPosType.INVENTORY, True)
+        invItems = _ServerCompFactory.CreateItem(playerId).GetPlayerAllItems(_ItemPosType.INVENTORY, True)
         if "inv27" in keys:
             data['inv27'] = invItems[9:]
         if "shortcut" in keys:
@@ -2277,12 +2277,12 @@ class NuoyanServerSystem(_ServerSystem):
             'namespace': namespace,
         })
 
-    @listen("_UpdateItemsData")
+    @server_listener("_UpdateItemsData")
     def _OnUpdateItemsData(self, args):
         playerId = args['__id__']
         data = args['data']
         namespace = args['namespace']
-        comp = _CompFactory.CreateItem(playerId)
+        comp = _ServerCompFactory.CreateItem(playerId)
         invItems = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
         for key, items in data.items():
             if key == "inv27":
@@ -2296,7 +2296,7 @@ class NuoyanServerSystem(_ServerSystem):
             else:
                 self.itemsData[playerId][(namespace, key)] = items
 
-    @listen("_BroadcastToAllClient")
+    @server_listener("_BroadcastToAllClient")
     def _OnBroadcastToAllClient(self, args):
         eventName = args['eventName']
         eventData = args['eventData']
@@ -2304,7 +2304,7 @@ class NuoyanServerSystem(_ServerSystem):
             eventData['__id__'] = args['__id__']
         self.BroadcastToAllClient(eventName, eventData)
 
-    @listen("UiInitFinished", priority=1)
+    @server_listener("UiInitFinished", priority=1)
     def _OnUiInitFinished(self, args):
         playerId = args['__id__']
         self.allPlayerData[playerId] = {}
@@ -2320,7 +2320,7 @@ class NuoyanServerSystem(_ServerSystem):
         for args in _lsnFuncArgs:
             args[1] = getattr(self, args[1])
             self.ListenForEventV2(*args)
-        for event in ALL_ENGINE_EVENTS:
+        for event in ALL_SERVER_ENGINE_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanServerSystem, event):
                 self.ListenForEventV2(event, getattr(self, event), 1)
 

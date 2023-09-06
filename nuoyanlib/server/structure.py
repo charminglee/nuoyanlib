@@ -25,16 +25,19 @@ __all__ = [
 ]
 
 
-def place_large_structure(self, pos, dimensionId, jsonList, namespace):
+def place_large_structure(pos, dimensionId, jsonList, namespace):
     """
-    放置由编辑器导出的经过切分的大型结构。
-    放置结构时以第一个小结构为起点开始放置。
-    -----------------------------------------------------------
-    【jsonList: List[dict]】 使用编辑器导出结构文件时附带的json内的列表
-    【pos: Tuple[int, int, int]】 放置坐标
-    【dimensionId: int】 维度ID
-    -----------------------------------------------------------
-    return: Dict[str, bool] -> 返回结构放置结果字典，key为各个小结构的名称，value为放置结果（成功为True，失败为False）
+    放置由编辑器导出的经过切分的大型结构。放置结构时以第一个小结构为起点开始放置。
+
+    -----
+
+    :param tuple[float,float,float] pos: 放置坐标
+    :param int dimensionId: 维度ID
+    :param list[dict] jsonList: 使用编辑器导出结构文件时附带的json，直接将整个json复制过来即可
+    :param str namespace: 结构文件所在文件夹名称
+
+    :return: 返回结构放置结果字典，key为各个小结构的名称，value为放置结果（成功为True，失败为False）
+    :rtype: dict[str, bool]
     """
     orgPos = jsonList[0]['pos']
     result = {}

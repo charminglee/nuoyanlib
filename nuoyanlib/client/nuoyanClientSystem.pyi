@@ -27,11 +27,11 @@ _PATH: str
 _UI_NAMESPACE_GAME_TICK: str
 _UI_PATH_GAME_TICK: str
 _UI_DEF_GAME_TICK: str
-ALL_ENGINE_EVENTS: List[str]
+ALL_CLIENT_ENGINE_EVENTS: List[str]
 _lsnFuncArgs: List[Dict[str, Union[str, int, Callable]]]
 
 
-def listen_server(
+def client_listener(
     eventName: Union[str, Callable] = "",
     namespace: str = "",
     systemName: str = "",
@@ -148,16 +148,16 @@ class NuoyanClientSystem(ClientSystem):
         param: Optional[dict] = None,
     ) -> ScreenNode: ...
     def _setPrintLog(self) -> None: ...
-    @listen_server("_SetQueryCache")
+    @client_listener("_SetQueryCache")
     def _OnSetQueryCache(self, args: dict) -> None: ...
-    @listen_server("_SetQueryVar")
+    @client_listener("_SetQueryVar")
     def _setQuery(self, args: dict) -> None: ...
-    @listen_server("_ListenServerGameTick")
+    @client_listener("_ListenServerGameTick")
     def _OnListenServerGameTick(self, args: dict = None) -> None: ...
     def _listenClientGameTick(self) -> None: ...
-    @listen_server("UiInitFinished")
+    @client_listener("UiInitFinished")
     def _OnUiInitFinished(self, args: dict) -> None: ...
-    @listen_server("_SetMotion")
+    @client_listener("_SetMotion")
     def _OnSetMotion(self, motion: Tuple[float, float, float]) -> None: ...
     def __listen(self) -> None: ...
     def _startGameTick(self) -> None: ...
