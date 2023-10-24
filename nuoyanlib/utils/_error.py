@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-09-13
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 from traceback import format_exc as _format_exc
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
-from config import (
+from ..config import (
     MOD_NAME as _MOD_NAME,
     CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
     SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME,

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-10-01
 #
 # ====================================================
 
@@ -28,7 +28,7 @@ from ..utils.calculator import (
     is_in_sector as _is_in_sector,
     pos_distance_to_line as _pos_distance_to_line,
 )
-from ..utils.vector import vector_angle as _vector_angle
+from ..utils.vector import vec_angle as _vec_angle
 from entity import (
     entity_filter as _entity_filter,
     get_entities_in_area as _get_entities_in_area,
@@ -125,7 +125,7 @@ def line_damage(damage, radius, startPos, endPos, dim, attackerId="", childAttac
             continue
         v1 = tuple(a - b for a, b in zip(startPos, ep))
         v2 = tuple(a - b for a, b in zip(endPos, ep))
-        if _vector_angle(v1, v2) < 1.57:
+        if _vec_angle(v1, v2) < 1.57:
             continue
         if funcBeforeHurt:
             retEid = funcBeforeHurt(eid, attackerId, childAttackerId)

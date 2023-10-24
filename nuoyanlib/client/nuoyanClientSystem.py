@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-10-24
 #
 # ====================================================
 
@@ -28,7 +28,6 @@ from clientComps import (
     PLAYER_ID as _PLAYER_ID,
     ClientSystem as _ClientSystem,
     ClientCompFactory as _ClientCompFactory,
-    ClientPlayerComps as _ClientPlayerComps,
 )
 
 
@@ -46,6 +45,7 @@ _UI_DEF_GAME_TICK = "_GameTick.main"
 
 
 ALL_CLIENT_ENGINE_EVENTS = {
+    "AchievementButtonMovedClientEvent",
     "OnKeyboardControllerLayoutChangeClientEvent",
     "OnGamepadControllerLayoutChangeClientEvent",
     "OnGamepadTriggerClientEvent",
@@ -147,6 +147,18 @@ ALL_CLIENT_ENGINE_EVENTS = {
 _lsnFuncArgs = []
 
 
+def _add_listener(func, eventName="", namespace=_MOD_NAME, systemName=_SERVER_SYSTEM_NAME, priority=0):
+    if not eventName:
+        eventName = func.__name__
+    _lsnFuncArgs.append({
+        'func': func,
+        'eventName': eventName,
+        'namespace': namespace,
+        'systemName': systemName,
+        'priority': priority,
+    })
+
+
 def client_listener(eventName="", namespace="", systemName="", priority=0):
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
@@ -191,15 +203,7 @@ def client_listener(eventName="", namespace="", systemName="", priority=0):
     """
     # @client_listener
     if callable(eventName):
-        funcName = eventName.__name__
-        global _lsnFuncArgs
-        _lsnFuncArgs.append({
-            'namespace': _MOD_NAME,
-            'systemName': _SERVER_SYSTEM_NAME,
-            'eventName': funcName,
-            'func': funcName,
-            'priority': priority,
-        })
+        _add_listener(eventName)
         return eventName
     # @client_listener(...)
     else:
@@ -215,15 +219,7 @@ def client_listener(eventName="", namespace="", systemName="", priority=0):
         elif not systemName:
             raise AssertionError("Missing parameter 'systemName'.")
         def decorator(func):
-            funcName1 = func.__name__
-            global _lsnFuncArgs
-            _lsnFuncArgs.append({
-                'namespace': namespace,
-                'systemName': systemName,
-                'eventName': eventName if eventName else funcName1,
-                'func': funcName1,
-                'priority': priority,
-            })
+            _add_listener(func, eventName, namespace, systemName, priority)
             return func
         return decorator
 
@@ -273,9 +269,12 @@ class NuoyanClientSystem(_ClientSystem):
     1、带有 *[event]* 标签的方法为事件，重写该方法即可使用该事件。
 
     2、带有 *[tick]* 标签的事件为帧事件，需要注意编写相关逻辑。
+
+    3、事件回调参数中，参数名前面的美元符号“$”表示该参数可进行修改。
     """
 
     def __init__(self, namespace, systemName):
+        # noinspection PySuperArguments
         super(NuoyanClientSystem, self).__init__(namespace, systemName)
         self.__gameTickNode = None
         self._uiInitFinished = False
@@ -293,8 +292,6 @@ class NuoyanClientSystem(_ClientSystem):
         若重写该方法，请调用一次NuoyanClientSystem的同名方法。如：
 
         >>> class MyClientSystem(NuoyanClientSystem):
-        ...     def __init__(self, namespace, systemName):
-        ...         pass
         ...     def Destroy(self):
         ...         super(MyClientSystem, self).Destroy()  # 或者：NuoyanClientSystem.Destroy(self)
 
@@ -305,7 +302,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def Update(self):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         客户端每帧调用，1秒有30帧。
 
@@ -317,6 +314,26 @@ class NuoyanClientSystem(_ClientSystem):
 
     # ======================================= Engine Event Callback ==========================================
 
+    def AchievementButtonMovedClientEvent(self, args):
+        """
+        *[event]*
+
+        使用自定义成就系统的时，拖动成就入口结束时触发。
+
+        -----
+
+        【oldPosition: Tuple[float, float]】 移动前该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
+
+        【newPosition: Tuple[float, float]】 移动后该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
     def OnKeyboardControllerLayoutChangeClientEvent(self, args):
         """
         *[event]*
@@ -327,9 +344,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         【action: str】 行为
 
-        【newKey: int】 修改后的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html>`_
+        【newKey: int】 修改后的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
 
-        【oldKey: int】 修改前的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html>`_
+        【oldKey: int】 修改前的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
 
         -----
 
@@ -349,9 +366,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         【action: str】 行为
 
-        【newKey: int】 修改后的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+        【newKey: int】 修改后的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
 
-        【oldKey: int】 修改前的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+        【oldKey: int】 修改前的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
 
         -----
 
@@ -369,7 +386,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
 
         【magnitude: float】 扣动扳机的力度，取值为 0 ~ 1.0
 
@@ -389,7 +406,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
 
         【x: float】摇杆水平方向的值，从左到右取值为 -1.0 ~ 1.0
 
@@ -413,7 +430,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【screenName: str】 当前screenName
 
-        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html>`_
+        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
 
         【isDown: str】 是否按下，按下为1，弹起为0
 
@@ -559,7 +576,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         在F11下右键，按下会触发RightClickBeforeClientEvent，松开时会触发TapOrHoldReleaseClientEvent。
 
-        pc的普通控制模式下的鼠标点击流程见TapOrHoldReleaseClientEvent备注中的 `配图 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E4%BA%8B%E4%BB%B6/%E6%8E%A7%E5%88%B6.html?catalog=1#taporholdreleaseclientevent>`_。
+        pc的普通控制模式下的鼠标点击流程见TapOrHoldReleaseClientEvent备注中的 `配图 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%8E%A7%E5%88%B6.html?key=TapOrHoldReleaseClientEvent&docindex=6&type=0>`_。
         
         -----
 
@@ -625,7 +642,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【screenName: str】 当前screenName
 
-        【key: str】 键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html>`_
+        【key: str】 键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
 
         【isDown: str】 是否按下，按下为1，弹起为0
 
@@ -1015,7 +1032,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        【path: str】 grid网格所在的路径（从UI根节点算起）
 
         -----
 
@@ -1187,7 +1204,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         -----
 
@@ -1207,7 +1224,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         -----
 
@@ -1227,7 +1244,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         【$cancel: bool】 是否取消此次操作
 
@@ -1247,7 +1264,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【itemDict: dict】 切换后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】 切换后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         -----
 
@@ -1269,7 +1286,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【durationLeft: float】 蓄力剩余时间（当物品缺少"minecraft:maxduration"组件时，蓄力剩余时间为负数）
 
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         【maxUseDuration: int】 最大蓄力时长
 
@@ -1301,9 +1318,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         【slot: int】 背包槽位
 
-        【oldItemDict: dict】 变化前槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【oldItemDict: dict】 变化前槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
-        【newItemDict: dict】 变化后槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【newItemDict: dict】 变化后槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         -----
 
@@ -1323,11 +1340,11 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【oldItemDict: dict】 合成前的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_（砂轮内第一个物品）
+        【oldItemDict: dict】 合成前的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（砂轮内第一个物品）
 
-        【additionalItemDict: dict】 作为合成材料的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_（砂轮内第二个物品）
+        【additionalItemDict: dict】 作为合成材料的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（砂轮内第二个物品）
 
-        【newItemDict: dict】 合成后的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【newItemDict: dict】 合成后的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         【exp: int】 本次合成返还的经验
 
@@ -1359,7 +1376,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def ClientItemUseOnEvent(self, args):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         玩家在对方块使用物品时客户端抛出的事件。
 
@@ -1371,7 +1388,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【entityId: str】 玩家实体ID
 
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         【x: int】 方块x坐标
 
@@ -1383,7 +1400,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【blockAuxValue: int】 方块的附加值
 
-        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
+        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
 
         【clickX: float】 点击点的x比例位置
 
@@ -1417,7 +1434,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         【$cancel: bool】 是否取消使用物品
 
@@ -1441,11 +1458,11 @@ class NuoyanClientSystem(_ClientSystem):
 
         【itemShowName: str】 合成后的物品显示名称
 
-        【itemDict: dict】 合成后的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】 合成后的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
-        【oldItemDict: dict】 合成前的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_（铁砧内第一个物品）
+        【oldItemDict: dict】 合成前的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第一个物品）
 
-        【materialItemDict: dict】 合成所使用材料的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_（铁砧内第二个物品）
+        【materialItemDict: dict】 合成所使用材料的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第二个物品）
 
         -----
 
@@ -1465,9 +1482,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         【playerId: str】 玩家的实体ID
 
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
-        【useMethod: int】 使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html>`_
+        【useMethod: int】 使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
 
         -----
 
@@ -1489,9 +1506,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         【secondaryActor: str】 物品给予者玩家实体ID，如果不存在给予者的话，这里为空字符串
 
-        【itemDict: dict】 获取到的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8#%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8>`_
+        【itemDict: dict】 获取到的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
-        【acquireMethod: int】 获得物品的方法，详见 `ItemAcquisitionMethod <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html>`_
+        【acquireMethod: int】 获得物品的方法，详见 `ItemAcquisitionMethod <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
 
         -----
 
@@ -1671,7 +1688,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         【z: int】 方块z坐标
 
-        【face: int】 方块被敲击的面向ID，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI-beta/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
+        【face: int】 方块被敲击的面向ID，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
 
         【blockName: str】 方块的identifier，包含命名空间及名称
 
@@ -1691,7 +1708,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def OnStandOnBlockClientEvent(self, args):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         当实体站立到方块上时客户端持续触发。
 
@@ -1773,7 +1790,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def OnEntityInsideBlockClientEvent(self, args):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         当实体碰撞盒所在区域有方块时，客户端持续触发。
 
@@ -1827,7 +1844,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def OnAfterFallOnBlockClientEvent(self, args):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         当实体降落到方块后客户端触发，主要用于力的计算。
 
@@ -1913,7 +1930,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def ClientBlockUseEvent(self, args):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         玩家右键点击新版自定义方块（或者通过接口AddBlockItemListenForUseEvent增加监听的MC原生游戏方块）时客户端抛出该事件。
 
@@ -2595,7 +2612,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def OnScriptTickClient(self):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         客户端tick事件，1秒30次。
         
@@ -2633,7 +2650,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def OnGameTick(self):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         频率与游戏实时帧率同步的Tick事件。比如游戏当前帧率为60帧，则该事件每秒触发60次。
 
@@ -2757,9 +2774,11 @@ class NuoyanClientSystem(_ClientSystem):
 
         客户端监听事件：
 
-        >>> def func(self, args):
-        ...     print args  # {'num': 123, '__id__': "-114514"}
-        >>> self.ListenForEvent(serverNamespace, serverSystemName, "MyEvent", self, self.func)
+        >>> from nuoyanlib.client import client_listener
+        >>> class MyClient(ClientSystem):
+        ...     @client_listener
+        ...     def MyEvent(self, args):
+        ...         print args  # {'num': 123, '__id__': "-114514"}
 
         客户端广播事件（假设该玩家的实体ID为"-114514"）：
 
@@ -2814,7 +2833,7 @@ class NuoyanClientSystem(_ClientSystem):
         _clientApi.SetMcpModLogCanPostDump(True)
 
     @client_listener("_SetQueryCache")
-    def _OnSetQueryCache(self, args):
+    def _onSetQueryCache(self, args):
         for entityId, queries in args.items():
             for name, value in queries.items():
                 comp = _ClientCompFactory.CreateQueryVariable(entityId)
@@ -2835,7 +2854,7 @@ class NuoyanClientSystem(_ClientSystem):
         comp.Set(name, value)
 
     @client_listener("_ListenServerGameTick")
-    def _OnListenServerGameTick(self, args=None):
+    def _onListenServerGameTick(self, args=None):
         if self._uiInitFinished:
             if not self.__gameTickNode:
                 self._startGameTick()
@@ -2851,34 +2870,36 @@ class NuoyanClientSystem(_ClientSystem):
         else:
             self.__handle = 1
 
+    def _startGameTick(self):
+        self.__gameTickNode = self.RegisterAndCreateUI(
+            _UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK
+        )
+
+    def _checkOnGameTick(self):
+        if _is_method_overridden(self.__class__, NuoyanClientSystem, "OnGameTick"):
+            self._listenClientGameTick()
+
     @client_listener("UiInitFinished")
-    def _OnUiInitFinished(self, args):
+    def _onUiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
         self._uiInitFinished = True
         if self.__handle == 1:
             self._listenClientGameTick()
         elif self.__handle == 2:
-            self._OnListenServerGameTick()
-
-    @client_listener("_SetMotion")
-    def _OnSetMotion(self, motion):
-        _ClientPlayerComps.ActorMotion.SetMotion(motion)
+            self._onListenServerGameTick()
 
     def __listen(self):
         for kwargs in _lsnFuncArgs:
-            kwargs['func'] = getattr(self, kwargs['func'])
-            self.ListenForEvent(instance=self, **kwargs)
+            func = kwargs['func']
+            funcName = func.__name__
+            method = getattr(self, funcName, None)
+            if method and method.__func__ is func:
+                kwargs['func'] = method
+                self.ListenForEvent(instance=self, **kwargs)
         for event in ALL_CLIENT_ENGINE_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanClientSystem, event):
                 func = getattr(self, event)
                 self.ListenForEvent(_CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, event, self, func)
-
-    def _startGameTick(self):
-        self.__gameTickNode = self.RegisterAndCreateUI(_UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)
-
-    def _checkOnGameTick(self):
-        if _is_method_overridden(self.__class__, NuoyanClientSystem, "OnGameTick"):
-            self._listenClientGameTick()
 
 
 class _GameTick(_ScreenNode):

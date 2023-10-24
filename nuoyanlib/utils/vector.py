@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-10-02
 
 # ====================================================
 
@@ -30,40 +30,40 @@ from calculator import pos_distance as _pos_distance
 
 
 __all__ = [
-    "normalize_vector",
-    "vector_rot_p2p",
-    "vector_p2p",
-    "vector_length",
-    "vector_angle",
-    "rotate_vector",
-    "outgoing_vector",
-    "composite_vector",
+    "vec_normalize",
+    "vec_rot_p2p",
+    "vec_p2p",
+    "vec_length",
+    "vec_angle",
+    "vec_euler_rotate",
+    "vec_rotate_around",
+    "outgoing_vec",
+    "vec_composite",
 ]
 
 
-def normalize_vector(vector):
+def vec_normalize(vector):
     """
-    向量标准化。支持二维向量和三维向量。
+    向量标准化。
 
     -----
 
-    :param tuple[float,float]|tuple[float,float,float] vector: 向量
+    :param tuple[float,float,float] vector: 向量
 
-    :return: 标准化的向量，长度为1
-    :rtype: tuple[float,float]|tuple[float,float,float]
+    :return: 单位向量，长度为1
+    :rtype: tuple[float,float,float]
     """
-    length = vector_length(vector)
-    return tuple(x / length for x in vector)
+    return _Vector3(vector).Normalized().ToTuple()
 
 
-def vector_rot_p2p(pos1, pos2):
+def vec_rot_p2p(pos1, pos2):
     """
     计算从pos1指向pos2的向量角度。
 
     -----
 
-    :param tuple[float,float,float] pos1: 三维坐标1
-    :param tuple[float,float,float] pos2: 三维坐标2
+    :param tuple[float,float,float] pos1: 坐标1
+    :param tuple[float,float,float] pos2: 坐标2
 
     :return: 角度元组，分别为竖直角度、水平角度
     :rtype: tuple[float,float]
@@ -81,54 +81,48 @@ def vector_rot_p2p(pos1, pos2):
     return verticalRot, horizontalRot
 
 
-def vector_p2p(pos1, pos2):
+def vec_p2p(pos1, pos2):
     """
-    计算从pos1指向pos2的单位向量。支持二维坐标和三维坐标。
+    计算从pos1指向pos2的单位向量。
 
     -----
 
-    :param tuple[float,float]|tuple[float,float,float] pos1: 坐标1
-    :param tuple[float,float]|tuple[float,float,float] pos2: 坐标2
+    :param tuple[float,float,float] pos1: 坐标1
+    :param tuple[float,float,float] pos2: 坐标2
 
     :return: 从pos1指向pos2的单位向量
-    :rtype: tuple[float,float]|tuple[float,float,float]
+    :rtype: tuple[float,float,float]
     """
-    vector = tuple(b - a for a, b in zip(pos1, pos2))
-    return normalize_vector(vector)
+    vector = _Vector3(pos2) - _Vector3(pos1)
+    return vector.Normalized().ToTuple()
 
 
-def vector_length(vector):
+def vec_length(vector):
     """
-    计算向量长度。支持二维向量和三维向量。
+    计算向量长度（模长）。
 
     -----
 
-    :param vector: tuple[float,float]|tuple[float,float,float] 向量
+    :param vector: tuple[float,float,float] 向量
 
     :return: 向量长度
     :rtype: float
     """
-    if len(vector) == 2:
-        vector += (0.0,)
     return _Vector3(vector).Length()
 
 
-def vector_angle(v1, v2):
+def vec_angle(v1, v2):
     """
-    计算两个向量之间的夹角。支持二维向量和三维向量。
+    计算两个向量之间的夹角。
 
     -----
 
-    :param tuple[float,float]|tuple[float,float,float] v1: 向量1
-    :param tuple[float,float]|tuple[float,float,float] v2: 向量2
+    :param tuple[float,float,float] v1: 向量1
+    :param tuple[float,float,float] v2: 向量2
 
     :return: 夹角弧度值
     :rtype: float
     """
-    if len(v1) == 2:
-        v1 += (0.0,)
-    if len(v2) == 2:
-        v2 += (0.0,)
     v1 = _Vector3(v1)
     v2 = _Vector3(v2)
     v1Len = v1.Length()
@@ -149,17 +143,17 @@ def _matrix_mult(matrix1, matrix2):
     return matrix3
 
 
-def rotate_vector(vector, xAngle=0.0, yAngle=0.0, zAngle=0.0, order="xyz"):
+def vec_euler_rotate(vector, xAngle=0.0, yAngle=0.0, zAngle=0.0, order="zyx"):
     """
-    计算向量旋转。
+    对指定向量应用欧拉旋转。
 
     -----
 
-    :param tuple[float,float,float] vector: 三维向量
+    :param tuple[float,float,float] vector: 要旋转的向量
     :param float xAngle: 绕x轴的旋转角度
     :param float yAngle: 绕y轴的旋转角度
     :param float zAngle: 绕z轴的旋转角度
-    :param str order: 旋转顺序，默认为"xyz"，即先选转x轴，再旋转y轴，最后旋转z轴
+    :param str order: 旋转顺序，默认为"zyx"，即先按z轴旋转，再按y轴旋转，最后按x轴旋转
 
     :return: 旋转后的向量
     :rtype: tuple[float,float,float]
@@ -186,8 +180,12 @@ def rotate_vector(vector, xAngle=0.0, yAngle=0.0, zAngle=0.0, order="xyz"):
         [sinZ, cosZ, 0],
         [0, 0, 1],
     ]
-    # 单位矩阵，用于累积旋转
-    accMatrix = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    # 用于累积旋转的矩阵
+    accMatrix = [
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 1],
+    ]
     for axis in order:
         if axis == 'x':
             accMatrix = _matrix_mult(accMatrix, xMatrix)
@@ -201,9 +199,33 @@ def rotate_vector(vector, xAngle=0.0, yAngle=0.0, zAngle=0.0, order="xyz"):
     return tuple(i[0] for i in rotatedVector)
 
 
-def outgoing_vector(vector, normal):
+def vec_rotate_around(v, u, angle):
     """
-    已知入射向量和法线求出射向量。只支持三维向量。
+    将向量v绕着向量u旋转。
+
+    :param tuple[float,float,float] v: 要旋转的向量
+    :param tuple[float,float,float] u: 旋转轴向量
+    :param float angle: 旋转角度
+
+    :return: 旋转后的向量
+    :rtype: tuple[float,float,float]
+    """
+    v = _Vector3(v)
+    vLen = v.Length()
+    v.Normalize()
+    u = _Vector3(u).Normalized()
+    theta = _radians(angle)
+    cos = _cos(theta)
+    sin = _sin(theta)
+    dot = _Vector3.Dot(u, v)
+    cross = _Vector3.Cross(u, v)
+    res = v * cos + u * (1 - cos) * dot + cross * sin # 罗德里格旋转公式
+    return (res * vLen).ToTuple()
+
+
+def outgoing_vec(vector, normal):
+    """
+    已知入射向量和法线求出射向量。
 
     -----
 
@@ -219,24 +241,20 @@ def outgoing_vector(vector, normal):
     return reflexVector.ToTuple()
 
 
-def composite_vector(vector, *moreVec):
+def vec_composite(vector, *moreVec):
     """
-    向量的合成。支持二维向量和三维向量。
+    向量的合成。
 
     -----
 
-    :param tuple[float,float]|tuple[float,float,float] vector: 向量
-    :param tuple[float,float]|tuple[float,float,float] moreVec: 更多向量
+    :param tuple[float,float,float] vector: 向量
+    :param tuple[float,float,float] moreVec: 更多向量
 
     :return: 合向量
-    :rtype: tuple[float,float]|tuple[float,float,float]
+    :rtype: tuple[float,float,float]
     """
-    if len(vector) == 2:
-        vector += (0.0,)
     resVec = _Vector3(vector)
     for v in moreVec:
-        if len(v) == 2:
-            v += (0.0,)
         resVec += _Vector3(v)
     return resVec.ToTuple()
 

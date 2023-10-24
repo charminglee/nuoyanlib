@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-30
+#   Last Modified : 2023-09-16
 #
 # ====================================================
 
@@ -45,7 +45,7 @@ class McTimer(object):
 
     5、Execute：立即执行一次函数。
 
-    6、IsCancelled：获取定时器是否已经取消。
+    6、IsCanceled：获取定时器是否已经取消。
 
     7、IsPaused：获取定时器是否暂停。
 
@@ -84,8 +84,8 @@ class McTimer(object):
     :param str ttype: 定时器类型，可选值为"d"和"r"，分别表示普通定时器和重复定时器
     :param float sec: 延迟秒数
     :param function func: 延迟函数
-    :param Any args: 变长参数，传入func
-    :param Any kwargs: 字典变长参数，传入func
+    :param Any args: 变长参数，调用func时传入
+    :param Any kwargs: 字典变长参数，调用func时传入
     """
 
     def __init__(self, ttype, sec, func, *args, **kwargs):
@@ -106,6 +106,8 @@ class McTimer(object):
         if self.type == "r" and not self._cancel:
             self.__timer = _Timer(self.sec, self.__func)
             self.__timer.start()
+        else:
+            self._release()
 
     def Start(self):
         """
@@ -121,7 +123,7 @@ class McTimer(object):
 
     def Cancel(self):
         """
-        取消尚未触发的定时器。
+        取消定时器。
 
         -----
 
@@ -129,7 +131,16 @@ class McTimer(object):
         :rtype: None
         """
         self.__timer.cancel()
+        self._release()
+
+    def _release(self):
+        self.__timer = None
         self._cancel = True
+        self._pause = False
+        self.sec = -1
+        self.func = None
+        self.args = None
+        self.kwargs = None
 
     def Pause(self, sec=None):
         """
@@ -170,7 +181,7 @@ class McTimer(object):
         """
         return self._execute()
 
-    def IsCancelled(self):
+    def IsCanceled(self):
         """
         获取定时器是否已经取消。
 

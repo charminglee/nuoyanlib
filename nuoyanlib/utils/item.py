@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-09-22
 #
 # ====================================================
 
@@ -63,7 +63,7 @@ def item_dict(
     :param bool showInHand: 可选，是否显示在手上，默认为True
     :param list[tuple[int, int]]|None enchantData: 可选，附魔数据，类型为列表，列表中每个元素为元组：( `附魔类型 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EnchantType.html>`_, 附魔等级)
     :param list[tuple[str,int]]|None modEnchantData: 可选，自定义附魔数据，类型为列表，列表中每个元素为元组：(自定义附魔id, 自定义附魔等级)
-    :param str customTips: 可选，物品的自定义tips，修改该内容后会覆盖实例的组件 `netease:customtips <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/1-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%89%A9%E5%93%81/1-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%BA%E7%A1%80%E7%89%A9%E5%93%81.html>`_ 的内容
+    :param str customTips: 可选，物品的自定义tips，修改该内容后会覆盖实例的组件 `netease:customtips <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/1-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%89%A9%E5%93%81/1-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%BA%E7%A1%80%E7%89%A9%E5%93%81.html?key=netease%3Acustomtips&docindex=1&type=0>`_ 的内容
     :param str extraId: 可选，物品自定义标识符，可以用于保存数据，区分物品
     :param dict|None userData: 可选，物品userData，用于灾厄旗帜、旗帜等物品，请勿随意设置该值
     :param int durability: 可选，物品耐久度，不存在耐久概念的物品默认值为0

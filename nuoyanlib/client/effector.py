@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-03
+#   Last Modified : 2023-09-15
 #
 # ====================================================
 
@@ -38,7 +38,7 @@ effector
 >>> particle.Play()
 True
 
-设置粒子位置：
+修改粒子位置：
 
 >>> particle.pos = (100, 100, 100)
 
@@ -81,7 +81,7 @@ class NeteaseParticle(object):
 
     4、Pause：暂停粒子特效。
 
-    5、Destroy：销毁粒子。
+    5、Destroy：销毁粒子特效。
 
     6、SetFadeDistance：设置粒子开始自动调整透明度的距离。
 
@@ -490,7 +490,7 @@ class NeteaseParticle(object):
 
     def Destroy(self):
         """
-        销毁粒子。
+        销毁粒子特效。
 
         -----
 
@@ -595,17 +595,19 @@ class NeteaseFrameAnim(object):
 
     4、Pause：暂停播放序列帧特效。
 
-    5、SetDeepTest：设置序列帧是否开启深度测试。
+    5、Destroy：销毁序列帧特效。
 
-    6、SetFaceCamera：设置序列帧是否始终朝向摄像机。
+    6、SetDeepTest：设置序列帧是否开启深度测试。
 
-    7、SetFadeDistance：设置序列帧开始自动调整透明度的距离。
+    7、SetFaceCamera：设置序列帧是否始终朝向摄像机。
 
-    8、SetLayer：设置序列帧渲染层级。
+    8、SetFadeDistance：设置序列帧开始自动调整透明度的距离。
 
-    9、SetLoop：设置序列帧是否循环播放。
+    9、SetLayer：设置序列帧渲染层级。
 
-    10、SetUsePointFiltering：设置序列帧材质的纹理滤波是否使用点滤波方法。
+    10、SetLoop：设置序列帧是否循环播放。
+
+    11、SetUsePointFiltering：设置序列帧材质的纹理滤波是否使用点滤波方法。
 
     -----
 
@@ -639,8 +641,8 @@ class NeteaseFrameAnim(object):
 
     -----
 
-    :param str jsonPath: 特效json配置路径，如"effects/xxx.json"，jsonPath与texPath选择其中一个参数传入即可，两个参数都传入时以jsonPath为准，默认为空字符串
-    :param str texPath: 特效贴图路径，如"textures/xxx"，不用后缀名，jsonPath与texPath选择其中一个参数传入即可，两个参数都传入时以jsonPath为准，默认为空字符串
+    :param str jsonPath: 特效json配置路径，如"effects/xxx.json"；jsonPath与texPath选择其中一个参数传入即可，两个参数都传入时以jsonPath为准，默认为空字符串
+    :param str texPath: 特效贴图路径，如"textures/xxx"，不用后缀名；jsonPath与texPath选择其中一个参数传入即可，两个参数都传入时以jsonPath为准，默认为空字符串
     :param tuple[float,float,float] pos: 创建位置，默认为None，绑定实体或骨骼时可忽略该参数
     :param tuple[float,float,float] rot: 角度，默认为None，绑定实体或骨骼时可忽略该参数
     :param tuple[float,float,float] scale: 缩放系数，默认为None
@@ -926,6 +928,33 @@ class NeteaseFrameAnim(object):
         res = self._ctrl.Pause()
         if res:
             self._playing = False
+        return res
+
+    def Destroy(self):
+        """
+        销毁序列帧特效。
+
+        -----
+
+        :return: 是否成功
+        :rtype: bool
+        """
+        res = self.__cs.DestroyEntity(self._id)
+        if res:
+            self._destroyed = True
+            self._bindEntId = ""
+            self._bindEntOffset = (0.0, 0.0, 0.0)
+            self._bindEntRot = (0.0, 0.0, 0.0)
+            self._bindSkelModelId = -1
+            self._bindSkelBoneName = ""
+            self._bindSkelOffset = (0.0, 0.0, 0.0)
+            self._bindSkelRot = (0.0, 0.0, 0.0)
+            self._playing = False
+            self._ctrl = None
+            self._trans = None
+            self._bindEntComp = None
+            self._bindSkelComp = None
+            self._id = None
         return res
 
     def SetDeepTest(self, enabled):

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-09-14
 #
 # ====================================================
 
@@ -82,6 +82,7 @@ class ItemFlyAnim(_ScreenNode):
     """
 
     def __init__(self, namespace, name, param):
+        # noinspection PySuperArguments
         super(ItemFlyAnim, self).__init__(namespace, name, param)
         self._itemFlyAnimNode = None
         self.__registerItemFlyAnimUI()

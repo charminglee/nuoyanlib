@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-09-14
 #
 # ====================================================
 
@@ -296,6 +296,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
     """
 
     def __init__(self, namespace, name, param):
+        # noinspection PySuperArguments
         super(ItemGridManager, self).__init__(namespace, name, param)
         self._gridItemsData = {}
         self._itemHeapData = {}
@@ -322,7 +323,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
     def Update(self):
         """
-        *[event]* *[tick]*
+        *[tick]* *[event]*
 
         客户端每帧调用，1秒有30帧。
 
@@ -339,6 +340,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         :return: 无
         :rtype: None
         """
+        # noinspection PySuperArguments
         super(ItemGridManager, self).Update()
         # 物品分堆
         self.__tick += 1
@@ -356,6 +358,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
     # ======================================= System Event Callback ====================================================
 
     def _OnCoordRelease(self, args):
+        # noinspection PySuperArguments
         super(ItemGridManager, self)._OnCoordRelease(args)
         if len(self.__moveInGridList) >= 2:
             self.SetSelectedItem(self._selectedItem['bp'], False)

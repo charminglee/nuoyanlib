@@ -37,7 +37,7 @@ from entity import (
     has_mob,
     entity_filter,
     is_entity_type,
-    sort_entity_list_by_distance,
+    sort_entity_list_by_dist,
     launch_projectile,
     entity_plunge,
     entity_plunge_by_dir,
@@ -50,7 +50,6 @@ from entity import (
     get_nearest_entity,
     attack_nearest_mob,
     has_effect,
-    set_entity_motion,
 )
 from hurt import (
     explode_hurt,
@@ -91,7 +90,7 @@ __all__ = [
     "has_mob",
     "entity_filter",
     "is_entity_type",
-    "sort_entity_list_by_distance",
+    "sort_entity_list_by_dist",
     "launch_projectile",
     "entity_plunge",
     "entity_plunge_by_dir",
@@ -104,7 +103,6 @@ __all__ = [
     "get_nearest_entity",
     "attack_nearest_mob",
     "has_effect",
-    "set_entity_motion",
     "explode_hurt",
     "aoe_damage",
     "sector_aoe_damage",
