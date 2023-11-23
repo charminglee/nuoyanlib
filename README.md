@@ -46,30 +46,22 @@
 ---
 
 - [**client（客户端函数库）**](/nuoyanlib/client)  
-
-  > 包含clientComps、effector、nuoyanClientSystem、player、setting、sound模块。
-
-  提供了客户端扩展、特效管理器等客户端专用工具。
+  包含clientComps、effector、nuoyanClientSystem、player、setting、sound模块。  
+  提供了客户端扩展、特效管理器等客户端专用工具。  
 
 
 - [**client.ui（UI库）**](/nuoyanlib/client/ui)  
-
-  > 包含itemFlyAnim、itemGridManager、itemTipsBox、nuoyanScreenNode、uiutils模块。
-
+  包含itemFlyAnim、itemGridManager、itemTipsBox、nuoyanScreenNode、uiutils模块。  
   提供了ScreenNode扩展、物品网格管理器等UI专用工具。
 
 
 - [**server（服务端函数库）**](/nuoyanlib/server)  
-
-  > 包含entity、hurt、inv、nuoyanServerSystem、serverComps、structure模块。
-
+  包含entity、hurt、inv、nuoyanServerSystem、serverComps、structure模块。  
   提供了服务端扩展、实体获取、实体操作、范围伤害、背包管理等服务端专用工具。
 
 
 - [**utils（通用工具库）**](/nuoyanlib/utils)  
-
-  > 包含calculator、enum、item、mcRandom、utils、vector模块。
-
+  包含calculator、enum、item、mcRandom、utils、vector模块。  
   提供了多种数学计算函数、更多的枚举值等双端通用的工具。
 
 <br></br>
@@ -104,23 +96,17 @@
     import nuoyanlib.server as nyl
     ```
 
-    
-
 <br></br>
 
 ## 🔍 参考文档
 
 ---
 
-详见：https://gitee.com/charming-lee/nuoyanlib/tree/master/%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3
-
 <br></br>
 
 ## 🎉 更新信息
 
 ---
-
-
 
 <br></br>
 
@@ -162,6 +148,7 @@
 ---
 
 如果在使用过程中遇到问题，可通过以下方式联系作者：
+
 - QQ：1279735247
 - 邮箱：1279735247@qq.com
 
