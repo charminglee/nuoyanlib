@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-30
+#   Last Modified : 2023-11-23
 #
 # ====================================================
 
@@ -20,9 +20,9 @@
 # 在modMain注册时填写的模组名称（命名空间）
 MOD_NAME = ""
 # 客户端系统名称
-CLIENT_SYSTEM_NAME = ""
+CLIENT_SYSTEM_NAME = "ClientSystem"
 # 服务端系统名称
-SERVER_SYSTEM_NAME = ""
+SERVER_SYSTEM_NAME = "ServerSystem"
 
 
 __version__ = "v0.1.0-beta"

@@ -1,6 +1,6 @@
 <h1 align="center" style="line-height: 0;">「nuoyanlib」</h1>
 <h1 align="center" style="line-height: 0;">🐱</h1>
-<h1 align="center" style="line-height: 0;">ModSDK开发工具</h1>
+<h1 align="center" style="line-height: 0;">基于ModSDK的开发工具库</h1>
 <h2 align="center" style="line-height: 0.5;">v0.1.0-beta</h2>
 
 <br></br>
@@ -19,7 +19,7 @@
 「nuoyanlib」可供大家学习参考，也可以直接应用于您个人/团队的项目中，希望「nuoyanlib」能提高大家的代码编写效率以及更轻松地实现复杂的效果！  
 感谢大家支持作者、支持该项目，喜欢的话可以点个Star噢，您的支持是作者最大的动力！  
 
-**_兼容的ModSDK版本：2.8_**
+**_兼容的ModSDK版本：2.9_**
 
 <br></br>
 
@@ -47,30 +47,30 @@
 
 - [**client（客户端函数库）**](/nuoyanlib/client)  
 
-  > 包含clientcomp、clientTimer、effector、nuoyanClientSystem、player、setting、sound模块。
+  > 包含clientComps、effector、nuoyanClientSystem、player、setting、sound模块。
 
-  提供了客户端扩展等实用功能。
+  提供了客户端扩展、特效管理器等客户端专用工具。
 
 
 - [**client.ui（UI库）**](/nuoyanlib/client/ui)  
 
-  > 包含itemFlyAnim、itemGridManager、itemTipsBox、nuoyanScreenNode、utils模块。
+  > 包含itemFlyAnim、itemGridManager、itemTipsBox、nuoyanScreenNode、uiutils模块。
 
-  提供了ScreenNode扩展、物品网格管理器等实用工具。
+  提供了ScreenNode扩展、物品网格管理器等UI专用工具。
 
 
 - [**server（服务端函数库）**](/nuoyanlib/server)  
 
-  > 包含entity、globalPlayerManager、hurt、inv、nuoyanServerSystem、servercomp、serverTimer、structure模块。
+  > 包含entity、hurt、inv、nuoyanServerSystem、serverComps、structure模块。
 
-  涵盖了服务端扩展、实体获取、实体操作、范围伤害、背包管理等各种功能。
+  提供了服务端扩展、实体获取、实体操作、范围伤害、背包管理等服务端专用工具。
 
 
 - [**utils（通用工具库）**](/nuoyanlib/utils)  
 
-  > 包含calculator、enum、error、item、random、utils、vector模块。
+  > 包含calculator、enum、item、mcRandom、utils、vector模块。
 
-  提供了多种数学计算函数、更多的枚举值等实用工具。
+  提供了多种数学计算函数、更多的枚举值等双端通用的工具。
 
 <br></br>
 
@@ -78,8 +78,8 @@
 
 ---
 
-1. 解压下载的文件，将`nuoyanlib`文件夹放至您的行为包根目录下（即`entities`文件夹所在目录）。
-2. 打开`nuoyanlib/config.py`配置文件，将您的模组名称、客户端系统名称和服务端系统名称填入对应位置。 
+1. 解压下载的文件，将`nuoyanlib`文件夹放至您的脚本根目录下（即`modMain.py`所在目录）。
+2. 打开`nuoyanlib/config.py`配置文件，将您的模组名称、客户端系统名称和服务端系统名称填入对应位置。
     > **[注意]**  
     请确保填入`config.py`的信息与您的模组对应，否则部分功能将无法使用。
     
@@ -92,9 +92,19 @@
     SERVER_SYSTEM_NAME = "MyServerSystem"
     ```
 3. 随后在您的Python文件顶部导入「nuoyanlib」即可：
+    > **[警告]**  
+    禁止导入对立端的库，如在客户端导入服务端库，服务端导入客户端库。
+
     ```python
-    import nuoyanlib as nyl
+    # 在客户端中导入
+    import nuoyanlib.client as nyl
+    # 在UI中导入
+    import nuoyanlib.client.ui as nyl
+    # 在服务端中导入
+    import nuoyanlib.server as nyl
     ```
+
+    
 
 <br></br>
 
@@ -110,9 +120,7 @@
 
 ---
 
-【v0.1.0-beta】
 
-更多信息详见：
 
 <br></br>
 

@@ -599,7 +599,7 @@ def get_nearest_entity(
     :param bool filterAbiotic: 是否过滤非生物实体，默认为不过滤
 
     :return: 若count==1，返回实体ID；若count>1，返回实体ID列表；获取不到实体返回None
-    :rtype: str|List[str]|None
+    :rtype: str|list[str]|None
     """
     if isinstance(obj, str):
         pos = _ServerCompFactory.CreatePos(obj).GetFootPos()

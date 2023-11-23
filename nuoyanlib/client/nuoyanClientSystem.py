@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-10-24
+#   Last Modified : 2023-11-05
 #
 # ====================================================
 
@@ -150,13 +150,7 @@ _lsnFuncArgs = []
 def _add_listener(func, eventName="", namespace=_MOD_NAME, systemName=_SERVER_SYSTEM_NAME, priority=0):
     if not eventName:
         eventName = func.__name__
-    _lsnFuncArgs.append({
-        'func': func,
-        'eventName': eventName,
-        'namespace': namespace,
-        'systemName': systemName,
-        'priority': priority,
-    })
+    _lsnFuncArgs.append((namespace, systemName, eventName, func, priority))
 
 
 def client_listener(eventName="", namespace="", systemName="", priority=0):
@@ -2889,13 +2883,11 @@ class NuoyanClientSystem(_ClientSystem):
             self._onListenServerGameTick()
 
     def __listen(self):
-        for kwargs in _lsnFuncArgs:
-            func = kwargs['func']
-            funcName = func.__name__
-            method = getattr(self, funcName, None)
+        for args in _lsnFuncArgs:
+            func = args[3]
+            method = getattr(self, func.__name__, None)
             if method and method.__func__ is func:
-                kwargs['func'] = method
-                self.ListenForEvent(instance=self, **kwargs)
+                self.ListenForEvent(args[0], args[1], args[2], self, method, args[4])
         for event in ALL_CLIENT_ENGINE_EVENTS:
             if _is_method_overridden(self.__class__, NuoyanClientSystem, event):
                 func = getattr(self, event)
