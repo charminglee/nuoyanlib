@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-05
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -24,8 +24,8 @@ from ..config import (
     CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
     MOD_NAME as _MOD_NAME,
 )
-from serverComps import (
-    ServerCompFactory as _ServerCompFactory,
+from comp import (
+    CompFactory as _CompFactory,
     SERVER_ENGINE_NAMESPACE as _SERVER_ENGINE_NAMESPACE,
     SERVER_ENGINE_SYSTEM_NAME as _SERVER_ENGINE_SYSTEM_NAME,
     ServerSystem as _ServerSystem,
@@ -39,7 +39,7 @@ __all__ = [
 ]
 
 
-ALL_SERVER_ENGINE_EVENTS = [
+ALL_SERVER_ENGINE_EVENTS = {
     "PlaceNeteaseLargeFeatureServerEvent",
     "PlayerNamedEntityServerEvent",
     "PlayerFeedEntityServerEvent",
@@ -196,19 +196,19 @@ ALL_SERVER_ENGINE_EVENTS = [
     "PlayerInventoryOpenScriptServerEvent",
     "UrgeShipEvent",
     "lobbyGoodBuySucServerEvent",
-]
+}
 
 
-_lsnFuncArgs = []
+_lsn_func_args = []
 
 
-def _add_listener(func, eventName="", namespace=_MOD_NAME, systemName=_CLIENT_SYSTEM_NAME, priority=0):
-    if not eventName:
-        eventName = func.__name__
-    _lsnFuncArgs.append((namespace, systemName, eventName, func, priority))
+def _add_listener(func, event_name="", namespace=_MOD_NAME, system_name=_CLIENT_SYSTEM_NAME, priority=0):
+    if not event_name:
+        event_name = func.__name__
+    _lsn_func_args.append((namespace, system_name, event_name, func, priority))
 
 
-def server_listener(eventName="", namespace="", systemName="", priority=0):
+def server_listener(event_name="", namespace="", system_name="", priority=0):
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
 
@@ -220,55 +220,28 @@ def server_listener(eventName="", namespace="", systemName="", priority=0):
 
     -----
 
-    【示例】
-
-    >>> class MyServerSystem(ServerSystem):
-    ...     @server_listener("MyCustomEvent1")  # 监听当前客户端传来的自定义事件
-    ...     def eventCallback1(self, args):
-    ...         pass
-    ...
-    ...     @server_listener("MyCustomEvent2", "OtherNamespace", "OtherClient")  # 监听其他客户端传来的自定义事件
-    ...     def eventCallback2(self, args):
-    ...         pass
-    ...
-    ...     @server_listener  # 监听当前客户端传来的与函数同名的事件
-    ...     def SomeEvent1(self, args):
-    ...         pass
-    ...
-    ...     @server_listener(namespace="OtherNamespace", systemName="OtherClient")  # 监听其他客户端传来的与函数同名的事件
-    ...     def SomeEvent2(self, args):
-    ...         pass
-    ...
-    ...     @server_listener("OnScriptTickServer")  # 监听引擎事件
-    ...     def OnTick(self, args):
-    ...         pass
-
-    -----
-
-    :param str eventName: 事件名称，默认为空字符串，表示监听与函数同名的事件
+    :param str event_name: 事件名称，默认为空字符串，表示监听与函数同名的事件
     :param str namespace: 指定命名空间，默认为空字符串，表示当前客户端的命名空间
-    :param str systemName: 指定系统名称，默认为空字符串，表示当前客户端的系统名称
+    :param str system_name: 指定系统名称，默认为空字符串，表示当前客户端的系统名称
     :param int priority: 优先级，默认为0
     """
-    # @server_listener
-    if callable(eventName):
-        _add_listener(eventName)
-        return eventName
-    # @server_listener(...)
+    if callable(event_name):
+        _add_listener(event_name)
+        return event_name
     else:
-        if not namespace and not systemName:
-            if eventName in ALL_SERVER_ENGINE_EVENTS:
+        if not namespace and not system_name:
+            if event_name in ALL_SERVER_ENGINE_EVENTS:
                 namespace = _SERVER_ENGINE_NAMESPACE
-                systemName = _SERVER_ENGINE_SYSTEM_NAME
+                system_name = _SERVER_ENGINE_SYSTEM_NAME
             else:
                 namespace = _MOD_NAME
-                systemName = _CLIENT_SYSTEM_NAME
+                system_name = _CLIENT_SYSTEM_NAME
         elif not namespace:
             raise AssertionError("Missing parameter 'namespace'.")
-        elif not systemName:
-            raise AssertionError("Missing parameter 'systemName'.")
+        elif not system_name:
+            raise AssertionError("Missing parameter 'system_name'.")
         def decorator(func):
-            _add_listener(func, eventName, namespace, systemName, priority)
+            _add_listener(func, event_name, namespace, system_name, priority)
             return func
         return decorator
 
@@ -279,40 +252,6 @@ class NuoyanServerSystem(_ServerSystem):
 
     -----
 
-    【基础功能】
-
-    1、所有官方文档中收录的服务端引擎事件以及NuoyanServerSystem新增的事件均无需手动监听，只需重写对应事件的同名方法即可（支持热更）。
-
-    2、无需重写Destroy方法进行事件的反监听。
-
-    3、自动将错误信息打印到McpModLog日志，可调用serverApi.SetMcpModLogCanPostDump(False)进行关闭。
-
-    -----
-
-    【接口一览】
-
-    1、CallClient：调用客户端属性（包括变量和函数）。
-
-    2、SetQueryVar：设置指定实体query.mod变量的值，全局同步。
-
-    -----
-
-    【事件一览】
-
-    1、UiInitFinished：客户端玩家UI框架初始化完成时，服务端触发。
-
-    2、OnGameTick：频率与游戏当前帧率同步的Tick事件。
-
-    -----
-
-    【属性一览】
-
-    1、allPlayerData：用于保存所有玩家数据的字典，key为玩家实体ID，value为玩家数据字典，可自行添加数据；玩家加入游戏时（UiInitFinished后）会自动把玩家加入字典，玩家退出游戏时则会自动从字典中删除玩家及其数据；初始值为空字典。
-
-    2、homeownerPlayerId：房主玩家的实体ID；初始值为"-1"。
-
-    -----
-
     【注意事项】
 
     1、带有 *[tick]* 标签的事件为帧事件，需要注意编写相关逻辑。
@@ -320,16 +259,17 @@ class NuoyanServerSystem(_ServerSystem):
     2、事件回调参数中，参数名前面的美元符号“$”表示该参数可进行修改。
     """
 
-    def __init__(self, namespace, systemName):
-        super(NuoyanServerSystem, self).__init__(namespace, systemName)
-        self.allPlayerData = {}
-        self._listenGameTick = False
-        self.homeownerPlayerId = "-1"
-        self.itemsData = {}
-        self._queryCache = {}
+    def __init__(self, namespace, system_name):
+        # noinspection PySuperArguments
+        super(NuoyanServerSystem, self).__init__(namespace, system_name)
+        self.all_player_data = {}
+        self._listen_game_tick = False
+        self.homeowner_player_id = "-1"
+        self._items_data = {}
+        self._query_cache = {}
         self.__listen()
-        self._checkOnGameTick()
-        self._setPrintLog()
+        self._check_on_game_tick()
+        self._set_print_log()
 
     def Destroy(self):
         """
@@ -4760,7 +4700,7 @@ class NuoyanServerSystem(_ServerSystem):
         :rtype: None
         """
 
-    @server_listener("OnGameTick")
+    @server_listener
     def OnGameTick(self, args):
         """
         *[tick]* *[event]*
@@ -4785,7 +4725,7 @@ class NuoyanServerSystem(_ServerSystem):
 
     # ======================================= Basic Function =================================================
 
-    def SetQueryVar(self, entityId, name, value):
+    def SetQueryVar(self, entity_id, name, value):
         """
         设置指定实体query.mod变量的值，全局同步。
 
@@ -4793,22 +4733,22 @@ class NuoyanServerSystem(_ServerSystem):
 
         -----
 
-        :param str entityId: 实体ID
+        :param str entity_id: 实体ID
         :param str name: 变量名
         :param float value: 设置的值
 
         :return: 无
         :rtype: None
         """
-        self._OnSetQueryVar({'entityId': entityId, 'name': name, 'value': value})
+        self._SetQueryVar({'entity_id': entity_id, 'name': name, 'value': value})
 
-    def CallClient(self, playerId, name, callback=None, *args):
+    def CallClient(self, player_id, name, callback=None, *args):
         """
         调用客户端属性（包括变量和函数）。
 
         -----
 
-        :param str playerId: 客户端对应的玩家实体ID
+        :param str player_id: 客户端对应的玩家实体ID
         :param str name: 客户端属性名
         :param function callback: 回调函数，调用客户端成功后客户端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
         :param Any args: 调用参数；如果调用的客户端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的客户端属性为函数，则args会作为参数传入该函数
@@ -4819,114 +4759,116 @@ class NuoyanServerSystem(_ServerSystem):
 
     # ====================================== Internal Method =================================================
 
-    def _setPrintLog(self):
+    def _set_print_log(self):
         _serverApi.SetMcpModLogCanPostDump(True)
 
-    @server_listener("_SetQueryVar")
-    def _OnSetQueryVar(self, args):
-        entityId = args['entityId']
+    @server_listener
+    def _SetQueryVar(self, args):
+        entity_id = args['entity_id']
         name = args['name']
         value = args['value']
-        if entityId not in self._queryCache:
-            self._queryCache[entityId] = {}
-        self._queryCache[entityId][name] = value
+        if entity_id not in self._query_cache:
+            self._query_cache[entity_id] = {}
+        self._query_cache[entity_id][name] = value
         self.BroadcastToAllClient("_SetQueryVar", args)
 
-    @server_listener("_ButtonCallbackTriggered")
-    def _OnButtonCallbackTriggered(self, args):
-        funcName = args['__name__']
-        func = getattr(self, funcName, None)
+    @server_listener
+    def _ButtonCallbackTriggered(self, args):
+        func_name = args['__name__']
+        func = getattr(self, func_name, None)
         if func:
             func(args)
 
-    @server_listener("_InitItemGrid")
-    def _OnInitItemGrid(self, args):
-        playerId = args['__id__']
+    @server_listener
+    def _InitItemGrid(self, args):
+        player_id = args['__id__']
         key = args['key']
         count = args['count']
         namespace = args['namespace']
-        self.itemsData[playerId][(namespace, key)] = [None] * count
+        self._items_data[player_id][(namespace, key)] = [None] * count
 
-    @server_listener("_ThrowItem")
-    def _OnThrowItem(self, args):
-        itemDict = args
-        playerId = args['__id__']
-        dim = _ServerCompFactory.CreateDimension(playerId).GetEntityDimensionId()
-        pos = _ServerCompFactory.CreatePos(playerId).GetPos()
+    @server_listener
+    def _ThrowItem(self, args):
+        item_dict = args
+        player_id = args['__id__']
+        del args['__id__']
+        dim = _CompFactory.CreateDimension(player_id).GetEntityDimensionId()
+        pos = _CompFactory.CreatePos(player_id).GetPos()
         if not pos:
             return
-        itemEnt = self.CreateEngineItemEntity(itemDict, dim, pos)
-        if itemEnt:
-            rot = _ServerCompFactory.CreateRot(playerId).GetRot()
+        item_ent = self.CreateEngineItemEntity(item_dict, dim, pos)
+        if item_ent:
+            rot = _CompFactory.CreateRot(player_id).GetRot()
             rot = (-15, rot[1])
             direction = _serverApi.GetDirFromRot(rot)
             motion = tuple(i * 0.3 for i in direction)
-            _ServerCompFactory.CreateActorMotion(itemEnt).SetMotion(motion)
+            _CompFactory.CreateActorMotion(item_ent).SetMotion(motion)
 
-    @server_listener("_SyncItems")
-    def _OnSyncItems(self, args):
-        playerId = args['__id__']
+    @server_listener
+    def _SyncItems(self, args):
+        player_id = args['__id__']
         namespace = args['namespace']
         keys = args['keys']
         data = {}
-        for (ns, key), items in self.itemsData[playerId].items():
+        for (ns, key), items in self._items_data[player_id].items():
             if ns != namespace or key not in keys:
                 continue
             data[key] = items
-        invItems = _ServerCompFactory.CreateItem(playerId).GetPlayerAllItems(_ItemPosType.INVENTORY, True)
+        inv_items = _CompFactory.CreateItem(player_id).GetPlayerAllItems(_ItemPosType.INVENTORY, True)
         if "inv27" in keys:
-            data['inv27'] = invItems[9:]
+            data['inv27'] = inv_items[9:]
         if "shortcut" in keys:
-            data['shortcut'] = invItems[:9]
+            data['shortcut'] = inv_items[:9]
         if "inv36" in keys:
-            data['inv36'] = invItems
-        self.NotifyToClient(playerId, "_SyncItems", {
-            'data': data,
-            'namespace': namespace,
-        })
+            data['inv36'] = inv_items
+        self.NotifyToClient(player_id, "_SyncItems", {'data': data, 'namespace': namespace})
 
-    @server_listener("_UpdateItemsData")
-    def _OnUpdateItemsData(self, args):
-        playerId = args['__id__']
+    @server_listener
+    def _UpdateItemsData(self, args):
+        player_id = args['__id__']
         data = args['data']
         namespace = args['namespace']
-        comp = _ServerCompFactory.CreateItem(playerId)
-        invItems = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
+        comp = _CompFactory.CreateItem(player_id)
+        inv_items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
         for key, items in data.items():
             if key == "inv27":
                 comp.SetPlayerAllItems({
-                    (_ItemPosType.INVENTORY, i + 9): item for i, item in enumerate(items) if item != invItems[i + 9]
+                    (_ItemPosType.INVENTORY, i + 9): item
+                    for i, item in enumerate(items)
+                    if item != inv_items[i + 9]
                 })
             elif key in ["shortcut", "inv36"]:
                 comp.SetPlayerAllItems({
-                    (_ItemPosType.INVENTORY, i): item for i, item in enumerate(items) if item != invItems[i]
+                    (_ItemPosType.INVENTORY, i): item
+                    for i, item in enumerate(items)
+                    if item != inv_items[i]
                 })
             else:
-                self.itemsData[playerId][(namespace, key)] = items
+                self._items_data[player_id][(namespace, key)] = items
 
-    @server_listener("_BroadcastToAllClient")
-    def _OnBroadcastToAllClient(self, args):
-        eventName = args['eventName']
-        eventData = args['eventData']
-        if isinstance(eventData, dict) and '__id__' in args:
-            eventData['__id__'] = args['__id__']
-        self.BroadcastToAllClient(eventName, eventData)
+    @server_listener
+    def _BroadcastToAllClient(self, args):
+        event_name = args['event_name']
+        event_data = args['event_data']
+        if isinstance(event_data, dict) and '__id__' in args:
+            event_data['__id__'] = args['__id__']
+        self.BroadcastToAllClient(event_name, event_data)
 
     @server_listener("UiInitFinished")
-    def _OnUiInitFinished(self, args):
-        playerId = args['__id__']
-        self.allPlayerData[playerId] = {}
-        self.itemsData[playerId] = {}
-        if self.homeownerPlayerId == "-1":
-            self.homeownerPlayerId = playerId
-            if self._listenGameTick:
-                self.NotifyToClient(self.homeownerPlayerId, "_ListenServerGameTick", {})
-        if self._queryCache:
-            self.NotifyToClient(playerId, "_SetQueryCache", self._queryCache)
+    def _UiInitFinished(self, args):
+        player_id = args['__id__']
+        self.all_player_data[player_id] = {}
+        self._items_data[player_id] = {}
+        if self.homeowner_player_id == "-1":
+            self.homeowner_player_id = player_id
+            if self._listen_game_tick:
+                self.NotifyToClient(self.homeowner_player_id, "_ListenServerGameTick", {})
+        if self._query_cache:
+            self.NotifyToClient(player_id, "_SetQueryCache", self._query_cache)
         self.UiInitFinished(args)
 
     def __listen(self):
-        for args in _lsnFuncArgs:
+        for args in _lsn_func_args:
             func = args[3]
             method = getattr(self, func.__name__, None)
             if method and method.__func__ is func:
@@ -4936,21 +4878,22 @@ class NuoyanServerSystem(_ServerSystem):
                 func = getattr(self, event)
                 self.ListenForEvent(_SERVER_ENGINE_NAMESPACE, _SERVER_ENGINE_SYSTEM_NAME, event, self, func)
 
-    def _listenForGameTickEvent(self):
-        if self._listenGameTick:
+    def _listen_for_game_tick_event(self):
+        if self._listen_game_tick:
             return
-        self._listenGameTick = True
-        if self.homeownerPlayerId != "-1":
-            self.NotifyToClient(self.homeownerPlayerId, "_ListenServerGameTick", {})
+        self._listen_game_tick = True
+        if self.homeowner_player_id != "-1":
+            self.NotifyToClient(self.homeowner_player_id, "_ListenServerGameTick", {})
 
-    def _checkOnGameTick(self):
+    def _check_on_game_tick(self):
         if _is_method_overridden(self.__class__, NuoyanServerSystem, "OnGameTick"):
-            self._listenForGameTickEvent()
+            self._listen_for_game_tick_event()
 
-    def _onPlayerLeave(self, args):
-        playerId = args['playerId']
-        if playerId in self.allPlayerData:
-            del self.allPlayerData[playerId]
+    @server_listener("PlayerIntendLeaveServerEvent")
+    def _PlayerIntendLeaveServerEvent(self, args):
+        player_id = args['playerId']
+        if player_id in self.all_player_data:
+            del self.all_player_data[player_id]
 
 
 

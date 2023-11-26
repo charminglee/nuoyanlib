@@ -12,12 +12,9 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-10
+#   Last Modified : 2023-11-26
 #
 # ====================================================
-
-
-# todo: 合并所有组件到一个类，实现一个类即可调用所有接口
 
 
 """
@@ -26,48 +23,6 @@ clientComps
 ===========
 
 该模块提供了使用存档ID（Level Id）和本地玩家ID创建客户端组件的快捷方法，同时，还提供了一些常用的变量，直接导入即可使用，无需再使用接口获取，节省了大量编写代码的时间。
-
------
-
-【模块变量说明】
-
-1、CLIENT_ENGINE_NAMESPACE：客户端引擎事件的命名空间。
-
-2、CLIENT_ENGINE_SYSTEM_NAME：客户端引擎系统名。
-
-3、ClientSystem：客户端system基类。
-
-4、ClientCompFactory：客户端引擎组件工厂。
-
-5、ScreenNode：ScreenNode类。
-
-6、ViewBinder：ViewBinder类。
-
-7、ViewRequest：ViewRequest类。
-
-8、PLAYER_ID：本地玩家ID。
-
-9、LEVEL_ID：存档ID。
-
-10、ClientPlayerComps：保存了使用本地玩家ID创建的所有客户端组件。
-
-11、ClientLevelComps：保存了使用存档ID创建的所有客户端组件。
-
------
-
-【示例】
-
->>> from nuoyanlib import ClientPlayerComps as cpc, ClientLevelComps as clc
-
-调用Item组件获取本地玩家手持物品，等价于clientApi.GetEngineCompFactory().CreateItem(clientApi.GetLocalPlayerId()).GetPlayerItem(2)。
-
->>> cpc.Item.GetPlayerItem(2)
-
-调用Game组件添加定时器，等价于clientApi.GetEngineCompFactory().CreateGame(clientApi.GetLevelId()).AddTimer(1, func)。
-
->>> def func():
-...     print("hello")
->>> clc.Game.AddTimer(1, func)
 
 """
 
@@ -79,14 +34,14 @@ __all__ = [
     "CLIENT_ENGINE_NAMESPACE",
     "CLIENT_ENGINE_SYSTEM_NAME",
     "ClientSystem",
-    "ClientCompFactory",
+    "CompFactory",
     "ScreenNode",
     "ViewBinder",
     "ViewRequest",
     "PLAYER_ID",
     "LEVEL_ID",
-    "ClientPlayerComps",
-    "ClientLevelComps",
+    "PlrComp",
+    "LvComp",
 ]
 
 
@@ -95,7 +50,7 @@ CLIENT_ENGINE_SYSTEM_NAME = _clientApi.GetEngineSystemName()
 
 
 ClientSystem = _clientApi.GetClientSystemCls()
-ClientCompFactory = _clientApi.GetEngineCompFactory()
+CompFactory = _clientApi.GetEngineCompFactory()
 
 
 ScreenNode = _clientApi.GetScreenNodeCls()
@@ -108,18 +63,17 @@ LEVEL_ID = _clientApi.GetLevelId()
 
 
 class _CompDescr(object):
-    def __init__(self, compName):
-        self.compName = compName
+    def __init__(self, comp_name):
+        self.comp_name = comp_name
 
     def __get__(self, ins, cls):
-        if self.compName not in cls._cache:
-            comp = getattr(ClientCompFactory, "Create" + self.compName)(cls._target)
-            # comp = self.compName
-            cls._cache[self.compName] = comp
-        return cls._cache[self.compName]
+        if self.comp_name not in cls._cache:
+            comp = getattr(CompFactory, "Create" + self.comp_name)(cls._target)
+            cls._cache[self.comp_name] = comp
+        return cls._cache[self.comp_name]
 
 
-class ClientCompPool(object):
+class _CompPool(object):
     Action = _CompDescr("Action")
     ActorCollidable = _CompDescr("ActorCollidable")
     ActorMotion = _CompDescr("ActorMotion")
@@ -176,26 +130,23 @@ class ClientCompPool(object):
     VirtualWorld = _CompDescr("VirtualWorld")
 
 
-class ClientPlayerComps(ClientCompPool):
+class PlrComp(_CompPool):
     _cache = {}
     _target = PLAYER_ID
 
 
-class ClientLevelComps(ClientCompPool):
+class LvComp(_CompPool):
     _cache = {}
     _target = LEVEL_ID
 
 
 if __name__ == "__main__":
     l = []
-    for k, v in ClientCompPool.__dict__.items():
+    for k, v in _CompPool.__dict__.items():
         if k.startswith("__"):
             continue
-        l.append(k == v.compName)
+        l.append(k == v.comp_name)
     assert all(l)
-
-
-
 
 
 

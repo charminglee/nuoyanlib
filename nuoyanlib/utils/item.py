@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-22
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -33,7 +33,7 @@ __all__ = [
 ]
 
 
-_AIR = ["minecraft:air", "air"]
+_AIR = ("minecraft:air", "air")
 
 
 def item_dict(
@@ -90,18 +90,21 @@ def _get_comp_factory():
     return _clientApi.GetEngineCompFactory() if _is_client() else _serverApi.GetEngineCompFactory()
 
 
-def get_item_count(playerId, name, aux=-1):
+def get_item_count(player_id, name, aux=-1):
     """
     获取玩家背包中指定物品的总数量。
-    -----------------------------------------------------------
-    【playerId: str】 玩家的实体ID
-    【name: str】 物品名称
-    【aux: int = -1】 物品特殊值（-1表示任意特殊值）
-    -----------------------------------------------------------
-    return: int -> 指定物品在背包中的总数
+
+    -----
+
+    :param str player_id: 玩家的实体ID
+    :param str name: 物品名称
+    :param int aux: 物品特殊值（-1表示任意特殊值），默认为-1
+
+    :return: 指定物品在背包中的总数
+    :rtype: int
     """
     count = 0
-    items = _get_comp_factory().CreateItem(playerId).GetPlayerAllItems(_ItemPosType.INVENTORY)
+    items = _get_comp_factory().CreateItem(player_id).GetPlayerAllItems(_ItemPosType.INVENTORY)
     for item in items:
         if is_empty_item(item):
             continue
@@ -111,96 +114,102 @@ def get_item_count(playerId, name, aux=-1):
 
 
 def set_namespace(name, namespace="minecraft"):
-    # type: (str, str) -> str
     """
     设置物品的命名空间。
-    【示例】
-    set_namespace("apple")     # "minecraft:apple"
-    set_namespace("apple", "nuoyan")     # "nuoyan:apple"
-    set_namespace("minecraft:apple", "nuoyan")     # "nuoyan:apple"
-    -----------------------------------------------------------
-    【name: str】 物品名称
-    【namespace: str = "minecraft"】 命名空间
-    -----------------------------------------------------------
-    return: str -> 新的物品名称
+
+    -----
+
+    :param str name: 物品名称
+    :param str namespace: 命名空间，默认为"minecraft"
+
+    :return: 新的物品名称
+    :rtype: str
     """
     if not name:
         return ""
-    nameLst = name.split(":")
+    name_lst = name.split(":")
     if ":" not in name:
-        nameLst.insert(0, "")
-    nameLst[0] = namespace
-    return ":".join(nameLst)
+        name_lst.insert(0, "")
+    name_lst[0] = namespace
+    return ":".join(name_lst)
 
 
 def _same(what1, what2):
     return (not what1 and not what2) or what1 == what2
 
 
-def is_same_item(itemDict1, itemDict2):
-    # type: (dict, dict) -> bool
+def is_same_item(item_dict1, item_dict2):
     """
     判断两个物品是否是同种物品。
-    -----------------------------------------------------------
-    【itemDict1: dict】 物品信息字典1
-    【itemDict2: dict】 物品信息字典2
-    -----------------------------------------------------------
-    return: bool -> 相同则返回True，否则返回False
+
+    -----
+
+    :param dict item_dict1: 物品信息字典1
+    :param dict item_dict2: 物品信息字典2
+
+    :return: 相同则返回True，否则返回False
+    :rtype: bool
     """
-    isEmp1 = is_empty_item(itemDict1)
-    isEmp2 = is_empty_item(itemDict2)
-    if isEmp1 != isEmp2:
+    is_emp1 = is_empty_item(item_dict1)
+    is_emp2 = is_empty_item(item_dict2)
+    if is_emp1 != is_emp2:
         return False
-    if isEmp1 and isEmp2:
+    if is_emp1 and is_emp2:
         return True
-    if 'newItemName' in itemDict1:
-        itemData1 = [itemDict1['newItemName'], itemDict1.get('newAuxValue', 0)]
+    if 'newItemName' in item_dict1:
+        item_data1 = [item_dict1['newItemName'], item_dict1.get('newAuxValue', 0)]
     else:
-        itemData1 = [itemDict1['itemName'], itemDict1.get('auxValue', 0)]
-    if 'newItemName' in itemDict2:
-        itemData2 = [itemDict2['newItemName'], itemDict2.get('newAuxValue', 0)]
+        item_data1 = [item_dict1['itemName'], item_dict1.get('auxValue', 0)]
+    if 'newItemName' in item_dict2:
+        item_data2 = [item_dict2['newItemName'], item_dict2.get('newAuxValue', 0)]
     else:
-        itemData2 = [itemDict2['itemName'], itemDict2.get('auxValue', 0)]
-    itemData1[0] = set_namespace(itemData1[0])
-    itemData2[0] = set_namespace(itemData2[0])
-    extraId1, extraId2 = itemDict1.get('extraId'), itemDict2.get('extraId')
-    userData1, userData2 = itemDict1.get('userData'), itemDict2.get('userData')
-    if not _same(extraId1, extraId2) or not _same(userData1, userData2):
+        item_data2 = [item_dict2['itemName'], item_dict2.get('auxValue', 0)]
+    item_data1[0] = set_namespace(item_data1[0])
+    item_data2[0] = set_namespace(item_data2[0])
+    extra_id1, extra_id2 = item_dict1.get('extraId'), item_dict2.get('extraId')
+    user_data1, user_data2 = item_dict1.get('userData'), item_dict2.get('userData')
+    if not _same(extra_id1, extra_id2) or not _same(user_data1, user_data2):
         return False
-    return itemData1 == itemData2
+    return item_data1 == item_data2
 
 
-def are_same_item(item, *otherItem):
-    # type: (dict, dict) -> bool
+def are_same_item(item, *other_item):
     """
     判断多个物品是否是同种物品。
-    -----------------------------------------------------------
-    【item: dict】 物品信息字典
-    【*otherItem: dict】 物品信息字典
-    -----------------------------------------------------------
-    return: bool -> 相同则返回True，否则返回False
+
+    -----
+
+    :param dict item: 物品信息字典
+    :param dict other_item: 物品信息字典
+
+    :return: 相同则返回True，否则返回False
+    :rtype: bool
     """
-    for it in otherItem:
+    for it in other_item:
         if not is_same_item(item, it):
             return False
     return True
 
 
-def is_empty_item(itemDict, zeroCountIsEmp=True):
-    # type: (dict, bool) -> bool
+def is_empty_item(item, zero_is_emp=True):
     """
     判断物品是否是空物品。
-    -----------------------------------------------------------
-    【itemDict: dict】 物品信息字典
-    【zeroCountIsEmp: bool = True】 是否把数量为0的物品视为空物品
-    -----------------------------------------------------------
-    return: bool -> 空物品则返回True，否则返回False
+
+    -----
+
+    :param dict item: 物品信息字典
+    :param bool zero_is_emp: 是否把数量为0的物品视为空物品，默认为是
+
+    :return: 空物品则返回True，否则返回False
+    :rtype: bool
     """
-    return not itemDict \
-           or ('newItemName' not in itemDict and 'itemName' not in itemDict) \
-           or (zeroCountIsEmp and itemDict.get('count', 1) <= 0) \
-           or itemDict.get('newItemName') in _AIR  \
-           or itemDict.get('itemName') in _AIR
+    return (
+        not item
+        or ('newItemName' not in item and 'itemName' not in item)
+        or (zero_is_emp and item.get('count', 1) <= 0)
+        or item.get('newItemName') in _AIR
+        or item.get('itemName') in _AIR
+    )
 
 
 def _get_level_id():
@@ -211,16 +220,19 @@ def _is_server():
     return _clientApi.GetLocalPlayerId() == "-1"
 
 
-def get_max_stack(itemDict):
+def get_max_stack(item):
     """
     获取物品最大堆叠数量。
-    -----------------------------------------------------------
-    【itemDict: dict】 物品信息字典
-    -----------------------------------------------------------
-    return: int -> 最大堆叠数量，获取不到返回-1
+
+    -----
+
+    :param dict item: 物品信息字典
+
+    :return: 最大堆叠数量，获取不到返回-1
+    :rtype: int
     """
-    name = itemDict['newItemName']
-    aux = itemDict.get('newAuxValue', 0)
+    name = item['newItemName']
+    aux = item.get('newAuxValue', 0)
     if aux == -1:
         aux = 0
     if _is_server():
@@ -233,7 +245,7 @@ def get_max_stack(itemDict):
         return -1
 
 
-def _test():
+if __name__ == "__main__":
     item1 = {'newItemName': "minecraft:apple"}
     item2 = {'itemName': "minecraft:apple"}
     item3 = {'newItemName': "minecraft:apple", 'newAuxValue': 1}
@@ -264,10 +276,6 @@ def _test():
     print "-" * 50
     print set_namespace("apple")  # "minecraft:apple"
     print set_namespace("minecraft:apple", "nuoyan")  # "nuoyan:apple"
-
-
-if __name__ == "__main__":
-    _test()
 
 
 

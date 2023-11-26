@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-05
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -20,14 +20,14 @@
 import mod.client.extraClientApi as _clientApi
 from ..config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from ..utils.utils import is_method_overridden as _is_method_overridden
-from clientComps import (
+from comp import (
     CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
     CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
     ScreenNode as _ScreenNode,
     ViewBinder as _ViewBinder,
     PLAYER_ID as _PLAYER_ID,
     ClientSystem as _ClientSystem,
-    ClientCompFactory as _ClientCompFactory,
+    CompFactory as _CompFactory,
 )
 
 
@@ -144,16 +144,16 @@ ALL_CLIENT_ENGINE_EVENTS = {
 }
 
 
-_lsnFuncArgs = []
+_lsn_func_args = []
 
 
-def _add_listener(func, eventName="", namespace=_MOD_NAME, systemName=_SERVER_SYSTEM_NAME, priority=0):
-    if not eventName:
-        eventName = func.__name__
-    _lsnFuncArgs.append((namespace, systemName, eventName, func, priority))
+def _add_listener(func, event_name="", namespace=_MOD_NAME, system_name=_SERVER_SYSTEM_NAME, priority=0):
+    if not event_name:
+        event_name = func.__name__
+    _lsn_func_args.append((namespace, system_name, event_name, func, priority))
 
 
-def client_listener(eventName="", namespace="", systemName="", priority=0):
+def client_listener(event_name="", namespace="", system_name="", priority=0):
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
 
@@ -165,55 +165,28 @@ def client_listener(eventName="", namespace="", systemName="", priority=0):
 
     -----
 
-    【示例】
-
-    >>> class MyClientSystem(ClientSystem):
-    ...     @client_listener("MyCustomEvent1")  # 监听当前服务端传来的自定义事件
-    ...     def eventCallback1(self, args):
-    ...         pass
-    ...
-    ...     @client_listener("MyCustomEvent2", "OtherNamespace", "OtherServer")  # 监听其他服务端传来的自定义事件
-    ...     def eventCallback2(self, args):
-    ...         pass
-    ...
-    ...     @client_listener  # 监听当前服务端传来的与函数同名的事件
-    ...     def SomeEvent1(self, args):
-    ...         pass
-    ...
-    ...     @client_listener(namespace="OtherNamespace", systemName="OtherServer")  # 监听其他服务端传来的与函数同名的事件
-    ...     def SomeEvent2(self, args):
-    ...         pass
-    ...
-    ...     @client_listener("AddEntityClientEvent")  # 监听引擎事件
-    ...     def OnAddEntity(self, args):
-    ...         pass
-
-    -----
-
-    :param str eventName: 事件名称，默认为空字符串，表示监听与函数同名的事件
+    :param str event_name: 事件名称，默认为空字符串，表示监听与函数同名的事件
     :param str namespace: 指定命名空间，默认为空字符串，表示当前服务端的命名空间
-    :param str systemName: 指定系统名称，默认为空字符串，表示当前服务端的系统名称
+    :param str system_name: 指定系统名称，默认为空字符串，表示当前服务端的系统名称
     :param int priority: 优先级，默认为0
     """
-    # @client_listener
-    if callable(eventName):
-        _add_listener(eventName)
-        return eventName
-    # @client_listener(...)
+    if callable(event_name):
+        _add_listener(event_name)
+        return event_name
     else:
-        if not namespace and not systemName:
-            if eventName in ALL_CLIENT_ENGINE_EVENTS:
+        if not namespace and not system_name:
+            if event_name in ALL_CLIENT_ENGINE_EVENTS:
                 namespace = _CLIENT_ENGINE_NAMESPACE
-                systemName = _CLIENT_ENGINE_SYSTEM_NAME
+                system_name = _CLIENT_ENGINE_SYSTEM_NAME
             else:
                 namespace = _MOD_NAME
-                systemName = _SERVER_SYSTEM_NAME
+                system_name = _SERVER_SYSTEM_NAME
         elif not namespace:
             raise AssertionError("Missing parameter 'namespace'.")
-        elif not systemName:
-            raise AssertionError("Missing parameter 'systemName'.")
+        elif not system_name:
+            raise AssertionError("Missing parameter 'system_name'.")
         def decorator(func):
-            _add_listener(func, eventName, namespace, systemName, priority)
+            _add_listener(func, event_name, namespace, system_name, priority)
             return func
         return decorator
 
@@ -221,41 +194,7 @@ def client_listener(eventName="", namespace="", systemName="", priority=0):
 class NuoyanClientSystem(_ClientSystem):
     """
     ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。
-    
-    -----
-    
-    【基础功能】
 
-    1、所有官方文档中收录的客户端引擎事件以及NuoyanClientSystem新增的事件均无需手动监听，只需重写对应事件的同名方法即可（支持热更）。
-
-    2、无需重写Destroy方法进行事件的反监听。
-
-    3、自动将错误信息打印到McpModLog日志，可调用clientApi.SetMcpModLogCanPostDump(False)进行关闭。
-    
-    -----
-    
-    【接口一览】
-
-    1、BroadcastToAllClient：广播事件到所有玩家的客户端。
-
-    2、RegisterAndCreateUI：注册并创建UI。
-
-    3、CallServer：调用服务端属性（包括变量和函数）。
-
-    4、AddPlayerRenderResources：一键添加玩家渲染资源，包括模型、贴图、材质、渲染控制器、动画、动画控制器、音效和粒子特效。
-
-    5、SetQueryVar：设置指定实体query.mod变量的值，支持全局同步（即所有客户端同步设置该变量的值）。
-    
-    -----
-
-    【事件一览】
-
-    1、OnGameTick：频率与游戏实时帧率同步的Tick事件。
-    
-    -----
-
-    【属性一览】
-    
     -----
 
     【注意事项】
@@ -267,15 +206,15 @@ class NuoyanClientSystem(_ClientSystem):
     3、事件回调参数中，参数名前面的美元符号“$”表示该参数可进行修改。
     """
 
-    def __init__(self, namespace, systemName):
+    def __init__(self, namespace, system_name):
         # noinspection PySuperArguments
-        super(NuoyanClientSystem, self).__init__(namespace, systemName)
-        self.__gameTickNode = None
-        self._uiInitFinished = False
+        super(NuoyanClientSystem, self).__init__(namespace, system_name)
+        self.__game_tick_node = None
+        self._ui_init_finished = False
         self.__handle = 0
         self.__listen()
-        self._checkOnGameTick()
-        self._setPrintLog()
+        self._check_on_game_tick()
+        self._set_print_log()
 
     def Destroy(self):
         """
@@ -288,6 +227,8 @@ class NuoyanClientSystem(_ClientSystem):
         >>> class MyClientSystem(NuoyanClientSystem):
         ...     def Destroy(self):
         ...         super(MyClientSystem, self).Destroy()  # 或者：NuoyanClientSystem.Destroy(self)
+
+        -----
 
         :return: 无
         :rtype: None
@@ -2664,7 +2605,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     # ========================================== Basic Function ==============================================
 
-    def SetQueryVar(self, entityId, name, value, sync=True):
+    def SetQueryVar(self, entity_id, name, value, sync=True):
         """
         设置指定实体query.mod变量的值，支持全局同步（即所有客户端同步设置该变量的值）。
 
@@ -2674,7 +2615,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        :param str entityId: 实体ID
+        :param str entity_id: 实体ID
         :param str name: 变量名
         :param float value: 设置的值
         :param bool sync: 是否进行全局同步，默认为True
@@ -2682,45 +2623,28 @@ class NuoyanClientSystem(_ClientSystem):
         :return: 无
         :rtype: None
         """
-        data = {'entityId': entityId, 'name': name, 'value': value}
-        self._setQuery(data)
+        data = {'entity_id': entity_id, 'name': name, 'value': value}
+        self._SetQueryVar(data)
         if sync:
             self.NotifyToServer("_SetQueryVar", data)
 
-    def AddPlayerRenderResources(self, playerId, *resTuple):
+    def AddPlayerRenderResources(self, player_id, *res_tuple):
         """
         一键添加玩家渲染资源，包括模型、贴图、材质、渲染控制器、动画、动画控制器、音效和粒子特效。
 
         注意：如需添加音效，音效名称必须至少包含一个“.”，如“sound.abc”，否则本接口将无法识别。
-        
-        -----
-
-        【示例】
-
-        >>> self.AddPlayerRenderResources(
-        ...     playerId,
-        ...     ("my_geo", "geometry.abc"),  # 模型：(Key, 模型名称)
-        ...     ("my_tex", "textures/entity/abc"),  # 贴图：(Key, 贴图所在路径)
-        ...     ("my_mat", "abc"),  # 材质：(Key, 材质名称)
-        ...     ("controller.render.abc", "1.0"),  # 渲染控制器：(渲染控制器名称, 生效条件)
-        ...     ("my_anim", "animation.abc"),  # 动画：(Key, 动画名称)
-        ...     ("my_ctrler", "controller.animation.abc"),  # 动画控制器：(Key, 动画控制器名称)
-        ...     ("my_sound", "my_sound.abc"),  # 音效：(Key, 音效名称)
-        ...     ("my_eff", "nuoyan:my_particle"),  # 粒子特效：(Key, 粒子特效名称)
-        ... )
-        (True, True, True, True, True, True, True, True)
 
         -----
 
-        :param str playerId: 玩家实体ID
-        :param tuple[str,str] resTuple: 变长参数，渲染资源元组，格式详见示例
+        :param str player_id: 玩家实体ID
+        :param tuple[str,str] res_tuple: 变长参数，渲染资源元组，格式详见示例
 
-        :return: 返回添加结果的元组，每个元素为一个bool，与传入的resTuple参数相对应
+        :return: 返回添加结果的元组，每个元素为一个bool，与传入的res_tuple参数相对应
         :rtype: tuple[bool]
         """
         res = []
-        comp = _ClientCompFactory.CreateActorRender(playerId)
-        for arg in resTuple:
+        comp = _CompFactory.CreateActorRender(player_id)
+        for arg in res_tuple:
             if arg[1].startswith("geometry."):
                 res.append(comp.AddPlayerGeometry(*arg))
             elif arg[1].startswith("textures/"):
@@ -2754,7 +2678,7 @@ class NuoyanClientSystem(_ClientSystem):
         :rtype: None
         """
 
-    def BroadcastToAllClient(self, eventName, eventData):
+    def BroadcastToAllClient(self, event_name, event_data):
         """
         广播事件到所有玩家的客户端。
 
@@ -2764,45 +2688,23 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【示例】
-
-        客户端监听事件：
-
-        >>> from nuoyanlib.client import client_listener
-        >>> class MyClient(ClientSystem):
-        ...     @client_listener
-        ...     def MyEvent(self, args):
-        ...         print args  # {'num': 123, '__id__': "-114514"}
-
-        客户端广播事件（假设该玩家的实体ID为"-114514"）：
-
-        >>> self.BroadcastToAllClient("MyEvent", {'num': 123})
-
-        -----
-
-        :param str eventName: 事件名称
-        :param Any eventData: 数据
+        :param str event_name: 事件名称
+        :param Any event_data: 数据
 
         :return: 无
         :rtype: None
         """
-        self.NotifyToServer("_BroadcastToAllClient", {'eventName': eventName, 'eventData': eventData})
+        self.NotifyToServer("_BroadcastToAllClient", {'event_name': event_name, 'event_data': event_data})
 
-    def RegisterAndCreateUI(self, namespace, clsPath, uiScreenDef, param=None):
+    def RegisterAndCreateUI(self, namespace, cls_path, ui_screen_def, param=None):
         """
         注册并创建UI。
 
         -----
 
-        【示例】
-
-        >>> uiNode = self.RegisterAndCreateUI(namespace, clsPath, uiScreenDef)
-        
-        -----
-
         :param str namespace: UI的名称，对应UI的json文件中“namespace”的值
-        :param str clsPath: UI的类路径
-        :param str uiScreenDef: UI画布路径，格式为“namespace.screenName”，screenName对应想打开的画布的名称（一般为main）
+        :param str cls_path: UI的类路径
+        :param str ui_screen_def: UI画布路径，格式为“namespace.screenName”，screenName对应想打开的画布的名称（一般为main）
         :param dict|None param: 创建UI的参数，会传到UI类的__init__方法中，默认为{'isHud': 1}
 
         :return: UI类实例
@@ -2811,79 +2713,76 @@ class NuoyanClientSystem(_ClientSystem):
         node = _clientApi.GetUI(_MOD_NAME, namespace)
         if node:
             return node
-        _clientApi.RegisterUI(_MOD_NAME, namespace, clsPath, uiScreenDef)
+        _clientApi.RegisterUI(_MOD_NAME, namespace, cls_path, ui_screen_def)
         if not param:
-            param = {
-                'isHud': 1,
-                '__cs__': self,
-            }
+            param = {'isHud': 1, '__cs__': self}
         else:
             param['__cs__'] = self
         return _clientApi.CreateUI(_MOD_NAME, namespace, param)
 
     # ========================================= Internal Method ==============================================
 
-    def _setPrintLog(self):
+    def _set_print_log(self):
         _clientApi.SetMcpModLogCanPostDump(True)
 
-    @client_listener("_SetQueryCache")
-    def _onSetQueryCache(self, args):
-        for entityId, queries in args.items():
+    @client_listener
+    def _SetQueryCache(self, args):
+        for entity_id, queries in args.items():
             for name, value in queries.items():
-                comp = _ClientCompFactory.CreateQueryVariable(entityId)
+                comp = _CompFactory.CreateQueryVariable(entity_id)
                 if comp.Get(name) == -1.0:
                     comp.Register(name, 0.0)
                 comp.Set(name, value)
 
-    @client_listener("_SetQueryVar")
-    def _setQuery(self, args):
-        entityId = args['entityId']
+    @client_listener
+    def _SetQueryVar(self, args):
+        entity_id = args['entity_id']
         name = args['name']
         value = args['value']
         if '__id__' in args and args['__id__'] == _PLAYER_ID:
             return
-        comp = _ClientCompFactory.CreateQueryVariable(entityId)
+        comp = _CompFactory.CreateQueryVariable(entity_id)
         if comp.Get(name) == -1.0:
             comp.Register(name, 0.0)
         comp.Set(name, value)
 
-    @client_listener("_ListenServerGameTick")
-    def _onListenServerGameTick(self, args=None):
-        if self._uiInitFinished:
-            if not self.__gameTickNode:
-                self._startGameTick()
-            self.__gameTickNode.notifySv = True
+    @client_listener
+    def _ListenServerGameTick(self, args):
+        if self._ui_init_finished:
+            if not self.__game_tick_node:
+                self._start_game_tick()
+            self.__game_tick_node.notify_sv = True
         else:
             self.__handle = 2
 
-    def _listenClientGameTick(self):
-        if self._uiInitFinished:
-            if not self.__gameTickNode:
-                self._startGameTick()
-            self.__gameTickNode.notifyCl = True
+    def _listen_client_game_tick(self):
+        if self._ui_init_finished:
+            if not self.__game_tick_node:
+                self._start_game_tick()
+            self.__game_tick_node.notify_cln = True
         else:
             self.__handle = 1
 
-    def _startGameTick(self):
-        self.__gameTickNode = self.RegisterAndCreateUI(
+    def _start_game_tick(self):
+        self.__game_tick_node = self.RegisterAndCreateUI(
             _UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK
         )
 
-    def _checkOnGameTick(self):
+    def _check_on_game_tick(self):
         if _is_method_overridden(self.__class__, NuoyanClientSystem, "OnGameTick"):
-            self._listenClientGameTick()
+            self._listen_client_game_tick()
 
     @client_listener("UiInitFinished")
-    def _onUiInitFinished(self, args):
+    def _UiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
-        self._uiInitFinished = True
+        self._ui_init_finished = True
         if self.__handle == 1:
-            self._listenClientGameTick()
+            self._listen_client_game_tick()
         elif self.__handle == 2:
-            self._onListenServerGameTick()
+            self._ListenServerGameTick(None)
 
     def __listen(self):
-        for args in _lsnFuncArgs:
+        for args in _lsn_func_args:
             func = args[3]
             method = getattr(self, func.__name__, None)
             if method and method.__func__ is func:
@@ -2898,14 +2797,14 @@ class _GameTick(_ScreenNode):
     def __init__(self, namespace, name, param):
         super(_GameTick, self).__init__(namespace, name, param)
         self.cs = param['__cs__']
-        self.notifySv = False
-        self.notifyCl = False
+        self.notify_sv = False
+        self.notify_cln = False
 
     @_ViewBinder.binding(_ViewBinder.BF_BindString, "#main.gametick")
     def OnGameTick(self):
-        if self.notifySv:
+        if self.notify_sv:
             self.cs.NotifyToServer("OnGameTick", {})
-        if self.notifyCl:
+        if self.notify_cln:
             self.cs.OnGameTick()
 
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-10-05
+#   Last Modified : 2023-11-27
 #
 # ====================================================
 
@@ -27,53 +27,88 @@ from math import (
     cos as _cos,
     floor as _floor,
 )
+from random import (
+    randint as _randint,
+    uniform as _uniform,
+)
 import mod.client.extraClientApi as _clientApi
 import mod.server.extraServerApi as _serverApi
 from mod.common.utils.mcmath import Vector3 as _Vector3
 
 
 __all__ = [
-    'pos_distance_to_line',
-    'floor_pos',
-    'pos_distance',
-    'to_relative_pos',
-    'to_screen_pos',
-    'rotate_pos',
-    'straight_pos_list',
-    'midpoint',
-    'camera_rot_p2p',
-    'circle_pos_list',
-    'pos_entity_facing',
-    'pos_forward_rot',
-    'n_quantiles_index_list',
-    'cube_center',
-    'cube_longest_side_len',
-    'is_in_sector',
-    'sphere_pos_list',
-    'cube_pos_list',
-    'spiral_pos_list',
-    'is_in_cube',
-    'rot_diff',
-    'ray_aabb_intersection',
+    "probability_true_i",
+    "probability_true_f",
+    "pos_distance_to_line",
+    "floor_pos",
+    "pos_distance",
+    "to_relative_pos",
+    "to_screen_pos",
+    "rotate_pos",
+    "straight_pos_list",
+    "midpoint",
+    "camera_rot_p2p",
+    "circle_pos_list",
+    "pos_entity_facing",
+    "pos_forward_rot",
+    "n_quantiles_index_list",
+    "cube_center",
+    "cube_longest_side_len",
+    "is_in_sector",
+    "sphere_pos_list",
+    "cube_pos_list",
+    "spiral_pos_list",
+    "is_in_cube",
+    "rot_diff",
+    "ray_aabb_intersection",
 ]
 
 
-def pos_distance_to_line(pos, linePos1, linePos2):
+def probability_true_i(n, d):
+    """
+    以指定概率返回True。（分数版本）
+
+    -----
+
+    :param int n: 概率分子
+    :param int d: 概率分母
+
+    :return: 以a/b的概率返回True
+    :rtype: bool
+    """
+    return n * d > 0 and _randint(1, d) <= n
+
+
+def probability_true_f(f):
+    """
+    以指定概率返回True。（浮点数版本）
+
+    -----
+
+    :param float f: 概率，范围为[0, 1]
+
+    :return: 以f的概率返回True
+    :rtype: bool
+    """
+    return f > 0 and _uniform(0, 1) <= f
+
+
+def pos_distance_to_line(pos, line_pos1, line_pos2):
     """
     计算指定坐标pos与指定直线的距离。
 
     -----
 
     :param tuple[float,float,float] pos: 指定坐标
-    :param tuple[float,float,float] linePos1: 指定直线上的坐标1
-    :param tuple[float,float,float] linePos2: 指定直线上的坐标2
+    :param tuple[float,float,float] line_pos1: 指定直线上的坐标1
+    :param tuple[float,float,float] line_pos2: 指定直线上的坐标2
         
     :return: pos与指定直线的距离
     :rtype: float
     """
-    a = pos_distance(pos, linePos1)
-    b = pos_distance(pos, linePos2)
-    c = pos_distance(linePos1, linePos2)
+    a = pos_distance(pos, line_pos1)
+    b = pos_distance(pos, line_pos2)
+    c = pos_distance(line_pos1, line_pos2)
     p = (a + b + c) / 2
     s = _sqrt(p * (p - a) * (p - b) * (p - c)) # 海伦公式
     h = s / c * 2
@@ -81,7 +116,7 @@ def pos_distance_to_line(pos, linePos1, linePos2):
 
 
 def _is_client():
-    return _clientApi.GetLocalPlayerId() != '-1'
+    return _clientApi.GetLocalPlayerId() != "-1"
 
 
 def _get_comp_factory():
@@ -102,76 +137,69 @@ def floor_pos(pos):
     return map(lambda x: int(_floor(x)), pos)
 
 
-def pos_distance(firstPoint, secondPoint):
+def pos_distance(first_point, second_point):
     """
     计算两个坐标间的距离。支持多元坐标。
         
     -----
     
-    :param tuple[float, ...] firstPoint: 坐标1
-    :param tuple[float, ...] secondPoint: 坐标2
+    :param tuple[float, ...] first_point: 坐标1
+    :param tuple[float, ...] second_point: 坐标2
         
     :return: 距离
     :rtype: float
     """
-    if not firstPoint or not secondPoint:
+    if not first_point or not second_point:
         return -1.0
-    return _sqrt(sum((a - b) ** 2 for a, b in zip(firstPoint, secondPoint)))
+    return _sqrt(sum((a - b) ** 2 for a, b in zip(first_point, second_point)))
 
 
-def to_relative_pos(entityPos1, entityPos2):
+def to_relative_pos(entity_pos1, entity_pos2):
     """
     将实体1的绝对坐标转换为相对实体2的坐标。
-
-    -----
-
-    【示例】
-
-    >>> to_relative_pos((1, 1, 4), (5, 1, 4))
-    (-4, 0, 0)
         
     -----
     
-    :param tuple[float,float,float] entityPos1: 实体1坐标
-    :param tuple[float,float,float] entityPos2: 实体2坐标
+    :param tuple[float,float,float] entity_pos1: 实体1坐标
+    :param tuple[float,float,float] entity_pos2: 实体2坐标
         
     :return: 相对坐标
     :rtype: tuple[float,float,float]|None
     """
-    if not entityPos1 or not entityPos2:
+    if not entity_pos1 or not entity_pos2:
         return
-    return tuple(a - b for a, b in zip(entityPos1, entityPos2))
+    return tuple(a - b for a, b in zip(entity_pos1, entity_pos2))
 
 
-def to_screen_pos(entityPos, centerPos, screenSize, maxDistance, uiSize, playerRot):
+def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, player_rot):
     """
     将实体的世界坐标转换为屏幕上的平面坐标，并根据玩家水平视角做对应旋转。可用于在小地图上显示实体图标。
         
     -----
     
-    :param tuple[float,float,float] entityPos: 实体坐标
-    :param tuple[float,float,float] centerPos: 屏幕坐标系原点对应的世界坐标（一般为玩家坐标）
-    :param int screenSize: 屏幕上用于显示实体位置的正方形区域的边长（如小地图的尺寸）
-    :param int maxDistance: 当实体位于上述区域的边界时，实体与centerPos之间的距离（如小地图的最远绘制距离）
-    :param int uiSize: 实体图标ui尺寸
-    :param float playerRot: 玩家水平视角
+    :param tuple[float,float,float] entity_pos: 实体坐标
+    :param tuple[float,float,float] center_pos: 屏幕坐标系原点对应的世界坐标（一般为玩家坐标）
+    :param int screen_size: 屏幕上用于显示实体位置的正方形区域的边长（如小地图的尺寸）
+    :param int max_distance: 当实体位于上述区域的边界时，实体与center_pos之间的距离（如小地图的最远绘制距离）
+    :param int ui_size: 实体图标ui尺寸
+    :param float player_rot: 玩家水平视角
         
     :return: 屏幕坐标
     :rtype: tuple[float, float]|None
     """
-    if not entityPos or not centerPos or not playerRot:
+    if not entity_pos or not center_pos or not player_rot:
         return
-    relativePos = to_relative_pos(centerPos, entityPos)
-    halfScreenSize = screenSize / 2.0
-    halfUiSize = uiSize / 2.0
-    ratio = (relativePos[0] / maxDistance, relativePos[2] / maxDistance)
-    origPos = (halfScreenSize * ratio[0], halfScreenSize * ratio[1])
-    rotatePos = rotate_pos(playerRot, origPos)
-    screenPos = (
-        halfScreenSize - rotatePos[0] - halfUiSize,
-        halfScreenSize - rotatePos[1] - halfUiSize,
+    relative_pos = to_relative_pos(center_pos, entity_pos)
+    half_screen_size = screen_size / 2.0
+    half_ui_size = ui_size / 2.0
+    ratio = (relative_pos[0] / max_distance, relative_pos[2] / max_distance)
+    orig_pos = (half_screen_size * ratio[0], half_screen_size * ratio[1])
+    rotated_pos = rotate_pos(player_rot, orig_pos)
+    screen_pos = (
+        half_screen_size - rotated_pos[0] - half_ui_size,
+        half_screen_size - rotated_pos[1] - half_ui_size,
     )
-    return screenPos
+    return screen_pos
 
 
 def rotate_pos(angle, pos):
@@ -189,9 +217,9 @@ def rotate_pos(angle, pos):
     if not angle or not pos:
         return
     radian = (-angle / 180) * _pi
-    rotateX = _cos(radian) * pos[0] - _sin(radian) * pos[1]
-    rotateY = _cos(radian) * pos[1] + _sin(radian) * pos[0]
-    return rotateX, rotateY
+    rotate_x = _cos(radian) * pos[0] - _sin(radian) * pos[1]
+    rotate_y = _cos(radian) * pos[1] + _sin(radian) * pos[0]
+    return rotate_x, rotate_y
 
 
 def straight_pos_list(pos1, pos2, count, only=-1):
@@ -213,35 +241,35 @@ def straight_pos_list(pos1, pos2, count, only=-1):
     xd = pos1[0] - pos2[0]
     yd = pos1[1] - pos2[1]
     zd = pos1[2] - pos2[2]
-    xStep = xd / (count + 1)
-    yStep = yd / (count + 1)
-    zStep = zd / (count + 1)
+    x_step = xd / (count + 1)
+    y_step = yd / (count + 1)
+    z_step = zd / (count + 1)
     result = []
     if only != -1:
         count = only
     while count > 0:
-        result.append((pos2[0] + xStep * count, pos2[1] + yStep * count, pos2[2] + zStep * count))
+        result.append((pos2[0] + x_step * count, pos2[1] + y_step * count, pos2[2] + z_step * count))
         count -= 1
     return result
 
 
-def midpoint(firstPoint, secondPoint):
+def midpoint(first_point, second_point):
     """
     计算给定两点间的中点坐标。
         
     -----
     
-    :param tuple[float, ...] firstPoint: 坐标1
-    :param tuple[float, ...] secondPoint: 坐标2
+    :param tuple[float, ...] first_point: 坐标1
+    :param tuple[float, ...] second_point: 坐标2
         
     :return: 中点坐标
     :rtype: tuple[float, ...]|None
     """
-    if not firstPoint or not secondPoint:
+    if not first_point or not second_point:
         return
     midpos = []
-    for i in range(len(firstPoint)):
-        midpos.append((firstPoint[i] + secondPoint[i]) / 2)
+    for i in range(len(first_point)):
+        midpos.append((first_point[i] + second_point[i]) / 2)
     return tuple(midpos)
 
 
@@ -264,32 +292,32 @@ def camera_rot_p2p(pos1, pos2):
         x = 0.000000001
     y = pos2[1] - pos1[1]
     z = pos2[2] - pos1[2]
-    horiDis = pos_distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
-    if horiDis == 0:
-        horiDis = 0.000000001
-    horizontalRot = 90 + (_atan(z / x) / _pi) * 180 + (-180 if x > 0 else 0)
-    verticalRot = -(_atan(y / horiDis) / _pi) * 180
-    return verticalRot, horizontalRot
+    hori_dis = pos_distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
+    if hori_dis == 0:
+        hori_dis = 0.000000001
+    horizontal_rot = 90 + (_atan(z / x) / _pi) * 180 + (-180 if x > 0 else 0)
+    vertical_rot = -(_atan(y / hori_dis) / _pi) * 180
+    return vertical_rot, horizontal_rot
 
 
-def circle_pos_list(centerPos, radius, density):
+def circle_pos_list(center_pos, radius, density):
     """
     计算以某一坐标为圆心的圆上各点的坐标。
 
     -----
 
-    :param tuple[float,float,float] centerPos: 圆心坐标
+    :param tuple[float,float,float] center_pos: 圆心坐标
     :param float radius: 半径
     :param int density: 返回的坐标个数
 
     :return: 坐标列表
     :rtype: list[tuple[float,float,float]]
     """
-    if not centerPos:
+    if not center_pos:
         return []
     result = []
     step = (2 * _pi) / density
-    ox, oy, oz = centerPos
+    ox, oy, oz = center_pos
     for i in range(density):
         angle = i * step
         nx = radius * _sin(angle) + ox
@@ -298,32 +326,32 @@ def circle_pos_list(centerPos, radius, density):
     return result
 
 
-def pos_entity_facing(entityId, dis, use0Yaw=False, heightOffset=0.0):
+def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
     """
     计算实体视角方向上、给定距离上的位置的坐标。
 
     -----
 
-    :param str entityId: 实体ID
+    :param str entity_id: 实体ID
     :param float dis: 距离
-    :param bool use0Yaw: 是否使用0作为实体竖直方向上的视角
-    :param float heightOffset: 高度偏移量（如实体为玩家建议使用1.6，其他实体建议使用其头部到脚底的距离）
+    :param bool use_0yaw: 是否使用0作为实体竖直方向上的视角
+    :param float height_offset: 高度偏移量（如实体为玩家建议使用1.6，其他实体建议使用其头部到脚底的距离）
 
     :return: 坐标
     :rtype: tuple[float,float,float]|None
     """
-    compFactory = _get_comp_factory()
-    rot = compFactory.CreateRot(entityId).GetRot()
+    comp_factory = _get_comp_factory()
+    rot = comp_factory.CreateRot(entity_id).GetRot()
     if not rot:
         return
-    if use0Yaw:
+    if use_0yaw:
         rot = (0, rot[1])
-    dirRot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
-    ep = compFactory.CreatePos(entityId).GetFootPos()
+    dir_rot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
+    ep = comp_factory.CreatePos(entity_id).GetFootPos()
     if not ep:
         return
-    ep = (ep[0], ep[1] + heightOffset, ep[2])
-    result = tuple(ep[i] + dirRot[i] * dis for i in range(3))
+    ep = (ep[0], ep[1] + height_offset, ep[2])
+    result = tuple(ep[i] + dir_rot[i] * dis for i in range(3))
     return result
 
 
@@ -342,21 +370,14 @@ def pos_forward_rot(pos, rot, dis):
     """
     if not rot or not pos:
         return
-    dirRot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
-    resultPos = tuple(pos[i] + dirRot[i] * dis for i in range(3))
-    return resultPos
+    dir_rot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
+    result_pos = tuple(pos[i] + dir_rot[i] * dis for i in range(3))
+    return result_pos
 
 
 def n_quantiles_index_list(n, data):
     """
     计算一串数据的n分位数的位置。
-
-    -----
-
-    【示例】
-
-    >>> n_quantiles_index_list(4, range(11))
-    [2, 5, 8]
 
     -----
 
@@ -376,98 +397,98 @@ def n_quantiles_index_list(n, data):
     return result
 
 
-def cube_center(startPos, endPos):
+def cube_center(start_pos, end_pos):
     """
     计算立方体中心坐标。
 
     -----
 
-    :param tuple[float,float,float] startPos: 立方体对角顶点坐标1
-    :param tuple[float,float,float] endPos: 立方体对角顶点坐标2
+    :param tuple[float,float,float] start_pos: 立方体对角顶点坐标1
+    :param tuple[float,float,float] end_pos: 立方体对角顶点坐标2
 
     :return: 中心坐标
     :rtype: tuple[float,float,float]|None
     """
-    if not startPos or not endPos:
+    if not start_pos or not end_pos:
         return
-    x = (startPos[0] + endPos[0]) / 2.0
-    y = (startPos[1] + endPos[1]) / 2.0
-    z = (startPos[2] + endPos[2]) / 2.0
+    x = (start_pos[0] + end_pos[0]) / 2.0
+    y = (start_pos[1] + end_pos[1]) / 2.0
+    z = (start_pos[2] + end_pos[2]) / 2.0
     return x, y, z
 
 
-def cube_longest_side_len(startPos, endPos):
+def cube_longest_side_len(start_pos, end_pos):
     """
     计算立方体最大棱长。
         
     -----
     
-    :param tuple[float,float,float] startPos: 立方体对角顶点坐标1
-    :param tuple[float,float,float] endPos: 立方体对角顶点坐标2
+    :param tuple[float,float,float] start_pos: 立方体对角顶点坐标1
+    :param tuple[float,float,float] end_pos: 立方体对角顶点坐标2
         
     :return: 最大棱长
     :rtype: float
     """
-    if not startPos or not endPos:
+    if not start_pos or not end_pos:
         return -1.0
-    xl = abs(startPos[0] - endPos[0])
-    yl = abs(startPos[1] - endPos[1])
-    zl = abs(startPos[2] - endPos[2])
+    xl = abs(start_pos[0] - end_pos[0])
+    yl = abs(start_pos[1] - end_pos[1])
+    zl = abs(start_pos[2] - end_pos[2])
     return max(xl, yl, zl)
 
 
-def is_in_sector(testPos, vertexPos, radius, sectorAngle, sectorBisectorAngle):
+def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_angle):
     """
     判断给定坐标是否在扇形区域内。
         
     -----
     
-    :param tuple[float,float,float] testPos: 待测试的坐标
-    :param tuple[float,float,float] vertexPos: 扇形顶点坐标
+    :param tuple[float,float,float] test_pos: 待测试的坐标
+    :param tuple[float,float,float] vertex_pos: 扇形顶点坐标
     :param float radius: 扇形半径
-    :param float sectorAngle: 扇形张开的角度(<=180)
-    :param float sectorBisectorAngle: 扇形角平分线所在直线的水平角度
+    :param float sector_angle: 扇形张开的角度(<=180)
+    :param float sector_bisector_angle: 扇形角平分线所在直线的水平角度
         
     :return: 在扇形区域内则返回True，否则返回False
     :rtype: bool
     """
-    dis = pos_distance(vertexPos, testPos)
+    dis = pos_distance(vertex_pos, test_pos)
     if dis <= radius:
-        if sectorAngle > 180:
-            sectorAngle = 180
-        elif sectorAngle < 0:
-            sectorAngle = 0
-        dx = testPos[0] - vertexPos[0]
-        dz = testPos[2] - vertexPos[2]
-        testPosAngle = -_degrees(_atan2(dx, dz))
-        minAngle = sectorBisectorAngle - sectorAngle / 2
-        maxAngle = sectorBisectorAngle + sectorAngle / 2
-        rangeList = []
-        if sectorBisectorAngle < 0:
-            if minAngle < -180:
-                rangeList.append((-180, maxAngle))
-                rangeList.append((360 - abs(minAngle), 180))
+        if sector_angle > 180:
+            sector_angle = 180
+        elif sector_angle < 0:
+            sector_angle = 0
+        dx = test_pos[0] - vertex_pos[0]
+        dz = test_pos[2] - vertex_pos[2]
+        test_pos_angle = -_degrees(_atan2(dx, dz))
+        min_angle = sector_bisector_angle - sector_angle / 2
+        max_angle = sector_bisector_angle + sector_angle / 2
+        range_list = []
+        if sector_bisector_angle < 0:
+            if min_angle < -180:
+                range_list.append((-180, max_angle))
+                range_list.append((360 - abs(min_angle), 180))
             else:
-                rangeList.append((minAngle, maxAngle))
+                range_list.append((min_angle, max_angle))
         else:
-            if maxAngle > 180:
-                rangeList.append((minAngle, 180))
-                rangeList.append((-180, -360 + maxAngle))
+            if max_angle > 180:
+                range_list.append((min_angle, 180))
+                range_list.append((-180, -360 + max_angle))
             else:
-                rangeList.append((minAngle, maxAngle))
-        for r in rangeList:
-            if r[0] <= testPosAngle <= r[1]:
+                range_list.append((min_angle, max_angle))
+        for r in range_list:
+            if r[0] <= test_pos_angle <= r[1]:
                 return True
     return False
 
 
-def sphere_pos_list(centerPos, radius, density):
+def sphere_pos_list(center_pos, radius, density):
     """
     根据球心、半径计算球面上各点的坐标。
         
     -----
     
-    :param tuple[float,float,float] centerPos: 球心坐标
+    :param tuple[float,float,float] center_pos: 球心坐标
     :param float radius: 半径
     :param int density: 返回的坐标个数
         
@@ -480,9 +501,9 @@ def sphere_pos_list(centerPos, radius, density):
     result = []
     while a < _pi:
         while b < 2 * _pi:
-            x = centerPos[0] + radius * _sin(a) * _cos(b)
-            y = centerPos[1] + radius * _sin(a) * _sin(b)
-            z = centerPos[2] + radius * _cos(a)
+            x = center_pos[0] + radius * _sin(a) * _cos(b)
+            y = center_pos[1] + radius * _sin(a) * _sin(b)
+            z = center_pos[2] + radius * _cos(a)
             result.append((x, y, z))
             b += step2
         a += step1
@@ -531,13 +552,13 @@ def cube_pos_list(pos1, pos2, step=1):
     return result
 
 
-def spiral_pos_list(startPos, iterations):
+def spiral_pos_list(start_pos, iterations):
     """
     生成螺旋轨迹坐标列表。
 
     -----
 
-    :param tuple[float,float,float] startPos: 开始坐标
+    :param tuple[float,float,float] start_pos: 开始坐标
     :param int iterations: 迭代次数
 
     :return: 坐标列表
@@ -545,29 +566,29 @@ def spiral_pos_list(startPos, iterations):
     """
     res = []
     axis = 0
-    relPos = [0, 0]
-    initStep = step = 1
+    rel_pos = [0, 0]
+    init_step = step = 1
     for i in range(iterations):
         if i > 0:
             if axis == 0:
-                relPos[0] += 1
+                rel_pos[0] += 1
             elif axis == 1:
-                relPos[1] -= 1
+                rel_pos[1] -= 1
             elif axis == 2:
-                relPos[0] -= 1
+                rel_pos[0] -= 1
             else:
-                relPos[1] += 1
+                rel_pos[1] += 1
             step -= 1
             if step <= 0:
                 axis = (axis + 1) % 4
                 if axis == 0 or axis == 2:
-                    initStep += 1
-                step = initStep
-        res.append((startPos[0] + relPos[0], startPos[1], startPos[2] + relPos[1]))
+                    init_step += 1
+                step = init_step
+        res.append((start_pos[0] + rel_pos[0], start_pos[1], start_pos[2] + rel_pos[1]))
     return res
 
 
-def is_in_cube(obj, pos1, pos2, ignoreY=False):
+def is_in_cube(obj, pos1, pos2, ignore_y=False):
     """
     判断对象是否在立方体区域内。
         
@@ -576,23 +597,23 @@ def is_in_cube(obj, pos1, pos2, ignoreY=False):
     :param str|tuple[float,float,float] obj: 实体ID或坐标
     :param tuple[float,float,float] pos1: 立方体对角顶点坐标1
     :param tuple[float,float,float] pos2: 立方体对角顶点坐标2
-    :param bool ignoreY: 是否忽略Y轴
+    :param bool ignore_y: 是否忽略Y轴
         
     :return: 在立方体区域内返回True，否则返回False
     :rtype: bool
     """
     if isinstance(obj, str):
-        targetPos = _get_comp_factory().CreatePos(obj).GetFootPos()
+        target_pos = _get_comp_factory().CreatePos(obj).GetFootPos()
     else:
-        targetPos = obj
-    if not targetPos or not pos1 or not pos2:
+        target_pos = obj
+    if not target_pos or not pos1 or not pos2:
         return False
-    def numInRange(num, r1, r2):
+    def num_in_range(num, r1, r2):
         return r1 <= num <= r2 or r2 <= num <= r1
     for i in range(3):
-        if ignoreY and i == 1:
+        if ignore_y and i == 1:
             continue
-        if not numInRange(targetPos[i], pos1[i], pos2[i]):
+        if not num_in_range(target_pos[i], pos1[i], pos2[i]):
             return False
     return True
 
@@ -600,13 +621,6 @@ def is_in_cube(obj, pos1, pos2, ignoreY=False):
 def rot_diff(r1, r2):
     """
     计算两个角度之间的实际差值。
-    
-    -----
-    
-    【示例】
-    
-    >>> rot_diff(-170, 20) 
-    170
         
     -----
     
@@ -624,42 +638,42 @@ def rot_diff(r1, r2):
     return abs(diff)
 
 
-def ray_aabb_intersection(rayStartPos, rayDir, length, cubeCenterPos, cubeSize):
+def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_size):
     """
     从指定位置射出一条射线，计算该射线与指定立方体（AABB）的第一个交点坐标，不相交时返回None。
 
     -----
 
-    :param tuple[float,float,float] rayStartPos: 射线起始坐标
-    :param tuple[float,float,float] rayDir: 射线方向向量（单位向量）
+    :param tuple[float,float,float] ray_start_pos: 射线起始坐标
+    :param tuple[float,float,float] ray_dir: 射线方向向量（单位向量）
     :param float length: 射线长度
-    :param tuple[float,float,float] cubeCenterPos: 立方体中心坐标
-    :param tuple[float,float,float] cubeSize: 立方体边长元组，分别对应xyz上的边长
+    :param tuple[float,float,float] cube_center_pos: 立方体中心坐标
+    :param tuple[float,float,float] cube_size: 立方体边长元组，分别对应xyz上的边长
 
     :return: 射线与立方体的第一个交点坐标，不相交时返回None
     :rtype: tuple[float,float,float]|None
     """
-    rayStartPos = _Vector3(rayStartPos)
-    rayDir = _Vector3(rayDir)
-    cubeCenterPos = _Vector3(cubeCenterPos)
-    localStartPos = rayStartPos - cubeCenterPos
-    tMin = -float('inf')
-    tMax = float('inf')
+    ray_start_pos = _Vector3(ray_start_pos)
+    ray_dir = _Vector3(ray_dir)
+    cube_center_pos = _Vector3(cube_center_pos)
+    local_start_pos = ray_start_pos - cube_center_pos
+    t_min = -float("inf")
+    t_max = float("inf")
     for i in range(3):
-        if rayDir[i] == 0.0:
+        if ray_dir[i] == 0.0:
             continue
-        t1 = (cubeSize[i] / 4.0 - localStartPos[i]) / rayDir[i]
-        t2 = (-cubeSize[i] / 4.0 - localStartPos[i]) / rayDir[i]
-        tMin = max(tMin, min(t1, t2))
-        tMax = min(tMax, max(t1, t2))
-    if 0.0 <= tMin <= tMax and tMin <= length:
-        return (rayStartPos + rayDir * tMin).ToTuple()
+        t1 = (cube_size[i] / 4.0 - local_start_pos[i]) / ray_dir[i]
+        t2 = (-cube_size[i] / 4.0 - local_start_pos[i]) / ray_dir[i]
+        t_min = max(t_min, min(t1, t2))
+        t_max = min(t_max, max(t1, t2))
+    if 0.0 <= t_min <= t_max and t_min <= length:
+        return (ray_start_pos + ray_dir * t_min).ToTuple()
 
 
 _LEVEL_ID = _serverApi.GetLevelId() or _clientApi.GetLevelId()
 
 
-def get_blocks_by_ray(startPos, direction, length, dimension=0, count=0, filterBlocks=None):
+def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter_blocks=None):
     """
     从指定位置射出一条射线，获取该射线经过的方块。
 
@@ -680,54 +694,54 @@ def get_blocks_by_ray(startPos, direction, length, dimension=0, count=0, filterB
 
     -----
 
-    :param tuple[float,float,float] startPos: 射线起始坐标
+    :param tuple[float,float,float] start_pos: 射线起始坐标
     :param tuple[float,float,float] direction: 射线方向向量
     :param float length: 射线长度
     :param int dimension: 维度ID，默认为0
     :param int count: 获取到多少个方块后停止，默认为0，表示不限制数量
-    :param list[str] filterBlocks: 过滤的方块ID列表，默认过滤空气
+    :param list[str]|None filter_blocks: 过滤的方块ID列表，默认过滤空气
 
     :return: 射线经过的方块的列表，顺序为由近到远，列表每个元素为一个字典，字典结构请见上方
     :rtype: list[dict[str, str|int|tuple]]
     """
-    if filterBlocks is None:
-        filterBlocks = ['minecraft:air']
-    tList = [0]
+    if filter_blocks is None:
+        filter_blocks = ["minecraft:air"]
+    t_list = [0]
     for n in range(3):
-        s = startPos[n]
+        s = start_pos[n]
         d = direction[n]
         if d == 0:
             continue
         start = int(_floor(s))
         end = int(_floor(s + d * length))
-        stepRange = range(start + 1, end + 1) if d > 0 else range(start, end, -1)
-        for i in stepRange:
-            tList.append((i - s) / d)
-    tList.sort()
-    tList = tList[:-1]
+        step_range = range(start + 1, end + 1) if d > 0 else range(start, end, -1)
+        for i in step_range:
+            t_list.append((i - s) / d)
+    t_list.sort()
+    t_list = t_list[:-1]
     comp = _get_comp_factory().CreateBlockInfo(_LEVEL_ID)
-    blockList = []
-    for t in tList:
-        blockPos = [0, 0, 0]
+    block_list = []
+    for t in t_list:
+        block_pos = [0, 0, 0]
         intersection = [0, 0, 0]
         for n in range(3):
-            posVal = startPos[n] + t * direction[n]
-            intersection[n] = posVal
-            if posVal.is_integer() and direction[n] < 0:
-                posVal -= 1
-            blockPos[n] = int(_floor(posVal))
-        blockPos = tuple(blockPos)
-        block = comp.GetBlockNew(blockPos, dimension)
-        if block and block['name'] not in filterBlocks:
-            blockList.append({
+            pos_val = start_pos[n] + t * direction[n]
+            intersection[n] = pos_val
+            if pos_val.is_integer() and direction[n] < 0:
+                pos_val -= 1
+            block_pos[n] = int(_floor(pos_val))
+        block_pos = tuple(block_pos)
+        block = comp.GetBlockNew(block_pos, dimension)
+        if block and block['name'] not in filter_blocks:
+            block_list.append({
                 'name': block['name'],
                 'aux': block['aux'],
-                'pos': blockPos,
+                'pos': block_pos,
                 'intersection': intersection,
             })
-            if len(blockList) >= count > 0:
+            if len(block_list) >= count > 0:
                 break
-    return blockList
+    return block_list
 
 
 

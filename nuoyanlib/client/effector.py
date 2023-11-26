@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-15
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -24,35 +24,16 @@ effector
 
 该模块提供了管理网易版粒子特效和序列帧特效的工具。
 
------
-
-【示例】
-
-创建一个网易版粒子特效对象（序列帧特效类似）：
-
->>> from nuoyanlib import NeteaseParticle, PLAYER_ID
->>> particle = NeteaseParticle("effects/my_effect.json", bindEntityId=PLAYER_ID)
-
-播放粒子特效：
-
->>> particle.Play()
-True
-
-修改粒子位置：
-
->>> particle.pos = (100, 100, 100)
-
-修改粒子绑定的实体：
-
->>> particle.bindEntityId = entityId
-
 """
 
 
 import mod.client.extraClientApi as _clientApi
-from ..config import MOD_NAME as _MOD_NAME, CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME
+from ..config import (
+    MOD_NAME as _MOD_NAME,
+    CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
+)
 from ..utils._error import ClientNotFoundError as _ClientNotFoundError
-from clientComps import ClientCompFactory as _ClientCompFactory
+from comp import CompFactory as _CompFactory
 
 
 __all__ = [
@@ -71,97 +52,39 @@ class NeteaseParticle(object):
 
     -----
 
-    【接口一览】
-
-    1、BindEntity：绑定粒子到实体上。
-
-    2、BindSkeleton：绑定粒子到骨骼模型上。
-
-    3、Play：播放粒子特效。
-
-    4、Pause：暂停粒子特效。
-
-    5、Destroy：销毁粒子特效。
-
-    6、SetFadeDistance：设置粒子开始自动调整透明度的距离。
-
-    7、SetLayer：设置粒子渲染层级。
-
-    8、SetRelative：设置当粒子绑定了实体或骨骼模型时，发射出的粒子使用相对坐标系还是世界坐标系。
-
-    9、SetUsePointFiltering：设置粒子材质的纹理滤波是否使用点滤波方法。
-
-    -----
-
-    【属性一览】
-
-    1、id：粒子特效ID（只读属性，不可修改）。
-
-    2、bindEntId：粒子绑定的实体ID。
-
-    3、bindEntOffset：粒子绑定的偏移量。
-
-    4、bindEntRot：粒子绑定的旋转角度。
-
-    5、bindEntCorrection：是否开启特效旋转角度修正。
-
-    6、bindSkelModelId：粒子绑定的骨骼模型的ID。
-
-    7、bindSkelBoneName：粒子绑定的具体骨骼的名称。
-
-    8、bindSkelOffset：粒子绑定骨骼时的偏移量。
-
-    9、bindSkelRot：粒子绑定骨骼时的旋转角度。
-
-    10、emissionRate：粒子发射器每帧发射粒子的频率。
-
-    11、maxNum：粒子发射器包含的最大粒子数量。
-
-    12、size：粒子大小的最小值和最大值。
-
-    13、volumeSize：粒子发射器的体积大小缩放值。
-
-    14、pos：粒子发射器的世界坐标位置。
-
-    15、rot：粒子发射器的旋转角度。
-
-    16、playing：粒子是否正在播放（只读属性，不可修改）。
-
-    17、destroyed：粒子是否已销毁（只读属性，不可修改）。
-
-    -----
-
-    :param str jsonPath: 粒子特效json文件路径，包含后缀名.json，如"effects/my_effect.json"
+    :param str json_path: 粒子特效json文件路径，包含后缀名.json，如"effects/my_effect.json"
     :param tuple[float,float,float]|None pos: 粒子的世界坐标位置，默认为None，绑定实体或骨骼时可忽略该参数
-    :param dict[str,str|tuple[float,float,float]|bool]|None bindEntity: 实体绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
-    :param dict[str,int|str|tuple[float,float,float]]|None bindSkeleton: 骨骼模型绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
+    :param dict[str,str|tuple[float,float,float]|bool]|None bind_entity: 实体绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
+    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
     """
 
-    def __init__(self, jsonPath, pos=None, bindEntity=None, bindSkeleton=None):
+    def __init__(self, json_path, pos=None, bind_entity=None, bind_skeleton=None):
         self.__cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if not self.__cs:
             raise _ClientNotFoundError
-        self._id = self.__cs.CreateEngineParticle(jsonPath, pos)
+        self._id = self.__cs.CreateEngineParticle(json_path, pos)
         if not self._id:
-            raise RuntimeError("Create particle failed. jsonPath='%s'." % jsonPath)
-        self._ctrl = _ClientCompFactory.CreateParticleControl(self._id)
-        self._trans = _ClientCompFactory.CreateParticleTrans(self._id)
-        self._bindEntComp = _ClientCompFactory.CreateParticleEntityBind(self._id)
-        self._bindSkelComp = _ClientCompFactory.CreateParticleSkeletonBind(self._id)
-        self._bindEntId = ""
-        self._bindEntOffset = (0.0, 0.0, 0.0)
-        self._bindEntRot = (0.0, 0.0, 0.0)
-        self._bindEntCorrection = False
-        self._bindSkelModelId = -1
-        self._bindSkelBoneName = ""
-        self._bindSkelOffset = (0.0, 0.0, 0.0)
-        self._bindSkelRot = (0.0, 0.0, 0.0)
-        if bindEntity and bindSkeleton:
-            raise AssertionError("Parameters 'bindEntity' and 'bindSkeleton' cannot be given at the same time.")
-        if bindEntity and not self.BindEntity(**bindEntity):
-            raise RuntimeError("Bind particle to entity failed. bindEntity=%s." % bindEntity)
-        if bindSkeleton and not self.BindSkeleton(**bindSkeleton):
-            raise RuntimeError("Bind particle to skeleton failed. bindSkeleton=%s." % bindSkeleton)
+            raise RuntimeError("Create particle failed. json_path='%s'." % json_path)
+        self._ctrl = _CompFactory.CreateParticleControl(self._id)
+        self._trans = _CompFactory.CreateParticleTrans(self._id)
+        self._bind_ent_comp = _CompFactory.CreateParticleEntityBind(self._id)
+        self._bind_skel_comp = _CompFactory.CreateParticleSkeletonBind(self._id)
+        self._bind_ent_id = ""
+        self._bind_ent_offset = (0.0, 0.0, 0.0)
+        self._bind_ent_rot = (0.0, 0.0, 0.0)
+        self._bind_ent_corr = False
+        self._bind_skel_model_id = -1
+        self._bind_skel_bone_name = ""
+        self._bind_skel_offset = (0.0, 0.0, 0.0)
+        self._bind_skel_rot = (0.0, 0.0, 0.0)
+        if bind_entity and bind_skeleton:
+            raise AssertionError(
+                "Parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time."
+            )
+        if bind_entity and not self.BindEntity(**bind_entity):
+            raise RuntimeError("Bind particle to entity failed. bind_entity=%s." % bind_entity)
+        if bind_skeleton and not self.BindSkeleton(**bind_skeleton):
+            raise RuntimeError("Bind particle to skeleton failed. bind_skeleton=%s." % bind_skeleton)
         self._playing = False
         self._destroyed = False
 
@@ -173,119 +96,119 @@ class NeteaseParticle(object):
         return self._id
 
     @property
-    def bindEntId(self):
+    def ent_id(self):
         """
         粒子绑定的实体ID。
         """
-        return self._bindEntId
+        return self._bind_ent_id
 
-    @bindEntId.setter
-    def bindEntId(self, value):
+    @ent_id.setter
+    def ent_id(self, value):
         """
         设置粒子绑定的实体ID。
         """
-        self.BindEntity(value, self._bindEntOffset, self._bindEntRot, self._bindEntCorrection)
+        self.BindEntity(value, self._bind_ent_offset, self._bind_ent_rot, self._bind_ent_corr)
 
     @property
-    def bindEntOffset(self):
+    def ent_offset(self):
         """
         粒子绑定实体时的偏移量。
         """
-        return self._bindEntOffset
+        return self._bind_ent_offset
 
-    @bindEntOffset.setter
-    def bindEntOffset(self, value):
+    @ent_offset.setter
+    def ent_offset(self, value):
         """
         设置粒子绑定实体时的偏移量。
         """
-        self.BindEntity(self._bindEntId, value, self._bindEntRot, self._bindEntCorrection)
+        self.BindEntity(self._bind_ent_id, value, self._bind_ent_rot, self._bind_ent_corr)
 
     @property
-    def bindEntRot(self):
+    def ent_rot(self):
         """
         粒子绑定实体时的旋转角度。
         """
-        return self._bindEntRot
+        return self._bind_ent_rot
 
-    @bindEntRot.setter
-    def bindEntRot(self, value):
+    @ent_rot.setter
+    def ent_rot(self, value):
         """
         设置粒子绑定实体时的旋转角度。
         """
-        self.BindEntity(self._bindEntId, self._bindEntOffset, value, self._bindEntCorrection)
+        self.BindEntity(self._bind_ent_id, self._bind_ent_offset, value, self._bind_ent_corr)
 
     @property
-    def bindEntCorrection(self):
+    def correction(self):
         """
         粒子绑定实体时是否开启特效旋转角度修正。
         """
-        return self._bindEntCorrection
+        return self._bind_ent_corr
 
-    @bindEntCorrection.setter
-    def bindEntCorrection(self, value):
+    @correction.setter
+    def correction(self, value):
         """
         设置粒子绑定实体时是否开启特效旋转角度修正。
         """
-        self.BindEntity(self._bindEntId, self._bindEntOffset, self._bindEntRot, value)
+        self.BindEntity(self._bind_ent_id, self._bind_ent_offset, self._bind_ent_rot, value)
 
     @property
-    def bindSkelModelId(self):
+    def model_id(self):
         """
         粒子绑定的骨骼模型的ID。
         """
-        return self._bindSkelModelId
+        return self._bind_skel_model_id
 
-    @bindSkelModelId.setter
-    def bindSkelModelId(self, value):
+    @model_id.setter
+    def model_id(self, value):
         """
         设置粒子绑定的骨骼模型的ID。
         """
-        self.BindSkeleton(value, self._bindSkelBoneName, self._bindSkelOffset, self._bindSkelRot)
+        self.BindSkeleton(value, self._bind_skel_bone_name, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
-    def bindSkelBoneName(self):
+    def bone_name(self):
         """
         粒子绑定的具体骨骼的名称。
         """
-        return self._bindSkelBoneName
+        return self._bind_skel_bone_name
 
-    @bindSkelBoneName.setter
-    def bindSkelBoneName(self, value):
+    @bone_name.setter
+    def bone_name(self, value):
         """
         设置粒子绑定的具体骨骼的名称。
         """
-        self.BindSkeleton(self._bindSkelModelId, value, self._bindSkelOffset, self._bindSkelRot)
+        self.BindSkeleton(self._bind_skel_model_id, value, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
-    def bindSkelOffset(self):
+    def skel_offset(self):
         """
         粒子绑定骨骼时的偏移量。
         """
-        return self._bindSkelOffset
+        return self._bind_skel_offset
 
-    @bindSkelOffset.setter
-    def bindSkelOffset(self, value):
+    @skel_offset.setter
+    def skel_offset(self, value):
         """
         设置粒子绑定骨骼时的偏移量。
         """
-        self.BindSkeleton(self._bindSkelModelId, self._bindSkelBoneName, value, self._bindSkelRot)
+        self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, value, self._bind_skel_rot)
 
     @property
-    def bindSkelRot(self):
+    def skel_rot(self):
         """
         粒子绑定骨骼时的旋转角度。
         """
-        return self._bindSkelRot
+        return self._bind_skel_rot
 
-    @bindSkelRot.setter
-    def bindSkelRot(self, value):
+    @skel_rot.setter
+    def skel_rot(self, value):
         """
         设置粒子绑定骨骼时的旋转角度。
         """
-        self.BindSkeleton(self._bindSkelModelId, self._bindSkelBoneName, self._bindSkelOffset, value)
+        self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, self._bind_skel_offset, value)
 
     @property
-    def emissionRate(self):
+    def emission_rate(self):
         """
         粒子发射器每帧发射粒子的频率，数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
 
@@ -293,8 +216,8 @@ class NeteaseParticle(object):
         """
         return self._ctrl.GetParticleEmissionRate()
 
-    @emissionRate.setter
-    def emissionRate(self, value):
+    @emission_rate.setter
+    def emission_rate(self, value):
         """
         设置粒子发射器每帧发射粒子的频率，数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
 
@@ -307,7 +230,7 @@ class NeteaseParticle(object):
         self._ctrl.SetParticleEmissionRate(*value)
 
     @property
-    def maxNum(self):
+    def max_num(self):
         """
         粒子发射器包含的最大粒子数量，数据类型为整数。
 
@@ -315,8 +238,8 @@ class NeteaseParticle(object):
         """
         return self._ctrl.GetParticleMaxNum()
 
-    @maxNum.setter
-    def maxNum(self, value):
+    @max_num.setter
+    def max_num(self, value):
         """
         设置粒子发射器的粒子容量，即粒子发射器所包含的最大粒子数量，数据类型为整数，不能为负值，粒子的数量最大值不超过100000。
 
@@ -347,14 +270,14 @@ class NeteaseParticle(object):
         self._ctrl.SetParticleSize(*value)
 
     @property
-    def volumeSize(self):
+    def volume_size(self):
         """
         粒子发射器的体积大小缩放值，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
         """
         return self._ctrl.GetParticleVolumeSize()
 
-    @volumeSize.setter
-    def volumeSize(self, value):
+    @volume_size.setter
+    def volume_size(self, value):
         """
         设置粒子发射器的体积大小缩放，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
 
@@ -408,13 +331,13 @@ class NeteaseParticle(object):
         """
         return self._destroyed
 
-    def BindEntity(self, bindEntityId, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0), correction=False):
+    def BindEntity(self, ent_id, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0), correction=False):
         """
         绑定粒子到实体上。
 
         -----
 
-        :param str bindEntityId: 特效绑定的实体ID
+        :param str ent_id: 特效绑定的实体ID
         :param tuple[float,float,float] offset: 绑定的偏移量，默认为(0.0, 0.0, 0.0)
         :param tuple[float,float,float] rot: 绑定的旋转角度，默认为(0.0, 0.0, 0.0)
         :param bool correction: 是否开启特效旋转角度修正，开启后可以使特效的旋转角度准确设置为参照玩家的相对角度，默认为False
@@ -422,42 +345,42 @@ class NeteaseParticle(object):
         :return: 是否成功
         :rtype: bool
         """
-        res = self._bindEntComp.Bind(bindEntityId, offset, rot, correction)
+        res = self._bind_ent_comp.Bind(ent_id, offset, rot, correction)
         if res:
-            self._bindEntId = bindEntityId
-            self._bindEntOffset = offset
-            self._bindEntRot = rot
-            self._bindEntCorrection = correction
-            self._bindSkelModelId = -1
-            self._bindSkelBoneName = ""
-            self._bindSkelOffset = (0.0, 0.0, 0.0)
-            self._bindSkelRot = (0.0, 0.0, 0.0)
+            self._bind_ent_id = ent_id
+            self._bind_ent_offset = offset
+            self._bind_ent_rot = rot
+            self._bind_ent_corr = correction
+            self._bind_skel_model_id = -1
+            self._bind_skel_bone_name = ""
+            self._bind_skel_offset = (0.0, 0.0, 0.0)
+            self._bind_skel_rot = (0.0, 0.0, 0.0)
         return res
 
-    def BindSkeleton(self, modelId, boneName, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
+    def BindSkeleton(self, model_id, bone_name, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
         """
         绑定粒子到骨骼模型上。
 
         -----
 
-        :param int modelId: 绑定的骨骼模型的ID（使用Model组件的GetModelId获取）
-        :param str boneName: 绑定具体骨骼的名称
+        :param int model_id: 绑定的骨骼模型的ID（使用Model组件的GetModelId获取）
+        :param str bone_name: 绑定具体骨骼的名称
         :param tuple[float,float,float] offset: 绑定的偏移量，默认为(0.0, 0.0, 0.0)
         :param tuple[float,float,float] rot: 绑定的旋转角度，默认为(0.0, 0.0, 0.0)
 
         :return: 是否成功
         :rtype: bool
         """
-        res = self._bindSkelComp.Bind(modelId, boneName, offset, rot)
+        res = self._bind_skel_comp.Bind(model_id, bone_name, offset, rot)
         if res:
-            self._bindSkelModelId = modelId
-            self._bindSkelBoneName = boneName
-            self._bindSkelOffset = offset
-            self._bindSkelRot = rot
-            self._bindEntId = ""
-            self._bindEntOffset = (0.0, 0.0, 0.0)
-            self._bindEntRot = (0.0, 0.0, 0.0)
-            self._bindEntCorrection = False
+            self._bind_skel_model_id = model_id
+            self._bind_skel_bone_name = bone_name
+            self._bind_skel_offset = offset
+            self._bind_skel_rot = rot
+            self._bind_ent_id = ""
+            self._bind_ent_offset = (0.0, 0.0, 0.0)
+            self._bind_ent_rot = (0.0, 0.0, 0.0)
+            self._bind_ent_corr = False
         return res
 
     def Play(self):
@@ -500,19 +423,19 @@ class NeteaseParticle(object):
         res = self.__cs.DestroyEntity(self._id)
         if res:
             self._destroyed = True
-            self._bindEntId = ""
-            self._bindEntOffset = (0.0, 0.0, 0.0)
-            self._bindEntRot = (0.0, 0.0, 0.0)
-            self._bindEntCorrection = False
-            self._bindSkelModelId = -1
-            self._bindSkelBoneName = ""
-            self._bindSkelOffset = (0.0, 0.0, 0.0)
-            self._bindSkelRot = (0.0, 0.0, 0.0)
+            self._bind_ent_id = ""
+            self._bind_ent_offset = (0.0, 0.0, 0.0)
+            self._bind_ent_rot = (0.0, 0.0, 0.0)
+            self._bind_ent_corr = False
+            self._bind_skel_model_id = -1
+            self._bind_skel_bone_name = ""
+            self._bind_skel_offset = (0.0, 0.0, 0.0)
+            self._bind_skel_rot = (0.0, 0.0, 0.0)
             self._playing = False
             self._ctrl = None
             self._trans = None
-            self._bindEntComp = None
-            self._bindSkelComp = None
+            self._bind_ent_comp = None
+            self._bind_skel_comp = None
             self._id = None
         return res
 
@@ -585,100 +508,55 @@ class NeteaseFrameAnim(object):
 
     -----
 
-    【接口一览】
-
-    1、BindEntity：绑定序列帧到实体上。
-
-    2、BindSkeleton：绑定序列帧到骨骼模型上。
-
-    3、Play：播放序列帧特效。
-
-    4、Pause：暂停播放序列帧特效。
-
-    5、Destroy：销毁序列帧特效。
-
-    6、SetDeepTest：设置序列帧是否开启深度测试。
-
-    7、SetFaceCamera：设置序列帧是否始终朝向摄像机。
-
-    8、SetFadeDistance：设置序列帧开始自动调整透明度的距离。
-
-    9、SetLayer：设置序列帧渲染层级。
-
-    10、SetLoop：设置序列帧是否循环播放。
-
-    11、SetUsePointFiltering：设置序列帧材质的纹理滤波是否使用点滤波方法。
-
-    -----
-
-    【属性一览】
-
-    1、id：序列帧特效ID（只读属性，不可修改）。
-
-    2、bindEntId：序列帧绑定的实体ID。
-
-    3、bindEntOffset：设置序列帧绑定实体时的偏移量。
-
-    4、bindEntRot：序列帧绑定实体时的旋转角度。
-
-    5、bindSkelModelId：序列帧绑定的骨骼模型的ID。
-
-    6、bindSkelBoneName：序列帧绑定的具体骨骼的名称。
-
-    7、bindSkelOffset：序列帧绑定骨骼时的偏移量。
-
-    8、bindSkelRot：序列帧绑定骨骼时的旋转角度。
-
-    9、pos：序列帧的世界坐标位置。
-
-    10、rot：序列帧的旋转角度。
-
-    11、scale：序列帧的缩放值。
-
-    12、playing：序列帧是否正在播放。
-
-    13、destroyed：序列帧是否已销毁。
-
-    -----
-
-    :param str jsonPath: 特效json配置路径，如"effects/xxx.json"；jsonPath与texPath选择其中一个参数传入即可，两个参数都传入时以jsonPath为准，默认为空字符串
-    :param str texPath: 特效贴图路径，如"textures/xxx"，不用后缀名；jsonPath与texPath选择其中一个参数传入即可，两个参数都传入时以jsonPath为准，默认为空字符串
+    :param str json_path: 特效json配置路径，如"effects/xxx.json"；json_path与tex_path选择其中一个参数传入即可，两个参数都传入时以json_path为准，默认为空字符串
+    :param str tex_path: 特效贴图路径，如"textures/xxx"，不用后缀名；json_path与tex_path选择其中一个参数传入即可，两个参数都传入时以json_path为准，默认为空字符串
     :param tuple[float,float,float] pos: 创建位置，默认为None，绑定实体或骨骼时可忽略该参数
     :param tuple[float,float,float] rot: 角度，默认为None，绑定实体或骨骼时可忽略该参数
     :param tuple[float,float,float] scale: 缩放系数，默认为None
-    :param dict[str,str|tuple[float,float,float]]|None bindEntity: 实体绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
-    :param dict[str,int|str|tuple[float,float,float]]|None bindSkeleton: 骨骼模型绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
+    :param dict[str,str|tuple[float,float,float]]|None bind_entity: 实体绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
+    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
     """
 
-    def __init__(self, jsonPath="", texPath="", pos=None, rot=None, scale=None, bindEntity=None, bindSkeleton=None):
+    def __init__(
+            self,
+            json_path="",
+            tex_path="",
+            pos=None,
+            rot=None,
+            scale=None,
+            bind_entity=None,
+            bind_skeleton=None,
+    ):
         self.__cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if not self.__cs:
             raise _ClientNotFoundError
-        if jsonPath:
-            self._id = self.__cs.CreateEngineSfxFromEditor(jsonPath, pos, rot, scale)
-        elif texPath:
-            self._id = self.__cs.CreateEngineSfx(texPath, pos, rot, scale)
+        if json_path:
+            self._id = self.__cs.CreateEngineSfxFromEditor(json_path, pos, rot, scale)
+        elif tex_path:
+            self._id = self.__cs.CreateEngineSfx(tex_path, pos, rot, scale)
         else:
-            raise AssertionError("Parameters 'jsonPath' or 'texPath' must be given.")
+            raise AssertionError("Parameters 'json_path' or 'tex_path' must be given.")
         if not self._id:
-            raise RuntimeError("Create frame animation failed. path='%s'." % (jsonPath or texPath))
-        self._ctrl = _ClientCompFactory.CreateFrameAniControl(self._id)
-        self._trans = _ClientCompFactory.CreateFrameAniTrans(self._id)
-        self._bindEntComp = _ClientCompFactory.CreateFrameAniEntityBind(self._id)
-        self._bindSkelComp = _ClientCompFactory.CreateFrameAniSkeletonBind(self._id)
-        self._bindEntId = ""
-        self._bindEntOffset = (0.0, 0.0, 0.0)
-        self._bindEntRot = (0.0, 0.0, 0.0)
-        self._bindSkelModelId = -1
-        self._bindSkelBoneName = ""
-        self._bindSkelOffset = (0.0, 0.0, 0.0)
-        self._bindSkelRot = (0.0, 0.0, 0.0)
-        if bindEntity and bindSkeleton:
-            raise AssertionError("Parameters 'bindEntity' and 'bindSkeleton' cannot be given at the same time.")
-        if bindEntity and not self.BindEntity(**bindEntity):
-            raise RuntimeError("Bind frame animation to entity failed. bindEntity=%s." % bindEntity)
-        if bindSkeleton and not self.BindSkeleton(**bindSkeleton):
-            raise RuntimeError("Bind frame animation to skeleton failed. bindSkeleton=%s." % bindSkeleton)
+            raise RuntimeError("Create frame animation failed. path='%s'." % (json_path or tex_path))
+        self._ctrl = _CompFactory.CreateFrameAniControl(self._id)
+        self._trans = _CompFactory.CreateFrameAniTrans(self._id)
+        self._bind_ent_comp = _CompFactory.CreateFrameAniEntityBind(self._id)
+        self._bind_skel_comp = _CompFactory.CreateFrameAniSkeletonBind(self._id)
+        self._bind_ent_id = ""
+        self._bind_ent_offset = (0.0, 0.0, 0.0)
+        self._bind_ent_rot = (0.0, 0.0, 0.0)
+        self._bind_skel_model_id = -1
+        self._bind_skel_bone_name = ""
+        self._bind_skel_offset = (0.0, 0.0, 0.0)
+        self._bind_skel_rot = (0.0, 0.0, 0.0)
+        if bind_entity and bind_skeleton:
+            raise AssertionError(
+                "Parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time."
+            )
+        if bind_entity and not self.BindEntity(**bind_entity):
+            raise RuntimeError("Bind frame animation to entity failed. bind_entity=%s." % bind_entity)
+        if bind_skeleton and not self.BindSkeleton(**bind_skeleton):
+            raise RuntimeError("Bind frame animation to skeleton failed. bind_skeleton=%s." % bind_skeleton)
         self._playing = False
         self._destroyed = False
 
@@ -690,102 +568,102 @@ class NeteaseFrameAnim(object):
         return self._id
 
     @property
-    def bindEntId(self):
+    def ent_id(self):
         """
         序列帧绑定的实体ID。
         """
-        return self._bindEntId
+        return self._bind_ent_id
 
-    @bindEntId.setter
-    def bindEntId(self, value):
+    @ent_id.setter
+    def ent_id(self, value):
         """
         设置序列帧绑定的实体ID。
         """
-        self.BindEntity(value, self._bindEntOffset, self._bindEntRot)
+        self.BindEntity(value, self._bind_ent_offset, self._bind_ent_rot)
 
     @property
-    def bindEntOffset(self):
+    def ent_offset(self):
         """
         序列帧绑定实体时的偏移量。
         """
-        return self._bindEntOffset
+        return self._bind_ent_offset
 
-    @bindEntOffset.setter
-    def bindEntOffset(self, value):
+    @ent_offset.setter
+    def ent_offset(self, value):
         """
         设置序列帧绑定实体时的偏移量。
         """
-        self.BindEntity(self._bindEntId, value, self._bindEntRot)
+        self.BindEntity(self._bind_ent_id, value, self._bind_ent_rot)
 
     @property
-    def bindEntRot(self):
+    def ent_rot(self):
         """
         序列帧绑定实体时的旋转角度。
         """
-        return self._bindEntRot
+        return self._bind_ent_rot
 
-    @bindEntRot.setter
-    def bindEntRot(self, value):
+    @ent_rot.setter
+    def ent_rot(self, value):
         """
         设置序列帧绑定实体时的旋转角度。
         """
-        self.BindEntity(self._bindEntId, self._bindEntOffset, value)
+        self.BindEntity(self._bind_ent_id, self._bind_ent_offset, value)
 
     @property
-    def bindSkelModelId(self):
+    def model_id(self):
         """
         序列帧绑定的骨骼模型的ID。
         """
-        return self._bindSkelModelId
+        return self._bind_skel_model_id
 
-    @bindSkelModelId.setter
-    def bindSkelModelId(self, value):
+    @model_id.setter
+    def model_id(self, value):
         """
         设置序列帧绑定的骨骼模型的ID。
         """
-        self.BindSkeleton(value, self._bindSkelBoneName, self._bindSkelOffset, self._bindSkelRot)
+        self.BindSkeleton(value, self._bind_skel_bone_name, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
-    def bindSkelBoneName(self):
+    def bone_name(self):
         """
         序列帧绑定的具体骨骼的名称。
         """
-        return self._bindSkelBoneName
+        return self._bind_skel_bone_name
 
-    @bindSkelBoneName.setter
-    def bindSkelBoneName(self, value):
+    @bone_name.setter
+    def bone_name(self, value):
         """
         设置序列帧绑定的具体骨骼的名称。
         """
-        self.BindSkeleton(self._bindSkelModelId, value, self._bindSkelOffset, self._bindSkelRot)
+        self.BindSkeleton(self._bind_skel_model_id, value, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
-    def bindSkelOffset(self):
+    def skel_offset(self):
         """
         序列帧绑定骨骼时的偏移量。
         """
-        return self._bindSkelOffset
+        return self._bind_skel_offset
 
-    @bindSkelOffset.setter
-    def bindSkelOffset(self, value):
+    @skel_offset.setter
+    def skel_offset(self, value):
         """
         设置序列帧绑定骨骼时的偏移量。
         """
-        self.BindSkeleton(self._bindSkelModelId, self._bindSkelBoneName, value, self._bindSkelRot)
+        self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, value, self._bind_skel_rot)
 
     @property
-    def bindSkelRot(self):
+    def skel_rot(self):
         """
         序列帧绑定骨骼时的旋转角度。
         """
-        return self._bindSkelRot
+        return self._bind_skel_rot
 
-    @bindSkelRot.setter
-    def bindSkelRot(self, value):
+    @skel_rot.setter
+    def skel_rot(self, value):
         """
         设置序列帧绑定骨骼时的旋转角度。
         """
-        self.BindSkeleton(self._bindSkelModelId, self._bindSkelBoneName, self._bindSkelOffset, value)
+        self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, self._bind_skel_offset, value)
 
     @property
     def pos(self):
@@ -853,53 +731,53 @@ class NeteaseFrameAnim(object):
         """
         return self._destroyed
 
-    def BindEntity(self, bindEntityId, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
+    def BindEntity(self, bind_entity_id, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
         """
         绑定序列帧到实体上。
 
         -----
 
-        :param str bindEntityId: 特效绑定的实体ID
+        :param str bind_entity_id: 特效绑定的实体ID
         :param tuple[float,float,float] offset: 绑定的偏移量，默认为(0.0, 0.0, 0.0)
         :param tuple[float,float,float] rot: 绑定的旋转角度，默认为(0.0, 0.0, 0.0)
 
         :return: 是否成功
         :rtype: bool
         """
-        res = self._bindEntComp.Bind(bindEntityId, offset, rot)
+        res = self._bind_ent_comp.Bind(bind_entity_id, offset, rot)
         if res:
-            self._bindEntId = bindEntityId
-            self._bindEntOffset = offset
-            self._bindEntRot = rot
-            self._bindSkelModelId = -1
-            self._bindSkelBoneName = ""
-            self._bindSkelOffset = (0.0, 0.0, 0.0)
-            self._bindSkelRot = (0.0, 0.0, 0.0)
+            self._bind_ent_id = bind_entity_id
+            self._bind_ent_offset = offset
+            self._bind_ent_rot = rot
+            self._bind_skel_model_id = -1
+            self._bind_skel_bone_name = ""
+            self._bind_skel_offset = (0.0, 0.0, 0.0)
+            self._bind_skel_rot = (0.0, 0.0, 0.0)
         return res
 
-    def BindSkeleton(self, modelId, boneName, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
+    def BindSkeleton(self, model_id, bone_name, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
         """
         绑定序列帧到骨骼模型上。
 
         -----
 
-        :param int modelId: 绑定的骨骼模型的ID（使用Model组件的GetModelId获取）
-        :param str boneName: 绑定具体骨骼的名称
+        :param int model_id: 绑定的骨骼模型的ID（使用Model组件的GetModelId获取）
+        :param str bone_name: 绑定具体骨骼的名称
         :param tuple[float,float,float] offset: 绑定的偏移量，默认为(0.0, 0.0, 0.0)
         :param tuple[float,float,float] rot: 绑定的旋转角度，默认为(0.0, 0.0, 0.0)
 
         :return: 是否成功
         :rtype: bool
         """
-        res = self._bindSkelComp.Bind(modelId, boneName, offset, rot)
+        res = self._bind_skel_comp.Bind(model_id, bone_name, offset, rot)
         if res:
-            self._bindSkelModelId = modelId
-            self._bindSkelBoneName = boneName
-            self._bindSkelOffset = offset
-            self._bindSkelRot = rot
-            self._bindEntId = ""
-            self._bindEntOffset = (0.0, 0.0, 0.0)
-            self._bindEntRot = (0.0, 0.0, 0.0)
+            self._bind_skel_model_id = model_id
+            self._bind_skel_bone_name = bone_name
+            self._bind_skel_offset = offset
+            self._bind_skel_rot = rot
+            self._bind_ent_id = ""
+            self._bind_ent_offset = (0.0, 0.0, 0.0)
+            self._bind_ent_rot = (0.0, 0.0, 0.0)
         return res
 
     def Play(self):
@@ -942,18 +820,18 @@ class NeteaseFrameAnim(object):
         res = self.__cs.DestroyEntity(self._id)
         if res:
             self._destroyed = True
-            self._bindEntId = ""
-            self._bindEntOffset = (0.0, 0.0, 0.0)
-            self._bindEntRot = (0.0, 0.0, 0.0)
-            self._bindSkelModelId = -1
-            self._bindSkelBoneName = ""
-            self._bindSkelOffset = (0.0, 0.0, 0.0)
-            self._bindSkelRot = (0.0, 0.0, 0.0)
+            self._bind_ent_id = ""
+            self._bind_ent_offset = (0.0, 0.0, 0.0)
+            self._bind_ent_rot = (0.0, 0.0, 0.0)
+            self._bind_skel_model_id = -1
+            self._bind_skel_bone_name = ""
+            self._bind_skel_offset = (0.0, 0.0, 0.0)
+            self._bind_skel_rot = (0.0, 0.0, 0.0)
             self._playing = False
             self._ctrl = None
             self._trans = None
-            self._bindEntComp = None
-            self._bindSkelComp = None
+            self._bind_ent_comp = None
+            self._bind_skel_comp = None
             self._id = None
         return res
 

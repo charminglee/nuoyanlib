@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-14
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -35,6 +35,7 @@ nuoyanScreenNode
 
 from functools import wraps as _wraps
 import mod.client.extraClientApi as _clientApi
+from ...config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
 from ..setting import (
     read_setting as _read_setting,
     save_setting as _save_setting,
@@ -45,18 +46,92 @@ from ...config import (
     CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
 )
 from ...utils._error import ClientNotFoundError as _ClientNotFoundError
-from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl as _ButtonUIControl
-from ..nuoyanClientSystem import client_listener as _client_listener
-from ..clientComps import (
-    ClientLevelComps as _ClientLevelComps,
+from ..client_system import ALL_CLIENT_ENGINE_EVENTS as _ALL_CLIENT_ENGINE_EVENTS
+from ..comp import (
+    CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
+    CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
+    LvComp as _LvComp,
     ScreenNode as _ScreenNode,
 )
 
 
 __all__ = [
-    "NuoyanScreenNode",
+    "ui_listener",
     "notify_server",
+    "NuoyanScreenNode",
 ]
+
+
+_lsnFuncArgs = []
+
+
+def _add_listener(func, eventName="", namespace=_MOD_NAME, systemName=_SERVER_SYSTEM_NAME, priority=0):
+    if not eventName:
+        eventName = func.__name__
+    _lsnFuncArgs.append((namespace, systemName, eventName, func, priority))
+
+
+def ui_listener(eventName="", namespace="", systemName="", priority=0):
+    """
+    函数装饰器，通过对函数进行装饰即可实现监听。
+
+    省略所有参数时，监听当前服务端传来的与被装饰函数同名的事件。
+
+    当指定命名空间和系统名称时，可监听来自其他系统的事件。
+
+    监听引擎事件时，只需传入该事件的名称即可，无需传入引擎命名空间和系统名称。
+
+    -----
+
+    【示例】
+
+    >>> class MyUI(NuoyanScreenNode):
+    ...     @ui_listener("MyCustomEvent1")  # 监听当前服务端传来的自定义事件
+    ...     def eventCallback1(self, args):
+    ...         pass
+    ...
+    ...     @ui_listener("MyCustomEvent2", "OtherNamespace", "OtherServer")  # 监听其他服务端传来的自定义事件
+    ...     def eventCallback2(self, args):
+    ...         pass
+    ...
+    ...     @ui_listener  # 监听当前服务端传来的与函数同名的事件
+    ...     def SomeEvent1(self, args):
+    ...         pass
+    ...
+    ...     @ui_listener(namespace="OtherNamespace", systemName="OtherServer")  # 监听其他服务端传来的与函数同名的事件
+    ...     def SomeEvent2(self, args):
+    ...         pass
+    ...
+    ...     @ui_listener("AddEntityClientEvent")  # 监听引擎事件
+    ...     def OnAddEntity(self, args):
+    ...         pass
+
+    -----
+
+    :param str eventName: 事件名称，默认为空字符串，表示监听与函数同名的事件
+    :param str namespace: 指定命名空间，默认为空字符串，表示当前服务端的命名空间
+    :param str systemName: 指定系统名称，默认为空字符串，表示当前服务端的系统名称
+    :param int priority: 优先级，默认为0
+    """
+    if callable(eventName):
+        _add_listener(eventName)
+        return eventName
+    else:
+        if not namespace and not systemName:
+            if eventName in _ALL_CLIENT_ENGINE_EVENTS:
+                namespace = _CLIENT_ENGINE_NAMESPACE
+                systemName = _CLIENT_ENGINE_SYSTEM_NAME
+            else:
+                namespace = _MOD_NAME
+                systemName = _SERVER_SYSTEM_NAME
+        elif not namespace:
+            raise AssertionError("Missing parameter 'namespace'.")
+        elif not systemName:
+            raise AssertionError("Missing parameter 'systemName'.")
+        def decorator(func):
+            _add_listener(func, eventName, namespace, systemName, priority)
+            return func
+        return decorator
 
 
 def notify_server(func):
@@ -134,7 +209,7 @@ class NuoyanScreenNode(_ScreenNode):
         self.cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if not self.cs:
             raise _ClientNotFoundError
-        self.screenSize = _ClientLevelComps.Game.GetScreenSize()
+        self.screenSize = _LvComp.Game.GetScreenSize()
         self._btnDoubleClickData = {}
         self._doubleClickArgs = None
         self._vibrateTime = 100
@@ -152,6 +227,7 @@ class NuoyanScreenNode(_ScreenNode):
         self.__touchingButtonPath = ""
         self.__tick = 0
         self.__uiPosKey = self.__class__.__name__ + "_ui_pos_data"
+        self.__listen()
 
     def Create(self):
         """
@@ -250,7 +326,7 @@ class NuoyanScreenNode(_ScreenNode):
         :rtype: None
         """
 
-    # ========================================== Basic Function ========================================================
+    # ========================================== Basic Function ==============================================
 
     def SetButtonDoubleClickCallback(self, buttonPath, doubleClickCallback, touchUpCallback=None):
         """
@@ -352,7 +428,7 @@ class NuoyanScreenNode(_ScreenNode):
         :param function|None touchCancelFunc: TouchCancel回调函数，默认为None
 
         :return: 按钮的ButtonUIControl实例，设置失败时返回None
-        :rtype: _ButtonUIControl|None
+        :rtype: ButtonUIControl|None
         """
         if not associatedPath:
             associatedPath = ()
@@ -392,7 +468,7 @@ class NuoyanScreenNode(_ScreenNode):
         :param function|None touchCancelFunc: TouchCancel回调函数，默认为None
 
         :return: 按钮的ButtonUIControl实例，设置失败时返回None
-        :rtype: _ButtonUIControl|None
+        :rtype: ButtonUIControl|None
         """
         self._btnLongClickData[btnPath] = {
             'longClickFunc': longClickFunc,
@@ -457,7 +533,14 @@ class NuoyanScreenNode(_ScreenNode):
             return self._btnLongClickData[bp]['hasLongClicked']
         return False
 
-    # todo:====================================== Internal Method ======================================================
+    # ====================================== Internal Method =================================================
+
+    def __listen(self):
+        for args in _lsnFuncArgs:
+            func = args[3]
+            method = getattr(self, func.__name__, None)
+            if method and method.__func__ is func:
+                self.cs.ListenForEvent(args[0], args[1], args[2], self, method, args[4])
 
     def _runTouchUpList(self, args):
         bp = args['ButtonPath']
@@ -465,7 +548,7 @@ class NuoyanScreenNode(_ScreenNode):
             for func in self._btnTouchUpCallbackData[bp]:
                 func(args)
 
-    @_client_listener("GetEntityByCoordReleaseClientEvent")
+    @ui_listener("GetEntityByCoordReleaseClientEvent")
     def _OnCoordRelease(self, args):
         self._saveUiPosition()
         self.__fingerPos = None
@@ -528,7 +611,7 @@ class NuoyanScreenNode(_ScreenNode):
                 touchData['touchDownFunc'](args)
 
     def _vibrate(self):
-        _ClientLevelComps.Device.SetDeviceVibrate(self._vibrateTime)
+        _LvComp.Device.SetDeviceVibrate(self._vibrateTime)
 
     def _onLongClick(self, args):
         bp = args['ButtonPath']
@@ -595,7 +678,7 @@ class NuoyanScreenNode(_ScreenNode):
         if touchMoveCallback:
             touchMoveCallback(args)
 
-    @_client_listener("ScreenSizeChangedClientEvent")
+    @ui_listener("ScreenSizeChangedClientEvent")
     def _OnScreenSizeChanged(self, args):
         self.screenSize = args['afterX'], args['afterY']
 

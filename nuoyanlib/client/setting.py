@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -27,7 +27,7 @@ setting
 """
 
 
-from clientComps import ClientLevelComps as _ClientLevelComps
+from comp import LvComp as _LvComp
 
 
 __all__ = [
@@ -37,64 +37,52 @@ __all__ = [
 ]
 
 
-def save_setting(name, dataDict, isGlobal=True):
+def save_setting(name, data_dict, is_global=True):
     """
     保存设置数据。
     
     -----
     
     :param str name: 数据名，只能包含字母、数字和下划线字符
-    :param dict dataDict: 数据字典
-    :param bool isGlobal: 是否为全局数据，默认为True
+    :param dict data_dict: 数据字典
+    :param bool is_global: 是否为全局数据，默认为True
     
     :return: 是否保存成功
     :rtype: bool
     """
-    return _ClientLevelComps.ConfigClient.SetConfigData(name, dataDict, isGlobal)
+    return _LvComp.ConfigClient.SetConfigData(name, data_dict, is_global)
 
 
-def read_setting(name, isGlobal=True):
+def read_setting(name, is_global=True):
     """
     读取设置数据。
     
     -----
 
     :param str name: 数据名，只能包含字母、数字和下划线字符
-    :param bool isGlobal: 是否为全局数据，默认为True
+    :param bool is_global: 是否为全局数据，默认为True
     
     :return: 数据字典
     :rtype: dict
     """
-    return _ClientLevelComps.ConfigClient.GetConfigData(name, isGlobal)
+    return _LvComp.ConfigClient.GetConfigData(name, is_global)
 
 
-def check_setting(name, itemList, isGlobal=True):
+def check_setting(name, item_list, is_global=True):
     """
     检测本地存储的设置数据是否完整。
-
-    -----
-
-    【示例】
-
-    >>> import nuoyanlib as nyl
-    >>> d = {'name': "nuoyan", 'qq': "1279735247"}
-    >>> nyl.save_setting("my_data", d)
-    True
-    >>> checkItem = ["name", "qq", "email", "age"]
-    >>> nyl.check_setting("my_data", checkItem)
-    ["email", "age"]
     
     -----
 
     :param str name: 数据名，只能包含字母、数字和下划线字符
-    :param list itemList: 检测项目列表
-    :param bool isGlobal: 是否为全局数据，默认为True
+    :param list item_list: 检测项目列表
+    :param bool is_global: 是否为全局数据，默认为True
 
     :return: 缺失项目列表
     :rtype: list
     """
-    data = read_setting(name, isGlobal)
-    return [k for k in itemList if k not in data]
+    data = read_setting(name, is_global)
+    return [k for k in item_list if k not in data]
 
 
 

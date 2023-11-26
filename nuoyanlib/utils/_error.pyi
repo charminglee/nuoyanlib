@@ -12,6 +12,40 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-11-26
 #
 # ====================================================
+
+
+def _notify_message(m: str) -> None: ...
+def print_error(modName: str = "") -> None: ...
+
+
+class ConfigError(Exception):
+    def __str__(self) -> str: ...
+
+
+class ClientNotFoundError(Exception):
+    def __str__(self) -> str: ...
+
+
+class ServerNotFoundError(Exception):
+    def __str__(self) -> str: ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

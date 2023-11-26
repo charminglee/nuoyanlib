@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -82,7 +82,7 @@ from mod.common.component.baseComponent import BaseComponent
 CLIENT_ENGINE_NAMESPACE: str
 CLIENT_ENGINE_SYSTEM_NAME: str
 ClientSystem: Type[ClientSystem]
-ClientCompFactory: EngineCompFactoryClient
+CompFactory: EngineCompFactoryClient
 ScreenNode: Type[ScreenNode]
 ViewBinder: Type[ViewBinder]
 ViewRequest: Type[ViewRequest]
@@ -91,11 +91,11 @@ LEVEL_ID: str
 
 
 class _CompDescr(object):
-    def __init__(self, compName: str) -> None: ...
-    def __get__(self, ins: ClientCompPool, cls: Type[ClientCompPool]) -> BaseComponent: ...
+    def __init__(self, comp_name: str) -> None: ...
+    def __get__(self, ins: _CompPool, cls: Type[_CompPool]) -> BaseComponent: ...
 
 
-class ClientCompPool(object):
+class _CompPool(object):
     Action: ActionCompClient
     ActorCollidable: Any
     ActorMotion: ActorMotionComponentClient
@@ -152,12 +152,12 @@ class ClientCompPool(object):
     VirtualWorld: VirtualWorldCompClient
 
 
-class ClientPlayerComps(ClientCompPool):
+class PlrComp(_CompPool):
     _cache: Dict[str, BaseComponent]
     _target: str
 
 
-class ClientLevelComps(ClientCompPool):
+class LvComp(_CompPool):
     _cache: Dict[str, BaseComponent]
     _target: str
     

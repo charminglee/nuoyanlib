@@ -27,7 +27,7 @@ uiutils
 """
 
 
-from ..clientComps import ScreenNode as _ScreenNode
+from ..comp import ScreenNode as _ScreenNode
 
 
 __all__ = [

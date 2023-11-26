@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-10-02
+#   Last Modified : 2023-11-26
 
 # ====================================================
 
@@ -73,12 +73,12 @@ def vec_rot_p2p(pos1, pos2):
         x = 0.000000001
     y = pos2[1] - pos1[1]
     z = pos2[2] - pos1[2]
-    horiDis = _pos_distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
-    if horiDis == 0:
-        horiDis = 0.000000001
-    horizontalRot = (_atan(z / x) / _pi) * 180
-    verticalRot = (_atan(y / horiDis) / _pi) * 180 * (-1 if x < 0 else 1)
-    return verticalRot, horizontalRot
+    hori_dis = _pos_distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
+    if hori_dis == 0:
+        hori_dis = 0.000000001
+    horizontal_rot = (_atan(z / x) / _pi) * 180
+    vertical_rot = (_atan(y / hori_dis) / _pi) * 180 * (-1 if x < 0 else 1)
+    return vertical_rot, horizontal_rot
 
 
 def vec_p2p(pos1, pos2):
@@ -125,10 +125,10 @@ def vec_angle(v1, v2):
     """
     v1 = _Vector3(v1)
     v2 = _Vector3(v2)
-    v1Len = v1.Length()
-    v2Len = v2.Length()
+    v1_len = v1.Length()
+    v2_len = v2.Length()
     v1v2 = _Vector3.Dot(v1, v2)
-    cos = v1v2 / (v1Len * v2Len)
+    cos = v1v2 / (v1_len * v2_len)
     return _acos(cos)
 
 
@@ -143,60 +143,60 @@ def _matrix_mult(matrix1, matrix2):
     return matrix3
 
 
-def vec_euler_rotate(vector, xAngle=0.0, yAngle=0.0, zAngle=0.0, order="zyx"):
+def vec_euler_rotate(vector, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx"):
     """
     对指定向量应用欧拉旋转。
 
     -----
 
     :param tuple[float,float,float] vector: 要旋转的向量
-    :param float xAngle: 绕x轴的旋转角度
-    :param float yAngle: 绕y轴的旋转角度
-    :param float zAngle: 绕z轴的旋转角度
+    :param float x_angle: 绕x轴的旋转角度
+    :param float y_angle: 绕y轴的旋转角度
+    :param float z_angle: 绕z轴的旋转角度
     :param str order: 旋转顺序，默认为"zyx"，即先按z轴旋转，再按y轴旋转，最后按x轴旋转
 
     :return: 旋转后的向量
     :rtype: tuple[float,float,float]
     """
-    xAngle = _radians(xAngle)
-    yAngle = _radians(yAngle)
-    zAngle = _radians(zAngle)
-    cosX, sinX = _cos(xAngle), _sin(xAngle)
-    cosY, sinY = _cos(yAngle), _sin(yAngle)
-    cosZ, sinZ = _cos(zAngle), _sin(zAngle)
+    x_angle = _radians(x_angle)
+    y_angle = _radians(y_angle)
+    z_angle = _radians(z_angle)
+    cos_x, sin_x = _cos(x_angle), _sin(x_angle)
+    cos_y, sin_y = _cos(y_angle), _sin(y_angle)
+    cos_z, sin_z = _cos(z_angle), _sin(z_angle)
     # 旋转矩阵
-    xMatrix = [
+    x_matrix = [
         [1, 0, 0],
-        [0, cosX, -sinX],
-        [0, sinX, cosX],
+        [0, cos_x, -sin_x],
+        [0, sin_x, cos_x],
     ]
-    yMatrix = [
-        [cosY, 0, sinY],
+    y_matrix = [
+        [cos_y, 0, sin_y],
         [0, 1, 0],
-        [-sinY, 0, cosY],
+        [-sin_y, 0, cos_y],
     ]
-    zMatrix = [
-        [cosZ, -sinZ, 0],
-        [sinZ, cosZ, 0],
+    z_matrix = [
+        [cos_z, -sin_z, 0],
+        [sin_z, cos_z, 0],
         [0, 0, 1],
     ]
     # 用于累积旋转的矩阵
-    accMatrix = [
+    acc_matrix = [
         [1, 0, 0],
         [0, 1, 0],
         [0, 0, 1],
     ]
     for axis in order:
         if axis == 'x':
-            accMatrix = _matrix_mult(accMatrix, xMatrix)
+            acc_matrix = _matrix_mult(acc_matrix, x_matrix)
         elif axis == 'y':
-            accMatrix = _matrix_mult(accMatrix, yMatrix)
+            acc_matrix = _matrix_mult(acc_matrix, y_matrix)
         elif axis == 'z':
-            accMatrix = _matrix_mult(accMatrix, zMatrix)
+            acc_matrix = _matrix_mult(acc_matrix, z_matrix)
     # 计算旋转
-    columnVector = [[i] for i in vector]
-    rotatedVector = _matrix_mult(accMatrix, columnVector)
-    return tuple(i[0] for i in rotatedVector)
+    column_vector = [[i] for i in vector]
+    rotated_vector = _matrix_mult(acc_matrix, column_vector)
+    return tuple(i[0] for i in rotated_vector)
 
 
 def vec_rotate_around(v, u, angle):
@@ -211,7 +211,7 @@ def vec_rotate_around(v, u, angle):
     :rtype: tuple[float,float,float]
     """
     v = _Vector3(v)
-    vLen = v.Length()
+    v_len = v.Length()
     v.Normalize()
     u = _Vector3(u).Normalized()
     theta = _radians(angle)
@@ -220,7 +220,7 @@ def vec_rotate_around(v, u, angle):
     dot = _Vector3.Dot(u, v)
     cross = _Vector3.Cross(u, v)
     res = v * cos + u * (1 - cos) * dot + cross * sin # 罗德里格旋转公式
-    return (res * vLen).ToTuple()
+    return (res * v_len).ToTuple()
 
 
 def outgoing_vec(vector, normal):
@@ -237,26 +237,26 @@ def outgoing_vec(vector, normal):
     """
     v = _Vector3(vector)
     n = _Vector3(normal)
-    reflexVector = v - 2 * _Vector3.Dot(v, n) * n
-    return reflexVector.ToTuple()
+    reflex_vector = v - 2 * _Vector3.Dot(v, n) * n
+    return reflex_vector.ToTuple()
 
 
-def vec_composite(vector, *moreVec):
+def vec_composite(vector, *more_vec):
     """
     向量的合成。
 
     -----
 
     :param tuple[float,float,float] vector: 向量
-    :param tuple[float,float,float] moreVec: 更多向量
+    :param tuple[float,float,float] more_vec: 更多向量
 
     :return: 合向量
     :rtype: tuple[float,float,float]
     """
-    resVec = _Vector3(vector)
-    for v in moreVec:
-        resVec += _Vector3(v)
-    return resVec.ToTuple()
+    res_vec = _Vector3(vector)
+    for v in more_vec:
+        res_vec += _Vector3(v)
+    return res_vec.ToTuple()
 
 
 

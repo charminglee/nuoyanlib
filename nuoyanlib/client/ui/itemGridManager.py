@@ -100,10 +100,8 @@ from ...config import (
     MOD_NAME as _MOD_NAME,
     SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME,
 )
-from ...mctypes.client.ui.controls.buttonUIControl import ButtonUIControl as _ButtonUIControl
-from ...mctypes.client.ui.controls.progressBarUIControl import ProgressBarUIControl as _ProgressBarUIControl
 from uiutils import get_grid_direct_children as _get_grid_direct_children
-from ..clientComps import ClientLevelComps as _ClientLevelComps
+from ..comp import LvComp as _LvComp
 
 
 __all__ = [
@@ -462,7 +460,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
             return
         name = itemDict['newItemName']
         aux = itemDict.get('newAuxValue', 0)
-        maxStack = _ClientLevelComps.Item.GetItemBasicInfo(name, aux)['maxStackSize']
+        maxStack = _LvComp.Item.GetItemBasicInfo(name, aux)['maxStackSize']
         if itemDict['count'] < maxStack:
             self.MergeItems(bp)
         self.SetSelectedItem(bp, False)
@@ -521,7 +519,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         :param str key: 网格的key
 
         :return: 网格中所有方格的ButtonUIControl实例的列表，获取不到时返回空列表
-        :rtype: list[_ButtonUIControl]
+        :rtype: list[ButtonUIControl]
         """
         return self._cellUiCtrls.get(key, [])
 
@@ -534,7 +532,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         :param str|tuple[str,int] cell: 方格路径或方格位置元组
 
         :return: 指定方格的ButtonUIControl实例，获取不到时返回None
-        :rtype: _ButtonUIControl|None
+        :rtype: ButtonUIControl|None
         """
         pos = self.GetItemCellPos(cell)
         return self._cellUiCtrls[pos[0]][pos[1]] if pos else None
@@ -564,7 +562,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         itemName = itemDict['newItemName']
         aux = itemDict.get('newAuxValue', 0)
         isEnchanted = bool(itemDict.get('enchantData') or itemDict.get('modEnchantData'))
-        basicInfo = _ClientLevelComps.Item.GetItemBasicInfo(itemName, aux, isEnchanted)
+        basicInfo = _LvComp.Item.GetItemBasicInfo(itemName, aux, isEnchanted)
         maxDurability = basicInfo['maxDurability']
         if durability <= 0 or durability >= maxDurability:
             durCtrl.SetVisible(False)
@@ -1288,7 +1286,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         :param int count: 分堆数量
 
         :return: 设置成功时返回分堆数据字典，失败时返回None
-        :rtype: dict[str,dict|int|bool|_ProgressBarUIControl]|None
+        :rtype: dict[str,dict|int|bool|ProgressBarUIControl]|None
         """
         if not self._is_cell_exist(cell):
             return
@@ -1311,7 +1309,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         -----
 
         :return: 分堆数据字典，没有分堆数据时返回空字典
-        :rtype: dict[str,dict|int|bool|_ProgressBarUIControl]
+        :rtype: dict[str,dict|int|bool|ProgressBarUIControl]
         """
         return self._itemHeapData
 
@@ -1376,7 +1374,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
                 keys = (keys,)
             if not all(i in self._gridKeys for i in keys):
                 return False
-        _ClientLevelComps.Game.AddTimer(0, self._initItemGrids, keys, finishedFunc, args, kwargs)
+        _LvComp.Game.AddTimer(0, self._initItemGrids, keys, finishedFunc, args, kwargs)
         return True
 
     def _initItemGrids(self, keys, finishedFunc, args, kwargs):

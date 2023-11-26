@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -24,34 +24,6 @@ serverComps
 
 该模块提供了使用存档ID（Level Id）创建服务端组件的快捷方法，同时，还提供了一些常用的变量，直接导入即可使用，无需再使用接口获取，节省了大量编写代码的时间。
 
------
-
-【模块变量说明】
-
-1、SERVER_ENGINE_NAMESPACE：服务端引擎事件的命名空间。
-
-2、SERVER_ENGINE_SYSTEM_NAME：服务端引擎系统名。
-
-3、ClientSystem：服务端system基类。
-
-4、ServerCompFactory：服务端引擎组件工厂。
-
-5、LEVEL_ID：存档ID。
-
-6、LevelComps：保存了使用存档ID创建的所有服务端组件。
-
------
-
-【示例】
-
->>> from nuoyanlib import ServerLevelComps as slc
-
-调用Game组件添加定时器，等价于serverApi.GetEngineCompFactory().CreateGame(serverApi.GetLevelId()).AddTimer(1, func)。
-
->>> def func():
-...     print("hello")
->>> slc.Game.AddTimer(1, func)
-
 """
 
 
@@ -62,9 +34,9 @@ __all__ = [
     "SERVER_ENGINE_NAMESPACE",
     "SERVER_ENGINE_SYSTEM_NAME",
     "ServerSystem",
-    "ServerCompFactory",
+    "CompFactory",
     "LEVEL_ID",
-    "ServerLevelComps",
+    "LvComp",
 ]
 
 
@@ -73,25 +45,24 @@ SERVER_ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
 
 
 ServerSystem = _serverApi.GetServerSystemCls()
-ServerCompFactory = _serverApi.GetEngineCompFactory()
+CompFactory = _serverApi.GetEngineCompFactory()
 
 
 LEVEL_ID = _serverApi.GetLevelId()
 
 
 class _CompDescr(object):
-    def __init__(self, compName):
-        self.compName = compName
+    def __init__(self, comp_name):
+        self.comp_name = comp_name
 
     def __get__(self, ins, cls):
-        if self.compName not in cls._cache:
-            comp = getattr(ServerCompFactory, "Create" + self.compName)(LEVEL_ID)
-            # comp = self.compName
-            cls._cache[self.compName] = comp
-        return cls._cache[self.compName]
+        if self.comp_name not in cls._cache:
+            comp = getattr(CompFactory, "Create" + self.comp_name)(LEVEL_ID)
+            cls._cache[self.comp_name] = comp
+        return cls._cache[self.comp_name]
 
 
-class ServerCompPool(object):
+class _CompPool(object):
     Loot = _CompDescr("Loot")
     Interact = _CompDescr("Interact")
     Feature = _CompDescr("Feature")
@@ -158,16 +129,16 @@ class ServerCompPool(object):
     Name = _CompDescr("Name")
 
 
-class ServerLevelComps(ServerCompPool):
+class LvComp(_CompPool):
     _cache = {}
 
 
 if __name__ == "__main__":
     l = []
-    for k, v in ServerCompPool.__dict__.items():
+    for k, v in _CompPool.__dict__.items():
         if k.startswith("__"):
             continue
-        l.append(k == v.compName)
+        l.append(k == v.comp_name)
     assert all(l)
 
 

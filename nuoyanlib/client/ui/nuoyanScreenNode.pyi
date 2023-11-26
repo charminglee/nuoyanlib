@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-03
+#   Last Modified : 2023-11-25
 #
 # ====================================================
 
@@ -22,9 +22,15 @@ from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.system.clientSystem import ClientSystem
-from ..nuoyanClientSystem import client_listener
+from ..client_system import client_listener
 
 
+def ui_listener(
+    eventName: str = "",
+    namespace: str = "",
+    systemName: str = "",
+    priority: int = 0
+) -> Callable[[Callable], Callable]: ...
 def notify_server(func: Callable) -> Callable: ...
 
 
@@ -92,6 +98,7 @@ class NuoyanScreenNode(ScreenNode):
     def RemoveButtonLongClickCallback(self, btnPath: str) -> None: ...
     def SetLongClickVibrateTime(self, time: int) -> None: ...
     def HasLongClicked(self, bp: str) -> bool: ...
+    def __listen(self) -> None: ...
     def _runTouchUpList(self, args: dict) -> None: ...
     @client_listener("GetEntityByCoordReleaseClientEvent")
     def _OnCoordRelease(self, args: dict) -> None: ...

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -21,21 +21,21 @@ from typing import List
 from mod.common.minecraftEnum import ItemPosType
 
 
-def clear_items(playerId: str, itemPosType: int, pos: int) -> dict: ...
+def clear_items(player_id: str, item_pos_type: int, pos: int) -> dict: ...
 def get_item_pos(
-    entityId: str,
-    posType: int,
-    itemId: str,
-    itemAux: int = -1,
+    entity_id: str,
+    pos_type: int,
+    item_id: str,
+    item_aux: int = -1,
     count: int = 1,
 ) -> List[int]: ...
 def change_item_count(
-    playerId: str,
-    posType: int = ItemPosType.CARRIED,
+    player_id: str,
+    pos_type: int = ItemPosType.CARRIED,
     pos: int = 0,
     change: int = -1,
 ) -> None: ...
-def deduct_inv_item(playerId: str, name: str, aux: int = -1, count: int = 1) -> bool: ...
+def deduct_inv_item(player_id: str, name: str, aux: int = -1, count: int = 1) -> bool: ...
 
 
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-13
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -43,20 +43,15 @@ def _notify_message(m):
 
 
 def print_error(modName=""):
-    # type: (str) -> None
     """
     打印错误信息。
-    -----------------------------------------------------------
-    【modName: str = ""】 模组名称
-    -----------------------------------------------------------
-    NoReturn
-    -----------------------------------------------------------
-    【示例】
-    try:
-        a = {}
-        c = a['b']
-    except KeyError:
-        print_error()
+    
+    -----
+
+    :param str modName: 模组名称，默认为空字符串
+
+    :return: 无
+    :rtype: None
     """
     if modName:
         modName = "[%s] " % modName

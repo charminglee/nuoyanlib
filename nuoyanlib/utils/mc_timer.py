@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-16
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -30,54 +30,6 @@ class McTimer(object):
     客户端函数定时器。非重复执行的定时器在执行完毕后会自动销毁。
 
     与官方的定时器不同的是，该定时器使用threading标准库实现，比官方的定时器计时更精准。
-
-    -----
-
-    接口一览：
-
-    1、Start：启动定时器。
-
-    2、Cancel：取消尚未触发的定时器。
-
-    3、Pause：暂停定时器，重复调用时仅第一次有效。
-
-    4、Continue：继续运行被暂停的定时器。
-
-    5、Execute：立即执行一次函数。
-
-    6、IsCanceled：获取定时器是否已经取消。
-
-    7、IsPaused：获取定时器是否暂停。
-
-    -----
-
-    【示例】
-
-    创建一个延迟一秒调用的普通定时器：
-
-    >>> def func1(x, y):
-    ...     print x + y
-    >>> timer1 = McTimer("d", 1, func1, 1, 2)
-
-    创建一个重复调用的定时器，每两秒执行一次：
-
-    >>> a = 0
-    >>> def func2(x):
-    ...     global a
-    ...     a += x
-    ...     print a
-    ...     if a >= 3:
-    ...         timer2.Cancel()
-    >>> timer2 = McTimer("r", 2, func2, 1)
-
-    启动定时器：
-
-    >>> timer1.Start()
-    >>> timer2.Start()
-    3  # 一秒后打印
-    1  # 每两秒打印一次
-    2
-    3  # 打印到3时停止
 
     -----
 
@@ -143,6 +95,7 @@ class McTimer(object):
         self.kwargs = None
 
     def Pause(self, sec=None):
+        # todo: Pause
         """
         暂停定时器，重复调用时仅第一次有效。
 
@@ -158,6 +111,7 @@ class McTimer(object):
         return self
 
     def Continue(self):
+        # todo: Continue
         """
         继续运行被暂停的定时器。
 
@@ -204,7 +158,7 @@ class McTimer(object):
         return not self._cancel and self._pause
 
 
-def _test():
+if __name__ == "__main__":
     def func1(x, y):
         print x + y
     timer1 = McTimer("d", 1, func1, 1, 2)
@@ -224,10 +178,6 @@ def _test():
         timer3.Cancel()
         print "stop 114514"
     McTimer("d", 1, func4).Start()
-
-
-if __name__ == "__main__":
-    _test()
 
 
 

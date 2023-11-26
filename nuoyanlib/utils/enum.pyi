@@ -12,6 +12,25 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-11-26
 #
 # ====================================================
+
+
+from typing import Dict, List, Tuple, Any, Optional
+
+
+def search_data(data: Any, lst: list) -> bool: ...
+
+
+ENTITY_LIST: List[Optional[Tuple[int, str, str, int]]]
+MOB_LIST: List[Tuple[int, str, str, int, bool]]
+FRIENDLY_MOB_LIST: List[Tuple[int, str, str, int]]
+HOSTILE_MOB_LIST: List[Tuple[int, str, str, int]]
+ATTACKABLE_MOB_LIST: List[Tuple[int, str, str, int]]
+ENTITY_ID_DICT: Dict[int, int]
+EFFECT_DICT: Dict[str, str]
+BIOME_DICT: Dict[str, str]
+STRUCTURE_DICT: Dict[int, Tuple[str, str]]
+BLOCK_LIST: List[str]
+ITEM_LIST: List[str]

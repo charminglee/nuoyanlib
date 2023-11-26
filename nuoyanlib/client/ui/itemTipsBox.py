@@ -45,8 +45,8 @@ itemTipsBox
 
 import mod.client.extraClientApi as _clientApi
 from ...utils.item import is_empty_item as _is_empty_item
-from ..clientComps import (
-    ClientLevelComps as _ClientLevelComps,
+from ..comp import (
+    LvComp as _LvComp,
     ScreenNode as _ScreenNode,
 )
 
@@ -171,7 +171,7 @@ class _ItemTipsBoxUI(_ScreenNode):
         if aux == -1:
             aux = 0
         userData = itemDict.get('userData')
-        text = _ClientLevelComps.Item.GetItemFormattedHoverText(name, aux, True, userData)
+        text = _LvComp.Item.GetItemFormattedHoverText(name, aux, True, userData)
         self.ShowTipsBox(text)
 
     def ShowTipsBox(self, text):
@@ -183,26 +183,26 @@ class _ItemTipsBoxUI(_ScreenNode):
         self.tipsLabel.SetText(text)
         # 取消正在执行的timer
         if self.timer1:
-            _ClientLevelComps.Game.CancelTimer(self.timer1)
+            _LvComp.Game.CancelTimer(self.timer1)
         if self.timer2:
-            _ClientLevelComps.Game.CancelTimer(self.timer2)
+            _LvComp.Game.CancelTimer(self.timer2)
         # 一秒后执行渐出动画
         def func1():
             self.alphaTick = 30
             self.timer1 = None
-        self.timer1 = _ClientLevelComps.Game.AddTimer(1, func1)
+        self.timer1 = _LvComp.Game.AddTimer(1, func1)
         # 两秒后隐藏文本框并恢复初始状态
         def func2():
             self.HideTipsBox()
             self.timer2 = None
-        self.timer2 = _ClientLevelComps.Game.AddTimer(2, func2)
+        self.timer2 = _LvComp.Game.AddTimer(2, func2)
 
     def HideTipsBox(self):
         if self.timer1:
-            _ClientLevelComps.Game.CancelTimer(self.timer1)
+            _LvComp.Game.CancelTimer(self.timer1)
             self.timer1 = None
         if self.timer2:
-            _ClientLevelComps.Game.CancelTimer(self.timer2)
+            _LvComp.Game.CancelTimer(self.timer2)
             self.timer2 = None
         self.alphaTick = 0
         self.tipsImg.SetAlpha(1.0)

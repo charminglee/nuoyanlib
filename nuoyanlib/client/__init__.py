@@ -12,76 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-09
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
 
-from ui import *
-from clientComps import (
-    CLIENT_ENGINE_NAMESPACE,
-    CLIENT_ENGINE_SYSTEM_NAME,
-    ClientSystem,
-    ClientCompFactory,
-    ScreenNode,
-    ViewBinder,
-    ViewRequest,
-    PLAYER_ID,
-    LEVEL_ID,
-    ClientPlayerComps,
-    ClientLevelComps,
-)
-from effector import (
-    NeteaseParticle,
-    NeteaseFrameAnim,
-)
-from nuoyanClientSystem import (
-    client_listener,
-    NuoyanClientSystem,
-    ALL_CLIENT_ENGINE_EVENTS,
-)
-from player import (
-    player_plunge,
-)
-from setting import (
-    save_setting,
-    read_setting,
-    check_setting,
-)
-from sound import (
-    play_custom_sound,
-    stop_custom_sound,
-)
-
-
-__all__ = [
-    "ItemFlyAnim",
-    "ItemGridManager",
-    "ItemTipsBox",
-    "NuoyanScreenNode",
-    "notify_server",
-    "get_grid_direct_children",
-    "get_parent_path",
-    "CLIENT_ENGINE_NAMESPACE",
-    "CLIENT_ENGINE_SYSTEM_NAME",
-    "ClientSystem",
-    "ClientCompFactory",
-    "ScreenNode",
-    "ViewBinder",
-    "ViewRequest",
-    "PLAYER_ID",
-    "LEVEL_ID",
-    "ClientPlayerComps",
-    "ClientLevelComps",
-    "NeteaseParticle",
-    "NeteaseFrameAnim",
-    "client_listener",
-    "NuoyanClientSystem",
-    "ALL_CLIENT_ENGINE_EVENTS",
-    "player_plunge",
-    "save_setting",
-    "read_setting",
-    "check_setting",
-    "play_custom_sound",
-    "stop_custom_sound",
-]
+from client_system import *
+from comp import *
+from effector import *
+from player import *
+from setting import *
+from sound import *

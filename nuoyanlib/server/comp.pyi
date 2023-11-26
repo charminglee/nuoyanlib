@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-06
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
@@ -90,16 +90,16 @@ from mod.server.component.actorLootCompServer import ActorLootComponentServer
 SERVER_ENGINE_NAMESPACE: str
 SERVER_ENGINE_SYSTEM_NAME: str
 ServerSystem: Type[ServerSystem]
-ServerCompFactory: EngineCompFactoryServer
+CompFactory: EngineCompFactoryServer
 LEVEL_ID: str
 
 
 class _CompDescr(object):
-    def __init__(self, compName: str) -> None: ...
-    def __get__(self, ins: ServerCompPool, cls: Type[ServerCompPool]) -> BaseComponent: ...
+    def __init__(self, comp_name: str) -> None: ...
+    def __get__(self, ins: _CompPool, cls: Type[_CompPool]) -> BaseComponent: ...
 
 
-class ServerCompPool(object):
+class _CompPool(object):
     Loot: LootComponentServer
     Interact: InteractComponentServer
     Feature: FeatureCompServer
@@ -166,7 +166,7 @@ class ServerCompPool(object):
     Name: NameComponentServer
 
 
-class ServerLevelComps(ServerCompPool):
+class LvComp(_CompPool):
     _cache: Dict[str, BaseComponent]
 
 
