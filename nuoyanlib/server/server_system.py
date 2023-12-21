@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2023-12-21
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as _serverApi
+import mod.server.extraServerApi as api
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
 from ..utils.utils import is_method_overridden as _is_method_overridden
 from ..config import (
@@ -40,6 +40,8 @@ __all__ = [
 
 
 ALL_SERVER_ENGINE_EVENTS = {
+    "PlayerHungerChangeServerEvent",
+    "ItemDurabilityChangedServerEvent",
     "PlaceNeteaseLargeFeatureServerEvent",
     "PlayerNamedEntityServerEvent",
     "PlayerFeedEntityServerEvent",
@@ -302,6 +304,64 @@ class NuoyanServerSystem(_ServerSystem):
 
     # ==================================== Engine Event Callback =============================================
 
+    def PlayerHungerChangeServerEvent(self, args):
+        """
+        *[event]*
+
+        玩家饥饿度变化时触发该事件。
+
+        当通过SetPlayerHunger接口设置饥饿度时，不会触发服务端对应的事件。
+
+        当通过/hunger等指令设置饥饿度设置时，hunger字段值可能会超过最大饥饿度。
+
+        -----
+
+        【playerId: str】 玩家ID
+
+        【hungerBefore: float】 变化前的饥饿度
+
+        【hunger: float】 变化后的饥饿度
+
+        【$cancel: bool】 是否取消饥饿度变化
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def ItemDurabilityChangedServerEvent(self, args):
+        """
+        *[event]*
+
+        物品耐久度变化事件。
+
+        目前只有存在耐久的物品，并且有物主的物品才会触发该事件，存在发射器中发射导致的物品耐久变化不会触发该事件。
+
+        目前铁砧修复、经验修补魔咒、SetItemDurability接口触发的耐久度变化中canChange为False，并且不支持修改变化后耐久度。
+
+        -----
+
+        【entityId: str】 物品拥有者的实体ID
+
+        【itemDict: dict】 物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+
+        【durabilityBefore: int】 变化前耐久度
+
+        【$durability: int】 变化后耐久度，支持修改。但是请注意修改范围，支持范围为[-32768,32767)
+
+        【$canChange: bool】 是否支持修改，为True时支持通过durability修改，为False时不支持
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
     def PlaceNeteaseLargeFeatureServerEvent(self, args):
         """
         *[event]*
@@ -380,7 +440,7 @@ class NuoyanServerSystem(_ServerSystem):
 
         【entityId: str】 被喂养生物的实体ID
 
-        【itemDict: dict】 当前玩家手持物品的物品信息字典
+        【itemDict: dict】 当前玩家手持物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         【$cancel: bool】 是否取消触发，默认为False，若设为True，可阻止触发后续的生物喂养逻辑
 
@@ -2404,7 +2464,7 @@ class NuoyanServerSystem(_ServerSystem):
 
         玩家吃下食物时触发。
         
-        吃蛋糕以及喝牛奶不触发该事件。
+        由于牛奶本身并没有饱食度的概念，因此，当喝牛奶触发该事件时，饥饿度、营养价值字段无效并始终为0。
 
         -----
 
@@ -4422,11 +4482,11 @@ class NuoyanServerSystem(_ServerSystem):
         
         比较特殊不走该事件的例子：
         
-        1、喝牛奶；
+        1、染料对有水的炼药锅使用；
         
-        2、染料对有水的炼药锅使用；
-        
-        3、盔甲架装备盔甲。
+        2、盔甲架装备盔甲。
+
+        注意，喝牛奶会触发该事件，但是不会触发ActorUseItemClientEvent。
 
         -----
 
@@ -4760,7 +4820,7 @@ class NuoyanServerSystem(_ServerSystem):
     # ====================================== Internal Method =================================================
 
     def _set_print_log(self):
-        _serverApi.SetMcpModLogCanPostDump(True)
+        api.SetMcpModLogCanPostDump(True)
 
     @server_listener
     def _SetQueryVar(self, args):
@@ -4800,7 +4860,7 @@ class NuoyanServerSystem(_ServerSystem):
         if item_ent:
             rot = _CompFactory.CreateRot(player_id).GetRot()
             rot = (-15, rot[1])
-            direction = _serverApi.GetDirFromRot(rot)
+            direction = api.GetDirFromRot(rot)
             motion = tuple(i * 0.3 for i in direction)
             _CompFactory.CreateActorMotion(item_ent).SetMotion(motion)
 

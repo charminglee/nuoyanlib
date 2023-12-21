@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-14
+#   Last Modified : 2023-12-10
 #
 # ====================================================
 
@@ -93,14 +93,14 @@ from ...utils.item import (
     is_empty_item as _is_empty_item,
     get_max_stack as _get_max_stack
 )
-from itemFlyAnim import ItemFlyAnim as _ItemFlyAnim
-from itemTipsBox import ItemTipsBox as _ItemTipsBox
+from item_fly_anim import ItemFlyAnim as _ItemFlyAnim
+from item_tips_box import ItemTipsBox as _ItemTipsBox
 from nuoyanScreenNode import NuoyanScreenNode as _NuoyanScreenNode
 from ...config import (
     MOD_NAME as _MOD_NAME,
     SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME,
 )
-from uiutils import get_grid_direct_children as _get_grid_direct_children
+from ui_utils import get_grid_direct_children as _get_grid_direct_children
 from ..comp import LvComp as _LvComp
 
 
@@ -111,6 +111,11 @@ __all__ = [
 
 _IMAGE_PATH_ITEM_CELL_SELECTED = "textures/ui/recipe_book_button_borderless_lightpressed"
 _IMAGE_PATH_ITEM_CELL_DEFAULT = "textures/ui/item_cell"
+_UI_NAME_COUNT = "count"
+_UI_NAME_ITEM_RENDERER = "item_renderer"
+_UI_NAME_DURABILITY = "durability"
+_UI_NAME_DEFAULT = "default"
+_UI_NAME_HEAP = "heap"
 
 
 _SHORTCUT = "shortcut"
@@ -552,7 +557,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         if not self._is_cell_exist(cell):
             return False
-        durCtrl = self.GetItemCellUIControl(cell).GetChildByName("durability").asProgressBar()
+        durCtrl = self.GetItemCellUIControl(cell).GetChildByName(_UI_NAME_DURABILITY).asProgressBar()
         if auto:
             itemDict = self.GetItemCellItem(cell)
         if _is_empty_item(itemDict):
@@ -586,7 +591,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         if not self._is_cell_exist(cell):
             return False
-        itemRenderer = self.GetItemCellUIControl(cell).GetChildByName("item_renderer").asItemRenderer()
+        itemRenderer = self.GetItemCellUIControl(cell).GetChildByName(_UI_NAME_ITEM_RENDERER).asItemRenderer()
         if auto:
             itemDict = self.GetItemCellItem(cell)
         if not _is_empty_item(itemDict):
@@ -615,7 +620,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         if not self._is_cell_exist(cell):
             return False
-        label = self.GetItemCellUIControl(cell).GetChildByName("count").asLabel()
+        label = self.GetItemCellUIControl(cell).GetChildByName(_UI_NAME_COUNT).asLabel()
         if auto:
             itemDict = self.GetItemCellItem(cell)
         count = itemDict.get('count', 1) if not _is_empty_item(itemDict) else 0
@@ -663,7 +668,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         if self._selectedItem:
             bp = self._selectedItem['bp']
-            defaultImg = self.GetItemCellUIControl(bp).GetChildByName("default").asImage()
+            defaultImg = self.GetItemCellUIControl(bp).GetChildByName(_UI_NAME_DEFAULT).asImage()
             defaultImg.SetSprite(_IMAGE_PATH_ITEM_CELL_DEFAULT)
             self._selectedItem = {}
         if self._itemHeapData:
@@ -1243,7 +1248,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         if not self._is_cell_exist(cell):
             return False
-        defaultImg = self.GetItemCellUIControl(cell).GetChildByName("default").asImage()
+        defaultImg = self.GetItemCellUIControl(cell).GetChildByName(_UI_NAME_DEFAULT).asImage()
         if selected:
             bp = self.GetItemCellPath(cell)
             pos = self.GetItemCellPos(cell)
@@ -1291,7 +1296,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         if not self._is_cell_exist(cell):
             return
         itemDict = self.GetItemCellItem(cell)
-        heapBar = self.GetItemCellUIControl(cell).GetChildByName("heap").asProgressBar()
+        heapBar = self.GetItemCellUIControl(cell).GetChildByName(_UI_NAME_HEAP).asProgressBar()
         heapBar.SetVisible(True)
         heapBar.SetValue(float(count) / itemDict['count'])
         self._itemHeapData = {

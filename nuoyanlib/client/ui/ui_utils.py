@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-11-30
 #
 # ====================================================
 
@@ -36,28 +36,28 @@ __all__ = [
 ]
 
 
-def get_grid_direct_children(path, uiSelf):
+def get_grid_direct_children(path, ui_self):
     """
     获取网格的所有直接子控件的路径。例如，一个网格包含两个按钮，而每个按钮又包含三张图片，则按钮为网格的直接子控件，图片为网格的间接子控件。
 
     -----
 
     :param str path: 网格路径
-    :param _ScreenNode uiSelf: UI类实例，在UI类里调用该函数直接传self即可
+    :param _ScreenNode ui_self: UI类实例，在UI类里调用该函数直接传self即可
 
     :return: 网格的所有直接子控件的路径，获取不到返回空列表
     :rtype: list[str]
     """
     if not path.startswith("/"):
         path = "/" + path
-    gpLevel = path.count("/")
-    allChildren = []
-    for p in uiSelf.GetAllChildrenPath(path):
+    gp_level = path.count("/")
+    all_children = []
+    for p in ui_self.GetAllChildrenPath(path):
         if p.startswith("/safezone_screen_matrix"):
             p = "/variables_button_mappings_and_controls" + p
-        if p.count("/") == gpLevel + 1:
-            allChildren.append(p)
-    return allChildren
+        if p.count("/") == gp_level + 1:
+            all_children.append(p)
+    return all_children
 
 
 def get_parent_path(path):

@@ -27,7 +27,7 @@ serverComps
 """
 
 
-import mod.server.extraServerApi as _serverApi
+import mod.server.extraServerApi as api
 
 
 __all__ = [
@@ -40,15 +40,15 @@ __all__ = [
 ]
 
 
-SERVER_ENGINE_NAMESPACE = _serverApi.GetEngineNamespace()
-SERVER_ENGINE_SYSTEM_NAME = _serverApi.GetEngineSystemName()
+SERVER_ENGINE_NAMESPACE = api.GetEngineNamespace()
+SERVER_ENGINE_SYSTEM_NAME = api.GetEngineSystemName()
 
 
-ServerSystem = _serverApi.GetServerSystemCls()
-CompFactory = _serverApi.GetEngineCompFactory()
+ServerSystem = api.GetServerSystemCls()
+CompFactory = api.GetEngineCompFactory()
 
 
-LEVEL_ID = _serverApi.GetLevelId()
+LEVEL_ID = api.GetLevelId()
 
 
 class _CompDescr(object):

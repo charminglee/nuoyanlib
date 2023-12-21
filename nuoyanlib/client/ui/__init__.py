@@ -17,8 +17,8 @@
 # ====================================================
 
 
-from itemFlyAnim import *
+from item_fly_anim import *
 from itemGridManager import *
-from itemTipsBox import *
+from item_tips_box import *
 from nuoyanScreenNode import *
-from uiutils import *
+from ui_utils import *

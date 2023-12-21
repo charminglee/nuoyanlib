@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-27
+#   Last Modified : 2023-12-16
 #
 # ====================================================
 
@@ -31,8 +31,8 @@ from random import (
     randint as _randint,
     uniform as _uniform,
 )
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
+import mod.client.extraClientApi as client_api
+import mod.server.extraServerApi as server_api
 from mod.common.utils.mcmath import Vector3 as _Vector3
 
 
@@ -40,11 +40,11 @@ __all__ = [
     "probability_true_i",
     "probability_true_f",
     "pos_distance_to_line",
-    "floor_pos",
+    "pos_floor",
     "pos_distance",
     "to_relative_pos",
     "to_screen_pos",
-    "rotate_pos",
+    "pos_rotate",
     "straight_pos_list",
     "midpoint",
     "camera_rot_p2p",
@@ -116,14 +116,14 @@ def pos_distance_to_line(pos, line_pos1, line_pos2):
 
 
 def _is_client():
-    return _clientApi.GetLocalPlayerId() != "-1"
+    return client_api.GetLocalPlayerId() != "-1"
 
 
 def _get_comp_factory():
-    return _clientApi.GetEngineCompFactory() if _is_client() else _serverApi.GetEngineCompFactory()
+    return client_api.GetEngineCompFactory() if _is_client() else server_api.GetEngineCompFactory()
 
 
-def floor_pos(pos):
+def pos_floor(pos):
     """
     对坐标进行向下取整。
         
@@ -134,7 +134,7 @@ def floor_pos(pos):
     :return: 取整后的坐标
     :rtype: tuple[int, int, int] 
     """
-    return map(lambda x: int(_floor(x)), pos)
+    return tuple(map(lambda x: int(_floor(x)), pos))
 
 
 def pos_distance(first_point, second_point):
@@ -194,7 +194,7 @@ def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, pl
     half_ui_size = ui_size / 2.0
     ratio = (relative_pos[0] / max_distance, relative_pos[2] / max_distance)
     orig_pos = (half_screen_size * ratio[0], half_screen_size * ratio[1])
-    rotated_pos = rotate_pos(player_rot, orig_pos)
+    rotated_pos = pos_rotate(player_rot, orig_pos)
     screen_pos = (
         half_screen_size - rotated_pos[0] - half_ui_size,
         half_screen_size - rotated_pos[1] - half_ui_size,
@@ -202,7 +202,7 @@ def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, pl
     return screen_pos
 
 
-def rotate_pos(angle, pos):
+def pos_rotate(angle, pos):
     """
     计算给定坐标绕坐标原点旋转后的新坐标。
         
@@ -267,10 +267,7 @@ def midpoint(first_point, second_point):
     """
     if not first_point or not second_point:
         return
-    midpos = []
-    for i in range(len(first_point)):
-        midpos.append((first_point[i] + second_point[i]) / 2)
-    return tuple(midpos)
+    return tuple((a + b) / 2.0 for a, b in zip(first_point, second_point))
 
 
 def camera_rot_p2p(pos1, pos2):
@@ -346,7 +343,7 @@ def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
         return
     if use_0yaw:
         rot = (0, rot[1])
-    dir_rot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
+    dir_rot = client_api.GetDirFromRot(rot) if _is_client() else server_api.GetDirFromRot(rot)
     ep = comp_factory.CreatePos(entity_id).GetFootPos()
     if not ep:
         return
@@ -370,7 +367,7 @@ def pos_forward_rot(pos, rot, dis):
     """
     if not rot or not pos:
         return
-    dir_rot = _clientApi.GetDirFromRot(rot) if _is_client() else _serverApi.GetDirFromRot(rot)
+    dir_rot = client_api.GetDirFromRot(rot) if _is_client() else server_api.GetDirFromRot(rot)
     result_pos = tuple(pos[i] + dir_rot[i] * dis for i in range(3))
     return result_pos
 
@@ -657,8 +654,8 @@ def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_
     ray_dir = _Vector3(ray_dir)
     cube_center_pos = _Vector3(cube_center_pos)
     local_start_pos = ray_start_pos - cube_center_pos
-    t_min = -float("inf")
-    t_max = float("inf")
+    t_min = -float('inf')
+    t_max = float('inf')
     for i in range(3):
         if ray_dir[i] == 0.0:
             continue
@@ -670,7 +667,7 @@ def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_
         return (ray_start_pos + ray_dir * t_min).ToTuple()
 
 
-_LEVEL_ID = _serverApi.GetLevelId() or _clientApi.GetLevelId()
+_LEVEL_ID = client_api.GetLevelId() or server_api.GetLevelId()
 
 
 def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter_blocks=None):

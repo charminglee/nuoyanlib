@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-02
+#   Last Modified : 2023-11-30
 #
 # ====================================================
 
@@ -21,7 +21,7 @@ from typing import List
 from mod.client.ui.screenNode import ScreenNode
 
 
-def get_grid_direct_children(path: str, uiSelf: ScreenNode) -> List[str]: ...
+def get_grid_direct_children(path: str, ui_self: ScreenNode) -> List[str]: ...
 def get_parent_path(path: str) -> str: ...
 
 

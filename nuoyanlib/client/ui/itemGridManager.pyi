@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-03
+#   Last Modified : 2023-12-10
 #
 # ====================================================
 
@@ -20,8 +20,8 @@
 from typing import List, Dict, Union, Optional, Tuple, Set, NewType, Callable, Any
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
-from itemFlyAnim import ItemFlyAnim
-from itemTipsBox import ItemTipsBox
+from item_fly_anim import ItemFlyAnim
+from item_tips_box import ItemTipsBox
 from nuoyanScreenNode import NuoyanScreenNode
 
 
@@ -31,6 +31,11 @@ ItemCell = NewType("ItemCell", Union[str, CellPos])
 
 _IMAGE_PATH_ITEM_CELL_SELECTED: str
 _IMAGE_PATH_ITEM_CELL_DEFAULT: str
+_UI_NAME_COUNT: str
+_UI_NAME_ITEM_RENDERER: str
+_UI_NAME_DURABILITY: str
+_UI_NAME_DEFAULT: str
+_UI_NAME_HEAP: str
 _SHORTCUT: str
 _INV27: str
 _INV36: str

@@ -27,7 +27,7 @@ effector
 """
 
 
-import mod.client.extraClientApi as _clientApi
+import mod.client.extraClientApi as api
 from ..config import (
     MOD_NAME as _MOD_NAME,
     CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
@@ -59,7 +59,7 @@ class NeteaseParticle(object):
     """
 
     def __init__(self, json_path, pos=None, bind_entity=None, bind_skeleton=None):
-        self.__cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
+        self.__cs = api.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if not self.__cs:
             raise _ClientNotFoundError
         self._id = self.__cs.CreateEngineParticle(json_path, pos)
@@ -527,7 +527,7 @@ class NeteaseFrameAnim(object):
             bind_entity=None,
             bind_skeleton=None,
     ):
-        self.__cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
+        self.__cs = api.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if not self.__cs:
             raise _ClientNotFoundError
         if json_path:

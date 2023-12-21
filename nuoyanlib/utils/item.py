@@ -12,13 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2023-11-30
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
+import mod.client.extraClientApi as client_api
+import mod.server.extraServerApi as server_api
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
 
 
@@ -83,11 +83,11 @@ def item_dict(
 
 
 def _is_client():
-    return _clientApi.GetLocalPlayerId() != "-1"
+    return client_api.GetLocalPlayerId() != "-1"
 
 
 def _get_comp_factory():
-    return _clientApi.GetEngineCompFactory() if _is_client() else _serverApi.GetEngineCompFactory()
+    return client_api.GetEngineCompFactory() if _is_client() else server_api.GetEngineCompFactory()
 
 
 def get_item_count(player_id, name, aux=-1):
@@ -212,12 +212,7 @@ def is_empty_item(item, zero_is_emp=True):
     )
 
 
-def _get_level_id():
-    return _clientApi.GetLevelId() or _serverApi.GetLevelId()
-
-
-def _is_server():
-    return _clientApi.GetLocalPlayerId() == "-1"
+_LEVEL_ID = client_api.GetLevelId() or server_api.GetLevelId()
 
 
 def get_max_stack(item):
@@ -235,10 +230,10 @@ def get_max_stack(item):
     aux = item.get('newAuxValue', 0)
     if aux == -1:
         aux = 0
-    if _is_server():
-        comp = _serverApi.GetEngineCompFactory().CreateItem(_get_level_id())
+    if _is_client():
+        comp = client_api.GetEngineCompFactory().CreateItem(_LEVEL_ID)
     else:
-        comp = _clientApi.GetEngineCompFactory().CreateItem(_get_level_id())
+        comp = server_api.GetEngineCompFactory().CreateItem(_LEVEL_ID)
     try:
         return comp.GetItemBasicInfo(name, aux)['maxStackSize']
     except KeyError:

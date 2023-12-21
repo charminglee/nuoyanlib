@@ -17,7 +17,7 @@
 # ====================================================
 
 
-import mod.server.extraServerApi as _serverApi
+import mod.server.extraServerApi as api
 from mod.common.minecraftEnum import EntityType as _EntityType
 from ..utils.calculator import (
     pos_distance as _pos_distance,
@@ -365,7 +365,7 @@ def launch_projectile(
         rot = _CompFactory.CreateRot(spawner_id).GetRot()
         if not rot:
             return "-1"
-        direction = _serverApi.GetDirFromRot(rot)
+        direction = api.GetDirFromRot(rot)
     param = {
         'position': position,
         'direction': direction,
@@ -436,7 +436,7 @@ def entity_plunge_by_rot(entity_id, rot, speed):
     :return: 无
     :rtype: None
     """
-    direction = _serverApi.GetDirFromRot(rot)
+    direction = api.GetDirFromRot(rot)
     entity_plunge_by_dir(entity_id, direction, speed)
 
 
@@ -449,7 +449,7 @@ def get_all_entities():
     :return: 实体ID列表
     :rtype: list[str]
     """
-    return _serverApi.GetEngineActor().keys() + _serverApi.GetPlayerList()
+    return api.GetEngineActor().keys() + api.GetPlayerList()
 
 
 def get_entities_in_area(

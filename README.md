@@ -46,7 +46,7 @@
 ---
 
 - [**client（客户端库）**](/nuoyanlib/client)  
-  包含client_system、comp、effector、player、setting、sound模块。  
+  包含client_system、comp、effect、player、setting、sound模块。  
   提供了客户端扩展、特效管理器等客户端专用工具。  
 
 
@@ -61,7 +61,7 @@
 
 
 - [**utils（通用工具库）**](/nuoyanlib/utils)  
-  包含calculator、enum、item、mc_random、utils、vector模块。  
+  包含calculator、creative_inv、enum、item、mc_random、utils、vector模块。  
   提供了多种数学计算函数、更多的枚举值等双端通用的工具。
 
 <br></br>
@@ -72,9 +72,6 @@
 
 1. 解压下载的文件，将`nuoyanlib`文件夹放至您的脚本根目录下（即`modMain.py`所在目录）。
 2. 打开`nuoyanlib/config.py`配置文件，将您的模组名称、客户端系统名称和服务端系统名称填入对应位置。
-    > **[注意]**  
-    请确保填入`config.py`的信息与您的模组对应，否则部分功能将无法正常使用。
-    
     ```python
     # 在modMain注册时填写的模组名称（命名空间）
     MOD_NAME = "MyMod"
@@ -83,10 +80,9 @@
     # 服务端系统名称
     SERVER_SYSTEM_NAME = "MyServerSystem"
     ```
+    > **[注意]**  
+    请确保填入`config.py`的信息与您的模组对应，否则部分功能将无法正常使用。
 3. 随后，在您需要使用「nuoyanlib」的Python文件顶部进行导入即可。
-    > **[警告]**  
-    禁止导入对立端的库，如在客户端导入服务端库，服务端导入客户端库，否则可能会导致整个库功能瘫痪甚至游戏闪退等严重问题。
-
     ```python
     # 在客户端中导入
     import nuoyanlib.client as nyl
@@ -95,6 +91,8 @@
     # 在服务端中导入
     import nuoyanlib.server as nyl
     ```
+    > **[警告]**  
+    禁止导入对立端的库，如在客户端导入服务端库，服务端导入客户端库，否则可能会导致整个库功能瘫痪甚至游戏闪退等严重问题。
 
 <br></br>
 
@@ -131,10 +129,9 @@
 
 ---
 
-本项目欢迎各位开发者共同参与开发，如果您有更好的算法或修改建议，可通过Pull Request或Issue的方式提交，成为本项目的贡献者。
+本项目欢迎各位开发者共同参与开发，如果您有更好的算法或修改建议，可通过Issue或Pull Request的方式提交，成为本项目的贡献者。
 
 [什么是Issue？](https://help.gitee.com/base/issue/intro)
-
 [什么是Pull Request？](https://help.gitee.com/base/pullrequest/intro)
 
 <br></br>

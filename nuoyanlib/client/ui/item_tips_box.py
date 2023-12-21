@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-09-14
+#   Last Modified : 2023-11-30
 #
 # ====================================================
 
@@ -43,7 +43,7 @@ itemTipsBox
 """
 
 
-import mod.client.extraClientApi as _clientApi
+import mod.client.extraClientApi as api
 from ...utils.item import is_empty_item as _is_empty_item
 from ..comp import (
     LvComp as _LvComp,
@@ -56,7 +56,7 @@ __all__ = [
 ]
 
 
-_PATH = __file__.replace(".py", "").replace("/", ".") if "/" in __file__ else __file__
+_PATH = __file__.replace(".py", "").replace("/", ".")
 _NAMESPACE = "NuoyanLib"
 _UI_NAME_ITEM_TIPS_BOX = "NyItemTipsBox"
 _UI_PATH_ITEM_TIPS_BOX = _PATH + "._ItemTipsBoxUI"
@@ -69,48 +69,38 @@ _UI_PATH_TIPS_LABEL = "/tips_panel/image/label"
 class ItemTipsBox(_ScreenNode):
     """
     为原版ScreenNode提供物品悬浮文本显示支持。
-
-    -----
-
-    【接口一览】
-
-    1、ShowItemHoverTipsBox：显示物品悬浮文本框。
-
-    2、ShowTipsBox：显示自定义内容的悬浮文本框。
-
-    3、HideTipsBox：隐藏悬浮文本框。
     """
 
     def __init__(self, namespace, name, param):
         # noinspection PySuperArguments
         super(ItemTipsBox, self).__init__(namespace, name, param)
-        self._itemTipsBoxNode = None
-        self.__registerItemTipsBoxUI()
+        self._item_tips_box_node = None
+        self.__register()
 
-    def __registerItemTipsBoxUI(self):
-        uiNode = _clientApi.GetUI(_NAMESPACE, _UI_NAME_ITEM_TIPS_BOX)
-        if uiNode:
-            self._itemTipsBoxNode = uiNode
+    def __register(self):
+        node = api.GetUI(_NAMESPACE, _UI_NAME_ITEM_TIPS_BOX)
+        if node:
+            self._item_tips_box_node = node
         else:
-            _clientApi.RegisterUI(
+            api.RegisterUI(
                 _NAMESPACE, _UI_NAME_ITEM_TIPS_BOX, _UI_PATH_ITEM_TIPS_BOX, _UI_DEF_ITEM_TIPS_BOX
             )
-            self._itemTipsBoxNode = _clientApi.CreateUI(
+            self._item_tips_box_node = api.CreateUI(
                 _NAMESPACE, _UI_NAME_ITEM_TIPS_BOX, {'isHud': 1, '__cs__': self}
             )
 
-    def ShowItemHoverTipsBox(self, itemDict):
+    def ShowItemHoverTipsBox(self, item_dict):
         """
         显示物品悬浮文本框。
 
         -----
 
-        :param dict itemDict: 物品信息字典
+        :param dict item_dict: 物品信息字典
 
         :return: 无
         :rtype: None
         """
-        self._itemTipsBoxNode.ShowItemHoverTipsBox(itemDict)
+        self._item_tips_box_node.ShowItemHoverTipsBox(item_dict)
 
     def ShowTipsBox(self, text):
         """
@@ -123,7 +113,7 @@ class ItemTipsBox(_ScreenNode):
         :return: 无
         :rtype: None
         """
-        self._itemTipsBoxNode.ShowTipsBox(text)
+        self._item_tips_box_node.ShowTipsBox(text)
 
     def HideTipsBox(self):
         """
@@ -134,53 +124,53 @@ class ItemTipsBox(_ScreenNode):
         :return: 无
         :rtype: None
         """
-        self._itemTipsBoxNode.HideTipsBox()
+        self._item_tips_box_node.HideTipsBox()
 
 
 class _ItemTipsBoxUI(_ScreenNode):
     def __init__(self, namespace, name, param):
         super(_ItemTipsBoxUI, self).__init__(namespace, name, param)
-        self.alphaTick = 0
-        self.tipsImg = None
-        self.tipsPanel = None
-        self.tipsLabel = None
+        self.alpha_tick = 0
+        self.tips_img = None
+        self.tips_panel = None
+        self.tips_label = None
         self.timer1 = None
         self.timer2 = None
 
     def Create(self):
-        self.tipsLabel = self.GetBaseUIControl(_UI_PATH_TIPS_LABEL).asLabel()
-        self.tipsPanel = self.GetBaseUIControl(_UI_PATH_TIPS)
-        self.tipsImg = self.GetBaseUIControl(_UI_PATH_TIPS_IMAGE).asImage()
+        self.tips_label = self.GetBaseUIControl(_UI_PATH_TIPS_LABEL).asLabel()
+        self.tips_panel = self.GetBaseUIControl(_UI_PATH_TIPS)
+        self.tips_img = self.GetBaseUIControl(_UI_PATH_TIPS_IMAGE).asImage()
         self.SetScreenVisible(False)
 
     def Update(self):
         # tips透明度动画
-        if self.alphaTick:
-            self.alphaTick -= 1
-            alpha = self.alphaTick / 30.0
-            self.tipsImg.SetAlpha(alpha)
-            self.tipsLabel.SetAlpha(alpha)
+        if self.alpha_tick:
+            self.alpha_tick -= 1
+            alpha = self.alpha_tick / 30.0
+            self.tips_img.SetAlpha(alpha)
+            self.tips_label.SetAlpha(alpha)
 
     # ========================================= Basic Function =========================================================
 
-    def ShowItemHoverTipsBox(self, itemDict):
-        if _is_empty_item(itemDict):
+    def ShowItemHoverTipsBox(self, item_dict):
+        if _is_empty_item(item_dict):
             return
-        name = itemDict['newItemName']
-        aux = itemDict.get('newAuxValue', 0)
+        name = item_dict['newItemName']
+        aux = item_dict.get('newAuxValue', 0)
         if aux == -1:
             aux = 0
-        userData = itemDict.get('userData')
-        text = _LvComp.Item.GetItemFormattedHoverText(name, aux, True, userData)
+        user_data = item_dict.get('userData')
+        text = _LvComp.Item.GetItemFormattedHoverText(name, aux, True, user_data)
         self.ShowTipsBox(text)
 
     def ShowTipsBox(self, text):
         # 显示文本框
         self.SetScreenVisible(True)
-        self.alphaTick = 0
-        self.tipsImg.SetAlpha(1.0)
-        self.tipsLabel.SetAlpha(1.0)
-        self.tipsLabel.SetText(text)
+        self.alpha_tick = 0
+        self.tips_img.SetAlpha(1.0)
+        self.tips_label.SetAlpha(1.0)
+        self.tips_label.SetText(text)
         # 取消正在执行的timer
         if self.timer1:
             _LvComp.Game.CancelTimer(self.timer1)
@@ -188,7 +178,7 @@ class _ItemTipsBoxUI(_ScreenNode):
             _LvComp.Game.CancelTimer(self.timer2)
         # 一秒后执行渐出动画
         def func1():
-            self.alphaTick = 30
+            self.alpha_tick = 30
             self.timer1 = None
         self.timer1 = _LvComp.Game.AddTimer(1, func1)
         # 两秒后隐藏文本框并恢复初始状态
@@ -204,9 +194,9 @@ class _ItemTipsBoxUI(_ScreenNode):
         if self.timer2:
             _LvComp.Game.CancelTimer(self.timer2)
             self.timer2 = None
-        self.alphaTick = 0
-        self.tipsImg.SetAlpha(1.0)
-        self.tipsLabel.SetAlpha(1.0)
+        self.alpha_tick = 0
+        self.tips_img.SetAlpha(1.0)
+        self.tips_label.SetAlpha(1.0)
         self.SetScreenVisible(False)
 
 

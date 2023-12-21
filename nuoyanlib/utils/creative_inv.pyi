@@ -17,31 +17,15 @@
 # ====================================================
 
 
-class ConfigError(Exception):
-    def __str__(self) -> str: ...
+from typing import List, Dict
 
 
-class ClientNotFoundError(Exception):
-    def __str__(self) -> str: ...
+CONSTRUCTION: List[Dict[str, ...]]
+EQUIPMENT: List[Dict[str, ...]]
+ITEMS: List[Dict[str, ...]]
+NATURE: List[Dict[str, ...]]
+SEARCH: List[Dict[str, ...]]
 
 
-class ServerNotFoundError(Exception):
-    def __str__(self) -> str: ...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def _remove_useless(item_list: List[Dict[str, ...]]) -> None: ...
+def _stack_to_search() -> None: ...

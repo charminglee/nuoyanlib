@@ -34,13 +34,13 @@ nuoyanScreenNode
 
 
 from functools import wraps as _wraps
-import mod.client.extraClientApi as _clientApi
+import mod.client.extraClientApi as api
 from ...config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME
 from ..setting import (
     read_setting as _read_setting,
     save_setting as _save_setting,
 )
-from uiutils import get_parent_path as _get_parent_path
+from ui_utils import get_parent_path as _get_parent_path
 from ...config import (
     MOD_NAME as _MOD_NAME,
     CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
@@ -152,7 +152,7 @@ def notify_server(func):
         ret = func(self, args)
         if ('cancelNotify' in args and args['cancelNotify']) or ret == -1:
             return ret
-        cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
+        cs = api.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if cs:
             args['__name__'] = func.__name__
             cs.NotifyToServer("_ButtonCallbackTriggered", args)
@@ -206,7 +206,7 @@ class NuoyanScreenNode(_ScreenNode):
     def __init__(self, namespace, name, param):
         # noinspection PySuperArguments
         super(NuoyanScreenNode, self).__init__(namespace, name, param)
-        self.cs = _clientApi.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
+        self.cs = api.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if not self.cs:
             raise _ClientNotFoundError
         self.screenSize = _LvComp.Game.GetScreenSize()

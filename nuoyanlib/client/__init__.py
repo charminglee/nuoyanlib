@@ -19,7 +19,7 @@
 
 from client_system import *
 from comp import *
-from effector import *
+from effect import *
 from player import *
 from setting import *
 from sound import *

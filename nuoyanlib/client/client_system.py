@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2023-12-21
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _clientApi
+import mod.client.extraClientApi as api
 from ..config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from ..utils.utils import is_method_overridden as _is_method_overridden
 from comp import (
@@ -38,13 +38,15 @@ __all__ = [
 ]
 
 
-_PATH = __file__.replace(".py", "").replace("/", ".") if "/" in __file__ else __file__
+_PATH = __file__.replace(".py", "").replace("/", ".")
 _UI_NAMESPACE_GAME_TICK = "_GameTick"
 _UI_PATH_GAME_TICK = _PATH + "._GameTick"
 _UI_DEF_GAME_TICK = "_GameTick.main"
 
 
 ALL_CLIENT_ENGINE_EVENTS = {
+    "ModBlockEntityTickClientEvent",
+    "ModBlockEntityRemoveClientEvent",
     "AchievementButtonMovedClientEvent",
     "OnKeyboardControllerLayoutChangeClientEvent",
     "OnGamepadControllerLayoutChangeClientEvent",
@@ -249,6 +251,62 @@ class NuoyanClientSystem(_ClientSystem):
 
     # ======================================= Engine Event Callback ==========================================
 
+    def ModBlockEntityTickClientEvent(self, args):
+        """
+        *[event]*
+
+        客户端自定义方块实体tick事件。
+
+        只有client_tick字段为true的自定义方块实体才能触发该事件（见 `自定义方块实体 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93.html>`_）。
+
+        目前客户端实体tick范围为硬编码，范围为玩家为中心的等腰等斜边八边形，其中斜边长度为5，非斜边长度为3。
+
+        -----
+
+        【posX: int】 自定义方块实体的位置X
+
+        【posY: int】 自定义方块实体的位置Y
+
+        【posZ: int】 自定义方块实体的位置Z
+
+        【dimensionId: int】 维度ID
+
+        【blockName: str】 方块的identifier，包含命名空间及名称
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def ModBlockEntityRemoveClientEvent(self, args):
+        """
+        *[event]*
+
+        客户端自定义方块实体卸载时触发。
+
+        -----
+
+        【posX: int】 自定义方块实体的位置X
+
+        【posY: int】 自定义方块实体的位置Y
+
+        【posZ: int】 自定义方块实体的位置Z
+
+        【dimensionId: int】 维度ID
+
+        【blockName: str】 方块的identifier，包含命名空间及名称
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
     def AchievementButtonMovedClientEvent(self, args):
         """
         *[event]*
@@ -434,6 +492,8 @@ class NuoyanClientSystem(_ClientSystem):
         -----
 
         【screenName: str】 UI名字
+
+        【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
 
         -----
 
@@ -897,6 +957,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         【screenName: str】 UI名字
 
+        【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
+
         -----
 
         :param dict args: 参数字典，参数解释见上方
@@ -910,10 +972,14 @@ class NuoyanClientSystem(_ClientSystem):
         *[event]*
 
         screen移除触发。
+
+        screenName为正在弹出的Screen名，如果需要获取下一个Screen可使用PopScreenAfterClientEvent。
         
         -----
 
         【screenName: str】 UI名字
+
+        【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
 
         -----
 
@@ -945,11 +1011,11 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        点击快捷栏和背包栏的物品槽时触发。
+        点击快捷栏、背包栏、盔甲栏、副手栏的物品槽时触发。
         
         -----
 
-        【slotIndex: int】 点击的物品槽的编号
+        【slotIndex: int】 点击的物品槽的编号，编号对应位置详见 `物品栏 <https://minecraft.fandom.com/zh/wiki/%E7%89%A9%E5%93%81%E6%A0%8F>`_
 
         -----
 
@@ -2710,20 +2776,20 @@ class NuoyanClientSystem(_ClientSystem):
         :return: UI类实例
         :rtype: _ScreenNode
         """
-        node = _clientApi.GetUI(_MOD_NAME, namespace)
+        node = api.GetUI(_MOD_NAME, namespace)
         if node:
             return node
-        _clientApi.RegisterUI(_MOD_NAME, namespace, cls_path, ui_screen_def)
+        api.RegisterUI(_MOD_NAME, namespace, cls_path, ui_screen_def)
         if not param:
             param = {'isHud': 1, '__cs__': self}
         else:
             param['__cs__'] = self
-        return _clientApi.CreateUI(_MOD_NAME, namespace, param)
+        return api.CreateUI(_MOD_NAME, namespace, param)
 
     # ========================================= Internal Method ==============================================
 
     def _set_print_log(self):
-        _clientApi.SetMcpModLogCanPostDump(True)
+        api.SetMcpModLogCanPostDump(True)
 
     @client_listener
     def _SetQueryCache(self, args):

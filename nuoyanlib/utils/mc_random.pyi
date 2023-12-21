@@ -12,13 +12,16 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2023-11-30
 #
 # ====================================================
 
 
 from typing import Optional, Tuple, Dict, Callable, Sequence, Any, Union, List
 from random import Random
+
+
+_LEVEL_ID: str
 
 
 def _is_client() -> bool: ...

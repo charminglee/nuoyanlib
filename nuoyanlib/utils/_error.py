@@ -12,14 +12,11 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2023-11-30
 #
 # ====================================================
 
 
-from traceback import format_exc as _format_exc
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
 from ..config import (
     MOD_NAME as _MOD_NAME,
     CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
@@ -28,42 +25,10 @@ from ..config import (
 
 
 __all__ = [
-    "print_error",
     "ConfigError",
     "ClientNotFoundError",
     "ServerNotFoundError",
 ]
-
-
-def _notify_message(m):
-    if _clientApi.GetLocalPlayerId() == "-1":
-        _serverApi.GetEngineCompFactory().CreateGame(_serverApi.GetLevelId()).SetNotifyMsg(m)
-    else:
-        _clientApi.GetEngineCompFactory().CreateTextNotifyClient(_clientApi.GetLevelId()).SetLeftCornerNotify(m)
-
-
-def print_error(modName=""):
-    """
-    打印错误信息。
-    
-    -----
-
-    :param str modName: 模组名称，默认为空字符串
-
-    :return: 无
-    :rtype: None
-    """
-    if modName:
-        modName = "[%s] " % modName
-    errorInfo = _format_exc()
-    errorLine = errorInfo.split("\n")
-    for i in range(len(errorLine)):
-        error = errorLine[i]
-        if not i:
-            text = ("§4§l%s运行出错！请将以下错误代码截图并向作者反馈：\n§r" % modName) + error
-        else:
-            text = error
-        _notify_message(text)
 
 
 class ConfigError(Exception):

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-27
+#   Last Modified : 2023-12-16
 #
 # ====================================================
 
@@ -31,7 +31,7 @@ def pos_distance_to_line(
 ) -> float: ...
 def _is_client() -> bool: ...
 def _get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...
-def floor_pos(pos: Tuple[float, float, float]) -> Tuple[int, int, int]: ...
+def pos_floor(pos: Tuple[float, float, float]) -> Tuple[int, int, int]: ...
 def pos_distance(
     first_point: Tuple[float, float, float],
     second_point: Tuple[float, float, float],
@@ -48,7 +48,7 @@ def to_screen_pos(
     ui_size: int,
     player_rot: float,
 ) -> Optional[Tuple[float, float]]: ...
-def rotate_pos(angle: float, pos: Tuple[float, float]) -> Optional[Tuple[float, float]]: ...
+def pos_rotate(angle: float, pos: Tuple[float, float]) -> Optional[Tuple[float, float]]: ...
 def straight_pos_list(
     pos1: Tuple[float, float, float],
     pos2: Tuple[float, float, float],

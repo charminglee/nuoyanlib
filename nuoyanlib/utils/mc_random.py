@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2023-11-30
 #
 # ====================================================
 
@@ -27,8 +27,8 @@ from string import (
     ascii_lowercase as _ascii_lowercase,
     ascii_uppercase as _ascii_uppercase,
 )
-import mod.client.extraClientApi as _clientApi
-import mod.server.extraServerApi as _serverApi
+import mod.client.extraClientApi as client_api
+import mod.server.extraServerApi as server_api
 from calculator import pos_distance as _pos_distance
 
 
@@ -40,7 +40,10 @@ __all__ = [
 
 
 def _is_client():
-    return _clientApi.GetLocalPlayerId() != "-1"
+    return client_api.GetLocalPlayerId() != "-1"
+
+
+_LEVEL_ID = client_api.GetLevelId() or server_api.GetLevelId()
 
 
 def random_pos(center_pos, grid, use_top_height=False, dimension=0):
@@ -64,8 +67,7 @@ def random_pos(center_pos, grid, use_top_height=False, dimension=0):
     x = center_pos[0] + ran_x
     z = center_pos[2] + ran_z
     if use_top_height and not _is_client():
-        level_id = _serverApi.GetLevelId()
-        y = _serverApi.GetEngineCompFactory().CreateBlockInfo(level_id).GetTopBlockHeight(
+        y = server_api.GetEngineCompFactory().CreateBlockInfo(_LEVEL_ID).GetTopBlockHeight(
             (x, z), dimension
         )
         if y is not None:
