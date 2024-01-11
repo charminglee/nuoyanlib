@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2023-12-24
 #
 # ====================================================
 
@@ -255,25 +255,8 @@ class NuoyanScreenNode(_ScreenNode):
                 if ui:
                     ui.SetPosition(tuple(pos))
 
-    def Update(self):
-        """
-        *[tick]* *[event]*
-
-        客户端每帧调用，1秒有30帧。
-
-        若重写该方法，请调用一次NuoyanScreenNode的同名方法，否则部分功能将不可用。如：
-
-        >>> class MyUI(NuoyanScreenNode):
-        ...     def __init__(self, namespace, name, param):
-        ...         pass
-        ...     def Update(self):
-        ...         super(MyUI, self).Update()  # 或者：NuoyanScreenNode.Update(self)
-
-        -----
-
-        :return: 无
-        :rtype: None
-        """
+    @ui_listener("OnScriptTickClient")
+    def _onTick(self):
         if self.__doubleClickTick:
             self.__doubleClickTick += 1
             if self.__doubleClickTick == 11:
@@ -285,6 +268,33 @@ class NuoyanScreenNode(_ScreenNode):
                 btnData['longClickFunc'](self._touchingButtonArgs)
                 btnData['hasLongClicked'] = True
                 self._vibrate()
+        self.OnTick()
+
+    def OnTick(self):
+        """
+        *[tick]* *[event]*
+
+        客户端每帧调用，1秒有30帧。
+
+        -----
+
+        :return: 无
+        :rtype: None
+        """
+
+    def Update(self):
+        """
+        *[tick]* *[event]*
+
+        客户端每帧调用。
+
+        注意：在2.10及以上版本中，该方法的触发频率与游戏实时帧率同步。在2.10以下版本中，触发频率为固定的每秒钟30次。
+
+        -----
+
+        :return: 无
+        :rtype: None
+        """
 
     def Destroy(self):
         """
@@ -442,7 +452,7 @@ class NuoyanScreenNode(_ScreenNode):
             'associatedPath': associatedPath,
             'touchMoveCallback': touchMoveCallback,
             'longClickFunc': longClickFunc,
-            'touchDownFunc': touchDownFunc
+            'touchDownFunc': touchDownFunc,
         }
         return btn
 
@@ -480,9 +490,9 @@ class NuoyanScreenNode(_ScreenNode):
             'touchCancelFunc': touchCancelFunc
         }
         btn = self.GetBaseUIControl(btnPath).asButton()
-        btn.SetButtonTouchMoveOutCallback(self._onTouchCancel)
+        btn.SetButtonTouchMoveOutCallback(self._onTouchMoveOut)
         btn.SetButtonTouchDownCallback(self._onTouchDown)
-        btn.SetButtonTouchCancelCallback(self._onTouchMoveOut)
+        btn.SetButtonTouchCancelCallback(self._onTouchCancel)
         btn.SetButtonTouchUpCallback(self._runTouchUpList)
         if btnPath not in self._btnTouchUpCallbackData:
             self._btnTouchUpCallbackData[btnPath] = []
