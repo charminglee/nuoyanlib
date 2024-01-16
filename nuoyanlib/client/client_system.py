@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-12-21
+#   Last Modified : 2024-01-14
 #
 # ====================================================
 
@@ -193,6 +193,21 @@ def client_listener(event_name="", namespace="", system_name="", priority=0):
         return decorator
 
 
+def _listen_custom(self):
+    for args in _lsn_func_args:
+        func = args[3]
+        method = getattr(self, func.__name__, None)
+        if method and method.__func__ is func:
+            self.ListenForEvent(args[0], args[1], args[2], self, method, args[4])
+
+
+def _listen_engine(self):
+    for event in ALL_CLIENT_ENGINE_EVENTS:
+        if _is_method_overridden(self.__class__, NuoyanClientSystem, event):
+            func = getattr(self, event)
+            self.ListenForEvent(_CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, event, self, func)
+
+
 class NuoyanClientSystem(_ClientSystem):
     """
     ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。
@@ -214,7 +229,8 @@ class NuoyanClientSystem(_ClientSystem):
         self.__game_tick_node = None
         self._ui_init_finished = False
         self.__handle = 0
-        self.__listen()
+        _listen_custom(self)
+        _listen_engine(self)
         self._check_on_game_tick()
         self._set_print_log()
 
@@ -249,7 +265,7 @@ class NuoyanClientSystem(_ClientSystem):
         :rtype: None
         """
 
-    # ======================================= Engine Event Callback ==========================================
+    # ============================================ Engine Event Callback ===============================================
 
     def ModBlockEntityTickClientEvent(self, args):
         """
@@ -2647,7 +2663,7 @@ class NuoyanClientSystem(_ClientSystem):
         :rtype: None
         """
 
-    # ======================================== New Event Callback ============================================
+    # ============================================= New Event Callback =================================================
 
     def OnGameTick(self):
         """
@@ -2669,7 +2685,7 @@ class NuoyanClientSystem(_ClientSystem):
         :rtype: None
         """
 
-    # ========================================== Basic Function ==============================================
+    # ============================================= New Interface ======================================================
 
     def SetQueryVar(self, entity_id, name, value, sync=True):
         """
@@ -2690,7 +2706,7 @@ class NuoyanClientSystem(_ClientSystem):
         :rtype: None
         """
         data = {'entity_id': entity_id, 'name': name, 'value': value}
-        self._SetQueryVar(data)
+        _transit_sys._SetQueryVar(data)
         if sync:
             self.NotifyToServer("_SetQueryVar", data)
 
@@ -2786,40 +2802,17 @@ class NuoyanClientSystem(_ClientSystem):
             param['__cs__'] = self
         return api.CreateUI(_MOD_NAME, namespace, param)
 
-    # ========================================= Internal Method ==============================================
+    # ============================================== Internal Method ===================================================
+
+    @client_listener("UiInitFinished")
+    def _UiInitFinished(self, args):
+        self.NotifyToServer("UiInitFinished", {})
+        self._ui_init_finished = True
+        if self.__handle == 1:
+            self._listen_client_game_tick()
 
     def _set_print_log(self):
         api.SetMcpModLogCanPostDump(True)
-
-    @client_listener
-    def _SetQueryCache(self, args):
-        for entity_id, queries in args.items():
-            for name, value in queries.items():
-                comp = _CompFactory.CreateQueryVariable(entity_id)
-                if comp.Get(name) == -1.0:
-                    comp.Register(name, 0.0)
-                comp.Set(name, value)
-
-    @client_listener
-    def _SetQueryVar(self, args):
-        entity_id = args['entity_id']
-        name = args['name']
-        value = args['value']
-        if '__id__' in args and args['__id__'] == _PLAYER_ID:
-            return
-        comp = _CompFactory.CreateQueryVariable(entity_id)
-        if comp.Get(name) == -1.0:
-            comp.Register(name, 0.0)
-        comp.Set(name, value)
-
-    @client_listener
-    def _ListenServerGameTick(self, args):
-        if self._ui_init_finished:
-            if not self.__game_tick_node:
-                self._start_game_tick()
-            self.__game_tick_node.notify_sv = True
-        else:
-            self.__handle = 2
 
     def _listen_client_game_tick(self):
         if self._ui_init_finished:
@@ -2830,53 +2823,53 @@ class NuoyanClientSystem(_ClientSystem):
             self.__handle = 1
 
     def _start_game_tick(self):
-        self.__game_tick_node = self.RegisterAndCreateUI(
-            _UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK
-        )
+        self.__game_tick_node = self.RegisterAndCreateUI(_UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)
 
     def _check_on_game_tick(self):
         if _is_method_overridden(self.__class__, NuoyanClientSystem, "OnGameTick"):
             self._listen_client_game_tick()
-
-    @client_listener("UiInitFinished")
-    def _UiInitFinished(self, args):
-        self.NotifyToServer("UiInitFinished", {})
-        self._ui_init_finished = True
-        if self.__handle == 1:
-            self._listen_client_game_tick()
-        elif self.__handle == 2:
-            self._ListenServerGameTick(None)
-
-    def __listen(self):
-        for args in _lsn_func_args:
-            func = args[3]
-            method = getattr(self, func.__name__, None)
-            if method and method.__func__ is func:
-                self.ListenForEvent(args[0], args[1], args[2], self, method, args[4])
-        for event in ALL_CLIENT_ENGINE_EVENTS:
-            if _is_method_overridden(self.__class__, NuoyanClientSystem, event):
-                func = getattr(self, event)
-                self.ListenForEvent(_CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, event, self, func)
 
 
 class _GameTick(_ScreenNode):
     def __init__(self, namespace, name, param):
         super(_GameTick, self).__init__(namespace, name, param)
         self.cs = param['__cs__']
-        self.notify_sv = False
         self.notify_cln = False
 
     @_ViewBinder.binding(_ViewBinder.BF_BindString, "#main.gametick")
     def OnGameTick(self):
-        if self.notify_sv:
-            self.cs.NotifyToServer("OnGameTick", {})
         if self.notify_cln:
             self.cs.OnGameTick()
 
 
+class _TransitClientSystem(_ClientSystem):
+    def __init__(self, namespace, system_name):
+        super(_TransitClientSystem, self).__init__(namespace, system_name)
+        _listen_custom(self)
+
+    @client_listener(namespace="NuoyanLib", system_name="_TransitServerSystem")
+    def _SetQueryCache(self, args):
+        for entity_id, queries in args.items():
+            for name, value in queries.items():
+                comp = _CompFactory.CreateQueryVariable(entity_id)
+                if comp.Get(name) == -1.0:
+                    comp.Register(name, 0.0)
+                comp.Set(name, value)
+
+    @client_listener(namespace="NuoyanLib", system_name="_TransitServerSystem")
+    def _SetQueryVar(self, args):
+        entity_id = args['entity_id']
+        name = args['name']
+        value = args['value']
+        if args.get('__id__') == _PLAYER_ID:
+            return
+        comp = _CompFactory.CreateQueryVariable(entity_id)
+        if comp.Get(name) == -1.0:
+            comp.Register(name, 0.0)
+        comp.Set(name, value)
 
 
-
+_transit_sys = _TransitClientSystem("NuoyanLib", "_TransitClientSystem")
 
 
 

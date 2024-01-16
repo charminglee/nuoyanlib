@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-01-11
 #
 # ====================================================
 
@@ -85,6 +85,9 @@ from mod.server.component.modAttrCompServer import ModAttrComponentServer
 from mod.server.component.exDataCompServer import ExDataCompServer
 from mod.server.component.blockUseEventWhiteListCompServer import BlockUseEventWhiteListComponentServer
 from mod.server.component.actorLootCompServer import ActorLootComponentServer
+from mod.server.component.blockEntityCompServer import BlockEntityCompServer
+from mod.server.component.aiCommandCompServer import AiCommandComponentServer
+from mod.server.component.entityDefinitionsCompServer import EntityDefinitionsCompServer
 
 
 SERVER_ENGINE_NAMESPACE: str
@@ -100,6 +103,9 @@ class _CompDescr(object):
 
 
 class _CompPool(object):
+    EntityDefinitions: EntityDefinitionsCompServer
+    AiCommand: AiCommandComponentServer
+    BlockEntity: BlockEntityCompServer
     Loot: LootComponentServer
     Interact: InteractComponentServer
     Feature: FeatureCompServer

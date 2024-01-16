@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2024-01-15
 #
 # ====================================================
 
@@ -23,39 +23,18 @@ from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
 from mod.client.ui.viewBinder import ViewBinder
 
 
-_PATH: str
-_NAMESPACE: str
-_UI_NAME_ITEM_FLY_ANIM: str
-_UI_PATH_ITEM_FLY_ANIM: str
-_UI_DEF_ITEM_FLY_ANIM: str
-_UI_PATH_FLY_ITEM_1: str
-_UI_PATH_FLY_ITEM_2: str
+_ITEM_FLY_PANEL_NAME: str
+_UI_NAME_ITEM_FLY_PANEL: str
+_UI_PATH_FLY_ITEM_0: str
 
 
 class ItemFlyAnim(ScreenNode):
-    _item_fly_anim_node: _ItemFlyAnimUI
-    def __init__(self, namespace: str, name: str, param: dict) -> None: ...
-    def __register(self) -> None: ...
-    def SetOneItemFlyAnim(
-        self,
-        item_dict: dict,
-        from_pos: Tuple[float, float],
-        to_pos: Tuple[float, float],
-        ui_size: Union[float, Tuple[float, float]],
-    ) -> None: ...
-    def SetItemsFlyAnim(
-        self,
-        data: List[Dict[str, Union[dict, Tuple[float, float], float]]],
-    ) -> None: ...
-
-
-class _ItemFlyAnimUI(ScreenNode):
-    item_fly_queue: Dict[str, Union[float, int, ItemRendererUIControl]]
-    fly_ir: List[ItemRendererUIControl]
-    def __init__(self, namespace: str, name: str, param: dict) -> None: ...
+    _item_fly_queue: Dict[int, Dict[str, Union[float, int, ItemRendererUIControl]]]
+    _fly_ir: List[ItemRendererUIControl]
+    def __init__(self, namespace: str, name: str, param: Optional[dict]) -> None: ...
     def Create(self) -> None: ...
     @ViewBinder.binding(ViewBinder.BF_BindString, "#main.gametick")
-    def OnGameTick(self) -> None: ...
+    def _OnGameTick(self) -> None: ...
     def _clone_new_ir(self) -> Optional[ItemRendererUIControl]: ...
     def _get_idle_ir_index(self) -> int: ...
     def SetOneItemFlyAnim(
@@ -67,18 +46,5 @@ class _ItemFlyAnimUI(ScreenNode):
     ) -> None: ...
     def SetItemsFlyAnim(
         self,
-        data: List[Dict[str, Union[dict, Tuple[float, float], float]]]
+        data: List[Dict[str, Union[dict, Tuple[float, float], float]]],
     ) -> None: ...
-
-
-
-
-
-
-
-
-
-
-
-
-

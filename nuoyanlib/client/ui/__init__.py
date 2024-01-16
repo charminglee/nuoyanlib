@@ -20,5 +20,5 @@
 from item_fly_anim import *
 from itemGridManager import *
 from item_tips_box import *
-from nuoyanScreenNode import *
+from screen_node import *
 from ui_utils import *

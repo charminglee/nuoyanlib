@@ -12,19 +12,9 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-01-14
 #
 # ====================================================
-
-
-"""
-
-clientComps
-===========
-
-该模块提供了使用存档ID（Level Id）和本地玩家ID创建客户端组件的快捷方法，同时，还提供了一些常用的变量，直接导入即可使用，无需再使用接口获取，节省了大量编写代码的时间。
-
-"""
 
 
 import mod.client.extraClientApi as api

@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2024-01-17
 #
 # ====================================================
 
 
-from typing import Tuple, List, Optional, Dict, Union
+from typing import Tuple, List, Optional, Union
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
@@ -29,8 +29,8 @@ _LEVEL_ID: str
 
 def item_dict(
     newItemName: str,
-    newAuxValue: str,
-    count: str,
+    newAuxValue: str = 0,
+    count: str = 1,
     showInHand: bool = True,
     enchantData: Optional[List[Tuple[int, int]]] = None,
     modEnchantData: Optional[List[Tuple[str, int]]] = None,
@@ -40,7 +40,7 @@ def item_dict(
     durability: int = 0,
     itemName: str = "",
     auxValue: int = 0,
-) -> Dict[str, Union[str, int, bool, dict, list, None]]: ...
+) -> Optional[dict]: ...
 def _is_client() -> bool: ...
 def _get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...
 def get_item_count(player_id: str, name: str, aux: int = -1) -> int: ...

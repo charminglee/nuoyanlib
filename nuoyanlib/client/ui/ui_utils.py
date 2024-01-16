@@ -12,19 +12,9 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2024-01-14
 #
 # ====================================================
-
-
-"""
-
-uiutils
-=======
-
-该模块提供了一些与UI有关的工具函数。
-
-"""
 
 
 from ..comp import ScreenNode as _ScreenNode

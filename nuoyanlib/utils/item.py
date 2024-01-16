@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2024-01-17
 #
 # ====================================================
 
@@ -38,8 +38,8 @@ _AIR = ("minecraft:air", "air")
 
 def item_dict(
         newItemName,
-        newAuxValue,
-        count,
+        newAuxValue=0,
+        count=1,
         showInHand=True,
         enchantData=None,
         modEnchantData=None,
@@ -51,15 +51,15 @@ def item_dict(
         auxValue=0,
 ):
     """
-    构造物品信息字典。利用IDE的参数提示编写物品信息字典，省去了翻越文档的麻烦。
+    构造物品信息字典。
 
-    该函数返回的物品信息字典可直接传入接口使用。
+    利用IDE的参数提示编写物品信息字典，省去了翻阅文档的麻烦。该函数返回的物品信息字典可直接传入接口使用。
 
     -----
 
     :param str newItemName: 必须设置，物品的identifier，即"命名空间:物品名"
-    :param int newAuxValue: 必须设置，物品附加值
-    :param int count: 必须设置，物品数量，设置为0时为空物品
+    :param int newAuxValue: 可选，物品附加值，默认为0
+    :param int count: 可选，物品数量，设置为0时为空物品，默认为1
     :param bool showInHand: 可选，是否显示在手上，默认为True
     :param list[tuple[int, int]]|None enchantData: 可选，附魔数据，类型为列表，列表中每个元素为元组：( `附魔类型 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EnchantType.html>`_, 附魔等级)
     :param list[tuple[str,int]]|None modEnchantData: 可选，自定义附魔数据，类型为列表，列表中每个元素为元组：(自定义附魔id, 自定义附魔等级)
@@ -71,8 +71,10 @@ def item_dict(
     :param str auxValue: （废弃）1.22及以前版本的旧物品附加值，详见 `1.23版本物品id变更 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/13-%E6%A8%A1%E7%BB%84SDK%E7%BC%96%E7%A8%8B/2-Python%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91/99-1.23%E7%89%88%E6%9C%AC%E7%89%A9%E5%93%81id%E5%8F%98%E6%9B%B4.html>`_
 
     :return: 物品信息字典
-    :rtype: dict[str, str|int|bool|dict|list|None]
+    :rtype: dict
     """
+    if not newItemName or count == 0:
+        return None
     if not itemName:
         del itemName, auxValue
     if not enchantData:

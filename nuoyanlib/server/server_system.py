@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-12-21
+#   Last Modified : 2024-01-14
 #
 # ====================================================
 
@@ -204,12 +204,6 @@ ALL_SERVER_ENGINE_EVENTS = {
 _lsn_func_args = []
 
 
-def _add_listener(func, event_name="", namespace=_MOD_NAME, system_name=_CLIENT_SYSTEM_NAME, priority=0):
-    if not event_name:
-        event_name = func.__name__
-    _lsn_func_args.append((namespace, system_name, event_name, func, priority))
-
-
 def server_listener(event_name="", namespace="", system_name="", priority=0):
     """
     函数装饰器，通过对函数进行装饰即可实现监听。
@@ -248,6 +242,27 @@ def server_listener(event_name="", namespace="", system_name="", priority=0):
         return decorator
 
 
+def _add_listener(func, event_name="", namespace=_MOD_NAME, system_name=_CLIENT_SYSTEM_NAME, priority=0):
+    if not event_name:
+        event_name = func.__name__
+    _lsn_func_args.append((namespace, system_name, event_name, func, priority))
+
+
+def _listen_custom(self):
+    for args in _lsn_func_args:
+        func = args[3]
+        method = getattr(self, func.__name__, None)
+        if method and method.__func__ is func:
+            self.ListenForEvent(args[0], args[1], args[2], self, method, args[4])
+
+
+def _listen_engine(self):
+    for event in ALL_SERVER_ENGINE_EVENTS:
+        if _is_method_overridden(self.__class__, NuoyanServerSystem, event):
+            func = getattr(self, event)
+            self.ListenForEvent(_SERVER_ENGINE_NAMESPACE, _SERVER_ENGINE_SYSTEM_NAME, event, self, func)
+
+
 class NuoyanServerSystem(_ServerSystem):
     """
     ServerSystem扩展类。将自定义ServerSystem继承本类即可使用本类的全部功能。
@@ -265,12 +280,9 @@ class NuoyanServerSystem(_ServerSystem):
         # noinspection PySuperArguments
         super(NuoyanServerSystem, self).__init__(namespace, system_name)
         self.all_player_data = {}
-        self._listen_game_tick = False
         self.homeowner_player_id = "-1"
-        self._items_data = {}
-        self._query_cache = {}
-        self.__listen()
-        self._check_on_game_tick()
+        _listen_custom(self)
+        _listen_engine(self)
         self._set_print_log()
 
     def Destroy(self):
@@ -302,7 +314,7 @@ class NuoyanServerSystem(_ServerSystem):
         :rtype: None
         """
 
-    # ==================================== Engine Event Callback =============================================
+    # ========================================= Engine Event Callback ==================================================
 
     def PlayerHungerChangeServerEvent(self, args):
         """
@@ -4740,7 +4752,7 @@ class NuoyanServerSystem(_ServerSystem):
         :rtype: None
         """
 
-    # ====================================== New Event Callback ==============================================
+    # =========================================== New Event Callback ===================================================
 
     def UiInitFinished(self, args):
         """
@@ -4760,30 +4772,24 @@ class NuoyanServerSystem(_ServerSystem):
         :rtype: None
         """
 
-    @server_listener
-    def OnGameTick(self, args):
+    # ============================================= New Interface ======================================================
+
+    def SyncItemsToItemGrid(self, player_id, namespace, keys):
         """
-        *[tick]* *[event]*
-
-        触发帧率与房主玩家的游戏实时帧率同步的Tick事件。比如房主的游戏帧率为60帧，则该事件每秒触发60次。
-
-        需要注意的是，因为受游戏帧率影响，该事件的触发帧率并不稳定。
-
-        如果没有特殊需求，建议使用OnScriptTickServer事件。
+        立即同步一次玩家的物品信息给客户端的ItemGrid。
 
         -----
 
-        无参数
-
-        -----
-
-        :param dict args: 参数字典，参数解释见上方
+        :param str player_id: 玩家的实体ID
+        :param str namespace: UI类名
+        :param str|tuple[str,...] keys: 要同步的网格的key，多个网格请使用元组
 
         :return: 无
         :rtype: None
         """
-
-    # ======================================= Basic Function =================================================
+        if isinstance(keys, str):
+            keys = (keys,)
+        _transit_sys._SyncItems({'__id__': player_id, 'namespace': namespace, 'keys': keys})
 
     def SetQueryVar(self, entity_id, name, value):
         """
@@ -4800,7 +4806,7 @@ class NuoyanServerSystem(_ServerSystem):
         :return: 无
         :rtype: None
         """
-        self._SetQueryVar({'entity_id': entity_id, 'name': name, 'value': value})
+        _transit_sys._SetQueryVar({'entity_id': entity_id, 'name': name, 'value': value})
 
     def CallClient(self, player_id, name, callback=None, *args):
         """
@@ -4817,20 +4823,11 @@ class NuoyanServerSystem(_ServerSystem):
         :rtype: None
         """
 
-    # ====================================== Internal Method =================================================
+    @property
+    def item_grid_data(self):
+        return _transit_sys.items_data
 
-    def _set_print_log(self):
-        api.SetMcpModLogCanPostDump(True)
-
-    @server_listener
-    def _SetQueryVar(self, args):
-        entity_id = args['entity_id']
-        name = args['name']
-        value = args['value']
-        if entity_id not in self._query_cache:
-            self._query_cache[entity_id] = {}
-        self._query_cache[entity_id][name] = value
-        self.BroadcastToAllClient("_SetQueryVar", args)
+    # =========================================== Internal Method ======================================================
 
     @server_listener
     def _ButtonCallbackTriggered(self, args):
@@ -4840,18 +4837,69 @@ class NuoyanServerSystem(_ServerSystem):
             func(args)
 
     @server_listener
+    def _BroadcastToAllClient(self, args):
+        event_name = args['event_name']
+        event_data = args['event_data']
+        if isinstance(event_data, dict) and '__id__' in args:
+            event_data['__id__'] = args['__id__']
+        self.BroadcastToAllClient(event_name, event_data)
+
+    @server_listener("UiInitFinished")
+    def _UiInitFinished(self, args):
+        player_id = args['__id__']
+        self.all_player_data[player_id] = {}
+        if self.homeowner_player_id == "-1":
+            self.homeowner_player_id = player_id
+        self.UiInitFinished(args)
+
+    @server_listener("PlayerIntendLeaveServerEvent")
+    def _PlayerIntendLeaveServerEvent(self, args):
+        player_id = args['playerId']
+        if player_id in self.all_player_data:
+            del self.all_player_data[player_id]
+
+    def _set_print_log(self):
+        api.SetMcpModLogCanPostDump(True)
+
+
+class _TransitServerSystem(_ServerSystem):
+    def __init__(self, namespace, system_name):
+        super(_TransitServerSystem, self).__init__(namespace, system_name)
+        self.query_cache = {}
+        self.items_data = {}
+        _listen_custom(self)
+
+    @server_listener
+    def _SetQueryVar(self, args):
+        entity_id = args['entity_id']
+        name = args['name']
+        value = args['value']
+        if entity_id not in self.query_cache:
+            self.query_cache[entity_id] = {}
+        self.query_cache[entity_id][name] = value
+        self.BroadcastToAllClient("_SetQueryVar", args)
+
+    @server_listener
+    def UiInitFinished(self, args):
+        player_id = args['__id__']
+        self.items_data[player_id] = {}
+        if self.query_cache:
+            self.NotifyToClient(player_id, "_SetQueryCache", self.query_cache)
+
+    @server_listener
     def _InitItemGrid(self, args):
         player_id = args['__id__']
         key = args['key']
         count = args['count']
         namespace = args['namespace']
-        self._items_data[player_id][(namespace, key)] = [None] * count
+        if (namespace, key) not in self.items_data[player_id]:
+            self.items_data[player_id][(namespace, key)] = [None] * count
 
     @server_listener
     def _ThrowItem(self, args):
-        item_dict = args
         player_id = args['__id__']
         del args['__id__']
+        item_dict = args
         dim = _CompFactory.CreateDimension(player_id).GetEntityDimensionId()
         pos = _CompFactory.CreatePos(player_id).GetPos()
         if not pos:
@@ -4870,7 +4918,7 @@ class NuoyanServerSystem(_ServerSystem):
         namespace = args['namespace']
         keys = args['keys']
         data = {}
-        for (ns, key), items in self._items_data[player_id].items():
+        for (ns, key), items in self.items_data[player_id].items():
             if ns != namespace or key not in keys:
                 continue
             data[key] = items
@@ -4904,56 +4952,10 @@ class NuoyanServerSystem(_ServerSystem):
                     if item != inv_items[i]
                 })
             else:
-                self._items_data[player_id][(namespace, key)] = items
+                self.items_data[player_id][(namespace, key)] = items
 
-    @server_listener
-    def _BroadcastToAllClient(self, args):
-        event_name = args['event_name']
-        event_data = args['event_data']
-        if isinstance(event_data, dict) and '__id__' in args:
-            event_data['__id__'] = args['__id__']
-        self.BroadcastToAllClient(event_name, event_data)
 
-    @server_listener("UiInitFinished")
-    def _UiInitFinished(self, args):
-        player_id = args['__id__']
-        self.all_player_data[player_id] = {}
-        self._items_data[player_id] = {}
-        if self.homeowner_player_id == "-1":
-            self.homeowner_player_id = player_id
-            if self._listen_game_tick:
-                self.NotifyToClient(self.homeowner_player_id, "_ListenServerGameTick", {})
-        if self._query_cache:
-            self.NotifyToClient(player_id, "_SetQueryCache", self._query_cache)
-        self.UiInitFinished(args)
-
-    def __listen(self):
-        for args in _lsn_func_args:
-            func = args[3]
-            method = getattr(self, func.__name__, None)
-            if method and method.__func__ is func:
-                self.ListenForEvent(args[0], args[1], args[2], self, method, args[4])
-        for event in ALL_SERVER_ENGINE_EVENTS:
-            if _is_method_overridden(self.__class__, NuoyanServerSystem, event):
-                func = getattr(self, event)
-                self.ListenForEvent(_SERVER_ENGINE_NAMESPACE, _SERVER_ENGINE_SYSTEM_NAME, event, self, func)
-
-    def _listen_for_game_tick_event(self):
-        if self._listen_game_tick:
-            return
-        self._listen_game_tick = True
-        if self.homeowner_player_id != "-1":
-            self.NotifyToClient(self.homeowner_player_id, "_ListenServerGameTick", {})
-
-    def _check_on_game_tick(self):
-        if _is_method_overridden(self.__class__, NuoyanServerSystem, "OnGameTick"):
-            self._listen_for_game_tick_event()
-
-    @server_listener("PlayerIntendLeaveServerEvent")
-    def _PlayerIntendLeaveServerEvent(self, args):
-        player_id = args['playerId']
-        if player_id in self.all_player_data:
-            del self.all_player_data[player_id]
+_transit_sys = _TransitServerSystem("NuoyanLib", "_TransitServerSystem")
 
 
 

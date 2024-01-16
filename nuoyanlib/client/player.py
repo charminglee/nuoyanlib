@@ -12,19 +12,9 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-01-14
 #
 # ====================================================
-
-
-"""
-
-player
-======
-
-该模块提供了与本地玩家有关的工具。
-
-"""
 
 
 import mod.client.extraClientApi as api

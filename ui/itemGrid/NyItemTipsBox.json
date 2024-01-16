@@ -1,60 +1,53 @@
 {
-   "main" : {
+   "namespace" : "NyItemTipsBox",
+   "ny_tips_panel" : {
+      "alpha" : 1.0,
+      "anchor_from" : "bottom_middle",
+      "anchor_to" : "bottom_middle",
+      "clip_offset" : [ 0, 0 ],
+      "clips_children" : false,
       "controls" : [
          {
-            "tips_panel" : {
-               "alpha" : 1.0,
-               "anchor_from" : "bottom_middle",
-               "anchor_to" : "bottom_middle",
-               "clip_offset" : [ 0, 0 ],
-               "clips_children" : false,
+            "image" : {
+               "clip_direction" : "left",
+               "clip_ratio" : 0.0,
                "controls" : [
                   {
-                     "image" : {
-                        "clip_direction" : "left",
-                        "clip_ratio" : 0.0,
-                        "controls" : [
-                           {
-                              "label" : {
-                                 "color" : [ 1, 1, 1 ],
-                                 "controls" : [],
-                                 "font_scale_factor" : 1.10,
-                                 "font_type" : "smooth",
-                                 "layer" : 1,
-                                 "max_size" : [ 0, 0 ],
-                                 "min_size" : [ 0, 0 ],
-                                 "offset" : [ 0, 0 ],
-                                 "text" : "物品名称\n物品描述物品描述",
-                                 "type" : "label"
-                              }
-                           }
-                        ],
+                     "label" : {
+                        "color" : [ 1, 1, 1 ],
+                        "controls" : [],
+                        "font_scale_factor" : 1.10,
+                        "font_type" : "smooth",
                         "layer" : 1,
                         "max_size" : [ 0, 0 ],
                         "min_size" : [ 0, 0 ],
                         "offset" : [ 0, 0 ],
-                        "size" : [ "100.0%c+8.0px", "100.0%c+8.0px" ],
-                        "texture" : "textures/ui/purpleBorder",
-                        "type" : "image",
-                        "uv" : [ 0, 0 ],
-                        "uv_size" : [ 0, 0 ]
+                        "text" : "物品名称\n物品描述物品描述",
+                        "type" : "label"
                      }
                   }
                ],
-               "enabled" : true,
-               "layer" : 6000,
+               "layer" : 1,
                "max_size" : [ 0, 0 ],
                "min_size" : [ 0, 0 ],
-               "offset" : [ 0, "-5.0%+0.0px" ],
-               "priority" : 0,
-               "propagate_alpha" : true,
-               "size" : [ "100.0%c+0.0px", "100.0%c+0.0px" ],
-               "type" : "panel",
-               "visible" : true
+               "offset" : [ 0, 0 ],
+               "size" : [ "100.0%c+8.0px", "100.0%c+8.0px" ],
+               "texture" : "textures/ui/purpleBorder",
+               "type" : "image",
+               "uv" : [ 0, 0 ],
+               "uv_size" : [ 0, 0 ]
             }
          }
       ],
-      "type" : "screen"
-   },
-   "namespace" : "NyItemTipsBox"
+      "enabled" : true,
+      "layer" : 9999,
+      "max_size" : [ 0, 0 ],
+      "min_size" : [ 0, 0 ],
+      "offset" : [ 0, "-5.0%+0.0px" ],
+      "priority" : 0,
+      "propagate_alpha" : true,
+      "size" : [ "100.0%c+0.0px", "100.0%c+0.0px" ],
+      "type" : "panel",
+      "visible" : true
+   }
 }

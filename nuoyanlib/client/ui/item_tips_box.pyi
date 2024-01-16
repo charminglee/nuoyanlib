@@ -12,11 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2024-01-15
 #
 # ====================================================
 
 
+from typing import Optional
+from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.ui.controls.imageUIControl import ImageUIControl
@@ -24,49 +26,23 @@ from mod.client.ui.controls.labelUIControl import LabelUIControl
 from mod.common.utils.timer import CallLater
 
 
-_PATH: str
-_NAMESPACE: str
+_TIPS_PANEL_NAME: str
 _UI_NAME_ITEM_TIPS_BOX: str
-_UI_PATH_ITEM_TIPS_BOX: str
-_UI_DEF_ITEM_TIPS_BOX: str
-_UI_PATH_TIPS_IMAGE: str
-_UI_PATH_TIPS: str
-_UI_PATH_TIPS_LABEL: str
 
 
 class ItemTipsBox(ScreenNode):
-    _item_tips_box_node: _ItemTipsBoxUI
-    def __init__(self, namespace: str, name: str, param: dict) -> None: ...
-    def __register(self) -> None: ...
-    def ShowItemHoverTipsBox(self, item_dict: dict) -> None: ...
-    def ShowTipsBox(self, text: str) -> None: ...
-    def HideTipsBox(self) -> None: ...
-
-
-class _ItemTipsBoxUI(ScreenNode):
-    alpha_tick: int
-    tips_img: ImageUIControl
-    tips_panel: BaseUIControl
-    tips_label: LabelUIControl
-    timer1: CallLater
-    timer2: CallLater
-    def __init__(self, namespace: str, name: str, param: dict) -> None: ...
+    _alpha_tick: int
+    _tips_img: ImageUIControl
+    _tips_panel: BaseUIControl
+    _tips_label: LabelUIControl
+    __timer1: CallLater
+    __timer2: CallLater
+    __cs: ClientSystem
+    def __init__(self, namespace: str, name: str, param: Optional[dict]) -> None: ...
+    def __listen(self) -> None: ...
     def Create(self) -> None: ...
-    def Update(self) -> None: ...
+    def Destroy(self) -> None: ...
+    def _OnTickItemTipsBox(self) -> None: ...
     def ShowItemHoverTipsBox(self, item_dict: dict) -> None: ...
     def ShowTipsBox(self, text: str) -> None: ...
     def HideTipsBox(self) -> None: ...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
