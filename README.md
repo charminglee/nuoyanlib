@@ -1,7 +1,7 @@
 <h1 align="center" style="line-height: 0;">「nuoyanlib」</h1>
 <h1 align="center" style="line-height: 0;">🐱</h1>
 <h1 align="center" style="line-height: 0;">基于ModSDK的开发工具库</h1>
-<h2 align="center" style="line-height: 0.5;">v0.2.0-beta</h2>
+<h2 align="center" style="line-height: 0.5;">v0.3.6-beta</h2>
 
 <br></br>
 
@@ -19,7 +19,7 @@
 「nuoyanlib」可供大家学习参考，也可以直接应用于您个人/团队的项目中，希望「nuoyanlib」能提高大家的代码编写效率以及更轻松地实现复杂的效果！  
 感谢大家支持作者、支持该项目，喜欢的话可以点个Star噢，您的支持是作者最大的动力！  
 
-**_兼容的ModSDK版本：2.9_**
+### **兼容的ModSDK版本：2.11**
 
 <br></br>
 
