@@ -50,7 +50,7 @@ def _listen_engine(self: ClientSystem) -> None: ...
 
 
 class NuoyanClientSystem(ClientSystem):
-    _game_tick_node: ScreenNode | None
+    _game_tick_node: Optional[ScreenNode]
     _ui_init_finished: bool
     __handle: int
     _auto_show_ui: Dict[Tuple[str, int], List[Callable[[bool], Any]]]
