@@ -47,6 +47,7 @@ _UI_DEF_GAME_TICK = "_GameTick.main"
 
 
 ALL_CLIENT_ENGINE_EVENTS = {
+    "GyroSensorChangedClientEvent",
     "ModBlockEntityTickClientEvent",
     "ModBlockEntityRemoveClientEvent",
     "AchievementButtonMovedClientEvent",
@@ -267,15 +268,35 @@ class NuoyanClientSystem(_ClientSystem):
 
     # ============================================ Engine Event Callback ===============================================
 
+    def GyroSensorChangedClientEvent(self, args):
+        """
+        *[event]*
+
+        | 陀螺仪传感器姿态发生变化时触发。
+        | 该事件只适用于移动端。
+
+        -----
+
+        | 【xDiff: float】 x轴角速度，单位为弧度/s
+        | 【yDiff: float】 y轴角速度，单位为弧度/s
+        | 【zDiff: float】 z轴角速度，单位为弧度/s
+        | 【timestamp: float】 触发时间戳，秒
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
     def ModBlockEntityTickClientEvent(self, args):
         """
         *[event]*
 
-        客户端自定义方块实体tick事件。
-
-        只有client_tick字段为true的自定义方块实体才能触发该事件（见 `自定义方块实体 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93.html>`_）。
-
-        目前客户端实体tick范围为硬编码，范围为玩家为中心的等腰等斜边八边形，其中斜边长度为5，非斜边长度为3。
+        | 客户端自定义方块实体tick事件。
+        | 只有 ``client_tick`` 字段为 ``true`` 的自定义方块实体才能触发该事件（见 `自定义方块实体 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93.html>`_）。
+        | 目前客户端实体tick范围为硬编码，范围为玩家为中心的等腰等斜边八边形，其中斜边长度为5，非斜边长度为3。
 
         -----
 
@@ -437,9 +458,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端自定义方块实体加载完成后第一次出现在玩家视野中时触发。
-
-        只有在客户端自定义方块实体加载完成后，第一次出现在玩家视野中时才会触发该事件。注意：只有添加了自定义方块实体扩展功能的自定义方块实体才能触发该事件（见 `自定义方块实体外观 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4.1-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93%E5%A4%96%E8%A7%82.html>`_ ）；出生点是常加载区域，来回传送不会重复触发此事件。
+        | 客户端自定义方块实体加载完成后第一次出现在玩家视野中时触发。
+        | 只有在客户端自定义方块实体加载完成后，第一次出现在玩家视野中时才会触发该事件。注意：只有添加了自定义方块实体扩展功能的自定义方块实体才能触发该事件（见 `自定义方块实体外观 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4.1-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93%E5%A4%96%E8%A7%82.html>`_ ）；出生点是常加载区域，来回传送不会重复触发此事件。
 
         -----
 
@@ -479,9 +499,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        screen移除触发。
-
-        与PopScreenEvent不同，PopScreenAfterClientEvent触发时机是在完全把UI弹出后，返回的screenName是弹出后最顶层UI的Screen名。
+        | screen移除触发。
+        | 与 ``PopScreenEvent`` 不同， ``PopScreenAfterClientEvent`` 触发时机是在完全把UI弹出后，返回的 ``screenName`` 是弹出后最顶层UI的Screen名。
         
         -----
 
@@ -500,11 +519,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家点击屏幕后松手时触发。
-
-        仅在移动端或pc的F11模式下触发，pc的非F11模式可以使用LeftClickReleaseClientEvent与RightClickReleaseClientEvent事件监听鼠标松开。
-
-        短按及长按后松手都会触发该事件。
+        | 玩家点击屏幕后松手时触发。
+        | 仅在移动端或pc的F11模式下触发，pc的非F11模式可以使用 ``LeftClickReleaseClientEvent`` 与 ``RightClickReleaseClientEvent`` 事件监听鼠标松开。
+        | 短按及长按后松手都会触发该事件。
         
         -----
 
@@ -522,25 +539,16 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家点击屏幕并松手，即将响应到游戏内时触发。
-
-        仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用LeftClickBeforeClientEvent事件监听鼠标左键。
-
-        玩家点击屏幕的处理顺序为：
-
-        1、玩家点击屏幕，没有进行拖动，并在短按判定时间（250毫秒）内松手；
-
-        2、触发该事件；
-
-        3、若事件没有cancel，则根据准心处的物体类型以及与玩家的距离，进行攻击或放置等操作。
-
-        与GetEntityByCoordEvent事件不同的是，被ui层捕获，没有穿透到世界的点击不会触发该事件，例如：
-
-        1、点击原版的移动/跳跃等按钮。
-
-        2、通过SetIsHud(0)屏蔽了游戏操作。
-
-        3、对按钮使用AddTouchEventHandler接口时isSwallow参数设置为True。
+        | 玩家点击屏幕并松手，即将响应到游戏内时触发。
+        | 仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用 ``LeftClickBeforeClientEvent`` 事件监听鼠标左键。
+        | 玩家点击屏幕的处理顺序为：
+        | 1、玩家点击屏幕，没有进行拖动，并在短按判定时间（250毫秒）内松手；
+        | 2、触发该事件；
+        | 3、若事件没有cancel，则根据准心处的物体类型以及与玩家的距离，进行攻击或放置等操作。
+        | 与 ``GetEntityByCoordEvent`` 事件不同的是，被ui层捕获，没有穿透到世界的点击不会触发该事件，例如：
+        | 1、点击原版的移动/跳跃等按钮。
+        | 2、通过 ``SetIsHud(0)`` 屏蔽了游戏操作。
+        | 3、对按钮使用 ``AddTouchEventHandler`` 接口时 ``isSwallow`` 参数设置为 ``True`` 。
         
         -----
 
@@ -558,13 +566,10 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家松开鼠标右键时触发。
-
-        仅在pc的普通控制模式（即非F11模式）下触发。
-
-        在F11下右键，按下会触发RightClickBeforeClientEvent，松开时会触发TapOrHoldReleaseClientEvent。
-
-        pc的普通控制模式下的鼠标点击流程见TapOrHoldReleaseClientEvent备注中的 `配图 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%8E%A7%E5%88%B6.html?key=TapOrHoldReleaseClientEvent&docindex=6&type=0>`_。
+        | 玩家松开鼠标右键时触发。
+        | 仅在pc的普通控制模式（即非F11模式）下触发。
+        | 在F11下右键，按下会触发 ``RightClickBeforeClientEvent`` ，松开时会触发 ``TapOrHoldReleaseClientEvent`` 。
+        | pc的普通控制模式下的鼠标点击流程见 ``TapOrHoldReleaseClientEvent`` 备注中的 `配图 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%8E%A7%E5%88%B6.html?key=TapOrHoldReleaseClientEvent&docindex=6&type=0>`_。
         
         -----
 
@@ -600,9 +605,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        鼠标按下中键时触发。
-
-        仅通过PushScreen创建的界面能够正常返回坐标，开启F11模式的时候，返回最后点击屏幕时的坐标。
+        | 鼠标按下中键时触发。
+        | 仅通过 ``PushScreen`` 创建的界面能够正常返回坐标，开启F11模式的时候，返回最后点击屏幕时的坐标。
         
         -----
 
@@ -746,21 +750,14 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家长按屏幕，即将响应到游戏内时触发。
-
-        仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用RightClickBeforeClientEvent事件监听鼠标右键。
-
-        玩家长按屏幕的处理顺序为：
-
-        1、玩家点击屏幕，在长按判定时间内（默认为400毫秒，可通过SetHoldTimeThreshold接口修改）一直没有进行拖动或松手；
-
-        2、触发该事件；
-
-        3、若事件没有cancel，则根据主手上的物品，准心处的物体类型以及与玩家的距离，进行挖方块/使用物品/与实体交互等操作。
-
-        即该事件只会在到达长按判定时间的瞬间触发一次，后面一直按住不会连续触发，可以使用TapOrHoldReleaseClientEvent监听长按后松手。
-
-        与TapBeforeClientEvent事件类似，被ui层捕获，没有穿透到世界的点击不会触发该事件。
+        | 玩家长按屏幕，即将响应到游戏内时触发。
+        | 仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用 ``RightClickBeforeClientEvent`` 事件监听鼠标右键。
+        | 玩家长按屏幕的处理顺序为：
+        | 1、玩家点击屏幕，在长按判定时间内（默认为400毫秒，可通过 ``SetHoldTimeThreshold`` 接口修改）一直没有进行拖动或松手；
+        | 2、触发该事件；
+        | 3、若事件没有cancel，则根据主手上的物品，准心处的物体类型以及与玩家的距离，进行挖方块/使用物品/与实体交互等操作。
+        | 即该事件只会在到达长按判定时间的瞬间触发一次，后面一直按住不会连续触发，可以使用 ``TapOrHoldReleaseClientEvent`` 监听长按后松手。
+        | 与 ``TapBeforeClientEvent`` 事件类似，被ui层捕获，没有穿透到世界的点击不会触发该事件。
         
         -----
 
@@ -951,13 +948,12 @@ class NuoyanClientSystem(_ClientSystem):
         *[event]*
 
         screen移除触发。
-
-        screenName为正在弹出的Screen名，如果需要获取下一个Screen可使用PopScreenAfterClientEvent。
+        ``screenName`` 为正在弹出的Screen名，如果需要获取下一个Screen可使用 ``PopScreenAfterClientEvent`` 。
         
         -----
 
         | 【screenName: str】 UI名字
-        | 【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
+        | 【screenDef: str】 包含命名空间的UI名字，格式为"namespace.screenName"
 
         -----
 
@@ -1274,13 +1270,10 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家背包物品变化时客户端抛出的事件。
-
-        如果槽位变空，变化后槽位中物品为空气。
-
-        触发时槽位物品仍为变化前物品。
-
-        背包内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
+        | 玩家背包物品变化时客户端抛出的事件。
+        | 如果槽位变空，变化后槽位中物品为空气。
+        | 触发时槽位物品仍为变化前物品。
+        | 背包内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
         
         -----
 
@@ -1341,11 +1334,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[tick]* *[event]*
 
-        玩家在对方块使用物品时客户端抛出的事件。
-
-        注：如果需要取消物品的使用需要同时在ClientItemUseOnEvent和ServerItemUseOnEvent中将ret设置为True才能正确取消。
-
-        该事件仅在鼠标模式下为帧事件。
+        | 玩家在对方块使用物品时客户端抛出的事件。
+        | 注：如果需要取消物品的使用需要同时在 ``ClientItemUseOnEvent`` 和 ``ServerItemUseOnEvent`` 中将 ``ret`` 设置为 ``True`` 才能正确取消。
+        | 该事件仅在鼠标模式下为帧事件。
         
         -----
 
@@ -1374,13 +1365,10 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家点击右键尝试使用物品时客户端抛出的事件，可以通过设置cancel为True取消使用物品。
-
-        注：如果需要取消物品的使用需要同时在ClientItemTryUseEvent和ServerItemTryUseEvent中将cancel设置为True才能正确取消。
-
-        ServerItemTryUseEvent/ClientItemTryUseEvent不能取消对方块使用物品的行为，如使用生物蛋，使用桶倒出/收集，使用打火石点燃草等；
-
-        如果想要取消这种行为，请使用ClientItemUseOnEvent和ServerItemUseOnEvent。
+        | 玩家点击右键尝试使用物品时客户端抛出的事件，可以通过设置 ``cancel`` 为 ``True`` 取消使用物品。
+        | 注：如果需要取消物品的使用需要同时在 ``ClientItemTryUseEvent`` 和 ``ServerItemTryUseEvent`` 中将 ``cancel`` 设置为 ``True`` 才能正确取消。
+        | ``ServerItemTryUseEvent`` / ``ClientItemTryUseEvent`` 不能取消对方块使用物品的行为，如使用生物蛋，使用桶倒出/收集，使用打火石点燃草等；
+        | 如果想要取消这种行为，请使用 ``ClientItemUseOnEvent`` 和 ``ServerItemUseOnEvent`` 。
         
         -----
 
@@ -1463,17 +1451,12 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        实体刚移动至一个新实心方块时触发。
-
-        在合并微软更新之后，本事件触发时机与微软molang实验性玩法组件"minecraft:on_step_on"一致。
-
-        压力板与绊线钩在过去的版本的事件是可以触发的，但在更新后这种非实心方块并不会触发，有需要的可以使用OnEntityInsideBlockClientEvent事件。
-
-        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStepOn接口注册才能触发。
-
-        原版的红石矿默认注册了，但深层红石矿没有默认注册。
-
-        如果需要修改cancel，强烈建议配合服务端事件同步修改，避免出现被服务端矫正等非预期现象。
+        | 实体刚移动至一个新实心方块时触发。
+        | 在合并微软更新之后，本事件触发时机与微软molang实验性玩法组件 ``minecraft:on_step_on`` 一致。
+        | 压力板与绊线钩在过去的版本的事件是可以触发的，但在更新后这种非实心方块并不会触发，有需要的可以使用 ``OnEntityInsideBlockClientEvent`` 事件。
+        | 不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnStepOn`` 接口注册才能触发。
+        | 原版的红石矿默认注册了，但深层红石矿没有默认注册。
+        | 如果需要修改 ``cancel`` ，强烈建议配合服务端事件同步修改，避免出现被服务端矫正等非预期现象。
         
         -----
 
@@ -1489,9 +1472,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         【相关接口】
 
-        BlockInfoComponentClient.RegisterOnStepOn(blockName: str, sendPythonEvent: bool) -> bool
-
-        BlockInfoComponentClient.UnRegisterOnStepOn(blockName: str) -> bool
+        * BlockInfoComponentClient.RegisterOnStepOn(blockName: str, sendPythonEvent: bool) -> bool
+        * BlockInfoComponentClient.UnRegisterOnStepOn(blockName: str) -> bool
 
         -----
 
@@ -1505,9 +1487,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家开始挖方块时触发。创造模式下不触发。
-
-        如果是隔着火焰挖方块，即使将该事件cancel掉，火焰也会被扑灭。如果要阻止火焰扑灭，需要配合ExtinguishFireClientEvent使用。
+        | 玩家开始挖方块时触发。创造模式下不触发。
+        | 如果是隔着火焰挖方块，即使将该事件cancel掉，火焰也会被扑灭。如果要阻止火焰扑灭，需要配合 ``ExtinguishFireClientEvent`` 使用。
         
         -----
 
@@ -1516,6 +1497,7 @@ class NuoyanClientSystem(_ClientSystem):
         | 【auxValue: int】 方块的附加值
         | 【playerId: str】 玩家的实体ID
         | 【$cancel: bool】 修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockServerEvent一起修改。
+        | 【face: int】 方块被敲击面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
 
         -----
 
@@ -1529,11 +1511,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        实体移动离开一个实心方块时触发。
-
-        不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStepOff接口注册才能触发。
-
-        压力板与绊线钩这种非实心方块不会触发。
+        | 实体移动离开一个实心方块时触发。
+        | 不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnStepOff`` 接口注册才能触发。
+        | 压力板与绊线钩这种非实心方块不会触发。
         
         -----
 
@@ -1548,9 +1528,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         【相关接口】
 
-        BlockInfoComponentClient.RegisterOnStepOff(blockName: str, sendPythonEvent: bool) -> bool
-
-        BlockInfoComponentClient.UnRegisterOnStepOff(blockName: str) -> bool
+        * BlockInfoComponentClient.RegisterOnStepOff(blockName: str, sendPythonEvent: bool) -> bool
+        * BlockInfoComponentClient.UnRegisterOnStepOff(blockName: str) -> bool
 
         -----
 
@@ -1564,9 +1543,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家手持剪刀破坏方块时，有剪刀特殊效果的方块会在客户端线程触发该事件。
-
-        目前仅绊线会触发，需要取消剪刀效果得配合ShearsDestoryBlockBeforeServerEvent同时使用。
+        | 玩家手持剪刀破坏方块时，有剪刀特殊效果的方块会在客户端线程触发该事件。
+        | 目前仅绊线会触发，需要取消剪刀效果得配合 ``ShearsDestoryBlockBeforeServerEvent`` 同时使用。
         
         -----
 
@@ -1593,9 +1571,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        当玩家即将破坏方块时，客户端线程触发该事件。
-
-        主要用于床，旗帜，箱子这些根据方块实体数据进行渲染的方块，一般情况下请使用ServerPlayerTryDestroyBlockEvent。
+        | 当玩家即将破坏方块时，客户端线程触发该事件。
+        | 主要用于床，旗帜，箱子这些根据方块实体数据进行渲染的方块，一般情况下请使用 ``ServerPlayerTryDestroyBlockEvent`` 。
         
         -----
 
@@ -1620,13 +1597,10 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[tick]* *[event]*
 
-        当实体站立到方块上时客户端持续触发。
-
-        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnStandOn接口注册才能触发。
-
-        如果要在脚本层修改motion/cancel，强烈建议配合OnStandOnBlockServerEvent服务端事件同步修改，避免出现被服务端矫正等非预期现象。
-
-        如果要在脚本层修改motion，回传的一定要是浮点型，例如需要赋值0.0而不是0。
+        | 当实体站立到方块上时客户端持续触发。
+        | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnStandOn`` 接口注册才能触发。
+        | 如果要在脚本层修改 ``motion`` / ``cancel`` ，强烈建议配合 ``OnStandOnBlockServerEvent`` 服务端事件同步修改，避免出现被服务端矫正等非预期现象。
+        | 如果要在脚本层修改 ``motion`` ，回传的一定要是浮点型，例如需要赋值0.0而不是0。
         
         -----
 
@@ -1648,9 +1622,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         【相关接口】
 
-        BlockInfoComponentClient.RegisterOnStandOn(blockName: str, sendPythonEvent: bool) -> bool
-
-        BlockInfoComponentClient.UnRegisterOnStandOn(blockName: str) -> bool
+        * BlockInfoComponentClient.RegisterOnStandOn(blockName: str, sendPythonEvent: bool) -> bool
+        * BlockInfoComponentClient.UnRegisterOnStandOn(blockName: str) -> bool
 
         -----
 
@@ -1664,9 +1637,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        自定义方块实体绑定的特效创建成功事件。
-
-        以及使用接口CreateFrameEffectForBlockEntity或CreateParticleEffectForBlockEntity为自定义方块实体添加特效成功时触发。
+        | 自定义方块实体绑定的特效创建成功事件。
+        | 以及使用接口 ``CreateFrameEffectForBlockEntity`` 或 ``CreateParticleEffectForBlockEntity`` 为自定义方块实体添加特效成功时触发。
         
         -----
 
@@ -1687,17 +1659,12 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[tick]* *[event]*
 
-        当实体碰撞盒所在区域有方块时，客户端持续触发。
-
-        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过RegisterOnEntityInside接口注册才能触发。
-
-        如果需要修改slowdownMulti/cancel，强烈建议与服务端事件同步修改，避免出现被服务端矫正等非预期现象。
-
-        如果要在脚本层修改slowdownMulti，回传的一定要是浮点型，例如需要赋值1.0而不是1。
-
-        有任意slowdownMulti参数被传回非0值时生效减速比例。
-
-        slowdownMulti参数更像是一个Buff，并不是立刻计算，而是先保存在实体属性里延后计算、在已经有slowdownMulti属性的情况下会取最低的值、免疫掉落伤害等，与原版蜘蛛网逻辑基本一致。
+        | 当实体碰撞盒所在区域有方块时，客户端持续触发。
+        | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnEntityInside`` 接口注册才能触发。
+        | 如果需要修改 ``slowdownMulti`` / ``cancel`` ，强烈建议与服务端事件同步修改，避免出现被服务端矫正等非预期现象。
+        | 如果要在脚本层修改 ``slowdownMulti`` ，回传的一定要是浮点型，例如需要赋值1.0而不是1。
+        | 有任意 ``slowdownMulti`` 参数被传回非0值时生效减速比例。
+        | ``slowdownMulti`` 参数更像是一个Buff，并不是立刻计算，而是先保存在实体属性里延后计算、在已经有 ``slowdownMulti`` 属性的情况下会取最低的值、免疫掉落伤害等，与原版蜘蛛网逻辑基本一致。
         
         -----
 
@@ -1716,9 +1683,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         【相关接口】
 
-        BlockInfoComponentClient.RegisterOnEntityInside(blockName: str, sendPythonEvent: bool) -> bool
-
-        BlockInfoComponentClient.UnRegisterOnEntityInside(blockName: str) -> bool
+        * BlockInfoComponentClient.RegisterOnEntityInside(blockName: str, sendPythonEvent: bool) -> bool
+        * BlockInfoComponentClient.UnRegisterOnEntityInside(blockName: str) -> bool
 
         -----
 
@@ -1732,17 +1698,12 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[tick]* *[event]*
 
-        当实体降落到方块后客户端触发，主要用于力的计算。
-
-        不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
-
-        如果要在脚本层修改motion，回传的需要是浮点型，例如需要赋值0.0而不是0。
-
-        如果需要修改实体的力，最好配合服务端事件同步修改，避免产生非预期现象。
-
-        因为引擎最后一定会按照原版方块规则计算力（普通方块置0，床、粘液块等反弹），所以脚本层如果想直接修改当前力需要将calculate设为True取消原版计算，按照传回值计算。
-
-        引擎在落地之后OnAfterFallOnBlockClientEvent会一直触发，因此请在脚本层中做对应的逻辑判断。
+        | 当实体降落到方块后客户端触发，主要用于力的计算。
+        | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
+        | 如果要在脚本层修改 ``motion`` ，回传的需要是浮点型，例如需要赋值0.0而不是0。
+        | 如果需要修改实体的力，最好配合服务端事件同步修改，避免产生非预期现象。
+        | 因为引擎最后一定会按照原版方块规则计算力（普通方块置0，床、粘液块等反弹），所以脚本层如果想直接修改当前力需要将 ``calculate`` 设为 ``True`` 取消原版计算，按照传回值计算。
+        | 引擎在落地之后 ``OnAfterFallOnBlockClientEvent`` 会一直触发，因此请在脚本层中做对应的逻辑判断。
         
         -----
 
@@ -1768,11 +1729,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        当下落的方块开始计算砸到实体的伤害时，客户端触发该事件。
-
-        不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
-
-        当该事件的参数数据与服务端事件FallingBlockCauseDamageBeforeServerEvent数据有差异时，请以服务端事件数据为准。
+        | 当下落的方块开始计算砸到实体的伤害时，客户端触发该事件。
+        | 不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
+        | 当该事件的参数数据与服务端事件 ``FallingBlockCauseDamageBeforeServerEvent`` 数据有差异时，请以服务端事件数据为准。
         
         -----
 
@@ -1800,9 +1759,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[tick]* *[event]*
 
-        玩家右键点击新版自定义方块（或者通过接口AddBlockItemListenForUseEvent增加监听的MC原生游戏方块）时客户端抛出该事件。
-
-        有的方块是在ServerBlockUseEvent中设置cancel生效，但是有部分方块是在ClientBlockUseEvent中设置cancel才生效，如有需求建议在两个事件中同时设置cancel以保证生效。
+        | 玩家右键点击新版自定义方块（或者通过接口 ``AddBlockItemListenForUseEvent`` 增加监听的MC原生游戏方块）时客户端抛出该事件。
+        | 有的方块是在 ``ServerBlockUseEvent`` 中设置 ``cancel`` 生效，但是有部分方块是在 ``ClientBlockUseEvent`` 中设置 ``cancel`` 才生效，如有需求建议在两个事件中同时设置 ``cancel`` 以保证生效。
         
         -----
 
@@ -1826,9 +1784,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        视角切换时会触发的事件。
-
-        视角数字代表含义 0: 第一人称 1: 第三人称背面 2: 第三人称正面。
+        | 视角切换时会触发的事件。
+        | 视角数字代表含义 0: 第一人称 1: 第三人称背面 2: 第三人称正面。
         
         -----
 
@@ -1847,11 +1804,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        通过OpenPlayerHitBlockDetection打开方块碰撞检测后，当玩家碰撞到方块时触发该事件。
-
-        玩家着地时会触发OnGroundClientEvent，而不是该事件。
-
-        客户端和服务端分别作碰撞检测，可能两个事件返回的结果略有差异。
+        | 通过 ``OpenPlayerHitBlockDetection`` 打开方块碰撞检测后，当玩家碰撞到方块时触发该事件。
+        | 玩家着地时会触发 ``OnGroundClientEvent`` ，而不是该事件。
+        | 客户端和服务端分别作碰撞检测，可能两个事件返回的结果略有差异。
         
         -----
 
@@ -1866,9 +1821,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         【相关接口】
 
-        PlayerCompClient.OpenPlayerHitBlockDetection(precision: float) -> bool
-
-        PlayerCompClient.ClosePlayerHitBlockDetection() -> bool
+        * PlayerCompClient.OpenPlayerHitBlockDetection(precision: float) -> bool
+        * PlayerCompClient.ClosePlayerHitBlockDetection() -> bool
 
         -----
 
@@ -1882,11 +1836,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        个人游戏模式发生变化时客户端触发。
-
-        游戏模式：生存，创造，冒险分别为0~2。
-
-        默认游戏模式发生变化时最后反映在个人游戏模式之上。
+        | 个人游戏模式发生变化时客户端触发。
+        | 游戏模式：生存，创造，冒险分别为0~2。
+        | 默认游戏模式发生变化时最后反映在个人游戏模式之上。
 
         -----
 
@@ -1926,9 +1878,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家维度改变完成后触发。
-
-        当通过传送门从末地回到主世界时，toPos的y值为32767，其他情况一般会比设置值高1.62
+        | 玩家维度改变完成后触发。
+        | 当通过传送门从末地回到主世界时， ``toPos`` 的y值为32767，其他情况一般会比设置值高1.62。
         
         -----
 
@@ -1949,9 +1900,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家维度改变时触发。
-
-        当通过传送门从末地回到主世界时，toY值为32767，其他情况一般会比设置值高1.62
+        | 玩家维度改变时触发。
+        | 当通过传送门从末地回到主世界时， ``toY`` 值为32767，其他情况一般会比设置值高1.62。
         
         -----
 
@@ -1977,9 +1927,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        相机运动器停止事件。相机添加运动器并开始运行后，运动器自动停止时触发。
-
-        注意：该事件触发表示运动器播放顺利完成，手动调用的StopCameraMotion、RemoveCameraMotion不会触发该事件。
+        | 相机运动器停止事件。相机添加运动器并开始运行后，运动器自动停止时触发。
+        | 注意：该事件触发表示运动器播放顺利完成，手动调用的 ``StopCameraMotion`` 、 ``RemoveCameraMotion`` 不会触发该事件。
         
         -----
 
@@ -2035,9 +1984,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        一个实体即将骑乘另外一个实体时触发。
-
-        如果需要修改cancel，请通过服务端事件StartRidingServerEvent修改，客户端触发该事件时，实体已经骑乘成功。
+        | 一个实体即将骑乘另外一个实体时触发。
+        | 如果需要修改 ``cancel`` ，请通过服务端事件 ``StartRidingServerEvent`` 修改，客户端触发该事件时，实体已经骑乘成功。
         
         -----
 
@@ -2056,11 +2004,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        通过OpenPlayerHitMobDetection打开生物碰撞检测后，当生物间（包含玩家）碰撞时触发该事件。
-
-        注：客户端和服务端分别作碰撞检测，可能两个事件返回的略有差异。
-
-        本事件代替原有的OnPlayerHitMobClientEvent事件。
+        | 通过 ``OpenPlayerHitMobDetection`` 打开生物碰撞检测后，当生物间（包含玩家）碰撞时触发该事件。
+        | 注：客户端和服务端分别作碰撞检测，可能两个事件返回的略有差异。
+        | 本事件代替原有的 ``OnPlayerHitMobClientEvent`` 事件。
         
         -----
 
@@ -2071,9 +2017,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         【相关接口】
 
-        PlayerCompClient.OpenPlayerHitMobDetection() -> bool
-
-        PlayerCompClient.ClosePlayerHitMobDetection() -> bool
+        * PlayerCompClient.OpenPlayerHitMobDetection() -> bool
+        * PlayerCompClient.ClosePlayerHitMobDetection() -> bool
 
         -----
 
@@ -2125,25 +2070,16 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        当实体停止骑乘时触发。
-
-        以下情况不允许取消：
-
-        1、玩家传送时；
-
-        2、坐骑死亡时；
-
-        3、玩家睡觉时；
-
-        4、玩家死亡时；
-
-        5、未驯服的马；
-
-        6、怕水的生物坐骑进入水里；
-
-        7、切换维度；
-
-        8、ride组件StopEntityRiding接口。
+        | 当实体停止骑乘时触发。
+        | 以下情况不允许取消：
+        * 玩家传送时；
+        * 坐骑死亡时；
+        * 玩家睡觉时；
+        * 玩家死亡时；
+        * 未驯服的马；
+        * 怕水的生物坐骑进入水里；
+        * 切换维度；
+        * ride组件 ``StopEntityRiding`` 接口。
         
         -----
 
@@ -2241,9 +2177,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端侧实体被移除时触发。
-
-        客户端接收服务端AOI事件时触发，原事件名 RemoveEntityPacketEvent。
+        | 客户端侧实体被移除时触发。
+        | 客户端接收服务端AOI事件时触发，原事件名 ``RemoveEntityPacketEvent`` 。
         
         -----
 
@@ -2279,10 +2214,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        当command命令有成功消息输出时触发。
+        | 当command命令有成功消息输出时触发。
+        | 部分命令在返回的时候没有命令名称，命令组件需要 ``showOutput`` 参数为 ``True`` 时才会有返回。
 
-        部分命令在返回的时候没有命令名称，命令组件需要showOutput参数为True时才会有返回。
-        
         -----
 
         | 【command: str】 命令名称
@@ -2338,9 +2272,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端区块即将被卸载时触发。
-
-        区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载，参考 `区块介绍 <https://minecraft.fandom.com/zh/wiki/%E5%8C%BA%E5%9D%97>`_。
+        | 客户端区块即将被卸载时触发。
+        | 区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载，参考 `区块介绍 <https://minecraft.fandom.com/zh/wiki/%E5%8C%BA%E5%9D%97>`_。
         
         -----
 
@@ -2360,11 +2293,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家进入当前玩家所在的区块AOI后，玩家皮肤数据异步加载完成后触发的事件。
-
-        由于玩家皮肤是异步加载的原因，该事件触发时机比AddPlayerAOIClientEvent晚，触发该事件后可以对该玩家调用相关玩家渲染接口。
-
-        当前客户端每加载好一个玩家的皮肤，就会触发一次该事件，比如刚进入世界时，本地玩家加载好会触发一次，周围的所有玩家加载好后也会分别触发一次。
+        | 玩家进入当前玩家所在的区块AOI后，玩家皮肤数据异步加载完成后触发的事件。
+        | 由于玩家皮肤是异步加载的原因，该事件触发时机比 ``AddPlayerAOIClientEvent`` 晚，触发该事件后可以对该玩家调用相关玩家渲染接口。
+        | 当前客户端每加载好一个玩家的皮肤，就会触发一次该事件，比如刚进入世界时，本地玩家加载好会触发一次，周围的所有玩家加载好后也会分别触发一次。
         
         -----
 
@@ -2382,9 +2313,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家加入游戏或者其余玩家进入当前玩家所在的区块时触发的AOI事件，替换AddPlayerEvent。
-
-        该事件触发只表明在服务端数据中接收到了新玩家，并不能代表此时玩家在客户端中可见，若想在玩家进入AOI后立马调用玩家渲染相关接口，建议使用AddPlayerCreatedClientEvent。
+        | 玩家加入游戏或者其余玩家进入当前玩家所在的区块时触发的AOI事件，替换 ``AddPlayerEvent`` 。
+        | 该事件触发只表明在服务端数据中接收到了新玩家，并不能代表此时玩家在客户端中可见，若想在玩家进入AOI后立马调用玩家渲染相关接口，建议使用 ``AddPlayerCreatedClientEvent`` 。
         
         -----
 
@@ -2506,11 +2436,11 @@ class NuoyanClientSystem(_ClientSystem):
         """
         | 一次性添加多个玩家渲染资源，支持添加模型、贴图、材质、渲染控制器、动画、动画控制器、音效和微软粒子特效。
         | 注意：使用本接口添加的资源，需要遵循以下命名规范：
-        | 1、模型：以 ``geometry.`` 开头；
-        | 2、渲染控制器：以 ``controller.render.`` 开头；
-        | 3、动画：以 ``animation.`` 开头；
-        | 4、动画控制器：以 ``controller.animation.`` 开头；
-        | 5、音效：音效名称至少包含一个 ``.`` ，如 ``sound.abc`` 。
+        * 模型：以 ``geometry.`` 开头；
+        * 渲染控制器：以 ``controller.render.`` 开头；
+        * 动画：以 ``animation.`` 开头；
+        * 动画控制器：以 ``controller.animation.`` 开头；
+        * 音效：音效名称至少包含一个 ``.`` ，如 ``sound.abc`` 。
 
         -----
 
