@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -24,12 +24,12 @@ from threading import Timer
 class McTimer(object):
     type: str
     sec: float
-    func: Callable
+    func: Optional[Callable]
     args: Any
     kwargs: Any
     _pause: bool
     _cancel: bool
-    __timer: Timer
+    __timer: Optional[Timer]
     def __init__(self, ttype: str, sec: float, func: Callable, *args: Any, **kwargs: Any): ...
     def _execute(self) -> Any: ...
     def __func(self) -> None: ...

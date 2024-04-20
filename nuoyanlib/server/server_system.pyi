@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-15
+#   Last Modified : 2024-02-10
 #
 # ====================================================
 
@@ -216,8 +216,6 @@ class NuoyanServerSystem(ServerSystem):
     def item_grid_data(self) -> Dict[str, Dict[Tuple[str, str], List[Optional[dict]]]]: ...
     @server_listener
     def _ButtonCallbackTriggered(self, args: dict) -> None: ...
-    @server_listener
-    def _BroadcastToAllClient(self, args: dict) -> None: ...
     @server_listener("UiInitFinished")
     def _UiInitFinished(self, args: dict) -> None: ...
     @server_listener("PlayerIntendLeaveServerEvent")
@@ -239,6 +237,8 @@ class _TransitServerSystem(ServerSystem):
     def _SyncItems(self, args: dict) -> None: ...
     @server_listener
     def _UpdateItemsData(self, args: dict) -> None: ...
+    @server_listener
+    def _BroadcastToAllClient(self, args: dict) -> None: ...
 
 
 _transit_sys: _TransitServerSystem

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-14
+#   Last Modified : 2024-03-16
 #
 # ====================================================
 
@@ -22,11 +22,11 @@ from ..comp import ScreenNode as _ScreenNode
 
 __all__ = [
     "get_parent_path",
-    "get_grid_direct_children",
+    "get_direct_children_path",
 ]
 
 
-def get_grid_direct_children(path, ui_self):
+def get_direct_children_path(path, ui_self):
     """
     获取网格的所有直接子控件的路径。例如，一个网格包含两个按钮，而每个按钮又包含三张图片，则按钮为网格的直接子控件，图片为网格的间接子控件。
 

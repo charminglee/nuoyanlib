@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-14
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -206,13 +206,10 @@ _lsn_func_args = []
 
 def server_listener(event_name="", namespace="", system_name="", priority=0):
     """
-    函数装饰器，通过对函数进行装饰即可实现监听。
-
-    省略所有参数时，监听当前客户端传来的与被装饰函数同名的事件。
-
-    当指定命名空间和系统名称时，可监听来自其他系统的事件。
-
-    监听引擎事件时，只需传入该事件的名称即可，无需传入引擎命名空间和系统名称。
+    | 函数装饰器，通过对函数进行装饰即可实现监听。
+    | 省略所有参数时，监听当前客户端传来的与被装饰函数同名的事件。
+    | 当指定命名空间和系统名称时，可监听来自其他系统的事件。
+    | 监听引擎事件时，只需传入该事件的名称即可，无需传入引擎命名空间和系统名称。
 
     -----
 
@@ -271,9 +268,8 @@ class NuoyanServerSystem(_ServerSystem):
 
     【注意事项】
 
-    1、带有 *[tick]* 标签的事件为帧事件，需要注意编写相关逻辑。
-
-    2、事件回调参数中，参数名前面的美元符号“$”表示该参数可进行修改。
+    | 1、带有 *[tick]* 标签的事件为帧事件，需要注意编写相关逻辑。
+    | 2、事件回调参数中，参数名前面的美元符号 ``$`` 表示该参数可进行修改。
     """
 
     def __init__(self, namespace, system_name):
@@ -289,13 +285,14 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        服务端系统销毁时触发。
+        | 服务端系统销毁时触发。
+        | 若重写该方法，请调用一次父类的同名方法。如：
+        ::
 
-        若重写该方法，请调用一次NuoyanServerSystem的同名方法。如：
-
-        >>> class MyServerSystem(NuoyanServerSystem):
-        ...     def Destroy(self):
-        ...         super(MyServerSystem, self).Destroy()  # 或者：NuoyanServerSystem.Destroy(self)
+            class MyServerSystem(NuoyanServerSystem):
+                def Destroy(self):
+                    super(MyServerSystem, self).Destroy()
+                    # 或者：NuoyanServerSystem.Destroy(self)
 
         :return: 无
         :rtype: None
@@ -1470,7 +1467,7 @@ class NuoyanServerSystem(_ServerSystem):
 
     def OnStandOnBlockServerEvent(self, args):
         """
-        *[event]*
+        *[tick]* *[event]*
 
         当实体站立到方块上时服务端持续触发。
         
@@ -4793,9 +4790,8 @@ class NuoyanServerSystem(_ServerSystem):
 
     def SetQueryVar(self, entity_id, name, value):
         """
-        设置指定实体query.mod变量的值，全局同步。
-
-        若设置的变量未注册，则自动进行注册。
+        | 设置指定实体 ``query.mod`` 变量的值，全局同步。
+        | 若设置的变量未注册，则自动进行注册。
 
         -----
 
@@ -4835,14 +4831,6 @@ class NuoyanServerSystem(_ServerSystem):
         func = getattr(self, func_name, None)
         if func:
             func(args)
-
-    @server_listener
-    def _BroadcastToAllClient(self, args):
-        event_name = args['event_name']
-        event_data = args['event_data']
-        if isinstance(event_data, dict) and '__id__' in args:
-            event_data['__id__'] = args['__id__']
-        self.BroadcastToAllClient(event_name, event_data)
 
     @server_listener("UiInitFinished")
     def _UiInitFinished(self, args):
@@ -4953,6 +4941,14 @@ class _TransitServerSystem(_ServerSystem):
                 })
             else:
                 self.items_data[player_id][(namespace, key)] = items
+
+    @server_listener
+    def _BroadcastToAllClient(self, args):
+        event_name = args['event_name']
+        event_data = args['event_data']
+        if isinstance(event_data, dict) and '__id__' in args:
+            event_data['__id__'] = args['__id__']
+        self.BroadcastToAllClient(event_name, event_data)
 
 
 _transit_sys = _TransitServerSystem("NuoyanLib", "_TransitServerSystem")

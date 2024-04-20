@@ -205,40 +205,52 @@ def any_mob(entity_id_list):
 
 def entity_filter(entity_list, *args):
     """
-    实体ID过滤器。
-
-    执行过滤时将会从左到右按顺序处理过滤参数，且会自动丢弃无法获取坐标的实体。
+    | 实体ID过滤器。
+    | 执行过滤时将会从左到右按顺序处理过滤参数，且会自动丢弃无法获取坐标的实体。
 
     -----
 
     【过滤参数说明及示例】
 
-    1、传入一个tuple，tuple的第一个元素为坐标，第二个元素为半径，表示保留该坐标半径范围内的所有实体；
+    * **传入一个tuple，tuple的第一个元素为坐标，第二个元素为半径，表示保留该坐标半径范围内的所有实体：**
+    ::
 
-    >>> entity_filter(entity_list, (pos, 60)) # 保留以pos为中心60格半径内的实体
+        # 保留以pos为中心60格半径内的实体
+        entity_filter(entity_list, (pos, 60))
 
-    2、将EntityType枚举放入集合传入，表示保留这些类型的所有实体；
+    * **将EntityType枚举放入集合传入，表示保留这些类型的所有实体：**
+    ::
 
-    >>> entity_filter(entity_list, {EntityType.Mob}) # 保留所有生物
-    >>> entity_filter(entity_list, {EntityType.Pig, EntityType.Wolf}) # 保留所有猪和狼
+        # 保留所有生物
+        entity_filter(entity_list, {EntityType.Mob})
+        # 保留所有猪和狼
+        entity_filter(entity_list, {EntityType.Pig, EntityType.Wolf})
 
-    3、将字符串形式的维度ID放入集合传入，表示保留这些维度的所有实体；
+    * **将字符串形式的维度ID放入集合传入，表示保留这些维度的所有实体：**
+    ::
 
-    >>> entity_filter(entity_list, {"0", "1"}) # 保留所有主世界和地狱的实体
+        # 保留所有主世界和地狱的实体
+        entity_filter(entity_list, {"0", "1"})
 
-    4、将实体ID放入列表传入，表示抛弃这些实体ID；
+    * **将实体ID放入列表传入，表示抛弃这些实体ID：**
+    ::
 
-    >>> entity_list = ["-123", "-456", "-789"]
-    >>> entity_filter(entity_list, ["-123", "-456"]) # ["-789"]
+        entity_list = ["-123", "-456", "-789"]
+        entity_filter(entity_list, ["-123", "-456"]) # ["-789"]
 
-    5、将EntityType枚举放入列表传入，表示抛弃这些类型的所有实体；
+    * **将EntityType枚举放入列表传入，表示抛弃这些类型的所有实体：**
+    ::
 
-    >>> entity_filter(entity_list, [EntityType.Mob]) # 抛弃所有生物
-    >>> entity_filter(entity_list, [EntityType.Pig, EntityType.Wolf]) # 抛弃所有猪和狼
+        # 抛弃所有生物
+        entity_filter(entity_list, [EntityType.Mob])
+        # 抛弃所有猪和狼
+        entity_filter(entity_list, [EntityType.Pig, EntityType.Wolf])
 
-    6、以上5种过滤参数均可混合使用；
+    * **以上5种过滤参数均可混合使用：**
+    ::
 
-    >>> entity_filter(entity_list, {"0"}, (pos, 60), {EntityType.Mob}) # 保留主世界中以pos为中心60格半径内的所有生物
+        # 保留主世界中以pos为中心60格半径内的所有生物
+        entity_filter(entity_list, {"0"}, (pos, 60), {EntityType.Mob})
 
     -----
 
@@ -665,16 +677,16 @@ def get_entities_by_ray(
         filter_abiotic=False,
 ):
     """
-    从指定位置射出一条射线，获取该射线接触到的所有实体。
+    | 从指定位置射出一条射线，获取该射线接触到的所有实体。
+    | 返回一个列表，实体按照由近到远的顺序排列，列表每个元素为一个字典，结构如下：
+    ::
 
-    返回一个列表，实体按照由近到远的顺序排列，列表每个元素为一个字典，结构如下：
-
-    >>> {
-    ...     "entity_id": str, # 实体ID
-    ...     "pos": Tuple[float, float, float], # 实体坐标
-    ...     "intersection": Tuple[float, float, float], # 射线与实体的第一个交点的坐标
-    ...     "size": Tuple[float, float], # 实体的碰撞箱尺寸，与GetSize接口获取的相同
-    ... }
+        {
+            'entity_id': str, # 实体ID
+            'pos': Tuple[float, float, float], # 实体坐标
+            'intersection': Tuple[float, float, float], # 射线与实体的第一个交点的坐标
+            'size': Tuple[float, float], # 实体的碰撞箱尺寸，与GetSize接口获取的相同
+        }
 
     -----
 
@@ -689,7 +701,7 @@ def get_entities_by_ray(
     :param bool filter_abiotic: 是否过滤非生物实体，默认为不过滤
 
     :return: 射线经过的实体的列表，顺序为由近到远，列表每个元素为一个字典，字典结构请见上方
-    :rtype: list[dict[str, str|tuple]]
+    :rtype: list[dict[str,str|tuple]]
     """
     if not start_pos or not direction or length <= 0:
         return []

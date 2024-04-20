@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
 
-from typing import Dict, List, Tuple, Optional, Union
+from typing import Dict, List, Tuple, Optional, Union, Set
 
 
 def clear_effects(entity_id: str) -> None: ...
@@ -43,10 +43,10 @@ def attract_entities(
 ) -> List[str]: ...
 def is_mob(entity_id: str) -> bool: ...
 def all_mob(entity_id_list: List[str]) -> bool: ...
-def any_mob(entity_id_list: List[str]) -> bool:
+def any_mob(entity_id_list: List[str]) -> bool: ...
 def entity_filter(
     entity_list: List[str],
-    *args: Union[Tuple[Tuple[float, float, float], float], int, List[str], List[int]],
+    *args: Union[Tuple[Tuple[float, float, float], float], int, List[str], List[int], Set[int], Set[str]],
 ) -> List[str]: ...
 def is_entity_type(entity_id: str, etype: Union[int, str]) -> bool: ...
 def sort_entity_list_by_dist(entity_list: List[str], pos: Tuple[float, float, float]) -> None: ...

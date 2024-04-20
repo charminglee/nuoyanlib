@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -110,7 +110,7 @@ def change_item_count(player_id, pos_type=_ItemPosType.CARRIED, pos=0, change=-1
     if _LvComp.Game.GetPlayerGameType(player_id) == _GameType.Creative:
         return
     item_comp = _CompFactory.CreateItem(player_id)
-    item = item_comp.GetPlayerItem(pos_type, pos)
+    item = item_comp.GetPlayerItem(pos_type, pos, True)
     item['count'] += change
     if item['count'] <= 0:
         item = None
@@ -119,9 +119,8 @@ def change_item_count(player_id, pos_type=_ItemPosType.CARRIED, pos=0, change=-1
 
 def deduct_inv_item(player_id, name, aux=-1, count=1):
     """
-    从玩家背包中扣除指定数量的物品。
-
-    该函数无需传入物品所在位置，而是自动从背包中寻找指定物品，找到了则扣除指定数量。
+    | 从玩家背包中扣除指定数量的物品。
+    | 该函数无需传入物品所在位置，而是自动从背包中寻找指定物品，找到了则扣除指定数量。
 
     -----
 

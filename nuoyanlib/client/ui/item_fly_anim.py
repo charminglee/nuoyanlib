@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-15
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -50,13 +50,13 @@ class ItemFlyAnim(_ScreenNode):
         """
         *[event]*
 
-        UI生命周期函数，当UI创建成功时调用。
+        | UI生命周期函数，当UI创建成功时调用。
+        | 若重写了该方法，请调用一次父类的同名方法，否则部分功能将不可用。如：
+        ::
 
-        若重写了该方法，请调用一次父类的同名方法，否则部分功能将不可用。如：
-
-        >>> class MyUI(ItemFlyAnim):
-        ...     def Create(self):
-        ...         super(MyUI, self).Create()
+            class MyUI(ItemFlyAnim):
+                def Create(self):
+                    super(MyUI, self).Create()
 
         -----
 
@@ -154,7 +154,7 @@ class ItemFlyAnim(_ScreenNode):
 
         -----
 
-        :param list[dict[str,Any]] data: 动画数据列表，列表每个元素为一个字典，字典的key分别为item_dict、from_pos、to_pos、ui_size，对应的value的含义与SetOneItemFlyAnim方法中的参数相同。
+        :param list[dict[str,dict|tuple[float,float]|float]] data: 动画数据列表，列表每个元素为一个字典，字典的key分别为item_dict、from_pos、to_pos、ui_size，对应的value的含义与SetOneItemFlyAnim方法中的参数相同。
 
         :return: 无
         :rtype: None

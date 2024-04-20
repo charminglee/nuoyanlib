@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -31,11 +31,11 @@ from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindCo
 
 class NeteaseParticle(object):
     __cs: ClientSystem
-    _id: int
-    _ctrl: ParticleControlComp
-    _trans: ParticleTransComp
-    _bind_ent_comp: ParticleEntityBindComp
-    _bind_skel_comp: ParticleSkeletonBindComp
+    _id: Optional[int]
+    _ctrl: Optional[ParticleControlComp]
+    _trans: Optional[ParticleTransComp]
+    _bind_ent_comp: Optional[ParticleEntityBindComp]
+    _bind_skel_comp: Optional[ParticleSkeletonBindComp]
     _bind_ent_id: str
     _bind_ent_offset: Tuple[float, float, float]
     _bind_ent_rot: Tuple[float, float, float]
@@ -140,11 +140,11 @@ class NeteaseParticle(object):
 
 class NeteaseFrameAnim(object):
     __cs: ClientSystem
-    _id: int
-    _ctrl: FrameAniControlComp
-    _trans: FrameAniTransComp
-    _bind_ent_comp: FrameAniEntityBindComp
-    _bind_skel_comp: FrameAniSkeletonBindComp
+    _id: Optional[int]
+    _ctrl: Optional[FrameAniControlComp]
+    _trans: Optional[FrameAniTransComp]
+    _bind_ent_comp: Optional[FrameAniEntityBindComp]
+    _bind_skel_comp: Optional[FrameAniSkeletonBindComp]
     _bind_ent_id: str
     _bind_ent_offset: Tuple[float, float, float]
     _bind_ent_rot: Tuple[float, float, float]

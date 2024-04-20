@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-16
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -21,25 +21,25 @@
 
 itemGridManager
 ===============
-该模块提供了物品网格的Python实现。将自定义UI类继承ItemGridManager，即可轻松实现一个功能完备的背包UI。
+该模块提供了物品网格的Python实现。将自定义UI类继承 ``ItemGridManager`` ，即可轻松实现一个功能完备的背包UI。
 
 -----
 
 【名词解释】
 
-1、网格：即Grid控件，一种能够对模板控件多次克隆并排列成网状的控件。
+* 网格：即Grid控件，一种能够对模板控件多次克隆并排列成网状的控件。
 
-2、方格：即网格的单个子控件，也称为网格的元素，本质上是个按钮控件。
+* 方格：即网格的单个子控件，也称为网格的元素，本质上是个按钮控件。
 
-3、网格的key：在ItemGridManager中，每个网格都有一个唯一的key，数据类型为字符串，可自定义，或使用预设的key来启用特定功能。
+* 网格的key：在 ``ItemGridManager`` 中，每个网格都有一个唯一的key，数据类型为字符串，可自定义，或使用预设的key来启用特定功能。
 
-4、方格索引：类似于物品栏槽位，从0开始，网格的第一个方格的索引为0，第二个为1，以此类推，从左到右从上到下递增。
+* 方格索引：类似于物品栏槽位，从0开始，网格的第一个方格的索引为0，第二个为1，以此类推，从左到右从上到下递增。
 
-5、方格位置元组：用于表示指定方格，由两个元素组成：(方格所在网格的key, 方格索引)。
+* 方格位置元组：用于表示指定方格，由两个元素组成：(方格所在网格的key, 方格索引)。
 
-6、方格路径：即方格控件的UI路径。
+* 方格路径：即方格控件的UI路径。
 
-7、分堆数据字典：保存了当前物品分堆数据的字典。
+* 分堆数据字典：保存了当前物品分堆数据的字典。
 
 +---------------+----------------------+--------------------+
 |     字典键     |         数据类型       |         解释       |
@@ -53,7 +53,7 @@ itemGridManager
 |    barCtrl    | ProgressBarUIControl |  分堆进度条控件实例   |
 +---------------+----------------------+--------------------+
 
-8、选中物品数据字典：保存了当前选中物品的数据的字典。
+* 选中物品数据字典：保存了当前选中物品的数据的字典。
 
 +----------+--------+--------------------+
 |  字典键   | 数据类型 |        解释         |
@@ -67,21 +67,17 @@ itemGridManager
 
 【使用方法】
 
-1、将您的服务端继承NuoyanServerSystem，此后无需再继承ServerSystem。
-
-2、将您的UI类继承ItemGridManager，此后无需再继承ScreenNode，例如：class MyUi(ItemGridManager)，然后正常注册与创建您的UI。
-
-3、在UI类的__init__或Create方法里使用接口self.RegisterItemGrid注册一个物品网格。
-
-4、网格第一次显示时，调用self.InitItemGrids对网格进行初始化，第二次显示时无需再次调用该接口。网格何时第一次显示取决于您的设定，如果您没有在UI编辑器中把网格设置为隐藏，则在Create方法内执行上述初始化操作即可。
-
-5、完成上述步骤后您就可以调用其他接口对网格进行操作，如设置网格所有物品、设置指定位置物品的数量等。
+| 1、将您的服务端继承 ``NuoyanServerSystem`` ，此后无需再继承 ``ServerSystem`` 。
+| 2、将您的UI类继承 ``ItemGridManager`` ，此后无需再继承 ``ScreenNode`` ，例如： ``class MyUi(ItemGridManager)`` ，然后正常注册与创建您的UI。
+| 3、在UI类的 ``__init__`` 或 ``Create`` 方法里使用接口 ``self.RegisterItemGrid`` 注册一个物品网格。
+| 4、网格第一次显示时，调用 ``self.InitItemGrids`` 对网格进行初始化，第二次显示时无需再次调用该接口。网格何时第一次显示取决于您的设定，如果您没有在UI编辑器中把网格设置为隐藏，则在 ``Create`` 方法内执行上述初始化操作即可。
+| 5、完成上述步骤后您就可以调用其他接口对网格进行操作，如设置网格所有物品、设置指定位置物品的数量等。
 
 -----
 
 【注意事项】
 
-1、如果您的UI类重写了Update方法，请在该方法内调用一次父类同名方法，例如：super(你的UI类, self).Update()或ItemGridManager.Update()。
+| 1、如果您的UI类重写了 ``Update`` 方法，请在该方法内调用一次父类同名方法，例如： ``super(你的UI类, self).Update()`` 或 ``ItemGridManager.Update()`` 。
 
 """
 
@@ -98,7 +94,7 @@ from screen_node import (
     NuoyanScreenNode as _NuoyanScreenNode,
     ui_listener as _ui_listener,
 )
-from ui_utils import get_grid_direct_children as _get_grid_direct_children
+from ui_utils import get_direct_children_path as _get_direct_children_path
 from ..comp import (
     LvComp as _LvComp,
     CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
@@ -239,13 +235,13 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         *[event]*
 
-        UI生命周期函数，当UI销毁时调用。
+        | UI生命周期函数，当UI销毁时调用。
+        | 若重写了该方法，请调用一次父类的同名方法。如：
+        ::
 
-        若重写了该方法，请调用一次父类的同名方法。如：
-
-        >>> class MyUI(ItemGridManager):
-        ...     def Destroy(self):
-        ...         super(MyUI, self).Destroy()
+            class MyUI(ItemGridManager):
+                def Destroy(self):
+                    super(MyUI, self).Destroy()
 
         -----
 
@@ -266,13 +262,13 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         *[tick]* *[event]*
 
-        客户端每帧调用，1秒有30帧。
+        | 客户端每帧调用，1秒有30帧。
+        | 若重写了该方法，请调用一次父类的同名方法。如：
+        ::
 
-        若重写了该方法，请调用一次父类的同名方法。如：
-
-        >>> class MyUI(ItemGridManager):
-        ...     def OnTick(self):
-        ...         super(MyUI, self).OnTick()
+            class MyUI(ItemGridManager):
+                def OnTick(self):
+                    super(MyUI, self).OnTick()
 
         -----
 
@@ -307,23 +303,22 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
         -----
 
-        【fromPath: str】 起始位置的方格路径
+        | 【fromPath: str】 起始位置的方格路径
+        | 【toPath: str】 终点位置的方格路径
+        | 【fromPos: Tuple[str, int]】 起始位置的方格位置元组
+        | 【toPos: Tuple[str, int]】 终点位置的方格位置元组
+        | 【$moveCount: int】 移动数量，可修改
+        | 【$sync: bool】 是否将物品数据同步到服务端，设置为False则不会同步
+        | 【$flyAnim: bool】 是否播放物品飞行动画，设置为False则不会显示物品飞行动画
+        | 【$force: bool】 是否强制移动，若设置为True，则本次移动会用起始位置的物品覆盖终点位置的物品，否则交换两个位置的物品
+        | 【$cancel: bool】 是否取消本次移动，设置为True即可取消
 
-        【toPath: str】 终点位置的方格路径
+        -----
 
-        【fromPos: Tuple[str, int]】 起始位置的方格位置元组
+        :param dict args: 参数字典，参数解释见上方
 
-        【toPos: Tuple[str, int]】 终点位置的方格位置元组
-
-        【$moveCount: int】 移动数量，可修改
-
-        【$sync: bool】 是否将物品数据同步到服务端，设置为False则不会同步
-
-        【$flyAnim: bool】 是否播放物品飞行动画，设置为False则不会显示物品飞行动画
-
-        【$force: bool】 是否强制移动，若设置为True，则本次移动会用起始位置的物品覆盖终点位置的物品，否则交换两个位置的物品
-
-        【$cancel: bool】 是否取消本次移动，设置为True即可取消
+        :return: 无
+        :rtype: None
         """
 
     def OnMoveItemsAfter(self, args):
@@ -332,21 +327,21 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
         -----
 
-        【fromPath: str】 起始位置的方格路径
+        | 【fromPath: str】 起始位置的方格路径
+        | 【toPath: str】 终点位置的方格路径
+        | 【fromPos: Tuple[str, int]】 起始位置的方格位置元组
+        | 【toPos: Tuple[str, int]】 终点位置的方格位置元组
+        | 【moveCount: int】 移动数量
+        | 【sync: bool】 本次移动的物品数据是否同步到服务端
+        | 【flyAnim: bool】 是否播放物品飞行动画
+        | 【force: bool】 是否强制移动
 
-        【toPath: str】 终点位置的方格路径
+        -----
 
-        【fromPos: Tuple[str, int]】 起始位置的方格位置元组
+        :param dict args: 参数字典，参数解释见上方
 
-        【toPos: Tuple[str, int]】 终点位置的方格位置元组
-
-        【moveCount: int】 移动数量
-
-        【sync: bool】 本次移动的物品数据是否同步到服务端
-
-        【flyAnim: bool】 是否播放物品飞行动画
-
-        【force: bool】 是否强制移动
+        :return: 无
+        :rtype: None
         """
 
     def OnReceiveItemsDataFromServerBefore(self, args):
@@ -355,7 +350,14 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
         -----
 
-        【data: Dict[str, List[dict]]】 物品数据字典，字典键为网格的key，值为该网格所有物品的物品信息字典列表
+        | 【data: Dict[str, List[dict]]】 物品数据字典，字典键为网格的key，值为该网格所有物品的物品信息字典列表
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
         """
 
     def OnItemGridChanged(self, args):
@@ -364,12 +366,20 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
         -----
 
-        【changes: Dict[Tuple[str, int], Dict[str, dict]]】 字典，结构如下，其中(key, index)为发生变化的网格key和物品所在方格的索引，'old'为变化前的物品信息字典，'new'为变化后的物品信息字典
+        | 【changes: Dict[Tuple[str, int], Dict[str, dict]]】 字典，结构如下，其中(key, index)为发生变化的网格key和物品所在方格的索引，'old'为变化前的物品信息字典，'new'为变化后的物品信息字典
+        ::
 
-        >>> {
-        ...     (key, index): {'old': dict, 'new': dict},
-        ...     ...
-        ... }
+            {
+                (key, index): {'old': dict, 'new': dict},
+                ...
+            }
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
         """
 
     def OnItemGridSelectedItem(self, args):
@@ -378,20 +388,31 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
         -----
 
-        【itemDict: dict】 物品信息字典
+        | 【itemDict: dict】 物品信息字典
+        | 【cellPath: str】 方格路径
+        | 【cellPos: Tuple[str, int]】 方格位置元组
+        | 【$cancel: bool】 是否取消选中
 
-        【cellPath: str】 方格路径
+        -----
 
-        【cellPos: Tuple[str, int]】 方格位置元组
+        :param dict args: 参数字典，参数解释见上方
 
-        【$cancel: bool】 是否取消选中
+        :return: 无
+        :rtype: None
         """
 
     # ============================================ UI Callback =========================================================
 
     def OnItemCellTouchUp(self, args):
         """
-        方格抬起时触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
+        方格抬起时触发的回调函数。
+
+        -----
+
+        :param dict args: 参数字典，参数与通过官方接口设置的按钮回调函数相同
+
+        :return: 无
+        :rtype: None
         """
 
     def _onItemCellTouchUp(self, args):
@@ -411,7 +432,14 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
     def OnItemCellTouchMoveIn(self, args):
         """
-        手指移动到方格内时触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
+        手指移动到方格内时触发的回调函数。
+
+        -----
+
+        :param dict args: 参数字典，参数与通过官方接口设置的按钮回调函数相同
+
+        :return: 无
+        :rtype: None
         """
 
     def _onItemCellTouchMoveIn(self, args):
@@ -434,7 +462,14 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
     def OnItemCellDoubleClick(self, args):
         """
-        双击方格触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
+        双击方格触发的回调函数。
+
+        -----
+
+        :param dict args: 参数字典，参数与通过官方接口设置的按钮回调函数相同
+
+        :return: 无
+        :rtype: None
         """
 
     def _onItemCellDoubleClick(self, args):
@@ -456,7 +491,14 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
     def OnItemCellLongClick(self, args):
         """
-        长按方格触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
+        长按方格触发的回调函数。
+
+        -----
+
+        :param dict args: 参数字典，参数与通过官方接口设置的按钮回调函数相同
+
+        :return: 无
+        :rtype: None
         """
 
     def _onItemCellLongClick(self, args):
@@ -473,7 +515,14 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
     def OnItemCellTouchDown(self, args):
         """
-        方格按下时触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
+        方格按下时触发的回调函数。
+
+        -----
+
+        :param dict args: 参数字典，参数与通过官方接口设置的按钮回调函数相同
+
+        :return: 无
+        :rtype: None
         """
 
     def _onItemCellTouchDown(self, args):
@@ -484,17 +533,38 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
 
     def OnItemCellTouchMove(self, args):
         """
-        手指在方格上移动时每帧触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
+        手指在方格上移动时每帧触发的回调函数。
+
+        -----
+
+        :param dict args: 参数字典，参数与通过官方接口设置的按钮回调函数相同
+
+        :return: 无
+        :rtype: None
         """
 
     def OnItemCellTouchMoveOut(self, args):
         """
-        手指移出方格时触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
+        手指移出方格时触发的回调函数。
+
+        -----
+
+        :param dict args: 参数字典，参数与通过官方接口设置的按钮回调函数相同
+
+        :return: 无
+        :rtype: None
         """
 
     def OnItemCellTouchCancel(self, args):
         """
-        方格取消按下时触发的回调函数。参数与通过官方接口设置的按钮回调函数相同。
+        方格取消按下时触发的回调函数。
+
+        -----
+
+        :param dict args: 参数字典，参数与通过官方接口设置的按钮回调函数相同
+
+        :return: 无
+        :rtype: None
         """
 
     # ============================================== UI操作 =============================================================
@@ -1329,13 +1399,10 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
         """
         注册网格或注册单个方格按钮。如果注册的是单个方格按钮，则该方格按钮将被视为只有一个元素的网格。
 
-        当网格的key为shortcut、inv27或inv36时，将获得以下特殊功能：
-
-        1、该网格将与本地玩家的背包进行绑定，shortcut表示快捷栏，inv27表示除快捷栏以外的物品栏，inv36表示整个物品栏。
-
-        2、调用SyncAllItemsFromServer时将从服务端获取玩家所有背包物品，并显示到对应的网格上。
-
-        3、对这些网格进行的任何物品操作可自动与本地玩家的背包进行同步。
+        | 当网格的key为shortcut、inv27或inv36时，将获得以下特殊功能：
+        * 该网格将与本地玩家的背包进行绑定，shortcut表示快捷栏，inv27表示除快捷栏以外的物品栏，inv36表示整个物品栏。
+        * 调用SyncAllItemsFromServer时将从服务端获取玩家所有背包物品，并显示到对应的网格上。
+        * 对这些网格进行的任何物品操作可自动与本地玩家的背包进行同步。
 
         -----
 
@@ -1396,7 +1463,7 @@ class ItemGridManager(_ItemFlyAnim, _ItemTipsBox, _NuoyanScreenNode):
             if isSingle:
                 allChildren = (gp,)
             else:
-                allChildren = tuple(_get_grid_direct_children(gp, self))
+                allChildren = tuple(_get_direct_children_path(gp, self))
             # 初始化操作
             self._cellUiCtrls[key] = []
             for i, path in enumerate(allChildren):

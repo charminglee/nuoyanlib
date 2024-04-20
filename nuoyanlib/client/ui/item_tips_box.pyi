@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-15
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -32,11 +32,11 @@ _UI_NAME_ITEM_TIPS_BOX: str
 
 class ItemTipsBox(ScreenNode):
     _alpha_tick: int
-    _tips_img: ImageUIControl
-    _tips_panel: BaseUIControl
-    _tips_label: LabelUIControl
-    __timer1: CallLater
-    __timer2: CallLater
+    _tips_img: Optional[ImageUIControl]
+    _tips_panel: Optional[BaseUIControl]
+    _tips_label: Optional[LabelUIControl]
+    __timer1: Optional[CallLater]
+    __timer2: Optional[CallLater]
     __cs: ClientSystem
     def __init__(self, namespace: str, name: str, param: Optional[dict]) -> None: ...
     def __listen(self) -> None: ...

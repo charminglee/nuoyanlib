@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-16
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -51,38 +51,41 @@ _lsn_func_args = []
 
 def ui_listener(event_name="", namespace="", system_name="", priority=0):
     """
-    函数装饰器，通过对函数进行装饰即可实现监听。
-
-    省略所有参数时，监听当前服务端传来的与被装饰函数同名的事件。
-
-    当指定命名空间和系统名称时，可监听来自其他系统的事件。
-
-    监听引擎事件时，只需传入该事件的名称即可，无需传入引擎命名空间和系统名称。
+    | 函数装饰器，通过对函数进行装饰即可实现监听。
+    | 省略所有参数时，监听当前服务端传来的与被装饰函数同名的事件。
+    | 当指定命名空间和系统名称时，可监听来自其他系统的事件。
+    | 监听引擎事件时，只需传入该事件的名称即可，无需传入引擎命名空间和系统名称。
 
     -----
 
     【示例】
+    ::
 
-    >>> class MyUI(NuoyanScreenNode):
-    ...     @ui_listener("MyCustomEvent1")  # 监听当前服务端传来的自定义事件
-    ...     def eventCallback1(self, args):
-    ...         pass
-    ...
-    ...     @ui_listener("MyCustomEvent2", "OtherNamespace", "OtherServer")  # 监听其他服务端传来的自定义事件
-    ...     def eventCallback2(self, args):
-    ...         pass
-    ...
-    ...     @ui_listener  # 监听当前服务端传来的与函数同名的事件
-    ...     def SomeEvent1(self, args):
-    ...         pass
-    ...
-    ...     @ui_listener(namespace="OtherNamespace", system_name="OtherServer")  # 监听其他服务端传来的与函数同名的事件
-    ...     def SomeEvent2(self, args):
-    ...         pass
-    ...
-    ...     @ui_listener("AddEntityClientEvent")  # 监听引擎事件
-    ...     def OnAddEntity(self, args):
-    ...         pass
+        class MyUI(NuoyanScreenNode):
+            # 监听当前服务端传来的自定义事件
+            @ui_listener("MyCustomEvent1")
+            def eventCallback1(self, args):
+                pass
+
+            # 监听其他服务端传来的自定义事件
+            @ui_listener("MyCustomEvent2", "OtherNamespace", "OtherServer")
+            def eventCallback2(self, args):
+                pass
+
+            # 监听当前服务端传来的与函数同名的事件
+            @ui_listener
+            def SomeEvent1(self, args):
+                pass
+
+            # 监听其他服务端传来的与函数同名的事件
+            @ui_listener(namespace="OtherNamespace", system_name="OtherServer")
+            def SomeEvent2(self, args):
+                pass
+
+            # 监听引擎事件
+            @ui_listener("AddEntityClientEvent")
+            def OnAddEntity(self, args):
+                pass
 
     -----
 
@@ -129,15 +132,11 @@ def _listen(self):
 
 def notify_server(func):
     """
-    函数装饰器，用于按钮的回调函数。
-
-    被装饰的按钮回调函数每触发一次，服务端的同名函数也会触发一次。
-
-    服务端同名函数的参数与按钮回调函数的参数相同，且自带一个名为__id__的key，其value为触发按钮的玩家实体ID。
-
-    可通过args['cancelNotify'] = False或return -1的方式取消触发服务端函数。
-
-    若对按钮回调参数进行修改（如增加、修改或删除某个key或value），服务端得到的参数为修改后的参数，可通过该方式向服务端传递更多信息。
+    | 函数装饰器，用于按钮的回调函数。
+    | 被装饰的按钮回调函数每触发一次，服务端的同名函数也会触发一次。
+    | 服务端同名函数的参数与按钮回调函数的参数相同，且自带一个名为 ``__id__`` 的key，其value为触发按钮的玩家实体ID。
+    | 可通过 ``args['cancelNotify'] = False`` 或 ``return -1`` 的方式取消触发服务端函数。
+    | 若对按钮回调参数进行修改（如增加、修改或删除某个key或value），服务端得到的参数为修改后的参数，可通过该方式向服务端传递更多信息。
     """
     @_wraps(func)
     def wrapper(self, args):
@@ -159,13 +158,10 @@ class NuoyanScreenNode(_ScreenNode):
 
     -----
 
-    注意事项：
-
-    1、重写Create或Update方法时请调用一次父类的同名方法，如：super(MyUI, self).Create()或NuoyanScreenNode.Create(self)。
-
-    2、带有 *[event]* 标签的方法为事件，重写该方法即可使用该事件。
-
-    3、带有 *[tick]* 标签的事件为帧事件，需要注意相关逻辑的编写。
+    | 注意事项：
+    | 1、重写 ``Create`` 或 ``Update`` 方法时请调用一次父类的同名方法，如： ``super(MyUI, self).Create()`` 或 ``NuoyanScreenNode.Create(self)`` 。
+    | 2、带有 *[event]* 标签的方法为事件，重写该方法即可使用该事件。
+    | 3、带有 *[tick]* 标签的事件为帧事件，需要注意相关逻辑的编写。
     """
 
     def __init__(self, namespace, name, param):
@@ -201,13 +197,13 @@ class NuoyanScreenNode(_ScreenNode):
         """
         *[event]*
 
-        UI生命周期函数，当UI创建成功时调用。
+        | UI生命周期函数，当UI创建成功时调用。
+        | 若重写了该方法，请调用一次父类的同名方法，否则部分功能将不可用。如：
+        ::
 
-        若重写了该方法，请调用一次父类的同名方法，否则部分功能将不可用。如：
-
-        >>> class MyUI(NuoyanScreenNode):
-        ...     def Create(self):
-        ...         super(MyUI, self).Create()
+            class MyUI(NuoyanScreenNode):
+                def Create(self):
+                    super(MyUI, self).Create()
 
         -----
 
@@ -239,7 +235,8 @@ class NuoyanScreenNode(_ScreenNode):
 
         客户端每帧调用。
 
-        注意：在2.10及以上版本中，该方法的触发频率与游戏实时帧率同步。在2.10以下版本中，触发频率为固定的每秒钟30次。
+        | *作者的tips：*
+        | *在2.10及以上版本中，该方法的触发频率与游戏实时帧率同步。在2.10以下版本中，触发频率为固定的每秒钟30次。*
 
         -----
 
@@ -251,13 +248,13 @@ class NuoyanScreenNode(_ScreenNode):
         """
         *[event]*
 
-        UI生命周期函数，当UI销毁时调用。
+        | UI生命周期函数，当UI销毁时调用。
+        | 若重写了该方法，请调用一次父类的同名方法。如：
+        ::
 
-        若重写了该方法，请调用一次父类的同名方法。如：
-
-        >>> class MyUI(NuoyanScreenNode):
-        ...     def Destroy(self):
-        ...         super(MyUI, self).Destroy()
+            class MyUI(NuoyanScreenNode):
+                def Destroy(self):
+                    super(MyUI, self).Destroy()
 
         -----
 
@@ -281,9 +278,8 @@ class NuoyanScreenNode(_ScreenNode):
         """
         *[event]*
 
-        UI生命周期函数，当栈顶UI有其他UI入栈时调用。
-
-        不建议使用在OnDeactive函数中调用SetScreenVisible(False)，在OnActive函数中调用SetScreenVisible(True)的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用PushScreen，PopScreen接口实现。
+        | UI生命周期函数，当栈顶UI有其他UI入栈时调用。
+        | 不建议使用在 ``OnDeactive`` 函数中调用 ``SetScreenVisible(False)`` ，在 ``OnActive`` 函数中调用 ``SetScreenVisible(True)`` 的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用 ``PushScreen`` ， ``PopScreen`` 接口实现。
 
         -----
 
@@ -295,9 +291,8 @@ class NuoyanScreenNode(_ScreenNode):
         """
         *[event]*
 
-        UI生命周期函数，当UI重新回到栈顶时调用。
-
-        不建议使用在OnDeactive函数中调用SetScreenVisible(False)，在OnActive函数中调用SetScreenVisible(True)的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用PushScreen，PopScreen接口实现。
+        | UI生命周期函数，当UI重新回到栈顶时调用。
+        | 不建议使用在 ``OnDeactive`` 函数中调用 ``SetScreenVisible(False)`` ，在 ``OnActive`` 函数中调用 ``SetScreenVisible(True)`` 的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用 ``PushScreen`` ， ``PopScreen`` 接口实现。
 
         -----
 
@@ -368,6 +363,8 @@ class NuoyanScreenNode(_ScreenNode):
     def CancelButtonMovable(self, btn_path):
         """
         取消按钮可拖动。
+
+        -----
 
         :param str btn_path: 按钮路径
 
