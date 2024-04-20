@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-13
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
 
-from typing import List, Union, Optional, Tuple, Callable, Any, Set
+from typing import List, Union, Optional, Tuple, Callable, Any, Set, Dict
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.viewBinder import ViewBinder
@@ -50,9 +50,11 @@ def _listen_engine(self: ClientSystem) -> None: ...
 
 
 class NuoyanClientSystem(ClientSystem):
-    __game_tick_node: ScreenNode
+    _game_tick_node: ScreenNode | None
     _ui_init_finished: bool
     __handle: int
+    _auto_show_ui: Dict[Tuple[str, int], List[Callable[[bool], Any]]]
+    _old_carried_item: Tuple[str, int]
     def __init__(self, namespace: str, system_name: str): ...
     def Destroy(self): ...
     def Update(self): ...
@@ -156,7 +158,12 @@ class NuoyanClientSystem(ClientSystem):
     def UiInitFinished(self, args): ...
     def OnGameTick(self): ...
     def SetQueryVar(self, entity_id: str, name: str, value: float, sync: bool = True) -> None: ...
-    def AddPlayerRenderResources(self, player_id: str, *res_tuple: Tuple[str, str]) -> Tuple[bool, ...]: ...
+    def AddPlayerRenderResources(
+        self,
+        player_id: str,
+        rebuild: bool,
+        *res_tuple: Tuple[str, str],
+    ) -> Tuple[bool, ...]: ...
     def CallServer(self, name: str, callback: Callable = None, *args: Any) -> None: ...
     def BroadcastToAllClient(self, event_name: str, event_data: Any) -> None: ...
     def RegisterAndCreateUI(
@@ -166,6 +173,16 @@ class NuoyanClientSystem(ClientSystem):
         ui_screen_def: str,
         param: Optional[dict] = None,
     ) -> ScreenNode: ...
+    def RegisterAutoShowUiForItem(
+        self,
+        item_name: Union[str, None],
+        ui_node: Optional[ScreenNode] = None,
+        func: Optional[Callable[[bool], Any]] = None,
+        item_aux: int = -1,
+    ) -> None: ...
+    @client_listener("OnCarriedNewItemChangedClientEvent")
+    def _OnCarriedNewItemChangedClientEvent(self, args: dict) -> None: ...
+    def _set_ui_visible(self, item: Tuple[str, int], visible: bool) -> None: ...
     @client_listener("UiInitFinished")
     def _UiInitFinished(self, args: dict) -> None: ...
     def _set_print_log(self) -> None: ...

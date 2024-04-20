@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-12-16
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -20,8 +20,24 @@
 from typing import Tuple, Union, Optional, List, Dict
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
+from mod.common.minecraftEnum import Facing
 
 
+def pos_block_facing(
+    pos: Tuple[float, float, float],
+    face: int = Facing.North,
+    dist: float = 1.0
+) -> Optional[Tuple[float, float, float]]: ...
+def to_polar_coordinate(
+    coordinate: Tuple[float, float],
+    rad: bool = False,
+    origin: Tuple[float, float] = (0, 0),
+) -> Tuple[float, float]: ...
+def to_cartesian_coordinate(
+    coordinate: Tuple[float, float],
+    rad: bool = False,
+    origin: Tuple[float, float] = (0, 0),
+) -> Tuple[float, float]: ...
 def probability_true_i(n: int, d: int) -> bool: ...
 def probability_true_f(f: float) -> bool: ...
 def pos_distance_to_line(
@@ -33,8 +49,8 @@ def _is_client() -> bool: ...
 def _get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...
 def pos_floor(pos: Tuple[float, float, float]) -> Tuple[int, int, int]: ...
 def pos_distance(
-    first_point: Tuple[float, float, float],
-    second_point: Tuple[float, float, float],
+    first_point: Tuple[float, ...],
+    second_point: Tuple[float, ...],
 ) -> float: ...
 def to_relative_pos(
     entity_pos1: Tuple[float, float, float],

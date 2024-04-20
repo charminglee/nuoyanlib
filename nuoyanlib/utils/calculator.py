@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-12-16
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -26,6 +26,7 @@ from math import (
     sin as _sin,
     cos as _cos,
     floor as _floor,
+    radians as _radians,
 )
 from random import (
     randint as _randint,
@@ -34,9 +35,13 @@ from random import (
 import mod.client.extraClientApi as client_api
 import mod.server.extraServerApi as server_api
 from mod.common.utils.mcmath import Vector3 as _Vector3
+from mod.common.minecraftEnum import Facing as _Facing
 
 
 __all__ = [
+    "pos_block_facing",
+    "to_polar_coordinate",
+    "to_cartesian_coordinate",
     "probability_true_i",
     "probability_true_f",
     "pos_distance_to_line",
@@ -62,6 +67,80 @@ __all__ = [
     "rot_diff",
     "ray_aabb_intersection",
 ]
+
+
+def pos_block_facing(pos, face=_Facing.North, dist=1.0):
+    """
+    计算方块某个面朝向的坐标。
+
+    -----
+
+    :param tuple[float,float,float] pos: 方块的坐标
+    :param int face: 方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_，默认为Facing.North
+    :param float dist: 距离，默认为1.0
+
+    :return: 坐标
+    :rtype: tuple[float,float,float]|None
+    """
+    if not pos:
+        return
+    pos = map(float, pos)
+    if face == _Facing.Up:
+        return pos[0], pos[1] + dist, pos[2]
+    elif face == _Facing.Down:
+        return pos[0], pos[1] - dist, pos[2]
+    elif face == _Facing.East:
+        return pos[0] + dist, pos[1], pos[2]
+    elif face == _Facing.West:
+        return pos[0] - dist, pos[1], pos[2]
+    elif face == _Facing.South:
+        return pos[0], pos[1], pos[2] + dist
+    elif face == _Facing.North:
+        return pos[0], pos[1], pos[2] - dist
+
+
+def to_polar_coordinate(coordinate, rad=False, origin=(0, 0)):
+    """
+    将平面直角坐标转换为极坐标。
+
+    -----
+
+    :param tuple[float,float] coordinate: 平面直角坐标
+    :param bool rad: 是否使用弧度制，为False时使用角度制，默认为False
+    :param tuple[float,float] origin: 指定坐标原点，默认为(0, 0)
+
+    :return: 极坐标
+    :rtype: tuple[float,float]
+    """
+    x, y = coordinate
+    x -= origin[0]
+    y -= origin[1]
+    r = _sqrt(x ** 2 + y ** 2)
+    theta = _atan2(y, x)
+    if not rad:
+        theta = _degrees(theta)
+    return r, theta
+
+
+def to_cartesian_coordinate(coordinate, rad=False, origin=(0, 0)):
+    """
+    将极坐标转换为平面直角坐标。
+
+    -----
+
+    :param tuple[float,float] coordinate: 极坐标
+    :param bool rad: 是否使用弧度制，为False时使用角度制，默认为False
+    :param tuple[float,float] origin: 指定坐标原点，默认为(0, 0)
+
+    :return: 平面直角坐标
+    :rtype: tuple[float,float]
+    """
+    r, theta = coordinate
+    if not rad:
+        theta = _radians(theta)
+    x = r * _cos(theta) + origin[0]
+    y = r * _sin(theta) + origin[1]
+    return x, y
 
 
 def probability_true_i(n, d):
@@ -126,13 +205,13 @@ def _get_comp_factory():
 def pos_floor(pos):
     """
     对坐标进行向下取整。
-        
+
     -----
-    
+
     :param tuple[float,float,float] pos: 坐标
         
     :return: 取整后的坐标
-    :rtype: tuple[int, int, int] 
+    :rtype: tuple[int,int,int]
     """
     return tuple(map(lambda x: int(_floor(x)), pos))
 
@@ -143,8 +222,8 @@ def pos_distance(first_point, second_point):
         
     -----
     
-    :param tuple[float, ...] first_point: 坐标1
-    :param tuple[float, ...] second_point: 坐标2
+    :param tuple[float,...] first_point: 坐标1
+    :param tuple[float,...] second_point: 坐标2
         
     :return: 距离
     :rtype: float
@@ -185,7 +264,7 @@ def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, pl
     :param float player_rot: 玩家水平视角
         
     :return: 屏幕坐标
-    :rtype: tuple[float, float]|None
+    :rtype: tuple[float,float]|None
     """
     if not entity_pos or not center_pos or not player_rot:
         return
@@ -209,10 +288,10 @@ def pos_rotate(angle, pos):
     -----
     
     :param float angle: 旋转角
-    :param tuple[float, float] pos: 原始坐标（二维坐标）
+    :param tuple[float,float] pos: 原始坐标（二维坐标）
         
     :return: 旋转后的坐标
-    :rtype: tuple[float, float]|None
+    :rtype: tuple[float,float]|None
     """
     if not angle or not pos:
         return
@@ -259,8 +338,8 @@ def midpoint(first_point, second_point):
         
     -----
     
-    :param tuple[float, ...] first_point: 坐标1
-    :param tuple[float, ...] second_point: 坐标2
+    :param tuple[float,...] first_point: 坐标1
+    :param tuple[float,...] second_point: 坐标2
         
     :return: 中点坐标
     :rtype: tuple[float, ...]|None
@@ -280,7 +359,7 @@ def camera_rot_p2p(pos1, pos2):
     :param tuple[float,float,float] pos2: 坐标2
 
     :return: (竖直角度, 水平角度)
-    :rtype: tuple[float, float]|None
+    :rtype: tuple[float,float]|None
     """
     if not pos1 or not pos2:
         return
@@ -359,7 +438,7 @@ def pos_forward_rot(pos, rot, dis):
     -----
 
     :param tuple[float,float,float] pos: 坐标
-    :param tuple[float, float] rot: (竖直角度, 水平角度)
+    :param tuple[float,float] rot: (竖直角度, 水平角度)
     :param float dis: 距离
 
     :return: 坐标
@@ -672,22 +751,19 @@ _LEVEL_ID = client_api.GetLevelId() or server_api.GetLevelId()
 
 def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter_blocks=None):
     """
-    从指定位置射出一条射线，获取该射线经过的方块。
+    | 从指定位置射出一条射线，获取该射线经过的方块。
+    | 返回一个列表，方块按照由近到远的顺序排列，列表每个元素为一个字典，结构如下：
+    ::
 
-    返回一个列表，方块按照由近到远的顺序排列，列表每个元素为一个字典，结构如下：
+        {
+            "name": str, # 方块ID
+            "aux": int, # 方块特殊值
+            "pos": Tuple[float, float, float], # 方块坐标
+            "intersection": Tuple[float, float, float], # 射线与方块的第一个交点的坐标
+        }
 
-    >>> {
-    ...     "name": str, # 方块ID
-    ...     "aux": int, # 方块特殊值
-    ...     "pos": Tuple[float, float, float], # 方块坐标
-    ...     "intersection": Tuple[float, float, float], # 射线与方块的第一个交点的坐标
-    ... }
-
-    -----
-
-    *算法作者：头脑风暴*
-
-    *修改：* `诺言Nuoyan <https://gitee.com/charming-lee>`_
+    | *算法作者：头脑风暴*
+    | *修改：* `诺言Nuoyan <https://gitee.com/charming-lee>`_
 
     -----
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-14
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -28,6 +28,8 @@ from comp import (
     PLAYER_ID as _PLAYER_ID,
     ClientSystem as _ClientSystem,
     CompFactory as _CompFactory,
+    LvComp as _LvComp,
+    PlrComp as _PlrComp,
 )
 
 
@@ -157,13 +159,10 @@ def _add_listener(func, event_name="", namespace=_MOD_NAME, system_name=_SERVER_
 
 def client_listener(event_name="", namespace="", system_name="", priority=0):
     """
-    函数装饰器，通过对函数进行装饰即可实现监听。
-
-    省略所有参数时，监听当前服务端传来的与被装饰函数同名的事件。
-
-    当指定命名空间和系统名称时，可监听来自其他系统的事件。
-
-    监听引擎事件时，只需传入该事件的名称即可，无需传入引擎命名空间和系统名称。
+    | 函数装饰器，通过对函数进行装饰即可实现监听。
+    | 省略所有参数时，监听当前服务端传来的与被装饰函数同名的事件。
+    | 当指定命名空间和系统名称时，可监听来自其他系统的事件。
+    | 监听引擎事件时，只需传入该事件的名称即可，无需传入引擎命名空间和系统名称。
 
     -----
 
@@ -216,19 +215,19 @@ class NuoyanClientSystem(_ClientSystem):
 
     【注意事项】
 
-    1、带有 *[event]* 标签的方法为事件，重写该方法即可使用该事件。
-
-    2、带有 *[tick]* 标签的事件为帧事件，需要注意编写相关逻辑。
-
-    3、事件回调参数中，参数名前面的美元符号“$”表示该参数可进行修改。
+    | 1、带有 *[event]* 标签的方法为事件，重写该方法即可使用该事件。
+    | 2、带有 *[tick]* 标签的事件为帧事件，需要注意编写相关逻辑。
+    | 3、事件回调参数中，参数名前面的美元符号 ``$`` 表示该参数可进行修改。
     """
 
     def __init__(self, namespace, system_name):
         # noinspection PySuperArguments
         super(NuoyanClientSystem, self).__init__(namespace, system_name)
-        self.__game_tick_node = None
+        self._game_tick_node = None
         self._ui_init_finished = False
         self.__handle = 0
+        self._auto_show_ui = {}
+        self._old_carried_item = ("minecraft:air", 0)
         _listen_custom(self)
         _listen_engine(self)
         self._check_on_game_tick()
@@ -238,13 +237,14 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端系统销毁时触发。
+        | 客户端系统销毁时触发。
+        | 若重写该方法，请调用一次父类的同名方法。如：
+        ::
 
-        若重写该方法，请调用一次NuoyanClientSystem的同名方法。如：
-
-        >>> class MyClientSystem(NuoyanClientSystem):
-        ...     def Destroy(self):
-        ...         super(MyClientSystem, self).Destroy()  # 或者：NuoyanClientSystem.Destroy(self)
+            class MyClientSystem(NuoyanClientSystem):
+                def Destroy(self):
+                    super(MyClientSystem, self).Destroy()
+                    # 或者：NuoyanClientSystem.Destroy(self)
 
         -----
 
@@ -279,15 +279,11 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【posX: int】 自定义方块实体的位置X
-
-        【posY: int】 自定义方块实体的位置Y
-
-        【posZ: int】 自定义方块实体的位置Z
-
-        【dimensionId: int】 维度ID
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【posX: int】 自定义方块实体的位置X
+        | 【posY: int】 自定义方块实体的位置Y
+        | 【posZ: int】 自定义方块实体的位置Z
+        | 【dimensionId: int】 维度ID
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
 
         -----
 
@@ -305,15 +301,11 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【posX: int】 自定义方块实体的位置X
-
-        【posY: int】 自定义方块实体的位置Y
-
-        【posZ: int】 自定义方块实体的位置Z
-
-        【dimensionId: int】 维度ID
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【posX: int】 自定义方块实体的位置X
+        | 【posY: int】 自定义方块实体的位置Y
+        | 【posZ: int】 自定义方块实体的位置Z
+        | 【dimensionId: int】 维度ID
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
 
         -----
 
@@ -331,9 +323,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【oldPosition: Tuple[float, float]】 移动前该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
-
-        【newPosition: Tuple[float, float]】 移动后该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
+        | 【oldPosition: Tuple[float, float]】 移动前该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
+        | 【newPosition: Tuple[float, float]】 移动后该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
 
         -----
 
@@ -351,11 +342,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【action: str】 行为
-
-        【newKey: int】 修改后的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
-
-        【oldKey: int】 修改前的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
+        | 【action: str】 行为
+        | 【newKey: int】 修改后的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
+        | 【oldKey: int】 修改前的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
 
         -----
 
@@ -373,11 +362,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【action: str】 行为
-
-        【newKey: int】 修改后的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-
-        【oldKey: int】 修改前的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
+        | 【action: str】 行为
+        | 【newKey: int】 修改后的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
+        | 【oldKey: int】 修改前的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
 
         -----
 
@@ -395,9 +382,8 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-
-        【magnitude: float】 扣动扳机的力度，取值为 0 ~ 1.0
+        | 【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
+        | 【magnitude: float】 扣动扳机的力度，取值为 0 ~ 1.0
 
         -----
 
@@ -415,11 +401,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-
-        【x: float】摇杆水平方向的值，从左到右取值为 -1.0 ~ 1.0
-
-        【y: float】摇杆竖直方向的值，从下到上取值为 -1.0 ~ 1.0
+        | 【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
+        | 【x: float】摇杆水平方向的值，从左到右取值为 -1.0 ~ 1.0
+        | 【y: float】摇杆竖直方向的值，从下到上取值为 -1.0 ~ 1.0
 
         -----
 
@@ -437,11 +421,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【screenName: str】 当前screenName
-
-        【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-
-        【isDown: str】 是否按下，按下为1，弹起为0
+        | 【screenName: str】 当前screenName
+        | 【key: int】 键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
+        | 【isDown: str】 是否按下，按下为1，弹起为0
 
         -----
 
@@ -461,15 +443,11 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【posX: int】 自定义方块实体的位置X
-
-        【posY: int】 自定义方块实体的位置Y
-
-        【posZ: int】 自定义方块实体的位置Z
-
-        【dimensionId: int】 维度ID
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【posX: int】 自定义方块实体的位置X
+        | 【posY: int】 自定义方块实体的位置Y
+        | 【posZ: int】 自定义方块实体的位置Z
+        | 【dimensionId: int】 维度ID
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
 
         -----
 
@@ -507,9 +485,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【screenName: str】 UI名字
-
-        【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
+        | 【screenName: str】 UI名字
+        | 【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
 
         -----
 
@@ -567,7 +544,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【$cancel: bool】 设置为True可拦截原版的攻击或放置响应
+        | 【$cancel: bool】 设置为True可拦截原版的攻击或放置响应
 
         -----
 
@@ -609,7 +586,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【$cancel: bool】 设置为True可拦截原版的物品使用/实体交互响应
+        | 【$cancel: bool】 设置为True可拦截原版的物品使用/实体交互响应
 
         -----
 
@@ -629,11 +606,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【isDown: str】 是否按下，按下为1，弹起为0
-
-        【mousePositionX: float】 按下时的x坐标
-
-        【mousePositionY: float】 按下时的y坐标
+        | 【isDown: str】 是否按下，按下为1，弹起为0
+        | 【mousePositionX: float】 按下时的x坐标
+        | 【mousePositionY: float】 按下时的y坐标
 
         -----
 
@@ -651,11 +626,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【screenName: str】 当前screenName
-
-        【key: str】 键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
-
-        【isDown: str】 是否按下，按下为1，弹起为0
+        | 【screenName: str】 当前screenName
+        | 【key: str】 键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
+        | 【isDown: str】 是否按下，按下为1，弹起为0
 
         -----
 
@@ -723,7 +696,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【direction: int】 1为向上滚动，0为向下滚动
+        | 【direction: int】 1为向上滚动，0为向下滚动
 
         -----
 
@@ -759,7 +732,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【$cancel: bool】 设置为True可拦截原版的挖方块或攻击响应
+        | 【$cancel: bool】 设置为True可拦截原版的挖方块或攻击响应
 
         -----
 
@@ -791,7 +764,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【$cancel: bool】 设置为True可拦截原版的挖方块/使用物品/与实体交互响应
+        | 【$cancel: bool】 设置为True可拦截原版的挖方块/使用物品/与实体交互响应
 
         -----
 
@@ -809,9 +782,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【x: int】 手指点击位置x坐标
-
-        【y: int】 手指点击位置y坐标
+        | 【x: int】 手指点击位置x坐标
+        | 【y: int】 手指点击位置y坐标
 
         -----
 
@@ -865,7 +837,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【$continueJump: bool】 设置是否执行跳跃逻辑
+        | 【$continueJump: bool】 设置是否执行跳跃逻辑
 
         -----
 
@@ -883,15 +855,11 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【name: str】 即资源包中sounds/sound_definitions.json中的key
-
-        【pos: Tuple[float, float, float]】 音效播放的位置，UI音效为(0,0,0)
-
-        【volume: float】 音量，范围为0-1
-
-        【pitch: float】 播放速度，正常速度为1
-
-        【$cancel: bool】 设为True可屏蔽该次音效播放
+        | 【name: str】 即资源包中sounds/sound_definitions.json中的key
+        | 【pos: Tuple[float, float, float]】 音效播放的位置，UI音效为(0,0,0)
+        | 【volume: float】 音量，范围为0-1
+        | 【pitch: float】 播放速度，正常速度为1
+        | 【$cancel: bool】 设为True可屏蔽该次音效播放
 
         -----
 
@@ -909,9 +877,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【name: str】 即资源包中sounds/music_definitions.json中的event_name，并且对应sounds/sound_definitions.json中的key
-
-        【$cancel: bool】 设为True可屏蔽该次音效播放
+        | 【name: str】 即资源包中sounds/music_definitions.json中的event_name，并且对应sounds/sound_definitions.json中的key
+        | 【$cancel: bool】 设为True可屏蔽该次音效播放
 
         -----
 
@@ -929,7 +896,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【musicName: str】 音乐名称
+        | 【musicName: str】 音乐名称
 
         -----
 
@@ -947,13 +914,10 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【beforeX: float】 屏幕大小改变前的宽度
-
-        【beforeY: float】 屏幕大小改变前的高度
-
-        【afterX: float】 屏幕大小改变后的宽度
-
-        【afterY: float】 屏幕大小改变后的高度
+        | 【beforeX: float】 屏幕大小改变前的宽度
+        | 【beforeY: float】 屏幕大小改变前的高度
+        | 【afterX: float】 屏幕大小改变后的宽度
+        | 【afterY: float】 屏幕大小改变后的高度
 
         -----
 
@@ -971,9 +935,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【screenName: str】 UI名字
-
-        【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
+        | 【screenName: str】 UI名字
+        | 【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
 
         -----
 
@@ -993,9 +956,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【screenName: str】 UI名字
-
-        【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
+        | 【screenName: str】 UI名字
+        | 【screenDef: str】 包含命名空间的UI名字，格式为namespace.screenName
 
         -----
 
@@ -1031,7 +993,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【slotIndex: int】 点击的物品槽的编号，编号对应位置详见 `物品栏 <https://minecraft.fandom.com/zh/wiki/%E7%89%A9%E5%93%81%E6%A0%8F>`_
+        | 【slotIndex: int】 点击的物品槽的编号，编号对应位置详见 `物品栏 <https://minecraft.fandom.com/zh/wiki/%E7%89%A9%E5%93%81%E6%A0%8F>`_
 
         -----
 
@@ -1049,7 +1011,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【path: str】 grid网格所在的路径（从UI根节点算起）
+        | 【path: str】 grid网格所在的路径（从UI根节点算起）
 
         -----
 
@@ -1067,9 +1029,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【isCreative: bool】 是否是创造模式背包界面
-
-        【$cancel: bool】 是否取消打开物品背包界面。
+        | 【isCreative: bool】 是否是创造模式背包界面
+        | 【$cancel: bool】 是否取消打开物品背包界面。
 
         -----
 
@@ -1105,13 +1066,10 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【x: int】 箱子x坐标
-
-        【y: int】 箱子y坐标
-
-        【z: int】 箱子z坐标
+        | 【playerId: str】 玩家的实体ID
+        | 【x: int】 箱子x坐标
+        | 【y: int】 箱子y坐标
+        | 【z: int】 箱子z坐标
 
         -----
 
@@ -1147,7 +1105,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【id: str】 实体ID
+        | 【id: str】 实体ID
 
         -----
 
@@ -1165,7 +1123,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【id: str】 实体ID
+        | 【id: str】 实体ID
 
         -----
 
@@ -1183,7 +1141,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【id: str】 实体ID
+        | 【id: str】 实体ID
 
         -----
 
@@ -1201,7 +1159,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【id: str】 实体ID
+        | 【id: str】 实体ID
 
         -----
 
@@ -1219,9 +1177,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【playerId: str】 玩家的实体ID
+        | 【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         -----
 
@@ -1239,9 +1196,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【playerId: str】 玩家的实体ID
+        | 【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         -----
 
@@ -1259,11 +1215,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【$cancel: bool】 是否取消此次操作
+        | 【playerId: str】 玩家的实体ID
+        | 【itemDict: dict】 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【$cancel: bool】 是否取消此次操作
 
         -----
 
@@ -1277,11 +1231,14 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        手持物品发生变化时，触发该事件；数量改变不会通知。
-        
+        手持物品发生变化时，触发该事件；数量改变不会触发。
+
+        | *作者的tips：*
+        | *该事件在进入游戏时会触发一次，且触发时机比UiInitFinished更早。*
+
         -----
 
-        【itemDict: dict】 切换后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【itemDict: dict】 切换后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         -----
 
@@ -1299,15 +1256,11 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【durationLeft: float】 蓄力剩余时间（当物品缺少"minecraft:maxduration"组件时，蓄力剩余时间为负数）
-
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【maxUseDuration: int】 最大蓄力时长
-
-        【$cancel: bool】 设置为True可以取消，需要同时取消服务端事件ItemReleaseUsingServerEvent
+        | 【playerId: str】 玩家的实体ID
+        | 【durationLeft: float】 蓄力剩余时间（当物品缺少"minecraft:maxduration"组件时，蓄力剩余时间为负数）
+        | 【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【maxUseDuration: int】 最大蓄力时长
+        | 【$cancel: bool】 设置为True可以取消，需要同时取消服务端事件ItemReleaseUsingServerEvent
 
         -----
 
@@ -1331,13 +1284,10 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【slot: int】 背包槽位
-
-        【oldItemDict: dict】 变化前槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【newItemDict: dict】 变化后槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【playerId: str】 玩家的实体ID
+        | 【slot: int】 背包槽位
+        | 【oldItemDict: dict】 变化前槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【newItemDict: dict】 变化后槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
 
         -----
 
@@ -1355,15 +1305,11 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【oldItemDict: dict】 合成前的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（砂轮内第一个物品）
-
-        【additionalItemDict: dict】 作为合成材料的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（砂轮内第二个物品）
-
-        【newItemDict: dict】 合成后的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【exp: int】 本次合成返还的经验
+        | 【playerId: str】 玩家的实体ID
+        | 【oldItemDict: dict】 合成前的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（砂轮内第一个物品）
+        | 【additionalItemDict: dict】 作为合成材料的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（砂轮内第二个物品）
+        | 【newItemDict: dict】 合成后的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【exp: int】 本次合成返还的经验
 
         -----
 
@@ -1381,7 +1327,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【recipeId: str】 配方ID，对应配方json文件中的identifier字段
+        | 【recipeId: str】 配方ID，对应配方json文件中的identifier字段
 
         -----
 
@@ -1403,29 +1349,18 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【entityId: str】 玩家实体ID
-
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【x: int】 方块x坐标
-
-        【y: int】 方块y坐标
-
-        【z: int】 方块z坐标
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【blockAuxValue: int】 方块的附加值
-
-        【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-
-        【clickX: float】 点击点的x比例位置
-
-        【clickY: float】 点击点的y比例位置
-
-        【clickZ: float】 点击点的z比例位置
-
-        【$ret: bool】 设为True可取消物品的使用
+        | 【entityId: str】 玩家实体ID
+        | 【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【x: int】 方块x坐标
+        | 【y: int】 方块y坐标
+        | 【z: int】 方块z坐标
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【blockAuxValue: int】 方块的附加值
+        | 【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
+        | 【clickX: float】 点击点的x比例位置
+        | 【clickY: float】 点击点的y比例位置
+        | 【clickZ: float】 点击点的z比例位置
+        | 【$ret: bool】 设为True可取消物品的使用
 
         -----
 
@@ -1449,11 +1384,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【$cancel: bool】 是否取消使用物品
+        | 【playerId: str】 玩家的实体ID
+        | 【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【$cancel: bool】 是否取消使用物品
 
         -----
 
@@ -1471,15 +1404,11 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【itemShowName: str】 合成后的物品显示名称
-
-        【itemDict: dict】 合成后的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【oldItemDict: dict】 合成前的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第一个物品）
-
-        【materialItemDict: dict】 合成所使用材料的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第二个物品）
+        | 【playerId: str】 玩家的实体ID
+        | 【itemShowName: str】 合成后的物品显示名称
+        | 【itemDict: dict】 合成后的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【oldItemDict: dict】 合成前的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第一个物品）
+        | 【materialItemDict: dict】 合成所使用材料的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第二个物品）
 
         -----
 
@@ -1497,11 +1426,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【useMethod: int】 使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
+        | 【playerId: str】 玩家的实体ID
+        | 【itemDict: dict】  `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【useMethod: int】 使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
 
         -----
 
@@ -1519,13 +1446,10 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【actor: str】 获得物品玩家实体ID
-
-        【secondaryActor: str】 物品给予者玩家实体ID，如果不存在给予者的话，这里为空字符串
-
-        【itemDict: dict】 获取到的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-
-        【acquireMethod: int】 获得物品的方法，详见 `ItemAcquisitionMethod <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
+        | 【actor: str】 获得物品玩家实体ID
+        | 【secondaryActor: str】 物品给予者玩家实体ID，如果不存在给予者的话，这里为空字符串
+        | 【itemDict: dict】 获取到的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【acquireMethod: int】 获得物品的方法，详见 `ItemAcquisitionMethod <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
 
         -----
 
@@ -1553,19 +1477,13 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【$cancel: bool】 是否允许触发，默认为False，若设为True，可阻止触发后续原版逻辑
-
-        【blockX: int】 方块x坐标
-
-        【blockY: int】 方块y坐标
-
-        【blockZ: int】 方块z坐标
-
-        【entityId: str】 实体ID
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【dimensionId: int】 维度ID
+        | 【$cancel: bool】 是否允许触发，默认为False，若设为True，可阻止触发后续原版逻辑
+        | 【blockX: int】 方块x坐标
+        | 【blockY: int】 方块y坐标
+        | 【blockZ: int】 方块z坐标
+        | 【entityId: str】 实体ID
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【dimensionId: int】 维度ID
         
         -----
 
@@ -1593,15 +1511,11 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【pos: Tuple[float, float, float]】 方块的坐标
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【auxValue: int】 方块的附加值
-
-        【playerId: str】 玩家的实体ID
-
-        【$cancel: bool】 修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockServerEvent一起修改。
+        | 【pos: Tuple[float, float, float]】 方块的坐标
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【auxValue: int】 方块的附加值
+        | 【playerId: str】 玩家的实体ID
+        | 【$cancel: bool】 修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockServerEvent一起修改。
 
         -----
 
@@ -1623,17 +1537,12 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【blockX: int】 方块位置x
-
-        【blockY: int】 方块位置y
-
-        【blockZ: int】 方块位置z
-
-        【entityId: str】 实体ID
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【dimensionId: int】 维度ID
+        | 【blockX: int】 方块位置x
+        | 【blockY: int】 方块位置y
+        | 【blockZ: int】 方块位置z
+        | 【entityId: str】 实体ID
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【dimensionId: int】 维度ID
         
         -----
 
@@ -1661,25 +1570,16 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【blockX: int】 方块位置x
-
-        【blockY: int】 方块位置y
-
-        【blockZ: int】 方块位置z
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【auxData: int】 方块附加值
-
-        【dropName: str】 触发剪刀效果的掉落物identifier，包含命名空间及名称
-
-        【dropCount: int】 触发剪刀效果的掉落物数量
-
-        【playerId: str】 触发剪刀效果的玩家ID
-
-        【dimensionId: int】 玩家触发时的维度ID
-
-        【$cancelShears: bool】 是否取消剪刀效果
+        | 【blockX: int】 方块位置x
+        | 【blockY: int】 方块位置y
+        | 【blockZ: int】 方块位置z
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【auxData: int】 方块附加值
+        | 【dropName: str】 触发剪刀效果的掉落物identifier，包含命名空间及名称
+        | 【dropCount: int】 触发剪刀效果的掉落物数量
+        | 【playerId: str】 触发剪刀效果的玩家ID
+        | 【dimensionId: int】 玩家触发时的维度ID
+        | 【$cancelShears: bool】 是否取消剪刀效果
 
         -----
 
@@ -1699,21 +1599,14 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【x: int】 方块x坐标
-
-        【y: int】 方块y坐标
-
-        【z: int】 方块z坐标
-
-        【face: int】 方块被敲击的面向ID，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【auxData: int】 方块附加值
-
-        【playerId: str】 试图破坏方块的玩家的实体ID
-
-        【$cancel: bool】 默认为False，在脚本层设置为True就能取消该方块的破坏
+        | 【x: int】 方块x坐标
+        | 【y: int】 方块y坐标
+        | 【z: int】 方块z坐标
+        | 【face: int】 方块被敲击的面向ID，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【auxData: int】 方块附加值
+        | 【playerId: str】 试图破坏方块的玩家的实体ID
+        | 【$cancel: bool】 默认为False，在脚本层设置为True就能取消该方块的破坏
 
         -----
 
@@ -1737,31 +1630,19 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【entityId: str】 实体ID
-
-        【dimensionId: int】 实体所在维度ID
-
-        【posX: float】 实体位置x
-
-        【posY: float】 实体位置y
-
-        【posZ: float】 实体位置z
-
-        【$motionX: float】 瞬时移动x方向的力
-
-        【$motionY: float】 瞬时移动y方向的力
-
-        【$motionZ: float】 瞬时移动z方向的力
-
-        【blockX: int】 方块位置x
-
-        【blockY: int】 方块位置y
-
-        【blockZ: int】 方块位置z
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【$cancel: bool】 可由脚本层回传True给引擎，阻止触发后续原版逻辑
+        | 【entityId: str】 实体ID
+        | 【dimensionId: int】 实体所在维度ID
+        | 【posX: float】 实体位置x
+        | 【posY: float】 实体位置y
+        | 【posZ: float】 实体位置z
+        | 【$motionX: float】 瞬时移动x方向的力
+        | 【$motionY: float】 瞬时移动y方向的力
+        | 【$motionZ: float】 瞬时移动z方向的力
+        | 【blockX: int】 方块位置x
+        | 【blockY: int】 方块位置y
+        | 【blockZ: int】 方块位置z
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【$cancel: bool】 可由脚本层回传True给引擎，阻止触发后续原版逻辑
         
         -----
 
@@ -1789,13 +1670,10 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【effectName: str】 创建成功的特效的自定义键值名称
-
-        【id: int】 该特效的ID
-
-        【effectType: int】 该特效的类型，0为粒子特效，1为序列帧特效
-
-        【blockPos: Tuple[float, float, float]】 该特效绑定的自定义方块实体的世界坐标
+        | 【effectName: str】 创建成功的特效的自定义键值名称
+        | 【id: int】 该特效的ID
+        | 【effectType: int】 该特效的类型，0为粒子特效，1为序列帧特效
+        | 【blockPos: Tuple[float, float, float]】 该特效绑定的自定义方块实体的世界坐标
 
         -----
 
@@ -1823,25 +1701,16 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【entityId: str】 实体ID
-
-        【dimensionId: int】 实体所在维度ID
-
-        【$slowdownMultiX: float】 实体移速x方向的减速比例
-
-        【$slowdownMultiY: float】 实体移速y方向的减速比例
-
-        【$slowdownMultiZ: float】 实体移速z方向的减速比例
-
-        【blockX: int】 方块位置x
-
-        【blockY: int】 方块位置y
-
-        【blockZ: int】 方块位置z
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【$cancel: bool】 可由脚本层回传True给引擎，阻止触发后续原版逻辑
+        | 【entityId: str】 实体ID
+        | 【dimensionId: int】 实体所在维度ID
+        | 【$slowdownMultiX: float】 实体移速x方向的减速比例
+        | 【$slowdownMultiY: float】 实体移速y方向的减速比例
+        | 【$slowdownMultiZ: float】 实体移速z方向的减速比例
+        | 【blockX: int】 方块位置x
+        | 【blockY: int】 方块位置y
+        | 【blockZ: int】 方块位置z
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【$cancel: bool】 可由脚本层回传True给引擎，阻止触发后续原版逻辑
         
         -----
 
@@ -1877,23 +1746,15 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【entityId: str】 实体ID
-
-        【posX: float】 实体位置x
-
-        【posY: float】 实体位置y
-
-        【posZ: float】 实体位置z
-
-        【$motionX: float】 瞬时移动x方向的力
-
-        【$motionY: float】 瞬时移动y方向的力
-
-        【$motionZ: float】 瞬时移动z方向的力
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【$calculate: bool】 是否按脚本层传值计算力
+        | 【entityId: str】 实体ID
+        | 【posX: float】 实体位置x
+        | 【posY: float】 实体位置y
+        | 【posZ: float】 实体位置z
+        | 【$motionX: float】 瞬时移动x方向的力
+        | 【$motionY: float】 瞬时移动y方向的力
+        | 【$motionZ: float】 瞬时移动z方向的力
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【$calculate: bool】 是否按脚本层传值计算力
 
         -----
 
@@ -1915,27 +1776,17 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【fallingBlockId: str】 下落的方块实体ID
-
-        【fallingBlockX: float】 下落的方块实体位置x
-
-        【fallingBlockY: float】 下落的方块实体位置y
-
-        【fallingBlockZ: float】 下落的方块实体位置z
-
-        【blockName: str】 重力方块的identifier，包含命名空间及名称
-
-        【dimensionId: int】 下落的方块实体维度ID
-
-        【collidingEntitys: Optional[List[str]]】 当前碰撞到的实体ID列表（客户端只能获取到玩家），如果没有的话是None
-
-        【fallTickAmount: int】 下落的方块实体持续下落了多少tick
-
-        【fallDistance: float】 下落的方块实体持续下落了多少距离
-
-        【isHarmful: bool】 客户端始终为false，因为客户端不会计算伤害值
-
-        【fallDamage: int】 对实体的伤害
+        | 【fallingBlockId: str】 下落的方块实体ID
+        | 【fallingBlockX: float】 下落的方块实体位置x
+        | 【fallingBlockY: float】 下落的方块实体位置y
+        | 【fallingBlockZ: float】 下落的方块实体位置z
+        | 【blockName: str】 重力方块的identifier，包含命名空间及名称
+        | 【dimensionId: int】 下落的方块实体维度ID
+        | 【collidingEntitys: Optional[List[str]]】 当前碰撞到的实体ID列表（客户端只能获取到玩家），如果没有的话是None
+        | 【fallTickAmount: int】 下落的方块实体持续下落了多少tick
+        | 【fallDistance: float】 下落的方块实体持续下落了多少距离
+        | 【isHarmful: bool】 客户端始终为false，因为客户端不会计算伤害值
+        | 【fallDamage: int】 对实体的伤害
 
         -----
 
@@ -1955,19 +1806,13 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【blockName: str】 方块的identifier，包含命名空间及名称
-
-        【aux: int】 方块附加值
-
-        【$cancel: bool】 设置为True可拦截与方块交互的逻辑
-
-        【x: int】 方块x坐标
-
-        【y: int】 方块y坐标
-
-        【z: int】 方块z坐标
+        | 【playerId: str】 玩家的实体ID
+        | 【blockName: str】 方块的identifier，包含命名空间及名称
+        | 【aux: int】 方块附加值
+        | 【$cancel: bool】 设置为True可拦截与方块交互的逻辑
+        | 【x: int】 方块x坐标
+        | 【y: int】 方块y坐标
+        | 【z: int】 方块z坐标
 
         -----
 
@@ -1987,9 +1832,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【from: int】 切换前的视角
-
-        【to: int】 切换后的视角
+        | 【from: int】 切换前的视角
+        | 【to: int】 切换后的视角
 
         -----
 
@@ -2011,17 +1855,12 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【posX: int】 碰撞方块x坐标
-
-        【posY: int】 碰撞方块y坐标
-
-        【posZ: int】 碰撞方块z坐标
-
-        【blockId: str】 碰撞方块的identifier
-
-        【auxValue: int】 碰撞方块的附加值
+        | 【playerId: str】 玩家的实体ID
+        | 【posX: int】 碰撞方块x坐标
+        | 【posY: int】 碰撞方块y坐标
+        | 【posZ: int】 碰撞方块z坐标
+        | 【blockId: str】 碰撞方块的identifier
+        | 【auxValue: int】 碰撞方块的附加值
         
         -----
 
@@ -2051,11 +1890,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【oldGameType: int】 切换前的游戏模式
-
-        【newGameType: int】 切换后的游戏模式
+        | 【playerId: str】 玩家的实体ID
+        | 【oldGameType: int】 切换前的游戏模式
+        | 【newGameType: int】 切换后的游戏模式
 
         -----
 
@@ -2073,11 +1910,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【pos: Tuple[float, float, float]】 火焰方块的坐标
-
-        【playerId: str】 玩家的实体ID
-
-        【$cancel: bool】 修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireServerEvent一起修改。
+        | 【pos: Tuple[float, float, float]】 火焰方块的坐标
+        | 【playerId: str】 玩家的实体ID
+        | 【$cancel: bool】 修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireServerEvent一起修改。
 
         -----
 
@@ -2097,13 +1932,10 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【fromDimensionId: int】 维度改变前的维度
-
-        【toDimensionId: int】 维度改变后的维度
-
-        【toPos: Tuple[float, float, float]】 改变后的位置(x,y,z)，其中y值为脚底加上角色的身高值
+        | 【playerId: str】 玩家的实体ID
+        | 【fromDimensionId: int】 维度改变前的维度
+        | 【toDimensionId: int】 维度改变后的维度
+        | 【toPos: Tuple[float, float, float]】 改变后的位置(x,y,z)，其中y值为脚底加上角色的身高值
 
         -----
 
@@ -2123,23 +1955,15 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【fromDimensionId: int】 维度改变前的维度
-
-        【toDimensionId: int】 维度改变后的维度
-
-        【fromX: float】 改变前的位置x
-
-        【fromY: float】 改变前的位置y
-
-        【fromZ: float】 改变前的位置z
-
-        【toX: float】 改变后的位置x
-
-        【toY: float】 改变后的位置y
-
-        【toZ: float】 改变后的位置z
+        | 【playerId: str】 玩家的实体ID
+        | 【fromDimensionId: int】 维度改变前的维度
+        | 【toDimensionId: int】 维度改变后的维度
+        | 【fromX: float】 改变前的位置x
+        | 【fromY: float】 改变前的位置y
+        | 【fromZ: float】 改变前的位置z
+        | 【toX: float】 改变后的位置x
+        | 【toY: float】 改变后的位置y
+        | 【toZ: float】 改变后的位置z
 
         -----
 
@@ -2159,9 +1983,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【motionId: int】 运动器ID
-
-        【$remove: bool】 是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除
+        | 【motionId: int】 运动器ID
+        | 【$remove: bool】 是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除
 
         -----
 
@@ -2179,7 +2002,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【motionId: int】 运动器ID
+        | 【motionId: int】 运动器ID
 
         -----
 
@@ -2197,9 +2020,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【entityId: str】 远离的生物的实体ID
+        | 【playerId: str】 玩家的实体ID
+        | 【entityId: str】 远离的生物的实体ID
 
         -----
 
@@ -2219,9 +2041,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【actorId: str】 骑乘者的实体ID
-
-        【victimId: str】 被骑乘者的实体ID
+        | 【actorId: str】 骑乘者的实体ID
+        | 【victimId: str】 被骑乘者的实体ID
 
         -----
 
@@ -2243,9 +2064,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【mobId: str】 当前生物的实体ID
-
-        【hittedMobList: List[str]】 当前生物碰撞到的其他所有生物的实体ID的list
+        | 【mobId: str】 当前生物的实体ID
+        | 【hittedMobList: List[str]】 当前生物碰撞到的其他所有生物的实体ID的list
         
         -----
 
@@ -2271,7 +2091,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【id: str】 实体ID
+        | 【id: str】 实体ID
 
         -----
 
@@ -2289,11 +2109,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【entityId: str】 实体ID
-
-        【from: float】 变化前的生命值
-
-        【to: float】 变化后的生命值
+        | 【entityId: str】 实体ID
+        | 【from: float】 变化前的生命值
+        | 【to: float】 变化后的生命值
 
         -----
 
@@ -2329,17 +2147,12 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【id: str】 实体ID
-
-        【rideId: str】 坐骑的实体ID
-
-        【exitFromRider: bool】 是否下坐骑
-
-        【entityIsBeingDestroyed: bool】 坐骑是否将要销毁
-
-        【switchingRides: bool】 是否换乘坐骑
-
-        【$cancel: bool】 设置为True可以取消（需要与服务端事件一同取消）
+        | 【id: str】 实体ID
+        | 【rideId: str】 坐骑的实体ID
+        | 【exitFromRider: bool】 是否下坐骑
+        | 【entityIsBeingDestroyed: bool】 坐骑是否将要销毁
+        | 【switchingRides: bool】 是否换乘坐骑
+        | 【$cancel: bool】 设置为True可以取消（需要与服务端事件一同取消）
 
         -----
 
@@ -2357,11 +2170,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【entityId: str】 实体ID
-
-        【newModel: str】 新的模型名字
-
-        【oldModel: str】 旧的模型名字
+        | 【entityId: str】 实体ID
+        | 【newModel: str】 新的模型名字
+        | 【oldModel: str】 旧的模型名字
 
         -----
 
@@ -2379,9 +2190,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
-
-        【entityId: str】 靠近的生物的实体ID
+        | 【playerId: str】 玩家的实体ID
+        | 【entityId: str】 靠近的生物的实体ID
 
         -----
 
@@ -2417,7 +2227,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
+        | 【playerId: str】 玩家的实体ID
 
         -----
 
@@ -2437,7 +2247,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【id: str】 移除的实体ID
+        | 【id: str】 移除的实体ID
 
         -----
 
@@ -2455,7 +2265,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
+        | 【playerId: str】 玩家的实体ID
 
         -----
 
@@ -2475,9 +2285,8 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【command: str】 命令名称
-
-        【message: str】 命令返回的消息
+        | 【command: str】 命令名称
+        | 【message: str】 命令返回的消息
 
         -----
 
@@ -2513,11 +2322,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【dimension: int】 区块所在维度
-
-        【chunkPosX: int】 区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
-
-        【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
+        | 【dimension: int】 区块所在维度
+        | 【chunkPosX: int】 区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
+        | 【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
 
         -----
 
@@ -2537,11 +2344,9 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【dimension: int】 区块所在维度
-
-        【chunkPosX: int】 区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
-
-        【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
+        | 【dimension: int】 区块所在维度
+        | 【chunkPosX: int】 区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
+        | 【chunkPosZ: int】 区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
 
         -----
 
@@ -2563,7 +2368,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
+        | 【playerId: str】 玩家的实体ID
 
         -----
 
@@ -2583,7 +2388,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【playerId: str】 玩家的实体ID
+        | 【playerId: str】 玩家的实体ID
 
         -----
 
@@ -2601,23 +2406,15 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        【id: str】 实体ID
-
-        【posX: float】 位置x
-
-        【posY: float】 位置y
-
-        【posZ: float】 位置z
-
-        【dimensionId: int】 实体维度
-
-        【isBaby: bool】 是否为幼儿
-
-        【engineTypeStr: str】 实体类型
-
-        【itemName: str】 物品identifier（仅当物品实体时存在该字段）
-
-        【auxValue: int】 物品附加值（仅当物品实体时存在该字段）
+        | 【id: str】 实体ID
+        | 【posX: float】 位置x
+        | 【posY: float】 位置y
+        | 【posZ: float】 位置z
+        | 【dimensionId: int】 实体维度
+        | 【isBaby: bool】 是否为幼儿
+        | 【engineTypeStr: str】 实体类型
+        | 【itemName: str】 物品identifier（仅当物品实体时存在该字段）
+        | 【auxValue: int】 物品附加值（仅当物品实体时存在该字段）
 
         -----
 
@@ -2647,9 +2444,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        UI初始化框架完成，此时可以创建UI。
-
-        切换维度后会重新初始化UI并触发该事件。
+        | UI初始化框架完成，此时可以创建UI。
+        | 切换维度后会重新初始化UI并触发该事件。
         
         -----
 
@@ -2669,11 +2465,9 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[tick]* *[event]*
 
-        频率与游戏实时帧率同步的Tick事件。比如游戏当前帧率为60帧，则该事件每秒触发60次。
-
-        需要注意的是，因为受游戏帧率影响，该事件的触发帧率并不稳定。
-
-        如果没有特殊需求，建议使用OnScriptTickClient。
+        | 频率与游戏实时帧率同步的Tick事件。比如游戏当前帧率为60帧，则该事件每秒触发60次。
+        | 需要注意的是，因为受游戏帧率影响，该事件的触发帧率并不稳定。
+        | 如果没有特殊需求，建议使用 ``OnScriptTickClient`` 。
         
         -----
 
@@ -2689,11 +2483,9 @@ class NuoyanClientSystem(_ClientSystem):
 
     def SetQueryVar(self, entity_id, name, value, sync=True):
         """
-        设置指定实体query.mod变量的值，支持全局同步（即所有客户端同步设置该变量的值）。
-
-        若不进行全局同步，则本次设置只对当前客户端有效。
-
-        若设置的变量未注册，则自动进行注册。
+        | 设置指定实体 ``query.mod`` 变量的值，支持全局同步（即所有客户端同步设置该变量的值）。
+        | 若不进行全局同步，则本次设置只对当前客户端有效。
+        | 若设置的变量未注册，则自动进行注册。
         
         -----
 
@@ -2710,23 +2502,30 @@ class NuoyanClientSystem(_ClientSystem):
         if sync:
             self.NotifyToServer("_SetQueryVar", data)
 
-    def AddPlayerRenderResources(self, player_id, *res_tuple):
+    def AddPlayerRenderResources(self, player_id, rebuild, *res_tuple):
         """
-        一键添加玩家渲染资源，包括模型、贴图、材质、渲染控制器、动画、动画控制器、音效和粒子特效。
-
-        注意：如需添加音效，音效名称必须至少包含一个“.”，如“sound.abc”，否则本接口将无法识别。
+        | 一次性添加多个玩家渲染资源，支持添加模型、贴图、材质、渲染控制器、动画、动画控制器、音效和微软粒子特效。
+        | 注意：使用本接口添加的资源，需要遵循以下命名规范：
+        | 1、模型：以 ``geometry.`` 开头；
+        | 2、渲染控制器：以 ``controller.render.`` 开头；
+        | 3、动画：以 ``animation.`` 开头；
+        | 4、动画控制器：以 ``controller.animation.`` 开头；
+        | 5、音效：音效名称至少包含一个 ``.`` ，如 ``sound.abc`` 。
 
         -----
 
         :param str player_id: 玩家实体ID
-        :param tuple[str,str] res_tuple: 变长参数，渲染资源元组，格式详见示例
+        :param bool rebuild: 是否重建玩家的数据渲染器，传入True时会自动调用RebuildPlayerRender接口。
+        :param tuple[str,str] res_tuple: 变长参数，渲染资源元组，第一个元素为资源键名（短名称），第二个参数为具体资源名称（模型ID、贴图路径、动画名称等）
 
-        :return: 返回添加结果的元组，每个元素为一个bool，与传入的res_tuple参数相对应
+        :return: 返回添加结果（是否成功），结果为一个元组，元素类型为bool，与传入的res_tuple参数相对应
         :rtype: tuple[bool]
         """
         res = []
         comp = _CompFactory.CreateActorRender(player_id)
         for arg in res_tuple:
+            if not arg:
+                continue
             if arg[1].startswith("geometry."):
                 res.append(comp.AddPlayerGeometry(*arg))
             elif arg[1].startswith("textures/"):
@@ -2743,7 +2542,8 @@ class NuoyanClientSystem(_ClientSystem):
                 res.append(comp.AddPlayerSoundEffect(*arg))
             else:
                 res.append(comp.AddPlayerRenderMaterial(*arg))
-        comp.RebuildPlayerRender()
+        if rebuild:
+            comp.RebuildPlayerRender()
         return tuple(res)
 
     def CallServer(self, name, callback=None, *args):
@@ -2762,11 +2562,9 @@ class NuoyanClientSystem(_ClientSystem):
 
     def BroadcastToAllClient(self, event_name, event_data):
         """
-        广播事件到所有玩家的客户端。
-
-        注：因为全局广播要经过服务端，所以监听事件时要使用服务端的命名空间和系统名称。
-
-        若传递的数据为字典，则客户端接收到的字典会内置一个key：__id__，其value为发送广播的玩家实体ID。
+        | 广播事件到所有玩家的客户端。
+        | 注：因为全局广播要经过服务端，所以监听事件时要使用服务端的命名空间和系统名称。
+        | 若传递的数据为字典，则客户端接收到的字典会内置一个名为 ``__id__`` 的key，其value为发送广播的玩家实体ID。
 
         -----
 
@@ -2784,9 +2582,9 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        :param str namespace: UI的名称，对应UI的json文件中“namespace”的值
+        :param str namespace: UI的名称，对应UI的json文件中"namespace"的值
         :param str cls_path: UI的类路径
-        :param str ui_screen_def: UI画布路径，格式为“namespace.screenName”，screenName对应想打开的画布的名称（一般为main）
+        :param str ui_screen_def: UI画布路径，格式为"namespace.screenName"，screenName对应想打开的画布的名称（一般为main）
         :param dict|None param: 创建UI的参数，会传到UI类的__init__方法中，默认为{'isHud': 1}
 
         :return: UI类实例
@@ -2802,7 +2600,48 @@ class NuoyanClientSystem(_ClientSystem):
             param['__cs__'] = self
         return api.CreateUI(_MOD_NAME, namespace, param)
 
+    def RegisterAutoShowUiForItem(self, item_name, ui_node=None, func=None, item_aux=-1):
+        """
+        | 为指定物品注册一个手持时自动显示，不手持时自动隐藏的UI界面。
+        | 可为同一物品注册多个UI。
+
+        -----
+
+        :param str item_name: 物品ID；空手可传入None或"minecraft:air"
+        :param ScreenNode ui_node: UI实例；若func参数为None，显示/隐藏UI时将会调用uiNode.SetScreenVisible接口；默认为None
+        :param function func: 显示/隐藏UI时调用的自定义函数；该函数需要接受一个类型bool的参数，当需要显示UI时为True，隐藏时为False；默认为None
+        :param int item_aux: 物品特殊值，传入-1时表示任意特殊值，默认为-1
+
+        :return: 无
+        :rtype: None
+        """
+        if item_name is None:
+            item_name = "minecraft:air"
+        if func is None:
+            func = ui_node.SetScreenVisible
+        self._auto_show_ui.setdefault((item_name, item_aux), []).append(func)
+
     # ============================================== Internal Method ===================================================
+
+    @client_listener("OnCarriedNewItemChangedClientEvent")
+    def _OnCarriedNewItemChangedClientEvent(self, args):
+        item_dict = args['itemDict']
+        item_name = item_dict['newItemName'] if item_dict else "minecraft:air"
+        item_aux = item_dict['newAuxValue'] if item_dict else 0
+        item = (item_name, item_aux)
+        self._set_ui_visible(self._old_carried_item, False)
+        self._set_ui_visible(item, True)
+        self._old_carried_item = item
+
+    def _set_ui_visible(self, item, visible):
+        name = item[0]
+        func_list = []
+        if item in self._auto_show_ui:
+            func_list += self._auto_show_ui[item]
+        if (name, -1) in self._auto_show_ui:
+            func_list += self._auto_show_ui[(name, -1)]
+        for func in func_list:
+            func(visible)
 
     @client_listener("UiInitFinished")
     def _UiInitFinished(self, args):
@@ -2810,20 +2649,21 @@ class NuoyanClientSystem(_ClientSystem):
         self._ui_init_finished = True
         if self.__handle == 1:
             self._listen_client_game_tick()
+        _LvComp.Game.AddTimer(0, self._OnCarriedNewItemChangedClientEvent, {'itemDict': _PlrComp.Item.GetCarriedItem()})
 
     def _set_print_log(self):
         api.SetMcpModLogCanPostDump(True)
 
     def _listen_client_game_tick(self):
         if self._ui_init_finished:
-            if not self.__game_tick_node:
+            if not self._game_tick_node:
                 self._start_game_tick()
-            self.__game_tick_node.notify_cln = True
+            self._game_tick_node.notify_cln = True
         else:
             self.__handle = 1
 
     def _start_game_tick(self):
-        self.__game_tick_node = self.RegisterAndCreateUI(_UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)
+        self._game_tick_node = self.RegisterAndCreateUI(_UI_NAMESPACE_GAME_TICK, _UI_PATH_GAME_TICK, _UI_DEF_GAME_TICK)
 
     def _check_on_game_tick(self):
         if _is_method_overridden(self.__class__, NuoyanClientSystem, "OnGameTick"):

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-27
+#   Last Modified : 2024-04-20
 #
 # ====================================================
 
@@ -25,7 +25,7 @@ CLIENT_SYSTEM_NAME = ""
 SERVER_SYSTEM_NAME = ""
 
 
-__version__ = "v0.2.0-beta"
+__version__ = "v0.3.6-beta"
 __authorname__ = "诺言Nuoyan"
 __authorqq__ = "1279735247"
 __authoremail__ = "1279735247@qq.com"
