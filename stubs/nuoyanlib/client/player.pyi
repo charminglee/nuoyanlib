@@ -12,20 +12,25 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-08-31
+#   Last Modified : 2023-09-02
 #
 # ====================================================
 
 
-from utils import utils
-# from config import MOD_NAME, CLIENT_SYSTEM_NAME, SERVER_SYSTEM_NAME
+def player_plunge(speed: float) -> None: ...
 
 
-def _test(module):
-    print module.__name__
-    print "=" * 50
-    module._test()
-    print "\n\n"
 
 
-_test(utils)
+
+
+
+
+
+
+
+
+
+
+
+

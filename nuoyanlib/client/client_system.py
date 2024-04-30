@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as api
+import mod.client.extraClientApi as _client_api
 from ..config import SERVER_SYSTEM_NAME as _SERVER_SYSTEM_NAME, MOD_NAME as _MOD_NAME
 from ..utils.utils import is_method_overridden as _is_method_overridden
 from comp import (
@@ -34,7 +34,6 @@ from comp import (
 
 
 __all__ = [
-    "ALL_CLIENT_ENGINE_EVENTS",
     "client_listener",
     "NuoyanClientSystem",
 ]
@@ -46,7 +45,7 @@ _UI_PATH_GAME_TICK = _PATH + "._GameTick"
 _UI_DEF_GAME_TICK = "_GameTick.main"
 
 
-ALL_CLIENT_ENGINE_EVENTS = {
+_ALL_CLIENT_ENGINE_EVENTS = [
     "GyroSensorChangedClientEvent",
     "ModBlockEntityTickClientEvent",
     "ModBlockEntityRemoveClientEvent",
@@ -146,9 +145,7 @@ ALL_CLIENT_ENGINE_EVENTS = {
     "RightClickReleaseClientEvent",
     "TapBeforeClientEvent",
     "TapOrHoldReleaseClientEvent",
-}
-
-
+]
 _lsn_func_args = []
 
 
@@ -177,7 +174,7 @@ def client_listener(event_name="", namespace="", system_name="", priority=0):
         return event_name
     else:
         if not namespace and not system_name:
-            if event_name in ALL_CLIENT_ENGINE_EVENTS:
+            if event_name in _ALL_CLIENT_ENGINE_EVENTS:
                 namespace = _CLIENT_ENGINE_NAMESPACE
                 system_name = _CLIENT_ENGINE_SYSTEM_NAME
             else:
@@ -202,7 +199,7 @@ def _listen_custom(self):
 
 
 def _listen_engine(self):
-    for event in ALL_CLIENT_ENGINE_EVENTS:
+    for event in _ALL_CLIENT_ENGINE_EVENTS:
         if _is_method_overridden(self.__class__, NuoyanClientSystem, event):
             func = getattr(self, event)
             self.ListenForEvent(_CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, event, self, func)
@@ -210,7 +207,7 @@ def _listen_engine(self):
 
 class NuoyanClientSystem(_ClientSystem):
     """
-    ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。
+    | ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。
 
     -----
 
@@ -222,7 +219,6 @@ class NuoyanClientSystem(_ClientSystem):
     """
 
     def __init__(self, namespace, system_name):
-        # noinspection PySuperArguments
         super(NuoyanClientSystem, self).__init__(namespace, system_name)
         self._game_tick_node = None
         self._ui_init_finished = False
@@ -245,26 +241,33 @@ class NuoyanClientSystem(_ClientSystem):
             class MyClientSystem(NuoyanClientSystem):
                 def Destroy(self):
                     super(MyClientSystem, self).Destroy()
-                    # 或者：NuoyanClientSystem.Destroy(self)
 
         -----
 
         :return: 无
         :rtype: None
         """
+        super(NuoyanClientSystem, self).Destroy()
         self.UnListenAllEvents()
 
     def Update(self):
         """
         *[tick]* *[event]*
 
-        客户端每帧调用，1秒有30帧。
+        | 客户端每帧调用，1秒有30帧。
+        | 若重写了该方法，请调用一次父类的同名方法。如：
+        ::
+
+            class MyClientSystem(NuoyanClientSystem):
+                def Update(self):
+                    super(MyUI, self).Update()
 
         -----
 
         :return: 无
         :rtype: None
         """
+        super(NuoyanClientSystem, self).Update()
 
     # ============================================ Engine Event Callback ===============================================
 
@@ -318,7 +321,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端自定义方块实体卸载时触发。
+        | 客户端自定义方块实体卸载时触发。
 
         -----
 
@@ -340,7 +343,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        使用自定义成就系统的时，拖动成就入口结束时触发。
+        | 使用自定义成就系统的时，拖动成就入口结束时触发。
 
         -----
 
@@ -359,7 +362,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        键盘按键映射改变事件。
+        | 键盘按键映射改变事件。
 
         -----
 
@@ -379,7 +382,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        游戏手柄按键映射改变事件。
+        | 游戏手柄按键映射改变事件。
 
         -----
 
@@ -399,7 +402,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        游戏手柄扳机事件。当扣动扳机的力度发生改变时触发。
+        | 游戏手柄扳机事件。当扣动扳机的力度发生改变时触发。
 
         -----
 
@@ -418,7 +421,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        游戏手柄摇杆事件。当摇杆摇动位置发生改变时触发。
+        | 游戏手柄摇杆事件。当摇杆摇动位置发生改变时触发。
 
         -----
 
@@ -438,7 +441,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        游戏手柄按键事件。
+        | 游戏手柄按键事件。
 
         -----
 
@@ -481,7 +484,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        关闭商城界面时触发，包括脚本商城和Apollo插件商城。
+        | 关闭商城界面时触发，包括脚本商城和Apollo插件商城。
 
         -----
 
@@ -587,7 +590,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家按下鼠标右键时触发。仅在pc下触发（普通控制模式及F11模式都会触发）。
+        | 玩家按下鼠标右键时触发。仅在pc下触发（普通控制模式及F11模式都会触发）。
         
         -----
 
@@ -626,7 +629,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        按键按下或按键释放时触发。
+        | 按键按下或按键释放时触发。
         
         -----
 
@@ -646,7 +649,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        移动按钮按下释放时触发事件，同时按下多个方向键，需要释放所有的方向键才会触发事件。
+        | 移动按钮按下释放时触发事件，同时按下多个方向键，需要释放所有的方向键才会触发事件。
         
         -----
 
@@ -662,7 +665,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        移动按钮按下触发事件，在按住一个方向键的同时，去按另外一个方向键，不会触发第二次。
+        | 移动按钮按下触发事件，在按住一个方向键的同时，去按另外一个方向键，不会触发第二次。
         
         -----
 
@@ -678,7 +681,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        返回按钮（目前特指安卓系统导航中的返回按钮）松开时触发。
+        | 返回按钮（目前特指安卓系统导航中的返回按钮）松开时触发。
         
         -----
 
@@ -696,7 +699,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        鼠标滚轮滚动时触发。
+        | 鼠标滚轮滚动时触发。
         
         -----
 
@@ -714,7 +717,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家松开鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
+        | 玩家松开鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
         
         -----
 
@@ -732,7 +735,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家按下鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
+        | 玩家按下鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
         
         -----
 
@@ -775,7 +778,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家点击屏幕后松开时触发，多个手指点在屏幕上时，只有最后一个手指松开时触发。
+        | 玩家点击屏幕后松开时触发，多个手指点在屏幕上时，只有最后一个手指松开时触发。
         
         -----
 
@@ -794,7 +797,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家点击屏幕时触发，多个手指点在屏幕上时，只有第一个会触发。
+        | 玩家点击屏幕时触发，多个手指点在屏幕上时，只有第一个会触发。
         
         -----
 
@@ -812,7 +815,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        跳跃按钮按下释放事件。
+        | 跳跃按钮按下释放事件。
         
         -----
 
@@ -830,7 +833,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        跳跃按钮按下事件，返回值设置参数只对当次按下事件起作用。
+        | 跳跃按钮按下事件，返回值设置参数只对当次按下事件起作用。
         
         -----
 
@@ -848,7 +851,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        播放场景音效或UI音效时触发。
+        | 播放场景音效或UI音效时触发。
         
         -----
 
@@ -870,7 +873,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        播放背景音乐时触发。
+        | 播放背景音乐时触发。
         
         -----
 
@@ -889,7 +892,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        音乐停止时，当玩家调用StopCustomMusic来停止自定义背景音乐时，会触发该事件。
+        | 音乐停止时，当玩家调用 ``StopCustomMusic`` 来停止自定义背景音乐时，会触发该事件。
         
         -----
 
@@ -907,7 +910,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        改变屏幕大小时会触发的事件。该事件仅支持PC。
+        | 改变屏幕大小时会触发的事件。该事件仅支持PC。
         
         -----
 
@@ -928,7 +931,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        screen创建触发。
+        | screen创建触发。
         
         -----
 
@@ -947,8 +950,8 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        screen移除触发。
-        ``screenName`` 为正在弹出的Screen名，如果需要获取下一个Screen可使用 ``PopScreenAfterClientEvent`` 。
+        | screen移除触发。
+        | ``screenName`` 为正在弹出的Screen名，如果需要获取下一个Screen可使用 ``PopScreenAfterClientEvent`` 。
         
         -----
 
@@ -967,7 +970,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家点击聊天按钮或回车键触发呼出聊天窗口时客户端抛出的事件。
+        | 玩家点击聊天按钮或回车键触发呼出聊天窗口时客户端抛出的事件。
         
         -----
 
@@ -985,7 +988,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        点击快捷栏、背包栏、盔甲栏、副手栏的物品槽时触发。
+        | 点击快捷栏、背包栏、盔甲栏、副手栏的物品槽时触发。
         
         -----
 
@@ -1003,7 +1006,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        UI grid组件里格子数目发生变化时触发。
+        | UI grid组件里格子数目发生变化时触发。
         
         -----
 
@@ -1021,7 +1024,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        打开物品背包界面时触发。
+        | 打开物品背包界面时触发。
         
         -----
 
@@ -1040,7 +1043,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        关闭物品背包界面时触发。
+        | 关闭物品背包界面时触发。
         
         -----
 
@@ -1058,7 +1061,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        打开箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
+        | 打开箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
         
         -----
 
@@ -1079,7 +1082,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        关闭箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
+        | 关闭箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
         
         -----
 
@@ -1097,7 +1100,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        走路动作结束时触发。使用SetModel替换骨骼模型后，该事件才生效。
+        | 走路动作结束时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
         
         -----
 
@@ -1115,7 +1118,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        走路动作开始时触发。使用SetModel替换骨骼模型后，该事件才生效。
+        | 走路动作开始时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
         
         -----
 
@@ -1133,7 +1136,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        攻击动作结束时触发。使用SetModel替换骨骼模型后，该事件才生效。
+        | 攻击动作结束时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
         
         -----
 
@@ -1151,7 +1154,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        攻击动作开始时触发。使用SetModel替换骨骼模型后，该事件才生效。
+        | 攻击动作开始时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
         
         -----
 
@@ -1169,7 +1172,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家停止使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
+        | 玩家停止使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
         
         -----
 
@@ -1188,7 +1191,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
+        | 玩家使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
         
         -----
 
@@ -1207,7 +1210,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家丢弃物品时触发。
+        | 玩家丢弃物品时触发。
         
         -----
 
@@ -1227,7 +1230,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        手持物品发生变化时，触发该事件；数量改变不会触发。
+        | 手持物品发生变化时，触发该事件；数量改变不会触发。
 
         | *作者的tips：*
         | *该事件在进入游戏时会触发一次，且触发时机比UiInitFinished更早。*
@@ -1248,7 +1251,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        释放正在使用的物品时触发。
+        | 释放正在使用的物品时触发。
         
         -----
 
@@ -1294,7 +1297,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家点击砂轮合成得到的物品时抛出的事件。
+        | 玩家点击砂轮合成得到的物品时抛出的事件。
         
         -----
 
@@ -1316,7 +1319,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家合成物品时触发。
+        | 玩家合成物品时触发。
         
         -----
 
@@ -1388,7 +1391,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家点击铁砧合成得到的物品时抛出的事件。
+        | 玩家点击铁砧合成得到的物品时抛出的事件。
         
         -----
 
@@ -1410,7 +1413,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家使用物品时客户端抛出的事件（比较特殊不走该事件的例子：1.喝牛奶；2.染料对有水的炼药锅使用；3.盔甲架装备盔甲）。
+        | 玩家使用物品时客户端抛出的事件（比较特殊不走该事件的例子：1.喝牛奶；2.染料对有水的炼药锅使用；3.盔甲架装备盔甲）。
         
         -----
 
@@ -1430,7 +1433,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家获得物品时客户端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
+        | 玩家获得物品时客户端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
         
         -----
 
@@ -1858,7 +1861,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家扑灭火焰时触发。下雨，倒水等方式熄灭火焰不会触发。
+        | 玩家扑灭火焰时触发。下雨，倒水等方式熄灭火焰不会触发。
         
         -----
 
@@ -1947,7 +1950,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        相机运动器开始事件。相机添加运动器后，运动器开始运行时触发。
+        | 相机运动器开始事件。相机添加运动器后，运动器开始运行时触发。
         
         -----
 
@@ -1965,7 +1968,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家远离生物时触发。
+        | 玩家远离生物时触发。
         
         -----
 
@@ -2032,7 +2035,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        实体着地事件。玩家，沙子，铁砧，掉落的物品，点燃的TNT掉落地面时触发，其余实体着地不触发。
+        | 实体着地事件。玩家，沙子，铁砧，掉落的物品，点燃的TNT掉落地面时触发，其余实体着地不触发。
         
         -----
 
@@ -2050,7 +2053,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        生物生命值发生变化时触发。
+        | 生物生命值发生变化时触发。
         
         -----
 
@@ -2102,7 +2105,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        实体模型切换时触发。
+        | 实体模型切换时触发。
         
         -----
 
@@ -2122,7 +2125,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家靠近生物时触发。
+        | 玩家靠近生物时触发。
         
         -----
 
@@ -2141,7 +2144,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端卸载mod之前触发。
+        | 客户端卸载mod之前触发。
         
         -----
 
@@ -2159,7 +2162,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家离开当前玩家同一个区块时触发AOI事件。
+        | 玩家离开当前玩家同一个区块时触发AOI事件。
         
         -----
 
@@ -2196,7 +2199,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        玩家进入存档，出生点地形加载完成时触发。该事件触发时可以进行切换维度的操作。
+        | 玩家进入存档，出生点地形加载完成时触发。该事件触发时可以进行切换维度的操作。
         
         -----
 
@@ -2234,7 +2237,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端加载mod完成事件。
+        | 客户端加载mod完成事件。
         
         -----
 
@@ -2252,7 +2255,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端区块加载完成时触发。
+        | 客户端区块加载完成时触发。
         
         -----
 
@@ -2332,7 +2335,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[event]*
 
-        客户端侧创建新实体时触发。创建玩家时不会触发该事件。
+        | 客户端侧创建新实体时触发。创建玩家时不会触发该事件。
         
         -----
 
@@ -2358,7 +2361,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         *[tick]* *[event]*
 
-        客户端tick事件，1秒30次。
+        | 客户端tick事件，1秒30次。
         
         -----
 
@@ -2478,7 +2481,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def CallServer(self, name, callback=None, *args):
         """
-        调用服务端属性（包括变量和函数）。
+        | 调用服务端属性（包括变量和函数）。
         
         -----
 
@@ -2508,7 +2511,7 @@ class NuoyanClientSystem(_ClientSystem):
 
     def RegisterAndCreateUI(self, namespace, cls_path, ui_screen_def, param=None):
         """
-        注册并创建UI。
+        | 注册并创建UI。
 
         -----
 
@@ -2520,15 +2523,15 @@ class NuoyanClientSystem(_ClientSystem):
         :return: UI类实例
         :rtype: _ScreenNode
         """
-        node = api.GetUI(_MOD_NAME, namespace)
+        node = _client_api.GetUI(_MOD_NAME, namespace)
         if node:
             return node
-        api.RegisterUI(_MOD_NAME, namespace, cls_path, ui_screen_def)
+        _client_api.RegisterUI(_MOD_NAME, namespace, cls_path, ui_screen_def)
         if not param:
             param = {'isHud': 1, '__cs__': self}
         else:
             param['__cs__'] = self
-        return api.CreateUI(_MOD_NAME, namespace, param)
+        return _client_api.CreateUI(_MOD_NAME, namespace, param)
 
     def RegisterAutoShowUiForItem(self, item_name, ui_node=None, func=None, item_aux=-1):
         """
@@ -2582,7 +2585,7 @@ class NuoyanClientSystem(_ClientSystem):
         _LvComp.Game.AddTimer(0, self._OnCarriedNewItemChangedClientEvent, {'itemDict': _PlrComp.Item.GetCarriedItem()})
 
     def _set_print_log(self):
-        api.SetMcpModLogCanPostDump(True)
+        _client_api.SetMcpModLogCanPostDump(True)
 
     def _listen_client_game_tick(self):
         if self._ui_init_finished:
@@ -2612,12 +2615,16 @@ class _GameTick(_ScreenNode):
             self.cs.OnGameTick()
 
 
+_LIB_NAMESPACE = "NuoyanLib"
+_TRANSIT_SERVER_SYSTEM = "_TransitServerSystem"
+
+
 class _TransitClientSystem(_ClientSystem):
     def __init__(self, namespace, system_name):
         super(_TransitClientSystem, self).__init__(namespace, system_name)
         _listen_custom(self)
 
-    @client_listener(namespace="NuoyanLib", system_name="_TransitServerSystem")
+    @client_listener(namespace=_LIB_NAMESPACE, system_name=_TRANSIT_SERVER_SYSTEM)
     def _SetQueryCache(self, args):
         for entity_id, queries in args.items():
             for name, value in queries.items():
@@ -2626,7 +2633,7 @@ class _TransitClientSystem(_ClientSystem):
                     comp.Register(name, 0.0)
                 comp.Set(name, value)
 
-    @client_listener(namespace="NuoyanLib", system_name="_TransitServerSystem")
+    @client_listener(namespace=_LIB_NAMESPACE, system_name=_TRANSIT_SERVER_SYSTEM)
     def _SetQueryVar(self, args):
         entity_id = args['entity_id']
         name = args['name']
@@ -2639,7 +2646,13 @@ class _TransitClientSystem(_ClientSystem):
         comp.Set(name, value)
 
 
-_transit_sys = _TransitClientSystem("NuoyanLib", "_TransitClientSystem")
+transit_sys_name = "_TransitClientSystem"
+path = __file__.replace(".py", "").replace("/", ".") + "." + transit_sys_name
+_transit_sys = _client_api.GetSystem(_LIB_NAMESPACE, transit_sys_name)
+if not _transit_sys:
+    _client_api.RegisterSystem(_LIB_NAMESPACE, transit_sys_name, path)
+    _transit_sys = _client_api.GetSystem(_LIB_NAMESPACE, transit_sys_name)
+del transit_sys_name, path
 
 
 

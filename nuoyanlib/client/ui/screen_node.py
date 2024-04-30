@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -30,7 +30,7 @@ from ...config import (
     CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
 )
 from ...utils._error import ClientNotFoundError as _ClientNotFoundError
-from ..client_system import ALL_CLIENT_ENGINE_EVENTS as _ALL_CLIENT_ENGINE_EVENTS
+from ..client_system import _ALL_CLIENT_ENGINE_EVENTS
 from ..comp import (
     CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
     CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
@@ -135,7 +135,7 @@ def notify_server(func):
     | 函数装饰器，用于按钮的回调函数。
     | 被装饰的按钮回调函数每触发一次，服务端的同名函数也会触发一次。
     | 服务端同名函数的参数与按钮回调函数的参数相同，且自带一个名为 ``__id__`` 的key，其value为触发按钮的玩家实体ID。
-    | 可通过 ``args['cancelNotify'] = False`` 或 ``return -1`` 的方式取消触发服务端函数。
+    | 可通过 args['cancelNotify'] = False 或 return -1 的方式取消触发服务端函数。
     | 若对按钮回调参数进行修改（如增加、修改或删除某个key或value），服务端得到的参数为修改后的参数，可通过该方式向服务端传递更多信息。
     """
     @_wraps(func)
@@ -154,7 +154,7 @@ def notify_server(func):
 
 class NuoyanScreenNode(_ScreenNode):
     """
-    ScreenNode扩展类，将自定义UI类继承本类即可使用本类的全部功能。
+    | ScreenNode扩展类，将自定义UI类继承本类即可使用本类的全部功能。
 
     -----
 
@@ -165,7 +165,6 @@ class NuoyanScreenNode(_ScreenNode):
     """
 
     def __init__(self, namespace, name, param):
-        # noinspection PySuperArguments
         super(NuoyanScreenNode, self).__init__(namespace, name, param)
         if param and '__cs__' in param:
             self.cs = param['__cs__']
@@ -173,6 +172,7 @@ class NuoyanScreenNode(_ScreenNode):
             self.cs = _api.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
         if not self.cs:
             raise _ClientNotFoundError
+        self.__screen_node = param['_screen_node'] if param and '_screen_node' in param else self
         self.screen_size = _LvComp.Game.GetScreenSize()
         self._btn_double_click_data = {}
         self._double_click_args = None
@@ -210,39 +210,43 @@ class NuoyanScreenNode(_ScreenNode):
         :return: 无
         :rtype: None
         """
+        super(NuoyanScreenNode, self).Create()
         data = _read_setting(self.__ui_pos_key, False)
         if data:
             for bp, pos in data.items():
-                ui = self.GetBaseUIControl(bp)
+                ui = self.__screen_node.GetBaseUIControl(bp)
                 if ui:
                     ui.SetPosition(tuple(pos))
-
-    def OnTick(self):
-        """
-        *[tick]* *[event]*
-
-        客户端每帧调用，1秒有30帧。
-
-        -----
-
-        :return: 无
-        :rtype: None
-        """
 
     def Update(self):
         """
         *[tick]* *[event]*
 
-        客户端每帧调用。
+        | 客户端每帧调用。
+        | 若重写了该方法，请调用一次父类的同名方法。如：
+        ::
 
-        | *作者的tips：*
-        | *在2.10及以上版本中，该方法的触发频率与游戏实时帧率同步。在2.10以下版本中，触发频率为固定的每秒钟30次。*
+            class MyUI(NuoyanScreenNode):
+                def Update(self):
+                    super(MyUI, self).Update()
 
         -----
 
         :return: 无
         :rtype: None
         """
+        super(NuoyanScreenNode, self).Update()
+        if self.__double_click_tick:
+            self.__double_click_tick += 1
+            if self.__double_click_tick == 11:
+                self.__double_click_tick = 0
+        if 1 <= self.__tick <= 20:
+            self.__tick += 1
+            if self.__tick == 21 and self.__touching_btn_path in self._btn_long_click_data:
+                btn_data = self._btn_long_click_data[self.__touching_btn_path]
+                btn_data['on_long_click'](self._touching_button_args)
+                btn_data['hasLongClicked'] = True
+                self._vibrate()
 
     def Destroy(self):
         """
@@ -261,10 +265,7 @@ class NuoyanScreenNode(_ScreenNode):
         :return: 无
         :rtype: None
         """
-        self.cs.UnListenForEvent(
-            _CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, "OnScriptTickClient",
-            self, self._OnScriptTickClient
-        )
+        super(NuoyanScreenNode, self).Destroy()
         self.cs.UnListenForEvent(
             _CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, "GetEntityByCoordReleaseClientEvent",
             self, self._GetEntityByCoordReleaseClientEvent
@@ -280,12 +281,19 @@ class NuoyanScreenNode(_ScreenNode):
 
         | UI生命周期函数，当栈顶UI有其他UI入栈时调用。
         | 不建议使用在 ``OnDeactive`` 函数中调用 ``SetScreenVisible(False)`` ，在 ``OnActive`` 函数中调用 ``SetScreenVisible(True)`` 的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用 ``PushScreen`` ， ``PopScreen`` 接口实现。
+        | 若重写了该方法，请调用一次父类的同名方法。如：
+        ::
+
+            class MyUI(NuoyanScreenNode):
+                def OnDeactive(self):
+                    super(MyUI, self).OnDeactive()
 
         -----
 
         :return: 无
         :rtype: None
         """
+        super(NuoyanScreenNode, self).OnDeactive()
 
     def OnActive(self):
         """
@@ -293,18 +301,25 @@ class NuoyanScreenNode(_ScreenNode):
 
         | UI生命周期函数，当UI重新回到栈顶时调用。
         | 不建议使用在 ``OnDeactive`` 函数中调用 ``SetScreenVisible(False)`` ，在 ``OnActive`` 函数中调用 ``SetScreenVisible(True)`` 的方式实现打开新界面时隐藏原界面，新界面关闭时自动显示原界面的功能，由于隐藏接口不会改动UI栈，多Mod容易形成冲突。推荐使用 ``PushScreen`` ， ``PopScreen`` 接口实现。
+        | 若重写了该方法，请调用一次父类的同名方法。如：
+        ::
+
+            class MyUI(NuoyanScreenNode):
+                def OnActive(self):
+                    super(MyUI, self).OnActive()
 
         -----
 
         :return: 无
         :rtype: None
         """
+        super(NuoyanScreenNode, self).OnActive()
 
     # ================================================ New Interface ===================================================
 
     def SetButtonDoubleClickCallback(self, btn_path, on_double_click, on_touch_up=None):
         """
-        设置按钮双击监听。
+        | 设置按钮双击监听。
 
         -----
 
@@ -319,7 +334,7 @@ class NuoyanScreenNode(_ScreenNode):
             'on_double_click': on_double_click,
             'on_touch_up': on_touch_up,
         }
-        btn_ctrl = self.GetBaseUIControl(btn_path).asButton()
+        btn_ctrl = self.__screen_node.GetBaseUIControl(btn_path).asButton()
         btn_ctrl.SetButtonTouchUpCallback(self._run_touch_up_list)
         if btn_path not in self._btn_touch_up_data:
             self._btn_touch_up_data[btn_path] = []
@@ -329,7 +344,7 @@ class NuoyanScreenNode(_ScreenNode):
 
     def SetButtonMovable(self, btn_path, move_parent=False, associated_path=None, on_touch_move=None):
         """
-        设置按钮可拖动。
+        | 设置按钮可拖动。
 
         -----
 
@@ -352,7 +367,7 @@ class NuoyanScreenNode(_ScreenNode):
             'associated_path': associated_path,
             'on_touch_move': on_touch_move
         }
-        btn = self.GetBaseUIControl(btn_path).asButton()
+        btn = self.__screen_node.GetBaseUIControl(btn_path).asButton()
         btn.SetButtonTouchMoveCallback(self._on_move)
         self._save_pos_uis.update(associated_path)
         if move_parent:
@@ -362,7 +377,7 @@ class NuoyanScreenNode(_ScreenNode):
 
     def CancelButtonMovable(self, btn_path):
         """
-        取消按钮可拖动。
+        | 取消按钮可拖动。
 
         -----
 
@@ -373,7 +388,7 @@ class NuoyanScreenNode(_ScreenNode):
         """
         if btn_path in self._btn_movable_data:
             orig_callback = self._btn_movable_data[btn_path]['on_touch_move']
-            self.GetBaseUIControl(btn_path).asButton().SetButtonTouchMoveCallback(orig_callback)
+            self.__screen_node.GetBaseUIControl(btn_path).asButton().SetButtonTouchMoveCallback(orig_callback)
             del self._btn_movable_data[btn_path]
 
     def SetButtonMovableAfterLongClick(
@@ -389,7 +404,7 @@ class NuoyanScreenNode(_ScreenNode):
             on_touch_cancel=None,
     ):
         """
-        设置按钮长按拖动。该方法设置的按钮拖动会自动保存位置，下次启动游戏时按钮会恢复到上次游戏时的位置。
+        | 设置按钮长按拖动。该方法设置的按钮拖动会自动保存位置，下次启动游戏时按钮会恢复到上次游戏时的位置。
 
         -----
 
@@ -432,7 +447,7 @@ class NuoyanScreenNode(_ScreenNode):
             on_touch_cancel=None,
     ):
         """
-        设置按钮长按监听。
+        | 设置按钮长按监听。
 
         -----
 
@@ -455,7 +470,7 @@ class NuoyanScreenNode(_ScreenNode):
             'on_touch_down': on_touch_down,
             'on_touch_cancel': on_touch_cancel
         }
-        btn = self.GetBaseUIControl(btn_path).asButton()
+        btn = self.__screen_node.GetBaseUIControl(btn_path).asButton()
         btn.SetButtonTouchMoveOutCallback(self._on_touch_move_out)
         btn.SetButtonTouchDownCallback(self._on_touch_down)
         btn.SetButtonTouchCancelCallback(self._on_touch_cancel)
@@ -469,7 +484,7 @@ class NuoyanScreenNode(_ScreenNode):
 
     def RemoveButtonLongClickCallback(self, btn_path):
         """
-        移除按钮长按监听。
+        | 移除按钮长按监听。
 
         -----
 
@@ -483,7 +498,7 @@ class NuoyanScreenNode(_ScreenNode):
 
     def SetLongClickVibrateTime(self, time):
         """
-        设置长按后震动反馈的时长。
+        | 设置长按后震动反馈的时长。
 
         -----
 
@@ -496,7 +511,7 @@ class NuoyanScreenNode(_ScreenNode):
 
     def HasLongClicked(self, bp):
         """
-        用于判断按钮在当次按下中是否已经触发了长按。
+        | 用于判断按钮在当次按下中是否已经触发了长按。
 
         -----
 
@@ -510,21 +525,6 @@ class NuoyanScreenNode(_ScreenNode):
         return False
 
     # =========================================== Internal Method ======================================================
-
-    @ui_listener("OnScriptTickClient")
-    def _OnScriptTickClient(self):
-        if self.__double_click_tick:
-            self.__double_click_tick += 1
-            if self.__double_click_tick == 11:
-                self.__double_click_tick = 0
-        if 1 <= self.__tick <= 20:
-            self.__tick += 1
-            if self.__tick == 21 and self.__touching_btn_path in self._btn_long_click_data:
-                btn_data = self._btn_long_click_data[self.__touching_btn_path]
-                btn_data['on_long_click'](self._touching_button_args)
-                btn_data['hasLongClicked'] = True
-                self._vibrate()
-        self.OnTick()
 
     @ui_listener("ScreenSizeChangedClientEvent")
     def _ScreenSizeChangedClientEvent(self, args):
@@ -626,14 +626,14 @@ class NuoyanScreenNode(_ScreenNode):
         offset = (touch_x - self.__finger_pos[0], touch_y - self.__finger_pos[1])
         self.__finger_pos = (touch_x, touch_y)
         if not move_parent:
-            btn = self.GetBaseUIControl(btn_path)
+            btn = self.__screen_node.GetBaseUIControl(btn_path)
             self._set_widget_pos(btn, offset)
         else:
             parent_path = _get_parent_path(btn_path)
-            ctrl = self.GetBaseUIControl(parent_path)
+            ctrl = self.__screen_node.GetBaseUIControl(parent_path)
             self._set_widget_pos(ctrl, offset)
         for path in associated_path:
-            ctrl = self.GetBaseUIControl(path)
+            ctrl = self.__screen_node.GetBaseUIControl(path)
             self._set_widget_pos(ctrl, offset)
         if on_touch_move:
             on_touch_move(args)
@@ -641,7 +641,7 @@ class NuoyanScreenNode(_ScreenNode):
     def _save_ui_pos(self):
         data = {}
         for bp in self._save_pos_uis:
-            pos = self.GetBaseUIControl(bp).GetPosition()
+            pos = self.__screen_node.GetBaseUIControl(bp).GetPosition()
             if pos[0] < 0 or pos[1] < 0:
                 continue
             data[bp] = pos

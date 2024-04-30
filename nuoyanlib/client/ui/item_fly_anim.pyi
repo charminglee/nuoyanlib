@@ -12,13 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-15
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
 
 from typing import Tuple, Union, List, Dict, Optional
 from mod.client.ui.screenNode import ScreenNode
+from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
 from mod.client.ui.viewBinder import ViewBinder
 
@@ -29,22 +30,25 @@ _UI_PATH_FLY_ITEM_0: str
 
 
 class ItemFlyAnim(ScreenNode):
+    __screen_node: ScreenNode
     _item_fly_queue: Dict[int, Dict[str, Union[float, int, ItemRendererUIControl]]]
     _fly_ir: List[ItemRendererUIControl]
-    def __init__(self, namespace: str, name: str, param: Optional[dict]) -> None: ...
-    def Create(self) -> None: ...
-    @ViewBinder.binding(ViewBinder.BF_BindString, "#main.gametick")
-    def _OnGameTick(self) -> None: ...
-    def _clone_new_ir(self) -> Optional[ItemRendererUIControl]: ...
-    def _get_idle_ir_index(self) -> int: ...
+    __path: str
+    item_fly_panel: Optional[BaseUIControl]
+    def __init__(self: ..., namespace: str, name: str, param: Optional[dict]) -> None: ...
+    def Create(self: ...) -> None: ...
+    @ViewBinder.binding(ViewBinder.BF_BindString, "#NyItemFlyAnim.game_tick")
+    def _OnGameTick(self: ...) -> None: ...
+    def _clone_new_ir(self: ...) -> Optional[ItemRendererUIControl]: ...
+    def _get_idle_ir_index(self: ...) -> int: ...
     def SetOneItemFlyAnim(
-        self,
+        self: ...,
         item_dict: dict,
         from_pos: Tuple[float, float],
         to_pos: Tuple[float, float],
         ui_size: Union[float, Tuple[float, float]],
     ) -> None: ...
     def SetItemsFlyAnim(
-        self,
+        self: ...,
         data: List[Dict[str, Union[dict, Tuple[float, float], float]]],
     ) -> None: ...

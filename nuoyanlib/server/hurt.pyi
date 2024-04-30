@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -25,12 +25,12 @@ def explode_hurt(
     radius: float,
     pos: Tuple[float, float, float],
     source_id: str,
-    player_id: str,
+    dim: int,
     fire: bool = False,
     breaks: bool = True,
     tile_drops: bool = True,
     mob_loot: bool = True,
-    hurt_player: bool = False,
+    hurt_source: bool = False,
 ) -> None: ...
 def line_damage(
     damage: int,

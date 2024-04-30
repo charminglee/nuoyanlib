@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -41,7 +41,7 @@ _ITEM_POS_SIZE = (36, 1, 1, 4)
 
 def clear_items(player_id, item_pos_type, pos):
     """
-    清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
+    | 清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
 
     -----
 
@@ -60,7 +60,7 @@ def clear_items(player_id, item_pos_type, pos):
 
 def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     """
-    获取物品所在槽位。
+    | 获取物品所在槽位。
 
     -----
 
@@ -95,7 +95,7 @@ def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
 
 def change_item_count(player_id, pos_type=_ItemPosType.CARRIED, pos=0, change=-1):
     """
-    改变玩家指定槽位物品的数量。（创造模式下不生效）
+    | 改变玩家指定槽位物品的数量。（创造模式下不生效）
 
     -----
 

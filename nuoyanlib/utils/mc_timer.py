@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -62,7 +62,7 @@ class McTimer(object):
 
     def Start(self):
         """
-        启动定时器。
+        | 启动定时器。
 
         -----
 
@@ -74,7 +74,7 @@ class McTimer(object):
 
     def Cancel(self):
         """
-        取消定时器。
+        | 取消定时器。
 
         -----
 
@@ -96,7 +96,7 @@ class McTimer(object):
     def Pause(self, sec=None):
         # todo: Pause
         """
-        暂停定时器，重复调用时仅第一次有效。
+        | 暂停定时器，重复调用时仅第一次有效。
 
         -----
 
@@ -112,7 +112,7 @@ class McTimer(object):
     def Continue(self):
         # todo: Continue
         """
-        继续运行被暂停的定时器。
+        | 继续运行被暂停的定时器。
 
         -----
 
@@ -125,7 +125,7 @@ class McTimer(object):
 
     def Execute(self):
         """
-        立即执行一次函数。
+        | 立即执行一次函数。
 
         -----
 
@@ -136,7 +136,7 @@ class McTimer(object):
 
     def IsCanceled(self):
         """
-        获取定时器是否已经取消。
+        | 获取定时器是否已经取消。
 
         -----
 
@@ -147,7 +147,7 @@ class McTimer(object):
 
     def IsPaused(self):
         """
-        获取定时器是否暂停。
+        | 获取定时器是否暂停。
 
         -----
 

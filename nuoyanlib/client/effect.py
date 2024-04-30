@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -308,7 +308,7 @@ class NeteaseParticle(object):
 
     def BindEntity(self, ent_id, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0), correction=False):
         """
-        绑定粒子到实体上。
+        | 绑定粒子到实体上。
 
         -----
 
@@ -334,7 +334,7 @@ class NeteaseParticle(object):
 
     def BindSkeleton(self, model_id, bone_name, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
         """
-        绑定粒子到骨骼模型上。
+        | 绑定粒子到骨骼模型上。
 
         -----
 
@@ -360,7 +360,7 @@ class NeteaseParticle(object):
 
     def Play(self):
         """
-        播放粒子特效。
+        | 播放粒子特效。
 
         -----
 
@@ -374,7 +374,7 @@ class NeteaseParticle(object):
 
     def Pause(self):
         """
-        暂停粒子特效。
+        | 暂停粒子特效。
 
         -----
 
@@ -388,7 +388,7 @@ class NeteaseParticle(object):
 
     def Destroy(self):
         """
-        销毁粒子特效。
+        | 销毁粒子特效。
 
         -----
 
@@ -458,7 +458,7 @@ class NeteaseParticle(object):
 
     def SetUsePointFiltering(self, use):
         """
-        设置粒子材质的纹理滤波是否使用点滤波方法。
+        | 设置粒子材质的纹理滤波是否使用点滤波方法。
 
         -----
 
@@ -698,7 +698,7 @@ class NeteaseFrameAnim(object):
 
     def BindEntity(self, bind_entity_id, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
         """
-        绑定序列帧到实体上。
+        | 绑定序列帧到实体上。
 
         -----
 
@@ -722,7 +722,7 @@ class NeteaseFrameAnim(object):
 
     def BindSkeleton(self, model_id, bone_name, offset=(0.0, 0.0, 0.0), rot=(0.0, 0.0, 0.0)):
         """
-        绑定序列帧到骨骼模型上。
+        | 绑定序列帧到骨骼模型上。
 
         -----
 
@@ -747,7 +747,7 @@ class NeteaseFrameAnim(object):
 
     def Play(self):
         """
-        播放序列帧特效。
+        | 播放序列帧特效。
 
         -----
 
@@ -761,7 +761,7 @@ class NeteaseFrameAnim(object):
 
     def Pause(self):
         """
-        暂停序列帧特效。
+        | 暂停序列帧特效。
 
         -----
 
@@ -775,7 +775,7 @@ class NeteaseFrameAnim(object):
 
     def Destroy(self):
         """
-        销毁序列帧特效。
+        | 销毁序列帧特效。
 
         -----
 
@@ -802,7 +802,7 @@ class NeteaseFrameAnim(object):
 
     def SetDeepTest(self, enabled):
         """
-        设置序列帧是否开启深度测试。
+        | 设置序列帧是否开启深度测试。
 
         -----
 
@@ -815,7 +815,7 @@ class NeteaseFrameAnim(object):
 
     def SetFaceCamera(self, face):
         """
-        设置序列帧是否始终朝向摄像机。
+        | 设置序列帧是否始终朝向摄像机。
 
         -----
 
@@ -856,7 +856,7 @@ class NeteaseFrameAnim(object):
 
     def SetLoop(self, loop):
         """
-        设置序列帧是否循环播放。
+        | 设置序列帧是否循环播放。
 
         -----
 
@@ -869,7 +869,7 @@ class NeteaseFrameAnim(object):
 
     def SetUsePointFiltering(self, use):
         """
-        设置序列帧材质的纹理滤波是否使用点滤波方法。
+        | 设置序列帧材质的纹理滤波是否使用点滤波方法。
 
         -----
 

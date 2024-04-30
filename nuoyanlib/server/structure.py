@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -27,7 +27,7 @@ __all__ = [
 
 def place_large_structure(pos, dimension_id, json_list, namespace):
     """
-    放置由编辑器导出的经过切分的大型结构。放置结构时以第一个小结构为起点开始放置。
+    | 放置由编辑器导出的经过切分的大型结构。放置结构时以第一个小结构为起点开始放置。
 
     -----
 

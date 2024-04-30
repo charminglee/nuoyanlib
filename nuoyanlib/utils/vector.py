@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-28
 
 # ====================================================
 
@@ -44,7 +44,7 @@ __all__ = [
 
 def vec_normalize(vector):
     """
-    向量标准化。
+    | 向量标准化。
 
     -----
 
@@ -58,7 +58,7 @@ def vec_normalize(vector):
 
 def vec_rot_p2p(pos1, pos2):
     """
-    计算从pos1指向pos2的向量角度。
+    | 计算从 ``pos1`` 指向 ``pos2`` 的向量角度。
 
     -----
 
@@ -83,7 +83,7 @@ def vec_rot_p2p(pos1, pos2):
 
 def vec_p2p(pos1, pos2):
     """
-    计算从pos1指向pos2的单位向量。
+    | 计算从 ``pos1`` 指向 ``pos2`` 的单位向量。
 
     -----
 
@@ -99,7 +99,7 @@ def vec_p2p(pos1, pos2):
 
 def vec_length(vector):
     """
-    计算向量长度（模长）。
+    | 计算向量长度（模长）。
 
     -----
 
@@ -113,7 +113,7 @@ def vec_length(vector):
 
 def vec_angle(v1, v2):
     """
-    计算两个向量之间的夹角。
+    | 计算两个向量之间的夹角。
 
     -----
 
@@ -145,7 +145,7 @@ def _matrix_mult(matrix1, matrix2):
 
 def vec_euler_rotate(vector, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx"):
     """
-    对指定向量应用欧拉旋转。
+    | 对指定向量应用欧拉旋转。
 
     -----
 
@@ -201,7 +201,7 @@ def vec_euler_rotate(vector, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx")
 
 def vec_rotate_around(v, u, angle):
     """
-    将向量v绕着向量u旋转。
+    | 将向量v绕着向量u旋转。
 
     :param tuple[float,float,float] v: 要旋转的向量
     :param tuple[float,float,float] u: 旋转轴向量
@@ -225,7 +225,7 @@ def vec_rotate_around(v, u, angle):
 
 def outgoing_vec(vector, normal):
     """
-    已知入射向量和法线求出射向量。
+    | 已知入射向量和法线求出射向量。
 
     -----
 
@@ -243,7 +243,7 @@ def outgoing_vec(vector, normal):
 
 def vec_composite(vector, *more_vec):
     """
-    向量的合成。
+    | 向量的合成。
 
     -----
 

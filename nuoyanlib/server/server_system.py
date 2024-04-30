@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-29
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as api
+import mod.server.extraServerApi as _server_api
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
 from ..utils.utils import is_method_overridden as _is_method_overridden
 from ..config import (
@@ -29,17 +29,17 @@ from comp import (
     SERVER_ENGINE_NAMESPACE as _SERVER_ENGINE_NAMESPACE,
     SERVER_ENGINE_SYSTEM_NAME as _SERVER_ENGINE_SYSTEM_NAME,
     ServerSystem as _ServerSystem,
+    LvComp as _LvComp,
 )
 
 
 __all__ = [
     "server_listener",
     "NuoyanServerSystem",
-    "ALL_SERVER_ENGINE_EVENTS",
 ]
 
 
-ALL_SERVER_ENGINE_EVENTS = {
+_ALL_SERVER_ENGINE_EVENTS = [
     "EntityDieLoottableAfterServerEvent",
     "PlayerHungerChangeServerEvent",
     "ItemDurabilityChangedServerEvent",
@@ -72,7 +72,6 @@ ALL_SERVER_ENGINE_EVENTS = {
     "SpawnProjectileServerEvent",
     "OnGroundServerEvent",
     "ServerBlockUseEvent",
-    "ServerSpawnMobEvent",
     "PlayerAttackEntityEvent",
     "AchievementCompleteEvent",
     "AddServerPlayerEvent",
@@ -162,7 +161,6 @@ ALL_SERVER_ENGINE_EVENTS = {
     "HopperTryPullOutServerEvent",
     "OnAfterFallOnBlockServerEvent",
     "OnBeforeFallOnBlockServerEvent",
-    "OnEntityInsideBlockServerEvent",
     "OnStandOnBlockServerEvent",
     "PistonActionServerEvent",
     "ServerBlockEntityTickEvent",
@@ -199,7 +197,8 @@ ALL_SERVER_ENGINE_EVENTS = {
     "PlayerInventoryOpenScriptServerEvent",
     "UrgeShipEvent",
     "lobbyGoodBuySucServerEvent",
-}
+]
+_DATA_KEY_ITEMS_DATA = "_ny_items_data"
 
 
 _lsn_func_args = []
@@ -224,7 +223,7 @@ def server_listener(event_name="", namespace="", system_name="", priority=0):
         return event_name
     else:
         if not namespace and not system_name:
-            if event_name in ALL_SERVER_ENGINE_EVENTS:
+            if event_name in _ALL_SERVER_ENGINE_EVENTS:
                 namespace = _SERVER_ENGINE_NAMESPACE
                 system_name = _SERVER_ENGINE_SYSTEM_NAME
             else:
@@ -255,7 +254,7 @@ def _listen_custom(self):
 
 
 def _listen_engine(self):
-    for event in ALL_SERVER_ENGINE_EVENTS:
+    for event in _ALL_SERVER_ENGINE_EVENTS:
         if _is_method_overridden(self.__class__, NuoyanServerSystem, event):
             func = getattr(self, event)
             self.ListenForEvent(_SERVER_ENGINE_NAMESPACE, _SERVER_ENGINE_SYSTEM_NAME, event, self, func)
@@ -263,7 +262,7 @@ def _listen_engine(self):
 
 class NuoyanServerSystem(_ServerSystem):
     """
-    ServerSystem扩展类。将自定义ServerSystem继承本类即可使用本类的全部功能。
+    | ServerSystem扩展类。将自定义ServerSystem继承本类即可使用本类的全部功能。
 
     -----
 
@@ -274,10 +273,9 @@ class NuoyanServerSystem(_ServerSystem):
     """
 
     def __init__(self, namespace, system_name):
-        # noinspection PySuperArguments
         super(NuoyanServerSystem, self).__init__(namespace, system_name)
         self.all_player_data = {}
-        self.homeowner_player_id = "-1"
+        self.first_player_id = "-1"
         _listen_custom(self)
         _listen_engine(self)
         self._set_print_log()
@@ -293,24 +291,31 @@ class NuoyanServerSystem(_ServerSystem):
             class MyServerSystem(NuoyanServerSystem):
                 def Destroy(self):
                     super(MyServerSystem, self).Destroy()
-                    # 或者：NuoyanServerSystem.Destroy(self)
 
         :return: 无
         :rtype: None
         """
+        super(NuoyanServerSystem, self).Destroy()
         self.UnListenAllEvents()
 
     def Update(self):
         """
         *[tick]* *[event]*
 
-        服务端每帧调用，1秒有30帧。
+        | 服务端每帧调用，1秒有30帧。
+        | 若重写该方法，请调用一次父类的同名方法。如：
+        ::
+
+            class MyServerSystem(NuoyanServerSystem):
+                def Update(self):
+                    super(MyServerSystem, self).Update()
 
         -----
 
         :return: 无
         :rtype: None
         """
+        super(NuoyanServerSystem, self).Update()
 
     # ========================================= Engine Event Callback ==================================================
 
@@ -389,7 +394,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        网易版大型结构即将生成时服务端抛出该事件。
+        | 网易版大型结构即将生成时服务端抛出该事件。
 
         -----
 
@@ -413,7 +418,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家用命名牌重命名实体时触发，例如玩家手持命名牌对羊修改名字、玩家手持命名牌对盔甲架修改名字。
+        | 玩家用命名牌重命名实体时触发，例如玩家手持命名牌对羊修改名字、玩家手持命名牌对盔甲架修改名字。
 
         -----
 
@@ -461,7 +466,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家登录联机大厅服务器，或者联机大厅游戏内购买商品时触发。如果是玩家登录，触发时玩家客户端已经触发了 ``UiInitFinished`` 事件。
+        | 玩家登录联机大厅服务器，或者联机大厅游戏内购买商品时触发。如果是玩家登录，触发时玩家客户端已经触发了 ``UiInitFinished`` 事件。
 
         -----
 
@@ -480,7 +485,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家点击商城催促发货按钮时触发该事件。
+        | 玩家点击商城催促发货按钮时触发该事件。
 
         -----
 
@@ -498,7 +503,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        某个客户端打开物品背包界面时触发。可以监听此事件判定客户端是否打开了创造背包。
+        | 某个客户端打开物品背包界面时触发。可以监听此事件判定客户端是否打开了创造背包。
 
         -----
 
@@ -667,7 +672,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家即将捡起物品时触发。
+        | 玩家即将捡起物品时触发。
 
         -----
 
@@ -711,7 +716,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家丢弃物品时触发。
+        | 玩家丢弃物品时触发。
 
         -----
 
@@ -752,7 +757,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家使用盾牌抵挡伤害之后触发.
+        | 玩家使用盾牌抵挡伤害之后触发.
 
         -----
 
@@ -773,7 +778,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家激活/取消激活盾牌触发的事件。包括玩家持盾进入潜行状态，以及在潜行状态切换盾牌（切换耐久度不同的相同盾牌不会触发）。
+        | 玩家激活/取消激活盾牌触发的事件。包括玩家持盾进入潜行状态，以及在潜行状态切换盾牌（切换耐久度不同的相同盾牌不会触发）。
 
         -----
 
@@ -921,7 +926,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        释放正在使用的物品时触发。
+        | 释放正在使用的物品时触发。
 
         -----
 
@@ -969,7 +974,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        服务端熔炉烧制触发事件。熔炉、高炉、烟熏炉烧出物品时触发。
+        | 服务端熔炉烧制触发事件。熔炉、高炉、烟熏炉烧出物品时触发。
 
         -----
 
@@ -1191,7 +1196,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        手动放置或通过接口创建含自定义方块实体的方块时触发，此时可向该方块实体中存放数据。
+        | 手动放置或通过接口创建含自定义方块实体的方块时触发，此时可向该方块实体中存放数据。
 
         -----
 
@@ -1264,7 +1269,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        活塞或者粘性活塞推送/缩回影响附近方块时触发。
+        | 活塞或者粘性活塞推送/缩回影响附近方块时触发。
 
         -----
 
@@ -1382,7 +1387,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当漏斗以毗邻的方式连接容器时，即从旁边连接容器时，漏斗向容器开始输出物品时触发，事件仅触发一次。
+        | 当漏斗以毗邻的方式连接容器时，即从旁边连接容器时，漏斗向容器开始输出物品时触发，事件仅触发一次。
 
         -----
 
@@ -1407,7 +1412,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当漏斗上方连接容器后，容器往漏斗开始输入物品时触发，事件仅触发一次。
+        | 当漏斗上方连接容器后，容器往漏斗开始输入物品时触发，事件仅触发一次。
 
         -----
 
@@ -1658,7 +1663,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家点击命令方块，尝试打开命令方块的设置界面。
+        | 玩家点击命令方块，尝试打开命令方块的设置界面。
 
         -----
 
@@ -1682,7 +1687,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        两个并排的小箱子方块准备组合为一个大箱子方块时触发。
+        | 两个并排的小箱子方块准备组合为一个大箱子方块时触发。
 
         -----
 
@@ -1707,7 +1712,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        自定义机械元件方块红石信号量发生变化时触发。
+        | 自定义机械元件方块红石信号量发生变化时触发。
 
         -----
 
@@ -1731,7 +1736,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        方块转为含雪或者脱离含雪前触发。
+        | 方块转为含雪或者脱离含雪前触发。
 
         -----
 
@@ -1754,7 +1759,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        方块转为含雪或者脱离含雪后触发。
+        | 方块转为含雪或者脱离含雪后触发。
 
         -----
 
@@ -1777,7 +1782,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        监听该事件的方块在销毁时触发，可以通过 `ListenOnBlockRemoveEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=ListenOnBlockRemoveEvent&docindex=3&type=0>`_ 方法进行监听，或者通过json组件 `netease:listen_block_remove <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html#netease-listen-block-remove>`_ 进行配置。
+        | 监听该事件的方块在销毁时触发，可以通过 `ListenOnBlockRemoveEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=ListenOnBlockRemoveEvent&docindex=3&type=0>`_ 方法进行监听，或者通过json组件 `netease:listen_block_remove <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html#netease-listen-block-remove>`_ 进行配置。
 
         -----
 
@@ -1806,7 +1811,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        自定义方块配置 ``"netease:random_tick"`` 随机tick时触发。
+        | 自定义方块配置 ``"netease:random_tick"`` 随机tick时触发。
 
         -----
 
@@ -1830,7 +1835,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        自定义方块周围的方块发生变化时，需要配置 ``"netease:neighborchanged_sendto_script"`` 。
+        | 自定义方块周围的方块发生变化时，需要配置 ``"netease:neighborchanged_sendto_script"`` 。
 
         -----
 
@@ -1859,7 +1864,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        方块转为含水或者脱离含水(流体)前触发。
+        | 方块转为含水或者脱离含水(流体)前触发。
 
         -----
 
@@ -1883,7 +1888,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        方块转为含水或者脱离含水(流体)后触发。
+        | 方块转为含水或者脱离含水(流体)后触发。
 
         -----
 
@@ -1931,7 +1936,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家游戏内购买商品时服务端抛出的事件。
+        | 玩家游戏内购买商品时服务端抛出的事件。
 
         -----
 
@@ -1970,7 +1975,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家尝试使用床睡觉时触发。
+        | 玩家尝试使用床睡觉时触发。
 
         -----
 
@@ -1989,7 +1994,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当玩家传送时触发该事件，如：玩家使用末影珍珠或tp指令时。
+        | 当玩家传送时触发该事件，如：玩家使用末影珍珠或tp指令时。
 
         -----
 
@@ -2007,7 +2012,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家停止睡觉时触发。
+        | 玩家停止睡觉时触发。
 
         -----
 
@@ -2025,7 +2030,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家使用床睡觉成功时触发。
+        | 玩家使用床睡觉成功时触发。
 
         -----
 
@@ -2082,7 +2087,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当玩家受伤害前触发该事件。
+        | 当玩家受伤害前触发该事件。
 
         -----
 
@@ -2125,7 +2130,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当玩家死亡时触发该事件。
+        | 当玩家死亡时触发该事件。
 
         -----
 
@@ -2249,7 +2254,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        获取玩家下一个等级升级经验时触发，用于重载玩家的升级经验，每个等级在重置之前都只会触发一次。
+        | 获取玩家下一个等级升级经验时触发，用于重载玩家的升级经验，每个等级在重置之前都只会触发一次。
 
         -----
 
@@ -2275,7 +2280,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当玩家升级时触发该事件。
+        | 当玩家升级时触发该事件。
 
         -----
 
@@ -2295,7 +2300,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当玩家增加经验时触发该事件。
+        | 当玩家增加经验时触发该事件。
 
         -----
 
@@ -2343,7 +2348,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        实体即将获得状态效果前触发。
+        | 实体即将获得状态效果前触发。
 
         -----
 
@@ -2366,7 +2371,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        一个实体即将骑乘另外一个实体时触发。
+        | 一个实体即将骑乘另外一个实体时触发。
 
         -----
 
@@ -2386,7 +2391,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        实体身上状态效果被移除时触发。
+        | 实体身上状态效果被移除时触发。
 
         -----
 
@@ -2407,7 +2412,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        实体身上状态效果更新时触发，更新条件1、新增状态等级较高，更新状态等级及时间；2、新增状态等级不变，时间较长，更新状态持续时间。
+        | 实体身上状态效果更新时触发，更新条件1、新增状态等级较高，更新状态等级及时间；2、新增状态等级不变，时间较长，更新状态持续时间。
 
         -----
 
@@ -2483,7 +2488,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        实体被击退时触发。
+        | 实体被击退时触发。
 
         -----
 
@@ -2501,7 +2506,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        生物受到火焰伤害时触发。
+        | 生物受到火焰伤害时触发。
 
         -----
 
@@ -2548,7 +2553,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        生物生命值发生变化时触发。
+        | 生物生命值发生变化时触发。
 
         -----
 
@@ -2569,7 +2574,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[tick]* *[event]*
         
-        实体tick时触发。该事件为20帧每秒。需要使用 ``AddEntityTickEventWhiteList`` 添加触发该事件的实体类型白名单。
+        | 实体tick时触发。该事件为20帧每秒。需要使用 ``AddEntityTickEventWhiteList`` 添加触发该事件的实体类型白名单。
 
         -----
 
@@ -2594,7 +2599,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        有 ``"minecraft:behavior.pickup_items"`` 行为的生物拾取物品时触发该事件，例如村民拾取面包、猪灵拾取金锭。
+        | 有 ``"minecraft:behavior.pickup_items"`` 行为的生物拾取物品时触发该事件，例如村民拾取面包、猪灵拾取金锭。
 
         -----
 
@@ -2635,7 +2640,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        实体运动器开始事件。实体（包含玩家）添加运动器后，运动器开始运行时触发。
+        | 实体运动器开始事件。实体（包含玩家）添加运动器后，运动器开始运行时触发。
 
         -----
 
@@ -2673,7 +2678,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        生物受到状态伤害/回复事件。
+        | 生物受到状态伤害/回复事件。
 
         -----
 
@@ -2697,7 +2702,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        生物扔出物品时触发。
+        | 生物扔出物品时触发。
 
         -----
 
@@ -2766,7 +2771,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        实体获得状态效果时触发。
+        | 实体获得状态效果时触发。
 
         -----
 
@@ -2788,7 +2793,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        生物（包括玩家）受伤时触发。
+        | 生物（包括玩家）受伤时触发。
 
         -----
 
@@ -2840,7 +2845,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        用方块组合生成生物，在放置最后一个组成方块时触发该事件。
+        | 用方块组合生成生物，在放置最后一个组成方块时触发该事件。
 
         -----
 
@@ -2863,7 +2868,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        用方块组合生成生物，生成生物之后触发该事件。
+        | 用方块组合生成生物，生成生物之后触发该事件。
 
         -----
 
@@ -2886,7 +2891,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家发送聊天信息时触发。
+        | 玩家发送聊天信息时触发。
 
         -----
 
@@ -2914,7 +2919,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        准备显示“xxx离开游戏”的玩家离开提示文字时服务端抛出的事件。
+        | 准备显示“xxx离开游戏”的玩家离开提示文字时服务端抛出的事件。
 
         -----
 
@@ -3011,7 +3016,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        下雨强度发生改变时触发。
+        | 下雨强度发生改变时触发。
 
         -----
 
@@ -3030,7 +3035,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        独立维度天气下雨强度发生改变时触发。
+        | 独立维度天气下雨强度发生改变时触发。
 
         -----
 
@@ -3050,7 +3055,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        独立维度天气打雷强度发生改变时触发。
+        | 独立维度天气打雷强度发生改变时触发。
 
         -----
 
@@ -3070,7 +3075,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        打雷强度发生改变时触发。
+        | 打雷强度发生改变时触发。
 
         -----
 
@@ -3159,7 +3164,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        服务器加载完mod时触发。
+        | 服务器加载完mod时触发。
 
         -----
 
@@ -3177,7 +3182,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        删除玩家时触发该事件。
+        | 删除玩家时触发该事件。
 
         -----
 
@@ -3218,7 +3223,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        客户端mod加载完成时，服务端触发此事件。服务器可以使用此事件，往客户端发送数据给其初始化。
+        | 客户端mod加载完成时，服务端触发此事件。服务器可以使用此事件，往客户端发送数据给其初始化。
 
         -----
 
@@ -3258,7 +3263,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        区块创建完成时触发。
+        | 区块创建完成时触发。
 
         -----
 
@@ -3327,7 +3332,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家完成自定义成就时触发该事件。
+        | 玩家完成自定义成就时触发该事件。
 
         -----
 
@@ -3349,7 +3354,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当玩家攻击时触发该事件。
+        | 当玩家攻击时触发该事件。
 
         -----
 
@@ -3410,7 +3415,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        实体着地事件。实体，掉落的物品，点燃的TNT掉落地面时触发。
+        | 实体着地事件。实体，掉落的物品，点燃的TNT掉落地面时触发。
 
         -----
 
@@ -3498,7 +3503,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        生物生命值发生变化之前触发。
+        | 生物生命值发生变化之前触发。
 
         -----
 
@@ -3542,7 +3547,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        生物定义json文件中设置的event触发时同时触发。
+        | 生物定义json文件中设置的event触发时同时触发。
 
         -----
 
@@ -3561,7 +3566,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家与有 ``"minecraft:interact"`` 组件的生物交互时触发该事件，例如玩家手持空桶对牛挤奶、玩家手持打火石点燃苦力怕。
+        | 玩家与有 ``"minecraft:interact"`` 组件的生物交互时触发该事件，例如玩家手持空桶对牛挤奶、玩家手持打火石点燃苦力怕。
 
         -----
 
@@ -3653,7 +3658,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        通过 ``OpenMobHitBlockDetection`` 打开方块碰撞检测后，当生物（不包括玩家）碰撞到方块时触发该事件。
+        | 通过 ``OpenMobHitBlockDetection`` 打开方块碰撞检测后，当生物（不包括玩家）碰撞到方块时触发该事件。
 
         -----
 
@@ -3722,7 +3727,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当实体骑乘上另一个实体时触发。
+        | 当实体骑乘上另一个实体时触发。
 
         -----
 
@@ -3829,7 +3834,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        玩家获得物品时服务端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
+        | 玩家获得物品时服务端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
 
         -----
 
@@ -3933,7 +3938,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        当抛射物碰撞时触发该事件。
+        | 当抛射物碰撞时触发该事件。
 
         -----
 
@@ -4005,7 +4010,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[tick]* *[event]*
 
-        服务端tick事件，1秒30次。
+        | 服务端tick事件，1秒30次。
 
         -----
 
@@ -4019,7 +4024,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         *[event]*
 
-        客户端玩家UI框架初始化完成时，服务端触发。
+        | 客户端玩家UI框架初始化完成时，服务端触发。
 
         -----
 
@@ -4035,14 +4040,58 @@ class NuoyanServerSystem(_ServerSystem):
 
     # ============================================= New Interface ======================================================
 
-    def SyncItemsToItemGrid(self, player_id, namespace, keys):
+    def SetItemsToItemGrid(self, player_id, cls_name, key, item_dict_list, sync=True):
         """
-        立即同步一次玩家的物品信息给客户端的ItemGrid。
+        | 设置由 ``ItemGridManager`` 管理的网格的物品。
+
+        -----
+
+        :param str player_id: 玩家实体ID
+        :param str cls_name: UI类名
+        :param str key: 网格的key
+        :param list[dict|None] item_dict_list: 物品信息字典列表
+        :param bool sync: 是否立即同步给客户端，默认为True
+
+        :return: 无
+        :rtype: None
+        """
+        data = _transit_sys.items_data
+        if player_id not in data:
+            data[player_id] = {}
+        data_key = (_MOD_NAME + "_" + cls_name, key)
+        data[player_id][data_key] = item_dict_list
+        if sync:
+            self.SyncItemsToItemGrid(player_id, cls_name, key)
+
+    def GetItemsFromItemGrid(self, player_id, cls_name, key):
+        """
+        | 获取由 ``ItemGridManager`` 管理的网格的物品。
+
+        -----
+
+        :param str player_id: 玩家实体ID
+        :param str cls_name: UI类名
+        :param str key: 网格的key
+
+        :return: 物品信息字典列表
+        :rtype: list[dict|None]
+        """
+        data = _transit_sys.items_data
+        if player_id not in data:
+            return []
+        data_key = (_MOD_NAME + "_" + cls_name, key)
+        if data_key not in data[player_id]:
+            return []
+        return data[player_id][data_key]
+
+    def SyncItemsToItemGrid(self, player_id, cls_name, keys):
+        """
+        | 立即同步一次玩家的物品数据给客户端的由 ``ItemGridManager`` 管理的物品网格。
 
         -----
 
         :param str player_id: 玩家的实体ID
-        :param str namespace: UI类名
+        :param str cls_name: UI类名
         :param str|tuple[str,...] keys: 要同步的网格的key，多个网格请使用元组
 
         :return: 无
@@ -4050,7 +4099,7 @@ class NuoyanServerSystem(_ServerSystem):
         """
         if isinstance(keys, str):
             keys = (keys,)
-        _transit_sys._SyncItems({'__id__': player_id, 'namespace': namespace, 'keys': keys})
+        _transit_sys._SyncItems({'__id__': player_id, 'namespace': _MOD_NAME + "_" + cls_name, 'keys': keys})
 
     def SetQueryVar(self, entity_id, name, value):
         """
@@ -4070,7 +4119,7 @@ class NuoyanServerSystem(_ServerSystem):
 
     def CallClient(self, player_id, name, callback=None, *args):
         """
-        调用客户端属性（包括变量和函数）。
+        | 调用客户端属性（包括变量和函数）。
 
         -----
 
@@ -4082,10 +4131,6 @@ class NuoyanServerSystem(_ServerSystem):
         :return: 无
         :rtype: None
         """
-
-    @property
-    def item_grid_data(self):
-        return _transit_sys.items_data
 
     # =========================================== Internal Method ======================================================
 
@@ -4100,8 +4145,8 @@ class NuoyanServerSystem(_ServerSystem):
     def _UiInitFinished(self, args):
         player_id = args['__id__']
         self.all_player_data[player_id] = {}
-        if self.homeowner_player_id == "-1":
-            self.homeowner_player_id = player_id
+        if self.first_player_id == "-1":
+            self.first_player_id = player_id
         self.UiInitFinished(args)
 
     @server_listener("PlayerIntendLeaveServerEvent")
@@ -4111,15 +4156,18 @@ class NuoyanServerSystem(_ServerSystem):
             del self.all_player_data[player_id]
 
     def _set_print_log(self):
-        api.SetMcpModLogCanPostDump(True)
+        _server_api.SetMcpModLogCanPostDump(True)
 
 
 class _TransitServerSystem(_ServerSystem):
     def __init__(self, namespace, system_name):
         super(_TransitServerSystem, self).__init__(namespace, system_name)
         self.query_cache = {}
-        self.items_data = {}
+        self.items_data = _LvComp.ExtraData.GetExtraData(_DATA_KEY_ITEMS_DATA) or {}
         _listen_custom(self)
+
+    def Destroy(self):
+        _LvComp.ExtraData.SetExtraData(_DATA_KEY_ITEMS_DATA, self.items_data)
 
     @server_listener
     def _SetQueryVar(self, args):
@@ -4132,20 +4180,18 @@ class _TransitServerSystem(_ServerSystem):
         self.BroadcastToAllClient("_SetQueryVar", args)
 
     @server_listener
-    def UiInitFinished(self, args):
-        player_id = args['__id__']
-        self.items_data[player_id] = {}
-        if self.query_cache:
-            self.NotifyToClient(player_id, "_SetQueryCache", self.query_cache)
+    def _BroadcastToAllClient(self, args):
+        event_name = args['event_name']
+        event_data = args['event_data']
+        if isinstance(event_data, dict) and '__id__' in args:
+            event_data['__id__'] = args['__id__']
+        self.BroadcastToAllClient(event_name, event_data)
 
     @server_listener
-    def _InitItemGrid(self, args):
+    def UiInitFinished(self, args):
         player_id = args['__id__']
-        key = args['key']
-        count = args['count']
-        namespace = args['namespace']
-        if (namespace, key) not in self.items_data[player_id]:
-            self.items_data[player_id][(namespace, key)] = [None] * count
+        if self.query_cache:
+            self.NotifyToClient(player_id, "_SetQueryCache", self.query_cache)
 
     @server_listener
     def _ThrowItem(self, args):
@@ -4160,7 +4206,7 @@ class _TransitServerSystem(_ServerSystem):
         if item_ent:
             rot = _CompFactory.CreateRot(player_id).GetRot()
             rot = (-15, rot[1])
-            direction = api.GetDirFromRot(rot)
+            direction = _server_api.GetDirFromRot(rot)
             motion = tuple(i * 0.3 for i in direction)
             _CompFactory.CreateActorMotion(item_ent).SetMotion(motion)
 
@@ -4170,10 +4216,11 @@ class _TransitServerSystem(_ServerSystem):
         namespace = args['namespace']
         keys = args['keys']
         data = {}
-        for (ns, key), items in self.items_data[player_id].items():
-            if ns != namespace or key not in keys:
-                continue
-            data[key] = items
+        if player_id in self.items_data:
+            for (ns, key), items in self.items_data[player_id].items():
+                if ns != namespace or key not in keys:
+                    continue
+                data[key] = items
         inv_items = _CompFactory.CreateItem(player_id).GetPlayerAllItems(_ItemPosType.INVENTORY, True)
         if "inv27" in keys:
             data['inv27'] = inv_items[9:]
@@ -4188,6 +4235,7 @@ class _TransitServerSystem(_ServerSystem):
         player_id = args['__id__']
         data = args['data']
         namespace = args['namespace']
+        itemsData = self.items_data.setdefault(player_id, {})
         comp = _CompFactory.CreateItem(player_id)
         inv_items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
         for key, items in data.items():
@@ -4204,22 +4252,18 @@ class _TransitServerSystem(_ServerSystem):
                     if item != inv_items[i]
                 })
             else:
-                self.items_data[player_id][(namespace, key)] = items
-
-    @server_listener
-    def _BroadcastToAllClient(self, args):
-        event_name = args['event_name']
-        event_data = args['event_data']
-        if isinstance(event_data, dict) and '__id__' in args:
-            event_data['__id__'] = args['__id__']
-        self.BroadcastToAllClient(event_name, event_data)
+                itemsData.setdefault((namespace, key), {})
+                itemsData[(namespace, key)] = items
 
 
-_transit_sys = _TransitServerSystem("NuoyanLib", "_TransitServerSystem")
-
-
-
-
+lib_namespace = "NuoyanLib"
+transit_sys_name = "_TransitServerSystem"
+path = __file__.replace(".py", "").replace("/", ".") + "." + transit_sys_name
+_transit_sys = _server_api.GetSystem(lib_namespace, transit_sys_name)
+if not _transit_sys:
+    _server_api.RegisterSystem(lib_namespace, transit_sys_name, path)
+    _transit_sys = _server_api.GetSystem(lib_namespace, transit_sys_name)
+del lib_namespace, transit_sys_name, path
 
 
 

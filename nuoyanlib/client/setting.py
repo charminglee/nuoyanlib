@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-14
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -29,7 +29,7 @@ __all__ = [
 
 def save_setting(name, data_dict, is_global=True):
     """
-    保存设置数据。
+    | 保存设置数据。
     
     -----
     
@@ -45,7 +45,7 @@ def save_setting(name, data_dict, is_global=True):
 
 def read_setting(name, is_global=True):
     """
-    读取设置数据。
+    | 读取设置数据。
     
     -----
 
@@ -60,7 +60,7 @@ def read_setting(name, is_global=True):
 
 def check_setting(name, item_list, is_global=True):
     """
-    检测本地存储的设置数据是否完整。
+    | 检测本地存储的设置数据是否完整。
     
     -----
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-14
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -28,7 +28,7 @@ __all__ = [
 
 def player_plunge(speed):
     """
-    使玩家向准星方向以指定初始速度突进。
+    | 使玩家向准星方向以指定初始速度突进。
 
     -----
 

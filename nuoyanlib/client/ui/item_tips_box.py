@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -22,12 +22,6 @@ from ...utils.item import is_empty_item as _is_empty_item
 from ..comp import (
     LvComp as _LvComp,
     ScreenNode as _ScreenNode,
-    CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
-    CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
-)
-from ...config import (
-    MOD_NAME as _MOD_NAME,
-    CLIENT_SYSTEM_NAME as _CLIENT_SYSTEM_NAME,
 )
 
 
@@ -46,21 +40,16 @@ class ItemTipsBox(_ScreenNode):
     """
 
     def __init__(self, namespace, name, param):
-        # noinspection PySuperArguments
         super(ItemTipsBox, self).__init__(namespace, name, param)
+        self.__screen_node = param['_screen_node'] if param and '_screen_node' in param else self
         self._alpha_tick = 0
-        self._tips_img = None
-        self._tips_panel = None
-        self._tips_label = None
+        self.item_tips_bg = None
+        self.item_tips_panel = None
+        self.item_tips_label = None
         self.__timer1 = None
         self.__timer2 = None
-        self.__cs = _api.GetSystem(_MOD_NAME, _CLIENT_SYSTEM_NAME)
-        self.__listen()
-
-    def __listen(self):
-        self.__cs.ListenForEvent(
-            _CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, "OnScriptTickClient", self, self._OnTickItemTipsBox
-        )
+        self.__follow = False
+        self.__path = ""
 
     def Create(self):
         """
@@ -79,48 +68,47 @@ class ItemTipsBox(_ScreenNode):
         :return: 无
         :rtype: None
         """
-        # noinspection PySuperArguments
         super(ItemTipsBox, self).Create()
-        self._tips_panel = self.CreateChildControl(_UI_NAME_ITEM_TIPS_BOX, _TIPS_PANEL_NAME)
-        self._tips_img = self._tips_panel.GetChildByName("image").asImage()
-        self._tips_label = self._tips_img.GetChildByName("label").asLabel()
-        self._tips_panel.SetVisible(False)
+        self.item_tips_panel = self.__screen_node.GetBaseUIControl(self.__path)
+        if not self.__path or not self.item_tips_panel:
+            self.item_tips_panel = self.__screen_node.CreateChildControl(_UI_NAME_ITEM_TIPS_BOX, _TIPS_PANEL_NAME)
+            self.__path = self.item_tips_panel.GetPath()
+        self.item_tips_bg = self.item_tips_panel.GetChildByName("image").asImage()
+        self.item_tips_label = self.item_tips_bg.GetChildByName("label").asLabel()
+        self.item_tips_panel.SetVisible(False)
 
-    def Destroy(self):
+    def Update(self):
         """
-        *[event]*
+        *[tick]* *[event]*
 
-        | UI生命周期函数，当UI销毁时调用。
-        | 若重写了该方法，请调用一次父类的同名方法。如：
+        | 客户端每帧调用。
+        | 若重写了该方法，请调用一次父类的同名方法，否则部分功能将不可用。如：
         ::
 
             class MyUI(ItemTipsBox):
-                def Destroy(self):
-                    super(MyUI, self).Destroy()
+                def Update(self):
+                    super(MyUI, self).Update()
 
         -----
 
         :return: 无
         :rtype: None
         """
-        # noinspection PySuperArguments
-        super(ItemTipsBox, self).Destroy()
-        self.__cs.UnListenForEvent(
-            _CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, "OnScriptTickClient",
-            self, self._OnTickItemTipsBox
-        )
-
-    def _OnTickItemTipsBox(self):
+        super(ItemTipsBox, self).Update()
+        if self.__follow and self.item_tips_panel:
+            pos = _LvComp.ActorMotion.GetMousePosition() or _api.GetTouchPos()
+            if pos:
+                self.item_tips_panel.SetPosition(pos)
         # 透明度动画
         if self._alpha_tick:
             self._alpha_tick -= 1
             alpha = self._alpha_tick / 30.0
-            self._tips_img.SetAlpha(alpha)
-            self._tips_label.SetAlpha(alpha)
+            self.item_tips_bg.SetAlpha(alpha)
+            self.item_tips_label.SetAlpha(alpha)
 
     def ShowItemHoverTipsBox(self, item_dict):
         """
-        根据物品信息显示悬浮文本框。
+        | 根据物品信息显示悬浮文本框。
 
         -----
 
@@ -139,42 +127,46 @@ class ItemTipsBox(_ScreenNode):
         text = _LvComp.Item.GetItemFormattedHoverText(name, aux, True, user_data)
         self.ShowTipsBox(text)
 
-    def ShowTipsBox(self, text):
+    def ShowTipsBox(self, text, follow=False):
         """
-        显示自定义内容的悬浮文本框。
+        | 显示自定义内容的悬浮文本框。
 
         -----
 
         :param str text: 文本内容
+        :param bool follow: 是否跟随鼠标指针或手指位置
 
         :return: 无
         :rtype: None
         """
         # 显示文本框
-        self._tips_panel.SetVisible(True)
+        self.item_tips_panel.SetVisible(True)
         self._alpha_tick = 0
-        self._tips_img.SetAlpha(1.0)
-        self._tips_label.SetAlpha(1.0)
-        self._tips_label.SetText(text)
+        self.item_tips_bg.SetAlpha(1.0)
+        self.item_tips_label.SetAlpha(1.0)
+        self.item_tips_label.SetText(text)
         # 取消正在执行的timer
         if self.__timer1:
             _LvComp.Game.CancelTimer(self.__timer1)
         if self.__timer2:
             _LvComp.Game.CancelTimer(self.__timer2)
-        # 一秒后执行渐出动画
-        def func1():
-            self._alpha_tick = 30
-            self.__timer1 = None
-        self.__timer1 = _LvComp.Game.AddTimer(1, func1)
-        # 两秒后隐藏文本框并恢复初始状态
-        def func2():
-            self.HideTipsBox()
-            self.__timer2 = None
-        self.__timer2 = _LvComp.Game.AddTimer(2, func2)
+        if not follow:
+            # 一秒后执行渐出动画
+            def func1():
+                self._alpha_tick = 30
+                self.__timer1 = None
+            self.__timer1 = _LvComp.Game.AddTimer(1, func1)
+            # 两秒后隐藏文本框并恢复初始状态
+            def func2():
+                self.HideTipsBox()
+                self.__timer2 = None
+            self.__timer2 = _LvComp.Game.AddTimer(2, func2)
+        else:
+            self.__follow = True
 
     def HideTipsBox(self):
         """
-        立即隐藏悬浮文本框。
+        | 立即隐藏悬浮文本框。
 
         -----
 
@@ -188,9 +180,10 @@ class ItemTipsBox(_ScreenNode):
             _LvComp.Game.CancelTimer(self.__timer2)
             self.__timer2 = None
         self._alpha_tick = 0
-        self._tips_img.SetAlpha(1.0)
-        self._tips_label.SetAlpha(1.0)
-        self._tips_panel.SetVisible(False)
+        self.item_tips_bg.SetAlpha(1.0)
+        self.item_tips_label.SetAlpha(1.0)
+        self.item_tips_panel.SetVisible(False)
+        self.__follow = False
 
 
 

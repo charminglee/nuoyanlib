@@ -12,12 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
 
 from copy import copy as _copy
+import mod.server.extraServerApi as _server_api
 from mod.common.minecraftEnum import (
     EntityType as _EntityType,
     AttrType as _AttrType,
@@ -52,44 +53,50 @@ __all__ = [
 
 
 def explode_hurt(
-        radius, 
-        pos, 
-        source_id, 
-        player_id, 
-        fire=False, 
-        breaks=True, 
-        tile_drops=True, 
+        radius,
+        pos,
+        source_id,
+        dim,
+        fire=False,
+        breaks=True,
+        tile_drops=True,
         mob_loot=True,
-        hurt_player=False,
+        hurt_source=False,
 ):
     """
-    造成爆炸伤害。
+    | 造成爆炸伤害。
     
     -----
 
     :param float radius: 爆炸强度
     :param tuple[float,float,float] pos: 爆炸中心坐标
     :param str source_id: 爆炸伤害源的实体ID
-    :param str player_id: 创造爆炸的实体ID
+    :param int dim: 爆炸维度
     :param bool fire: 是否造成火焰，默认为否
     :param bool breaks: 是否破坏方块，默认为是
     :param bool tile_drops: 破坏方块后是否生成掉落物，默认为是
     :param bool mob_loot: 生物被炸死后是否生成掉落物，默认为是
-    :param bool hurt_player: 是否对爆炸创造者造成伤害，默认为否
+    :param bool hurt_source: 是否对爆炸伤害源实体造成伤害，默认为否
 
     :return: 无
     :rtype: None
     """
+    for plr in _server_api.GetPlayerList():
+        if _CompFactory.CreateDimension(plr).GetEntityDimensionId() == dim:
+            player_id = plr
+            break
+    else:
+        return
     orig_rule = _LvComp.Game.GetGameRulesInfoServer()
     _LvComp.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tile_drops, 'mob_loot': mob_loot}})
-    comp = _CompFactory.CreateHurt(player_id)
+    comp = _CompFactory.CreateHurt(source_id)
     try:
-        if not hurt_player:
+        if not hurt_source:
             comp.ImmuneDamage(True)
         _LvComp.Explosion.CreateExplosion(pos, radius, fire, breaks, source_id, player_id)
     finally:
         _LvComp.Game.SetGameRulesInfoServer(orig_rule)
-        if not hurt_player:
+        if not hurt_source:
             comp.ImmuneDamage(False)
 
 
@@ -111,7 +118,7 @@ def line_damage(
         force=False,
 ):
     """
-    对一条线段上的生物造成伤害。
+    | 对一条线段上的生物造成伤害。
     
     -----
 
@@ -177,7 +184,7 @@ def hurt_mobs(
         force=False,
 ):
     """
-    对多个生物造成伤害。（无视攻击冷却）
+    | 对多个生物造成伤害。（无视攻击冷却）
     
     -----
 
@@ -212,7 +219,7 @@ def aoe_damage(
         force=False,
 ):
     """
-    在指定坐标造成范围伤害。
+    | 在指定坐标造成范围伤害。
     
     -----
 
@@ -269,7 +276,7 @@ def sector_aoe_damage(
         force=False,
 ):
     """
-    朝攻击者视线前方造成扇形范围伤害。（无视攻击冷却）
+    | 朝攻击者视线前方造成扇形范围伤害。（无视攻击冷却）
     
     -----
 
@@ -317,7 +324,7 @@ def rectangle_aoe_damage(
         force=False,
 ):
     """
-    对指定矩形区域内所有实体造成伤害。（无视攻击冷却）
+    | 对指定矩形区域内所有实体造成伤害。（无视攻击冷却）
     
     -----
 
@@ -349,7 +356,7 @@ def rectangle_aoe_damage(
 
 def hurt_by_set_health(entity_id, damage):
     """
-    通过设置生命值的方式对实体造成伤害。
+    | 通过设置生命值的方式对实体造成伤害。
     
     -----
 
@@ -375,7 +382,7 @@ def hurt(
         force=False,
 ):
     """
-    对指定生物造成伤害。
+    | 对指定生物造成伤害。
     
     -----
 
@@ -406,7 +413,7 @@ def percent_damage(
         force=False,
 ):
     """
-    对生物造成百分比伤害。（无视攻击冷却）
+    | 对生物造成百分比伤害。（无视攻击冷却）
     
     -----
 

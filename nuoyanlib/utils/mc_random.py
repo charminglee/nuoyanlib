@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -48,7 +48,7 @@ _LEVEL_ID = client_api.GetLevelId() or server_api.GetLevelId()
 
 def random_pos(center_pos, grid, use_top_height=False, dimension=0):
     """
-    在指定区域内随机获取一点坐标。
+    | 在指定区域内随机获取一点坐标。
     
     -----
 
@@ -89,7 +89,7 @@ _random_ins = {}
 
 def random_string(length, lower=True, upper=True, num=True, seed=None, generate_num=1):
     """
-    生成随机字符串。
+    | 生成随机字符串。
     
     -----
 
@@ -120,7 +120,7 @@ def _is_pos_far_enough(poses, x, y, z, min_distance):
 
 def random_even_poses(center_pos, x_range, y_range, z_range, pos_num, min_distance=1.0):
     """
-    在指定坐标周围，生成随机的均匀分布的多个坐标。
+    | 在指定坐标周围，生成随机的均匀分布的多个坐标。
     
     -----
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -20,9 +20,11 @@
 from typing import List, Dict, Union, Optional, Tuple, Set, Callable, Any
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
+from mod.client.system.clientSystem import ClientSystem
+from mod.client.ui.screenNode import ScreenNode
 from item_fly_anim import ItemFlyAnim
 from item_tips_box import ItemTipsBox
-from screen_node import NuoyanScreenNode, ui_listener
+from screen_node import ui_listener, NuoyanScreenNode
 
 
 _IMAGE_PATH_ITEM_CELL_SELECTED: str
@@ -32,6 +34,7 @@ _UI_NAME_ITEM_RENDERER: str
 _UI_NAME_DURABILITY: str
 _UI_NAME_DEFAULT: str
 _UI_NAME_HEAP: str
+_UI_NAME_ITEM_BG: str
 _SHORTCUT: str
 _INV27: str
 _INV36: str
@@ -44,38 +47,39 @@ class _Inv36ItemList(list):
     def append(self, obj: Optional[dict]) -> None: ...
 
 
-def _deepcopy(itemDict: dict) -> dict: ...
+def _deepcopy(obj: dict) -> dict: ...
 def _listen_item_changes(func: Callable) -> Callable: ...
 def _analyze_changes(
     old: Dict[str, List[Optional[dict]]],
     new: Dict[str, List[Optional[dict]]],
 ) -> Dict[Tuple[str, int], Dict[str, Optional[dict]]]: ...
 def _update_changes(
-    oldChanges: Dict[Tuple[str, int], Dict[str, Optional[dict]]],
-    newChanges: Dict[Tuple[str, int], Dict[str, Optional[dict]]],
+    old_changes: Dict[Tuple[str, int], Dict[str, Optional[dict]]],
+    new_changes: Dict[Tuple[str, int], Dict[str, Optional[dict]]],
 ) -> None: ...
 
 
 class ItemGridManager(ItemFlyAnim, ItemTipsBox, NuoyanScreenNode):
-    _gridItemsData: Dict[str, List[Optional[dict]]]
-    _itemHeapData: Dict[str, Union[dict, int, bool, ProgressBarUIControl]]
-    _selectedItem: Dict[str, Union[dict, str]]
-    _gridPaths: Dict[str, Tuple[str, bool]]
-    _gridKeys: List[str]
-    _cellPaths: Dict[Tuple[str, int], str]
-    _cellPoses: Dict[str, Tuple[str, int]]
-    _cellUiCtrls: Dict[str, List[ButtonUIControl]]
-    _changes: Dict[Tuple[str, int], Dict[str, dict]]
-    _lockedCells: Set[Tuple[str, int]]
-    _lockedGrids: Set[str]
-    _moveInGridList: List[str]
-    _initedKeys: List[str]
+    _cs: ClientSystem
+    __screen_node: ScreenNode
+    _grid_items_data: Dict[str, List[Optional[dict]]]
+    _item_heap_data: Dict[str, Union[dict, int, bool, ProgressBarUIControl]]
+    _selected_item: Dict[str, Union[dict, str]]
+    _grid_paths: Dict[str, Tuple[str, bool]]
+    _grid_keys: List[str]
+    _cell_paths: Dict[Tuple[str, int], str]
+    _cell_poses: Dict[str, Tuple[str, int]]
+    _cell_ui_ctrls: Dict[str, List[ButtonUIControl]]
+    __changes: Dict[Tuple[str, int], Dict[str, dict]]
+    _locked_cells: Set[Tuple[str, int]]
+    _locked_grids: Set[str]
+    __move_in_grid_list: List[str]
+    _inited_keys: List[str]
     __tick: int
-    _orgItem: dict
+    __org_item: dict
     __namespace: str
     def __init__(self, namespace: str, name: str, param: Optional[dict]) -> None: ...
     def Destroy(self) -> None: ...
-    def OnTick(self) -> None: ...
     @ui_listener("GetEntityByCoordReleaseClientEvent")
     def _GetEntityByCoordReleaseClientEvent1(self, args: dict) -> None: ...
     def OnMoveItemsBefore(self, args: dict) -> None: ...
@@ -84,15 +88,15 @@ class ItemGridManager(ItemFlyAnim, ItemTipsBox, NuoyanScreenNode):
     def OnItemGridChanged(self, args: dict) -> None: ...
     def OnItemGridSelectedItem(self, args: dict) -> None: ...
     def OnItemCellTouchUp(self, args: dict) -> None: ...
-    def _onItemCellTouchUp(self, args: dict) -> None: ...
+    def _on_item_cell_touch_up(self, args: dict) -> None: ...
     def OnItemCellTouchMoveIn(self, args: dict) -> None: ...
-    def _onItemCellTouchMoveIn(self, args: dict) -> None: ...
+    def _on_item_cell_touch_move_in(self, args: dict) -> None: ...
     def OnItemCellDoubleClick(self, args: dict) -> None: ...
-    def _onItemCellDoubleClick(self, args: dict) -> None: ...
+    def _on_item_cell_double_click(self, args: dict) -> None: ...
     def OnItemCellLongClick(self, args: dict) -> None: ...
-    def _onItemCellLongClick(self, args: dict) -> None: ...
+    def _on_item_cell_long_click(self, args: dict) -> None: ...
     def OnItemCellTouchDown(self, args: dict) -> None: ...
-    def _onItemCellTouchDown(self, args: dict) -> None: ...
+    def _on_item_cell_touch_down(self, args: dict) -> None: ...
     def OnItemCellTouchMove(self, args: dict) -> None: ...
     def OnItemCellTouchMoveOut(self, args: dict) -> None: ...
     def OnItemCellTouchCancel(self, args: dict) -> None: ...
@@ -101,28 +105,28 @@ class ItemGridManager(ItemFlyAnim, ItemTipsBox, NuoyanScreenNode):
     def SetItemCellDurabilityBar(
         self,
         cell: Union[str, Tuple[str, int]],
-        itemDict: dict = None,
+        item_dict: dict = None,
         auto: bool = False,
     ) -> bool: ...
     def SetItemCellRenderer(
         self,
         cell: Union[str, Tuple[str, int]],
-        itemDict: dict = None,
+        item_dict: dict = None,
         auto: bool = False,
     ) -> bool: ...
     def SetItemCellCountLabel(
         self,
         cell: Union[str, Tuple[str, int]],
-        itemDict: dict = None,
+        item_dict: dict = None,
         auto: bool = False,
     ) -> bool: ...
     def UpdateAndSyncItemGrids(self, keys: Optional[str, Tuple[str, ...]] = None) -> bool: ...
     def ClearItemGridState(self) -> bool: ...
-    def _setItemFlyAnim(
+    def _set_item_fly_anim(
         self,
-        itemDict: dict,
-        fromCell: Union[str, Tuple[str, int]],
-        toCell: Union[str, Tuple[str, int]],
+        item_dict: dict,
+        from_cell: Union[str, Tuple[str, int]],
+        to_cell: Union[str, Tuple[str, int]],
     ) -> None: ...
     def StartItemHeapProgressBar(self) -> bool: ...
     def PauseItemHeapProgressBar(self) -> bool: ...
@@ -132,44 +136,44 @@ class ItemGridManager(ItemFlyAnim, ItemTipsBox, NuoyanScreenNode):
     def IsItemCellLocked(self, cell: Union[str, Tuple[str, int]]) -> bool: ...
     def _is_cell_exist(self, *cell: Union[str, Tuple[str, int]]) -> bool: ...
     @_listen_item_changes
-    def _setCellItem(self, cell: Union[str, Tuple[str, int]], itemDict: Optional[dict]) -> None: ...
-    def SetItemGridItems(self, itemDictList: List[dict], key: str, sync: bool = True) -> bool: ...
+    def _set_cell_item(self, cell: Union[str, Tuple[str, int]], item_dict: Optional[dict]) -> None: ...
+    def SetItemGridItems(self, item_dict_list: List[dict], key: str, sync: bool = True) -> bool: ...
     def GetItemGridItems(self, key: str) -> List[Optional[dict]]: ...
-    def SetItemCellItem(self, cell: Union[str, Tuple[str, int]], itemDict: dict, sync: bool = True) -> bool: ...
+    def SetItemCellItem(self, cell: Union[str, Tuple[str, int]], item_dict: dict, sync: bool = True) -> bool: ...
     def GetItemCellItem(self, cell: Union[str, Tuple[str, int]]) -> Optional[dict]: ...
     def MoveItems(
         self,
-        fromCell: Union[str, Tuple[str, int]],
-        toCell: Union[str, Tuple[str, int]],
-        moveCount: int = -1,
+        from_cell: Union[str, Tuple[str, int]],
+        to_cell: Union[str, Tuple[str, int]],
+        move_count: int = -1,
         sync: bool = True,
-        flyAnim: bool = True,
+        fly_anim: bool = True,
         force: bool = False,
     ) -> bool: ...
-    def _exchangeItems(
+    def _exchange_items(
         self,
-        fromCell: Union[str, Tuple[str, int]],
-        toCell: Union[str, Tuple[str, int]],
+        from_cell: Union[str, Tuple[str, int]],
+        to_cell: Union[str, Tuple[str, int]],
     ) -> None: ...
-    def _moveItemsToEmpty(
+    def _move_items_to_empty(
         self,
-        fromCell: Union[str, Tuple[str, int]],
-        toCell: Union[str, Tuple[str, int]],
+        from_cell: Union[str, Tuple[str, int]],
+        to_cell: Union[str, Tuple[str, int]],
         count: int,
     ) -> None: ...
-    def _moveItemsToSame(
+    def _move_items_to_same(
         self,
-        fromCell: Union[str, Tuple[str, int]],
-        toCell: Union[str, Tuple[str, int]],
+        from_cell: Union[str, Tuple[str, int]],
+        to_cell: Union[str, Tuple[str, int]],
         count: int,
     ) -> None: ...
-    def MergeItems(self, toCell: Union[str, Tuple[str, int]], sync: bool = True, flyAnim: bool = True) -> bool: ...
+    def MergeItems(self, to_cell: Union[str, Tuple[str, int]], sync: bool = True, fly_anim: bool = True) -> bool: ...
     @_listen_item_changes
     def SeparateItemsEvenly(
         self,
-        fromCell: Union[str, Tuple[str, int]],
-        fromOrgItem: dict,
-        toCellList: List[Union[str, Tuple[str, int]]],
+        from_cell: Union[str, Tuple[str, int]],
+        from_org_item: dict,
+        to_cell_list: List[Union[str, Tuple[str, int]]],
         sync: bool = True,
     ) -> bool: ...
     @_listen_item_changes
@@ -185,12 +189,12 @@ class ItemGridManager(ItemFlyAnim, ItemTipsBox, NuoyanScreenNode):
     @_listen_item_changes
     def PutItemToGrids(
         self,
-        putItem: Union[dict, Union[str, Tuple[str, int]]],
+        put_item: Union[dict, Union[str, Tuple[str, int]]],
         keys: Optional[Union[str, Tuple[str, ...]]] = None,
         sync: bool = True,
-        flyAnim: bool = True,
+        fly_anim: bool = True,
     ) -> List[Tuple[str, int]]: ...
-    def _putItem(self, putItem: dict, key: str) -> List[Tuple[str, int]]: ...
+    def _put_item(self, put_item: dict, key: str) -> List[Tuple[str, int]]: ...
     def ThrowItem(self, what: Union[dict, Union[str, Tuple[str, int]]], count: int = -1, sync: bool = True) -> bool: ...
     def SyncAllItemsFromServer(self, keys: Optional[Union[str, Tuple[str, ...]]] = None) -> bool: ...
     @ui_listener(namespace="NuoyanLib", system_name="_TransitServerSystem")
@@ -207,14 +211,14 @@ class ItemGridManager(ItemFlyAnim, ItemTipsBox, NuoyanScreenNode):
     def InitItemGrids(
         self,
         keys:Union[str, Tuple[str, ...]] = None,
-        finishedFunc: Optional[Callable] = None,
+        finished_func: Optional[Callable] = None,
         *args: Any,
         **kwargs: Any,
     ) -> bool: ...
-    def _initItemGrids(
+    def _init_item_grids(
         self,
         keys: Tuple[str, ...],
-        finishedFunc: Optional[Callable],
+        finished_func: Optional[Callable],
         args: Any,
         kwargs: Any,
     ) -> None: ...

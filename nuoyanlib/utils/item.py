@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -93,7 +93,7 @@ def _get_comp_factory():
 
 def get_item_count(player_id, name, aux=-1):
     """
-    获取玩家背包中指定物品的总数量。
+    | 获取玩家背包中指定物品的总数量。
 
     -----
 
@@ -116,7 +116,7 @@ def get_item_count(player_id, name, aux=-1):
 
 def set_namespace(name, namespace="minecraft"):
     """
-    设置物品的命名空间。
+    | 设置物品的命名空间。
 
     -----
 
@@ -141,7 +141,7 @@ def _same(what1, what2):
 
 def is_same_item(item_dict1, item_dict2):
     """
-    判断两个物品是否是同种物品。
+    | 判断两个物品是否是同种物品。
 
     -----
 
@@ -176,7 +176,7 @@ def is_same_item(item_dict1, item_dict2):
 
 def are_same_item(item, *other_item):
     """
-    判断多个物品是否是同种物品。
+    | 判断多个物品是否是同种物品。
 
     -----
 
@@ -194,7 +194,7 @@ def are_same_item(item, *other_item):
 
 def is_empty_item(item, zero_is_emp=True):
     """
-    判断物品是否是空物品。
+    | 判断物品是否是空物品。
 
     -----
 
@@ -218,7 +218,7 @@ _LEVEL_ID = client_api.GetLevelId() or server_api.GetLevelId()
 
 def get_max_stack(item):
     """
-    获取物品最大堆叠数量。
+    | 获取物品最大堆叠数量。
 
     -----
 

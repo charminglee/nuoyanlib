@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -38,7 +38,7 @@ __all__ = [
 
 def search_data(data, lst):
     """
-    在列表中搜索数据。
+    | 在列表中搜索数据。
 
     -----
 

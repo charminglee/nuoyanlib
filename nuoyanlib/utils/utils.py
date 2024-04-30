@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -33,7 +33,7 @@ __all__ = [
 
 def all_indexes(seq, *elements):
     """
-    获取元素在序列中所有出现位置的下标。
+    | 获取元素在序列中所有出现位置的下标。
     
     -----
 
@@ -48,7 +48,7 @@ def all_indexes(seq, *elements):
 
 def check_string(string, *check):
     """
-    检测字符串是否只含有指定字符。
+    | 检测字符串是否只含有指定字符。
     
     -----
 
@@ -73,7 +73,7 @@ def check_string(string, *check):
 
 def check_string2(string, *check):
     """
-    返回字符串中指定字符之外的字符的列表。
+    | 返回字符串中指定字符之外的字符的列表。
     
     -----
 
@@ -99,7 +99,7 @@ def check_string2(string, *check):
 
 def turn_dict_value_to_tuple(orig_dict):
     """
-    将字典值中的列表全部转换为元组。（改变原字典）
+    | 将字典值中的列表全部转换为元组。（改变原字典）
     
     -----
 
@@ -115,7 +115,7 @@ def turn_dict_value_to_tuple(orig_dict):
 
 def turn_list_to_tuple(lst):
     """
-    将一个列表及其元素中的列表转换成元组。
+    | 将一个列表及其元素中的列表转换成元组。
     
     -----
 
@@ -135,7 +135,7 @@ def turn_list_to_tuple(lst):
 
 def is_method_overridden(subclass, father, method):
     """
-    判断子类是否重写了父类的方法。
+    | 判断子类是否重写了父类的方法。
     
     -----
 
@@ -153,7 +153,7 @@ def is_method_overridden(subclass, father, method):
 
 def translate_time(sec):
     """
-    将秒数转换成h/m/s的格式。
+    | 将秒数转换成h/m/s的格式。
     
     -----
 

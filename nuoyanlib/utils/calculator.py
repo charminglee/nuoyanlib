@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -71,7 +71,7 @@ __all__ = [
 
 def pos_block_facing(pos, face=_Facing.North, dist=1.0):
     """
-    计算方块某个面朝向的坐标。
+    | 计算方块某个面朝向的坐标。
 
     -----
 
@@ -101,7 +101,7 @@ def pos_block_facing(pos, face=_Facing.North, dist=1.0):
 
 def to_polar_coordinate(coordinate, rad=False, origin=(0, 0)):
     """
-    将平面直角坐标转换为极坐标。
+    | 将平面直角坐标转换为极坐标。
 
     -----
 
@@ -124,7 +124,7 @@ def to_polar_coordinate(coordinate, rad=False, origin=(0, 0)):
 
 def to_cartesian_coordinate(coordinate, rad=False, origin=(0, 0)):
     """
-    将极坐标转换为平面直角坐标。
+    | 将极坐标转换为平面直角坐标。
 
     -----
 
@@ -145,7 +145,7 @@ def to_cartesian_coordinate(coordinate, rad=False, origin=(0, 0)):
 
 def probability_true_i(n, d):
     """
-    以指定概率返回True。（分数版本）
+    | 以指定概率返回 ``True`` 。（分数版本）
 
     -----
 
@@ -160,7 +160,7 @@ def probability_true_i(n, d):
 
 def probability_true_f(f):
     """
-    以指定概率返回True。（浮点数版本）
+    | 以指定概率返回 ``True`` 。（浮点数版本）
 
     -----
 
@@ -174,7 +174,7 @@ def probability_true_f(f):
 
 def pos_distance_to_line(pos, line_pos1, line_pos2):
     """
-    计算指定坐标pos与指定直线的距离。
+    | 计算指定坐标 ``pos`` 与指定直线的距离。
 
     -----
 
@@ -204,7 +204,7 @@ def _get_comp_factory():
 
 def pos_floor(pos):
     """
-    对坐标进行向下取整。
+    | 对坐标进行向下取整。
 
     -----
 
@@ -218,7 +218,7 @@ def pos_floor(pos):
 
 def pos_distance(first_point, second_point):
     """
-    计算两个坐标间的距离。支持多元坐标。
+    | 计算两个坐标间的距离。支持多元坐标。
         
     -----
     
@@ -235,7 +235,7 @@ def pos_distance(first_point, second_point):
 
 def to_relative_pos(entity_pos1, entity_pos2):
     """
-    将实体1的绝对坐标转换为相对实体2的坐标。
+    | 将实体1的绝对坐标转换为相对实体2的坐标。
         
     -----
     
@@ -252,7 +252,7 @@ def to_relative_pos(entity_pos1, entity_pos2):
 
 def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, player_rot):
     """
-    将实体的世界坐标转换为屏幕上的平面坐标，并根据玩家水平视角做对应旋转。可用于在小地图上显示实体图标。
+    | 将实体的世界坐标转换为屏幕上的平面坐标，并根据玩家水平视角做对应旋转。可用于在小地图上显示实体图标。
         
     -----
     
@@ -283,7 +283,7 @@ def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, pl
 
 def pos_rotate(angle, pos):
     """
-    计算给定坐标绕坐标原点旋转后的新坐标。
+    | 计算给定坐标绕坐标原点旋转后的新坐标。
         
     -----
     
@@ -303,7 +303,7 @@ def pos_rotate(angle, pos):
 
 def straight_pos_list(pos1, pos2, count, only=-1):
     """
-    计算给定两点连线上各点的坐标(不包括pos1和pos2)。
+    | 计算给定两点连线上各点的坐标（不包括 ``pos1`` 和 ``pos2`` ）。
         
     -----
     
@@ -334,7 +334,7 @@ def straight_pos_list(pos1, pos2, count, only=-1):
 
 def midpoint(first_point, second_point):
     """
-    计算给定两点间的中点坐标。
+    | 计算给定两点间的中点坐标。
         
     -----
     
@@ -351,7 +351,7 @@ def midpoint(first_point, second_point):
 
 def camera_rot_p2p(pos1, pos2):
     """
-    计算从pos1指向pos2的相机角度。（可用于将玩家相机视角锁定到某一坐标）
+    | 计算从 ``pos1`` 指向 ``pos2`` 的相机角度。（可用于将玩家相机视角锁定到某一坐标）
 
     -----
 
@@ -378,7 +378,7 @@ def camera_rot_p2p(pos1, pos2):
 
 def circle_pos_list(center_pos, radius, density):
     """
-    计算以某一坐标为圆心的圆上各点的坐标。
+    | 计算以某一坐标为圆心的圆上各点的坐标。
 
     -----
 
@@ -404,7 +404,7 @@ def circle_pos_list(center_pos, radius, density):
 
 def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
     """
-    计算实体视角方向上、给定距离上的位置的坐标。
+    | 计算实体视角方向上、给定距离上的位置的坐标。
 
     -----
 
@@ -433,7 +433,7 @@ def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
 
 def pos_forward_rot(pos, rot, dis):
     """
-    计算从pos射出，以rot为方向的射线上，与pos的距离为dis的位置的坐标。
+    | 计算从 ``pos`` 射出，以 ``rot`` 为方向的射线上，与 ``pos`` 的距离为 ``dis`` 的位置的坐标。
 
     -----
 
@@ -453,7 +453,7 @@ def pos_forward_rot(pos, rot, dis):
 
 def n_quantiles_index_list(n, data):
     """
-    计算一串数据的n分位数的位置。
+    | 计算一串数据的n分位数的位置。
 
     -----
 
@@ -475,7 +475,7 @@ def n_quantiles_index_list(n, data):
 
 def cube_center(start_pos, end_pos):
     """
-    计算立方体中心坐标。
+    | 计算立方体中心坐标。
 
     -----
 
@@ -495,7 +495,7 @@ def cube_center(start_pos, end_pos):
 
 def cube_longest_side_len(start_pos, end_pos):
     """
-    计算立方体最大棱长。
+    | 计算立方体最大棱长。
         
     -----
     
@@ -515,7 +515,7 @@ def cube_longest_side_len(start_pos, end_pos):
 
 def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_angle):
     """
-    判断给定坐标是否在扇形区域内。
+    | 判断给定坐标是否在扇形区域内。
         
     -----
     
@@ -560,7 +560,7 @@ def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_ang
 
 def sphere_pos_list(center_pos, radius, density):
     """
-    根据球心、半径计算球面上各点的坐标。
+    | 根据球心、半径计算球面上各点的坐标。
         
     -----
     
@@ -589,7 +589,7 @@ def sphere_pos_list(center_pos, radius, density):
 
 def cube_pos_list(pos1, pos2, step=1):
     """
-    计算立方体区域内各点的坐标。
+    | 计算立方体区域内各点的坐标。
         
     -----
     
@@ -630,7 +630,7 @@ def cube_pos_list(pos1, pos2, step=1):
 
 def spiral_pos_list(start_pos, iterations):
     """
-    生成螺旋轨迹坐标列表。
+    | 生成螺旋轨迹坐标列表。
 
     -----
 
@@ -666,7 +666,7 @@ def spiral_pos_list(start_pos, iterations):
 
 def is_in_cube(obj, pos1, pos2, ignore_y=False):
     """
-    判断对象是否在立方体区域内。
+    | 判断对象是否在立方体区域内。
         
     -----
     
@@ -696,7 +696,7 @@ def is_in_cube(obj, pos1, pos2, ignore_y=False):
 
 def rot_diff(r1, r2):
     """
-    计算两个角度之间的实际差值。
+    | 计算两个角度之间的实际差值。
         
     -----
     
@@ -716,7 +716,7 @@ def rot_diff(r1, r2):
 
 def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_size):
     """
-    从指定位置射出一条射线，计算该射线与指定立方体（AABB）的第一个交点坐标，不相交时返回None。
+    | 从指定位置射出一条射线，计算该射线与指定立方体（AABB）的第一个交点坐标，不相交时返回 ``None`` 。
 
     -----
 

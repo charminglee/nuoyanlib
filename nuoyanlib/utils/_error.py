@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -32,28 +32,16 @@ __all__ = [
 
 
 class ConfigError(Exception):
-    """
-    未修改config.py配置文件而抛出的异常。
-    """
-
     def __str__(self):
         return "You haven't modified \"config.py\"."
 
 
 class ClientNotFoundError(Exception):
-    """
-    没有找到config.py中配置的客户端系统而抛出的异常。
-    """
-
     def __str__(self):
         return "MOD_NAME='%s', CLIENT_SYSTEM_NAME='%s'." % (_MOD_NAME, _CLIENT_SYSTEM_NAME)
 
 
 class ServerNotFoundError(Exception):
-    """
-    没有找到config.py中配置的服务端系统而抛出的异常。
-    """
-
     def __str__(self):
         return "MOD_NAME='%s', SERVER_SYSTEM_NAME='%s'." % (_MOD_NAME, _SERVER_SYSTEM_NAME)
 

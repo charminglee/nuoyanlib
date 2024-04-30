@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-04-28
 #
 # ====================================================
 
@@ -41,10 +41,12 @@ class ItemFlyAnim(_ScreenNode):
     """
 
     def __init__(self, namespace, name, param):
-        # noinspection PySuperArguments
         super(ItemFlyAnim, self).__init__(namespace, name, param)
+        self.__screen_node = param['_screen_node'] if param and '_screen_node' in param else self
         self._item_fly_queue = {}
         self._fly_ir = []
+        self.__path = ""
+        self.item_fly_panel = None
 
     def Create(self):
         """
@@ -63,13 +65,16 @@ class ItemFlyAnim(_ScreenNode):
         :return: 无
         :rtype: None
         """
-        # noinspection PySuperArguments
         super(ItemFlyAnim, self).Create()
-        panel = self.CreateChildControl(_UI_NAME_ITEM_FLY_PANEL, _ITEM_FLY_PANEL_NAME)
-        self._fly_ir.append(panel.GetChildByName("0").asItemRenderer())
-        self._fly_ir.append(panel.GetChildByName("1").asItemRenderer())
+        self.item_fly_panel = self.__screen_node.GetBaseUIControl(self.__path)
+        if not self.__path or not self.item_fly_panel:
+            self.item_fly_panel = self.__screen_node.CreateChildControl(_UI_NAME_ITEM_FLY_PANEL, _ITEM_FLY_PANEL_NAME)
+            self.__path = self.item_fly_panel.GetPath()
+            self.item_fly_panel.GetPath()
+        self._fly_ir.append(self.item_fly_panel.GetChildByName("0").asItemRenderer())
+        self._fly_ir.append(self.item_fly_panel.GetChildByName("1").asItemRenderer())
 
-    @_ViewBinder.binding(_ViewBinder.BF_BindString, "#main.gametick")
+    @_ViewBinder.binding(_ViewBinder.BF_BindString, "#NyItemFlyAnim.game_tick")
     def _OnGameTick(self):
         # 物品飞行动画
         for k, data in self._item_fly_queue.items():
@@ -86,8 +91,8 @@ class ItemFlyAnim(_ScreenNode):
 
     def _clone_new_ir(self):
         name = str(len(self._fly_ir))
-        if self.Clone(_UI_PATH_FLY_ITEM_0, "/" + _ITEM_FLY_PANEL_NAME, name):
-            ir = self.GetBaseUIControl("/%s/%s" % (_ITEM_FLY_PANEL_NAME, name)).asItemRenderer()
+        if self.__screen_node.Clone(_UI_PATH_FLY_ITEM_0, "/" + _ITEM_FLY_PANEL_NAME, name):
+            ir = self.__screen_node.GetBaseUIControl("/%s/%s" % (_ITEM_FLY_PANEL_NAME, name)).asItemRenderer()
             self._fly_ir.append(ir)
             return ir
 
@@ -98,7 +103,7 @@ class ItemFlyAnim(_ScreenNode):
 
     def SetOneItemFlyAnim(self, item_dict, from_pos, to_pos, ui_size):
         """
-        设置单个物品飞行动画。
+        | 设置单个物品飞行动画。
 
         -----
 
@@ -150,7 +155,7 @@ class ItemFlyAnim(_ScreenNode):
 
     def SetItemsFlyAnim(self, data):
         """
-        设置多个物品飞行动画。
+        | 设置多个物品飞行动画。
 
         -----
 
