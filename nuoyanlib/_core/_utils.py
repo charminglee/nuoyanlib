@@ -12,20 +12,36 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-28
+#   Last Modified : 2024-05-26
 #
 # ====================================================
 
 
+from _const import (
+    SHORTCUT as _SHORTCUT,
+    INV27 as _INV27,
+    INV36 as _INV36,
+)
 
 
+def is_inv36_key(k):
+    return k.endswith(_INV36)
 
 
+def is_inv27_key(k):
+    return k.endswith(_INV27)
 
 
+def is_shortcut_key(k):
+    return k.endswith(_SHORTCUT)
 
 
+def is_inv_key(k):
+    return is_inv36_key(k) or is_inv27_key(k) or is_shortcut_key(k)
 
+
+def is_not_inv_key(k):
+    return not is_inv_key(k)
 
 
 
