@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-27
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
-from ..comp import ScreenNode as _ScreenNode
+from ..._core._client._comp import ScreenNode as _ScreenNode
 
 
 __all__ = [
@@ -57,6 +57,7 @@ def get_direct_children_path(control, ui_ins):
         p_level = p.count("/")
         if p_level == path_level + 1:
             all_children.append(p)
+    return all_children
 
 
 def get_parent_path(control):

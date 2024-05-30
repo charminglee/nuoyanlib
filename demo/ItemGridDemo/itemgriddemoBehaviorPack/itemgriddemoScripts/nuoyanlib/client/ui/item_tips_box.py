@@ -12,15 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-27
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _client_api
-from ...utils.item import is_empty_item as _is_empty_item
-from ..comp import (
+from ..._core._client._comp import (
     LvComp as _LvComp,
+)
+from ...utils.item import (
+    is_empty_item as _is_empty_item,
 )
 
 
@@ -79,10 +81,8 @@ class ItemTipsBox(object):
 
     def Update(self):
         # 文本框跟随
-        if self.__follow and self.item_tips_panel:
-            pos = _LvComp.ActorMotion.GetMousePosition() or _client_api.GetTouchPos()
-            if pos:
-                self.item_tips_panel.SetPosition(pos)
+        if self.__follow:
+            self._update_pos()
 
     def ShowItemHoverTipsBox(self, item_dict, show_category=True, show_user_data=True, follow=False):
         """
@@ -121,11 +121,13 @@ class ItemTipsBox(object):
         :rtype: bool
         """
         self.item_tips_label.SetText(text)
-        self.item_tips_panel.SetVisible(True)
         self.item_tips_panel.StopAnimation("alpha")
-        if not follow:
+        if follow:
+            self._update_pos()
+        else:
             self.item_tips_panel.SetPosition(self.__orig_pos)
             self.item_tips_panel.PlayAnimation("alpha")
+        self.item_tips_panel.SetVisible(True)
         self.__follow = follow
         return True
 
@@ -140,6 +142,14 @@ class ItemTipsBox(object):
         """
         self.item_tips_panel.SetVisible(False)
         self.__follow = False
+
+    def _update_pos(self):
+        if not self.item_tips_panel:
+            return
+        pos = _LvComp.ActorMotion.GetMousePosition() or _client_api.GetTouchPos()
+        if pos:
+            self.item_tips_panel.SetPosition(pos)
+
 
 
 

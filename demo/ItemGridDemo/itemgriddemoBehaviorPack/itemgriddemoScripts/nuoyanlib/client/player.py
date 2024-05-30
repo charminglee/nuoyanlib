@@ -12,13 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-28
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as api
-from comp import PlrComp as _PlrComp
+from .._core._client._comp import PlrComp as _PlrComp
 
 
 __all__ = [

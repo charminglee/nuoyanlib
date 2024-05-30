@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-27
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
@@ -50,3 +50,4 @@ class ItemTipsBox(object):
     ) -> bool: ...
     def ShowHoverTipsBox(self: ..., text: str, follow: bool = False) -> bool: ...
     def HideHoverTipsBox(self: ...) -> None: ...
+    def _update_pos(self: ...) -> None: ...

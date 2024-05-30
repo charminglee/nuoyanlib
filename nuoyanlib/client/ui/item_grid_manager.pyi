@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
@@ -61,6 +61,7 @@ class ItemGridManager(object):
     _shortcut_keys: Set[str]
     __tick: int
     __src_item: ItemDict
+    __cancel_hide_tips: int
     def __init__(
         self: ...,
         nuoyan_screen_node: NuoyanScreenNode,
@@ -98,6 +99,8 @@ class ItemGridManager(object):
     def OnItemCellTouchMove(self: ..., args: EventArgs) -> None: ...
     def OnItemCellTouchMoveOut(self: ..., args: EventArgs) -> None: ...
     def OnItemCellTouchCancel(self: ..., args: EventArgs) -> None: ...
+    def _on_item_cell_hover_in(self: ..., args: EventArgs) -> None: ...
+    def _on_item_cell_hover_out(self: ..., args: EventArgs) -> None: ...
     def GetAllItemCellUIControls(self: ..., key: str) -> List[ButtonUIControl]: ...
     def GetItemCellUIControl(self: ..., cell: ItemCell) -> Optional[ButtonUIControl]: ...
     def SetItemCellDurabilityBar(

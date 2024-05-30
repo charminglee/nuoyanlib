@@ -16,11 +16,17 @@
     },
     "UI": {
         "customPrefabGroupExpand": [
-
+            "NuoyanItemGrid"
         ],
         "expandData": {
             "prefab": {
-
+                "NuoyanItemGrid.item_cell": [
+                    "/netease_prefab_screen"
+                ],
+                "NuoyanItemGrid.ny_item_fly_panel": [
+                    "/netease_prefab_screen",
+                    "/netease_prefab_screen/ny_item_fly_panel"
+                ]
             },
             "screen": {
                 "D:\\MCMod\\nuoyanLib\\demo\\ItemGridDemo\\itemgriddemoResourcePack\\ui\\CustomItemGridScreen.json": [

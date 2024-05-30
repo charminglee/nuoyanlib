@@ -12,17 +12,22 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
-from .._core._client._listener import (
-    listen_for,
+from .._core._const import (
+    LIB_NAME,
+    LIB_CLIENT_NAME,
+    LIB_CLIENT_PATH,
 )
-from client_system import (
-    NuoyanClientSystem,
-)
+import mod.client.extraClientApi as client_api
+if not client_api.GetSystem(LIB_NAME, LIB_CLIENT_NAME):
+    client_api.RegisterSystem(LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH)
+del client_api, LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH
+
+
 from .._core._client._comp import (
     CLIENT_ENGINE_NAMESPACE,
     CLIENT_ENGINE_SYSTEM_NAME,
@@ -32,6 +37,12 @@ from .._core._client._comp import (
     LEVEL_ID,
     PlrComp,
     LvComp,
+)
+from .._core._client._listener import (
+    listen_for,
+)
+from client_system import (
+    NuoyanClientSystem,
 )
 from effect import (
     NeteaseParticle,

@@ -12,13 +12,15 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-27
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _client_api
-from ...utils.item import is_empty_item as _is_empty_item
+from ...utils.item import (
+    is_empty_item as _is_empty_item,
+)
 
 
 __all__ = [
@@ -41,14 +43,10 @@ class ItemFlyAnim(object):
         self.__screen_node = screen_node
         self._item_fly_queue = []
         self._fly_ir = []
-        self.__path = ""
         self.item_fly_panel = None
 
     def Create(self):
-        self.item_fly_panel = self.__screen_node.GetBaseUIControl(self.__path)
-        if not self.__path or not self.item_fly_panel:
-            self.item_fly_panel = self.__screen_node.CreateChildControl(_UI_NAME_ITEM_FLY_PANEL, _ITEM_FLY_PANEL_NAME)
-            self.__path = self.item_fly_panel.GetPath()
+        self.item_fly_panel = self.__screen_node.CreateChildControl(_UI_NAME_ITEM_FLY_PANEL, _ITEM_FLY_PANEL_NAME)
         self._fly_ir.append(self.item_fly_panel.GetChildByPath("/0").asItemRenderer())
         self._fly_ir.append(self.item_fly_panel.GetChildByPath("/1").asItemRenderer())
 
@@ -112,13 +110,14 @@ class ItemFlyAnim(object):
                 'to': to_pos,
             },
         })
-        ir.RemoveAnimation("offset")
+        if ir.IsAnimEndCallbackRegistered(anim_name):
+            ir.RemoveAnimation("offset")
         if not ir.SetAnimation("offset", _NAMESPACE, anim_name, True):
             return False
-        def callback():
+        def anim_end():
             ir.SetVisible(False)
             self._item_fly_queue.remove(index)
-        ir.SetAnimEndCallback(anim_name, callback)
+        ir.SetAnimEndCallback(anim_name, anim_end)
         self._item_fly_queue.append(index)
         return True
 

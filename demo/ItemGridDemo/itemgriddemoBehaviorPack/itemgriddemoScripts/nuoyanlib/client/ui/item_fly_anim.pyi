@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-27
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
-from typing import Tuple, Union, List, Dict, Optional
+from typing import Tuple, Union, List, Optional
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
@@ -33,7 +33,6 @@ class ItemFlyAnim(object):
     __screen_node: ScreenNode
     _item_fly_queue: List[int]
     _fly_ir: List[ItemRendererUIControl]
-    __path: str
     item_fly_panel: Optional[BaseUIControl]
     def __init__(self: ..., screen_node: ScreenNode) -> None: ...
     def Create(self: ...) -> None: ...

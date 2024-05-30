@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-28
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
-from comp import LvComp as _LvComp
+from .._core._client._comp import LvComp as _LvComp
 
 
 __all__ = [

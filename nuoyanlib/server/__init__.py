@@ -12,17 +12,22 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
-from .._core._server._listener import (
-    listen_for,
+from .._core._const import (
+    LIB_NAME,
+    LIB_SERVER_NAME,
+    LIB_SERVER_PATH,
 )
-from server_system import (
-    NuoyanServerSystem,
-)
+import mod.server.extraServerApi as server_api
+if not server_api.GetSystem(LIB_NAME, LIB_SERVER_NAME):
+    server_api.RegisterSystem(LIB_NAME, LIB_SERVER_NAME, LIB_SERVER_PATH)
+del server_api, LIB_NAME, LIB_SERVER_NAME, LIB_SERVER_PATH
+
+
 from .._core._server._comp import (
     SERVER_ENGINE_NAMESPACE,
     SERVER_ENGINE_SYSTEM_NAME,
@@ -30,6 +35,12 @@ from .._core._server._comp import (
     CompFactory,
     LEVEL_ID,
     LvComp,
+)
+from .._core._server._listener import (
+    listen_for,
+)
+from server_system import (
+    NuoyanServerSystem,
 )
 from entity import (
     clear_effects,

@@ -12,24 +12,24 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
 from functools import wraps as _wraps
+from ..._core._client._comp import (
+    CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
+    CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
+    LvComp as _LvComp,
+    ScreenNode as _ScreenNode,
+)
 from ..._core._client._lib_client import (
     get_lib_system as _get_lib_system,
 )
 from ..._core._client._listener import (
     listen_custom as _listen_custom,
     listen_for as _listen_for,
-)
-from ..comp import (
-    CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
-    CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
-    LvComp as _LvComp,
-    ScreenNode as _ScreenNode,
 )
 from ..setting import (
     read_setting as _read_setting,

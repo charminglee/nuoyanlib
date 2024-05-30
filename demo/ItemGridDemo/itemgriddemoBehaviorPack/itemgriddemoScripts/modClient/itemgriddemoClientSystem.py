@@ -34,12 +34,13 @@ class ItemGridDemoClientSystem(NuoyanClientSystem):
 
     # 重写一个与事件同名的方法即可完成对该事件的监听
     def UiInitFinished(self, args):
+        print "===== UiInitFinished ====="
         # 注册物品网格
         self.RegisterItemGrid(
-            "custom_inv_gird", UI_PATH_CUSTOM_ITEM_GRID_SCREEN, UI_PATH_CUSTOM_INV27_GRID, 27
+            "custom_gird_inv27", UI_PATH_CUSTOM_ITEM_GRID_SCREEN, UI_PATH_CUSTOM_INV27_GRID, 27
         )
         self.RegisterItemGrid(
-            "custom_shortcut_gird", UI_PATH_CUSTOM_ITEM_GRID_SCREEN, UI_PATH_CUSTOM_SHORTCUT_GRID, 9
+            "custom_gird_shortcut", UI_PATH_CUSTOM_ITEM_GRID_SCREEN, UI_PATH_CUSTOM_SHORTCUT_GRID, 9
         )
         self.RegisterItemGrid(
             "custom_extra_gird", UI_PATH_CUSTOM_ITEM_GRID_SCREEN, UI_PATH_EXTRA_GRID, 16

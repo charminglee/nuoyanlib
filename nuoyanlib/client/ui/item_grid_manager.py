@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
@@ -92,18 +92,18 @@ from ..._core._const import (
     INV27 as _INV27,
     INV36 as _INV36,
 )
+from ..._core._client._comp import (
+    LvComp as _LvComp,
+    PLAYER_ID as _PLAYER_ID,
+    CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
+    CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
+)
 from ..._core._client._lib_client import (
     get_lib_system as _get_lib_system,
 )
 from ..._core._client._listener import (
     listen_for as _listen_for,
     listen_for_lib_sys as _listen_for_lib_sys,
-)
-from ..comp import (
-    LvComp as _LvComp,
-    PLAYER_ID as _PLAYER_ID,
-    CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
-    CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
 )
 from ...utils.item import (
     is_same_item as _is_same_item,
@@ -160,6 +160,7 @@ class ItemGridManager(object):
         self._inv27_keys = set()
         self._shortcut_keys = set()
         self.__tick = 0
+        self.__cancel_hide_tips = 0
 
     # System Event Callbacks ===========================================================================================
 
@@ -281,7 +282,7 @@ class ItemGridManager(object):
 
     @property
     def _registered_keys(self):
-        cls = self.__class__
+        cls = self.__nsn_ins.__class__
         return self.__lib_sys.registered_keys[cls.__module__ + "." + cls.__name__]
 
     def _parse_keys(self, keys):
@@ -359,9 +360,11 @@ class ItemGridManager(object):
                     break
                 btn = btn.asButton()
                 btn.AddTouchEventParams()
+                btn.AddHoverEventParams()
                 btn.SetButtonTouchMoveInCallback(self._on_item_cell_touch_move_in)
                 btn.SetButtonTouchMoveCallback(self.OnItemCellTouchMove)
-                btn.GetChildByPath(_UI_PATH_HEAP).SetVisible(False)
+                btn.SetButtonHoverInCallback(self._on_item_cell_hover_in)
+                btn.SetButtonHoverOutCallback(self._on_item_cell_hover_out)
                 self.__nsn_ins.SetButtonDoubleClickCallback(
                     path,
                     self._on_item_cell_double_click,
@@ -375,6 +378,7 @@ class ItemGridManager(object):
                     self._on_item_cell_touch_down,
                     self.OnItemCellTouchCancel,
                 )
+                btn.GetChildByPath(_UI_PATH_HEAP).SetVisible(False)
                 pos = (key, i)
                 self.SetItemCellRenderer(pos)
                 self.SetItemCellCountLabel(pos)
@@ -635,12 +639,29 @@ class ItemGridManager(object):
         :rtype: None
         """
 
+    def _on_item_cell_hover_in(self, args):
+        bp = args['ButtonPath']
+        item_dict = self._get_cell_item(bp)
+        if _is_empty_item(item_dict):
+            self.__itb_ins.HideHoverTipsBox()
+        else:
+            self.__itb_ins.ShowItemHoverTipsBox(item_dict, follow=True)
+        self.__cancel_hide_tips += 1
+
+    def _on_item_cell_hover_out(self, args):
+        print "out", self.__cancel_hide_tips
+        if self.__cancel_hide_tips == 1:
+            self.__itb_ins.HideHoverTipsBox()
+            self.__cancel_hide_tips = 0
+        else:
+            self.__cancel_hide_tips = 1
+
     # UI Operations ====================================================================================================
 
     def _set_cell_ui_item(self, cell, item_dict):
         self.SetItemCellRenderer(cell, item_dict)
-        self.SetItemCellCountLabel(cell, item_dict)
-        self.SetItemCellDurabilityBar(cell, item_dict)
+        self.SetItemCellCountLabel(cell, item_dict=item_dict)
+        self.SetItemCellDurabilityBar(cell, item_dict=item_dict)
 
     def _set_grid_ui_item(self, key, item_dict_list):
         for i, item_dict in enumerate(item_dict_list):
