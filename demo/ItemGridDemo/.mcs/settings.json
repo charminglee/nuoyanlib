@@ -1,0 +1,17 @@
+{
+    "Arena.Component.Namespace": "bulcb",
+    "FirstTabSetting": 0,
+    "ShortItemSettings": [
+        "itemgriddemoResourcePack\\ui",
+        "itemgriddemoBehaviorPack\\Presets",
+        "itemgriddemoBehaviorPack\\Parts",
+        "itemgriddemoBehaviorPack\\BoxData",
+        "itemgriddemoResourcePack\\effects",
+        "itemgriddemoResourcePack\\models",
+        "itemgriddemoResourcePack\\textures"
+    ],
+    "Uluru.autoLayerDict": {
+        "CustomItemGridScreen": true
+    },
+    "Uluru.checkSuspectOldUI": true
+}

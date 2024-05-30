@@ -1,0 +1,34 @@
+{
+    "Addon": {
+        "EnchantSetting": {
+            "amplifier": 1
+        },
+        "PackResourceSortData": {
+
+        },
+        "PlayerEffectSetting": {
+            "amplifier": 1,
+            "duration": 10
+        },
+        "PresetInstanceTreeData": [
+
+        ]
+    },
+    "UI": {
+        "customPrefabGroupExpand": [
+
+        ],
+        "expandData": {
+            "prefab": {
+
+            },
+            "screen": {
+                "D:\\MCMod\\nuoyanLib\\demo\\ItemGridDemo\\itemgriddemoResourcePack\\ui\\CustomItemGridScreen.json": [
+                    "/main",
+                    "/main/stack_panel",
+                    "/main/stack_panel/panel"
+                ]
+            }
+        }
+    }
+}

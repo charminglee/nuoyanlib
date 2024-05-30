@@ -1,7 +1,7 @@
 <h1 align="center" style="line-height: 0;">「nuoyanlib」</h1>
 <h1 align="center" style="line-height: 0;">🐱</h1>
 <h1 align="center" style="line-height: 0;">基于ModSDK的开发工具库</h1>
-<h2 align="center" style="line-height: 0.5;">v0.3.6-beta</h2>
+<h2 align="center" style="line-height: 0.5;">v0.5.0-beta</h2>
 
 <br></br>
 
@@ -12,14 +12,14 @@
 ---
 
 > **[注意]**  
-目前该项目仍处于测试阶段，部分功能仍未开发完成或存在较多bug，且其中的函数名称、功能等随时可能会发生变化。
+目前该项目仍处于测试阶段，部分功能仍未开发完成或存在较多bug，且其中的函数名称、功能等随时可能会发生变化，请开发者谨慎使用。
 
 「nuoyanlib」是基于我的世界中国版ModSDK开发的开源函数库，整合了众多开发中常用的算法，封装了部分常用的官方接口。  
 「nuoyanlib」目前仅由 _**诺言Nuoyan**_ 一人开发，所有代码均为原创（有备注的除外）。  
 「nuoyanlib」可供大家学习参考，也可以直接应用于您个人/团队的项目中，希望「nuoyanlib」能提高大家的代码编写效率以及更轻松地实现复杂的效果！  
 感谢大家支持作者、支持该项目，喜欢的话可以点个Star噢，您的支持是作者最大的动力！  
 
-### **兼容的ModSDK版本：2.11**
+### **兼容框架：ModSDK 2.11、Apollo 1.0（正在开发）**
 
 <br></br>
 
@@ -27,13 +27,7 @@
 
 ---
 
-- 下载项目完整文件：点击页面上方“克隆/下载”按钮，下载ZIP。
-
-<p align="center">
-  <img src="img/download_project.png"/>
-</p>
-
-- 【推荐】下载发行版：在右侧发行版处选择一个版本下载。
+在右侧的发行版处选择一个版本下载。
 
 <p align="center">
   <img src="img/download_nyl.png"/>
@@ -46,22 +40,18 @@
 ---
 
 - [**client（客户端库）**](/nuoyanlib/client)  
-  包含client_system、comp、effect、player、setting、sound模块。  
   提供了客户端扩展、特效管理器等客户端专用工具。  
 
 
 - [**client.ui（UI库）**](/nuoyanlib/client/ui)  
-  包含itemFlyAnim、itemGridManager、itemTipsBox、nuoyanScreenNode、uiutils模块。  
   提供了ScreenNode扩展、物品网格管理器等UI专用工具。
 
 
 - [**server（服务端库）**](/nuoyanlib/server)  
-  包含comp、entity、hurt、inv、server_system、structure模块。  
   提供了服务端扩展、实体获取、实体操作、范围伤害、背包管理等服务端专用工具。
 
 
 - [**utils（通用工具库）**](/nuoyanlib/utils)  
-  包含calculator、creative_inv、enum、item、mc_random、utils、vector模块。  
   提供了多种数学计算函数、更多的枚举值等双端通用的工具。
 
 <br></br>
@@ -70,26 +60,20 @@
 
 ---
 
-1. 解压下载的文件，将`nuoyanlib`文件夹放至您的脚本根目录下（即`modMain.py`所在目录）。
-2. 打开`nuoyanlib/config.py`配置文件，将您的模组名称、客户端系统名称和服务端系统名称填入对应位置。
+1. 解压下载的压缩包，将`nuoyanlib`文件夹放至您的脚本根目录下（即`modMain.py`所在目录）即可。
+2. 推荐使用以下方式在您的代码中导入「nuoyanlib」，`myScripts`为您的脚本文件夹名称：
+
+    - 导入客户端库
     ```python
-    # 在modMain注册时填写的模组名称（命名空间）
-    MOD_NAME = "MyMod"
-    # 客户端系统名称
-    CLIENT_SYSTEM_NAME = "MyClientSystem"
-    # 服务端系统名称
-    SERVER_SYSTEM_NAME = "MyServerSystem"
+    import myScripts.nuoyanlib.client as nyl
     ```
-    > **[注意]**  
-    请确保填入`config.py`的信息与您的模组对应，否则部分功能将无法正常使用。
-3. 随后，在您需要使用「nuoyanlib」的Python文件顶部进行导入即可。
+    - 导入UI库
     ```python
-    # 在客户端中导入
-    import nuoyanlib.client as nyl
-    # 在UI中导入
-    import nuoyanlib.client.ui as nyl
-    # 在服务端中导入
-    import nuoyanlib.server as nyl
+    import myScripts.nuoyanlib.client.ui as nylui
+    ```
+    - 导入服务端库
+    ```python
+    import myScripts.nuoyanlib.server as nyl
     ```
     > **[警告]**  
     禁止导入对立端的库，如在客户端导入服务端库，服务端导入客户端库，否则可能会导致整个库功能瘫痪甚至游戏闪退等严重问题。

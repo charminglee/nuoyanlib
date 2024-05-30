@@ -1,0 +1,53 @@
+{
+    "Account": "m17688231268@163.com",
+    "AssertCacheDir": "S:\\MCStudioDownload\\EngineAssert",
+    "BlockNums": [
+        0,
+        0
+    ],
+    "BornPoint": [
+        0,
+        0,
+        0
+    ],
+    "CanPublishResourceComponent": true,
+    "CodeEnable": false,
+    "CreateNew": true,
+    "CreateVersion": "2.11.0.614308",
+    "DCWebUrl": "https://x19apigatewayexpr.nie.netease.com",
+    "EditAddOnPaths": [
+
+    ],
+    "EditLogFilePath": "S:\\MCStudioDownload\\work\\editor\\edit.log",
+    "EditMaterialPaths": [
+
+    ],
+    "EditName": "ItemGridDemo",
+    "EditType": 4,
+    "EditVersion": "2.11.0.614308",
+    "EditorResourcePackPath": "S:\\MCStudio\\data\\inner_res",
+    "ElkUrl": "https://x19mclexpr.nie.netease.com/client-log",
+    "GameType": 0,
+    "Id": "adacba2bbd9d4a859a5202525a33c345",
+    "IsMap": false,
+    "NewEditCount": 1,
+    "OldComponents": [
+
+    ],
+    "OldEditCount": 0,
+    "ResourceIds": [
+
+    ],
+    "SaveBackAddOnPath": "D:\\MCMod\\nuoyanLib\\demo\\ItemGridDemo",
+    "SaveBackMapPath": null,
+    "Seed": "",
+    "ServerName": "EXPR",
+    "ShowGpuDriverTips": false,
+    "ShowGuide": false,
+    "Source": "import",
+    "StudioPort": 10739,
+    "StudioTempPath": "S:\\MCStudioDownload\\temp\\editorTemp",
+    "UserId": "53757",
+    "UserName": "诺言Nuoyan",
+    "WorldType": 1
+}

@@ -1,0 +1,7 @@
+{
+    "ui_defs": [
+        "ui/CustomItemGridScreen.json",
+        "ui/NuoyanItemGrid.json",
+        "ui/netease_editor_template_namespace.json"
+    ]
+}

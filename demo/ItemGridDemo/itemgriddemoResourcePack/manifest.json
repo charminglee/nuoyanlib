@@ -1,0 +1,18 @@
+{
+    "format_version": 1,
+    "modules": [
+        {
+            "description": "ItemGridDemo By @诺言Nuoyan",
+            "type": "resources",
+            "uuid": "58f438a2-0480-11ef-b778-04e8b9467408",
+            "version": [ 0, 0, 1 ]
+        }
+    ],
+    "header": {
+        "description": "ItemGridDemo By @诺言Nuoyan",
+        "name": "ItemGridDemo",
+        "uuid": "58f438a3-0480-11ef-bad1-04e8b9467408",
+        "version": [ 0, 0, 1 ],
+        "min_engine_version": [ 1, 18, 0 ]
+    }
+}
