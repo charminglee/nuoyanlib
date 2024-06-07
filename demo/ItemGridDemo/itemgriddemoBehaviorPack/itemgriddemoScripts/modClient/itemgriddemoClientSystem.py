@@ -4,24 +4,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as clientApi
 from ..modCommon.modConfig import *
-# 导入客户端nuoyanlib
-import itemgriddemoScripts.nuoyanlib.client as nyl
-# 一些常用的工具可直接导入为模块变量
-from itemgriddemoScripts.nuoyanlib.client import (
-    NuoyanClientSystem,
-    listen_for,
-    LvComp,
-    PlrComp,
-    CompFactory,
-    PLAYER_ID,
-)
+from itemgriddemoScripts.nuoyanlib.client import NuoyanClientSystem
 
 
 # 将客户端类继承NuoyanClientSystem，以获得由NuoyanClientSystem提供的各种接口。
@@ -34,7 +24,6 @@ class ItemGridDemoClientSystem(NuoyanClientSystem):
 
     # 重写一个与事件同名的方法即可完成对该事件的监听
     def UiInitFinished(self, args):
-        print "===== UiInitFinished ====="
         # 注册物品网格
         self.RegisterItemGrid(
             "custom_gird_inv27", UI_PATH_CUSTOM_ITEM_GRID_SCREEN, UI_PATH_CUSTOM_INV27_GRID, 27

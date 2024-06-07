@@ -4,25 +4,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-05-31
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as clientApi
 from ...modCommon.modConfig import *
-import itemgriddemoScripts.nuoyanlib.client as nyl
-from itemgriddemoScripts.nuoyanlib.client import (
-    listen_for,
-    LvComp,
-    PlrComp,
-    CompFactory,
-    PLAYER_ID,
-)
-# 导入UI端nuoyanlib
-from itemgriddemoScripts.nuoyanlib.client.ui import (
-    NuoyanScreenNode,
-)
+from itemgriddemoScripts.nuoyanlib.client.ui import NuoyanScreenNode
 
 
 # 将UI类继承NuoyanScreenNode，以获得由NuoyanScreenNode提供的接口。

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-06-07
 #
 # ====================================================
 
@@ -649,7 +649,6 @@ class ItemGridManager(object):
         self.__cancel_hide_tips += 1
 
     def _on_item_cell_hover_out(self, args):
-        print "out", self.__cancel_hide_tips
         if self.__cancel_hide_tips == 1:
             self.__itb_ins.HideHoverTipsBox()
             self.__cancel_hide_tips = 0
@@ -720,7 +719,7 @@ class ItemGridManager(object):
             if not basic_info:
                 return False
             max_dur = basic_info['maxDurability']
-            val = float(dur) / max_dur
+            val = float(dur) / (max_dur if max_dur > 0 else 1.0)
         dur_ctrl.SetVisible(val < 1)
         dur_ctrl.SetValue(val)
         return True
