@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -37,7 +37,7 @@ from .._core._server._comp import (
     LvComp,
 )
 from .._core._server._listener import (
-    listen_for,
+    event,
 )
 from server_system import (
     NuoyanServerSystem,

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -78,25 +78,6 @@ class NuoyanClientSystem(_ClientSystem):
         """
         super(NuoyanClientSystem, self).Destroy()
         self.UnListenAllEvents()
-
-    def Update(self):
-        """
-        *[tick]* *[event]*
-
-        | 客户端每帧调用，1秒有30帧。
-        | 若重写了该方法，请调用一次父类的同名方法。如：
-        ::
-
-            class MyClientSystem(NuoyanClientSystem):
-                def Update(self):
-                    super(MyUI, self).Update()
-
-        -----
-
-        :return: 无
-        :rtype: None
-        """
-        super(NuoyanClientSystem, self).Update()
 
     # Engine Event Callbacks ===========================================================================================
 
@@ -2387,23 +2368,26 @@ class NuoyanClientSystem(_ClientSystem):
         else:
             return _client_api.CreateUI(namespace, ui_key, param)
 
-    def RegisterAutoShowUiForItem(self, item_name, ui_node=None, func=None, item_aux=-1):
+    def RegisterUiDisplayCondition(self, namespace, ui_key, cond, display_func=None):
         """
-        | 为指定物品注册一个手持时自动显示，不手持时自动隐藏的UI界面。
+        | 为指定UI界面注册一个自动显示/隐藏的条件。当条件为 ``True`` 时，自动显示UI；条件为 ``False`` 时，自动隐藏UI。
+        | 注意：注册后会以每秒30次的频率调用条件函数，请勿在条件函数内编写过于消耗性能的逻辑。
+        | 当对同一个UI界面注册多个条件时，以最后一个为准。
 
         -----
 
-        :param str item_name: 物品ID；可使用None或"minecraft:air"表示空气；可使用元组传入多个物品
-        :param _ScreenNode ui_node: UI实例（ScreenNode），当func参数为None时会调用uiNode.SetScreenVisible接口显示/隐藏UI；默认为None
-        :param function func: 用于显示/隐藏UI的函数；该函数需要接受一个类型bool的参数，当需要显示UI时该参数为True，隐藏时为False；默认为None
-        :param int item_aux: 物品特殊值，传入-1时表示任意特殊值，默认为-1
+        :param str namespace: UI命名空间
+        :param str ui_key: UI唯一标识
+        :param function cond: 条件函数，无参数，当该函数返回True时，UI会被显示；返回False时，UI会被隐藏
+        :param function display_func: 用于显示/隐藏UI的函数，默认为None；该函数需要接受一个类型为bool的参数，当需要显示UI时会调用display_func(True)，需要隐藏UI时会调用display_func(False)；当该参数为None时，会调用UI的SetScreenVisible接口
 
         :return: 是否成功
         :rtype: bool
         """
         if not self.__lib_sys:
             return False
-        return self.__lib_sys.register_auto_show_ui(item_name, ui_node, func, item_aux)
+        self.__lib_sys.register_auto_show_ui(namespace, ui_key, cond, display_func)
+        return True
 
     # Internal =========================================================================================================
 

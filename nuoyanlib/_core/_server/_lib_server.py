@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -310,8 +310,14 @@ class NuoyanLibServerSystem(_ServerSystem):
             return _deepcopy_item_dict(items[index])
 
 
+_lib_sys = None
+
+
 def get_lib_system():
-    return _server_api.GetSystem(_LIB_NAME, _LIB_SERVER_NAME)
+    global _lib_sys
+    if not _lib_sys:
+        _lib_sys = _server_api.GetSystem(_LIB_NAME, _LIB_SERVER_NAME)
+    return _lib_sys
 
 
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -30,7 +30,6 @@ class NuoyanClientSystem(ClientSystem):
     __system_name: str
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def Destroy(self: ...): ...
-    def Update(self: ...): ...
     def GyroSensorChangedClientEvent(self: ..., args: EventArgs): ...
     def ModBlockEntityTickClientEvent(self: ..., args: EventArgs): ...
     def ModBlockEntityRemoveClientEvent(self: ..., args: EventArgs): ...
@@ -156,11 +155,11 @@ class NuoyanClientSystem(ClientSystem):
         stack: bool = False,
         param: Optional[dict] = None,
     ) -> Optional[ScreenNode]: ...
-    def RegisterAutoShowUiForItem(
+    def RegisterUiDisplayCondition(
         self: ...,
-        item_name: Union[str, None],
-        ui_node: Optional[ScreenNode] = None,
-        func: Optional[Callable[[bool], Any]] = None,
-        item_aux: int = -1,
+        namespace: str,
+        ui_key: str,
+        cond: Callable[[], bool],
+        display_func: Optional[Callable[[bool], Any]] = None,
     ) -> bool: ...
     def _set_print_log(self: ...) -> None: ...

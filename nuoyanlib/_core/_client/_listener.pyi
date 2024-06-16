@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -27,7 +27,7 @@ _ALL_CLIENT_LIB_EVENTS: Dict[str, str]
 _lsn_func_args: List[Tuple[str, str, str, str, int]]
 
 
-def listen_for(
+def event(
     event_name: Union[str, Callable] = "",
     namespace: str = "",
     system_name: str = "",
@@ -35,4 +35,4 @@ def listen_for(
 ) -> Callable: ...
 def listen_custom(self: InstanceType) -> None: ...
 def listen_engine_and_lib(self: ClientSystem) -> None: ...
-def listen_for_lib_sys(event: str) -> Callable: ...
+def listen_for_lib_sys(name: str) -> Callable: ...

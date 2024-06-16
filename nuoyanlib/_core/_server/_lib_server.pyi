@@ -12,15 +12,15 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-26
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
 
-from typing import List, Tuple, Dict, Optional, Union, overload
+from typing import List, Dict, Optional, Union, overload
 from mod.server.system.serverSystem import ServerSystem
 from .._typing import ItemDict, ItemCellPos, EventArgs
-from _listener import listen_for, listen_for_lib_sys
+from _listener import event, listen_for_lib_sys
 
 
 _DATA_KEY_ITEMS_DATA: str
@@ -34,7 +34,7 @@ class NuoyanLibServerSystem(ServerSystem):
     def Destroy(self: ...): ...
     @listen_for_lib_sys("_BroadcastToAllClient")
     def _on_broadcast_to_all_client(self: ..., args: EventArgs) -> None: ...
-    @listen_for("UiInitFinished")
+    @event("UiInitFinished")
     def _on_ui_init_finished(self: ..., args: EventArgs) -> None: ...
     @listen_for_lib_sys("_SetQueryVar")
     def on_set_query_var(self: ..., args: EventArgs) -> None: ...
@@ -78,6 +78,9 @@ class NuoyanLibServerSystem(ServerSystem):
     def _get_not_inv_items(self: ..., player_id: str, key: str) -> List[ItemDict]: ...
     @overload
     def _get_not_inv_items(self: ..., player_id: str, key: str, index: int) -> ItemDict: ...
+
+
+_lib_sys: Optional[NuoyanLibServerSystem]
 
 
 def get_lib_system() -> Optional[NuoyanLibServerSystem]: ...

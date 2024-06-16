@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -21,7 +21,7 @@ from typing import List, Tuple, Callable, Union, Any, Dict, Optional
 from mod.server.system.serverSystem import ServerSystem
 from .._core._typing import ItemDict, EventArgs
 from .._core._server._lib_server import NuoyanLibServerSystem
-from .._core._server._listener import listen_for, listen_for_lib_sys
+from .._core._server._listener import event, listen_for_lib_sys
 
 
 class NuoyanServerSystem(ServerSystem):
@@ -30,7 +30,6 @@ class NuoyanServerSystem(ServerSystem):
     __lib_sys: NuoyanLibServerSystem
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def Destroy(self: ...): ...
-    def Update(self: ...): ...
     def EntityDieLoottableAfterServerEvent(self: ..., args: EventArgs): ...
     def PlayerHungerChangeServerEvent(self: ..., args: EventArgs): ...
     def ItemDurabilityChangedServerEvent(self: ..., args: EventArgs): ...
@@ -199,7 +198,7 @@ class NuoyanServerSystem(ServerSystem):
     def _on_btn_callback_trigger(self: ..., args: EventArgs) -> None: ...
     @listen_for_lib_sys("AddServerPlayerEvent")
     def _on_add_player(self: ..., args: EventArgs) -> None: ...
-    @listen_for("PlayerIntendLeaveServerEvent")
+    @event("PlayerIntendLeaveServerEvent")
     def _on_player_intend_leave(self: ..., args: EventArgs) -> None: ...
     @listen_for_lib_sys("ItemGridChangedServerEvent")
     def _on_item_grid_changed(self: ..., args: EventArgs) -> None: ...

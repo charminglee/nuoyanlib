@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-07
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -102,7 +102,7 @@ from ..._core._client._lib_client import (
     get_lib_system as _get_lib_system,
 )
 from ..._core._client._listener import (
-    listen_for as _listen_for,
+    event as _event,
     listen_for_lib_sys as _listen_for_lib_sys,
 )
 from ...utils.item import (
@@ -187,7 +187,7 @@ class ItemGridManager(object):
                     bar_ctrl = self._item_heap_data['bar_ctrl']
                     bar_ctrl.SetValue(float(self._item_heap_data['selected_count']) / count)
 
-    @_listen_for("GetEntityByCoordReleaseClientEvent")
+    @_event("GetEntityByCoordReleaseClientEvent")
     def _on_get_entity_by_coord_release(self, args):
         if len(self.__move_in_cell_list) >= 2:
             self.SetSelectedItemData(self._selected_item['cell_path'], False)
@@ -204,7 +204,7 @@ class ItemGridManager(object):
         if update_inv:
             self._update_inv_grids(update_inv)
 
-    @_listen_for("InventoryItemChangedClientEvent")
+    @_event("InventoryItemChangedClientEvent")
     def _on_inv_item_changed(self, args):
         player_id = args['playerId']
         slot = args['slot']

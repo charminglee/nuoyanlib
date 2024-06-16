@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -27,11 +27,10 @@ from _comp import (
     ClientSystem as _ClientSystem,
     CompFactory as _CompFactory,
     LvComp as _LvComp,
-    PlrComp as _PlrComp,
 )
 from _listener import (
     listen_custom as _listen_custom,
-    listen_for as _listen_for,
+    event as _event,
     listen_for_lib_sys as _listen_for_lib_sys,
 )
 from .._utils import (
@@ -53,15 +52,30 @@ class NuoyanLibClientSystem(_ClientSystem):
         self.item_grid_items = {}
         self.registered_keys = {}
         self._auto_show_ui = {}
-        self._old_carried_item = ("minecraft:air", 0)
+        self._ui_display_state = {}
         _LvComp.Game.AddTimer(0, _listen_custom, self)
 
     # General ==========================================================================================================
 
-    @_listen_for("UiInitFinished")
+    @_event("UiInitFinished")
     def _on_ui_init_finished(self, args):
         self.NotifyToServer("UiInitFinished", {})
-        _LvComp.Game.AddTimer(0, self._on_carried_item_changed, {'itemDict': _PlrComp.Item.GetCarriedItem()})
+
+    @_event("OnScriptTickClient")
+    def _on_script_tick(self):
+        for ui, lst in self._auto_show_ui.items():
+            cond, display_func = lst
+            if not display_func:
+                ui_node = _client_api.GetUI(*ui)
+                if ui_node:
+                    display_func = lst[1] = ui_node.SetScreenVisible
+                else:
+                    continue
+            to_display = bool(cond())
+            state = self._ui_display_state[ui]
+            if to_display != state:
+                display_func(to_display)
+                self._ui_display_state[ui] = to_display
 
     @_listen_for_lib_sys("_SetQueryCache")
     def _on_set_query_cache(self, args):
@@ -84,39 +98,10 @@ class NuoyanLibClientSystem(_ClientSystem):
             comp.Register(name, 0.0)
         comp.Set(name, value)
 
-    # Auto Show Ui =====================================================================================================
-
-    @_listen_for("OnCarriedNewItemChangedClientEvent")
-    def _on_carried_item_changed(self, args):
-        item_dict = args['itemDict']
-        item_name = item_dict['newItemName'] if item_dict else "minecraft:air"
-        item_aux = item_dict['newAuxValue'] if item_dict else 0
-        item = (item_name, item_aux)
-        self._set_ui_visible(self._old_carried_item, False)
-        self._set_ui_visible(item, True)
-        self._old_carried_item = item
-
-    def _set_ui_visible(self, item, visible):
-        name = item[0]
-        func_list = []
-        if item in self._auto_show_ui:
-            func_list += self._auto_show_ui[item]
-        if (name, -1) in self._auto_show_ui:
-            func_list += self._auto_show_ui[(name, -1)]
-        for func in func_list:
-            func(visible)
-
-    def register_auto_show_ui(self, item_name, ui_node=None, func=None, item_aux=-1):
-        if not ui_node and not func:
-            return False
-        if item_name is None:
-            item_name = "minecraft:air"
-        if not func:
-            func = getattr(ui_node, "SetScreenVisible", None)
-        if not func:
-            return False
-        self._auto_show_ui.setdefault((item_name, item_aux), []).append(func)
-        return True
+    def register_auto_show_ui(self, namespace, ui_key, cond, display_func):
+        key = (namespace, ui_key)
+        self._auto_show_ui[key] = [cond, display_func]
+        self._ui_display_state.setdefault(key, None)
 
     # Item Grid ========================================================================================================
 
@@ -137,8 +122,14 @@ class NuoyanLibClientSystem(_ClientSystem):
         return True
 
 
+_lib_sys = None
+
+
 def get_lib_system():
-    return _client_api.GetSystem(_LIB_NAME, _LIB_CLIENT_NAME)
+    global _lib_sys
+    if not _lib_sys:
+        _lib_sys = _client_api.GetSystem(_LIB_NAME, _LIB_CLIENT_NAME)
+    return _lib_sys
 
 
 

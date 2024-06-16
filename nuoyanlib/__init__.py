@@ -12,23 +12,6 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-29
+#   Last Modified : 2024-06-15
 #
 # ====================================================
-
-
-__all__ = [
-    "enable_nuoyanlib",
-]
-
-
-def enable_nuoyanlib():
-    """
-    | 为当前模组启用nuoyanlib。请在modMain.py里调用该函数。
-
-    -----
-
-    :return: 无
-    :rtype: None
-    """
-    import _core._main

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -29,7 +29,7 @@ from ..._core._client._lib_client import (
 )
 from ..._core._client._listener import (
     listen_custom as _listen_custom,
-    listen_for as _listen_for,
+    event as _event,
 )
 from ..setting import (
     read_setting as _read_setting,
@@ -213,11 +213,11 @@ class NuoyanScreenNode(_ScreenNode):
             self, self._on_screen_size_changed
         )
 
-    @_listen_for("ScreenSizeChangedClientEvent")
+    @_event("ScreenSizeChangedClientEvent")
     def _on_screen_size_changed(self, args):
         self.screen_size = (args['afterX'], args['afterY'])
 
-    @_listen_for("GetEntityByCoordReleaseClientEvent")
+    @_event("GetEntityByCoordReleaseClientEvent")
     def _on_get_entity_by_coord_release(self, args):
         self._save_ui_pos()
         self.__finger_pos = None

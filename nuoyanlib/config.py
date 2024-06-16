@@ -12,6 +12,11 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-16
 #
 # ====================================================
+
+
+# 绑定客户端与服务端
+SYSTEM_BINDINGS = [
+]

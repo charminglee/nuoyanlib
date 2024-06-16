@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -24,7 +24,7 @@ from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.system.clientSystem import ClientSystem
 from ..._core._typing import EventArgs, Control
 from ..._core._client._lib_client import NuoyanLibClientSystem
-from ..._core._client._listener import listen_for
+from ..._core._client._listener import event
 from item_fly_anim import ItemFlyAnim
 from item_tips_box import ItemTipsBox
 from item_grid_manager import ItemGridManager
@@ -105,9 +105,9 @@ class NuoyanScreenNode(ScreenNode):
     def RemoveButtonLongClickCallback(self: ..., btn_path: str) -> None: ...
     def SetLongClickVibrateTime(self: ..., time: int) -> None: ...
     def HasLongClicked(self: ..., bp: str) -> bool: ...
-    @listen_for("ScreenSizeChangedClientEvent")
+    @event("ScreenSizeChangedClientEvent")
     def _on_screen_size_changed(self: ..., args: EventArgs) -> None: ...
-    @listen_for("GetEntityByCoordReleaseClientEvent")
+    @event("GetEntityByCoordReleaseClientEvent")
     def _on_get_entity_by_coord_release(self: ..., args: EventArgs) -> None: ...
     def _super(self: ..., name: str) -> None: ...
     def _run_touch_up_list(self: ..., args: EventArgs) -> None: ...

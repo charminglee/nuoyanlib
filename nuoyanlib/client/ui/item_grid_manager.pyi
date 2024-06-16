@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -25,7 +25,7 @@ from item_tips_box import ItemTipsBox
 from screen_node import NuoyanScreenNode
 from ..._core._typing import ItemCellPos, ItemCell, ItemDict, EventArgs, ItemGridKeys, ItemHeapData, ItemSelectedData
 from ..._core._client._lib_client import NuoyanLibClientSystem
-from ..._core._client._listener import listen_for, listen_for_lib_sys
+from ..._core._client._listener import event, listen_for_lib_sys
 
 
 _IMAGE_PATH_ITEM_CELL_SELECTED: str
@@ -78,11 +78,11 @@ class ItemGridManager(object):
     def _grid_items(self: ...) -> Dict[str, List[ItemDict]]: ...
     @property
     def _registered_keys(self: ...) -> List[str]: ...
-    @listen_for("GetEntityByCoordReleaseClientEvent")
+    @event("GetEntityByCoordReleaseClientEvent")
     def _on_get_entity_by_coord_release(self: ..., args: EventArgs) -> None: ...
     @listen_for_lib_sys("_UpdateItemGrids")
     def _on_update_item_grids(self: ..., args: EventArgs) -> None: ...
-    @listen_for("InventoryItemChangedClientEvent")
+    @event("InventoryItemChangedClientEvent")
     def _on_inv_item_changed(self: ..., args: EventArgs) -> None: ...
     def OnMoveItemsBefore(self: ..., args: EventArgs) -> None: ...
     def OnItemGridSelectOrUnselectItem(self: ..., args: EventArgs) -> None: ...

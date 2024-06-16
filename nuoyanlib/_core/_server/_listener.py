@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -22,13 +22,16 @@ from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_CLIENT_NAME as _LIB_CLIENT_NAME,
 )
+from .._utils import (
+    get_opposite_system as _get_opposite_system,
+)
 from ...utils.utils import (
     is_method_overridden as _is_method_overridden
 )
 
 
 __all__ = [
-    "listen_for",
+    "event",
     "listen_custom",
     "listen_engine_and_lib",
     "listen_for_lib_sys",
@@ -207,7 +210,7 @@ _SERVER_ENGINE_NAMESPACE = _api.GetEngineNamespace()
 _SERVER_ENGINE_SYSTEM_NAME = _api.GetEngineSystemName()
 
 
-def listen_for(event_name="", namespace="", system_name="", priority=0):
+def event(event_name="", namespace="", system_name="", priority=0):
     """
     | 函数装饰器，通过对函数进行装饰即可实现事件监听。用于服务端。
     | 监听引擎事件（ ``event_name`` 为引擎事件名）时，可省略 ``namespace`` 和 ``system_name`` 参数。
@@ -245,26 +248,30 @@ def listen_custom(self):
     from _lib_server import get_lib_system
     lib_sys = get_lib_system()
     for args in _lsn_func_args:
+        # noinspection PyUnresolvedReferences
+        namespace = args[0] or self.namespace
+        # noinspection PyUnresolvedReferences
+        system_name = args[1] or _get_opposite_system(self.systemName)
         func = args[3]
         method = getattr(self, func.__name__, None)
         if method and method.__func__ is func:
-            lib_sys.ListenForEvent(args[0], args[1], args[2], self, method, args[4])
+            lib_sys.ListenForEvent(namespace, system_name, args[2], self, method, args[4])
 
 
 def listen_engine_and_lib(self):
     from ...server.server_system import NuoyanServerSystem
-    for event in _ALL_SERVER_ENGINE_EVENTS:
-        if _is_method_overridden(self.__class__, NuoyanServerSystem, event):
-            method = getattr(self, event)
-            self.ListenForEvent(_SERVER_ENGINE_NAMESPACE, _SERVER_ENGINE_SYSTEM_NAME, event, self, method)
-    for event, sys_name in _ALL_SERVER_LIB_EVENTS.items():
-        if _is_method_overridden(self.__class__, NuoyanServerSystem, event):
-            method = getattr(self, event)
-            self.ListenForEvent(_LIB_NAME, sys_name, event, self, method)
+    for name in _ALL_SERVER_ENGINE_EVENTS:
+        if _is_method_overridden(self.__class__, NuoyanServerSystem, name):
+            method = getattr(self, name)
+            self.ListenForEvent(_SERVER_ENGINE_NAMESPACE, _SERVER_ENGINE_SYSTEM_NAME, name, self, method)
+    for name, sys_name in _ALL_SERVER_LIB_EVENTS.items():
+        if _is_method_overridden(self.__class__, NuoyanServerSystem, name):
+            method = getattr(self, name)
+            self.ListenForEvent(_LIB_NAME, sys_name, name, self, method)
 
 
-def listen_for_lib_sys(event):
-    return listen_for(event, _LIB_NAME, _LIB_CLIENT_NAME)
+def listen_for_lib_sys(name):
+    return event(name, _LIB_NAME, _LIB_CLIENT_NAME)
 
 
 

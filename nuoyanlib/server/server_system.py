@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-16
 #
 # ====================================================
 
@@ -28,7 +28,7 @@ from .._core._server._listener import (
     listen_custom as _listen_custom,
     listen_engine_and_lib as _listen_engine_and_lib,
     listen_for_lib_sys as _listen_for_lib_sys,
-    listen_for as _listen_for,
+    event as _event,
 )
 
 
@@ -75,25 +75,6 @@ class NuoyanServerSystem(_ServerSystem):
         """
         super(NuoyanServerSystem, self).Destroy()
         self.UnListenAllEvents()
-
-    def Update(self):
-        """
-        *[tick]* *[event]*
-
-        | 服务端每帧调用，1秒有30帧。
-        | 若重写该方法，请调用一次父类的同名方法。如：
-        ::
-
-            class MyServerSystem(NuoyanServerSystem):
-                def Update(self):
-                    super(MyServerSystem, self).Update()
-
-        -----
-
-        :return: 无
-        :rtype: None
-        """
-        super(NuoyanServerSystem, self).Update()
 
     # Engine Event Callbacks ===========================================================================================
 
@@ -3926,14 +3907,14 @@ class NuoyanServerSystem(_ServerSystem):
 
     # Internal =========================================================================================================
 
-    @_listen_for("AddServerPlayerEvent")
+    @_event("AddServerPlayerEvent")
     def _on_add_player(self, args):
         player_id = args['id']
         self.all_player_data.setdefault(player_id, {})
         if self.first_player_id == "-1":
             self.first_player_id = player_id
 
-    @_listen_for("PlayerIntendLeaveServerEvent")
+    @_event("PlayerIntendLeaveServerEvent")
     def _on_player_intend_leave(self, args):
         player_id = args['playerId']
         if player_id in self.all_player_data:
@@ -3943,6 +3924,7 @@ class NuoyanServerSystem(_ServerSystem):
     def _on_btn_callback_trigger(self, args):
         func_name = args['name']
         func_args = args['args']
+        func_args['__id__'] = args['__id__']
         func = getattr(self, func_name, None)
         if func:
             func(func_args)
