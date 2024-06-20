@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2024-06-19
 #
 # ====================================================
 
@@ -21,10 +21,6 @@ from typing import Optional, Tuple, Dict, Callable, Sequence, Any, Union, List
 from random import Random
 
 
-_LEVEL_ID: str
-
-
-def _is_client() -> bool: ...
 def random_pos(
     center_pos: Tuple[float, float, float],
     grid: float,

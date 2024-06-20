@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-28
+#   Last Modified : 2024-06-19
 
 # ====================================================
 
@@ -26,7 +26,7 @@ from math import (
     radians as _radians,
 )
 from mod.common.utils.mcmath import Vector3 as _Vector3
-from calculator import pos_distance as _pos_distance
+from .calculator import pos_distance as _pos_distance
 
 
 __all__ = [

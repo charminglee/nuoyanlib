@@ -12,14 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-06-19
 #
 # ====================================================
 
 
 from typing import Tuple, Union, Optional, List, Dict
-from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
-from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 from mod.common.minecraftEnum import Facing
 
 
@@ -45,8 +43,6 @@ def pos_distance_to_line(
     line_pos1: Tuple[float, float, float],
     line_pos2: Tuple[float, float, float],
 ) -> float: ...
-def _is_client() -> bool: ...
-def _get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...
 def pos_floor(pos: Tuple[float, float, float]) -> Tuple[int, int, int]: ...
 def pos_distance(
     first_point: Tuple[float, ...],
@@ -135,11 +131,6 @@ def ray_aabb_intersection(
     cube_center_pos: Tuple[float, float, float],
     cube_size: Tuple[float, float, float],
 ) -> Optional[Tuple[float, float, float]]: ...
-
-
-_LEVEL_ID: str
-
-
 def get_blocks_by_ray(
     start_pos: Tuple[float, float, float],
     direction: Tuple[float, float, float],

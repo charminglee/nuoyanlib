@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-19
 #
 # ====================================================
 
@@ -36,9 +36,6 @@ __all__ = [
 ]
 
 
-_ITEM_POS_SIZE = (36, 1, 1, 4)
-
-
 def clear_items(player_id, item_pos_type, pos):
     """
     | 清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
@@ -58,6 +55,9 @@ def clear_items(player_id, item_pos_type, pos):
     return item
 
 
+_ITEM_POS_SIZE = (36, 1, 1, 4)
+
+
 def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     """
     | 获取物品所在槽位。
@@ -75,9 +75,8 @@ def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     """
     is_player = (_CompFactory.CreateEngineType(entity_id).GetEngineTypeStr() == "minecraft:player")
     item_comp = _CompFactory.CreateItem(entity_id)
-    num = _ITEM_POS_SIZE[pos_type - 1]
     result = []
-    for i in range(num):
+    for i in range(_ITEM_POS_SIZE[pos_type]):
         if len(result) >= count:
             break
         if is_player:

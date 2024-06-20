@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-06-19
 #
 # ====================================================
 
@@ -111,7 +111,7 @@ from ...utils.item import (
     get_max_stack as _get_max_stack,
     deepcopy_item_dict as _deepcopy_item_dict,
 )
-from ui_utils import (
+from .ui_utils import (
     get_direct_children_path as _get_direct_children_path,
 )
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-06-19
 #
 # ====================================================
 
@@ -35,14 +35,14 @@ from ..setting import (
     read_setting as _read_setting,
     save_setting as _save_setting,
 )
-from ui_utils import (
+from .ui_utils import (
     get_direct_children_path as _get_direct_children_path,
     get_parent_path as _get_parent_path,
     get_parent_control as _get_parent_control,
 )
-from item_fly_anim import ItemFlyAnim as _ItemFlyAnim
-from item_tips_box import ItemTipsBox as _ItemTipsBox
-from item_grid_manager import ItemGridManager as _ItemGridManager
+from .item_fly_anim import ItemFlyAnim as _ItemFlyAnim
+from .item_tips_box import ItemTipsBox as _ItemTipsBox
+from .item_grid_manager import ItemGridManager as _ItemGridManager
 
 
 __all__ = [

@@ -12,15 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-08
+#   Last Modified : 2024-06-19
 #
 # ====================================================
 
 
 from typing import Tuple, List, Optional, Union
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
-from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
-from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 
 
 _AIR: Tuple[str, str]
@@ -42,8 +40,6 @@ def gen_item_dict(
     itemName: str = "",
     auxValue: int = 0,
 ) -> Optional[dict]: ...
-def _is_client() -> bool: ...
-def _get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...
 def get_item_count(player_id: str, name: str, aux: int = -1) -> int: ...
 def set_namespace(name: str, namespace: str = "minecraft") -> str: ...
 def _same(what1: Union[str, dict, None], what2: Union[str, dict, None]) -> bool: ...

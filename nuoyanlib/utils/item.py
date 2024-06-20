@@ -12,14 +12,16 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-19
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as _client_api
-import mod.server.extraServerApi as _server_api
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
+from .._core._sys import (
+    get_comp_factory as _get_comp_factory,
+    LEVEL_ID as _LEVEL_ID,
+)
 
 
 __all__ = [
@@ -106,17 +108,6 @@ def gen_item_dict(
     if not modEnchantData:
         modEnchantData = []
     return locals()
-
-
-def _is_client():
-    try:
-        return _client_api.GetLocalPlayerId() != "-1"
-    except ImportError:
-        return False
-
-
-def _get_comp_factory():
-    return _client_api.GetEngineCompFactory() if _is_client() else _server_api.GetEngineCompFactory()
 
 
 def get_item_count(player_id, name, aux=-1):
@@ -244,9 +235,6 @@ def is_empty_item(item, zero_is_emp=True):
     )
 
 
-_LEVEL_ID = _client_api.GetLevelId() if _is_client() else _server_api.GetLevelId()
-
-
 def get_max_stack(item):
     """
     | 获取物品最大堆叠数量。
@@ -262,10 +250,7 @@ def get_max_stack(item):
     aux = item.get('newAuxValue', 0)
     if aux == -1:
         aux = 0
-    if _is_client():
-        comp = _client_api.GetEngineCompFactory().CreateItem(_LEVEL_ID)
-    else:
-        comp = _server_api.GetEngineCompFactory().CreateItem(_LEVEL_ID)
+    comp = _get_comp_factory().CreateItem(_LEVEL_ID)
     try:
         return comp.GetItemBasicInfo(name, aux)['maxStackSize']
     except KeyError:

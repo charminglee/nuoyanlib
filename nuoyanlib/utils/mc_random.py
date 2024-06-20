@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-06-19
 #
 # ====================================================
 
@@ -27,9 +27,12 @@ from string import (
     ascii_lowercase as _ascii_lowercase,
     ascii_uppercase as _ascii_uppercase,
 )
-import mod.client.extraClientApi as _client_api
-import mod.server.extraServerApi as _server_api
-from calculator import pos_distance as _pos_distance
+from .._core._sys import (
+    is_client as _is_client,
+    get_api as _get_api,
+    LEVEL_ID as _LEVEL_ID,
+)
+from .calculator import pos_distance as _pos_distance
 
 
 __all__ = [
@@ -37,16 +40,6 @@ __all__ = [
     "random_string",
     "random_even_poses",
 ]
-
-
-def _is_client():
-    try:
-        return _client_api.GetLocalPlayerId() != "-1"
-    except ImportError:
-        return False
-
-
-_LEVEL_ID = _client_api.GetLevelId() if _is_client() else _server_api.GetLevelId()
 
 
 def random_pos(center_pos, grid, use_top_height=False, dimension=0):
@@ -70,7 +63,7 @@ def random_pos(center_pos, grid, use_top_height=False, dimension=0):
     x = center_pos[0] + ran_x
     z = center_pos[2] + ran_z
     if use_top_height and not _is_client():
-        y = _server_api.GetEngineCompFactory().CreateBlockInfo(_LEVEL_ID).GetTopBlockHeight(
+        y = _get_api().GetEngineCompFactory().CreateBlockInfo(_LEVEL_ID).GetTopBlockHeight(
             (x, z), dimension
         )
         if y is not None:

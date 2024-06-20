@@ -33,7 +33,7 @@ from ..utils.calculator import (
     pos_distance_to_line as _pos_distance_to_line,
 )
 from ..utils.vector import vec_angle as _vec_angle
-from entity import (
+from .entity import (
     entity_filter as _entity_filter,
     get_entities_in_area as _get_entities_in_area,
     get_all_entities as _get_all_entities,

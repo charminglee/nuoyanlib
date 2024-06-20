@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-13
+#   Last Modified : 2024-06-20
 #
 # ====================================================
 
@@ -32,10 +32,13 @@ from random import (
     randint as _randint,
     uniform as _uniform,
 )
-import mod.client.extraClientApi as _client_api
-import mod.server.extraServerApi as _server_api
 from mod.common.utils.mcmath import Vector3 as _Vector3
 from mod.common.minecraftEnum import Facing as _Facing
+from .._core._sys import (
+    get_api as _get_api,
+    get_comp_factory as _get_comp_factory,
+    LEVEL_ID as _LEVEL_ID,
+)
 
 
 __all__ = [
@@ -194,17 +197,6 @@ def pos_distance_to_line(pos, line_pos1, line_pos2):
     return h
 
 
-def _is_client():
-    try:
-        return _client_api.GetLocalPlayerId() != "-1"
-    except ImportError:
-        return False
-
-
-def _get_comp_factory():
-    return _client_api.GetEngineCompFactory() if _is_client() else _server_api.GetEngineCompFactory()
-
-
 def pos_floor(pos):
     """
     | 对坐标进行向下取整。
@@ -216,15 +208,15 @@ def pos_floor(pos):
     :return: 取整后的坐标
     :rtype: tuple[int,int,int]
     """
-    return tuple(map(lambda x: int(_floor(x)), pos))
+    return tuple(int(_floor(i)) for i in pos)
 
 
 def pos_distance(first_point, second_point):
     """
     | 计算两个坐标间的距离。支持多元坐标。
-        
+
     -----
-    
+
     :param tuple[float] first_point: 坐标1
     :param tuple[float] second_point: 坐标2
         
@@ -425,7 +417,7 @@ def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
         return
     if use_0yaw:
         rot = (0, rot[1])
-    dir_rot = _client_api.GetDirFromRot(rot) if _is_client() else _server_api.GetDirFromRot(rot)
+    dir_rot = _get_api().GetDirFromRot(rot)
     ep = comp_factory.CreatePos(entity_id).GetFootPos()
     if not ep:
         return
@@ -449,7 +441,7 @@ def pos_forward_rot(pos, rot, dis):
     """
     if not rot or not pos:
         return
-    dir_rot = _client_api.GetDirFromRot(rot) if _is_client() else _server_api.GetDirFromRot(rot)
+    dir_rot = _get_api().GetDirFromRot(rot)
     result_pos = tuple(pos[i] + dir_rot[i] * dis for i in range(3))
     return result_pos
 
@@ -747,9 +739,6 @@ def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_
         t_max = min(t_max, max(t1, t2))
     if 0.0 <= t_min <= t_max and t_min <= length:
         return (ray_start_pos + ray_dir * t_min).ToTuple()
-
-
-_LEVEL_ID = _client_api.GetLevelId() if _is_client() else _server_api.GetLevelId()
 
 
 def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter_blocks=None):
