@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-20
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
-from typing import Union
+from typing import Union, Dict, Tuple, Callable, Any
 import mod.client.extraClientApi as client_api
 import mod.server.extraServerApi as server_api
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
@@ -30,3 +30,18 @@ def get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer
 
 
 LEVEL_ID: str
+
+
+class NuoyanLibBaseSystem(object):
+    _cond_func: Dict[int, Tuple[Callable[[], bool], Callable[[bool], Any], int]]
+    _cond_state: Dict[int, bool]
+    __tick: int
+    def __init__(self: ..., namespace: str, system_name: str) -> None: ...
+    def Update(self: ...): ...
+    def add_condition_to_func(
+        self: ...,
+        cond: Callable[[], bool],
+        func: Callable[[bool], Any],
+        freq: int,
+    ) -> int: ...
+    def remove_condition_to_func(self, cond_id: int) -> bool: ...

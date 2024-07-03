@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-03
 #
 # ====================================================
 
@@ -39,7 +39,7 @@ __all__ = [
 
 class NuoyanServerSystem(_ServerSystem):
     """
-    | ServerSystem扩展类。将自定义ServerSystem继承本类即可使用本类的全部功能。
+    | ServerSystem扩展类。将服务端继承本类即可使用本类的全部功能。
 
     -----
 
@@ -2927,7 +2927,7 @@ class NuoyanServerSystem(_ServerSystem):
 
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -3818,77 +3818,6 @@ class NuoyanServerSystem(_ServerSystem):
         """
 
     # New Interfaces ===================================================================================================
-
-    def SetItemsToItemGrid(self, player_id, key, item_dict_list):
-        """
-        | 设置物品网格的所有物品。
-
-        -----
-
-        :param str player_id: 玩家实体ID
-        :param str key: 网格的key
-        :param list[dict|None] item_dict_list: 物品信息字典列表
-
-        :return: 返回一个列表，列表元素为布尔值，对应item_dict_list中各物品是否设置成功
-        :rtype: list[bool]
-        """
-        if not self.__lib_sys:
-            return False
-        return self.__lib_sys.set_all_items(player_id, key, item_dict_list, True)
-
-    def GetItemsFromItemGrid(self, player_id, key):
-        """
-        | 获取物品网格的所有物品。
-
-        -----
-
-        :param str player_id: 玩家实体ID
-        :param str key: 网格的key
-
-        :return: 物品信息字典列表，获取不到返回空列表
-        :rtype: list[dict|None]
-        """
-        if not self.__lib_sys:
-            return []
-        return self.__lib_sys.get_all_items(player_id, key)
-
-    def UpdateItemGrids(self, player_id, keys):
-        """
-        | 立即同步一次玩家的物品数据给客户端的物品网格。
-        | 以“_shortcut”、“_inv27”或“_inv36”结尾的网格无需使用此接口进行同步。
-
-        -----
-
-        :param str player_id: 玩家的实体ID
-        :param str|tuple[str] keys: 网格的key，多个网格请使用元组
-
-        :return: 是否成功
-        :rtype: bool
-        """
-        if not self.__lib_sys:
-            return False
-        if isinstance(keys, str):
-            keys = (keys,)
-        return self.__lib_sys.on_update_item_grids({'__id__': player_id, 'keys': keys})
-
-    def SetQueryVar(self, entity_id, name, value):
-        """
-        | 设置指定实体 ``query.mod`` 变量的值，全局同步。
-        | 若设置的变量未注册，则自动进行注册。
-
-        -----
-
-        :param str entity_id: 实体ID
-        :param str name: 变量名
-        :param float value: 设置的值
-
-        :return: 是否成功
-        :rtype: bool
-        """
-        if not self.__lib_sys:
-            return False
-        self.__lib_sys.on_set_query_var({'entity_id': entity_id, 'name': name, 'value': value})
-        return True
 
     def CallClient(self, player_id, name, callback=None, *args):
         """

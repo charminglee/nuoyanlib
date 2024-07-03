@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-14
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as api
+import mod.client.extraClientApi as _api
 
 
 __all__ = [
@@ -35,21 +35,21 @@ __all__ = [
 ]
 
 
-CLIENT_ENGINE_NAMESPACE = api.GetEngineNamespace()
-CLIENT_ENGINE_SYSTEM_NAME = api.GetEngineSystemName()
+CLIENT_ENGINE_NAMESPACE = _api.GetEngineNamespace()
+CLIENT_ENGINE_SYSTEM_NAME = _api.GetEngineSystemName()
 
 
-ClientSystem = api.GetClientSystemCls()
-CompFactory = api.GetEngineCompFactory()
+ClientSystem = _api.GetClientSystemCls()
+CompFactory = _api.GetEngineCompFactory()
 
 
-ScreenNode = api.GetScreenNodeCls()
-ViewBinder = api.GetViewBinderCls()
-ViewRequest = api.GetViewViewRequestCls()
+ScreenNode = _api.GetScreenNodeCls()
+ViewBinder = _api.GetViewBinderCls()
+ViewRequest = _api.GetViewViewRequestCls()
 
 
-PLAYER_ID = api.GetLocalPlayerId()
-LEVEL_ID = api.GetLevelId()
+PLAYER_ID = _api.GetLocalPlayerId()
+LEVEL_ID = _api.GetLevelId()
 
 
 class _CompDescr(object):

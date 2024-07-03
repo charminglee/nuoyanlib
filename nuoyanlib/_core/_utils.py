@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
-from _const import (
+from ._const import (
     SHORTCUT as _SHORTCUT,
     INV27 as _INV27,
     INV36 as _INV36,

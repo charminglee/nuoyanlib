@@ -12,33 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-27
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
-from typing import List, Optional
-from mod.client.ui.screenNode import ScreenNode
-from mod.client.ui.controls.baseUIControl import BaseUIControl
-from _core._typing import Control
+from typing import Tuple
 
 
-def _get_path(control: Control) -> str: ...
-def get_direct_children_path(control: Control, ui_ins: ScreenNode) -> List[str]: ...
-def get_parent_path(control: Control) -> Optional[str]: ...
-def get_parent_control(control: Control, ui_ins: ScreenNode) -> Optional[BaseUIControl]: ...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def set_query_mod_var(entity_id: str, name: str, value: float, sync: bool = True) -> bool: ...
+def add_player_render_resources(player_id: str, rebuild: bool, *res_tuple: Tuple[str, str]) -> Tuple[bool, ...]: ...
+def add_entity_render_resources(entity_id: str, rebuild: bool, *res_tuple: Tuple[str, str]) -> Tuple[bool, ...]: ...

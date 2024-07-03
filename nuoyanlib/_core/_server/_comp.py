@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-11
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as api
+import mod.server.extraServerApi as _api
 
 
 __all__ = [
@@ -30,15 +30,15 @@ __all__ = [
 ]
 
 
-SERVER_ENGINE_NAMESPACE = api.GetEngineNamespace()
-SERVER_ENGINE_SYSTEM_NAME = api.GetEngineSystemName()
+SERVER_ENGINE_NAMESPACE = _api.GetEngineNamespace()
+SERVER_ENGINE_SYSTEM_NAME = _api.GetEngineSystemName()
 
 
-ServerSystem = api.GetServerSystemCls()
-CompFactory = api.GetEngineCompFactory()
+ServerSystem = _api.GetServerSystemCls()
+CompFactory = _api.GetEngineCompFactory()
 
 
-LEVEL_ID = api.GetLevelId()
+LEVEL_ID = _api.GetLevelId()
 
 
 class _CompDescr(object):

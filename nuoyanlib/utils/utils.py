@@ -12,15 +12,18 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-28
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
 from re import match as _match
+from .._core._sys import is_client as _is_client
 
 
 __all__ = [
+    "add_condition_to_func",
+    "remove_condition_to_func",
     "all_indexes",
     "check_string",
     "check_string2",
@@ -29,6 +32,51 @@ __all__ = [
     "is_method_overridden",
     "translate_time",
 ]
+
+
+def _get_lib_system():
+    if _is_client():
+        from .._core._client._lib_client import get_lib_system
+    else:
+        from .._core._server._lib_server import get_lib_system
+    return get_lib_system()
+
+
+def add_condition_to_func(cond, func, freq=1):
+    """
+    | 为指定函数添加一个条件，当条件发生变化时，自动执行一次函数。例如，当条件由 ``True`` 变化到 ``False``，或由 ``False`` 变化到 ``True`` 时，都会执行一次指定函数。
+
+    -----
+
+    :param function cond: 条件函数，无参数，需要返回一个bool，当返回的bool（即条件）发生变化时，自动执行一次func
+    :param function func: 条件发生变化时执行的函数，该函数需要接受一个类型为bool的参数，即当前的条件状态（cond的返回值）
+    :param int freq: 条件判断频率，单位为tick，默认为1，即每1tick判断一次，小于1的值会被视为1
+
+    :return: 返回一个int型ID，后续可用该ID移除添加的条件和函数，添加失败时返回-1
+    :rtype: int
+    """
+    freq = max(1, int(freq))
+    lib_sys = _get_lib_system()
+    if not lib_sys:
+        return -1
+    return lib_sys.add_condition_to_func(cond, func, freq)
+
+
+def remove_condition_to_func(cond_id):
+    """
+    | 移除由 ``add_condition_to_func`` 添加的条件和函数。
+
+    -----
+
+    :param cond_id: 由add_condition_to_func返回的ID
+
+    :return: 是否成功
+    :rtype: bool
+    """
+    lib_sys = _get_lib_system()
+    if not lib_sys:
+        return False
+    return lib_sys.remove_condition_to_func(cond_id)
 
 
 def all_indexes(seq, *elements):

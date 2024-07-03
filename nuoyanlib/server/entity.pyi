@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-20
+#   Last Modified : 2024-07-03
 #
 # ====================================================
 
@@ -20,6 +20,7 @@
 from typing import Dict, List, Tuple, Optional, Union, Set
 
 
+def set_query_mod_var(entity_id: str, name: str, value: float) -> bool: ...
 def clear_effects(entity_id: str) -> None: ...
 def bounce_entities(
     pos: Tuple[float, float, float],

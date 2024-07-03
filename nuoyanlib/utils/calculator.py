@@ -511,7 +511,7 @@ def cube_longest_side_len(start_pos, end_pos):
 def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_angle):
     """
     | 判断给定坐标是否在扇形区域内。
-        
+
     -----
     
     :param tuple[float,float,float] test_pos: 待测试的坐标

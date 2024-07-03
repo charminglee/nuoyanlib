@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
@@ -22,7 +22,7 @@ from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_CLIENT_NAME as _LIB_CLIENT_NAME,
 )
-from _comp import (
+from ._comp import (
     PLAYER_ID as _PLAYER_ID,
     ClientSystem as _ClientSystem,
     CompFactory as _CompFactory,
@@ -36,6 +36,9 @@ from ._listener import (
 from .._utils import (
     is_not_inv_key as _is_not_inv_key,
 )
+from .._sys import (
+    NuoyanLibBaseSystem as _NuoyanLibBaseSystem,
+)
 
 
 __all__ = [
@@ -44,15 +47,13 @@ __all__ = [
 ]
 
 
-class NuoyanLibClientSystem(_ClientSystem):
+class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
         self.item_grid_path = {}
         self.item_grid_size = {}
         self.item_grid_items = {}
         self.registered_keys = {}
-        self._auto_show_ui = {}
-        self._ui_display_state = {}
         _LvComp.Game.AddTimer(0, _listen_custom, self)
 
     # General ==========================================================================================================
@@ -60,22 +61,6 @@ class NuoyanLibClientSystem(_ClientSystem):
     @_event("UiInitFinished")
     def _on_ui_init_finished(self, args):
         self.NotifyToServer("UiInitFinished", {})
-
-    @_event("OnScriptTickClient")
-    def _on_script_tick(self):
-        for ui, lst in self._auto_show_ui.items():
-            cond, display_func = lst
-            if not display_func:
-                ui_node = _client_api.GetUI(*ui)
-                if ui_node:
-                    display_func = lst[1] = ui_node.SetScreenVisible
-                else:
-                    continue
-            to_display = bool(cond())
-            state = self._ui_display_state[ui]
-            if to_display != state:
-                display_func(to_display)
-                self._ui_display_state[ui] = to_display
 
     @_listen_for_lib_sys("_SetQueryCache")
     def _on_set_query_cache(self, args):
@@ -97,11 +82,6 @@ class NuoyanLibClientSystem(_ClientSystem):
         if comp.Get(name) == -1.0:
             comp.Register(name, 0.0)
         comp.Set(name, value)
-
-    def register_auto_show_ui(self, namespace, ui_key, cond, display_func):
-        key = (namespace, ui_key)
-        self._auto_show_ui[key] = [cond, display_func]
-        self._ui_display_state.setdefault(key, None)
 
     # Item Grid ========================================================================================================
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-03
 #
 # ====================================================
 
@@ -28,7 +28,6 @@ from .._core._client._listener import (
 from .._core._client._comp import (
     ScreenNode as _ScreenNode,
     ClientSystem as _ClientSystem,
-    CompFactory as _CompFactory,
 )
 
 
@@ -39,7 +38,7 @@ __all__ = [
 
 class NuoyanClientSystem(_ClientSystem):
     """
-    | ClientSystem扩展类。将自定义ClientSystem继承本类即可使用本类的全部功能。
+    | ClientSystem扩展类。将客户端继承本类即可使用本类的全部功能。
 
     -----
 
@@ -298,7 +297,7 @@ class NuoyanClientSystem(_ClientSystem):
 
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -338,7 +337,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -386,7 +385,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -463,7 +462,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -479,7 +478,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -495,7 +494,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -531,7 +530,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -611,7 +610,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -629,7 +628,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -784,7 +783,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -857,7 +856,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -896,7 +895,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -1958,7 +1957,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -2051,7 +2050,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -2175,7 +2174,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -2192,7 +2191,7 @@ class NuoyanClientSystem(_ClientSystem):
         
         -----
 
-        无参数
+        | 无参数
 
         -----
 
@@ -2205,99 +2204,6 @@ class NuoyanClientSystem(_ClientSystem):
     # Lib Event Callbacks ==============================================================================================
 
     # New Interfaces ===================================================================================================
-
-    def RegisterItemGrid(self, key, ui_cls_path, grid_path, grid_size=1, is_single=False):
-        """
-        | 注册物品网格或注册单个方格按钮。如果注册的是单个方格按钮，则该方格按钮将被视为只有一个元素的网格。
-        | 注册后还需要在网格显示在屏幕上时调用 ``ItemGridManager`` 的 ``InitItemGrids`` 接口才能正常使用。
-        | 当网格的key以“_shortcut”、“_inv27”或“_inv36”结尾时（如“my_item_grid_inv36”），将获得以下特殊功能：
-        * 该网格将与本地玩家的背包进行绑定，"_shortcut"表示快捷栏，"_inv27"表示除快捷栏以外的物品栏，"_inv36"表示整个物品栏。
-        * 该网格会自动获取本地玩家背包物品数据，并显示物品。
-        * 在该网格进行的任何物品操作会自动与本地玩家的背包进行同步。
-        | key以“_shortcut”、“_inv27”或“_inv36”结尾的网格的方格数量分别为9、27、36时才能注册成功。
-
-        -----
-
-        :param str key: 网格的key，请保证key唯一，不能与其他网格相同，建议格式为“模组名+网格名称”
-        :param str ui_cls_path: 网格所在UI类的路径（该UI类需要继承ItemGridManager）
-        :param str grid_path: 网格的UI路径
-        :param int grid_size: 网格的方格数量，默认为1
-        :param bool is_single: 是否是单个方格按钮，默认为False
-
-        :return: 是否注册成功
-        :rtype: bool
-        """
-        if not self.__lib_sys:
-            return False
-        return self.__lib_sys.register_item_grid(key, ui_cls_path, grid_path, grid_size, is_single)
-
-    def SetQueryVar(self, entity_id, name, value, sync=True):
-        """
-        | 设置指定实体 ``query.mod`` 变量的值，支持全局同步（即所有客户端同步设置该变量的值）。
-        | 若不进行全局同步，则本次设置只对当前客户端有效。
-        | 若设置的变量未注册，会自动进行注册。
-        
-        -----
-
-        :param str entity_id: 实体ID
-        :param str name: 变量名
-        :param float value: 设置的值
-        :param bool sync: 是否进行全局同步，默认为True
-
-        :return: 是否成功
-        :rtype: bool
-        """
-        if not self.__lib_sys:
-            return False
-        data = {'entity_id': entity_id, 'name': name, 'value': value}
-        self.__lib_sys.on_set_query_var(data)
-        if sync:
-            self.__lib_sys.NotifyToServer("_SetQueryVar", data)
-        return True
-
-    def AddPlayerRenderResources(self, player_id, rebuild, *res_tuple):
-        """
-        | 一次性添加多个玩家渲染资源，支持添加模型、贴图、材质、渲染控制器、动画、动画控制器、音效和微软粒子特效。
-        | 注意：使用本接口添加的资源，需要遵循以下命名规范：
-        * 模型：以 geometry. 开头；
-        * 渲染控制器：以 controller.render. 开头；
-        * 动画：以 animation. 开头；
-        * 动画控制器：以 controller.animation. 开头；
-        * 音效：音效名称至少包含一个“.”，如 sound.abc。
-
-        -----
-
-        :param str player_id: 玩家实体ID
-        :param bool rebuild: 是否重建玩家的数据渲染器，传入True时会自动调用RebuildPlayerRender接口。
-        :param tuple[str,str] res_tuple: 变长参数，渲染资源元组，第一个元素为资源键名（短名称），第二个参数为具体资源名称（模型ID、贴图路径、动画名称等）
-
-        :return: 返回添加结果（是否成功），结果为一个元组，元素类型为bool，与传入的res_tuple参数相对应
-        :rtype: tuple[bool]
-        """
-        res = []
-        comp = _CompFactory.CreateActorRender(player_id)
-        for arg in res_tuple:
-            if not arg:
-                continue
-            if arg[1].startswith("geometry."):
-                res.append(comp.AddPlayerGeometry(*arg))
-            elif arg[1].startswith("textures/"):
-                res.append(comp.AddPlayerTexture(*arg))
-            elif arg[0].startswith("controller.render."):
-                res.append(comp.AddPlayerRenderController(*arg))
-            elif arg[1].startswith("animation."):
-                res.append(comp.AddPlayerAnimation(*arg))
-            elif arg[1].startswith("controller.animation."):
-                res.append(comp.AddPlayerAnimationController(*arg))
-            elif ":" in arg[1]:
-                res.append(comp.AddPlayerParticleEffect(*arg))
-            elif "." in arg[1]:
-                res.append(comp.AddPlayerSoundEffect(*arg))
-            else:
-                res.append(comp.AddPlayerRenderMaterial(*arg))
-        if rebuild:
-            comp.RebuildPlayerRender()
-        return tuple(res)
 
     def CallServer(self, name, callback=None, *args):
         """
@@ -2341,7 +2247,7 @@ class NuoyanClientSystem(_ClientSystem):
         """
         | 注册并创建UI。
         | 如果UI已创建，则返回其实例。
-        | 使用该接口创建的UI，其UI类 ``__init__`` 方法的 ``param`` 参数会自带一个名为"__cs__"的key，对应的值为创建UI的客户端的实例，可以方便地调用客户端的属性、方法和接口。
+        | 使用该接口创建的UI，其UI类 ``__init__`` 方法的 ``param`` 参数会自带一个名为 ``__cs__`` 的key，对应的值为创建UI的客户端的实例，可以方便地调用客户端的属性、方法和接口。
 
         -----
 
@@ -2362,32 +2268,12 @@ class NuoyanClientSystem(_ClientSystem):
             return
         if param is None:
             param = {}
-        param['__cs__'] = self
+        if isinstance(param, dict):
+            param['__cs__'] = self
         if stack:
             return _client_api.PushScreen(namespace, ui_key, param)
         else:
             return _client_api.CreateUI(namespace, ui_key, param)
-
-    def RegisterUiDisplayCondition(self, namespace, ui_key, cond, display_func=None):
-        """
-        | 为指定UI界面注册一个自动显示/隐藏的条件。当条件为 ``True`` 时，自动显示UI；条件为 ``False`` 时，自动隐藏UI。
-        | 注意：注册后会以每秒30次的频率调用条件函数，请勿在条件函数内编写过于消耗性能的逻辑。
-        | 当对同一个UI界面注册多个条件时，以最后一个为准。
-
-        -----
-
-        :param str namespace: UI命名空间
-        :param str ui_key: UI唯一标识
-        :param function cond: 条件函数，无参数，当该函数返回True时，UI会被显示；返回False时，UI会被隐藏
-        :param function display_func: 用于显示/隐藏UI的函数，默认为None；该函数需要接受一个类型为bool的参数，当需要显示UI时会调用display_func(True)，需要隐藏UI时会调用display_func(False)；当该参数为None时，会调用UI的SetScreenVisible接口
-
-        :return: 是否成功
-        :rtype: bool
-        """
-        if not self.__lib_sys:
-            return False
-        self.__lib_sys.register_auto_show_ui(namespace, ui_key, cond, display_func)
-        return True
 
     # Internal =========================================================================================================
 

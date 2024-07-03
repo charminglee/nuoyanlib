@@ -12,14 +12,16 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
-from typing import Sequence, Any, List
+from typing import Sequence, Any, List, Callable
 
 
+def add_condition_to_func(cond: Callable[[], bool], func: Callable[[bool], Any], interval: int = 1) -> int: ...
+def remove_condition_to_func(cond_id: int) -> bool: ...
 def all_indexes(seq: Sequence, *elements: Any) -> List[int]: ...
 def check_string(string: str, *check: str) -> bool: ...
 def check_string2(string: str, *check: str) -> bool: ...

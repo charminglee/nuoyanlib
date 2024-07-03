@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
@@ -190,9 +190,9 @@ def listen_custom(self):
     lib_sys = get_lib_system()
     for args in _lsn_func_args:
         # noinspection PyUnresolvedReferences
-        namespace = args[0] or (self.cs.namespace if hasattr(self, "cs") else self.namespace)
+        namespace = args[0] or (self.cs.namespace if hasattr(self, 'cs') else self.namespace)
         # noinspection PyUnresolvedReferences
-        system_name = args[1] or _get_opposite_system(self.cs.systemName if hasattr(self, "cs") else self.systemName)
+        system_name = args[1] or _get_opposite_system(self.cs.systemName if hasattr(self, 'cs') else self.systemName)
         func = args[3]
         method = getattr(self, func.__name__, None)
         if method and method.__func__ is func:

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2024-07-03
 #
 # ====================================================
 
@@ -25,15 +25,79 @@ from .._core._server._comp import (
     CompFactory as _CompFactory,
     LvComp as _LvComp,
 )
+from .._core._server._lib_server import (
+    get_lib_system as _get_lib_system,
+)
 from ..utils.item import is_empty_item as _is_empty_item
 
 
 __all__ = [
+    "set_items_to_item_grid",
+    "get_items_from_item_grid",
+    "update_item_grids",
     "deduct_inv_item",
     "clear_items",
     "get_item_pos",
     "change_item_count",
 ]
+
+
+def set_items_to_item_grid(player_id, key, item_dict_list):
+    """
+    | 设置物品网格的所有物品。
+
+    -----
+
+    :param str player_id: 玩家实体ID
+    :param str key: 网格的key
+    :param list[dict|None] item_dict_list: 物品信息字典列表
+
+    :return: 返回一个列表，列表元素为布尔值，对应item_dict_list中各物品是否设置成功
+    :rtype: list[bool]
+    """
+    lib_sys = _get_lib_system()
+    if not lib_sys:
+        return False
+    return lib_sys.set_all_items(player_id, key, item_dict_list, True)
+
+
+def get_items_from_item_grid(player_id, key):
+    """
+    | 获取物品网格的所有物品。
+
+    -----
+
+    :param str player_id: 玩家实体ID
+    :param str key: 网格的key
+
+    :return: 物品信息字典列表，获取不到返回空列表
+    :rtype: list[dict|None]
+    """
+    lib_sys = _get_lib_system()
+    if not lib_sys:
+        return []
+    return lib_sys.get_all_items(player_id, key)
+
+
+def update_item_grids(player_id, keys):
+    """
+    | 立即同步一次玩家的物品数据给客户端的物品网格。
+    | 以“_shortcut”、“_inv27”或“_inv36”结尾的网格无需使用此接口进行同步。
+
+    -----
+
+    :param str player_id: 玩家的实体ID
+    :param str|tuple[str] keys: 网格的key，多个网格请使用元组
+
+    :return: 是否成功
+    :rtype: bool
+    """
+    lib_sys = _get_lib_system()
+    if not lib_sys:
+        return False
+    if isinstance(keys, str):
+        keys = (keys,)
+    return lib_sys.on_update_item_grids({'__id__': player_id, 'keys': keys})
 
 
 def clear_items(player_id, item_pos_type, pos):

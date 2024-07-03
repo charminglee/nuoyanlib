@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2024-07-03
 #
 # ====================================================
 
@@ -22,6 +22,9 @@ from mod.common.minecraftEnum import EntityType as _EntityType
 from .._core._server._comp import (
     CompFactory as _CompFactory,
     LvComp as _LvComp,
+)
+from .._core._server._lib_server import (
+    get_lib_system as _get_lib_system,
 )
 from ..utils.calculator import (
     pos_distance as _pos_distance,
@@ -34,6 +37,7 @@ from ..utils.vector import (
 
 
 __all__ = [
+    "set_query_mod_var",
     "clear_effects",
     "bounce_entities",
     "attract_entities",
@@ -58,6 +62,27 @@ __all__ = [
     "get_entities_by_ray",
     "entity_distance",
 ]
+
+
+def set_query_mod_var(entity_id, name, value):
+    """
+    | 设置指定实体 ``query.mod`` 变量的值，全局同步。
+    | 若设置的变量未注册，则自动进行注册。
+
+    -----
+
+    :param str entity_id: 实体ID
+    :param str name: 变量名
+    :param float value: 设置的值
+
+    :return: 是否成功
+    :rtype: bool
+    """
+    lib_sys = _get_lib_system()
+    if not lib_sys:
+        return False
+    lib_sys.on_set_query_var({'entity_id': entity_id, 'name': name, 'value': value})
+    return True
 
 
 def clear_effects(entity_id):

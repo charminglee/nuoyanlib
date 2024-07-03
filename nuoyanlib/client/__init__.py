@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
@@ -41,22 +41,42 @@ from .._core._client._comp import (
 from .._core._client._listener import (
     event,
 )
-from client_system import (
-    NuoyanClientSystem,
-)
-from effect import (
-    NeteaseParticle,
-    NeteaseFrameAnim,
-)
-from player import (
-    player_plunge,
-)
-from setting import (
-    save_setting,
-    read_setting,
-    check_setting,
-)
-from sound import (
-    play_custom_sound,
-    stop_custom_sound,
-)
+from .client_system import *
+from .effect import *
+from .player import *
+from .setting import *
+from .sound import *
+from .render import *
+
+
+__all__ = [
+    # _comp
+    "CLIENT_ENGINE_NAMESPACE",
+    "CLIENT_ENGINE_SYSTEM_NAME",
+    "ClientSystem",
+    "CompFactory",
+    "PLAYER_ID",
+    "LEVEL_ID",
+    "PlrComp",
+    "LvComp",
+    # _listener
+    "event",
+    # client_system
+    "NuoyanClientSystem",
+    # effect
+    "NeteaseParticle",
+    "NeteaseFrameAnim",
+    # player
+    "player_plunge",
+    # setting
+    "save_setting",
+    "read_setting",
+    "check_setting",
+    # sound
+    "play_custom_sound",
+    "stop_custom_sound",
+    # render
+    "set_query_mod_var",
+    "add_player_render_resources",
+    "add_entity_render_resources",
+]

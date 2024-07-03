@@ -12,39 +12,30 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
-from typing import List, Optional, Dict, Tuple, Callable, Any
+from typing import List, Optional, Dict, Tuple
 from mod.client.system.clientSystem import ClientSystem
 from .._typing import EventArgs
-from _listener import event, listen_for_lib_sys
+from ._listener import event, listen_for_lib_sys
+from .._sys import NuoyanLibBaseSystem
 
 
-class NuoyanLibClientSystem(ClientSystem):
+class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     item_grid_path: Dict[str, Tuple[str, bool]]
     item_grid_size: Dict[str, int]
     item_grid_items: Dict[str, List[Optional[dict]]]
     registered_keys: Dict[str, List[str]]
-    _auto_show_ui: Dict[Tuple[str, str], List[Callable[[], bool], Callable[[bool], Any]]]
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     @event("UiInitFinished")
     def _on_ui_init_finished(self: ..., args: EventArgs) -> None: ...
-    @event("OnScriptTickClient")
-    def _on_script_tick(self: ...) -> None: ...
     @listen_for_lib_sys("_SetQueryCache")
     def _on_set_query_cache(self: ..., args: EventArgs) -> None: ...
     @listen_for_lib_sys("_SetQueryVar")
     def on_set_query_var(self: ..., args: EventArgs) -> None: ...
-    def register_auto_show_ui(
-        self: ...,
-        namespace: str,
-        ui_key: str,
-        cond: Callable[[], bool],
-        display_func: Optional[Callable[[bool], Any]] = None,
-    ) -> None: ...
     @listen_for_lib_sys("_UpdateItemGrids")
     def _on_update_item_grids(self: ..., args: EventArgs) -> None: ...
     def register_item_grid(self: ..., key: str, ui_cls_path: str, path: str, size: int, is_single: bool) -> bool: ...

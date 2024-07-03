@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-29
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
@@ -26,7 +26,7 @@ from mod.client.component.frameAniControlComp import FrameAniControlComp
 from mod.client.component.frameAniTransComp import FrameAniTransComp
 from mod.client.component.frameAniEntityBindComp import FrameAniEntityBindComp
 from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindComp
-from _core._client._lib_client import NuoyanLibClientSystem
+from .._core._client._lib_client import NuoyanLibClientSystem
 
 
 class NeteaseParticle(object):

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2024-07-03
 #
 # ====================================================
 
@@ -146,7 +146,7 @@ class NuoyanScreenNode(_ScreenNode):
         :rtype: None
         """
         super(NuoyanScreenNode, self).Create()
-        self._super("Create")
+        self.__super("Create")
         data = _read_setting(self.__ui_pos_key, False)
         if data:
             for bp, pos in data.items():
@@ -172,18 +172,20 @@ class NuoyanScreenNode(_ScreenNode):
         :rtype: None
         """
         super(NuoyanScreenNode, self).Update()
-        self._super("Update")
+        self.__super("Update")
+        # double click
         if self.__double_click_tick:
             self.__double_click_tick += 1
             if self.__double_click_tick == 11:
                 self.__double_click_tick = 0
+        # long click
         if 1 <= self.__tick <= 20:
             self.__tick += 1
             if self.__tick == 21 and self.__touching_btn_path in self.__btn_long_click_data:
                 btn_data = self.__btn_long_click_data[self.__touching_btn_path]
                 btn_data['on_long_click'](self.__touching_button_args)
                 btn_data['hasLongClicked'] = True
-                self._vibrate()
+                self.__vibrate()
 
     def Destroy(self):
         """
@@ -203,7 +205,7 @@ class NuoyanScreenNode(_ScreenNode):
         :rtype: None
         """
         super(NuoyanScreenNode, self).Destroy()
-        self._super("Destroy")
+        self.__super("Destroy")
         self.__lib_sys.UnListenForEvent(
             _CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, "GetEntityByCoordReleaseClientEvent",
             self, self._on_get_entity_by_coord_release
@@ -282,12 +284,12 @@ class NuoyanScreenNode(_ScreenNode):
             'on_touch_up': on_touch_up,
         }
         btn_ctrl = self.__screen_node.GetBaseUIControl(btn_path).asButton()
-        btn_ctrl.SetButtonTouchUpCallback(self._run_touch_up_list)
+        btn_ctrl.SetButtonTouchUpCallback(self.__run_touch_up_list)
         if btn_path not in self.__btn_touch_up_data:
             self.__btn_touch_up_data[btn_path] = []
         if on_touch_up and on_touch_up not in self.__btn_touch_up_data[btn_path]:
             self.__btn_touch_up_data[btn_path].append(on_touch_up)
-        self.__btn_touch_up_data[btn_path].append(self._on_btn_touch_up)
+        self.__btn_touch_up_data[btn_path].append(self.__on_btn_touch_up)
 
     def SetButtonMovable(self, btn_path, move_parent=False, associated_path=None, on_touch_move=None):
         """
@@ -315,7 +317,7 @@ class NuoyanScreenNode(_ScreenNode):
             'on_touch_move': on_touch_move
         }
         btn = self.__screen_node.GetBaseUIControl(btn_path).asButton()
-        btn.SetButtonTouchMoveCallback(self._on_move)
+        btn.SetButtonTouchMoveCallback(self.__on_move)
         self.__save_pos_uis.update(associated_path)
         if move_parent:
             self.__save_pos_uis.add(_get_parent_path(btn_path))
@@ -373,7 +375,7 @@ class NuoyanScreenNode(_ScreenNode):
         elif isinstance(associated_path, str):
             associated_path = (associated_path,)
         btn = self.SetButtonLongClickCallback(
-            btn_path, self._on_long_click, on_touch_up, on_touch_move_out, self._on_down, on_touch_cancel
+            btn_path, self.__on_long_click, on_touch_up, on_touch_move_out, self.__on_down, on_touch_cancel
         )
         self.__move_after_lc_data[btn_path] = {
             'move_parent': move_parent,
@@ -418,13 +420,13 @@ class NuoyanScreenNode(_ScreenNode):
             'on_touch_cancel': on_touch_cancel
         }
         btn = self.__screen_node.GetBaseUIControl(btn_path).asButton()
-        btn.SetButtonTouchMoveOutCallback(self._on_touch_move_out)
-        btn.SetButtonTouchDownCallback(self._on_touch_down)
-        btn.SetButtonTouchCancelCallback(self._on_touch_cancel)
-        btn.SetButtonTouchUpCallback(self._run_touch_up_list)
+        btn.SetButtonTouchMoveOutCallback(self.__on_touch_move_out)
+        btn.SetButtonTouchDownCallback(self.__on_touch_down)
+        btn.SetButtonTouchCancelCallback(self.__on_touch_cancel)
+        btn.SetButtonTouchUpCallback(self.__run_touch_up_list)
         if btn_path not in self.__btn_touch_up_data:
             self.__btn_touch_up_data[btn_path] = []
-        self.__btn_touch_up_data[btn_path].append(self._on_touch_up)
+        self.__btn_touch_up_data[btn_path].append(self.__on_touch_up)
         if on_touch_up and on_touch_up not in self.__btn_touch_up_data[btn_path]:
             self.__btn_touch_up_data[btn_path].append(on_touch_up)
         return btn
@@ -473,18 +475,18 @@ class NuoyanScreenNode(_ScreenNode):
 
     # Internal =========================================================================================================
 
-    def _super(self, name):
+    def __super(self, name):
         for ins in self.__compose_ins:
             if ins and hasattr(ins, name):
                 getattr(ins, name)()
 
-    def _run_touch_up_list(self, args):
+    def __run_touch_up_list(self, args):
         bp = args['ButtonPath']
         if bp in self.__btn_touch_up_data:
             for func in self.__btn_touch_up_data[bp]:
                 func(args)
 
-    def _on_btn_touch_up(self, args):
+    def __on_btn_touch_up(self, args):
         bp = args['ButtonPath']
         if bp in self.__btn_double_click_data:
             if self.__double_click_tick and bp == self.__double_click_btn_path:
@@ -497,12 +499,12 @@ class NuoyanScreenNode(_ScreenNode):
                 self.__double_click_btn_path = bp
                 self.__double_click_args = args
 
-    def _on_touch_up(self, args):
+    def __on_touch_up(self, args):
         btn_path = args['ButtonPath']
         if btn_path in self.__btn_long_click_data:
             self.__tick = 0
 
-    def _on_touch_cancel(self, args):
+    def __on_touch_cancel(self, args):
         btn_path = args['ButtonPath']
         if btn_path in self.__btn_long_click_data:
             self.__tick = 0
@@ -511,7 +513,7 @@ class NuoyanScreenNode(_ScreenNode):
             if data['on_touch_cancel']:
                 data['on_touch_cancel'](args)
 
-    def _on_touch_move_out(self, args):
+    def __on_touch_move_out(self, args):
         btn_path = args['ButtonPath']
         if btn_path in self.__btn_long_click_data:
             self.__tick = 0
@@ -520,7 +522,7 @@ class NuoyanScreenNode(_ScreenNode):
             if data['on_touch_move_out']:
                 data['on_touch_move_out'](args)
 
-    def _on_touch_down(self, args):
+    def __on_touch_down(self, args):
         btn_path = args['ButtonPath']
         if btn_path in self.__btn_long_click_data:
             self.__touching_button_args = args
@@ -532,7 +534,7 @@ class NuoyanScreenNode(_ScreenNode):
             if data['on_touch_down']:
                 data['on_touch_down'](args)
 
-    def _on_long_click(self, args):
+    def __on_long_click(self, args):
         bp = args['ButtonPath']
         if bp not in self.__move_after_lc_data:
             return
@@ -544,7 +546,7 @@ class NuoyanScreenNode(_ScreenNode):
         if data['on_long_click']:
             data['on_long_click'](args)
 
-    def _on_down(self, args):
+    def __on_down(self, args):
         bp = args['ButtonPath']
         if bp not in self.__move_after_lc_data:
             return
@@ -553,7 +555,7 @@ class NuoyanScreenNode(_ScreenNode):
         if data['on_touch_down']:
             data['on_touch_down'](args)
 
-    def _on_move(self, args):
+    def __on_move(self, args):
         touch_x = args['TouchPosX']
         touch_y = args['TouchPosY']
         btn_path = args['ButtonPath']
@@ -570,14 +572,14 @@ class NuoyanScreenNode(_ScreenNode):
         self.__finger_pos = (touch_x, touch_y)
         if not move_parent:
             btn = self.__screen_node.GetBaseUIControl(btn_path)
-            self._set_widget_pos(btn, offset)
+            self.__set_widget_pos(btn, offset)
         else:
             parent_path = _get_parent_path(btn_path)
             ctrl = self.__screen_node.GetBaseUIControl(parent_path)
-            self._set_widget_pos(ctrl, offset)
+            self.__set_widget_pos(ctrl, offset)
         for path in associated_path:
             ctrl = self.__screen_node.GetBaseUIControl(path)
-            self._set_widget_pos(ctrl, offset)
+            self.__set_widget_pos(ctrl, offset)
         if on_touch_move:
             on_touch_move(args)
 
@@ -590,23 +592,21 @@ class NuoyanScreenNode(_ScreenNode):
             data[bp] = pos
         _save_setting(self.__ui_pos_key, data, False)
 
-    def _vibrate(self):
+    def __vibrate(self):
         _LvComp.Device.SetDeviceVibrate(self._vibrate_time)
 
-    def _test_pos_is_out(self, pos, button_size):
-        if pos[1] < 0:
-            pos[1] = 0
-        if pos[0] < 0:
-            pos[0] = 0
-        if pos[1] + button_size[1] > self.screen_size[1]:
-            pos[1] = self.screen_size[1] - button_size[1]
-        if pos[0] + button_size[0] > self.screen_size[0]:
-            pos[0] = self.screen_size[0] - button_size[0]
-
-    def _set_widget_pos(self, widget_ctrl, offset):
+    def __set_widget_pos(self, widget_ctrl, offset):
         orig_pos = widget_ctrl.GetPosition()
         new_pos = [orig_pos[0] + offset[0], orig_pos[1] + offset[1]]
-        self._test_pos_is_out(new_pos, widget_ctrl.GetSize())
+        size = widget_ctrl.GetSize()
+        if new_pos[1] < 0:
+            new_pos[1] = 0
+        if new_pos[0] < 0:
+            new_pos[0] = 0
+        if new_pos[1] + size[1] > self.screen_size[1]:
+            new_pos[1] = self.screen_size[1] - size[1]
+        if new_pos[0] + size[0] > self.screen_size[0]:
+            new_pos[0] = self.screen_size[0] - size[0]
         widget_ctrl.SetPosition(tuple(new_pos))
 
 

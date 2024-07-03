@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-03
 #
 # ====================================================
 
 
-from typing import Union, Optional, Tuple, Callable, Any
+from typing import Optional, Callable, Any
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from .._core._typing import EventArgs
@@ -129,21 +129,6 @@ class NuoyanClientSystem(ClientSystem):
     def AddEntityClientEvent(self: ..., args: EventArgs): ...
     def OnScriptTickClient(self: ...): ...
     def UiInitFinished(self: ..., args: EventArgs): ...
-    def RegisterItemGrid(
-        self: ...,
-        key: str,
-        ui_cls_path: str,
-        grid_path: str,
-        grid_size: int = 1,
-        is_single: bool = False,
-    ) -> bool: ...
-    def SetQueryVar(self: ..., entity_id: str, name: str, value: float, sync: bool = True) -> bool: ...
-    def AddPlayerRenderResources(
-        self: ...,
-        player_id: str,
-        rebuild: bool,
-        *res_tuple: Tuple[str, str],
-    ) -> Tuple[bool, ...]: ...
     def CallServer(self: ..., name: str, callback: Optional[Callable] = None, *args: Any) -> None: ...
     def BroadcastToAllClient(self: ..., event_name: str, event_data: Any) -> bool: ...
     def RegisterAndCreateUI(
@@ -155,11 +140,4 @@ class NuoyanClientSystem(ClientSystem):
         stack: bool = False,
         param: Optional[dict] = None,
     ) -> Optional[ScreenNode]: ...
-    def RegisterUiDisplayCondition(
-        self: ...,
-        namespace: str,
-        ui_key: str,
-        cond: Callable[[], bool],
-        display_func: Optional[Callable[[bool], Any]] = None,
-    ) -> bool: ...
     def _set_print_log(self: ...) -> None: ...

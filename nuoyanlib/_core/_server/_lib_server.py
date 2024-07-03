@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
@@ -41,6 +41,9 @@ from .._utils import (
     is_inv_key as _is_inv_key,
     is_not_inv_key as _is_not_inv_key,
 )
+from .._sys import (
+    NuoyanLibBaseSystem as _NuoyanLibBaseSystem,
+)
 from ...utils.item import (
     is_empty_item as _is_empty_item,
     deepcopy_item_dict as _deepcopy_item_dict,
@@ -57,7 +60,7 @@ _DATA_KEY_ITEMS_DATA = "_nuoyanlib_item_grid_data"
 _INV_POS_TYPE = _ItemPosType.INVENTORY
 
 
-class NuoyanLibServerSystem(_ServerSystem):
+class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
         self._query_cache = {}
