@@ -17,7 +17,7 @@
 # ====================================================
 
 
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import LvComp as _LvComp
+from .._core._server._comp import LvComp as _LvComp
 
 
 __all__ = [

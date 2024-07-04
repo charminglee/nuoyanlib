@@ -12,20 +12,20 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
 import mod.server.extraServerApi as _api
-from _core._const import (
+from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_CLIENT_NAME as _LIB_CLIENT_NAME,
 )
-from _core._utils import (
+from .._utils import (
     get_opposite_system as _get_opposite_system,
 )
-from utils.utils import (
+from ...utils.utils import (
     is_method_overridden as _is_method_overridden
 )
 
@@ -245,7 +245,7 @@ def event(event_name="", namespace="", system_name="", priority=0):
 
 
 def listen_custom(self):
-    from _lib_server import get_lib_system
+    from ._lib_server import get_lib_system
     lib_sys = get_lib_system()
     for args in _lsn_func_args:
         # noinspection PyUnresolvedReferences
@@ -259,7 +259,7 @@ def listen_custom(self):
 
 
 def listen_engine_and_lib(self):
-    from developer_mods.nuoyanlibDev.nuoyanlibScripts.server import NuoyanServerSystem
+    from ...server.server_system import NuoyanServerSystem
     for name in _ALL_SERVER_ENGINE_EVENTS:
         if _is_method_overridden(self.__class__, NuoyanServerSystem, name):
             method = getattr(self, name)

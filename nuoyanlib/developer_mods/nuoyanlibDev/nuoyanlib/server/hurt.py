@@ -24,15 +24,15 @@ from mod.common.minecraftEnum import (
     AttrType as _AttrType,
     ActorDamageCause as _ActorDamageCause,
 )
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import (
+from .._core._server._comp import (
     CompFactory as _CompFactory,
     LvComp as _LvComp,
 )
-from utils.calculator import (
+from ..utils.calculator import (
     is_in_sector as _is_in_sector,
     pos_distance_to_line as _pos_distance_to_line,
 )
-from utils.vector import vec_angle as _vec_angle
+from ..utils.vector import vec_angle as _vec_angle
 from .entity import (
     entity_filter as _entity_filter,
     get_entities_in_area as _get_entities_in_area,

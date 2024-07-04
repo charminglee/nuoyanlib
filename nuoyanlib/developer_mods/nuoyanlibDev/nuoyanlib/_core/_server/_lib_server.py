@@ -21,7 +21,7 @@ import mod.server.extraServerApi as _server_api
 from mod.common.minecraftEnum import (
     ItemPosType as _ItemPosType
 )
-from _core._const import (
+from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_SERVER_NAME as _LIB_SERVER_NAME,
 )
@@ -34,17 +34,17 @@ from ._listener import (
     listen_custom as _listen_custom,
     listen_for_lib_sys as _listen_for_lib_sys,
 )
-from _core._utils import (
+from .._utils import (
     is_inv36_key as _is_inv36_key,
     is_inv27_key as _is_inv27_key,
     is_shortcut_key as _is_shortcut_key,
     is_inv_key as _is_inv_key,
     is_not_inv_key as _is_not_inv_key,
 )
-from _core._sys import (
+from .._sys import (
     NuoyanLibBaseSystem as _NuoyanLibBaseSystem,
 )
-from utils.item import (
+from ...utils.item import (
     is_empty_item as _is_empty_item,
     deepcopy_item_dict as _deepcopy_item_dict,
 )

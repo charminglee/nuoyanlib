@@ -1,24 +1,24 @@
 {
-    "format_version": 1,
+    "format_version": 1, 
     "header": {
-        "description": "By 诺言Nuoyan",
-        "name": "nuoyanlib",
-        "uuid": "55507c94-2a84-4771-9bc6-5b28bc9d958c",
+        "description": "nuoyanlib", 
+        "name": "nuoyanlib", 
+        "uuid": "9e80f910-3462-4d99-8fb0-59be7a0cadb8", 
         "version": [
-            0,
-            5,
-            1
+            0, 
+            5, 
+            2
         ]
-    },
+    }, 
     "modules": [
         {
-            "description": "By 诺言Nuoyan",
-            "type": "resources",
-            "uuid": "0bc2fc24-9506-4142-8c48-508a32bce1dd",
+            "description": "nuoyanlib", 
+            "type": "resources", 
+            "uuid": "8c6a9489-f607-4906-8179-148171e29b61", 
             "version": [
-                0,
-                5,
-                1
+                0, 
+                5, 
+                2
             ]
         }
     ]

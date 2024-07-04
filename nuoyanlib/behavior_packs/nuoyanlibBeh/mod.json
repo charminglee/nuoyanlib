@@ -1,8 +1,13 @@
 {
-    "netgame_mod_name": "nuoyanlib_beh",
-    "netgame_mod_version": "v0.5.1-beta",
-    "min_app_version": "2.9.0.release20231116",
-    "description": "nuoyanlib",
-    "support_server_type": [ "lobby", "game", "master", "service" ],
-    "author": "诺言Nuoyan"
+    "author": "Nuoyan", 
+    "description": "nuoyanlib", 
+    "min_app_version": "2.9.0.release20231116", 
+    "netgame_mod_name": "nuoyanlib_beh", 
+    "netgame_mod_version": "v0.5.2-beta", 
+    "support_server_type": [
+        "lobby", 
+        "game", 
+        "master", 
+        "service"
+    ]
 }

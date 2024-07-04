@@ -18,10 +18,10 @@
 
 
 import mod.client.extraClientApi as _client_api
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from ..._core._client._comp import (
     LvComp as _LvComp,
 )
-from utils.item import (
+from ...utils.item import (
     is_empty_item as _is_empty_item,
 )
 

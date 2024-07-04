@@ -18,17 +18,17 @@
 
 
 import mod.client.extraClientApi as _client_api
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from .._core._client._lib_client import (
     get_lib_system as _get_lib_system,
 )
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from .._core._client._listener import (
     listen_custom as _listen_custom,
     listen_engine_and_lib as _listen_engine_and_lib,
 )
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from .._core._client._comp import (
+    ScreenNode as _ScreenNode,
     ClientSystem as _ClientSystem,
 )
-
 
 __all__ = [
     "NuoyanClientSystem",

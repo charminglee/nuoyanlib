@@ -85,27 +85,27 @@ item_grid_manager
 
 
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
-from _core._const import (
+from ..._core._const import (
     LIB_NAME as _LIB_NAME,
     LIB_SERVER_NAME as _LIB_SERVER_NAME,
     SHORTCUT as _SHORTCUT,
     INV27 as _INV27,
     INV36 as _INV36,
 )
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from ..._core._client._comp import (
     LvComp as _LvComp,
     PLAYER_ID as _PLAYER_ID,
     CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
     CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
 )
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from ..._core._client._lib_client import (
     get_lib_system as _get_lib_system,
 )
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from ..._core._client._listener import (
     event as _event,
     listen_for_lib_sys as _listen_for_lib_sys,
 )
-from utils.item import (
+from ...utils.item import (
     is_same_item as _is_same_item,
     is_empty_item as _is_empty_item,
     get_max_stack as _get_max_stack,

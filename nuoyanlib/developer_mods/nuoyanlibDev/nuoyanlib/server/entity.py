@@ -19,18 +19,18 @@
 
 import mod.server.extraServerApi as api
 from mod.common.minecraftEnum import EntityType as _EntityType
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import (
+from .._core._server._comp import (
     CompFactory as _CompFactory,
     LvComp as _LvComp,
 )
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import (
+from .._core._server._lib_server import (
     get_lib_system as _get_lib_system,
 )
-from utils.calculator import (
+from ..utils.calculator import (
     pos_distance as _pos_distance,
     ray_aabb_intersection as _ray_aabb_intersection,
 )
-from utils.vector import (
+from ..utils.vector import (
     vec_p2p as _vec_p2p,
     vec_composite as _vec_composite,
 )

@@ -18,13 +18,13 @@
 
 
 import mod.server.extraServerApi as _api
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import (
+from .._core._server._comp import (
     ServerSystem as _ServerSystem,
 )
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import (
+from .._core._server._lib_server import (
     get_lib_system as _get_lib_system,
 )
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import (
+from .._core._server._listener import (
     listen_custom as _listen_custom,
     listen_engine_and_lib as _listen_engine_and_lib,
     listen_for_lib_sys as _listen_for_lib_sys,

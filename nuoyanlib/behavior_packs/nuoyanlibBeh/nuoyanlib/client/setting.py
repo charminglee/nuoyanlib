@@ -17,7 +17,7 @@
 # ====================================================
 
 
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import LvComp as _LvComp
+from .._core._client._comp import LvComp as _LvComp
 
 
 __all__ = [

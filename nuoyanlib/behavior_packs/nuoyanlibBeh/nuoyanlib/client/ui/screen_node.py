@@ -18,16 +18,16 @@
 
 
 from functools import wraps as _wraps
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from ..._core._client._comp import (
     CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
     CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
     LvComp as _LvComp,
     ScreenNode as _ScreenNode,
 )
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from ..._core._client._lib_client import (
     get_lib_system as _get_lib_system,
 )
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from ..._core._client._listener import (
     listen_custom as _listen_custom,
     event as _event,
 )

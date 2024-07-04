@@ -21,14 +21,14 @@ from mod.common.minecraftEnum import (
     ItemPosType as _ItemPosType,
     GameType as _GameType,
 )
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import (
+from .._core._server._comp import (
     CompFactory as _CompFactory,
     LvComp as _LvComp,
 )
-from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import (
+from .._core._server._lib_server import (
     get_lib_system as _get_lib_system,
 )
-from utils.item import is_empty_item as _is_empty_item
+from ..utils.item import is_empty_item as _is_empty_item
 
 
 __all__ = [

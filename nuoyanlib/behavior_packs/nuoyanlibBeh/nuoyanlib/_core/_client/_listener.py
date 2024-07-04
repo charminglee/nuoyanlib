@@ -18,14 +18,14 @@
 
 
 import mod.client.extraClientApi as _api
-from _core._const import (
+from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_SERVER_NAME as _LIB_SERVER_NAME,
 )
-from _core._utils import (
+from .._utils import (
     get_opposite_system as _get_opposite_system,
 )
-from utils.utils import (
+from ...utils.utils import (
     is_method_overridden as _is_method_overridden,
 )
 
@@ -186,7 +186,7 @@ def event(event_name="", namespace="", system_name="", priority=0):
 
 
 def listen_custom(self):
-    from _lib_client import get_lib_system
+    from ._lib_client import get_lib_system
     lib_sys = get_lib_system()
     for args in _lsn_func_args:
         # noinspection PyUnresolvedReferences
@@ -200,7 +200,7 @@ def listen_custom(self):
 
 
 def listen_engine_and_lib(self):
-    from behavior_packs.nuoyanlibBeh.nuoyanlibScripts.client import NuoyanClientSystem
+    from ...client.client_system import NuoyanClientSystem
     for name in _ALL_CLIENT_ENGINE_EVENTS:
         if _is_method_overridden(self.__class__, NuoyanClientSystem, name):
             method = getattr(self, name)

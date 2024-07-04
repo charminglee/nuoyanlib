@@ -17,7 +17,7 @@
 # ====================================================
 
 
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+from ..._core._client._lib_client import (
     get_lib_system as _get_lib_system,
 )
 

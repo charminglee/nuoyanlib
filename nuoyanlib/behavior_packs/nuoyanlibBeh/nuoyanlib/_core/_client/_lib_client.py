@@ -18,7 +18,7 @@
 
 
 import mod.client.extraClientApi as _client_api
-from _core._const import (
+from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_CLIENT_NAME as _LIB_CLIENT_NAME,
 )
@@ -33,10 +33,10 @@ from ._listener import (
     event as _event,
     listen_for_lib_sys as _listen_for_lib_sys,
 )
-from _core._utils import (
+from .._utils import (
     is_not_inv_key as _is_not_inv_key,
 )
-from _core._sys import (
+from .._sys import (
     NuoyanLibBaseSystem as _NuoyanLibBaseSystem,
 )
 

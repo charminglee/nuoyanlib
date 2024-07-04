@@ -17,7 +17,7 @@
 # ====================================================
 
 
-from _core._const import (
+from .._core._const import (
     LIB_NAME,
     LIB_CLIENT_NAME,
     LIB_CLIENT_PATH,
@@ -27,7 +27,18 @@ if not client_api.GetSystem(LIB_NAME, LIB_CLIENT_NAME):
     client_api.RegisterSystem(LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH)
 del client_api, LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH
 
-from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import (
+
+from .._core._client._comp import (
+    CLIENT_ENGINE_NAMESPACE,
+    CLIENT_ENGINE_SYSTEM_NAME,
+    ClientSystem,
+    CompFactory,
+    PLAYER_ID,
+    LEVEL_ID,
+    PlrComp,
+    LvComp,
+)
+from .._core._client._listener import (
     event,
 )
 from .client_system import *

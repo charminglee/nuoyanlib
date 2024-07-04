@@ -18,7 +18,7 @@
 
 
 import mod.client.extraClientApi as _client_api
-from utils.item import (
+from ...utils.item import (
     is_empty_item as _is_empty_item,
 )
 
