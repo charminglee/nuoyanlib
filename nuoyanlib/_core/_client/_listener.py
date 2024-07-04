@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
@@ -186,7 +186,7 @@ def event(event_name="", namespace="", system_name="", priority=0):
 
 
 def listen_custom(self):
-    from _lib_client import get_lib_system
+    from ._lib_client import get_lib_system
     lib_sys = get_lib_system()
     for args in _lsn_func_args:
         # noinspection PyUnresolvedReferences
