@@ -1,0 +1,25 @@
+{
+    "format_version": 1,
+    "header": {
+        "description": "By 诺言Nuoyan",
+        "name": "nuoyanlib",
+        "uuid": "55507c94-2a84-4771-9bc6-5b28bc9d958c",
+        "version": [
+            0,
+            5,
+            1
+        ]
+    },
+    "modules": [
+        {
+            "description": "By 诺言Nuoyan",
+            "type": "resources",
+            "uuid": "0bc2fc24-9506-4142-8c48-508a32bce1dd",
+            "version": [
+                0,
+                5,
+                1
+            ]
+        }
+    ]
+}
