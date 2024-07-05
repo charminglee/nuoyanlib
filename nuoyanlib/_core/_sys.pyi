@@ -24,6 +24,9 @@ from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 
 
+mod_config: Dict[str, Any]
+
+
 def get_opposite_system(sys_name: str) -> Optional[str]: ...
 def is_client() -> bool: ...
 def get_api() -> Union[client_api, server_api]: ...
