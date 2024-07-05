@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-05
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -218,7 +218,7 @@ def event(event_name="", namespace="", system_name="", priority=0):
     -----
 
     :param str event_name: 事件名称，默认为被装饰函数名
-    :param str namespace: 命名空间，默认为config.py中配置的与当前服务端绑定的客户端的命名空间
+    :param str namespace: 命名空间，默认为当前服务端的命名空间
     :param str system_name: 系统名称，默认为config.py中配置的与当前服务端绑定的客户端的系统名称
     :param int priority: 优先级，默认为0
     """
@@ -228,14 +228,9 @@ def event(event_name="", namespace="", system_name="", priority=0):
         else:
             _event_name = func.__name__
         _namespace, _system_name = namespace, system_name
-        if not _namespace and not _system_name:
-            if _event_name in _ALL_SERVER_ENGINE_EVENTS:
-                _namespace = _SERVER_ENGINE_NAMESPACE
-                _system_name = _SERVER_ENGINE_SYSTEM_NAME
-        elif not _namespace:
-            raise ValueError("Missing parameter 'namespace'.")
-        elif not _system_name:
-            raise ValueError("Missing parameter 'system_name'.")
+        if not _namespace and not _system_name and _event_name in _ALL_SERVER_ENGINE_EVENTS:
+            _namespace = _SERVER_ENGINE_NAMESPACE
+            _system_name = _SERVER_ENGINE_SYSTEM_NAME
         _lsn_func_args.append((_namespace, _system_name, _event_name, func, priority))
         return func
     if isinstance(event_name, str):
@@ -248,13 +243,13 @@ def listen_custom(self):
     from ._lib_server import get_lib_system
     lib_sys = get_lib_system()
     for args in _lsn_func_args:
-        # noinspection PyUnresolvedReferences
-        namespace = args[0] or self.namespace
-        # noinspection PyUnresolvedReferences
-        system_name = args[1] or _get_opposite_system(self.systemName)
         func = args[3]
         method = getattr(self, func.__name__, None)
         if method and method.__func__ is func:
+            # noinspection PyUnresolvedReferences
+            namespace = args[0] or self.namespace
+            # noinspection PyUnresolvedReferences
+            system_name = args[1] or _get_opposite_system(self.systemName)
             lib_sys.ListenForEvent(namespace, system_name, args[2], self, method, args[4])
 
 
