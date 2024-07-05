@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
-from typing import Optional
+from typing import Optional, Dict, Any
 
 
 def is_inv36_key(k: str) -> bool: ...
@@ -25,4 +25,9 @@ def is_inv27_key(k: str) -> bool: ...
 def is_shortcut_key(k: str) -> bool: ...
 def is_inv_key(k: str) -> bool: ...
 def is_not_inv_key(k: str) -> bool: ...
+
+
+mod_config: Dict[str, Any]
+
+
 def get_opposite_system(sys_name: str) -> Optional[str]: ...
