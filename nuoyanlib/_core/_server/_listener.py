@@ -218,8 +218,8 @@ def event(event_name="", namespace="", system_name="", priority=0):
     -----
 
     :param str event_name: 事件名称，默认为被装饰函数名
-    :param str namespace: 指定命名空间，默认为当前服务端对应的客户端的命名空间
-    :param str system_name: 指定系统名称，默认为当前服务端对应的客户端的名称
+    :param str namespace: 命名空间，默认为config.py中配置的与当前服务端绑定的客户端的命名空间
+    :param str system_name: 系统名称，默认为config.py中配置的与当前服务端绑定的客户端的系统名称
     :param int priority: 优先级，默认为0
     """
     def add_listener(func):
