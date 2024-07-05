@@ -12,18 +12,22 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
-from typing import Union, Dict, Tuple, Callable, Any
+from typing import Union, Dict, Tuple, Callable, Any, Optional
 import mod.client.extraClientApi as client_api
 import mod.server.extraServerApi as server_api
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 
 
+mod_config: Dict[str, Any]
+
+
+def get_opposite_system(sys_name: str) -> Optional[str]: ...
 def is_client() -> bool: ...
 def get_api() -> Union[client_api, server_api]: ...
 def get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...

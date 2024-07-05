@@ -12,18 +12,38 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
 __all__ = [
+    "get_opposite_system",
     "is_client",
     "get_api",
     "get_comp_factory",
     "LEVEL_ID",
     "NuoyanLibBaseSystem",
 ]
+
+
+mod_config = {}
+
+
+def get_opposite_system(sys_name):
+    global mod_config
+    if not mod_config:
+        from apolloCommon.commonNetgameApi import GetModJsonConfig
+        mod_config = GetModJsonConfig("nuoyanlib")
+    if not mod_config:
+        return
+    for sys1, sys2 in mod_config['SYSTEM_BINDINGS'].items():
+        name1 = sys1.split(":")[1]
+        name2 = sys2.split(":")[1]
+        if name1 == sys_name:
+            return name2
+        if name2 == sys_name:
+            return name1
 
 
 def is_client():

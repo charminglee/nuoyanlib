@@ -50,11 +50,11 @@ set_manifest(r"%s\release\nuoyanlib\behavior_packs\nuoyanlibBeh\manifest.json" %
 
 
 def set_mod_json(path):
-    with open(path, "r") as f:
-        data = json.load(f)
-    data['netgame_mod_version'] = version_str
-    with open(path, "w") as f:
-        json.dump(data, f, indent=4, separators=(", ", ": "), sort_keys=True)
+    with io.open(path, "r", encoding="utf-8") as f:
+        data = f.read()
+    data = re.sub('"netgame_mod_version": ".+"', '"netgame_mod_version": "%s"' % version_str, data)
+    with io.open(path, "w", encoding="utf-8") as f:
+        f.write(data)
 
 
 set_mod_json(r"%s\release\nuoyanlib\developer_mods\nuoyanlibDev\mod.json" % root_path)

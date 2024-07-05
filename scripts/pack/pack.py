@@ -20,6 +20,23 @@
 import shutil
 import os
 import sys
+import json
+
+
+core_files = [
+    "__init__.py",
+    "_const.py",
+    "_const.pyi",
+    "_sys.py",
+    "_sys.pyi",
+    "_typing.pyi",
+    "_utils.py",
+    "_utils.pyi",
+]
+copy_res = [
+    "GameTick",
+    "ItemGrid",
+]
 
 
 def delete_folder(path):
@@ -46,16 +63,6 @@ copy_folder(r"%s\nuoyanlib\utils" % root_path, dest_path + r"\developer_mods\nuo
 copy_folder(r"%s\nuoyanlib\_core\_client" % root_path, dest_path + r"\behavior_packs\nuoyanlibBeh\nuoyanlib\_core\_client")
 copy_folder(r"%s\nuoyanlib\_core\_server" % root_path, dest_path + r"\developer_mods\nuoyanlibDev\nuoyanlib\_core\_server")
 
-core_files = [
-    "__init__.py",
-    "_const.py",
-    "_const.pyi",
-    "_sys.py",
-    "_sys.pyi",
-    "_typing.pyi",
-    "_utils.py",
-    "_utils.pyi",
-]
 for f in core_files:
     p = r"%s\nuoyanlib\_core\%s" % (root_path, f)
     copy_file(p, dest_path + r"\developer_mods\nuoyanlibDev\nuoyanlib\_core\%s" % f)
@@ -63,6 +70,30 @@ for f in core_files:
 root_init_path = r"%s\nuoyanlib\__init__.py" % root_path
 copy_file(root_init_path, dest_path + r"\developer_mods\nuoyanlibDev\nuoyanlib\__init__.py")
 copy_file(root_init_path, dest_path + r"\behavior_packs\nuoyanlibBeh\nuoyanlib\__init__.py")
+
+
+dest_ui_def = {'ui_defs': []}
+for res in copy_res:
+    res_src_dir = root_path + r"\ui\%s" % res
+    for root, dirs, files in os.walk(res_src_dir, True):
+        for f in files:
+            if f.endswith(".md"):
+                continue
+            fp = root + r"\%s" % f
+            dp = dest_path + r"\resource_packs\nuoyanlibRes" + fp.replace(res_src_dir, "")
+            if f == "_ui_defs.json":
+                with open(fp, "r") as file_:
+                    src_ui_def = json.load(file_)['ui_defs']
+                    dest_ui_def['ui_defs'].extend(src_ui_def)
+            elif os.path.exists(dp):
+                print >> sys.stderr, "[Res Conflict] " + fp
+            else:
+                dir_name = os.path.dirname(dp)
+                if not os.path.exists(dir_name):
+                    os.makedirs(dir_name)
+                copy_file(fp, dp)
+with open(dest_path + r"\resource_packs\nuoyanlibRes\ui\_ui_defs.json", "w") as file_:
+    json.dump(dest_ui_def, file_, indent=4, separators=(", ", ": "), sort_keys=True)
 
 
 for root, dirs, files in os.walk(dest_path):

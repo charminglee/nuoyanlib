@@ -1,6 +1,5 @@
 {
     "ui_defs": [
-        "ui/NuoyanGameTick.json", 
         "ui/NuoyanItemGrid.json"
     ]
 }

@@ -22,7 +22,7 @@ from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_CLIENT_NAME as _LIB_CLIENT_NAME,
 )
-from .._utils import (
+from .._sys import (
     get_opposite_system as _get_opposite_system,
 )
 from ...utils.utils import (
