@@ -12,18 +12,30 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
+from ..config import SYSTEM_BINDINGS as _SYSTEM_BINDINGS
+
+
 __all__ = [
+    "get_opposite_system",
     "is_client",
     "get_api",
     "get_comp_factory",
     "LEVEL_ID",
     "NuoyanLibBaseSystem",
 ]
+
+
+def get_opposite_system(sys_name):
+    for sys1, sys2 in _SYSTEM_BINDINGS:
+        if sys1 == sys_name:
+            return sys2
+        if sys2 == sys_name:
+            return sys1
 
 
 def is_client():

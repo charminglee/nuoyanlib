@@ -30,7 +30,6 @@ __all__ = [
     "is_shortcut_key",
     "is_inv_key",
     "is_not_inv_key",
-    "get_opposite_system",
 ]
 
 
@@ -52,23 +51,6 @@ def is_inv_key(k):
 
 def is_not_inv_key(k):
     return not is_inv_key(k)
-
-
-mod_config = {}
-
-
-def get_opposite_system(sys_name):
-    global mod_config
-    if not mod_config:
-        from apolloCommon.commonNetgameApi import GetModJsonConfig
-        mod_config = GetModJsonConfig("nuoyanlib")
-    for sys1, sys2 in mod_config['SYSTEM_BINDINGS'].items():
-        name1 = sys1.split(":")[1]
-        name2 = sys2.split(":")[1]
-        if name1 == sys_name:
-            return name2
-        if name2 == sys_name:
-            return name1
 
 
 
