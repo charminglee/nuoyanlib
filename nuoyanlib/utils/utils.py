@@ -36,9 +36,9 @@ __all__ = [
 
 def _get_lib_system():
     if _is_client():
-        from behavior_packs.nuoyanlibBeh.nuoyanlibScripts._core._client import get_lib_system
+        from .._core._client._lib_client import get_lib_system
     else:
-        from developer_mods.nuoyanlibDev.nuoyanlibScripts._core._server import get_lib_system
+        from .._core._server._lib_server import get_lib_system
     return get_lib_system()
 
 

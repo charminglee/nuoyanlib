@@ -17,7 +17,7 @@
 # ====================================================
 
 
-from _core._const import (
+from .._core._const import (
     LIB_NAME,
     LIB_SERVER_NAME,
     LIB_SERVER_PATH,
@@ -27,6 +27,11 @@ if not server_api.GetSystem(LIB_NAME, LIB_SERVER_NAME):
     server_api.RegisterSystem(LIB_NAME, LIB_SERVER_NAME, LIB_SERVER_PATH)
 del server_api, LIB_NAME, LIB_SERVER_NAME, LIB_SERVER_PATH
 
+
+from .._core._server._comp import *
+from .._core._server._listener import (
+    event,
+)
 from .server_system import *
 from .entity import *
 from .hurt import *
