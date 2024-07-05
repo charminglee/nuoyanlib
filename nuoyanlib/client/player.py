@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
-import mod.client.extraClientApi as api
+import mod.client.extraClientApi as _api
 from .._core._client._comp import PlrComp as _PlrComp
 
 
@@ -38,7 +38,7 @@ def player_plunge(speed):
     :rtype: None
     """
     rot = _PlrComp.Rot.GetRot()
-    dir_rot = api.GetDirFromRot(rot)
+    dir_rot = _api.GetDirFromRot(rot)
     motion = tuple(map(lambda x: x * speed, dir_rot))
     _PlrComp.ActorMotion.SetMotion(motion)
 

@@ -12,18 +12,18 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
-from calculator import *
-from enum import *
-from item import *
-from mc_random import *
-# from mc_timer import *
-from utils import *
-from vector import *
+from .calculator import *
+from .enum import *
+from .item import *
+from .mc_random import *
+# from .mc_timer import *
+from .utils import *
+from .vector import *
 
 
 __all__ = [

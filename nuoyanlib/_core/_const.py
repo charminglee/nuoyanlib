@@ -12,18 +12,15 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
-__version__ = "v0.5.1-beta"
-__authorname__ = "诺言Nuoyan"
-__authorqq__ = "1279735247"
-__authoremail__ = "1279735247@qq.com"
+from .. import __version__
 
 
-LIB_VERSION = "0.5.1"
+LIB_VERSION = __version__[1:].replace("-beta", "")
 LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
 LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
 LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
