@@ -81,7 +81,7 @@ for root, dirs, files in os.walk(dest_path):
             print >> sys.stderr, "[Diff] " + fp
 
 
-import version
+import _version
 
 
 
