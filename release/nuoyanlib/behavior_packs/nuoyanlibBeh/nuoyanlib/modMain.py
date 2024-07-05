@@ -18,7 +18,7 @@
 
 
 from mod.common.mod import Mod
-import mod.client.extraClientApi as clientApi
+import mod.client.extraClientApi as client_api
 from ._core._const import LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH, LIB_VERSION
 
 
@@ -26,5 +26,6 @@ from ._core._const import LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH, LIB_VERSIO
 class NuoyanLibMain(object):
     @Mod.InitClient()
     def init_client(self):
-        clientApi.RegisterSystem(LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH)
+        if not client_api.GetSystem(LIB_NAME, LIB_CLIENT_NAME):
+            client_api.RegisterSystem(LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH)
 
