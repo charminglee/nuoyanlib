@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-05
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -45,8 +45,8 @@ def set_manifest(path):
         json.dump(data, f, indent=4, separators=(", ", ": "), sort_keys=True)
 
 
-set_manifest(r"%s\release\nuoyanlib\resource_packs\nuoyanlibRes\manifest.json" % root_path)
-set_manifest(r"%s\release\nuoyanlib\behavior_packs\nuoyanlibBeh\manifest.json" % root_path)
+set_manifest(r"%s\release\nuoyanlib\resource_packs\nuoyanlib\manifest.json" % root_path)
+set_manifest(r"%s\release\nuoyanlib\behavior_packs\nuoyanlib\manifest.json" % root_path)
 
 
 def set_mod_json(path):
@@ -57,8 +57,8 @@ def set_mod_json(path):
         f.write(data)
 
 
-set_mod_json(r"%s\release\nuoyanlib\developer_mods\nuoyanlibDev\mod.json" % root_path)
-set_mod_json(r"%s\release\nuoyanlib\behavior_packs\nuoyanlibBeh\mod.json" % root_path)
+set_mod_json(r"%s\release\nuoyanlib\developer_mods\nuoyanlib\mod.json" % root_path)
+set_mod_json(r"%s\release\nuoyanlib\behavior_packs\nuoyanlib\mod.json" % root_path)
 
 
 def set_const(path):
@@ -69,8 +69,20 @@ def set_const(path):
         f.write(data)
 
 
-set_const(r"%s\release\nuoyanlib\developer_mods\nuoyanlibDev\nuoyanlib\_core\_const.py" % root_path)
-set_const(r"%s\release\nuoyanlib\behavior_packs\nuoyanlibBeh\nuoyanlib\_core\_const.py" % root_path)
+set_const(r"%s\release\nuoyanlib\developer_mods\nuoyanlib\nuoyanlib\_core\_const.py" % root_path)
+set_const(r"%s\release\nuoyanlib\behavior_packs\nuoyanlib\nuoyanlib\_core\_const.py" % root_path)
+
+
+def set_world_json(path):
+    with open(path, "r") as f:
+        data = json.load(f)
+    data[0]['version'] = version_lst
+    with open(path, "w") as f:
+        json.dump(data, f, indent=4, separators=(", ", ": "), sort_keys=True)
+
+
+set_world_json(r"%s\release\nuoyanlib\worlds\level\world_behavior_packs.json" % root_path)
+set_world_json(r"%s\release\nuoyanlib\worlds\level\world_resource_packs.json" % root_path)
 
 
 

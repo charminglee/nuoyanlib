@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-05
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -56,20 +56,20 @@ dest_path = r"%s\release\nuoyanlib" % root_path
 delete_folder(dest_path)
 copy_folder("nuoyanlib", dest_path)
 
-copy_folder(r"%s\nuoyanlib\client" % root_path, dest_path + r"\behavior_packs\nuoyanlibBeh\nuoyanlib\client")
-copy_folder(r"%s\nuoyanlib\server" % root_path, dest_path + r"\developer_mods\nuoyanlibDev\nuoyanlib\server")
-copy_folder(r"%s\nuoyanlib\utils" % root_path, dest_path + r"\behavior_packs\nuoyanlibBeh\nuoyanlib\utils")
-copy_folder(r"%s\nuoyanlib\utils" % root_path, dest_path + r"\developer_mods\nuoyanlibDev\nuoyanlib\utils")
-copy_folder(r"%s\nuoyanlib\_core\_client" % root_path, dest_path + r"\behavior_packs\nuoyanlibBeh\nuoyanlib\_core\_client")
-copy_folder(r"%s\nuoyanlib\_core\_server" % root_path, dest_path + r"\developer_mods\nuoyanlibDev\nuoyanlib\_core\_server")
+copy_folder(r"%s\nuoyanlib\client" % root_path, dest_path + r"\behavior_packs\nuoyanlib\nuoyanlib\client")
+copy_folder(r"%s\nuoyanlib\server" % root_path, dest_path + r"\developer_mods\nuoyanlib\nuoyanlib\server")
+copy_folder(r"%s\nuoyanlib\utils" % root_path, dest_path + r"\behavior_packs\nuoyanlib\nuoyanlib\utils")
+copy_folder(r"%s\nuoyanlib\utils" % root_path, dest_path + r"\developer_mods\nuoyanlib\nuoyanlib\utils")
+copy_folder(r"%s\nuoyanlib\_core\_client" % root_path, dest_path + r"\behavior_packs\nuoyanlib\nuoyanlib\_core\_client")
+copy_folder(r"%s\nuoyanlib\_core\_server" % root_path, dest_path + r"\developer_mods\nuoyanlib\nuoyanlib\_core\_server")
 
 for f in core_files:
     p = r"%s\nuoyanlib\_core\%s" % (root_path, f)
-    copy_file(p, dest_path + r"\developer_mods\nuoyanlibDev\nuoyanlib\_core\%s" % f)
-    copy_file(p, dest_path + r"\behavior_packs\nuoyanlibBeh\nuoyanlib\_core\%s" % f)
+    copy_file(p, dest_path + r"\developer_mods\nuoyanlib\nuoyanlib\_core\%s" % f)
+    copy_file(p, dest_path + r"\behavior_packs\nuoyanlib\nuoyanlib\_core\%s" % f)
 root_init_path = r"%s\nuoyanlib\__init__.py" % root_path
-copy_file(root_init_path, dest_path + r"\developer_mods\nuoyanlibDev\nuoyanlib\__init__.py")
-copy_file(root_init_path, dest_path + r"\behavior_packs\nuoyanlibBeh\nuoyanlib\__init__.py")
+copy_file(root_init_path, dest_path + r"\developer_mods\nuoyanlib\nuoyanlib\__init__.py")
+copy_file(root_init_path, dest_path + r"\behavior_packs\nuoyanlib\nuoyanlib\__init__.py")
 
 
 dest_ui_def = {'ui_defs': []}
@@ -80,7 +80,7 @@ for res in copy_res:
             if f.endswith(".md"):
                 continue
             fp = root + r"\%s" % f
-            dp = dest_path + r"\resource_packs\nuoyanlibRes" + fp.replace(res_src_dir, "")
+            dp = dest_path + r"\resource_packs\nuoyanlib" + fp.replace(res_src_dir, "")
             if f == "_ui_defs.json":
                 with open(fp, "r") as file_:
                     src_ui_def = json.load(file_)['ui_defs']
@@ -92,7 +92,7 @@ for res in copy_res:
                 if not os.path.exists(dir_name):
                     os.makedirs(dir_name)
                 copy_file(fp, dp)
-with open(dest_path + r"\resource_packs\nuoyanlibRes\ui\_ui_defs.json", "w") as file_:
+with open(dest_path + r"\resource_packs\nuoyanlib\ui\_ui_defs.json", "w") as file_:
     json.dump(dest_ui_def, file_, indent=4, separators=(", ", ": "), sort_keys=True)
 
 
