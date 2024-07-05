@@ -12,16 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
-from .._core._const import (
-    LIB_NAME,
-    LIB_CLIENT_NAME,
-    LIB_CLIENT_PATH,
-)
+from .._core._const import LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH
 import mod.client.extraClientApi as client_api
 if not client_api.GetSystem(LIB_NAME, LIB_CLIENT_NAME):
     client_api.RegisterSystem(LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH)
