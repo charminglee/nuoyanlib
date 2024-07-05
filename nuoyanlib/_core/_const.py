@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-05
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -26,8 +26,8 @@ LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
 LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
 LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
 ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s.nuoyanlib._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s.nuoyanlib._core._server._lib_server.NuoyanLibServerSystem" % ROOT
+LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
+LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
 
 
 SHORTCUT = "_shortcut"
