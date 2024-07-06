@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 from typing import List, Dict, Optional, Union, overload
 from mod.server.system.serverSystem import ServerSystem
 from .._typing import ItemDict, ItemCellPos, EventArgs
-from ._listener import event, listen_for_lib_sys
+from ._listener import event, lib_sys_event
 from .._sys import NuoyanLibBaseSystem
 
 
@@ -33,13 +33,13 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
     _query_cache: Dict[str, Dict[str, float]]
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def Destroy(self: ...): ...
-    @listen_for_lib_sys("_BroadcastToAllClient")
+    @lib_sys_event("_BroadcastToAllClient")
     def _on_broadcast_to_all_client(self: ..., args: EventArgs) -> None: ...
     @event("UiInitFinished")
     def _on_ui_init_finished(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("_SetQueryVar")
+    @lib_sys_event("_SetQueryVar")
     def on_set_query_var(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("_ThrowItem")
+    @lib_sys_event("_ThrowItem")
     def _on_throw_item(self: ..., args: EventArgs) -> None: ...
     def _set_grid(self, player_id: str, args: tuple) -> None: ...
     def _set_cell(self, player_id: str, args: tuple) -> None: ...
@@ -48,13 +48,13 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
     def _divide(self, player_id: str, args: tuple) -> None: ...
     def _set_count(self, player_id: str, args: tuple) -> None: ...
     def _ret_items(self, player_id: str, args: tuple) -> None: ...
-    @listen_for_lib_sys("_SyncItemOperation")
+    @lib_sys_event("_SyncItemOperation")
     def _on_sync_item_operation(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("_RegisterItemGrid")
+    @lib_sys_event("_RegisterItemGrid")
     def _on_register_item_grid(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("_UpdateItemGrids")
+    @lib_sys_event("_UpdateItemGrids")
     def on_update_item_grids(self: ..., args: EventArgs) -> bool: ...
-    @listen_for_lib_sys("_OnClientItemGridInitFinished")
+    @lib_sys_event("_OnClientItemGridInitFinished")
     def _on_item_grid_init_finished(self: ..., args: EventArgs) -> None: ...
     def set_all_items(
         self: ...,

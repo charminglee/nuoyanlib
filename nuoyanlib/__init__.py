@@ -12,12 +12,18 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-05
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
 
-__version__ = "v0.5.2-beta"
+from ._core._logging import log as _log
+
+
+__version__ = "v0.5.3-beta"
 __authorname__ = "诺言Nuoyan"
 __authorqq__ = "1279735247"
 __authoremail__ = "1279735247@qq.com"
+
+
+_log("nuoyanlib starts loading, version: %s" % __version__)

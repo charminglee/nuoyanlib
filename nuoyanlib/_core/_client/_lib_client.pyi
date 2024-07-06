@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 from typing import List, Optional, Dict, Tuple
 from mod.client.system.clientSystem import ClientSystem
 from .._typing import EventArgs
-from ._listener import event, listen_for_lib_sys
+from ._listener import event, lib_sys_event
 from .._sys import NuoyanLibBaseSystem
 
 
@@ -32,11 +32,11 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     @event("UiInitFinished")
     def _on_ui_init_finished(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("_SetQueryCache")
+    @lib_sys_event("_SetQueryCache")
     def _on_set_query_cache(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("_SetQueryVar")
+    @lib_sys_event("_SetQueryVar")
     def on_set_query_var(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("_UpdateItemGrids")
+    @lib_sys_event("_UpdateItemGrids")
     def _on_update_item_grids(self: ..., args: EventArgs) -> None: ...
     def register_item_grid(self: ..., key: str, ui_cls_path: str, path: str, size: int, is_single: bool) -> bool: ...
 

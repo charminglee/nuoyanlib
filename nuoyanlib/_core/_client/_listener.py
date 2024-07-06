@@ -28,13 +28,14 @@ from .._sys import (
 from ...utils.utils import (
     is_method_overridden as _is_method_overridden,
 )
+from .._logging import log as _log
 
 
 __all__ = [
     "event",
     "listen_custom",
     "listen_engine_and_lib",
-    "listen_for_lib_sys",
+    "lib_sys_event",
 ]
 
 
@@ -180,34 +181,49 @@ def event(event_name="", namespace="", system_name="", priority=0):
         return add_listener(event_name)
 
 
+def lib_sys_event(name):
+    return event(name, _LIB_NAME, _LIB_SERVER_NAME)
+
+
 def listen_custom(self):
     from ._lib_client import get_lib_system
+    from ...client.ui.screen_node import NuoyanScreenNode
     lib_sys = get_lib_system()
-    for args in _lsn_func_args:
-        func = args[3]
+    listened = []
+    is_nsn = isinstance(self, NuoyanScreenNode)
+    for namespace, system_name, event_name, func, priority in _lsn_func_args:
         method = getattr(self, func.__name__, None)
         if method and method.__func__ is func:
-            # noinspection PyUnresolvedReferences
-            namespace = args[0] or (self.cs.namespace if hasattr(self, 'cs') else self.namespace)
-            # noinspection PyUnresolvedReferences
-            system_name = args[1] or _get_opposite_system(self.cs.systemName if hasattr(self, 'cs') else self.systemName)
-            lib_sys.ListenForEvent(namespace, system_name, args[2], self, method, args[4])
+            if not namespace:
+                namespace = self.cs.namespace if is_nsn else self.namespace
+            if not system_name:
+                system_name = _get_opposite_system(self.cs.systemName if is_nsn else self.systemName)
+            lib_sys.ListenForEvent(namespace, system_name, event_name, self, method, priority)
+            listened.append(event_name)
+    if listened:
+        _log("Listen custom events finished: %s" % listened, self.__class__)
+    else:
+        _log("No custom event to listen", self.__class__)
 
 
 def listen_engine_and_lib(self):
     from ...client.client_system import NuoyanClientSystem
+    cls = self.__class__
+    listened = []
     for name in _ALL_CLIENT_ENGINE_EVENTS:
-        if _is_method_overridden(self.__class__, NuoyanClientSystem, name):
+        if _is_method_overridden(cls, NuoyanClientSystem, name):
             method = getattr(self, name)
             self.ListenForEvent(_CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, name, self, method)
+            listened.append(name)
     for name, sys_name in _ALL_CLIENT_LIB_EVENTS.items():
-        if _is_method_overridden(self.__class__, NuoyanClientSystem, name):
+        if _is_method_overridden(cls, NuoyanClientSystem, name):
             method = getattr(self, name)
             self.ListenForEvent(_LIB_NAME, sys_name, name, self, method)
-
-
-def listen_for_lib_sys(name):
-    return event(name, _LIB_NAME, _LIB_SERVER_NAME)
+            listened.append(name)
+    if listened:
+        _log("Listen engine and lib events finished: %s" % listened, cls)
+    else:
+        _log("No engine or lib event to listen", cls)
 
 
 

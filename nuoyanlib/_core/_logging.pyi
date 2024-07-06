@@ -17,23 +17,12 @@
 # ====================================================
 
 
-from typing import List, Tuple, Callable, Union, Dict, Any
-from ...server.server_system import NuoyanServerSystem
+from typing import Any
+from logging import Logger
 
 
-_ALL_SERVER_ENGINE_EVENTS: Tuple[str, ...]
-_ALL_SERVER_LIB_EVENTS: Dict[str, str]
-_lsn_func_args: List[Tuple[str, str, str, Callable, int]]
-_SERVER_ENGINE_NAMESPACE: str
-_SERVER_ENGINE_SYSTEM_NAME: str
+_config: dict
+_logger: Logger
 
 
-def event(
-    event_name: Union[str, Callable] = "",
-    namespace: str = "",
-    system_name: str = "",
-    priority: int = 0,
-) -> Callable: ...
-def listen_custom(self: Any) -> None: ...
-def listen_engine_and_lib(self: NuoyanServerSystem) -> None: ...
-def lib_sys_event(name: str) -> Callable: ...
+def log(msg: str, cls: Any = None, level: str = "INFO") -> None: ...

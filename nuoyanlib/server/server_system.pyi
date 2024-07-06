@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -21,7 +21,7 @@ from typing import Callable, Any, Dict, Optional
 from mod.server.system.serverSystem import ServerSystem
 from .._core._typing import EventArgs
 from .._core._server._lib_server import NuoyanLibServerSystem
-from .._core._server._listener import event, listen_for_lib_sys
+from .._core._server._listener import event, lib_sys_event
 
 
 class NuoyanServerSystem(ServerSystem):
@@ -190,12 +190,12 @@ class NuoyanServerSystem(ServerSystem):
     def ItemGridChangedServerEvent(self: ..., args: EventArgs): ...
     def UiInitFinished(self: ..., args: EventArgs): ...
     def CallClient(self: ..., player_id: str, name: str, callback: Optional[Callable] = None, *args: Any) -> None: ...
-    @listen_for_lib_sys("_ButtonCallbackTrigger")
+    @lib_sys_event("_ButtonCallbackTrigger")
     def _on_btn_callback_trigger(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("AddServerPlayerEvent")
+    @lib_sys_event("AddServerPlayerEvent")
     def _on_add_player(self: ..., args: EventArgs) -> None: ...
     @event("PlayerIntendLeaveServerEvent")
     def _on_player_intend_leave(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("ItemGridChangedServerEvent")
+    @lib_sys_event("ItemGridChangedServerEvent")
     def _on_item_grid_changed(self: ..., args: EventArgs) -> None: ...
     def _set_print_log(self: ...) -> None: ...
