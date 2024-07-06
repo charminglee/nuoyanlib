@@ -63,7 +63,7 @@ class NeteaseParticle(object):
         self._bind_skel_offset = (0.0, 0.0, 0.0)
         self._bind_skel_rot = (0.0, 0.0, 0.0)
         if bind_entity and bind_skeleton:
-            raise AssertionError(
+            raise ValueError(
                 "Parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time."
             )
         if bind_entity and not self.BindEntity(**bind_entity):
@@ -500,7 +500,7 @@ class NeteaseFrameAnim(object):
         elif tex_path:
             self._id = self.__lib_sys.CreateEngineSfx(tex_path, pos, rot, scale)
         else:
-            raise AssertionError("Parameters 'json_path' or 'tex_path' must be given.")
+            raise ValueError("Parameters 'json_path' or 'tex_path' must be given.")
         if not self._id:
             raise RuntimeError("Create frame animation failed. path='%s'." % (json_path or tex_path))
         self._ctrl = _CompFactory.CreateFrameAniControl(self._id)
@@ -515,7 +515,7 @@ class NeteaseFrameAnim(object):
         self._bind_skel_offset = (0.0, 0.0, 0.0)
         self._bind_skel_rot = (0.0, 0.0, 0.0)
         if bind_entity and bind_skeleton:
-            raise AssertionError(
+            raise ValueError(
                 "Parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time."
             )
         if bind_entity and not self.BindEntity(**bind_entity):

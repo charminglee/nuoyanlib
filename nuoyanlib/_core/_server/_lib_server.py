@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -32,7 +32,7 @@ from ._comp import (
 )
 from ._listener import (
     listen_custom as _listen_custom,
-    listen_for_lib_sys as _listen_for_lib_sys,
+    lib_sys_event as _lib_sys_event,
 )
 from .._utils import (
     is_inv36_key as _is_inv36_key,
@@ -48,6 +48,7 @@ from ...utils.item import (
     is_empty_item as _is_empty_item,
     deepcopy_item_dict as _deepcopy_item_dict,
 )
+from .._logging import log as _log
 
 
 __all__ = [
@@ -66,13 +67,15 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
         self._query_cache = {}
         self._item_grid_items = _LvComp.ExtraData.GetExtraData(_DATA_KEY_ITEMS_DATA) or {}
         _LvComp.Game.AddTimer(0, _listen_custom, self)
+        _log("Inited", NuoyanLibServerSystem)
 
     def Destroy(self):
-        _LvComp.ExtraData.SetExtraData(_DATA_KEY_ITEMS_DATA, self._item_grid_items)
+        res = _LvComp.ExtraData.SetExtraData(_DATA_KEY_ITEMS_DATA, self._item_grid_items)
+        _log("Saved item grid data (%s)" % res, NuoyanLibServerSystem, "INFO" if res else "ERROR")
 
     # General ==========================================================================================================
 
-    @_listen_for_lib_sys("_SetQueryVar")
+    @_lib_sys_event("_SetQueryVar")
     def on_set_query_var(self, args):
         entity_id = args['entity_id']
         name = args['name']
@@ -80,7 +83,7 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
         self._query_cache.setdefault(entity_id, {})[name] = value
         self.BroadcastToAllClient("_SetQueryVar", args)
 
-    @_listen_for_lib_sys("_BroadcastToAllClient")
+    @_lib_sys_event("_BroadcastToAllClient")
     def _on_broadcast_to_all_client(self, args):
         event_name = args['event_name']
         event_data = args['event_data']
@@ -90,7 +93,7 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
             event_data['__id__'] = args['__id__']
         _ServerSystem(namespace, sys_name).BroadcastToAllClient(event_name, event_data)
 
-    @_listen_for_lib_sys("UiInitFinished")
+    @_lib_sys_event("UiInitFinished")
     def _on_ui_init_finished(self, args):
         player_id = args['__id__']
         if self._query_cache:
@@ -98,7 +101,7 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
 
     # Item Grid ========================================================================================================
 
-    @_listen_for_lib_sys("_RegisterItemGrid")
+    @_lib_sys_event("_RegisterItemGrid")
     def _on_register_item_grid(self, args):
         player_id = args['__id__']
         key = args['key']
@@ -107,14 +110,14 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
         if key not in data:
             data[key] = [None] * size
 
-    @_listen_for_lib_sys("_OnClientItemGridInitFinished")
+    @_lib_sys_event("_OnClientItemGridInitFinished")
     def _on_item_grid_init_finished(self, args):
         player_id = args['__id__']
         keys = args['keys']
         not_inv_keys = filter(_is_not_inv_key, keys)
         self.on_update_item_grids({'__id__': player_id, 'keys': not_inv_keys})
 
-    @_listen_for_lib_sys("_UpdateItemGrids")
+    @_lib_sys_event("_UpdateItemGrids")
     def on_update_item_grids(self, args):
         player_id = args['__id__']
         keys = args['keys']
@@ -127,9 +130,10 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
         }
         update_inv = filter(_is_inv_key, keys)
         self.NotifyToClient(player_id, "_UpdateItemGrids", {'data': data, 'update_inv': update_inv})
+        _log("Updated item grids: %s" % (data.keys() + update_inv), NuoyanLibServerSystem)
         return True
 
-    @_listen_for_lib_sys("_ThrowItem")
+    @_lib_sys_event("_ThrowItem")
     def _on_throw_item(self, args):
         player_id = args['__id__']
         del args['__id__']
@@ -146,7 +150,7 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
             motion = tuple(i * 0.3 for i in direction)
             _CompFactory.CreateActorMotion(item_ent).SetMotion(motion)
 
-    @_listen_for_lib_sys("_SyncItemOperation")
+    @_lib_sys_event("_SyncItemOperation")
     def _on_sync_item_operation(self, args):
         player_id = args['__id__']
         op = args['op']
@@ -320,6 +324,8 @@ def get_lib_system():
     global _lib_sys
     if not _lib_sys:
         _lib_sys = _server_api.GetSystem(_LIB_NAME, _LIB_SERVER_NAME)
+    if not _lib_sys:
+        _log("Get server lib system failed!", level="ERROR")
     return _lib_sys
 
 

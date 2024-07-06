@@ -12,14 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-16
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
 
-from types import InstanceType
-from typing import List, Tuple, Callable, Union, Dict
-from mod.server.system.serverSystem import ServerSystem
+from typing import List, Tuple, Callable, Union, Dict, Any
+from ...server.server_system import NuoyanServerSystem
 
 
 _ALL_SERVER_ENGINE_EVENTS: Tuple[str, ...]
@@ -35,6 +34,6 @@ def event(
     system_name: str = "",
     priority: int = 0,
 ) -> Callable: ...
-def listen_custom(self: InstanceType) -> None: ...
-def listen_engine_and_lib(self: ServerSystem) -> None: ...
-def listen_for_lib_sys(name: str) -> Callable: ...
+def listen_custom(self: Any) -> None: ...
+def listen_engine_and_lib(self: NuoyanServerSystem) -> None: ...
+def lib_sys_event(name: str) -> Callable: ...

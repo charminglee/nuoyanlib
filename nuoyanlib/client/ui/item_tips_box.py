@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -24,6 +24,7 @@ from ..._core._client._comp import (
 from ...utils.item import (
     is_empty_item as _is_empty_item,
 )
+from ..._core._logging import log as _log
 
 
 __all__ = [
@@ -78,11 +79,19 @@ class ItemTipsBox(object):
         self.item_tips_bg = self.item_tips_panel.GetChildByPath(_UI_PATH_TIPS_BG).asImage()
         self.item_tips_label = self.item_tips_panel.GetChildByPath(_UI_PATH_TIPS_LABEL).asLabel()
         self.item_tips_panel.SetVisible(False)
+        _log("Created: %s" % self.__class__.__module__, ItemTipsBox)
 
     def Update(self):
         # 文本框跟随
         if self.__follow:
             self._update_pos()
+
+    def _update_pos(self):
+        if not self.item_tips_panel:
+            return
+        pos = _LvComp.ActorMotion.GetMousePosition() or _client_api.GetTouchPos()
+        if pos:
+            self.item_tips_panel.SetPosition(pos)
 
     def ShowItemHoverTipsBox(self, item_dict, show_category=True, show_user_data=True, follow=False):
         """
@@ -142,13 +151,6 @@ class ItemTipsBox(object):
         """
         self.item_tips_panel.SetVisible(False)
         self.__follow = False
-
-    def _update_pos(self):
-        if not self.item_tips_panel:
-            return
-        pos = _LvComp.ActorMotion.GetMousePosition() or _client_api.GetTouchPos()
-        if pos:
-            self.item_tips_panel.SetPosition(pos)
 
 
 

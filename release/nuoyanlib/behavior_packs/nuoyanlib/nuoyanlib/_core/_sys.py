@@ -18,6 +18,7 @@
 
 
 __all__ = [
+    "is_apollo",
     "get_opposite_system",
     "is_client",
     "get_api",
@@ -28,6 +29,14 @@ __all__ = [
 
 
 mod_config = {}
+
+
+def is_apollo():
+    try:
+        import apolloCommon.mysqlPool
+        return True
+    except ImportError:
+        return False
 
 
 def get_opposite_system(sys_name):

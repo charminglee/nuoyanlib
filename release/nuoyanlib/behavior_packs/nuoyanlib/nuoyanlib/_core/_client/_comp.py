@@ -17,7 +17,7 @@
 # ====================================================
 
 
-import mod.client.extraClientApi as _api
+import mod.client.extraClientApi as _client_api
 
 
 __all__ = [
@@ -35,21 +35,21 @@ __all__ = [
 ]
 
 
-CLIENT_ENGINE_NAMESPACE = _api.GetEngineNamespace()
-CLIENT_ENGINE_SYSTEM_NAME = _api.GetEngineSystemName()
+CLIENT_ENGINE_NAMESPACE = _client_api.GetEngineNamespace()
+CLIENT_ENGINE_SYSTEM_NAME = _client_api.GetEngineSystemName()
 
 
-ClientSystem = _api.GetClientSystemCls()
-CompFactory = _api.GetEngineCompFactory()
+ClientSystem = _client_api.GetClientSystemCls()
+CompFactory = _client_api.GetEngineCompFactory()
 
 
-ScreenNode = _api.GetScreenNodeCls()
-ViewBinder = _api.GetViewBinderCls()
-ViewRequest = _api.GetViewViewRequestCls()
+ScreenNode = _client_api.GetScreenNodeCls()
+ViewBinder = _client_api.GetViewBinderCls()
+ViewRequest = _client_api.GetViewViewRequestCls()
 
 
-PLAYER_ID = _api.GetLocalPlayerId()
-LEVEL_ID = _api.GetLevelId()
+PLAYER_ID = _client_api.GetLocalPlayerId()
+LEVEL_ID = _client_api.GetLevelId()
 
 
 class _CompDescr(object):

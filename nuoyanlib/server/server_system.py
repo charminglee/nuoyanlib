@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as _api
+import mod.server.extraServerApi as _server_api
 from .._core._server._comp import (
     ServerSystem as _ServerSystem,
 )
@@ -27,9 +27,10 @@ from .._core._server._lib_server import (
 from .._core._server._listener import (
     listen_custom as _listen_custom,
     listen_engine_and_lib as _listen_engine_and_lib,
-    listen_for_lib_sys as _listen_for_lib_sys,
+    lib_sys_event as _lib_sys_event,
     event as _event,
 )
+from .._core._logging import log as _log
 
 
 __all__ = [
@@ -57,6 +58,7 @@ class NuoyanServerSystem(_ServerSystem):
         _listen_engine_and_lib(self)
         _listen_custom(self)
         self._set_print_log()
+        _log("Inited: %s" % self.__class__.__module__, NuoyanServerSystem)
 
     def Destroy(self):
         """
@@ -3849,7 +3851,7 @@ class NuoyanServerSystem(_ServerSystem):
         if player_id in self.all_player_data:
             del self.all_player_data[player_id]
 
-    @_listen_for_lib_sys("_ButtonCallbackTrigger")
+    @_lib_sys_event("_ButtonCallbackTrigger")
     def _on_btn_callback_trigger(self, args):
         func_name = args['name']
         func_args = args['args']
@@ -3859,7 +3861,7 @@ class NuoyanServerSystem(_ServerSystem):
             func(func_args)
 
     def _set_print_log(self):
-        _api.SetMcpModLogCanPostDump(True)
+        _server_api.SetMcpModLogCanPostDump(True)
 
 
 

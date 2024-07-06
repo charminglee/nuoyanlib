@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -43,6 +43,7 @@ from .ui_utils import (
 from .item_fly_anim import ItemFlyAnim as _ItemFlyAnim
 from .item_tips_box import ItemTipsBox as _ItemTipsBox
 from .item_grid_manager import ItemGridManager as _ItemGridManager
+from ..._core._logging import log as _log
 
 
 __all__ = [
@@ -117,8 +118,10 @@ class NuoyanScreenNode(_ScreenNode):
         self.__ui_pos_key = self.__class__.__name__ + "_ui_pos_data"
         # 公共属性
         self.cs = param.get('__cs__')
+        _log("cs of %s: %s" % (self.__class__.__name__, self.cs), NuoyanScreenNode)
         self.screen_size = _LvComp.Game.GetScreenSize()
         _listen_custom(self)
+        _log("Inited: %s" % self.__class__.__module__, NuoyanScreenNode)
 
     def __getattr__(self, name):
         for ins in self.__compose_ins:
@@ -153,6 +156,7 @@ class NuoyanScreenNode(_ScreenNode):
                 ui = self.__screen_node.GetBaseUIControl(bp)
                 if ui:
                     ui.SetPosition(tuple(pos))
+        _log("Ui position data: %s" % data, self.__class__)
 
     def Update(self):
         """

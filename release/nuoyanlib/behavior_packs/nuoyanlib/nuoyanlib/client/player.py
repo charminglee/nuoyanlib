@@ -17,7 +17,7 @@
 # ====================================================
 
 
-import mod.client.extraClientApi as _api
+import mod.client.extraClientApi as _client_api
 from .._core._client._comp import PlrComp as _PlrComp
 
 
@@ -38,7 +38,7 @@ def player_plunge(speed):
     :rtype: None
     """
     rot = _PlrComp.Rot.GetRot()
-    dir_rot = _api.GetDirFromRot(rot)
+    dir_rot = _client_api.GetDirFromRot(rot)
     motion = tuple(map(lambda x: x * speed, dir_rot))
     _PlrComp.ActorMotion.SetMotion(motion)
 

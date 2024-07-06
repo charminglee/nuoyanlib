@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -21,6 +21,7 @@ import mod.client.extraClientApi as _client_api
 from ...utils.item import (
     is_empty_item as _is_empty_item,
 )
+from ..._core._logging import log as _log
 
 
 __all__ = [
@@ -49,6 +50,7 @@ class ItemFlyAnim(object):
         self.item_fly_panel = self.__screen_node.CreateChildControl(_UI_NAME_ITEM_FLY_PANEL, _ITEM_FLY_PANEL_NAME)
         self._fly_ir.append(self.item_fly_panel.GetChildByPath("/0").asItemRenderer())
         self._fly_ir.append(self.item_fly_panel.GetChildByPath("/1").asItemRenderer())
+        _log("Created: %s" % self.__class__.__module__, ItemFlyAnim)
 
     def _clone_new_ir(self):
         name = str(len(self._fly_ir))
@@ -56,6 +58,8 @@ class ItemFlyAnim(object):
             ir = self.__screen_node.GetBaseUIControl("/%s/%s" % (_ITEM_FLY_PANEL_NAME, name)).asItemRenderer()
             self._fly_ir.append(ir)
             return ir
+        else:
+            _log("Clone new ItemRenderer failed", ItemFlyAnim, "ERROR")
 
     def _get_idle_ir_index(self):
         for i in range(len(self._fly_ir)):
@@ -113,6 +117,7 @@ class ItemFlyAnim(object):
         if ir.IsAnimEndCallbackRegistered(anim_name):
             ir.RemoveAnimation("offset")
         if not ir.SetAnimation("offset", _NAMESPACE, anim_name, True):
+            _log("SetAnimation failed", ItemFlyAnim, "ERROR")
             return False
         def anim_end():
             ir.SetVisible(False)

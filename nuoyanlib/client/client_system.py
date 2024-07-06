@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -29,6 +29,7 @@ from .._core._client._comp import (
     ScreenNode as _ScreenNode,
     ClientSystem as _ClientSystem,
 )
+from .._core._logging import log as _log
 
 
 __all__ = [
@@ -57,6 +58,7 @@ class NuoyanClientSystem(_ClientSystem):
         _listen_engine_and_lib(self)
         _listen_custom(self)
         self._set_print_log()
+        _log("Inited: %s" % self.__class__.__module__, NuoyanClientSystem)
 
     def Destroy(self):
         """

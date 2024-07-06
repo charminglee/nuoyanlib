@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -31,7 +31,7 @@ from ._comp import (
 from ._listener import (
     listen_custom as _listen_custom,
     event as _event,
-    listen_for_lib_sys as _listen_for_lib_sys,
+    lib_sys_event as _lib_sys_event,
 )
 from .._utils import (
     is_not_inv_key as _is_not_inv_key,
@@ -39,6 +39,7 @@ from .._utils import (
 from .._sys import (
     NuoyanLibBaseSystem as _NuoyanLibBaseSystem,
 )
+from .._logging import log as _log
 
 
 __all__ = [
@@ -55,6 +56,7 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
         self.item_grid_items = {}
         self.registered_keys = {}
         _LvComp.Game.AddTimer(0, _listen_custom, self)
+        _log("Inited", NuoyanLibClientSystem)
 
     # General ==========================================================================================================
 
@@ -62,7 +64,7 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
     def _on_ui_init_finished(self, args):
         self.NotifyToServer("UiInitFinished", {})
 
-    @_listen_for_lib_sys("_SetQueryCache")
+    @_lib_sys_event("_SetQueryCache")
     def _on_set_query_cache(self, args):
         for entity_id, queries in args.items():
             for name, value in queries.items():
@@ -71,7 +73,7 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
                     comp.Register(name, 0.0)
                 comp.Set(name, value)
 
-    @_listen_for_lib_sys("_SetQueryVar")
+    @_lib_sys_event("_SetQueryVar")
     def on_set_query_var(self, args):
         if args.get('__id__') == _PLAYER_ID:
             return
@@ -85,13 +87,15 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
 
     # Item Grid ========================================================================================================
 
-    @_listen_for_lib_sys("_UpdateItemGrids")
+    @_lib_sys_event("_UpdateItemGrids")
     def _on_update_item_grids(self, args):
         data = args['data']
         self.item_grid_items.update(data)
+        _log("Updated item grids: %s" % data.keys(), NuoyanLibClientSystem)
 
     def register_item_grid(self, key, cls_path, path, size, is_single):
         if key in self.item_grid_path:
+            _log("Register item grid failed: key '%s' already exists" % key, level="ERROR")
             return False
         self.registered_keys.setdefault(cls_path, []).append(key)
         self.item_grid_path[key] = (path, is_single)
@@ -109,6 +113,8 @@ def get_lib_system():
     global _lib_sys
     if not _lib_sys:
         _lib_sys = _client_api.GetSystem(_LIB_NAME, _LIB_CLIENT_NAME)
+    if not _lib_sys:
+        _log("Get client lib system failed!", level="ERROR")
     return _lib_sys
 
 

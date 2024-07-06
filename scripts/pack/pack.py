@@ -32,6 +32,8 @@ core_files = [
     "_typing.pyi",
     "_utils.py",
     "_utils.pyi",
+    "_logging.py",
+    "_logging.pyi",
 ]
 copy_res = [
     "GameTick",

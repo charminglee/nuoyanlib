@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-05
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as _api
+import mod.server.extraServerApi as _server_api
 from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_CLIENT_NAME as _LIB_CLIENT_NAME,
@@ -28,13 +28,14 @@ from .._sys import (
 from ...utils.utils import (
     is_method_overridden as _is_method_overridden
 )
+from .._logging import log as _log
 
 
 __all__ = [
     "event",
     "listen_custom",
     "listen_engine_and_lib",
-    "listen_for_lib_sys",
+    "lib_sys_event",
 ]
 
 
@@ -206,8 +207,8 @@ _ALL_SERVER_LIB_EVENTS = {
 _lsn_func_args = []
 
 
-_SERVER_ENGINE_NAMESPACE = _api.GetEngineNamespace()
-_SERVER_ENGINE_SYSTEM_NAME = _api.GetEngineSystemName()
+_SERVER_ENGINE_NAMESPACE = _server_api.GetEngineNamespace()
+_SERVER_ENGINE_SYSTEM_NAME = _server_api.GetEngineSystemName()
 
 
 def event(event_name="", namespace="", system_name="", priority=0):
@@ -218,7 +219,7 @@ def event(event_name="", namespace="", system_name="", priority=0):
     -----
 
     :param str event_name: 事件名称，默认为被装饰函数名
-    :param str namespace: 命名空间，默认为config.py中配置的与当前服务端绑定的客户端的命名空间
+    :param str namespace: 命名空间，默认为当前服务端的命名空间
     :param str system_name: 系统名称，默认为config.py中配置的与当前服务端绑定的客户端的系统名称
     :param int priority: 优先级，默认为0
     """
@@ -228,14 +229,9 @@ def event(event_name="", namespace="", system_name="", priority=0):
         else:
             _event_name = func.__name__
         _namespace, _system_name = namespace, system_name
-        if not _namespace and not _system_name:
-            if _event_name in _ALL_SERVER_ENGINE_EVENTS:
-                _namespace = _SERVER_ENGINE_NAMESPACE
-                _system_name = _SERVER_ENGINE_SYSTEM_NAME
-        elif not _namespace:
-            raise ValueError("Missing parameter 'namespace'.")
-        elif not _system_name:
-            raise ValueError("Missing parameter 'system_name'.")
+        if not _namespace and not _system_name and _event_name in _ALL_SERVER_ENGINE_EVENTS:
+            _namespace = _SERVER_ENGINE_NAMESPACE
+            _system_name = _SERVER_ENGINE_SYSTEM_NAME
         _lsn_func_args.append((_namespace, _system_name, _event_name, func, priority))
         return func
     if isinstance(event_name, str):
@@ -244,34 +240,47 @@ def event(event_name="", namespace="", system_name="", priority=0):
         return add_listener(event_name)
 
 
+def lib_sys_event(name):
+    return event(name, _LIB_NAME, _LIB_CLIENT_NAME)
+
+
 def listen_custom(self):
     from ._lib_server import get_lib_system
     lib_sys = get_lib_system()
-    for args in _lsn_func_args:
-        # noinspection PyUnresolvedReferences
-        namespace = args[0] or self.namespace
-        # noinspection PyUnresolvedReferences
-        system_name = args[1] or _get_opposite_system(self.systemName)
-        func = args[3]
+    listened = []
+    for namespace, system_name, event_name, func, priority in _lsn_func_args:
         method = getattr(self, func.__name__, None)
         if method and method.__func__ is func:
-            lib_sys.ListenForEvent(namespace, system_name, args[2], self, method, args[4])
+            if not namespace:
+                namespace = self.namespace
+            if not system_name:
+                system_name = _get_opposite_system(self.systemName)
+            lib_sys.ListenForEvent(namespace, system_name, event_name, self, method, priority)
+            listened.append(event_name)
+    if listened:
+        _log("Listen custom events finished: %s" % listened, self.__class__)
+    else:
+        _log("No custom event to listen", self.__class__)
 
 
 def listen_engine_and_lib(self):
     from ...server.server_system import NuoyanServerSystem
+    cls = self.__class__
+    listened = []
     for name in _ALL_SERVER_ENGINE_EVENTS:
-        if _is_method_overridden(self.__class__, NuoyanServerSystem, name):
+        if _is_method_overridden(cls, NuoyanServerSystem, name):
             method = getattr(self, name)
             self.ListenForEvent(_SERVER_ENGINE_NAMESPACE, _SERVER_ENGINE_SYSTEM_NAME, name, self, method)
+            listened.append(name)
     for name, sys_name in _ALL_SERVER_LIB_EVENTS.items():
-        if _is_method_overridden(self.__class__, NuoyanServerSystem, name):
+        if _is_method_overridden(cls, NuoyanServerSystem, name):
             method = getattr(self, name)
             self.ListenForEvent(_LIB_NAME, sys_name, name, self, method)
-
-
-def listen_for_lib_sys(name):
-    return event(name, _LIB_NAME, _LIB_CLIENT_NAME)
+            listened.append(name)
+    if listened:
+        _log("Listen engine and lib events finished: %s" % listened, cls)
+    else:
+        _log("No engine or lib event to listen", cls)
 
 
 

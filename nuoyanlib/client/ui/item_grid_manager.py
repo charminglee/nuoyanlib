@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -103,7 +103,7 @@ from ..._core._client._lib_client import (
 )
 from ..._core._client._listener import (
     event as _event,
-    listen_for_lib_sys as _listen_for_lib_sys,
+    lib_sys_event as _lib_sys_event,
 )
 from ...utils.item import (
     is_same_item as _is_same_item,
@@ -114,6 +114,7 @@ from ...utils.item import (
 from .ui_utils import (
     get_direct_children_path as _get_direct_children_path,
 )
+from ..._core._logging import log as _log
 
 
 __all__ = [
@@ -144,7 +145,6 @@ class ItemGridManager(object):
         self.__nsn_ins = nuoyan_screen_node
         self.__ifa_ins = item_fly_anim
         self.__itb_ins = item_tips_box
-        # noinspection PyUnresolvedReferences
         self.__screen_node = self.__nsn_ins._NuoyanScreenNode__screen_node
         self._item_heap_data = {}
         self._selected_item = {}
@@ -161,6 +161,7 @@ class ItemGridManager(object):
         self._shortcut_keys = set()
         self.__tick = 0
         self.__cancel_hide_tips = 0
+        _log("Inited: %s" % self.__class__.__module__, ItemGridManager)
 
     # System Event Callbacks ===========================================================================================
 
@@ -194,7 +195,7 @@ class ItemGridManager(object):
         self.__move_in_cell_list = []
         self.__src_item = None
 
-    @_listen_for_lib_sys("_UpdateItemGrids")
+    @_lib_sys_event("_UpdateItemGrids")
     def _on_update_item_grids(self, args):
         data = args['data']
         update_inv = args['update_inv']
@@ -203,6 +204,7 @@ class ItemGridManager(object):
                 self._set_grid_ui_item(key, item_list)
         if update_inv:
             self._update_inv_grids(update_inv)
+        _log("Updated item grids: %s" % (data.keys() + update_inv), ItemGridManager)
 
     @_event("InventoryItemChangedClientEvent")
     def _on_inv_item_changed(self, args):

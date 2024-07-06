@@ -25,7 +25,7 @@ from .item_tips_box import ItemTipsBox
 from .screen_node import NuoyanScreenNode
 from ..._core._typing import ItemCellPos, ItemCell, ItemDict, EventArgs, ItemGridKeys, ItemHeapData, ItemSelectedData
 from ..._core._client._lib_client import NuoyanLibClientSystem
-from ..._core._client._listener import event, listen_for_lib_sys
+from ..._core._client._listener import event, lib_sys_event
 
 
 _IMAGE_PATH_ITEM_CELL_SELECTED: str
@@ -80,7 +80,7 @@ class ItemGridManager(object):
     def _registered_keys(self: ...) -> List[str]: ...
     @event("GetEntityByCoordReleaseClientEvent")
     def _on_get_entity_by_coord_release(self: ..., args: EventArgs) -> None: ...
-    @listen_for_lib_sys("_UpdateItemGrids")
+    @lib_sys_event("_UpdateItemGrids")
     def _on_update_item_grids(self: ..., args: EventArgs) -> None: ...
     @event("InventoryItemChangedClientEvent")
     def _on_inv_item_changed(self: ..., args: EventArgs) -> None: ...
