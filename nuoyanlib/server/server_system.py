@@ -17,7 +17,7 @@
 # ====================================================
 
 
-import mod.server.extraServerApi as _api
+import mod.server.extraServerApi as _server_api
 from .._core._server._comp import (
     ServerSystem as _ServerSystem,
 )
@@ -3861,7 +3861,7 @@ class NuoyanServerSystem(_ServerSystem):
             func(func_args)
 
     def _set_print_log(self):
-        _api.SetMcpModLogCanPostDump(True)
+        _server_api.SetMcpModLogCanPostDump(True)
 
 
 

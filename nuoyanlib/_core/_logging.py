@@ -17,8 +17,11 @@
 # ====================================================
 
 
-import logging as _logging
-from logging.config import dictConfig as _dictConfig
+from time import (
+    time as _time,
+    strftime as _strftime,
+    localtime as _localtime,
+)
 
 
 __all__ = [
@@ -26,50 +29,14 @@ __all__ = [
 ]
 
 
-_config = {
-    'version': 1,
-    'formatters': {
-        'formatter': {
-            'format': "%(asctime)s | nuoyanlib | %(levelname)s | %(message)s",
-        }
-    },
-    'handlers': {
-        'handler': {
-            'class': "logging.StreamHandler",
-            'level': "DEBUG",
-            'formatter': "formatter",
-            'stream': "ext://sys.stdout",
-        },
-        'err_handler': {
-            'class': "logging.StreamHandler",
-            'level': "ERROR",
-            'formatter': "formatter",
-            'stream': "ext://sys.stderr",
-        }
-    },
-    'loggers': {
-        'logger': {
-            'handlers': ["handler"],
-            'level': 'DEBUG',
-        },
-        'err_logger': {
-            'handlers': ["err_handler"],
-            'level': 'ERROR',
-        }
-    },
-}
-_dictConfig(_config)
-_logger = _logging.getLogger("logger")
-_err_logger = _logging.getLogger("err_logger")
-
-
 def log(msg, cls=None, level="INFO"):
-    logger = _err_logger if level == "ERROR" else _logger
-    level = _logging.getLevelName(level)
+    ct = _time()
+    t = _strftime("%Y-%m-%d %H:%M:%S", _localtime(ct))
+    msecs = (ct - long(ct)) * 1000
+    s = "%s,%03d" % (t, msecs)
     if cls:
-        logger.log(level, "%s: %s" % (cls.__name__, msg))
-    else:
-        logger.log(level, msg)
+        msg = "%s: %s" % (cls.__name__, msg)
+    print "[%s] [%s] [nuoyanlib] %s" % (s, level, msg)
 
 
 if __name__ == "__main__":
@@ -77,7 +44,13 @@ if __name__ == "__main__":
     class Test(object): pass
     log("Hello, world!", Test)
     log("Hello, world!", Test, "ERROR")
-
+    import logging
+    lg = logging.getLogger()
+    lg.setLevel(logging.INFO)
+    hdlr = logging.StreamHandler()
+    hdlr.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] [nuoyanlib] %(message)s"))
+    lg.addHandler(hdlr)
+    lg.info("Hello, world!")
 
 
 

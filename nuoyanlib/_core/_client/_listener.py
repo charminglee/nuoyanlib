@@ -17,7 +17,7 @@
 # ====================================================
 
 
-import mod.client.extraClientApi as _api
+import mod.client.extraClientApi as _client_api
 from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_SERVER_NAME as _LIB_SERVER_NAME,
@@ -148,8 +148,8 @@ _ALL_CLIENT_LIB_EVENTS = {
 _lsn_func_args = []
 
 
-_CLIENT_ENGINE_NAMESPACE = _api.GetEngineNamespace()
-_CLIENT_ENGINE_SYSTEM_NAME = _api.GetEngineSystemName()
+_CLIENT_ENGINE_NAMESPACE = _client_api.GetEngineNamespace()
+_CLIENT_ENGINE_SYSTEM_NAME = _client_api.GetEngineSystemName()
 
 
 def event(event_name="", namespace="", system_name="", priority=0):

@@ -18,11 +18,6 @@
 
 
 from typing import Any
-from logging import Logger
-
-
-_config: dict
-_logger: Logger
 
 
 def log(msg: str, cls: Any = None, level: str = "INFO") -> None: ...

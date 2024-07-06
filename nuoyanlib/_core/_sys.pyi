@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-05
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -24,6 +24,7 @@ from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 
 
+def is_apollo() -> bool: ...
 def get_opposite_system(sys_name: str) -> Optional[str]: ...
 def is_client() -> bool: ...
 def get_api() -> Union[client_api, server_api]: ...

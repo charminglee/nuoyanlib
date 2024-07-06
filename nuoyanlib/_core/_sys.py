@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-05
+#   Last Modified : 2024-07-06
 #
 # ====================================================
 
@@ -21,6 +21,7 @@ from ..config import SYSTEM_BINDINGS as _SYSTEM_BINDINGS
 
 
 __all__ = [
+    "is_apollo",
     "get_opposite_system",
     "is_client",
     "get_api",
@@ -28,6 +29,14 @@ __all__ = [
     "LEVEL_ID",
     "NuoyanLibBaseSystem",
 ]
+
+
+def is_apollo():
+    try:
+        import apolloCommon.mysqlPool
+        return True
+    except ImportError:
+        return False
 
 
 def get_opposite_system(sys_name):
