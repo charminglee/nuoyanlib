@@ -28,15 +28,15 @@ __all__ = [
 ]
 
 
-mod_config = {}
-
-
 def is_apollo():
     try:
         import apolloCommon.mysqlPool
         return True
     except ImportError:
         return False
+
+
+mod_config = {}
 
 
 def get_opposite_system(sys_name):
