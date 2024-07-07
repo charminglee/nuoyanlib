@@ -58,7 +58,7 @@ def set_mod_json(path):
 
 
 set_mod_json(r"%s\release\nuoyanlib\developer_mods\nuoyanlib\mod.json" % root_path)
-set_mod_json(r"%s\release\nuoyanlib\behavior_packs\nuoyanlib\mod.json" % root_path)
+# set_mod_json(r"%s\release\nuoyanlib\behavior_packs\nuoyanlib\mod.json" % root_path)
 
 
 def set_const(path):
