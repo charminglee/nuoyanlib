@@ -46,9 +46,7 @@ def get_opposite_system(sys_name):
         mod_config = GetModJsonConfig("nuoyanlib")
     if not mod_config:
         return
-    for sys1, sys2 in mod_config['SYSTEM_BINDINGS'].items():
-        if sys1 == "//":
-            continue
+    for sys1, sys2 in mod_config['SYSTEM_BINDINGS']:
         name1 = sys1.split(":")[1]
         name2 = sys2.split(":")[1]
         if name1 == sys_name:
