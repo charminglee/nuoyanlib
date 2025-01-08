@@ -1,7 +1,7 @@
 <h1 align="center" style="line-height: 0;">「nuoyanlib」</h1>
 <h1 align="center" style="line-height: 0;">🐱</h1>
 <h1 align="center" style="line-height: 0;">基于ModSDK的开发工具库</h1>
-<h2 align="center" style="line-height: 0.5;">v0.5.0-beta</h2>
+<h2 align="center" style="line-height: 0.5;">v0.6.0-beta</h2>
 
 <br></br>
 
