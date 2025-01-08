@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-01-08
 #
 # ====================================================
 
@@ -40,6 +40,9 @@ __all__ = [
 
 
 _ALL_CLIENT_ENGINE_EVENTS = (
+    "OnLocalPlayerActionClientEvent",
+    "OnLocalPlayerStartJumpClientEvent",
+    "GameRenderTickEvent",
     "GyroSensorChangedClientEvent",
     "ModBlockEntityTickClientEvent",
     "ModBlockEntityRemoveClientEvent",

@@ -12,12 +12,9 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-08
+#   Last Modified : 2025-01-07
 #
 # ====================================================
-
-
-from ..config import SYSTEM_BINDINGS as _SYSTEM_BINDINGS
 
 
 __all__ = [
@@ -56,7 +53,8 @@ if is_apollo():
     #             return name1
 else:
     def get_opposite_system(sys_name):
-        for sys1, sys2 in _SYSTEM_BINDINGS:
+        from nuoyanlib.config import SYSTEM_BINDINGS
+        for sys1, sys2 in SYSTEM_BINDINGS:
             if sys1 == sys_name:
                 return sys2
             if sys2 == sys_name:

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-01-08
 #
 # ====================================================
 
@@ -82,6 +82,60 @@ class NuoyanClientSystem(_ClientSystem):
 
     # Engine Event Callbacks ===========================================================================================
 
+    def OnLocalPlayerActionClientEvent(self, args):
+        """
+        *[event]*
+
+        | 玩家动作事件，当本地玩家开始/停止某些动作时触发该事件。
+
+        -----
+
+        | 【actionType: int】 动作事件枚举，详见Minecraft枚举值文档的 `PlayerActionType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerActionType.html>`_
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def OnLocalPlayerStartJumpClientEvent(self, args):
+        """
+        *[event]*
+
+        | 本地玩家开始跳跃时触发。
+
+        -----
+
+        | 无参数
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def GameRenderTickEvent(self, args):
+        """
+        *[event]*
+
+        | 客户端渲染帧开始时触发该事件，一秒触发次数为当前的帧数。
+
+        -----
+
+        | 无参数
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
     def GyroSensorChangedClientEvent(self, args):
         """
         *[event]*
@@ -94,6 +148,7 @@ class NuoyanClientSystem(_ClientSystem):
         | 【xDiff: float】 x轴角速度，单位为弧度/s
         | 【yDiff: float】 y轴角速度，单位为弧度/s
         | 【zDiff: float】 z轴角速度，单位为弧度/s
+        | 【orientation: int】 当前屏幕朝向，0竖屏正向，1横屏向左，2竖屏倒置，3横屏向右
         | 【timestamp: float】 触发时间戳，秒
 
         -----
@@ -1585,6 +1640,9 @@ class NuoyanClientSystem(_ClientSystem):
         | 【x: int】 方块x坐标
         | 【y: int】 方块y坐标
         | 【z: int】 方块z坐标
+        | 【clickX: float】 点击点的x比例位置
+        | 【clickY: float】 点击点的y比例位置
+        | 【clickZ: float】 点击点的z比例位置
 
         -----
 

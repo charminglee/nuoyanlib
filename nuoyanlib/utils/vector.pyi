@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2024-01-08
 
 # ====================================================
 
@@ -52,3 +52,4 @@ def vec_composite(
     vector: Tuple[float, float, float],
     *more_vec: Tuple[float, float, float],
 ) -> Tuple[float, float, float]: ...
+def vec_scale(vector: Tuple[float, float, float], scale: float) -> Tuple[float, float, float]: ...

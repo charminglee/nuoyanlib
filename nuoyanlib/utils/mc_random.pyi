@@ -50,9 +50,10 @@ def _is_pos_far_enough(
 ) -> bool: ...
 def random_even_poses(
     center_pos: Tuple[float, float, float],
-    x_range: float,
-    y_range: float,
-    z_range: float,
+    radius: float,
     pos_num: int,
+    fixed_x: bool = False,
+    fixed_y: bool = False,
+    fixed_z: bool = False,
     min_distance: float = 1.0,
 ) -> List[Tuple[float, float, float]]: ...

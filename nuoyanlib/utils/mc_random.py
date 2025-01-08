@@ -12,11 +12,16 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2025-01-05
 #
 # ====================================================
 
 
+from math import (
+    pi as _pi,
+    sin as _sin,
+    cos as _cos,
+)
 from random import (
     uniform as _uniform,
     Random as _Random,
@@ -114,27 +119,31 @@ def _is_pos_far_enough(poses, x, y, z, min_distance):
     return True
 
 
-def random_even_poses(center_pos, x_range, y_range, z_range, pos_num, min_distance=1.0):
+def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False, fixed_z=False, min_distance=1.0):
     """
     | 在指定坐标周围，生成随机的均匀分布的多个坐标。
     
     -----
 
     :param tuple[float,float,float] center_pos: 中心坐标
-    :param float x_range: x坐标的取值范围
-    :param float y_range: y坐标的取值范围
-    :param float z_range: z坐标的取值范围
+    :param float radius: 生成半径
     :param int pos_num: 生成的坐标数量
-    :param float min_distance: 生成的坐标之间的最小距离，越小生成的坐标越不均匀
+    :param bool fixed_x: 是否固定x轴，固定后x轴取值将总是与center_pos一致，默认为不固定
+    :param bool fixed_y: 是否固定y轴，固定后y轴取值将总是与center_pos一致，默认为不固定
+    :param bool fixed_z: 是否固定z轴，固定后z轴取值将总是与center_pos一致，默认为不固定
+    :param float min_distance: 生成的坐标之间的最小距离，越小生成的坐标越不均匀，默认为1.0
 
     :return: 坐标列表
     :rtype: list[tuple[float,float,float]]
     """
     poses = []
     while len(poses) < pos_num:
-        x = center_pos[0] + _uniform(-x_range, x_range)
-        y = center_pos[1] + _uniform(-y_range, y_range)
-        z = center_pos[2] + _uniform(-z_range, z_range)
+        theta = _uniform(0, 2 * _pi)
+        phi = _uniform(0, _pi)
+        r = _uniform(0, radius)
+        x = center_pos[0] if fixed_x else center_pos[0] + r * _sin(phi) * _cos(theta)
+        y = center_pos[1] if fixed_y else center_pos[1] + r * _sin(phi) * _sin(theta)
+        z = center_pos[2] if fixed_z else center_pos[2] + r * _cos(phi)
         if not poses or _is_pos_far_enough(poses, x, y, z, min_distance):
             poses.append((x, y, z))
     return poses

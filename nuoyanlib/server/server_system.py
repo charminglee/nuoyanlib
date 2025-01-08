@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-01-08
 #
 # ====================================================
 
@@ -79,6 +79,103 @@ class NuoyanServerSystem(_ServerSystem):
         self.UnListenAllEvents()
 
     # Engine Event Callbacks ===========================================================================================
+
+    def OnPlayerActionServerEvent(self, args):
+        """
+        *[event]*
+
+        | 玩家动作事件，当玩家开始/停止某些动作时触发该事件。
+
+        -----
+
+        | 【playerId: str】 玩家实体ID
+        | 【actionType: int】 动作事件枚举，详见Minecraft枚举值文档的 `PlayerActionType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerActionType.html>`_
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def CustomCommandTriggerServerEvent(self, args):
+        """
+        *[event]*
+
+        | 自定义命令触发事件。
+        | ``args`` 中的某个dict参数说明如下：
+        * name: str，参数名称，对应json中的 ``name`` 字段
+        * type: str，参数类型，对应json中的 ``type`` 字段
+        * value: Any，参数的值，若玩家没传，则采用json中填写的 ``default`` 的值，但会转为python变量格式。如 ``null`` 转为 ``None`` ， ``array`` 转为 ``tuple``
+        | 当 ``type`` 为 ``pos`` 、 ``entity`` 、 ``item`` 时， ``value`` 的格式如下：
+        * pos: tuple，一个含有三个float的坐标，如 ``(-0.93,81.25,-5.67)``
+        * entity: dict，一个含有 ``entityType`` 的字典，如 ``{'entityType':'minecraft:cow'}``
+        * item: dict，一个含有 ``itemName`` 的字典，如 ``{'itemName':'minecraft:apple'}``
+        | ``origin`` 参数说明如下：
+        * entityId: str，触发指令的实体ID，若由命令方块触发，则不会含有此字段
+        * dimension: int，指令触发的维度ID，0-主世界; 1-下界; 2-末地; 或其他自定义维度
+        * blockPos: tuple，触发指令的实体或命令方块的整数坐标
+
+        -----
+
+        | 【command: str】 自定义命令名称，对应json中的name字段
+        | 【args: List[dict]】 自定义命令参数，详情见上方
+        | 【origin: dict】 触发源的信息，详情见上方
+        | 【$return_failed: bool】 设置自定义命令是否执行失败，默认为False，如果执行失败，返回信息以红色字体显示
+        | 【$return_msg_key: str】 设置返回给玩家或命令方块的信息，支持在语言文件（.lang）中定义，默认值为commands.custom.success（自定义命令执行成功）
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def GlobalCommandServerEvent(self, args):
+        """
+        *[event]*
+
+        | 服务端全局命令事件。包括聊天输入指令、 ``SetCommand`` 接口、命令方块、命令方块矿车执行指令时触发、行为包动画执行指令。
+
+        -----
+
+        | 【entityId: str】 执行命令的实体ID，命令方块执行时没有该参数
+        | 【command: str】 命令
+        | 【blockPos: Tuple[int, int, int]】 执行命令的实体或方块的方块坐标
+        | 【dimension: int】 执行命令的实体或方块所在维度ID
+        | 【$cancel: bool】 设置为True可以取消命令执行
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
+
+    def PlayerPickupArrowServerEvent(self, args):
+        """
+        *[event]*
+
+        | 玩家即将捡起抛射物时触发，包括使用 ``netease:pick_up`` 的自定义抛射物。
+
+        -----
+
+        | 【playerId: str】 玩家实体ID
+        | 【arrowId: str】 抛射物实体ID
+        | 【itemDict: dict】 触碰的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+        | 【$cancel: bool】 设置为True时将取消本次拾取
+        | 【$pickupDelay: int】 取消拾取后重新设置该物品的拾取cd，小于15帧将视作15帧，大于等于97813帧将视作无法拾取，每秒30帧
+
+        -----
+
+        :param dict args: 参数字典，参数解释见上方
+
+        :return: 无
+        :rtype: None
+        """
 
     def EntityDieLoottableAfterServerEvent(self, args):
         """
@@ -207,6 +304,7 @@ class NuoyanServerSystem(_ServerSystem):
         * 可骑乘生物，例如马，玩家要驯服马后，再给它喂养食物（例如金苹果、金萝卜），才可以触发事件；已驯服的马受伤后，用金苹果喂养时会治疗马，不触发事件，马的血量回满时，再喂养金苹果，才会触发事件；
         * 可驯服生物，例如狼，玩家要用骨头驯服狼后，再给它喂养肉类物品（例如熟猪排），才可以触发事件；
         * 需要在特定环境下才能繁殖的生物，例如熊猫，玩家用竹子喂养熊猫时，熊猫的5格内至少要有8根竹子，喂养后才可以触发事件。
+        | 该事件中如需调用使用手持物相关的接口，如 ``PlayerUseItemToEntity`` 或其他设置物品数量的接口，会导致接口正常调用但是物品数量计算异常，建议通过timer延迟调用。
 
         -----
 
@@ -2745,6 +2843,7 @@ class NuoyanServerSystem(_ServerSystem):
         | 首次生成地形时，结构特征即将生成时服务端抛出该事件。
         | 需要配合 ``AddNeteaseFeatureWhiteList`` 接口一同使用。
         | 若在本监听事件中调用其他modSDK接口将无法生效，强烈建议本事件仅用于设置结构放置与否。
+        | 事件只会在网易版结构放置时抛出， ``structureName`` 参数修改为不存在结构或者原生结构时，开发包会出现断言。
 
         -----
 
@@ -3125,6 +3224,7 @@ class NuoyanServerSystem(_ServerSystem):
         | 【isValid: int】 脚本是否设置伤害值：1表示是，0表示否
         | 【$cancel: bool】 是否取消该次攻击，默认不取消
         | 【$isKnockBack: bool】 是否支持击退效果，默认支持，当不支持时将屏蔽武器击退附魔效果
+        | 【isCrit: bool】 本次攻击是否产生暴击，不支持修改
 
         -----
 
@@ -3152,6 +3252,9 @@ class NuoyanServerSystem(_ServerSystem):
         | 【x: int】 方块x坐标
         | 【y: int】 方块y坐标
         | 【z: int】 方块z坐标
+        | 【clickX: float】 点击点的x比例位置
+        | 【clickY: float】 点击点的y比例位置
+        | 【clickZ: float】 点击点的z比例位置
         | 【face: int】 点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
         | 【itemDict: dict】 使用的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
         | 【dimensionId: int】 维度ID
@@ -3217,6 +3320,8 @@ class NuoyanServerSystem(_ServerSystem):
 
         | 生物死亡掉落物品时触发。
         | 只有当 ``dirty`` 为 ``True`` 时才会重新读取 ``itemList`` 并生成对应的掉落物，如果不需要修改掉落结果的话请勿随意修改 ``dirty`` 值。
+        | 该事件在生物死亡后会触发，无论是否掉落物品，因此掉落物品列表可能存在为空的情况。
+        | 掉落物不包含玩家或生物携带以及背包内的物品，若要获取死亡后由背包扔出的物品请参考 ``EntityDroppedItemServerEvent`` 事件。
 
         -----
 
@@ -3629,6 +3734,7 @@ class NuoyanServerSystem(_ServerSystem):
         | 【auxData: int】 方块附加值
         | 【playerId: str】 破坏方块的玩家实体ID
         | 【dimensionId: int】 维度ID
+        | 【dropEntityIds: List[str]】 掉落物实体ID列表
 
         -----
 

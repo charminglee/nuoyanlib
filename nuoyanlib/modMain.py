@@ -12,15 +12,29 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-12-31
+#   Last Modified : 2024-12-28
 #
 # ====================================================
 
 
-from .calculator import *
-from .enum import *
-from .item import *
-from .mc_random import *
-# from .mc_timer import *
-from .utils import *
-from .vector import *
+from mod.common.mod import Mod
+from _core._const import LIB_VERSION_UL
+
+
+@Mod.Binding(name="nuoyanlib", version=LIB_VERSION_UL)
+class ModMain(object):
+    @Mod.InitServer()
+    def ServerInit(self):
+        pass
+
+    @Mod.DestroyServer()
+    def ServerDestroy(self):
+        pass
+
+    @Mod.InitClient()
+    def ClientInit(self):
+        pass
+
+    @Mod.DestroyClient()
+    def ClientDestroy(self):
+        pass

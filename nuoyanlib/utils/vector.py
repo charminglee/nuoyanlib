@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2024-01-08
 
 # ====================================================
 
@@ -39,6 +39,7 @@ __all__ = [
     "vec_rotate_around",
     "outgoing_vec",
     "vec_composite",
+    "vec_scale",
 ]
 
 
@@ -257,6 +258,21 @@ def vec_composite(vector, *more_vec):
     for v in more_vec:
         res_vec += _Vector3(v)
     return res_vec.ToTuple()
+
+
+def vec_scale(vector, scale):
+    """
+    向量缩放。
+
+    -----
+
+    :param tuple[float,float,float] vector: 向量
+    :param float scale: 缩放比例
+
+    :return: 缩放后的向量
+    :rtype: tuple[float,float,float]
+    """
+    return (_Vector3(vector) * scale).ToTuple()
 
 
 

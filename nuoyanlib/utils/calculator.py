@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-20
+#   Last Modified : 2025-01-09
 #
 # ====================================================
 
@@ -698,7 +698,7 @@ def rot_diff(r1, r2):
     :param float r1: 角度1
     :param float r2: 角度2
         
-    :return: 差值（0~180）
+    :return: 差值（-180~180）
     :rtype: float
     """
     diff = r1 - r2
@@ -706,7 +706,7 @@ def rot_diff(r1, r2):
         diff += 360
     elif diff >= 180:
         diff -= 360
-    return abs(diff)
+    return diff
 
 
 def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_size):
