@@ -60,20 +60,20 @@
 
 ---
 
-1. 解压下载的压缩包，将`nuoyanlib`文件夹放至您的脚本根目录下（即`modMain.py`所在目录）即可。
+1. 解压下载的压缩包，将`nuoyanlib`文件夹放至您的行为包根目录下（即`entities`文件夹所在目录）即可。
 2. 推荐使用以下方式在您的代码中导入「nuoyanlib」，`myScripts`为您的脚本文件夹名称：
 
     - 导入客户端库
     ```python
-    import myScripts.nuoyanlib.client as nyl
+    import nuoyanlib.client as nyl
     ```
     - 导入UI库
     ```python
-    import myScripts.nuoyanlib.client.ui as nylui
+    import nuoyanlib.client.ui as nylui
     ```
     - 导入服务端库
     ```python
-    import myScripts.nuoyanlib.server as nyl
+    import nuoyanlib.server as nyl
     ```
     > **[警告]**  
     禁止导入对立端的库，如在客户端导入服务端库，服务端导入客户端库，否则可能会导致整个库功能瘫痪甚至游戏闪退等严重问题。
