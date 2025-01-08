@@ -12,33 +12,20 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2024-07-02
 #
 # ====================================================
 
 
-from .. import __version__
+from typing import Sequence, Any, List, Callable
 
 
-LIB_VERSION = __version__[1:].replace("-beta", "")
-LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
-LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
-LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
-LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
-ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
-
-
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
-
-
-
-
-
-
-
-
-
+def add_condition_to_func(cond: Callable[[], bool], func: Callable[[bool], Any], interval: int = 1) -> int: ...
+def remove_condition_to_func(cond_id: int) -> bool: ...
+def all_indexes(seq: Sequence, *elements: Any) -> List[int]: ...
+def check_string(string: str, *check: str) -> bool: ...
+def check_string2(string: str, *check: str) -> bool: ...
+def turn_dict_value_to_tuple(orig_dict: dict) -> None: ...
+def turn_list_to_tuple(lst: list) -> tuple: ...
+def is_method_overridden(subclass: Any, father: Any, method: str) -> bool: ...
+def translate_time(sec: int) -> str: ...

@@ -12,27 +12,41 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
-from .. import __version__
+import mod.client.extraClientApi as _client_api
+from .._core._client._comp import PlrComp as _PlrComp
 
 
-LIB_VERSION = __version__[1:].replace("-beta", "")
-LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
-LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
-LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
-LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
-ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
+__all__ = [
+    "player_plunge",
+]
 
 
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
+def player_plunge(speed):
+    """
+    | 使玩家向准星方向以指定初始速度突进。
+
+    -----
+
+    :param float speed: 初始速度
+
+    :return: 无
+    :rtype: None
+    """
+    rot = _PlrComp.Rot.GetRot()
+    dir_rot = _client_api.GetDirFromRot(rot)
+    motion = tuple(map(lambda x: x * speed, dir_rot))
+    _PlrComp.ActorMotion.SetMotion(motion)
+
+
+
+
+
+
 
 
 

@@ -12,33 +12,20 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2023-11-30
 #
 # ====================================================
 
 
-from .. import __version__
+from typing import List, Dict
 
 
-LIB_VERSION = __version__[1:].replace("-beta", "")
-LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
-LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
-LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
-LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
-ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
+CONSTRUCTION: List[Dict[str, ...]]
+EQUIPMENT: List[Dict[str, ...]]
+ITEMS: List[Dict[str, ...]]
+NATURE: List[Dict[str, ...]]
+SEARCH: List[Dict[str, ...]]
 
 
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
-
-
-
-
-
-
-
-
-
+def _remove_useless(item_list: List[Dict[str, ...]]) -> None: ...
+def _stack_to_search() -> None: ...

@@ -1,0 +1,20 @@
+{
+    "author": "Nuoyan", 
+    "description": "nuoyanlib", 
+    "min_app_version": "2.9.0.release20231116", 
+    "netgame_mod_name": "nuoyanlib",
+    "netgame_mod_version": "v0.5.3-beta", 
+    "support_server_type": [
+        "lobby", 
+        "game", 
+        "master", 
+        "service"
+    ],
+
+    "//": "绑定服务端与客户端，绑定后部分函数的参数的默认值会使用绑定的值（如event函数的system_name参数）",
+    "//": "以下为示例：",
+    "SYSTEM_BINDINGS": [
+        ["服务端1命名空间:服务端1系统名称", "客户端1命名空间:客户端1系统名称"],
+        ["服务端2命名空间:服务端2系统名称", "客户端2命名空间:客户端2系统名称"]
+    ]
+}

@@ -12,29 +12,45 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2024-07-05
 #
 # ====================================================
 
 
-from .. import __version__
+from ._const import (
+    SHORTCUT as _SHORTCUT,
+    INV27 as _INV27,
+    INV36 as _INV36,
+)
 
 
-LIB_VERSION = __version__[1:].replace("-beta", "")
-LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
-LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
-LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
-LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
-ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
+__all__ = [
+    "is_inv36_key",
+    "is_inv27_key",
+    "is_shortcut_key",
+    "is_inv_key",
+    "is_not_inv_key",
+]
 
 
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
+def is_inv36_key(k):
+    return k.endswith(_INV36)
 
 
+def is_inv27_key(k):
+    return k.endswith(_INV27)
+
+
+def is_shortcut_key(k):
+    return k.endswith(_SHORTCUT)
+
+
+def is_inv_key(k):
+    return is_inv36_key(k) or is_inv27_key(k) or is_shortcut_key(k)
+
+
+def is_not_inv_key(k):
+    return not is_inv_key(k)
 
 
 

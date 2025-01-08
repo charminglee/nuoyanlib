@@ -12,33 +12,34 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2024-05-30
 #
 # ====================================================
 
 
-from .. import __version__
+from typing import Tuple, Dict, Optional, Union, TypedDict
+from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
+from mod.client.ui.controls.baseUIControl import BaseUIControl
 
 
-LIB_VERSION = __version__[1:].replace("-beta", "")
-LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
-LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
-LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
-LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
-ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
+EventArgs = Dict[str, Union[str, int, list, tuple, dict]]
 
 
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
+ItemDict = Optional[dict]
+ItemCellPos = Tuple[str, int]
+ItemCell = Union[str, ItemCellPos]
+ItemGridKeys = Union[str, Tuple[str, ...], None]
+class ItemSelectedData(TypedDict):
+    item_dict: dict
+    cell_path: str
+    cell_pos: ItemCellPos
+class ItemHeapData(TypedDict):
+    item_dict: dict
+    cell_path: str
+    cell_pos: ItemCellPos
+    selected_count: int
+    animating: bool
+    bar_ctrl: ProgressBarUIControl
 
 
-
-
-
-
-
-
-
+Control = Union[str, BaseUIControl]

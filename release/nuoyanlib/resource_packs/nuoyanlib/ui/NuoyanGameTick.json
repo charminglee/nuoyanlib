@@ -1,0 +1,32 @@
+{
+    "main": {
+        "bindings": [
+            {
+                "binding_condition": "always",
+                "binding_name": "#NuoyanGameTick.game_tick"
+            }
+        ],
+        "type": "panel"
+    },
+    "namespace": "NuoyanGameTick"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,28 +17,21 @@
 # ====================================================
 
 
-from .. import __version__
+from typing import List, Tuple, Callable, Union, Dict, Any
+from ...client.client_system import NuoyanClientSystem
 
 
-LIB_VERSION = __version__[1:].replace("-beta", "")
-LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
-LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
-LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
-LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
-ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
+_ALL_CLIENT_ENGINE_EVENTS: Tuple[str, ...]
+_ALL_CLIENT_LIB_EVENTS: Dict[str, str]
+_lsn_func_args: List[Tuple[str, str, str, str, int]]
 
 
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
-
-
-
-
-
-
-
-
-
+def event(
+    event_name: Union[str, Callable] = "",
+    namespace: str = "",
+    system_name: str = "",
+    priority: int = 0,
+) -> Callable: ...
+def listen_custom(self: Any) -> None: ...
+def listen_engine_and_lib(self: NuoyanClientSystem) -> None: ...
+def lib_sys_event(name: str) -> Callable: ...

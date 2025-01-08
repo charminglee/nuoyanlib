@@ -12,27 +12,31 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
 
-from .. import __version__
+from typing import Tuple, Optional
 
 
-LIB_VERSION = __version__[1:].replace("-beta", "")
-LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
-LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
-LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
-LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
-ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
+def play_custom_sound(
+    sound_name: str,
+    pos: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+    volume: float = 1.0,
+    speed: float = 1.0,
+    is_loop: bool = False,
+    entity_id: Optional[str] = None,
+) -> str: ...
+def stop_custom_sound(sound_id: str, fade_out_time: float = 0.0) -> bool: ...
 
 
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
+
+
+
+
+
+
 
 
 

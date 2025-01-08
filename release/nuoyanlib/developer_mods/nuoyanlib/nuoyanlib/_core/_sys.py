@@ -12,12 +12,9 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-08
+#   Last Modified : 2024-07-06
 #
 # ====================================================
-
-
-from ..config import SYSTEM_BINDINGS as _SYSTEM_BINDINGS
 
 
 __all__ = [
@@ -32,35 +29,30 @@ __all__ = [
 
 
 def is_apollo():
-    return False
+    try:
+        import apolloCommon.mysqlPool
+        return True
+    except ImportError:
+        return False
 
 
 mod_config = {}
 
 
-if is_apollo():
-    pass
-    # def get_opposite_system(sys_name):
-    #     global mod_config
-    #     if not mod_config:
-    #         from apolloCommon.commonNetgameApi import GetModJsonConfig
-    #         mod_config = GetModJsonConfig("nuoyanlib")
-    #     if not mod_config:
-    #         return
-    #     for sys1, sys2 in mod_config['SYSTEM_BINDINGS']:
-    #         name1 = sys1.split(":")[1]
-    #         name2 = sys2.split(":")[1]
-    #         if name1 == sys_name:
-    #             return name2
-    #         if name2 == sys_name:
-    #             return name1
-else:
-    def get_opposite_system(sys_name):
-        for sys1, sys2 in _SYSTEM_BINDINGS:
-            if sys1 == sys_name:
-                return sys2
-            if sys2 == sys_name:
-                return sys1
+def get_opposite_system(sys_name):
+    global mod_config
+    if not mod_config:
+        from apolloCommon.commonNetgameApi import GetModJsonConfig
+        mod_config = GetModJsonConfig("nuoyanlib")
+    if not mod_config:
+        return
+    for sys1, sys2 in mod_config['SYSTEM_BINDINGS']:
+        name1 = sys1.split(":")[1]
+        name2 = sys2.split(":")[1]
+        if name1 == sys_name:
+            return name2
+        if name2 == sys_name:
+            return name1
 
 
 def is_client():

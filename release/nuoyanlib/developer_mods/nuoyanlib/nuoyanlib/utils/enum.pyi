@@ -12,33 +12,25 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2023-11-26
 #
 # ====================================================
 
 
-from .. import __version__
+from typing import Dict, List, Tuple, Any, Optional
 
 
-LIB_VERSION = __version__[1:].replace("-beta", "")
-LIB_VERSION_UL = LIB_VERSION.replace(".", "_")
-LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
-LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
-LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
-ROOT = __file__.split("/" if "/" in __file__ else ".")[0] # pc: scripts.nuoyanlib._core._const   pe: scripts/nuoyanlib/_core/_const.py
-LIB_CLIENT_PATH = "%s._core._client._lib_client.NuoyanLibClientSystem" % ROOT
-LIB_SERVER_PATH = "%s._core._server._lib_server.NuoyanLibServerSystem" % ROOT
+def search_data(data: Any, lst: list) -> bool: ...
 
 
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
-
-
-
-
-
-
-
-
-
+ENTITY_LIST: List[Optional[Tuple[int, str, str, int]]]
+MOB_LIST: List[Tuple[int, str, str, int, bool]]
+FRIENDLY_MOB_LIST: List[Tuple[int, str, str, int]]
+HOSTILE_MOB_LIST: List[Tuple[int, str, str, int]]
+ATTACKABLE_MOB_LIST: List[Tuple[int, str, str, int]]
+ENTITY_ID_DICT: Dict[int, int]
+EFFECT_DICT: Dict[str, str]
+BIOME_DICT: Dict[str, str]
+STRUCTURE_DICT: Dict[int, Tuple[str, str]]
+BLOCK_LIST: List[str]
+ITEM_LIST: List[str]
