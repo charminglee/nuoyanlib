@@ -12,16 +12,16 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-12-28
+#   Last Modified : 2025-01-09
 #
 # ====================================================
 
 
 from mod.common.mod import Mod
-from _core._const import LIB_VERSION_UL
+from _core._const import LIB_VERSION
 
 
-@Mod.Binding(name="nuoyanlib", version=LIB_VERSION_UL)
+@Mod.Binding(name="nuoyanlib", version=LIB_VERSION)
 class ModMain(object):
     @Mod.InitServer()
     def ServerInit(self):
