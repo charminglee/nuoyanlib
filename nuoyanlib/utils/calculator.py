@@ -366,7 +366,7 @@ def camera_rot_p2p(pos1, pos2):
     hori_dis = pos_distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
     if hori_dis == 0:
         hori_dis = 0.000000001
-    horizontal_rot = 90 + (_atan(z / x) / _pi) * 180 + (-180 if x > 0 else 0)
+    horizontal_rot = 90 + (_atan(z / x) / _pi) * 180 + (0 if x > 0 else -180)
     vertical_rot = -(_atan(y / hori_dis) / _pi) * 180
     return vertical_rot, horizontal_rot
 

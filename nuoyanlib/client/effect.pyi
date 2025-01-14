@@ -118,16 +118,16 @@ class NeteaseParticle(object):
     def BindEntity(
         self: ...,
         ent_id: str,
-        offset: Tuple[float, float, float] = (0.0, 0.0, 0.0),
-        rot: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+        offset: Tuple[float, float, float] = (0, 0, 0),
+        rot: Tuple[float, float, float] = (0, 0, 0),
         correction: bool = False,
     ) -> bool: ...
     def BindSkeleton(
         self: ...,
         model_id: int,
         bone_name: str,
-        offset: Tuple[float, float, float] = (0.0, 0.0, 0.0),
-        rot: Tuple[float, float, float] = (0.0, 0.0, 0.0)
+        offset: Tuple[float, float, float] = (0, 0, 0),
+        rot: Tuple[float, float, float] = (0, 0, 0)
     ) -> bool: ...
     def Play(self: ...) -> bool: ...
     def Pause(self: ...) -> bool: ...
@@ -212,15 +212,15 @@ class NeteaseFrameAnim(object):
     def BindEntity(
         self: ...,
         bind_entity_id: str,
-        offset: Tuple[float, float, float] = (0.0, 0.0, 0.0),
-        rot: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+        offset: Tuple[float, float, float] = (0, 0, 0),
+        rot: Tuple[float, float, float] = (0, 0, 0),
     ) -> bool: ...
     def BindSkeleton(
         self: ...,
         model_id: int,
         bone_name: str,
-        offset: Tuple[float, float, float] = (0.0, 0.0, 0.0),
-        rot: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+        offset: Tuple[float, float, float] = (0, 0, 0),
+        rot: Tuple[float, float, float] = (0, 0, 0),
     ) -> bool: ...
     def Play(self: ...) -> bool: ...
     def Pause(self: ...) -> bool: ...

@@ -22,7 +22,7 @@ from typing import Tuple, Optional
 
 def play_custom_sound(
     sound_name: str,
-    pos: Tuple[float, float, float] = (0.0, 0.0, 0.0),
+    pos: Tuple[float, float, float] = (0, 0, 0),
     volume: float = 1.0,
     speed: float = 1.0,
     is_loop: bool = False,

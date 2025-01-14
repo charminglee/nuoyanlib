@@ -175,7 +175,8 @@ class NuoyanScreenNode(_ScreenNode):
         :return: 无
         :rtype: None
         """
-        super(NuoyanScreenNode, self).Update()
+        if NuoyanScreenNode:
+            super(NuoyanScreenNode, self).Update()
         self.__super("Update")
         # double click
         if self.__double_click_tick:

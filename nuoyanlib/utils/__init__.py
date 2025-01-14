@@ -12,9 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-12-31
+#   Last Modified : 2025-01-10
 #
 # ====================================================
+
+
+"""
+nuoyanlib工具库。
+"""
 
 
 from .calculator import *
@@ -24,3 +29,4 @@ from .mc_random import *
 # from .mc_timer import *
 from .utils import *
 from .vector import *
+from .time_ease import *

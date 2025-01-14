@@ -12,9 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-12-31
+#   Last Modified : 2025-01-10
 #
 # ====================================================
+
+
+"""
+nuoyanlib服务端库。
+"""
 
 
 from .._core._const import LIB_NAME, LIB_SERVER_NAME, LIB_SERVER_PATH
