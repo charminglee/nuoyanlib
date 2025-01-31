@@ -477,16 +477,18 @@ def entity_plunge_by_rot(entity_id, rot, speed):
     entity_plunge_by_dir(entity_id, direction, speed)
 
 
-def get_all_entities():
+def get_all_entities(ent_filter=None):
     """
     | 获取所有实体，包括玩家。
 
     -----
 
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否获取该实体，可以使用nuoyanlib预设的过滤器EntityFilter，默认为None
+
     :return: 实体ID列表
     :rtype: list[str]
     """
-    return api.GetEngineActor().keys() + api.GetPlayerList()
+    return filter(ent_filter, api.GetEngineActor().keys() + api.GetPlayerList())
 
 
 def get_entities_in_area(

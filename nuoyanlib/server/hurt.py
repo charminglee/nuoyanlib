@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2025-01-25
 #
 # ====================================================
 
@@ -41,6 +41,7 @@ from .entity import (
 
 
 __all__ = [
+    "EntityFilter",
     "explode_hurt",
     "aoe_damage",
     "sector_aoe_damage",
@@ -50,6 +51,59 @@ __all__ = [
     "percent_damage",
     "line_damage",
 ]
+
+
+_sdk_damage_cause = [v for k, v in _ActorDamageCause.__dict__.items() if not k.startswith("_")]
+
+
+class EntityFilter:
+    """
+    实体过滤器，预设了一些常用的过滤条件。
+    过滤器接受一个实体ID作为参数，且返回一个bool值，返回True时表示该实体符合条件。
+    """
+
+    @staticmethod
+    def mob(eid):
+        """
+        | 过滤生物实体。
+
+        -----
+
+        :param str eid: 实体ID
+
+        :return: 返回True时表示该实体为生物实体
+        :rtype: bool
+        """
+        return _CompFactory.CreateEngineType(eid).GetEngineType() & _EntityType.Mob == _EntityType.Mob
+
+
+    @staticmethod
+    def non_mob(eid):
+        """
+        | 过滤非生物实体。
+
+        -----
+
+        :param str eid: 实体ID
+
+        :return: 返回True时表示该实体为非生物实体
+        :rtype: bool
+        """
+        return not EntityFilter.mob(eid)
+
+    @staticmethod
+    def has_health(eid):
+        """
+        | 过滤当前生命值>0的实体。
+
+        -----
+
+        :param str eid: 实体ID
+
+        :return: 返回True时表示该实体当前生命值>0
+        :rtype: bool
+        """
+        return _CompFactory.CreateAttr(eid).GetAttrValue(_AttrType.HEALTH) > 0
 
 
 def explode_hurt(
@@ -101,14 +155,14 @@ def explode_hurt(
 
 
 def line_damage(
-        damage,
         radius,
         start_pos,
         end_pos,
         dim,
-        attacker_id="",
-        child_id="",
-        cause=_ActorDamageCause.NONE,
+        damage,
+        cause=_ActorDamageCause.EntityAttack,
+        attacker_id=None,
+        child_id=None,
         knocked=True,
         filter_ids=None,
         filter_types=None,
@@ -122,14 +176,14 @@ def line_damage(
     
     -----
 
-    :param int damage: 伤害
     :param float radius: 伤害半径（生物到直线上的最大距离）
     :param tuple[float,float,float] start_pos: 线段起点坐标
     :param tuple[float,float,float] end_pos: 线段终点坐标
     :param int dim: 维度
-    :param str attacker_id: 攻击者实体ID，默认无攻击者
-    :param str child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
-    :param str cause: 伤害类型，ActorDamageCause枚举，默认为ActorDamageCause.NONE
+    :param int damage: 伤害
+    :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
+    :param str|None attacker_id: 攻击者实体ID，默认无攻击者
+    :param str|None child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
     :param bool knocked: 是否产生击退，默认为是
     :param list[str]|None filter_ids: 过滤的实体ID列表，列表中的实体将不会受到伤害，默认为不过滤
     :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
@@ -177,9 +231,9 @@ def line_damage(
 def hurt_mobs(
         entity_id_list,
         damage,
-        attacker_id="",
-        child_id="",
-        cause=_ActorDamageCause.NONE,
+        cause=_ActorDamageCause.EntityAttack,
+        attacker_id=None,
+        child_id=None,
         knocked=True,
         force=False,
 ):
@@ -190,9 +244,9 @@ def hurt_mobs(
 
     :param list[str] entity_id_list: 实体ID列表
     :param int damage: 伤害
-    :param str attacker_id: 攻击者实体ID，默认无攻击者
-    :param str child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
-    :param str cause: 伤害类型，ActorDamageCause枚举，默认为ActorDamageCause.NONE
+    :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
+    :param str|None attacker_id: 攻击者实体ID，默认无攻击者
+    :param str|None child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
     :param bool knocked: 是否产生击退，默认为是
     :param bool force: 是否无视攻击冷却或生物的无敌状态强制设置伤害，默认为否
 
@@ -204,13 +258,13 @@ def hurt_mobs(
 
 
 def aoe_damage(
-        damage,
         radius,
         pos,
         dim,
-        attacker_id="",
-        child_id="",
-        cause=_ActorDamageCause.NONE,
+        damage,
+        cause=_ActorDamageCause.EntityAttack,
+        attacker_id=None,
+        child_id=None,
         knocked=True,
         filter_ids=None,
         filter_types=None,
@@ -223,13 +277,13 @@ def aoe_damage(
     
     -----
 
-    :param int damage: 伤害
     :param float radius: 伤害半径
     :param tuple[float,float,float] pos: 产生范围伤害的中心点坐标
     :param int dim: 维度
-    :param str attacker_id: 攻击者实体ID，默认无攻击者
-    :param str child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
-    :param str cause: 伤害类型，ActorDamageCause枚举，默认为ActorDamageCause.NONE
+    :param int damage: 伤害
+    :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
+    :param str|None attacker_id: 攻击者实体ID，默认无攻击者
+    :param str|None child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
     :param bool knocked: 是否产生击退，默认为是
     :param list[str]|None filter_ids: 过滤的实体ID列表，列表中的实体将不会受到伤害，默认为不过滤
     :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
@@ -266,10 +320,12 @@ def aoe_damage(
 
 
 def sector_aoe_damage(
-        attacker_id,
         sector_radius,
         sector_angle,
         damage,
+        cause=_ActorDamageCause.EntityAttack,
+        attacker_id=None,
+        child_id=None,
         knocked=True,
         filter_ids=None,
         filter_types=None,
@@ -280,10 +336,12 @@ def sector_aoe_damage(
     
     -----
 
-    :param str attacker_id: 攻击者ID
     :param float sector_radius: 扇形半径
     :param float sector_angle: 扇形张开的角度
     :param int damage: 伤害
+    :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
+    :param str|None attacker_id: 攻击者ID，默认无攻击者
+    :param str|None child_id: 伤害来源的子实体ID，默认无子实体
     :param bool knocked: 是否击退，默认为是
     :param list[str]|None filter_ids: 过滤的实体ID列表，列表中的实体将不会受到伤害，默认为不过滤
     :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
@@ -307,49 +365,56 @@ def sector_aoe_damage(
             (pos[0], attacker_pos[1], pos[2]), attacker_pos, sector_radius, sector_angle, attacker_rot
         )
         if test:
-            hurt(eid, damage, "entity_attack", attacker_id, "", knocked, force)
+            hurt(eid, damage, cause, attacker_id, child_id, knocked, force)
             result.append(eid)
     return result
 
 
 def rectangle_aoe_damage(
-        top_pos1,
-        top_pos2,
+        min_vertex,
+        max_vertex,
         dim,
         damage,
-        attacker_id="",
+        cause=_ActorDamageCause.EntityAttack,
+        attacker_id=None,
+        child_id=None,
         knocked=True,
-        filter_ids=None,
-        filter_types=None,
+        hurt_attacker=False,
+        hurt_child=False,
+        ent_filter=None,
         force=False,
 ):
     """
-    | 对指定矩形区域内所有实体造成伤害。（无视攻击冷却）
+    | 对指定矩形区域内所有实体造成伤害。
     
     -----
 
-    :param tuple[float,float,float] top_pos1: 矩形顶点坐标1
-    :param tuple[float,float,float] top_pos2: 矩形顶点坐标2
+    :param tuple[float,float,float] min_vertex: 矩形最小顶点坐标
+    :param tuple[float,float,float] max_vertex: 矩形最大顶点坐标，最大顶点坐标必须大于最小顶点坐标，否则不会对任何实体造成伤害
     :param int dim: 维度
     :param int damage: 伤害
-    :param str attacker_id: 攻击者ID，默认无攻击者
-    :param bool knocked: 是否击退，默认为是
-    :param list[str]|None filter_ids: 过滤的实体ID列表，列表中的实体将不会受到伤害，默认为不过滤
-    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
-    :param bool force: 是否无视攻击冷却或生物的无敌状态强制设置伤害，默认为否
+    :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
+    :param str|None attacker_id: 攻击者ID，默认None
+    :param str|None child_id: 伤害来源的子实体ID，默认None
+    :param bool knocked: 是否击退，默认为True
+    :param bool hurt_attacker: 是否对攻击者造成伤害，默认为False
+    :param bool hurt_child: 是否对子实体造成伤害，默认为False
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用nuoyanlib预设的过滤器EntityFilter，默认为None
+    :param bool force: 是否无视攻击冷却或生物的无敌状态强制设置伤害，默认为False
 
     :return: 受到伤害的实体ID列表
     :rtype: list[str]
     """
-    if filter_ids is None:
-        filter_ids = []
-    if attacker_id:
-        filter_ids.append(attacker_id)
     result = []
-    entities_list = _LvComp.Game.GetEntitiesInSquareArea(None, top_pos1, top_pos2, dim)
-    entities_list = _entity_filter(entities_list, _EntityType.Mob, filter_ids, filter_types)
+    entities_list = _LvComp.Game.GetEntitiesInSquareArea(None, min_vertex, max_vertex, dim)
     for eid in entities_list:
-        hurt(eid, damage, "entity_attack", attacker_id, "", knocked, force)
+        if not hurt_attacker and eid == attacker_id:
+            continue
+        if not hurt_child and eid == child_id:
+            continue
+        if ent_filter and not ent_filter(eid):
+            continue
+        hurt(eid, damage, cause, attacker_id, child_id, knocked, force)
         result.append(eid)
     return result
 
@@ -375,9 +440,9 @@ def hurt_by_set_health(entity_id, damage):
 def hurt(
         entity_id,
         damage,
-        cause=_ActorDamageCause.NONE,
-        attacker="",
-        child_id="",
+        cause=_ActorDamageCause.EntityAttack,
+        attacker=None,
+        child_id=None,
         knocked=True,
         force=False,
 ):
@@ -388,16 +453,21 @@ def hurt(
 
     :param str entity_id: 生物ID
     :param int damage: 伤害
-    :param str cause: 伤害类型，ActorDamageCause枚举，默认为ActorDamageCause.NONE
-    :param str attacker: 攻击者实体ID，默认无攻击者
-    :param str child_id: 伤害来源的子实体ID，默认无子实体
+    :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
+    :param str|None attacker: 攻击者实体ID，默认无攻击者
+    :param str|None child_id: 伤害来源的子实体ID，默认无子实体
     :param bool knocked: 是否造成击退，默认为是
     :param bool force: 是否无视攻击冷却或生物的无敌状态强制设置伤害，默认为否
     
     :return: 无
     :rtype: None
     """
-    hurt_result = _CompFactory.CreateHurt(entity_id).Hurt(int(damage), cause, attacker, child_id, knocked)
+    if cause in _sdk_damage_cause:
+        custom_tag = None
+    else:
+        custom_tag = cause
+        cause = _ActorDamageCause.Custom
+    hurt_result = _CompFactory.CreateHurt(entity_id).Hurt(int(damage), cause, attacker, child_id, knocked, custom_tag)
     if not hurt_result and force:
         hurt_by_set_health(entity_id, damage)
 
@@ -406,23 +476,23 @@ def percent_damage(
         entity_id,
         percent,
         type_name,
-        cause=_ActorDamageCause.NONE,
-        attacker="",
-        child_id="",
+        cause=_ActorDamageCause.EntityAttack,
+        attacker=None,
+        child_id=None,
         knocked=True,
         force=False,
 ):
     """
-    | 对生物造成百分比伤害。（无视攻击冷却）
+    | 对生物造成百分比伤害。
     
     -----
 
     :param str entity_id: 生物ID
     :param float percent: 百分比
     :param str type_name: 伤害基准（可选值为"max_health"、"health"、"hunger"、"attacker_damage"）
-    :param str cause: 伤害类型，ActorDamageCause枚举，默认为ActorDamageCause.NONE
-    :param str attacker: 攻击者实体ID，默认无攻击者
-    :param str child_id: 伤害来源的子实体ID，默认无子实体
+    :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
+    :param str|None attacker: 攻击者实体ID，默认无攻击者
+    :param str|None child_id: 伤害来源的子实体ID，默认无子实体
     :param bool knocked: 是否造成击退，默认为是
     :param bool force: 是否无视攻击冷却或生物的无敌状态强制设置伤害，默认为否
     

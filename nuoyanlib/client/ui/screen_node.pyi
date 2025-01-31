@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
@@ -22,7 +22,7 @@ from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.system.clientSystem import ClientSystem
-from ..._core._typing import EventArgs, Control
+from ..._core._typing import EventArgs, UiControl, FTuple2
 from ..._core._client._lib_client import NuoyanLibClientSystem
 from ..._core._client._listener import event
 from .item_fly_anim import ItemFlyAnim
@@ -52,21 +52,21 @@ class NuoyanScreenNode(ScreenNode):
     __save_pos_uis: Set[str]
     __double_click_tick: int
     __double_click_btn_path: str
-    __finger_pos: Optional[Tuple[float, float]]
+    __finger_pos: Optional[FTuple2]
     __is_moving: bool
     __touching_btn_path: str
     __tick: int
     __ui_pos_key: str
     cs: Optional[ClientSystem]
-    screen_size: Tuple[float, float]
+    screen_size: FTuple2
     def __init__(self: ..., namespace: str, name: str, param: Optional[dict]) -> None: ...
     def __getattr__(self: ..., name: str) -> Any: ...
     def Create(self: ...): ...
     def Update(self: ...): ...
     def Destroy(self: ...): ...
-    def GetDirectChildrenPath(self: ..., control: Control) -> List[str]: ...
-    def GetParentPath(self: ..., control: Control) -> Optional[str]: ...
-    def GetParentControl(self: ..., control: Control) -> Optional[BaseUIControl]: ...
+    def GetDirectChildrenPath(self: ..., control: UiControl) -> List[str]: ...
+    def GetParentPath(self: ..., control: UiControl) -> Optional[str]: ...
+    def GetParentControl(self: ..., control: UiControl) -> Optional[BaseUIControl]: ...
     def SetButtonDoubleClickCallback(
         self: ...,
         btn_path: str,

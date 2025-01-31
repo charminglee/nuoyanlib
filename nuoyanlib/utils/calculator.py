@@ -333,11 +333,11 @@ def midpoint(first_point, second_point):
         
     -----
     
-    :param tuple[float,...] first_point: 坐标1
-    :param tuple[float,...] second_point: 坐标2
+    :param tuple[float] first_point: 坐标1
+    :param tuple[float] second_point: 坐标2
         
     :return: 中点坐标
-    :rtype: tuple[float, ...]|None
+    :rtype: tuple[float]|None
     """
     if not first_point or not second_point:
         return

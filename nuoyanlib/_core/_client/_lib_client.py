@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-01-26
 #
 # ====================================================
 
@@ -21,6 +21,7 @@ import mod.client.extraClientApi as _client_api
 from .._const import (
     LIB_NAME as _LIB_NAME,
     LIB_CLIENT_NAME as _LIB_CLIENT_NAME,
+    LIB_SERVER_NAME as _LIB_SERVER_NAME,
 )
 from ._comp import (
     PLAYER_ID as _PLAYER_ID,
@@ -40,12 +41,23 @@ from .._sys import (
     NuoyanLibBaseSystem as _NuoyanLibBaseSystem,
 )
 from .._logging import log as _log
+from ...utils.communicate import (
+    call_local as _call_local,
+    call_callback as _call_callback,
+)
 
 
 __all__ = [
     "NuoyanLibClientSystem",
     "get_lib_system",
 ]
+
+
+_lib_sys = None
+def get_lib_system():
+    if not _lib_sys:
+        _log("Get client lib system failed!", level="ERROR")
+    return _lib_sys
 
 
 class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
@@ -56,6 +68,8 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
         self.item_grid_items = {}
         self.registered_keys = {}
         _LvComp.Game.AddTimer(0, _listen_custom, self)
+        global _lib_sys
+        _lib_sys = self
         _log("Inited", NuoyanLibClientSystem)
 
     # General ==========================================================================================================
@@ -63,6 +77,37 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
     @_event("UiInitFinished")
     def _on_ui_init_finished(self, args):
         self.NotifyToServer("UiInitFinished", {})
+
+    # BroadcastToAllClient =============================================================================================
+
+    def broadcast_to_all_client(self, event_name, event_data, namespace="", sys_name=""):
+        if not namespace:
+            namespace = _LIB_NAME
+        if not sys_name:
+            sys_name = _LIB_CLIENT_NAME
+        self.NotifyToServer("_BroadcastToAllClient", {
+            'event_name': event_name,
+            'event_data': event_data,
+            'namespace': namespace,
+            'sys_name': sys_name,
+        })
+
+    # NotifyToMultiClients =============================================================================================
+
+    def notify_to_multi_clients(self, player_ids, event_name, event_data, namespace="", sys_name=""):
+        if not namespace:
+            namespace = _LIB_NAME
+        if not sys_name:
+            sys_name = _LIB_CLIENT_NAME
+        self.NotifyToServer("_NotifyToMultiClients", {
+            'player_ids': player_ids,
+            'event_name': event_name,
+            'event_data': event_data,
+            'namespace': namespace,
+            'sys_name': sys_name,
+        })
+
+    # set_query_mod_var ================================================================================================
 
     @_lib_sys_event("_SetQueryCache")
     def _on_set_query_cache(self, args):
@@ -85,7 +130,39 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
             comp.Register(name, 0.0)
         comp.Set(name, value)
 
-    # Item Grid ========================================================================================================
+    # call =============================================================================================================
+
+    @_event("_NuoyanLibCall", _LIB_NAME, _LIB_CLIENT_NAME)
+    @_event("_NuoyanLibCall", _LIB_NAME, _LIB_SERVER_NAME)
+    def _be_called(self, args):
+        namespace = args['namespace']
+        system_name = args['system_name']
+        method = args['method']
+        uuid = args['uuid']
+        delay_ret = args['delay_ret']
+        call_args = args['args']
+        call_kwargs = args['kwargs']
+        player_id = args.get('__id__')
+        target_sys = _client_api.GetSystem(namespace, system_name)
+        def callback(cb_args):
+            if player_id:
+                self.notify_to_multi_clients(
+                    [player_id],
+                    "_NuoyanLibCallReturn",
+                    {'uuid': uuid, 'cb_args': cb_args},
+                )
+            else:
+                self.NotifyToServer("_NuoyanLibCallReturn", {'uuid': uuid, 'cb_args': cb_args})
+        _call_local(target_sys, method, callback, delay_ret, call_args, call_kwargs)
+
+    @_event("_NuoyanLibCallReturn", _LIB_NAME, _LIB_CLIENT_NAME)
+    @_event("_NuoyanLibCallReturn", _LIB_NAME, _LIB_SERVER_NAME)
+    def _call_return(self, args):
+        uuid = args['uuid']
+        cb_args = args['cb_args']
+        _call_callback(uuid, **cb_args)
+
+    # Item Grid （已废弃） ===============================================================================================
 
     @_lib_sys_event("_UpdateItemGrids")
     def _on_update_item_grids(self, args):
@@ -104,18 +181,6 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
             self.item_grid_items[key] = [None] * size
             self.NotifyToServer("_RegisterItemGrid", {'key': key, 'size': size})
         return True
-
-
-_lib_sys = None
-
-
-def get_lib_system():
-    global _lib_sys
-    if not _lib_sys:
-        _lib_sys = _client_api.GetSystem(_LIB_NAME, _LIB_CLIENT_NAME)
-    if not _lib_sys:
-        _log("Get client lib system failed!", level="ERROR")
-    return _lib_sys
 
 
 

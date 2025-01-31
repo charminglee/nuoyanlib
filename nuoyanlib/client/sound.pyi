@@ -17,12 +17,13 @@
 # ====================================================
 
 
-from typing import Tuple, Optional
+from typing import Optional
+from .._core._typing import FTuple3
 
 
 def play_custom_sound(
     sound_name: str,
-    pos: Tuple[float, float, float] = (0, 0, 0),
+    pos: FTuple3 = (0, 0, 0),
     volume: float = 1.0,
     speed: float = 1.0,
     is_loop: bool = False,

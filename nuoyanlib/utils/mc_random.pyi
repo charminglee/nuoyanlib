@@ -12,21 +12,22 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
 
-from typing import Optional, Tuple, Dict, Callable, Sequence, Any, Union, List
+from typing import Optional, Dict, Callable, Sequence, Any, Union, List
 from random import Random
+from .._core._typing import FTuple3
 
 
 def random_pos(
-    center_pos: Tuple[float, float, float],
+    center_pos: FTuple3,
     grid: float,
     use_top_height: bool = False,
     dimension: int = 0,
-) -> Optional[Tuple[float, float, float]]: ...
+) -> Optional[FTuple3]: ...
 def _gen_str(choice: Callable[[Sequence], Any], s: str, l: int) -> str: ...
 
 
@@ -42,18 +43,18 @@ def random_string(
     generate_num: int = 1,
 ) -> Union[str, List[str]]: ...
 def _is_pos_far_enough(
-    poses: List[Tuple[float, float, float]],
+    poses: List[FTuple3],
     x: float,
     y: float,
     z: float,
     min_distance: float,
 ) -> bool: ...
 def random_even_poses(
-    center_pos: Tuple[float, float, float],
+    center_pos: FTuple3,
     radius: float,
     pos_num: int,
     fixed_x: bool = False,
     fixed_y: bool = False,
     fixed_z: bool = False,
     min_distance: float = 1.0,
-) -> List[Tuple[float, float, float]]: ...
+) -> List[FTuple3]: ...

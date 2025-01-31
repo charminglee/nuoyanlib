@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-10
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
@@ -22,35 +22,21 @@ nuoyanlib UI库。
 """
 
 
+from ..._core._sys import is_client
+if not is_client():
+    raise ImportError("Cannot import nuoyanlib.client.ui in server environment.")
+del is_client
+
+
 from ..._core._client._comp import (
     ScreenNode,
     ViewBinder,
     ViewRequest,
 )
+
+
 from .item_fly_anim import *
 from .item_grid_manager import *
 from .item_tips_box import *
 from .screen_node import *
 from .ui_utils import *
-
-
-__all__ = [
-    # _comp
-    "ScreenNode",
-    "ViewBinder",
-    "ViewRequest",
-    # item_fly_anim
-    "ItemFlyAnim",
-    # item_grid_manager
-    "ItemGridManager",
-    # item_tips_box
-    "ItemTipsBox",
-    # screen_node
-    "notify_server",
-    "NuoyanScreenNode",
-    # ui_utils
-    "register_item_grid",
-    "get_parent_path",
-    "get_direct_children_path",
-    "get_parent_control",
-]

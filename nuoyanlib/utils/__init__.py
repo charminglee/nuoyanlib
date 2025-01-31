@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-10
+#   Last Modified : 2025-01-25
 #
 # ====================================================
 
@@ -30,3 +30,4 @@ from .mc_random import *
 from .utils import *
 from .vector import *
 from .time_ease import *
+from .communicate import *

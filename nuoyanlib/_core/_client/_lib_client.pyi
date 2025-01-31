@@ -12,16 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-01-26
 #
 # ====================================================
 
 
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Any
 from mod.client.system.clientSystem import ClientSystem
 from .._typing import EventArgs
 from ._listener import event, lib_sys_event
 from .._sys import NuoyanLibBaseSystem
+from .._const import LIB_NAME, LIB_CLIENT_NAME, LIB_SERVER_NAME
 
 
 class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
@@ -30,6 +31,27 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     item_grid_items: Dict[str, List[Optional[dict]]]
     registered_keys: Dict[str, List[str]]
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
+    def broadcast_to_all_client(
+        self: ...,
+        event_name: str,
+        event_data: Any,
+        namespace: str = "",
+        sys_name: str = "",
+    ) -> None: ...
+    def notify_to_multi_clients(
+        self: ...,
+        player_ids: List[str],
+        event_name: str,
+        event_data: Any,
+        namespace: str = "",
+        sys_name: str = "",
+    ) -> None: ...
+    @event("_NuoyanLibCall", LIB_NAME, LIB_CLIENT_NAME)
+    @event("_NuoyanLibCall", LIB_NAME, LIB_SERVER_NAME)
+    def _be_called(self: ..., args: EventArgs) -> None: ...
+    @event("_NuoyanLibCallReturn", LIB_NAME, LIB_CLIENT_NAME)
+    @event("_NuoyanLibCallReturn", LIB_NAME, LIB_SERVER_NAME)
+    def _call_return(self: ..., args: EventArgs) -> None: ...
     @event("UiInitFinished")
     def _on_ui_init_finished(self: ..., args: EventArgs) -> None: ...
     @lib_sys_event("_SetQueryCache")

@@ -12,128 +12,70 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
 
 from typing import Tuple, Union, Optional, List, Dict
 from mod.common.minecraftEnum import Facing
+from .._core._typing import FTuple2, FTuple3
 
 
-def pos_block_facing(
-    pos: Tuple[float, float, float],
-    face: int = Facing.North,
-    dist: float = 1.0
-) -> Optional[Tuple[float, float, float]]: ...
-def to_polar_coordinate(
-    coordinate: Tuple[float, float],
-    rad: bool = False,
-    origin: Tuple[float, float] = (0, 0),
-) -> Tuple[float, float]: ...
-def to_cartesian_coordinate(
-    coordinate: Tuple[float, float],
-    rad: bool = False,
-    origin: Tuple[float, float] = (0, 0),
-) -> Tuple[float, float]: ...
+def pos_block_facing(pos: FTuple3, face: int = Facing.North, dist: float = 1.0) -> Optional[FTuple3]: ...
+def to_polar_coordinate(coordinate: FTuple2, rad: bool = False, origin: FTuple2 = (0, 0)) -> FTuple2: ...
+def to_cartesian_coordinate(coordinate: FTuple2, rad: bool = False, origin: FTuple2 = (0, 0)) -> FTuple2: ...
 def probability_true_i(n: int, d: int) -> bool: ...
 def probability_true_f(f: float) -> bool: ...
-def pos_distance_to_line(
-    pos: Tuple[float, float, float],
-    line_pos1: Tuple[float, float, float],
-    line_pos2: Tuple[float, float, float],
-) -> float: ...
-def pos_floor(pos: Tuple[float, float, float]) -> Tuple[int, int, int]: ...
-def pos_distance(
-    first_point: Tuple[float, ...],
-    second_point: Tuple[float, ...],
-) -> float: ...
-def to_relative_pos(
-    entity_pos1: Tuple[float, float, float],
-    entity_pos2: Tuple[float, float, float],
-) -> Optional[Tuple[float, float, float]]: ...
+def pos_distance_to_line(pos: FTuple3, line_pos1: FTuple3, line_pos2: FTuple3) -> float: ...
+def pos_floor(pos: FTuple3) -> Tuple[int, int, int]: ...
+def pos_distance(first_point: Tuple[float, ...], second_point: Tuple[float, ...]) -> float: ...
+def to_relative_pos(entity_pos1: FTuple3, entity_pos2: FTuple3) -> Optional[FTuple3]: ...
 def to_screen_pos(
-    entity_pos: Tuple[float, float, float],
-    center_pos: Tuple[float, float, float],
+    entity_pos: FTuple3,
+    center_pos: FTuple3,
     screen_size: int,
     max_distance: int,
     ui_size: int,
     player_rot: float,
-) -> Optional[Tuple[float, float]]: ...
-def pos_rotate(angle: float, pos: Tuple[float, float]) -> Optional[Tuple[float, float]]: ...
-def straight_pos_list(
-    pos1: Tuple[float, float, float],
-    pos2: Tuple[float, float, float],
-    count: int,
-    only: int=-1,
-) -> List[Tuple[float, float, float]]: ...
+) -> Optional[FTuple2]: ...
+def pos_rotate(angle: float, pos: FTuple2) -> Optional[FTuple2]: ...
+def straight_pos_list(pos1: FTuple3, pos2: FTuple3, count: int, only: int=-1) -> List[FTuple3]: ...
 def midpoint(first_point: Tuple[float, ...], second_point: Tuple[float, ...]) -> Tuple[float, ...]: ...
-def camera_rot_p2p(
-    pos1: Tuple[float, float, float],
-    pos2: Tuple[float, float, float],
-) -> Optional[Tuple[float, float]]: ...
-def circle_pos_list(
-    center_pos: Tuple[float, float, float],
-    radius: float, density: int,
-) -> List[Tuple[float, float, float]]: ...
+def camera_rot_p2p(pos1: FTuple3, pos2: FTuple3) -> Optional[FTuple2]: ...
+def circle_pos_list(center_pos: FTuple3, radius: float, density: int) -> List[FTuple3]: ...
 def pos_entity_facing(
     entity_id: str,
     dis: float,
     use_0yaw: bool = False,
     height_offset: float = 0.0,
-) -> Optional[Tuple[float, float, float]]: ...
-def pos_forward_rot(
-    pos: Tuple[float, float, float],
-    rot: Tuple[float, float],
-    dis: float,
-) -> Optional[Tuple[float, float, float]]: ...
+) -> Optional[FTuple3]: ...
+def pos_forward_rot(pos: FTuple3, rot: FTuple2, dis: float) -> Optional[FTuple3]: ...
 def n_quantiles_index_list(n: int, data: Union[tuple, list, set]) -> List[int]: ...
-def cube_center(
-    start_pos: Tuple[float, float, float],
-    end_pos: Tuple[float, float, float],
-) -> Optional[Tuple[float, float, float]]: ...
-def cube_longest_side_len(
-    start_pos: Tuple[float, float, float],
-    end_pos: Tuple[float, float, float],
-) -> float: ...
+def cube_center(start_pos: FTuple3, end_pos: FTuple3) -> Optional[FTuple3]: ...
+def cube_longest_side_len(start_pos: FTuple3, end_pos: FTuple3) -> float: ...
 def is_in_sector(
-    test_pos: Tuple[float, float, float],
-    vertex_pos: Tuple[float, float, float],
+    test_pos: FTuple3,
+    vertex_pos: FTuple3,
     radius: float,
     sector_angle: float,
     sector_bisector_angle: float,
 ) -> bool: ...
-def sphere_pos_list(
-    center_pos: Tuple[float, float, float],
-    radius: float,
-    density: int,
-) -> List[Tuple[float, float, float]]: ...
-def cube_pos_list(
-    pos1: Tuple[float, float, float],
-    pos2: Tuple[float, float, float],
-    step: int = 1,
-) -> List[Tuple[float, float, float]]: ...
-def spiral_pos_list(
-    start_pos: Tuple[float, float, float],
-    iterations: int,
-) -> List[Tuple[float, float, float]]: ...
-def is_in_cube(
-    obj: Union[str, Tuple[float, float, float]],
-    pos1: Tuple[float, float, float],
-    pos2: Tuple[float, float, float],
-    ignore_y: bool = False,
-) -> bool: ...
+def sphere_pos_list(center_pos: FTuple3, radius: float, density: int) -> List[FTuple3]: ...
+def cube_pos_list(pos1: FTuple3, pos2: FTuple3, step: int = 1) -> List[FTuple3]: ...
+def spiral_pos_list(start_pos: FTuple3, iterations: int) -> List[FTuple3]: ...
+def is_in_cube(obj: Union[str, FTuple3], pos1: FTuple3, pos2: FTuple3, ignore_y: bool = False) -> bool: ...
 def rot_diff(r1: float, r2: float) -> float: ...
 def ray_aabb_intersection(
-    ray_start_pos: Tuple[float, float, float],
-    ray_dir: Tuple[float, float, float],
+    ray_start_pos: FTuple3,
+    ray_dir: FTuple3,
     length: float,
-    cube_center_pos: Tuple[float, float, float],
-    cube_size: Tuple[float, float, float],
-) -> Optional[Tuple[float, float, float]]: ...
+    cube_center_pos: FTuple3,
+    cube_size: FTuple3,
+) -> Optional[FTuple3]: ...
 def get_blocks_by_ray(
-    start_pos: Tuple[float, float, float],
-    direction: Tuple[float, float, float],
+    start_pos: FTuple3,
+    direction: FTuple3,
     length: float,
     dimension: int = 0,
     count: int = 0,

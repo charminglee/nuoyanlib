@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-09
+#   Last Modified : 2025-01-19
 #
 # ====================================================
 
@@ -201,8 +201,8 @@ class TimeEaseFunc:
 
     in_out_back = staticmethod(
         lambda x:
-        (2 * x**3 - x * _sin(x * _pi) * 1.70158) if x < 0.5
-        else (1 - ((2 - 2 * x)**3 - (2 - 2 * x) * _sin((2 - 2 * x) * _pi) * 1.70158))
+            (2 * x**3 - x * _sin(x * _pi) * 1.70158) if x < 0.5
+            else (1 - ((2 - 2 * x)**3 - (2 - 2 * x) * _sin((2 - 2 * x) * _pi) * 1.70158))
     )
     """
     回退加减速，先回退后加速，之后回弹并减速。
@@ -220,8 +220,8 @@ class TimeEaseFunc:
 
     in_out_elastic = staticmethod(
         lambda x:
-        (0.5 * (1 - _sin(6 * _pi * x) * x**2)) if x < 0.5
-        else (0.5 * (_sin(6 * _pi * (x - 0.5)) * (1 - x)**2 + 1))
+            (0.5 * (1 - _sin(6 * _pi * x) * x**2)) if x < 0.5
+            else (0.5 * (_sin(6 * _pi * (x - 0.5)) * (1 - x)**2 + 1))
     )
     """
     弹性加减速，先加速后减速，表现为弹性效果。
@@ -231,8 +231,8 @@ class TimeEaseFunc:
 class TimeEase(object):
     def __init__(self, start_val, end_val, total_tm, fps=0, hold_on_last_frame=False, ease_func=TimeEaseFunc.linear):
         """
-        | 创建一个时间缓动对象，内置各种时间缓动函数，可用于实现动画、UI、摄像机等的平滑过渡效果。
-        | 时间缓动对象为一个迭代器，每次迭代或调用 ``next()`` 方法，都将返回一个缓动值。
+        | 创建一个时间缓动对象，内置各种时间缓动函数，可用于实现UI动画、运镜等的平滑过渡效果。
+        | 时间缓动对象为一个迭代器，每次迭代或调用 ``next()`` 方法时，会返回一个新的缓动值。
 
         -----
 
@@ -241,7 +241,7 @@ class TimeEase(object):
         :param float total_tm: 变化总时间，单位为秒
         :param int fps: 变化帧率，小于等于0的值将根据当前时间返回缓动值，默认为0
         :param bool hold_on_last_frame: 是否停止在最后一帧，若设为True，TimeEase可无限迭代，时间结束后将始终返回最后一帧的值，默认为False
-        :param function ease_func: 时间缓动函数，可使用TimeEaseFunc枚举值，支持使用自定义函数，默认为线性缓动
+        :param function ease_func: 时间缓动函数，可使用TimeEaseFunc提供的函数，或使用自定义函数，该函数接受并返回一个float值，且取值范围均为[0, 1]，默认为TimeEaseFunc.linear
         """
         self.start_val = start_val
         self.end_val = end_val

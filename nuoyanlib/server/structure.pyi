@@ -12,16 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
 
-from typing import Tuple, List, Dict
+from typing import List, Dict
+from .._core._typing import FTuple3
 
 
 def place_large_structure(
-    pos: Tuple[float, float, float],
+    pos: FTuple3,
     dimension_id: int,
     json_list: List[dict],
     namespace: str,

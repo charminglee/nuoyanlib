@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-10
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
@@ -20,6 +20,12 @@
 """
 nuoyanlib客户端库。
 """
+
+
+from .._core._sys import is_client
+if not is_client():
+    raise ImportError("Cannot import nuoyanlib.client in server environment.")
+del is_client
 
 
 from .._core._const import LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH
@@ -42,10 +48,15 @@ from .._core._client._comp import (
 from .._core._client._listener import (
     event,
 )
+
+
 from .client_system import *
 from .effect import *
 from .player import *
 from .setting import *
 from .sound import *
 from .render import *
+from .camera import *
+
+
 from ..utils import *

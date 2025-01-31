@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-08
+#   Last Modified : 2025-01-26
 #
 # ====================================================
 
@@ -1424,7 +1424,7 @@ class NuoyanClientSystem(_ClientSystem):
         | 【auxData: int】 方块附加值
         | 【dropName: str】 触发剪刀效果的掉落物identifier，包含命名空间及名称
         | 【dropCount: int】 触发剪刀效果的掉落物数量
-        | 【playerId: str】 触发剪刀效果的玩家ID
+        | 【playerId: str】 触发剪刀效果的玩家实体ID
         | 【dimensionId: int】 玩家触发时的维度ID
         | 【$cancelShears: bool】 是否取消剪刀效果
 
@@ -2265,24 +2265,10 @@ class NuoyanClientSystem(_ClientSystem):
 
     # New Interfaces ===================================================================================================
 
-    def CallServer(self, name, callback=None, *args):
-        """
-        | 调用服务端属性（包括变量和函数）。
-        
-        -----
-
-        :param str name: 服务端属性名
-        :param function callback: 回调函数，调用服务端成功后服务端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
-        :param Any args: 调用参数；如果调用的服务端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的服务端属性为函数，则args会作为参数传入该函数
-
-        :return: 无
-        :rtype: None
-        """
-
     def BroadcastToAllClient(self, event_name, event_data):
         """
-        | 广播事件到所有玩家的客户端。
-        | 监听时使用当前客户端的命名空间和名称。
+        | 广播事件到所有玩家的客户端，效果与服务端的BroadcastToAllClient类似。
+        | 监听时使用当前客户端的命名空间和名称即可。
         | 若传递的数据为字典，则客户端接收到的字典会内置一个名为 ``__id__`` 的key，其value为发送广播的玩家实体ID。
 
         -----
@@ -2295,12 +2281,27 @@ class NuoyanClientSystem(_ClientSystem):
         """
         if not self.__lib_sys:
             return False
-        self.__lib_sys.NotifyToServer("_BroadcastToAllClient", {
-            'event_name': event_name,
-            'event_data': event_data,
-            'namespace': self.__namespace,
-            'sys_name': self.__system_name,
-        })
+        self.__lib_sys.broadcast_to_all_client(event_name, event_data, self.__namespace, self.__system_name)
+        return True
+
+    def NotifyToMultiClients(self, player_ids, event_name, event_data):
+        """
+        | 广播事件到多个玩家的客户端，效果与服务端的NotifyToMultiClients类似。
+        | 监听时使用当前客户端的命名空间和名称即可。
+        | 若传递的数据为字典，则客户端接收到的字典会内置一个名为 ``__id__`` 的key，其value为发送广播的玩家实体ID。
+
+        -----
+
+        :param list[str] player_ids: 玩家实体ID列表
+        :param str event_name: 事件名称
+        :param Any event_data: 数据
+
+        :return: 是否成功
+        :rtype: bool
+        """
+        if not self.__lib_sys:
+            return False
+        self.__lib_sys.notify_to_multi_clients(player_ids, event_name, event_data, self.__namespace, self.__system_name)
         return True
 
     def RegisterAndCreateUI(self, namespace, ui_key, cls_path, ui_screen_def, stack=False, param=None):

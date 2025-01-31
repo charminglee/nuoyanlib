@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-08
+#   Last Modified : 2025-01-26
 #
 # ====================================================
 
@@ -211,7 +211,7 @@ class NuoyanServerSystem(_ServerSystem):
 
         -----
         
-        | 【playerId: str】 玩家ID
+        | 【playerId: str】 玩家实体ID
         | 【hungerBefore: float】 变化前的饥饿度
         | 【hunger: float】 变化后的饥饿度
         | 【$cancel: bool】 是否取消饥饿度变化
@@ -3926,21 +3926,6 @@ class NuoyanServerSystem(_ServerSystem):
         """
 
     # New Interfaces ===================================================================================================
-
-    def CallClient(self, player_id, name, callback=None, *args):
-        """
-        | 调用客户端属性（包括变量和函数）。
-
-        -----
-
-        :param str player_id: 客户端对应的玩家实体ID
-        :param str name: 客户端属性名
-        :param function callback: 回调函数，调用客户端成功后客户端会返回结果并调用该函数，该函数接受一个参数，即调用结果，具体用法请看示例
-        :param Any args: 调用参数；如果调用的客户端属性为变量，则args会赋值给该变量（不写调用参数则不会进行赋值）；如果调用的客户端属性为函数，则args会作为参数传入该函数
-
-        :return: 无
-        :rtype: None
-        """
 
     # Internal =========================================================================================================
 

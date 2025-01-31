@@ -12,17 +12,15 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-30
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
 
-from typing import Tuple, Dict, Optional, Union, TypedDict
+from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-
-
-EventArgs = Dict[str, Union[str, int, list, tuple, dict]]
+from mod.common.utils.mcmath import Vector3
 
 
 ItemDict = Optional[dict]
@@ -42,4 +40,15 @@ class ItemHeapData(TypedDict):
     bar_ctrl: ProgressBarUIControl
 
 
-Control = Union[str, BaseUIControl]
+PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
+FTuple2 = Tuple[float, float]
+FTuple3 = Tuple[float, float, float]
+Vector = Union[FTuple3, List[float], Vector3]
+VectorNotList = Union[FTuple3, Vector3]
+Matrix = List[List[float]]
+EventArgs = Dict[str, PyBasicTypes]
+
+
+UiControl = Union[str, BaseUIControl]
+EntFilter = Optional[Callable[[str], bool]]
+

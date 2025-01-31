@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-08
+#   Last Modified : 2025-01-26
 #
 # ====================================================
 
 
-from typing import Optional, Callable, Any
+from typing import Optional, Any, List
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from .._core._typing import EventArgs
@@ -132,8 +132,8 @@ class NuoyanClientSystem(ClientSystem):
     def AddEntityClientEvent(self: ..., args: EventArgs): ...
     def OnScriptTickClient(self: ...): ...
     def UiInitFinished(self: ..., args: EventArgs): ...
-    def CallServer(self: ..., name: str, callback: Optional[Callable] = None, *args: Any) -> None: ...
     def BroadcastToAllClient(self: ..., event_name: str, event_data: Any) -> bool: ...
+    def NotifyToMultiClients(self: ..., player_ids: List[str], event_name: str, event_data: Any) -> bool: ...
     def RegisterAndCreateUI(
         self: ...,
         namespace: str,

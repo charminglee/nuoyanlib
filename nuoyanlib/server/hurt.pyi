@@ -12,18 +12,31 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-28
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
 
-from typing import Tuple, List, Optional, Callable
+from typing import List, Optional, Callable
 from mod.common.minecraftEnum import ActorDamageCause
+from .._core._typing import FTuple3
+
+
+_sdk_damage_cause: List[str]
+
+
+class EntityFilter:
+    @staticmethod
+    def non_mob(eid: str) -> bool: ...
+    @staticmethod
+    def mob(eid: str) -> bool: ...
+    @staticmethod
+    def has_health(eid: str) -> bool: ...
 
 
 def explode_hurt(
     radius: float,
-    pos: Tuple[float, float, float],
+    pos: FTuple3,
     source_id: str,
     dim: int,
     fire: bool = False,
@@ -33,14 +46,14 @@ def explode_hurt(
     hurt_source: bool = False,
 ) -> None: ...
 def line_damage(
-    damage: int,
     radius: float,
-    start_pos: Tuple[float, float, float],
-    end_pos: Tuple[float, float, float],
+    start_pos: FTuple3,
+    end_pos: FTuple3,
     dim: int,
-    attacker_id: str = "",
-    child_id: str = "",
-    cause: str = ActorDamageCause.NONE,
+    damage: int,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
     knocked: bool = True,
     filter_ids: Optional[List[str]] = None,
     filter_types: Optional[List[int]] = None,
@@ -52,20 +65,20 @@ def line_damage(
 def hurt_mobs(
     entity_id_list: List[str],
     damage: int,
-    attacker_id: str = "",
-    child_id: str = "",
-    cause: str = ActorDamageCause.NONE,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
     knocked: bool = True,
     force: bool = False,
 ) -> None: ...
 def aoe_damage(
-    damage: int,
     radius: float,
-    pos: Tuple[float, float, float],
+    pos: FTuple3,
     dim: int,
-    attacker_id: str = "",
-    child_id: str = "",
-    cause: str = ActorDamageCause.NONE,
+    damage: int,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
     knocked: bool = True,
     filter_ids: Optional[List[str]] = None,
     filter_types: Optional[List[int]] = None,
@@ -74,33 +87,38 @@ def aoe_damage(
     force: bool = False,
 ) -> List[str]: ...
 def sector_aoe_damage(
-    attacker_id: str,
     sector_radius: float,
     sector_angle: float,
     damage: int,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
     knocked: bool = True,
     filter_ids: Optional[List[str]] = None,
     filter_types: Optional[List[int]] = None,
     force: bool = False,
 ) -> List[str]: ...
 def rectangle_aoe_damage(
-    top_pos1: Tuple[float, float, float],
-    top_pos2: Tuple[float, float, float],
+    min_vertex: FTuple3,
+    max_vertex: FTuple3,
     dim: int,
     damage: int,
-    attacker_id: str = "",
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
     knocked: bool = True,
-    filter_ids: Optional[List[str]] = None,
-    filter_types: Optional[List[int]] = None,
+    hurt_attacker: bool = False,
+    hurt_child: bool = False,
+    ent_filter: Optional[Callable[[str], bool]] = None,
     force: bool = False,
 ) -> List[str]: ...
 def hurt_by_set_health(entity_id: str, damage: int) -> None: ...
 def hurt(
     entity_id: str,
     damage: int,
-    cause: str = ActorDamageCause.NONE,
-    attacker: str = "",
-    child_id: str = "",
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker: Optional[str] = None,
+    child_id: Optional[str] = None,
     knocked: bool = True,
     force: bool = False,
 ) -> None: ...
@@ -108,9 +126,9 @@ def percent_damage(
     entity_id: str,
     percent: float,
     type_name: str,
-    cause: str = ActorDamageCause.NONE,
-    attacker: str = "",
-    child_id: str = "",
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker: Optional[str] = None,
+    child_id: Optional[str] = None,
     knocked: bool = True,
     force: bool = False,
 ) -> None: ...

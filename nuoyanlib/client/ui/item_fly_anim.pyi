@@ -12,15 +12,16 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
 
-from typing import Tuple, Union, List, Optional
+from typing import Union, List, Optional
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
+from ..._core._typing import FTuple2
 
 
 _NAMESPACE: str
@@ -41,7 +42,7 @@ class ItemFlyAnim(object):
     def PlayItemFlyAnim(
         self: ...,
         item_dict: dict,
-        from_pos: Tuple[float, float],
-        to_pos: Tuple[float, float],
-        ui_size: Union[float, Tuple[float, float]],
+        from_pos: FTuple2,
+        to_pos: FTuple2,
+        ui_size: Union[float, FTuple2],
     ) -> bool: ...

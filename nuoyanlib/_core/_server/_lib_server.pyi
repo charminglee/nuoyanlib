@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
@@ -33,8 +33,14 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
     _query_cache: Dict[str, Dict[str, float]]
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def Destroy(self: ...): ...
+    @lib_sys_event("_NuoyanLibCall")
+    def _be_called(self: ..., args: EventArgs) -> None: ...
+    @lib_sys_event("_NuoyanLibCallReturn")
+    def _call_return(self: ..., args: EventArgs) -> None: ...
     @lib_sys_event("_BroadcastToAllClient")
     def _on_broadcast_to_all_client(self: ..., args: EventArgs) -> None: ...
+    @lib_sys_event("_NotifyToMultiClients")
+    def _notify_to_multi_clients(self: ..., args: EventArgs) -> None: ...
     @event("UiInitFinished")
     def _on_ui_init_finished(self: ..., args: EventArgs) -> None: ...
     @lib_sys_event("_SetQueryVar")

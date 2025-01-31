@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-01-26
 #
 # ====================================================
 
@@ -20,10 +20,6 @@
 import mod.server.extraServerApi as _server_api
 from mod.common.minecraftEnum import (
     ItemPosType as _ItemPosType
-)
-from .._const import (
-    LIB_NAME as _LIB_NAME,
-    LIB_SERVER_NAME as _LIB_SERVER_NAME,
 )
 from ._comp import (
     CompFactory as _CompFactory,
@@ -49,6 +45,10 @@ from ...utils.item import (
     deepcopy_item_dict as _deepcopy_item_dict,
 )
 from .._logging import log as _log
+from ...utils.communicate import (
+    call_local as _call_local,
+    call_callback as _call_callback,
+)
 
 
 __all__ = [
@@ -61,12 +61,21 @@ _DATA_KEY_ITEMS_DATA = "_nuoyanlib_item_grid_data"
 _INV_POS_TYPE = _ItemPosType.INVENTORY
 
 
+_lib_sys = None
+def get_lib_system():
+    if not _lib_sys:
+        _log("Get server lib system failed!", level="ERROR")
+    return _lib_sys
+
+
 class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
         self._query_cache = {}
         self._item_grid_items = _LvComp.ExtraData.GetExtraData(_DATA_KEY_ITEMS_DATA) or {}
         _LvComp.Game.AddTimer(0, _listen_custom, self)
+        global _lib_sys
+        _lib_sys = self
         _log("Inited", NuoyanLibServerSystem)
 
     def Destroy(self):
@@ -75,13 +84,13 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
 
     # General ==========================================================================================================
 
-    @_lib_sys_event("_SetQueryVar")
-    def on_set_query_var(self, args):
-        entity_id = args['entity_id']
-        name = args['name']
-        value = args['value']
-        self._query_cache.setdefault(entity_id, {})[name] = value
-        self.BroadcastToAllClient("_SetQueryVar", args)
+    @_lib_sys_event("UiInitFinished")
+    def _on_ui_init_finished(self, args):
+        player_id = args['__id__']
+        if self._query_cache:
+            self.NotifyToClient(player_id, "_SetQueryCache", self._query_cache)
+
+    # BroadcastToAllClient =============================================================================================
 
     @_lib_sys_event("_BroadcastToAllClient")
     def _on_broadcast_to_all_client(self, args):
@@ -93,13 +102,53 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
             event_data['__id__'] = args['__id__']
         _ServerSystem(namespace, sys_name).BroadcastToAllClient(event_name, event_data)
 
-    @_lib_sys_event("UiInitFinished")
-    def _on_ui_init_finished(self, args):
-        player_id = args['__id__']
-        if self._query_cache:
-            self.NotifyToClient(player_id, "_SetQueryCache", self._query_cache)
+    # NotifyToMultiClients =============================================================================================
 
-    # Item Grid ========================================================================================================
+    @_lib_sys_event("_NotifyToMultiClients")
+    def _notify_to_multi_clients(self, args):
+        player_ids = args['player_ids']
+        event_name = args['event_name']
+        event_data = args['event_data']
+        namespace = args['namespace']
+        sys_name = args['sys_name']
+        if isinstance(event_data, dict) and '__id__' in args:
+            event_data['__id__'] = args['__id__']
+        _ServerSystem(namespace, sys_name).NotifyToMultiClients(player_ids, event_name, event_data)
+
+    # set_query_mod_var ================================================================================================
+
+    @_lib_sys_event("_SetQueryVar")
+    def on_set_query_var(self, args):
+        entity_id = args['entity_id']
+        name = args['name']
+        value = args['value']
+        self._query_cache.setdefault(entity_id, {})[name] = value
+        self.BroadcastToAllClient("_SetQueryVar", args)
+
+    # call =============================================================================================================
+
+    @_lib_sys_event("_NuoyanLibCall")
+    def _be_called(self, args):
+        namespace = args['namespace']
+        system_name = args['system_name']
+        method = args['method']
+        delay_ret = args['delay_ret']
+        call_args = args['args']
+        call_kwargs = args['kwargs']
+        uuid = args['uuid']
+        playerId = args['__id__']
+        target_sys = _server_api.GetSystem(namespace, system_name)
+        def callback(cb_args):
+            self.NotifyToClient(playerId, "_NuoyanLibCallReturn", {'uuid': uuid, 'cb_args': cb_args})
+        _call_local(target_sys, method, callback, delay_ret, call_args, call_kwargs)
+
+    @_lib_sys_event("_NuoyanLibCallReturn")
+    def _call_return(self, args):
+        uuid = args['uuid']
+        cb_args = args['cb_args']
+        _call_callback(uuid, **cb_args)
+
+    # Item Grid （已废弃） ===============================================================================================
 
     @_lib_sys_event("_RegisterItemGrid")
     def _on_register_item_grid(self, args):
@@ -315,18 +364,6 @@ class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
             return _deepcopy_item_dict(items)
         elif index < len(items):
             return _deepcopy_item_dict(items[index])
-
-
-_lib_sys = None
-
-
-def get_lib_system():
-    global _lib_sys
-    if not _lib_sys:
-        _lib_sys = _server_api.GetSystem(_LIB_NAME, _LIB_SERVER_NAME)
-    if not _lib_sys:
-        _log("Get server lib system failed!", level="ERROR")
-    return _lib_sys
 
 
 

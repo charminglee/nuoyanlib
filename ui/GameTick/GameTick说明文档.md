@@ -1,4 +1,4 @@
-# GameTick说明文档
+# GameTick说明文档 [已废弃]
 
 当我们实现某些需要帧执行的功能时，常常会用到ModAPI提供的`OnScriptTickClient`或`OnScriptTickServer`事件，这两个事件每秒30次的触发频率能满足我们绝大部分的需求。  
 

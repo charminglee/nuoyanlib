@@ -12,14 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
 
-from typing import Tuple
+from typing import List
+from .._core._typing import EntFilter
 
 
-def set_query_mod_var(entity_id: str, name: str, value: float, sync: bool = True) -> bool: ...
-def add_player_render_resources(player_id: str, rebuild: bool, *res_tuple: Tuple[str, str]) -> Tuple[bool, ...]: ...
-def add_entity_render_resources(entity_id: str, rebuild: bool, *res_tuple: Tuple[str, str]) -> Tuple[bool, ...]: ...
+def get_entities_within_view(
+    world_dist: float = 50,
+    screen_dist: float = 100,
+    ent_filter: EntFilter = None,
+) -> List[str]: ...

@@ -12,18 +12,19 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2025-01-29
 #
 # ====================================================
 
 
-from typing import Dict, List, Tuple, Optional, Union, Set
+from typing import Dict, List, Tuple, Optional, Union, Set, Callable
+from .._core._typing import FTuple3
 
 
 def set_query_mod_var(entity_id: str, name: str, value: float) -> bool: ...
 def clear_effects(entity_id: str) -> None: ...
 def bounce_entities(
-    pos: Tuple[float, float, float],
+    pos: FTuple3,
     dim: int,
     radius: float,
     power: float,
@@ -33,7 +34,7 @@ def bounce_entities(
     filter_abiotic: bool =False,
 ) -> List[str]: ...
 def attract_entities(
-    pos: Tuple[float, float, float],
+    pos: FTuple3,
     dim: int,
     radius: float,
     power: float,
@@ -47,27 +48,27 @@ def all_mob(entity_id_list: List[str]) -> bool: ...
 def any_mob(entity_id_list: List[str]) -> bool: ...
 def entity_filter(
     entity_list: List[str],
-    *args: Union[Tuple[Tuple[float, float, float], float], int, List[str], List[int], Set[int], Set[str]],
+    *args: Union[Tuple[FTuple3, float], int, List[str], List[int], Set[int], Set[str]],
 ) -> List[str]: ...
 def is_entity_type(entity_id: str, etype: Union[int, str]) -> bool: ...
-def sort_entity_list_by_dist(entity_list: List[str], pos: Tuple[float, float, float]) -> None: ...
+def sort_entity_list_by_dist(entity_list: List[str], pos: FTuple3) -> None: ...
 def launch_projectile(
     projectile_name: str,
     spawner_id: str,
     power: Optional[float] = None,
     damage: Optional[int] = None,
-    position: Optional[Tuple[float, float, float]] = None,
-    direction: Optional[Tuple[float, float, float]] = None,
+    position: Optional[FTuple3] = None,
+    direction: Optional[FTuple3] = None,
     gravity: Optional[float] = None,
     target_id: str = "",
     damage_owner: bool = False,
 ) -> str: ...
 def entity_plunge(entity_id1: str, entity_id2: str, speed: float) -> None: ...
-def entity_plunge_by_dir(entity_id: str, direction: Tuple[float, float, float], speed: float) -> None: ...
+def entity_plunge_by_dir(entity_id: str, direction: FTuple3, speed: float) -> None: ...
 def entity_plunge_by_rot(entity_id: str, rot: Tuple[float, float], speed: float) -> None: ...
-def get_all_entities() -> List[str]: ...
+def get_all_entities(ent_filter: Optional[Callable[[str], bool]] = None) -> List[str]: ...
 def get_entities_in_area(
-    pos: Tuple[float, float, float],
+    pos: FTuple3,
     radius: float,
     dimension: int = 0,
     filter_ids: Optional[List[str]] = None,
@@ -77,7 +78,7 @@ def get_entities_in_area(
 ) -> List[str]: ...
 def get_entities_by_type(
     type_id: int,
-    pos: Optional[Tuple[float, float, float]] = None,
+    pos: Optional[FTuple3] = None,
     dimension: int = 0,
     radius: float = 0.0,
 ) -> List[str]: ...
@@ -89,7 +90,7 @@ def get_entities_by_locking(
     filter_types: Optional[List[int]] = None,
 ) -> List[str]: ...
 def get_nearest_entity(
-    obj: Union[str, Tuple[float, float, float]],
+    obj: Union[str, FTuple3],
     count: int = 1,
     dim: int = 0,
     radius: float = -1.0,
@@ -105,8 +106,8 @@ def attack_nearest_mob(
 ) -> Optional[str]: ...
 def has_effect(entity_id: str, effect_id: str) -> bool: ...
 def get_entities_by_ray(
-    start_pos: Tuple[float, float, float],
-    direction: Tuple[float, float, float],
+    start_pos: FTuple3,
+    direction: FTuple3,
     length: float,
     dimension: int = 0,
     count: int = 0,
