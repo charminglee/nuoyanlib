@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
@@ -26,7 +26,7 @@ from .._core._server._comp import (
 from .._core._server._lib_server import (
     get_lib_system as _get_lib_system,
 )
-from ..utils.calculator import (
+from ..utils.mc_math import (
     pos_distance as _pos_distance,
     ray_aabb_intersection as _ray_aabb_intersection,
 )

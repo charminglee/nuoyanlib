@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-26
+#   Last Modified : 2025-02-16
 #
 # ====================================================
 
@@ -22,14 +22,44 @@ from mod.client.system.clientSystem import ClientSystem
 from mod.server.system.serverSystem import ServerSystem
 
 
-_CallbackType = Optional[Callable[[Dict[str, Any]], Any]]
+__CallbackType = Optional[Callable[[Dict[str, Any]], Any]]
 
 
-_callback_data: Dict[str, Dict[str, Union[int, _CallbackType]]]
+class Caller(object):
+    namespace: str
+    system_name: str
+    method: str
+    def __init__(self, namespace: str, system_name: str, method: str = "") -> None: ...
+    def __call__(
+        self,
+        args: Optional[Tuple[Any, ...]] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
+        method: str = "",
+        player_id: Optional[Union[str, List[str]]] = None,
+        callback: __CallbackType = None,
+        delay_ret: float = -1,
+    ) -> None: ...
+
+
+def call_func(
+    func_path: str,
+    args: Optional[Tuple[Any, ...]] = None,
+    kwargs: Optional[Dict[str, Any]] = None,
+    callback: __CallbackType = None,
+    delay_ret: float = -1,
+) -> None: ...
+def broadcast_to_all_systems(
+    event_name: str,
+    event_args: Any,
+    from_system: Union[ClientSystem, ServerSystem, Tuple[str, str]],
+) -> None: ...
+
+
+__callback_data: Dict[str, Dict[str, Union[int, __CallbackType]]]
 
 
 def call_callback(
-    cb_or_uuid: Union[_CallbackType, str],
+    cb_or_uuid: Union[__CallbackType, str],
     delay_ret: float = -1,
     success: bool = Tuple,
     ret: Any = None,
@@ -39,17 +69,17 @@ def call_callback(
 def call_local(
     target_sys: Union[ClientSystem, ServerSystem],
     method: str,
-    cb_or_uuid: Union[_CallbackType, str],
+    cb_or_uuid: Union[__CallbackType, str],
     delay_ret: float,
     args: Optional[Tuple[Any, ...]],
     kwargs: Optional[Dict[str, Any]],
 ) -> None: ...
-def _notify_call(
+def __notify_call(
     namespace: str,
     system_name: str,
     method: str,
     player_id: Union[str, List[str], None],
-    callback: _CallbackType,
+    callback: __CallbackType,
     delay_ret: float,
     args: Optional[Tuple[Any, ...]],
     kwargs: Optional[Dict[str, Any]],
@@ -58,10 +88,9 @@ def call(
     namespace: str,
     system_name: str,
     method: str,
-    player_id: Optional[Union[str, List[str]]] = None,
-    callback: _CallbackType = None,
-    delay_ret: float = -1,
-    timeout: float = 3.0,
     args: Optional[Tuple[Any, ...]] = None,
     kwargs: Optional[Dict[str, Any]] = None,
+    player_id: Optional[Union[str, List[str]]] = None,
+    callback: __CallbackType = None,
+    delay_ret: float = -1,
 ) -> None: ...

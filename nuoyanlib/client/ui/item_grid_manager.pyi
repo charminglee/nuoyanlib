@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2025-02-20
 #
 # ====================================================
 
@@ -25,7 +25,7 @@ from .item_tips_box import ItemTipsBox
 from .screen_node import NuoyanScreenNode
 from ..._core._typing import ItemCellPos, ItemCell, ItemDict, EventArgs, ItemGridKeys, ItemHeapData, ItemSelectedData
 from ..._core._client._lib_client import NuoyanLibClientSystem
-from ..._core._client._listener import event, lib_sys_event
+from ..._core._listener import event, lib_sys_event
 
 
 _IMAGE_PATH_ITEM_CELL_SELECTED: str

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-29
+#   Last Modified : 2025-02-21
 #
 # ====================================================
 
@@ -36,7 +36,8 @@ del server_api, LIB_NAME, LIB_SERVER_NAME, LIB_SERVER_PATH
 
 
 from .._core._server._comp import *
-from .._core._server._listener import (
+from .._core._listener import (
+    quick_listen,
     event,
 )
 

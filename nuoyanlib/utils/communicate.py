@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-26
+#   Last Modified : 2025-02-16
 #
 # ====================================================
 
@@ -28,22 +28,75 @@ from .._core._sys import (
 
 
 __all__ = [
-    "call_callback",
-    "call_local",
+    "Caller",
+    "broadcast_to_all_systems",
     "call",
 ]
 
 
-_callback_data = {}
+# todo
+class Caller(object):
+    def __init__(self, namespace, system_name, method=""):
+        self.namespace = namespace
+        self.system_name = system_name
+        self.method = method
+
+    def __call__(self, args=None, kwargs=None, method="", player_id=None, callback=None, delay_ret=-1):
+        method = method or self.method
+        return call(self.namespace, self.system_name, method, args, kwargs, player_id, callback, delay_ret)
+
+
+# todo
+def call_func(func_path, args=None, kwargs=None, callback=None, delay_ret=-1):
+    pass
+
+
+def broadcast_to_all_systems(event_name, event_args, from_system):
+    """
+    | 广播事件到所有系统，包括客户端和服务端。
+
+    -----
+
+    :param str event_name: 事件名
+    :param Any event_args: 事件参数
+    :param ClientSystem|ServerSystem|tuple[str,str] from_system: 事件来源系统，可传入系统实例或元组：(命名空间, 系统名称)
+
+    :return: 无
+    :rtype: None
+    """
+    api = _get_api()
+    if _is_client():
+        from .._core._client._lib_client import get_lib_system
+        lib_sys = get_lib_system()
+        if isinstance(from_system, tuple):
+            lib_sys.broadcast_to_all_client(event_name, event_args, *from_system)
+            from_system = api.GetSystem(*from_system)
+            if not from_system:
+                from mod.client.system.clientSystem import ClientSystem
+                from_system = ClientSystem(*from_system)
+        else:
+            lib_sys.broadcast_to_all_client(event_name, event_args, from_system.namespace, from_system.systemName)
+        from_system.NotifyToServer(event_name, event_args)
+    else:
+        if isinstance(from_system, tuple):
+            from_system = api.GetSystem(*from_system)
+            if not from_system:
+                from mod.server.system.serverSystem import ServerSystem
+                from_system = ServerSystem(*from_system)
+        from_system.BroadcastToAllClient(event_name, event_args)
+        from_system.BroadcastEvent(event_name, event_args)
+
+
+__callback_data = {}
 
 
 def call_callback(cb_or_uuid, delay_ret=-1, success=True, ret=None, error="", player_id=""):
     if isinstance(cb_or_uuid, str):
-        data = _callback_data[cb_or_uuid]
+        data = __callback_data[cb_or_uuid]
         callback = data['callback']
         data['count'] -= 1
         if data['count'] <= 0:
-            del _callback_data[cb_or_uuid]
+            del __callback_data[cb_or_uuid]
     else:
         callback = cb_or_uuid
     if not callback:
@@ -72,7 +125,7 @@ def call_local(target_sys, method, cb_or_uuid, delay_ret, args, kwargs):
             call_callback(cb_or_uuid, delay_ret, True, ret, player_id=player_id)
 
 
-def _notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs):
+def __notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs):
     uuid = str(_uuid4())
     notify_args = {
         'namespace': namespace,
@@ -83,7 +136,7 @@ def _notify_call(namespace, system_name, method, player_id, callback, delay_ret,
         'args': args,
         'kwargs': kwargs,
     }
-    _callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
+    __callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
     if _is_client():
         from .._core._client._lib_client import get_lib_system
         lib_sys = get_lib_system()
@@ -100,12 +153,11 @@ def call(
         namespace,
         system_name,
         method,
+        args=None,
+        kwargs=None,
         player_id=None,
         callback=None,
         delay_ret=-1,
-        timeout=3.0, # todo
-        args=None,
-        kwargs=None,
 ):
     """
     | 调用指定客户端或服务端系统的函数，可以通过回调函数获取被调用函数的返回值。
@@ -121,12 +173,11 @@ def call(
     :param str namespace: 被调用函数所在系统的命名空间
     :param str system_name: 被调用函数所在系统的名称
     :param str method: 被调用函数名
+    :param tuple args: 位置参数元组，展开后传入被调用函数中
+    :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数中
     :param str|list[str]|None player_id: 当被调用方为客户端时，可以指定玩家实体ID，传入玩家实体ID列表即可指定多个玩家，或用单字符"*"表示所有玩家；默认为None，表示被调用方为服务端
     :param function|None callback: 回调函数，默认为None；接受一个带有三个参数的字典，参数说明见上方
     :param float delay_ret: 延迟返回时间，单位为秒，若设置了该值，则callback触发前会延迟给定时间；但由于跨端调用本身存在不可避免的网络延迟，实际的延迟时间会大于此处给定的值；默认为-1，即无延迟
-    :param float timeout: 超时时间，单位为秒，若超时时间内未收到被调用函数的返回值，将判定为调用失败，默认为3.0
-    :param tuple args: 位置参数元组，展开后传入被调用函数中
-    :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数中
 
     :return: 无
     :rtype: None
@@ -142,7 +193,7 @@ def call(
     if _is_client():
         # c to s
         if not target_sys and not player_id:
-            _notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+            __notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
         # c to c
         else:
             local_plr = api.GetLocalPlayerId()
@@ -150,7 +201,7 @@ def call(
                 call_local(target_sys, method, callback, delay_ret, args, kwargs)
                 player_id.remove(local_plr)
             if player_id:
-                _notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+                __notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
     else:
         # s to s
         if target_sys:
@@ -159,7 +210,7 @@ def call(
             call_callback(callback, delay_ret, False)
         # s to c
         else:
-            _notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+            __notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
 
 
 

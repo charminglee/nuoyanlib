@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-06-19
+#   Last Modified : 2025-02-04
 #
 # ====================================================
 
@@ -154,7 +154,7 @@ def set_namespace(name, namespace="minecraft"):
     return ":".join(name_lst)
 
 
-def _same(what1, what2):
+def __same(what1, what2):
     return (not what1 and not what2) or what1 == what2
 
 
@@ -188,7 +188,7 @@ def is_same_item(item_dict1, item_dict2):
     item_data2[0] = set_namespace(item_data2[0])
     extra_id1, extra_id2 = item_dict1.get('extraId'), item_dict2.get('extraId')
     user_data1, user_data2 = item_dict1.get('userData'), item_dict2.get('userData')
-    if not _same(extra_id1, extra_id2) or not _same(user_data1, user_data2):
+    if not __same(extra_id1, extra_id2) or not __same(user_data1, user_data2):
         return False
     return item_data1 == item_data2
 
@@ -211,7 +211,7 @@ def are_same_item(item, *other_item):
     return True
 
 
-_AIR = ("minecraft:air", "air")
+__AIR = ("minecraft:air", "air")
 
 
 def is_empty_item(item, zero_is_emp=True):
@@ -230,8 +230,8 @@ def is_empty_item(item, zero_is_emp=True):
         not item
         or ('newItemName' not in item and 'itemName' not in item)
         or (zero_is_emp and item.get('count', 1) <= 0)
-        or item.get('newItemName') in _AIR
-        or item.get('itemName') in _AIR
+        or item.get('newItemName') in __AIR
+        or item.get('itemName') in __AIR
     )
 
 

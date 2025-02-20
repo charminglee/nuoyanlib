@@ -28,10 +28,10 @@ def random_pos(
     use_top_height: bool = False,
     dimension: int = 0,
 ) -> Optional[FTuple3]: ...
-def _gen_str(choice: Callable[[Sequence], Any], s: str, l: int) -> str: ...
+def __gen_str(choice: Callable[[Sequence], Any], s: str, l: int) -> str: ...
 
 
-_random_ins: Dict[Any, Random]
+__random_ins: Dict[Any, Random]
 
 
 def random_string(
@@ -42,7 +42,7 @@ def random_string(
     seed: Any = None,
     generate_num: int = 1,
 ) -> Union[str, List[str]]: ...
-def _is_pos_far_enough(
+def __is_pos_far_enough(
     poses: List[FTuple3],
     x: float,
     y: float,

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-25
+#   Last Modified : 2025-02-04
 #
 # ====================================================
 
@@ -28,7 +28,7 @@ from .._core._server._comp import (
     CompFactory as _CompFactory,
     LvComp as _LvComp,
 )
-from ..utils.calculator import (
+from ..utils.mc_math import (
     is_in_sector as _is_in_sector,
     pos_distance_to_line as _pos_distance_to_line,
 )
@@ -53,7 +53,7 @@ __all__ = [
 ]
 
 
-_sdk_damage_cause = [v for k, v in _ActorDamageCause.__dict__.items() if not k.startswith("_")]
+__sdk_damage_cause = [v for k, v in _ActorDamageCause.__dict__.items() if not k.startswith("_")]
 
 
 class EntityFilter:
@@ -462,7 +462,7 @@ def hurt(
     :return: 无
     :rtype: None
     """
-    if cause in _sdk_damage_cause:
+    if cause in __sdk_damage_cause:
         custom_tag = None
     else:
         custom_tag = cause

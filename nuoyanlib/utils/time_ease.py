@@ -229,6 +229,10 @@ class TimeEaseFunc:
 
 
 class TimeEase(object):
+    """
+    时间缓动对象。
+    """
+
     def __init__(self, start_val, end_val, total_tm, fps=0, hold_on_last_frame=False, ease_func=TimeEaseFunc.linear):
         """
         | 创建一个时间缓动对象，内置各种时间缓动函数，可用于实现UI动画、运镜等的平滑过渡效果。
@@ -239,8 +243,8 @@ class TimeEase(object):
         :param float start_val: 初始值
         :param float end_val: 最终值
         :param float total_tm: 变化总时间，单位为秒
-        :param int fps: 变化帧率，小于等于0的值将根据当前时间返回缓动值，默认为0
-        :param bool hold_on_last_frame: 是否停止在最后一帧，若设为True，TimeEase可无限迭代，时间结束后将始终返回最后一帧的值，默认为False
+        :param int fps: 变化帧率，小于等于0的值将根据实际时间确定缓动值，默认为0
+        :param bool hold_on_last_frame: 是否停止在最后一帧；若设为True，TimeEase可无限迭代，变化结束后将始终返回最后一帧的值；若设为False，变化结束后继续迭代将抛出StopIteration异常；默认为False
         :param function ease_func: 时间缓动函数，可使用TimeEaseFunc提供的函数，或使用自定义函数，该函数接受并返回一个float值，且取值范围均为[0, 1]，默认为TimeEaseFunc.linear
         """
         self.start_val = start_val
@@ -274,7 +278,7 @@ class TimeEase(object):
 
     def reset(self):
         """
-        | 重置状态，重新开始计算。
+        | 重置状态，重头开始计算。
 
         -----
 

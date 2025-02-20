@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
@@ -41,97 +41,97 @@ CompFactory = _server_api.GetEngineCompFactory()
 LEVEL_ID = _server_api.GetLevelId()
 
 
-class _CompDescr(object):
+class CompDescr(object):
     def __init__(self, comp_name):
-        self.comp_name = comp_name
+        self._comp_name = comp_name
 
     def __get__(self, ins, cls):
-        if self.comp_name not in cls._cache:
-            comp = getattr(CompFactory, "Create" + self.comp_name)(LEVEL_ID)
-            cls._cache[self.comp_name] = comp
-        return cls._cache[self.comp_name]
+        if self._comp_name not in cls._cache:
+            comp = getattr(CompFactory, "Create" + self._comp_name)(LEVEL_ID)
+            cls._cache[self._comp_name] = comp
+        return cls._cache[self._comp_name]
 
 
-class _CompPool(object):
-    EntityDefinitions = _CompDescr("EntityDefinitions")
-    AiCommand = _CompDescr("AiCommand")
-    BlockEntity = _CompDescr("BlockEntity")
-    Loot = _CompDescr("Loot")
-    Interact = _CompDescr("Interact")
-    Feature = _CompDescr("Feature")
-    ActorMotion = _CompDescr("ActorMotion")
-    CollisionBox = _CompDescr("CollisionBox")
-    Dimension = _CompDescr("Dimension")
-    BulletAttributes = _CompDescr("BulletAttributes")
-    EngineType = _CompDescr("EngineType")
-    ActorCollidable = _CompDescr("ActorCollidable")
-    Player = _CompDescr("Player")
-    RedStone = _CompDescr("RedStone")
-    BlockInfo = _CompDescr("BlockInfo")
-    Item = _CompDescr("Item")
-    Block = _CompDescr("Block")
-    Pet = _CompDescr("Pet")
-    Attr = _CompDescr("Attr")
-    Persistence = _CompDescr("Persistence")
-    Gravity = _CompDescr("Gravity")
-    Recipe = _CompDescr("Recipe")
-    Ride = _CompDescr("Ride")
-    BlockUseEventWhiteList = _CompDescr("BlockUseEventWhiteList")
-    Explosion = _CompDescr("Explosion")
-    Scale = _CompDescr("Scale")
-    Biome = _CompDescr("Biome")
-    Pos = _CompDescr("Pos")
-    Fly = _CompDescr("Fly")
-    Hurt = _CompDescr("Hurt")
-    Projectile = _CompDescr("Projectile")
-    ExtraData = _CompDescr("ExtraData")
-    ItemBanned = _CompDescr("ItemBanned")
-    ActorLoot = _CompDescr("ActorLoot")
-    EntityComponent = _CompDescr("EntityComponent")
-    Tag = _CompDescr("Tag")
-    Breath = _CompDescr("Breath")
-    BlockState = _CompDescr("BlockState")
-    Achievement = _CompDescr("Achievement")
-    ChestBlock = _CompDescr("ChestBlock")
-    Weather = _CompDescr("Weather")
-    Lv = _CompDescr("Lv")
-    AuxValue = _CompDescr("AuxValue")
-    MoveTo = _CompDescr("MoveTo")
-    Action = _CompDescr("Action")
-    Command = _CompDescr("Command")
-    BlockEntityData = _CompDescr("BlockEntityData")
-    ActorOwner = _CompDescr("ActorOwner")
-    Tame = _CompDescr("Tame")
-    Http = _CompDescr("Http")
-    Portal = _CompDescr("Portal")
-    ChunkSource = _CompDescr("ChunkSource")
-    ControlAi = _CompDescr("ControlAi")
-    MobSpawn = _CompDescr("MobSpawn")
-    Model = _CompDescr("Model")
-    ChatExtension = _CompDescr("ChatExtension")
-    ActorPushable = _CompDescr("ActorPushable")
-    Exp = _CompDescr("Exp")
-    Rot = _CompDescr("Rot")
-    Game = _CompDescr("Game")
-    Shareables = _CompDescr("Shareables")
-    Effect = _CompDescr("Effect")
-    Msg = _CompDescr("Msg")
-    ModAttr = _CompDescr("ModAttr")
-    Time = _CompDescr("Time")
-    EntityEvent = _CompDescr("EntityEvent")
-    Name = _CompDescr("Name")
+class __CompPool(object):
+    EntityDefinitions = CompDescr("EntityDefinitions")
+    AiCommand = CompDescr("AiCommand")
+    BlockEntity = CompDescr("BlockEntity")
+    Loot = CompDescr("Loot")
+    Interact = CompDescr("Interact")
+    Feature = CompDescr("Feature")
+    ActorMotion = CompDescr("ActorMotion")
+    CollisionBox = CompDescr("CollisionBox")
+    Dimension = CompDescr("Dimension")
+    BulletAttributes = CompDescr("BulletAttributes")
+    EngineType = CompDescr("EngineType")
+    ActorCollidable = CompDescr("ActorCollidable")
+    Player = CompDescr("Player")
+    RedStone = CompDescr("RedStone")
+    BlockInfo = CompDescr("BlockInfo")
+    Item = CompDescr("Item")
+    Block = CompDescr("Block")
+    Pet = CompDescr("Pet")
+    Attr = CompDescr("Attr")
+    Persistence = CompDescr("Persistence")
+    Gravity = CompDescr("Gravity")
+    Recipe = CompDescr("Recipe")
+    Ride = CompDescr("Ride")
+    BlockUseEventWhiteList = CompDescr("BlockUseEventWhiteList")
+    Explosion = CompDescr("Explosion")
+    Scale = CompDescr("Scale")
+    Biome = CompDescr("Biome")
+    Pos = CompDescr("Pos")
+    Fly = CompDescr("Fly")
+    Hurt = CompDescr("Hurt")
+    Projectile = CompDescr("Projectile")
+    ExtraData = CompDescr("ExtraData")
+    ItemBanned = CompDescr("ItemBanned")
+    ActorLoot = CompDescr("ActorLoot")
+    EntityComponent = CompDescr("EntityComponent")
+    Tag = CompDescr("Tag")
+    Breath = CompDescr("Breath")
+    BlockState = CompDescr("BlockState")
+    Achievement = CompDescr("Achievement")
+    ChestBlock = CompDescr("ChestBlock")
+    Weather = CompDescr("Weather")
+    Lv = CompDescr("Lv")
+    AuxValue = CompDescr("AuxValue")
+    MoveTo = CompDescr("MoveTo")
+    Action = CompDescr("Action")
+    Command = CompDescr("Command")
+    BlockEntityData = CompDescr("BlockEntityData")
+    ActorOwner = CompDescr("ActorOwner")
+    Tame = CompDescr("Tame")
+    Http = CompDescr("Http")
+    Portal = CompDescr("Portal")
+    ChunkSource = CompDescr("ChunkSource")
+    ControlAi = CompDescr("ControlAi")
+    MobSpawn = CompDescr("MobSpawn")
+    Model = CompDescr("Model")
+    ChatExtension = CompDescr("ChatExtension")
+    ActorPushable = CompDescr("ActorPushable")
+    Exp = CompDescr("Exp")
+    Rot = CompDescr("Rot")
+    Game = CompDescr("Game")
+    Shareables = CompDescr("Shareables")
+    Effect = CompDescr("Effect")
+    Msg = CompDescr("Msg")
+    ModAttr = CompDescr("ModAttr")
+    Time = CompDescr("Time")
+    EntityEvent = CompDescr("EntityEvent")
+    Name = CompDescr("Name")
 
 
-class LvComp(_CompPool):
+class LvComp(__CompPool):
     _cache = {}
 
 
 if __name__ == "__main__":
     l = []
-    for k, v in _CompPool.__dict__.items():
+    for k, v in __CompPool.__dict__.items():
         if k.startswith("__"):
             continue
-        l.append(k == v.comp_name)
+        l.append(k == v._comp_name)
     assert all(l)
 
 

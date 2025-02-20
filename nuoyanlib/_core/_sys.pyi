@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-08
+#   Last Modified : 2025-02-21
 #
 # ====================================================
 
@@ -22,13 +22,12 @@ import mod.client.extraClientApi as client_api
 import mod.server.extraServerApi as server_api
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
+from ._client._lib_client import NuoyanLibClientSystem
+from ._server._lib_server import NuoyanLibServerSystem
 
 
-mod_config: Dict[str, Any]
-
-
+def get_lib_system() -> Union[NuoyanLibClientSystem, NuoyanLibServerSystem, None]: ...
 def is_apollo() -> bool: ...
-def get_opposite_system(sys_name: str) -> Optional[str]: ...
 def is_client() -> bool: ...
 def get_api() -> Union[client_api, server_api]: ...
 def get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...

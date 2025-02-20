@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2025-02-08
 #
 # ====================================================
 
@@ -874,6 +874,20 @@ class NeteaseFrameAnim(object):
         :rtype: bool
         """
         return self._ctrl.SetUsePointFiltering(use)
+
+    def SetGlobal(self, isGlobal):
+        """
+        | 设置序列帧是否是全局的。
+        | 全局时，不会因摄像机的视野范围而被裁剪。
+
+        -----
+
+        :param bool isGlobal: True为全局，False为非全局，默认为False
+
+        :return: 是否成功
+        :rtype: bool
+        """
+        return self._ctrl.SetGlobal(isGlobal)
 
 
 

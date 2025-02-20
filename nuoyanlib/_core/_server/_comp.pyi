@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-11
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
@@ -97,12 +97,13 @@ CompFactory: EngineCompFactoryServer
 LEVEL_ID: str
 
 
-class _CompDescr(object):
+class CompDescr(object):
+    _comp_name: str
     def __init__(self: ..., comp_name: str) -> None: ...
-    def __get__(self: ..., ins: _CompPool, cls: Type[_CompPool]) -> BaseComponent: ...
+    def __get__(self: ..., ins: LvComp, cls: Type[LvComp]) -> BaseComponent: ...
 
 
-class _CompPool(object):
+class __CompPool(object):
     EntityDefinitions: EntityDefinitionsCompServer
     AiCommand: AiCommandComponentServer
     BlockEntity: BlockEntityCompServer
@@ -172,7 +173,7 @@ class _CompPool(object):
     Name: NameComponentServer
 
 
-class LvComp(_CompPool):
+class LvComp(__CompPool):
     _cache: Dict[str, BaseComponent]
 
 

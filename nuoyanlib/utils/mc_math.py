@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-09
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
@@ -53,19 +53,14 @@ __all__ = [
     "to_relative_pos",
     "to_screen_pos",
     "pos_rotate",
-    "straight_pos_list",
     "midpoint",
     "camera_rot_p2p",
-    "circle_pos_list",
     "pos_entity_facing",
     "pos_forward_rot",
     "n_quantiles_index_list",
     "cube_center",
     "cube_longest_side_len",
     "is_in_sector",
-    "sphere_pos_list",
-    "cube_pos_list",
-    "spiral_pos_list",
     "is_in_cube",
     "rot_diff",
     "ray_aabb_intersection",
@@ -296,37 +291,6 @@ def pos_rotate(angle, pos):
     return rotate_x, rotate_y
 
 
-def straight_pos_list(pos1, pos2, count, only=-1):
-    """
-    | 计算给定两点连线上各点的坐标（不包括 ``pos1`` 和 ``pos2`` ）。
-        
-    -----
-    
-    :param tuple[float,float,float] pos1: 坐标1
-    :param tuple[float,float,float] pos2: 坐标2
-    :param int count: 返回的坐标的个数
-    :param int only: 只取前only个点，-1表示取所有点
-        
-    :return: 坐标元组列表
-    :rtype: list[tuple[float,float,float]]
-    """
-    if not pos1 or not pos2:
-        return []
-    xd = pos1[0] - pos2[0]
-    yd = pos1[1] - pos2[1]
-    zd = pos1[2] - pos2[2]
-    x_step = xd / (count + 1)
-    y_step = yd / (count + 1)
-    z_step = zd / (count + 1)
-    result = []
-    if only != -1:
-        count = only
-    while count > 0:
-        result.append((pos2[0] + x_step * count, pos2[1] + y_step * count, pos2[2] + z_step * count))
-        count -= 1
-    return result
-
-
 def midpoint(first_point, second_point):
     """
     | 计算给定两点间的中点坐标。
@@ -369,32 +333,6 @@ def camera_rot_p2p(pos1, pos2):
     horizontal_rot = 90 + (_atan(z / x) / _pi) * 180 + (0 if x > 0 else -180)
     vertical_rot = -(_atan(y / hori_dis) / _pi) * 180
     return vertical_rot, horizontal_rot
-
-
-def circle_pos_list(center_pos, radius, density):
-    """
-    | 计算以某一坐标为圆心的圆上各点的坐标。
-
-    -----
-
-    :param tuple[float,float,float] center_pos: 圆心坐标
-    :param float radius: 半径
-    :param int density: 返回的坐标个数
-
-    :return: 坐标列表
-    :rtype: list[tuple[float,float,float]]
-    """
-    if not center_pos:
-        return []
-    result = []
-    step = (2 * _pi) / density
-    ox, oy, oz = center_pos
-    for i in range(density):
-        angle = i * step
-        nx = radius * _sin(angle) + ox
-        nz = radius * _cos(angle) + oz
-        result.append((nx, oy, nz))
-    return result
 
 
 def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
@@ -551,112 +489,6 @@ def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_ang
             if r[0] <= test_pos_angle <= r[1]:
                 return True
     return False
-
-
-def sphere_pos_list(center_pos, radius, density):
-    """
-    | 根据球心、半径计算球面上各点的坐标。
-        
-    -----
-    
-    :param tuple[float,float,float] center_pos: 球心坐标
-    :param float radius: 半径
-    :param int density: 返回的坐标个数
-        
-    :return: 坐标列表
-    :rtype: list[tuple[float,float,float]]
-    """
-    step1 = _pi / density
-    step2 = (2 * _pi) / density
-    a, b = 0, 0
-    result = []
-    while a < _pi:
-        while b < 2 * _pi:
-            x = center_pos[0] + radius * _sin(a) * _cos(b)
-            y = center_pos[1] + radius * _sin(a) * _sin(b)
-            z = center_pos[2] + radius * _cos(a)
-            result.append((x, y, z))
-            b += step2
-        a += step1
-        b = 0
-    return result
-
-
-def cube_pos_list(pos1, pos2, step=1):
-    """
-    | 计算立方体区域内各点的坐标。
-        
-    -----
-    
-    :param tuple[float,float,float] pos1: 立方体对角坐标1
-    :param tuple[float,float,float] pos2: 立方体对角坐标2
-    :param int step: 迭代步长
-        
-    :return: 坐标列表
-    :rtype: list[tuple[float,float,float]]
-    """
-    if not pos1 or not pos2 or step <= 0:
-        return []
-    if pos1[0] <= pos2[0]:
-        minx, maxx = pos1[0], pos2[0]
-    else:
-        minx, maxx = pos2[0], pos1[0]
-    if pos1[1] <= pos2[1]:
-        miny, maxy = pos1[1], pos2[1]
-    else:
-        miny, maxy = pos2[1], pos1[1]
-    if pos1[2] <= pos2[2]:
-        minz, maxz = pos1[2], pos2[2]
-    else:
-        minz, maxz = pos2[2], pos1[2]
-    x, y, z = minx, miny, minz
-    result = []
-    while x <= maxx:
-        y = miny
-        while y <= maxy:
-            z = minz
-            while z <= maxz:
-                result.append((x, y, z))
-                z += step
-            y += step
-        x += step
-    return result
-
-
-def spiral_pos_list(start_pos, iterations):
-    """
-    | 生成螺旋轨迹坐标列表。
-
-    -----
-
-    :param tuple[float,float,float] start_pos: 开始坐标
-    :param int iterations: 迭代次数
-
-    :return: 坐标列表
-    :rtype: list[tuple[float,float,float]]
-    """
-    res = []
-    axis = 0
-    rel_pos = [0, 0]
-    init_step = step = 1
-    for i in range(iterations):
-        if i > 0:
-            if axis == 0:
-                rel_pos[0] += 1
-            elif axis == 1:
-                rel_pos[1] -= 1
-            elif axis == 2:
-                rel_pos[0] -= 1
-            else:
-                rel_pos[1] += 1
-            step -= 1
-            if step <= 0:
-                axis = (axis + 1) % 4
-                if axis == 0 or axis == 2:
-                    init_step += 1
-                step = init_step
-        res.append((start_pos[0] + rel_pos[0], start_pos[1], start_pos[2] + rel_pos[1]))
-    return res
 
 
 def is_in_cube(obj, pos1, pos2, ignore_y=False):

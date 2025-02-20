@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-26
+#   Last Modified : 2025-02-20
 #
 # ====================================================
 
@@ -26,9 +26,9 @@ from ._comp import (
     ServerSystem as _ServerSystem,
     LvComp as _LvComp,
 )
-from ._listener import (
-    listen_custom as _listen_custom,
+from .._listener import (
     lib_sys_event as _lib_sys_event,
+    quick_listen as _quick_listen,
 )
 from .._utils import (
     is_inv36_key as _is_inv36_key,
@@ -52,8 +52,8 @@ from ...utils.communicate import (
 
 
 __all__ = [
-    "NuoyanLibServerSystem",
     "get_lib_system",
+    "NuoyanLibServerSystem",
 ]
 
 
@@ -68,12 +68,12 @@ def get_lib_system():
     return _lib_sys
 
 
+@_quick_listen
 class NuoyanLibServerSystem(_NuoyanLibBaseSystem, _ServerSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
         self._query_cache = {}
         self._item_grid_items = _LvComp.ExtraData.GetExtraData(_DATA_KEY_ITEMS_DATA) or {}
-        _LvComp.Game.AddTimer(0, _listen_custom, self)
         global _lib_sys
         _lib_sys = self
         _log("Inited", NuoyanLibServerSystem)

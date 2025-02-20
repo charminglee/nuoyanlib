@@ -22,7 +22,7 @@ from mod.common.minecraftEnum import ActorDamageCause
 from .._core._typing import FTuple3
 
 
-_sdk_damage_cause: List[str]
+__sdk_damage_cause: List[str]
 
 
 class EntityFilter:

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-29
+#   Last Modified : 2025-02-21
 #
 # ====================================================
 
@@ -45,7 +45,8 @@ from .._core._client._comp import (
     PlrComp,
     LvComp,
 )
-from .._core._client._listener import (
+from .._core._listener import (
+    quick_listen,
     event,
 )
 
@@ -57,6 +58,9 @@ from .setting import *
 from .sound import *
 from .render import *
 from .camera import *
+
+
+from .ui import *
 
 
 from ..utils import *

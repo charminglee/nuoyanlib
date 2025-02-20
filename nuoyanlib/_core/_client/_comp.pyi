@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-26
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
 
-from typing import Type, Any, Dict
+from typing import Type, Any, Dict, Union
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.client.ui.screenNode import ScreenNode
@@ -90,12 +90,13 @@ PLAYER_ID: str
 LEVEL_ID: str
 
 
-class _CompDescr(object):
+class CompDescr(object):
+    comp_name: str
     def __init__(self: ..., comp_name: str) -> None: ...
-    def __get__(self: ..., ins: _CompPool, cls: Type[_CompPool]) -> BaseComponent: ...
+    def __get__(self: ..., ins: Union[PlrComp, LvComp], cls: Union[Type[PlrComp], Type[LvComp]]) -> BaseComponent: ...
 
 
-class _CompPool(object):
+class __CompPool(object):
     Action: ActionCompClient
     ActorCollidable: Any
     ActorMotion: ActorMotionComponentClient
@@ -152,12 +153,12 @@ class _CompPool(object):
     VirtualWorld: VirtualWorldCompClient
 
 
-class PlrComp(_CompPool):
+class PlrComp(__CompPool):
     _cache: Dict[str, BaseComponent]
     _target: str
 
 
-class LvComp(_CompPool):
+class LvComp(__CompPool):
     _cache: Dict[str, BaseComponent]
     _target: str
     

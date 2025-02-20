@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
@@ -60,7 +60,7 @@ def register_item_grid(key, ui_cls_path, grid_path, grid_size=1, is_single=False
     return lib_sys.register_item_grid(key, ui_cls_path, grid_path, grid_size, is_single)
 
 
-def _get_path(control):
+def __get_path(control):
     return control if isinstance(control, str) else control.GetPath()
 
 
@@ -77,7 +77,7 @@ def get_direct_children_path(control, ui_ins):
     :return: 控件所有直接子控件的路径的列表，获取不到返回空列表
     :rtype: list[str]
     """
-    path = _get_path(control)
+    path = __get_path(control)
     if not path.startswith("/"):
         path = "/" + path
     path_level = path.count("/")
@@ -104,7 +104,7 @@ def get_parent_path(control):
     :return: 父控件路径，获取不到返回None
     :rtype: str|None
     """
-    path = _get_path(control)
+    path = __get_path(control)
     return path[:path.rindex("/")] if path else None
 
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-01-30
+#   Last Modified : 2025-02-04
 #
 # ====================================================
 
@@ -25,8 +25,11 @@ from math import (
     cos as _cos,
     radians as _radians,
 )
-from mod.common.utils.mcmath import Vector3 as _Vector3
-from .calculator import pos_distance as _pos_distance
+from mod.common.utils.mcmath import (
+    Vector3 as _Vector3,
+    Matrix as _Matrix,
+)
+from .mc_math import pos_distance as _pos_distance
 from .._core._sys import (
     get_api as _get_api,
     get_comp_factory as _get_comp_factory,
@@ -128,14 +131,14 @@ def vec_entity_back(entity_id, ignore_y=False, ret_Vector3=False):
     return back if ret_Vector3 else back.ToTuple()
 
 
-def _to_Vector3(vec):
+def __to_Vector3(vec):
     if isinstance(vec, _Vector3):
         return vec
     else:
         return _Vector3(*vec)
 
 
-def _convert_return_vec(input_vec, output_vec, convert):
+def __convert_return_vec(input_vec, output_vec, convert):
     if convert:
         if isinstance(input_vec, _Vector3):
             if isinstance(output_vec, _Vector3):
@@ -143,7 +146,7 @@ def _convert_return_vec(input_vec, output_vec, convert):
             else:
                 return tuple(output_vec)
         else:
-            return _to_Vector3(output_vec)
+            return __to_Vector3(output_vec)
     else:
         input_type = type(input_vec)
         return (
@@ -164,8 +167,8 @@ def vec_normalize(vec, convert_vec=False):
     :return: 单位向量，长度为1
     :rtype: tuple[float,float,float]|list[float]|_Vector3
     """
-    res = _to_Vector3(vec).Normalized()
-    return _convert_return_vec(vec, res, convert_vec)
+    res = __to_Vector3(vec).Normalized()
+    return __convert_return_vec(vec, res, convert_vec)
 
 
 def vec_rot_p2p(pos1, pos2):
@@ -206,7 +209,7 @@ def vec_p2p(pos1, pos2, ret_Vector3=False):
     :return: 从pos1指向pos2的单位向量
     :rtype: tuple[float,float,float]|_Vector3
     """
-    vec = _to_Vector3(pos2) - _to_Vector3(pos1)
+    vec = __to_Vector3(pos2) - __to_Vector3(pos1)
     vec = vec.Normalized()
     return vec if ret_Vector3 else vec.ToTuple()
 
@@ -222,7 +225,7 @@ def vec_length(vec):
     :return: 向量长度
     :rtype: float
     """
-    return _to_Vector3(vec).Length()
+    return __to_Vector3(vec).Length()
 
 
 def vec_angle(vec1, vec2):
@@ -237,24 +240,13 @@ def vec_angle(vec1, vec2):
     :return: 夹角弧度值
     :rtype: float
     """
-    vec1 = _to_Vector3(vec1)
-    vec2 = _to_Vector3(vec2)
+    vec1 = __to_Vector3(vec1)
+    vec2 = __to_Vector3(vec2)
     vec1_len = vec1.Length()
     vec2_len = vec2.Length()
     v1_v2 = _Vector3.Dot(vec1, vec2)
     cos = v1_v2 / (vec1_len * vec2_len)
     return _acos(cos)
-
-
-def _matrix_mult(matrix1, matrix2):
-    rows1, cols1 = len(matrix1), len(matrix1[0])
-    rows2, cols2 = len(matrix2), len(matrix2[0])
-    matrix3 = [[0] * cols2 for _ in range(rows1)]
-    for i in range(rows1):
-        for j in range(cols2):
-            for k in range(cols1):
-                matrix3[i][j] += matrix1[i][k] * matrix2[k][j]
-    return matrix3
 
 
 def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", convert_vec=False):
@@ -280,39 +272,37 @@ def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", co
     cos_y, sin_y = _cos(y_angle), _sin(y_angle)
     cos_z, sin_z = _cos(z_angle), _sin(z_angle)
     # 旋转矩阵
-    x_matrix = [
+    x_matrix = _Matrix.Create([
         [1, 0, 0],
         [0, cos_x, -sin_x],
         [0, sin_x, cos_x],
-    ]
-    y_matrix = [
+    ])
+    y_matrix = _Matrix.Create([
         [cos_y, 0, sin_y],
         [0, 1, 0],
         [-sin_y, 0, cos_y],
-    ]
-    z_matrix = [
+    ])
+    z_matrix = _Matrix.Create([
         [cos_z, -sin_z, 0],
         [sin_z, cos_z, 0],
         [0, 0, 1],
-    ]
+    ])
     # 用于累积旋转的矩阵
-    acc_matrix = [
-        [1, 0, 0],
-        [0, 1, 0],
-        [0, 0, 1],
-    ]
+    acc_matrix = _Matrix.CreateEye(3)
     for axis in order:
         if axis == 'x':
-            acc_matrix = _matrix_mult(acc_matrix, x_matrix)
+            acc_matrix = acc_matrix * x_matrix
         elif axis == 'y':
-            acc_matrix = _matrix_mult(acc_matrix, y_matrix)
+            acc_matrix = acc_matrix * y_matrix
         elif axis == 'z':
-            acc_matrix = _matrix_mult(acc_matrix, z_matrix)
+            acc_matrix = acc_matrix * z_matrix
     # 计算旋转
-    column_vec = [[vec[i]] for i in range(3)] if isinstance(vec, _Vector3) else [[i] for i in vec]
-    rotated_vec = _matrix_mult(acc_matrix, column_vec)
+    column_vec = _Matrix.Create(
+        [[vec[i]] for i in range(3)] if isinstance(vec, _Vector3) else [[i] for i in vec]
+    )
+    rotated_vec = acc_matrix * column_vec
     res = tuple(i[0] for i in rotated_vec)
-    return _convert_return_vec(vec, res, convert_vec)
+    return __convert_return_vec(vec, res, convert_vec)
 
 
 def vec_rotate_around(v, u, angle, convert_vec=False):
@@ -327,10 +317,10 @@ def vec_rotate_around(v, u, angle, convert_vec=False):
     :return: 旋转后的向量
     :rtype: tuple[float,float,float]|list[float]|_Vector3
     """
-    v = _to_Vector3(v)
+    v = __to_Vector3(v)
     v_len = v.Length()
     v.Normalize()
-    u = _to_Vector3(u).Normalized()
+    u = __to_Vector3(u).Normalized()
     theta = _radians(angle)
     cos = _cos(theta)
     sin = _sin(theta)
@@ -338,7 +328,7 @@ def vec_rotate_around(v, u, angle, convert_vec=False):
     cross = _Vector3.Cross(u, v)
     res = v * cos + u * (1 - cos) * dot + cross * sin # 罗德里格旋转公式
     res = res * v_len
-    return _convert_return_vec(v, res, convert_vec)
+    return __convert_return_vec(v, res, convert_vec)
 
 
 def outgoing_vec(vec, normal, convert_vec=False):
@@ -354,10 +344,10 @@ def outgoing_vec(vec, normal, convert_vec=False):
     :return: 出射向量
     :rtype: tuple[float,float,float]|list[float]|_Vector3
     """
-    v = _to_Vector3(vec)
-    n = _to_Vector3(normal)
+    v = __to_Vector3(vec)
+    n = __to_Vector3(normal)
     reflex_vec = v - 2 * _Vector3.Dot(v, n) * n
-    return _convert_return_vec(vec, reflex_vec, convert_vec)
+    return __convert_return_vec(vec, reflex_vec, convert_vec)
 
 
 def vec_composite(convert_vec, vec, *more_vec):
@@ -373,10 +363,10 @@ def vec_composite(convert_vec, vec, *more_vec):
     :return: 合向量
     :rtype: tuple[float,float,float]|list[float]|_Vector3
     """
-    res = _to_Vector3(vec)
+    res = __to_Vector3(vec)
     for v in more_vec:
-        res += _to_Vector3(v)
-    return _convert_return_vec(vec, res, convert_vec)
+        res += __to_Vector3(v)
+    return __convert_return_vec(vec, res, convert_vec)
 
 
 def vec_scale(vec, scale, convert_vec=False):
@@ -392,8 +382,8 @@ def vec_scale(vec, scale, convert_vec=False):
     :return: 缩放后的向量
     :rtype: tuple[float,float,float]|list[float]|_Vector3
     """
-    res = _to_Vector3(vec) * scale
-    return _convert_return_vec(vec, res, convert_vec)
+    res = __to_Vector3(vec) * scale
+    return __convert_return_vec(vec, res, convert_vec)
 
 
 

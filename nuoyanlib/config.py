@@ -12,15 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-29
+#   Last Modified : 2025-02-21
 #
 # ====================================================
 
 
-# 绑定服务端与客户端，绑定后部分函数的参数的默认值会使用绑定的值（如event函数的system_name参数）
-SYSTEM_BINDINGS = [
-    # 格式：
-    # (服务端1系统名称, 客户端1系统名称),
-    # (服务端2系统名称, 客户端2系统名称),
-    # ...
-]
+# 是否输出nuoyanlib日志信息
+ENABLE_LOG = True
+
+

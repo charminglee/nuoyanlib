@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-29
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
@@ -29,7 +29,7 @@ from ..utils.vector import (
     vec_p2p as _vec_p2p,
     vec_angle as _vec_angle,
 )
-from ..utils.calculator import (
+from ..utils.mc_math import (
     pos_distance as _pos_distance,
 )
 
@@ -39,12 +39,12 @@ __all__ = [
 ]
 
 
-_global_camera_viewport_args = {
+__global_camera_viewport_args = {
     # todo
 }
 
 
-def _get_viewport_args():
+def __get_viewport_args():
     # todo
     pass
 

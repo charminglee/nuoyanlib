@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-29
+#   Last Modified : 2025-02-21
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 from typing import List, Dict, Optional, Union, overload
 from mod.server.system.serverSystem import ServerSystem
 from .._typing import ItemDict, ItemCellPos, EventArgs
-from ._listener import event, lib_sys_event
+from .._listener import event, lib_sys_event, quick_listen
 from .._sys import NuoyanLibBaseSystem
 
 
@@ -28,6 +28,7 @@ _DATA_KEY_ITEMS_DATA: str
 _INV_POS_TYPE: int
 
 
+@quick_listen
 class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
     _item_grid_items: Dict[str, Dict[str, List[ItemDict]]]
     _query_cache: Dict[str, Dict[str, float]]

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-02-20
 #
 # ====================================================
 
@@ -22,6 +22,7 @@ from time import (
     strftime as _strftime,
     localtime as _localtime,
 )
+from ..config import ENABLE_LOG as _ENABLE_LOG
 
 
 __all__ = [
@@ -30,12 +31,14 @@ __all__ = [
 
 
 def log(msg, cls=None, level="INFO"):
+    if not _ENABLE_LOG:
+        return
     ct = _time()
     t = _strftime("%Y-%m-%d %H:%M:%S", _localtime(ct))
     msecs = (ct - long(ct)) * 1000
     s = "%s,%03d" % (t, msecs)
     if cls:
-        msg = "%s: %s" % (cls.__name__, msg)
+        msg = "(%s) %s" % (cls.__name__, msg)
     print "[%s] [%s] [nuoyanlib] %s" % (s, level, msg)
 
 

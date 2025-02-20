@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-05
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
@@ -37,7 +37,7 @@ from .._core._sys import (
     get_api as _get_api,
     LEVEL_ID as _LEVEL_ID,
 )
-from .calculator import pos_distance as _pos_distance
+from .mc_math import pos_distance as _pos_distance
 
 
 __all__ = [
@@ -81,11 +81,11 @@ def random_pos(center_pos, grid, use_top_height=False, dimension=0):
         return x, y, z
 
 
-def _gen_str(choice, s, l):
+def __gen_str(choice, s, l):
     return "".join(choice(s) for _ in range(l))
 
 
-_random_ins = {}
+__random_ins = {}
 
 
 def random_string(length, lower=True, upper=True, num=True, seed=None, generate_num=1):
@@ -105,14 +105,14 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
     :rtype: str|list[str]
     """
     s = (_ascii_lowercase if lower else "") + (_ascii_uppercase if upper else "") + (_digits if num else "")
-    random = _random_ins.setdefault(seed, _Random(seed))
+    random = __random_ins.setdefault(seed, _Random(seed))
     if generate_num == 1:
-        return _gen_str(random.choice, s, length)
+        return __gen_str(random.choice, s, length)
     else:
-        return [_gen_str(random.choice, s, length) for _ in range(generate_num)]
+        return [__gen_str(random.choice, s, length) for _ in range(generate_num)]
 
 
-def _is_pos_far_enough(poses, x, y, z, min_distance):
+def __is_pos_far_enough(poses, x, y, z, min_distance):
     for pos in poses:
         if _pos_distance(pos, (x, y, z)) < min_distance:
             return False
@@ -144,7 +144,7 @@ def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False,
         x = center_pos[0] if fixed_x else center_pos[0] + r * _sin(phi) * _cos(theta)
         y = center_pos[1] if fixed_y else center_pos[1] + r * _sin(phi) * _sin(theta)
         z = center_pos[2] if fixed_z else center_pos[2] + r * _cos(phi)
-        if not poses or _is_pos_far_enough(poses, x, y, z, min_distance):
+        if not poses or __is_pos_far_enough(poses, x, y, z, min_distance):
             poses.append((x, y, z))
     return poses
 

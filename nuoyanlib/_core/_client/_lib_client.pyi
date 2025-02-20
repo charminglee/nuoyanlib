@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-26
+#   Last Modified : 2025-02-21
 #
 # ====================================================
 
@@ -20,11 +20,12 @@
 from typing import List, Optional, Dict, Tuple, Any
 from mod.client.system.clientSystem import ClientSystem
 from .._typing import EventArgs
-from ._listener import event, lib_sys_event
+from .._listener import event, lib_sys_event, quick_listen
 from .._sys import NuoyanLibBaseSystem
 from .._const import LIB_NAME, LIB_CLIENT_NAME, LIB_SERVER_NAME
 
 
+@quick_listen
 class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     item_grid_path: Dict[str, Tuple[str, bool]]
     item_grid_size: Dict[str, int]

@@ -12,14 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2025-02-04
 #
 # ====================================================
 
 
-from typing import Sequence, Any, List, Callable
+from typing import Sequence, Any, List, Callable, Union
+from .._core._client._lib_client import NuoyanLibClientSystem
+from .._core._server._lib_server import NuoyanLibServerSystem
 
 
+def __get_lib_system() -> Union[NuoyanLibClientSystem, NuoyanLibServerSystem, None]: ...
 def add_condition_to_func(cond: Callable[[], bool], func: Callable[[bool], Any], interval: int = 1) -> int: ...
 def remove_condition_to_func(cond_id: int) -> bool: ...
 def all_indexes(seq: Sequence, *elements: Any) -> List[int]: ...

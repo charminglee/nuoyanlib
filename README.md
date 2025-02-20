@@ -1,7 +1,7 @@
 <h1 align="center" style="line-height: 0;">「nuoyanlib」</h1>
 <h1 align="center" style="line-height: 0;">🐱</h1>
 <h1 align="center" style="line-height: 0;">基于ModSDK的开发工具库</h1>
-<h2 align="center" style="line-height: 0.5;">v0.7.0-beta</h2>
+<h2 align="center" style="line-height: 0.5;">v0.8.0-beta</h2>
 
 <br></br>
 
@@ -18,7 +18,7 @@
 「nuoyanlib」可供大家学习参考，也可以直接应用于您个人/团队的项目中（可商业）。  
 「nuoyanlib」的定位为开发工具库，并非开发框架，因此可以与目前市面上任何一款开发框架兼容，且您无需对您现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。
 
-### **兼容框架：ModSDK 3.2、Apollo 1.0（正在开发）**
+### **兼容框架：ModSDK 3.2**
 
 <br></br>
 

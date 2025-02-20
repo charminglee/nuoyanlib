@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-05-31
+#   Last Modified : 2025-02-1
 #
 # ====================================================
 
@@ -55,8 +55,10 @@ def read_setting(name, is_global=True):
     :return: 数据字典
     :rtype: dict
     """
-    return _LvComp.ConfigClient.GetConfigData(name, is_global)
-
+    data = _LvComp.ConfigClient.GetConfigData(name, is_global)
+    if data:
+        data = {(str(k) if isinstance(k, unicode) else k): v for k, v in data.items()}
+    return data
 
 def check_setting(name, item_list, is_global=True):
     """

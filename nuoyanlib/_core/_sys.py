@@ -12,53 +12,31 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-07
+#   Last Modified : 2025-02-21
 #
 # ====================================================
 
 
 __all__ = [
+    "get_lib_system",
     "is_apollo",
-    "get_opposite_system",
     "is_client",
     "get_api",
     "get_comp_factory",
     "LEVEL_ID",
-    "NuoyanLibBaseSystem",
 ]
+
+
+def get_lib_system():
+    if is_client():
+        from ._client._lib_client import get_lib_system
+    else:
+        from ._server._lib_server import get_lib_system
+    return get_lib_system()
 
 
 def is_apollo():
     return False
-
-
-mod_config = {}
-
-
-if is_apollo():
-    pass
-    # def get_opposite_system(sys_name):
-    #     global mod_config
-    #     if not mod_config:
-    #         from apolloCommon.commonNetgameApi import GetModJsonConfig
-    #         mod_config = GetModJsonConfig("nuoyanlib")
-    #     if not mod_config:
-    #         return
-    #     for sys1, sys2 in mod_config['SYSTEM_BINDINGS']:
-    #         name1 = sys1.split(":")[1]
-    #         name2 = sys2.split(":")[1]
-    #         if name1 == sys_name:
-    #             return name2
-    #         if name2 == sys_name:
-    #             return name1
-else:
-    def get_opposite_system(sys_name):
-        from nuoyanlib.config import SYSTEM_BINDINGS
-        for sys1, sys2 in SYSTEM_BINDINGS:
-            if sys1 == sys_name:
-                return sys2
-            if sys2 == sys_name:
-                return sys1
 
 
 def is_client():

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2025-02-03
 #
 # ====================================================
 
@@ -52,7 +52,7 @@ PLAYER_ID = _client_api.GetLocalPlayerId()
 LEVEL_ID = _client_api.GetLevelId()
 
 
-class _CompDescr(object):
+class CompDescr(object):
     def __init__(self, comp_name):
         self.comp_name = comp_name
 
@@ -63,76 +63,76 @@ class _CompDescr(object):
         return cls._cache[self.comp_name]
 
 
-class _CompPool(object):
-    Action = _CompDescr("Action")
-    ActorCollidable = _CompDescr("ActorCollidable")
-    ActorMotion = _CompDescr("ActorMotion")
-    ActorRender = _CompDescr("ActorRender")
-    Attr = _CompDescr("Attr")
-    AuxValue = _CompDescr("AuxValue")
-    Biome = _CompDescr("Biome")
-    Block = _CompDescr("Block")
-    BlockGeometry = _CompDescr("BlockGeometry")
-    BlockInfo = _CompDescr("BlockInfo")
-    BlockUseEventWhiteList = _CompDescr("BlockUseEventWhiteList")
-    Brightness = _CompDescr("Brightness")
-    Camera = _CompDescr("Camera")
-    ChunkSource = _CompDescr("ChunkSource")
-    CollisionBox = _CompDescr("CollisionBox")
-    ConfigClient = _CompDescr("ConfigClient")
-    CustomAudio = _CompDescr("CustomAudio")
-    Device = _CompDescr("Device")
-    Effect = _CompDescr("Effect")
-    EngineEffectBindControl = _CompDescr("EngineEffectBindControl")
-    EngineType = _CompDescr("EngineType")
-    Fog = _CompDescr("Fog")
-    FrameAniControl = _CompDescr("FrameAniControl")
-    FrameAniEntityBind = _CompDescr("FrameAniEntityBind")
-    FrameAniSkeletonBind = _CompDescr("FrameAniSkeletonBind")
-    FrameAniTrans = _CompDescr("FrameAniTrans")
-    Game = _CompDescr("Game")
-    Health = _CompDescr("Health")
-    Item = _CompDescr("Item")
-    ModAttr = _CompDescr("ModAttr")
-    Model = _CompDescr("Model")
-    Name = _CompDescr("Name")
-    NeteaseShop = _CompDescr("NeteaseShop")
-    Operation = _CompDescr("Operation")
-    ParticleControl = _CompDescr("ParticleControl")
-    ParticleEntityBind = _CompDescr("ParticleEntityBind")
-    ParticleSkeletonBind = _CompDescr("ParticleSkeletonBind")
-    ParticleSystem = _CompDescr("ParticleSystem")
-    ParticleTrans = _CompDescr("ParticleTrans")
-    Player = _CompDescr("Player")
-    PlayerAnim = _CompDescr("PlayerAnim")
-    PlayerView = _CompDescr("PlayerView")
-    Pos = _CompDescr("Pos")
-    PostProcess = _CompDescr("PostProcess")
-    QueryVariable = _CompDescr("QueryVariable")
-    Recipe = _CompDescr("Recipe")
-    Ride = _CompDescr("Ride")
-    Rot = _CompDescr("Rot")
-    SkyRender = _CompDescr("SkyRender")
-    Tame = _CompDescr("Tame")
-    TextBoard = _CompDescr("TextBoard")
-    TextNotifyClient = _CompDescr("TextNotifyClient")
-    Time = _CompDescr("Time")
-    VirtualWorld = _CompDescr("VirtualWorld")
+class __CompPool(object):
+    Action = CompDescr("Action")
+    ActorCollidable = CompDescr("ActorCollidable")
+    ActorMotion = CompDescr("ActorMotion")
+    ActorRender = CompDescr("ActorRender")
+    Attr = CompDescr("Attr")
+    AuxValue = CompDescr("AuxValue")
+    Biome = CompDescr("Biome")
+    Block = CompDescr("Block")
+    BlockGeometry = CompDescr("BlockGeometry")
+    BlockInfo = CompDescr("BlockInfo")
+    BlockUseEventWhiteList = CompDescr("BlockUseEventWhiteList")
+    Brightness = CompDescr("Brightness")
+    Camera = CompDescr("Camera")
+    ChunkSource = CompDescr("ChunkSource")
+    CollisionBox = CompDescr("CollisionBox")
+    ConfigClient = CompDescr("ConfigClient")
+    CustomAudio = CompDescr("CustomAudio")
+    Device = CompDescr("Device")
+    Effect = CompDescr("Effect")
+    EngineEffectBindControl = CompDescr("EngineEffectBindControl")
+    EngineType = CompDescr("EngineType")
+    Fog = CompDescr("Fog")
+    FrameAniControl = CompDescr("FrameAniControl")
+    FrameAniEntityBind = CompDescr("FrameAniEntityBind")
+    FrameAniSkeletonBind = CompDescr("FrameAniSkeletonBind")
+    FrameAniTrans = CompDescr("FrameAniTrans")
+    Game = CompDescr("Game")
+    Health = CompDescr("Health")
+    Item = CompDescr("Item")
+    ModAttr = CompDescr("ModAttr")
+    Model = CompDescr("Model")
+    Name = CompDescr("Name")
+    NeteaseShop = CompDescr("NeteaseShop")
+    Operation = CompDescr("Operation")
+    ParticleControl = CompDescr("ParticleControl")
+    ParticleEntityBind = CompDescr("ParticleEntityBind")
+    ParticleSkeletonBind = CompDescr("ParticleSkeletonBind")
+    ParticleSystem = CompDescr("ParticleSystem")
+    ParticleTrans = CompDescr("ParticleTrans")
+    Player = CompDescr("Player")
+    PlayerAnim = CompDescr("PlayerAnim")
+    PlayerView = CompDescr("PlayerView")
+    Pos = CompDescr("Pos")
+    PostProcess = CompDescr("PostProcess")
+    QueryVariable = CompDescr("QueryVariable")
+    Recipe = CompDescr("Recipe")
+    Ride = CompDescr("Ride")
+    Rot = CompDescr("Rot")
+    SkyRender = CompDescr("SkyRender")
+    Tame = CompDescr("Tame")
+    TextBoard = CompDescr("TextBoard")
+    TextNotifyClient = CompDescr("TextNotifyClient")
+    Time = CompDescr("Time")
+    VirtualWorld = CompDescr("VirtualWorld")
 
 
-class PlrComp(_CompPool):
+class PlrComp(__CompPool):
     _cache = {}
     _target = PLAYER_ID
 
 
-class LvComp(_CompPool):
+class LvComp(__CompPool):
     _cache = {}
     _target = LEVEL_ID
 
 
 if __name__ == "__main__":
     l = []
-    for k, v in _CompPool.__dict__.items():
+    for k, v in __CompPool.__dict__.items():
         if k.startswith("__"):
             continue
         l.append(k == v.comp_name)
