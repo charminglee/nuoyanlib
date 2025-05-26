@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
@@ -32,12 +32,8 @@ from string import (
     ascii_lowercase as _ascii_lowercase,
     ascii_uppercase as _ascii_uppercase,
 )
-from .._core._sys import (
-    is_client as _is_client,
-    get_api as _get_api,
-    LEVEL_ID as _LEVEL_ID,
-)
-from .mc_math import pos_distance as _pos_distance
+from .._core import _sys
+from . import mc_math as _mc_math
 
 
 __all__ = [
@@ -67,8 +63,8 @@ def random_pos(center_pos, grid, use_top_height=False, dimension=0):
     ran_z = _randint(-grid, grid)
     x = center_pos[0] + ran_x
     z = center_pos[2] + ran_z
-    if use_top_height and not _is_client():
-        y = _get_api().GetEngineCompFactory().CreateBlockInfo(_LEVEL_ID).GetTopBlockHeight(
+    if use_top_height and not _sys.is_client():
+        y = _sys.get_api().GetEngineCompFactory().CreateBlockInfo(_sys.LEVEL_ID).GetTopBlockHeight(
             (x, z), dimension
         )
         if y is not None:
@@ -81,11 +77,11 @@ def random_pos(center_pos, grid, use_top_height=False, dimension=0):
         return x, y, z
 
 
-def __gen_str(choice, s, l):
+def _gen_str(choice, s, l):
     return "".join(choice(s) for _ in range(l))
 
 
-__random_ins = {}
+_random_ins = {}
 
 
 def random_string(length, lower=True, upper=True, num=True, seed=None, generate_num=1):
@@ -105,16 +101,16 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
     :rtype: str|list[str]
     """
     s = (_ascii_lowercase if lower else "") + (_ascii_uppercase if upper else "") + (_digits if num else "")
-    random = __random_ins.setdefault(seed, _Random(seed))
+    random = _random_ins.setdefault(seed, _Random(seed))
     if generate_num == 1:
-        return __gen_str(random.choice, s, length)
+        return _gen_str(random.choice, s, length)
     else:
-        return [__gen_str(random.choice, s, length) for _ in range(generate_num)]
+        return [_gen_str(random.choice, s, length) for _ in range(generate_num)]
 
 
-def __is_pos_far_enough(poses, x, y, z, min_distance):
+def _is_pos_far_enough(poses, x, y, z, min_distance):
     for pos in poses:
-        if _pos_distance(pos, (x, y, z)) < min_distance:
+        if _mc_math.pos_distance(pos, (x, y, z)) < min_distance:
             return False
     return True
 
@@ -144,7 +140,7 @@ def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False,
         x = center_pos[0] if fixed_x else center_pos[0] + r * _sin(phi) * _cos(theta)
         y = center_pos[1] if fixed_y else center_pos[1] + r * _sin(phi) * _sin(theta)
         z = center_pos[2] if fixed_z else center_pos[2] + r * _cos(phi)
-        if not poses or __is_pos_far_enough(poses, x, y, z, min_distance):
+        if not poses or _is_pos_far_enough(poses, x, y, z, min_distance):
             poses.append((x, y, z))
     return poses
 

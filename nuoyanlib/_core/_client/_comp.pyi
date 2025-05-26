@@ -77,6 +77,9 @@ from mod.client.component.tameCompClient import TameComponentClient
 from mod.client.component.modAttrCompClient import ModAttrComponentClient
 from mod.client.component.playerAnimCompClient import PlayerAnimCompClient
 from mod.common.component.baseComponent import BaseComponent
+from mod.client.ui.CustomUIScreenProxy import CustomUIScreenProxy
+from mod.client.ui.CustomUIControlProxy import CustomUIControlProxy
+from mod.client.ui.NativeScreenManager import NativeScreenManager
 
 
 CLIENT_ENGINE_NAMESPACE: str
@@ -86,6 +89,9 @@ CompFactory: EngineCompFactoryClient
 ScreenNode: Type[ScreenNode]
 ViewBinder: Type[ViewBinder]
 ViewRequest: Type[ViewRequest]
+CustomUIScreenProxy: CustomUIScreenProxy
+CustomUIControlProxy: CustomUIControlProxy
+NativeScreenManager: NativeScreenManager
 PLAYER_ID: str
 LEVEL_ID: str
 
@@ -93,7 +99,7 @@ LEVEL_ID: str
 class CompDescr(object):
     comp_name: str
     def __init__(self: ..., comp_name: str) -> None: ...
-    def __get__(self: ..., ins: Union[PlrComp, LvComp], cls: Union[Type[PlrComp], Type[LvComp]]) -> BaseComponent: ...
+    def __get__(self, ins: Union[PlrComp, LvComp], cls: Union[Type[PlrComp], Type[LvComp]]) -> BaseComponent: ...
 
 
 class __CompPool(object):

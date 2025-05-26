@@ -12,27 +12,17 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
 
-import mod.server.extraServerApi as api
+import mod.server.extraServerApi as _server_api
 from mod.common.minecraftEnum import EntityType as _EntityType
-from .._core._server._comp import (
-    CompFactory as _CompFactory,
-    LvComp as _LvComp,
-)
-from .._core._server._lib_server import (
-    get_lib_system as _get_lib_system,
-)
-from ..utils.mc_math import (
-    pos_distance as _pos_distance,
-    ray_aabb_intersection as _ray_aabb_intersection,
-)
-from ..utils.vector import (
-    vec_p2p as _vec_p2p,
-    vec_composite as _vec_composite,
+from .._core._server import _comp, _lib_server
+from ..utils import (
+    mc_math as _mc_math,
+    vector as _vector,
 )
 
 
@@ -78,10 +68,10 @@ def set_query_mod_var(entity_id, name, value):
     :return: 是否成功
     :rtype: bool
     """
-    lib_sys = _get_lib_system()
+    lib_sys = _lib_server.instance()
     if not lib_sys:
         return False
-    lib_sys.on_set_query_var({'entity_id': entity_id, 'name': name, 'value': value})
+    lib_sys._SetQueryVar({'entity_id': entity_id, 'name': name, 'value': value})
     return True
 
 
@@ -96,7 +86,7 @@ def clear_effects(entity_id):
     :return: 无
     :rtype: None
     """
-    comp = _CompFactory.CreateEffect(entity_id)
+    comp = _comp.CompFactory.CreateEffect(entity_id)
     effects = comp.GetAllEffects()
     if effects:
         for eff in effects:
@@ -167,15 +157,15 @@ def attract_entities(
     )
     res = []
     for eid in ents:
-        epos = _CompFactory.CreatePos(eid).GetFootPos()
+        epos = _comp.CompFactory.CreatePos(eid).GetFootPos()
         if not epos:
             continue
-        comp = _CompFactory.CreateActorMotion(eid)
+        comp = _comp.CompFactory.CreateActorMotion(eid)
         orig_motion = comp.GetMotion()
-        vec = _vec_p2p(epos, pos)
+        vec = _vector.vec_p2p(epos, pos)
         vec = tuple(i * power for i in vec)
-        res_motion = _vec_composite(orig_motion, vec)
-        etype = _CompFactory.CreateEngineType(eid).GetEngineType()
+        res_motion = _vector.vec_composite(orig_motion, vec)
+        etype = _comp.CompFactory.CreateEngineType(eid).GetEngineType()
         if etype == _EntityType.Player:
             if comp.SetPlayerMotion(res_motion):
                 res.append(eid)
@@ -196,7 +186,7 @@ def is_mob(entity_id):
     :return: 是生物返回True，否则返回False
     :rtype: bool
     """
-    type_str = _CompFactory.CreateEngineType(entity_id).GetEngineType()
+    type_str = _comp.CompFactory.CreateEngineType(entity_id).GetEngineType()
     return type_str & _EntityType.Mob == _EntityType.Mob
 
 
@@ -286,16 +276,16 @@ def entity_filter(entity_list, *args):
     :rtype: list[str]
     """
     def _filter(eid):
-        ent_pos = _CompFactory.CreatePos(eid).GetFootPos()
-        ent_type = _CompFactory.CreateEngineType(eid).GetEngineType()
-        ent_type_str = _CompFactory.CreateEngineType(eid).GetEngineTypeStr()
-        ent_dim = str(_CompFactory.CreateDimension(eid).GetEntityDimensionId())
+        ent_pos = _comp.CompFactory.CreatePos(eid).GetFootPos()
+        ent_type = _comp.CompFactory.CreateEngineType(eid).GetEngineType()
+        ent_type_str = _comp.CompFactory.CreateEngineType(eid).GetEngineTypeStr()
+        ent_dim = str(_comp.CompFactory.CreateDimension(eid).GetEntityDimensionId())
         if not ent_pos:
             return False
         for arg in args:
             if not arg:
                 continue
-            if isinstance(arg, tuple) and _pos_distance(arg[0], ent_pos) > arg[1]:
+            if isinstance(arg, tuple) and _mc_math.pos_distance(arg[0], ent_pos) > arg[1]:
                 return False
             if isinstance(arg, set):
                 for i in arg:
@@ -334,9 +324,9 @@ def is_entity_type(entity_id, etype):
     :rtype: bool
     """
     if isinstance(etype, int):
-        return _CompFactory.CreateEngineType(entity_id).GetEngineType() & etype == etype
+        return _comp.CompFactory.CreateEngineType(entity_id).GetEngineType() & etype == etype
     else:
-        return _CompFactory.CreateEngineType(entity_id).GetEngineTypeStr() == etype
+        return _comp.CompFactory.CreateEngineType(entity_id).GetEngineTypeStr() == etype
 
 
 def sort_entity_list_by_dist(entity_list, pos):
@@ -355,10 +345,10 @@ def sort_entity_list_by_dist(entity_list, pos):
         return []
     not_exist = []
     def func(eid):
-        ep = _CompFactory.CreatePos(eid).GetFootPos()
+        ep = _comp.CompFactory.CreatePos(eid).GetFootPos()
         if not ep:
             not_exist.append(eid)
-        return _pos_distance(ep, pos)
+        return _mc_math.pos_distance(ep, pos)
     entity_list.sort(key=func)
     for i in not_exist:
         entity_list.remove(i)
@@ -394,15 +384,15 @@ def launch_projectile(
     :rtype: str
     """
     if not position:
-        position = _CompFactory.CreatePos(spawner_id).GetFootPos()
+        position = _comp.CompFactory.CreatePos(spawner_id).GetFootPos()
         if not position:
             return "-1"
         position = (position[0], position[1] + 1.6, position[2])
     if not direction:
-        rot = _CompFactory.CreateRot(spawner_id).GetRot()
+        rot = _comp.CompFactory.CreateRot(spawner_id).GetRot()
         if not rot:
             return "-1"
-        direction = api.GetDirFromRot(rot)
+        direction = _server_api.GetDirFromRot(rot)
     param = {
         'position': position,
         'direction': direction,
@@ -416,7 +406,7 @@ def launch_projectile(
         param['gravity'] = gravity
     if target_id:
         param['targetId'] = target_id
-    return _LvComp.Projectile.CreateProjectileEntity(spawner_id, projectile_name, param)
+    return _comp.LvComp.Projectile.CreateProjectileEntity(spawner_id, projectile_name, param)
 
 
 def entity_plunge(entity_id1, entity_id2, speed):
@@ -432,7 +422,7 @@ def entity_plunge(entity_id1, entity_id2, speed):
     :return: 无
     :rtype: None
     """
-    rot = _CompFactory.CreateRot(entity_id2).GetRot()
+    rot = _comp.CompFactory.CreateRot(entity_id2).GetRot()
     if not rot:
         return
     entity_plunge_by_rot(entity_id1, rot, speed)
@@ -452,8 +442,8 @@ def entity_plunge_by_dir(entity_id, direction, speed):
     :rtype: None
     """
     motion = tuple(map(lambda x: x * speed, direction))
-    comp = _CompFactory.CreateActorMotion(entity_id)
-    etype = _CompFactory.CreateEngineType(entity_id).GetEngineType()
+    comp = _comp.CompFactory.CreateActorMotion(entity_id)
+    etype = _comp.CompFactory.CreateEngineType(entity_id).GetEngineType()
     if etype == _EntityType.Player:
         comp.SetPlayerMotion(motion)
     else:
@@ -473,7 +463,7 @@ def entity_plunge_by_rot(entity_id, rot, speed):
     :return: 无
     :rtype: None
     """
-    direction = api.GetDirFromRot(rot)
+    direction = _server_api.GetDirFromRot(rot)
     entity_plunge_by_dir(entity_id, direction, speed)
 
 
@@ -488,7 +478,7 @@ def get_all_entities(ent_filter=None):
     :return: 实体ID列表
     :rtype: list[str]
     """
-    return filter(ent_filter, api.GetEngineActor().keys() + api.GetPlayerList())
+    return filter(ent_filter, _server_api.GetEngineActor().keys() + _server_api.GetPlayerList())
 
 
 def get_entities_in_area(
@@ -520,7 +510,7 @@ def get_entities_in_area(
         return []
     start_pos = tuple(i - radius for i in pos)
     end_pos = tuple(i + radius for i in pos)
-    entities = _LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dimension)
+    entities = _comp.LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dimension)
     fa = {_EntityType.Mob} if filter_abiotic else None
     entities = entity_filter(
         entities, (pos, radius), fa, filter_ids, filter_types, filter_type_str
@@ -545,7 +535,7 @@ def get_entities_by_type(type_id, pos=None, dimension=0, radius=0.0):
     if pos:
         start_pos = tuple(i - radius for i in pos)
         end_pos = tuple(i + radius for i in pos)
-        entities = _LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dimension)
+        entities = _comp.LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dimension)
         entities = entity_filter(entities, {type_id}, (pos, radius))
     else:
         entities = get_all_entities()
@@ -566,7 +556,7 @@ def get_entities_by_name(name):
     """
     result = []
     for i in get_all_entities():
-        en = _CompFactory.CreateName(i).GetName()
+        en = _comp.CompFactory.CreateName(i).GetName()
         if en == name:
             result.append(i)
     return result
@@ -586,7 +576,7 @@ def get_entities_by_locking(entity_id, dist=-1.0, filter_ids=None, filter_types=
     :return: 实体ID列表
     :rtype: list[str]
     """
-    pos = _CompFactory.CreatePos(entity_id).GetFootPos()
+    pos = _comp.CompFactory.CreatePos(entity_id).GetFootPos()
     if not pos:
         return []
     if filter_ids is None:
@@ -599,7 +589,7 @@ def get_entities_by_locking(entity_id, dist=-1.0, filter_ids=None, filter_types=
     ents = entity_filter(ents, r, _EntityType.Mob, filter_ids, filter_types)
     return [
         eid for eid in ents
-        if _CompFactory.CreateAction(eid).GetAttackTarget() == entity_id
+        if _comp.CompFactory.CreateAction(eid).GetAttackTarget() == entity_id
     ]
 
 
@@ -633,8 +623,8 @@ def get_nearest_entity(
     else:
         filter_ids = filter_ids[:]
     if isinstance(obj, str):
-        pos = _CompFactory.CreatePos(obj).GetFootPos()
-        dim = _CompFactory.CreateDimension(obj).GetEntityDimensionId()
+        pos = _comp.CompFactory.CreatePos(obj).GetFootPos()
+        dim = _comp.CompFactory.CreateDimension(obj).GetEntityDimensionId()
         filter_ids.append(obj)
     else:
         pos = obj
@@ -669,7 +659,7 @@ def attack_nearest_mob(entity_id, r=15.0, filter_ids=None, filter_types=None):
         entity_id, radius=r, filter_ids=filter_ids, filter_types=filter_types, filter_abiotic=True
     )
     if nearest:
-        _CompFactory.CreateAction(entity_id).SetAttackTarget(nearest)
+        _comp.CompFactory.CreateAction(entity_id).SetAttackTarget(nearest)
     return nearest
 
 
@@ -685,7 +675,7 @@ def has_effect(entity_id, effect_id):
     :return: 存在返回True，否则返回False
     :rtype: bool
     """
-    effects = _CompFactory.CreateEffect(entity_id).GetAllEffects()
+    effects = _comp.CompFactory.CreateEffect(entity_id).GetAllEffects()
     for eff in effects:
         if eff['effectName'] == effect_id:
             return True
@@ -737,16 +727,18 @@ def get_entities_by_ray(
     entities = entity_filter(
         entities, fa, filter_ids, filter_types, filter_type_str, {str(dimension)}
     )
-    entities.sort(key=lambda x: _pos_distance(_CompFactory.CreatePos(x).GetFootPos(), start_pos))
+    entities.sort(
+        key=lambda x: _mc_math.pos_distance(_comp.CompFactory.CreatePos(x).GetFootPos(), start_pos)
+    )
     ent_list = []
     for entity_id in entities:
-        size = _CompFactory.CreateCollisionBox(entity_id).GetSize()
+        size = _comp.CompFactory.CreateCollisionBox(entity_id).GetSize()
         if not size:
             continue
-        ent_pos = _CompFactory.CreatePos(entity_id).GetFootPos()
+        ent_pos = _comp.CompFactory.CreatePos(entity_id).GetFootPos()
         center = (ent_pos[0], ent_pos[1] + size[1] / 2.0, ent_pos[2])
         cube_size = (size[0], size[1], size[0])
-        intersection = _ray_aabb_intersection(start_pos, direction, length, center, cube_size)
+        intersection = _mc_math.ray_aabb_intersection(start_pos, direction, length, center, cube_size)
         if intersection:
             ent_list.append({
                 'entity_id': entity_id,
@@ -771,9 +763,9 @@ def entity_distance(ent1, ent2):
     :return: 两个实体的距离
     :rtype: float
     """
-    pos1 = _CompFactory.CreatePos(ent1).GetFootPos()
-    pos2 = _CompFactory.CreatePos(ent2).GetFootPos()
-    return _pos_distance(pos1, pos2)
+    pos1 = _comp.CompFactory.CreatePos(ent1).GetFootPos()
+    pos2 = _comp.CompFactory.CreatePos(ent2).GetFootPos()
+    return _mc_math.pos_distance(pos1, pos2)
 
 
 

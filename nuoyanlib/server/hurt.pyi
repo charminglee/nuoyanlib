@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-29
+#   Last Modified : 2025-05-17
 #
 # ====================================================
 
@@ -20,9 +20,6 @@
 from typing import List, Optional, Callable
 from mod.common.minecraftEnum import ActorDamageCause
 from .._core._typing import FTuple3
-
-
-__sdk_damage_cause: List[str]
 
 
 class EntityFilter:
@@ -50,7 +47,7 @@ def line_damage(
     start_pos: FTuple3,
     end_pos: FTuple3,
     dim: int,
-    damage: int,
+    damage: float,
     cause: str = ActorDamageCause.EntityAttack,
     attacker_id: Optional[str] = None,
     child_id: Optional[str] = None,
@@ -64,7 +61,7 @@ def line_damage(
 ) -> List[str]: ...
 def hurt_mobs(
     entity_id_list: List[str],
-    damage: int,
+    damage: float,
     cause: str = ActorDamageCause.EntityAttack,
     attacker_id: Optional[str] = None,
     child_id: Optional[str] = None,
@@ -75,7 +72,7 @@ def aoe_damage(
     radius: float,
     pos: FTuple3,
     dim: int,
-    damage: int,
+    damage: float,
     cause: str = ActorDamageCause.EntityAttack,
     attacker_id: Optional[str] = None,
     child_id: Optional[str] = None,
@@ -89,7 +86,7 @@ def aoe_damage(
 def sector_aoe_damage(
     sector_radius: float,
     sector_angle: float,
-    damage: int,
+    damage: float,
     cause: str = ActorDamageCause.EntityAttack,
     attacker_id: Optional[str] = None,
     child_id: Optional[str] = None,
@@ -102,7 +99,7 @@ def rectangle_aoe_damage(
     min_vertex: FTuple3,
     max_vertex: FTuple3,
     dim: int,
-    damage: int,
+    damage: float,
     cause: str = ActorDamageCause.EntityAttack,
     attacker_id: Optional[str] = None,
     child_id: Optional[str] = None,
@@ -115,7 +112,7 @@ def rectangle_aoe_damage(
 def hurt_by_set_health(entity_id: str, damage: int) -> None: ...
 def hurt(
     entity_id: str,
-    damage: int,
+    damage: float,
     cause: str = ActorDamageCause.EntityAttack,
     attacker: Optional[str] = None,
     child_id: Optional[str] = None,

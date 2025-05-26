@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-22
 #
 # ====================================================
 
@@ -34,11 +34,7 @@ from random import (
 )
 from mod.common.utils.mcmath import Vector3 as _Vector3
 from mod.common.minecraftEnum import Facing as _Facing
-from .._core._sys import (
-    get_api as _get_api,
-    get_comp_factory as _get_comp_factory,
-    LEVEL_ID as _LEVEL_ID,
-)
+from .._core import _sys
 
 
 __all__ = [
@@ -195,20 +191,22 @@ def pos_distance_to_line(pos, line_pos1, line_pos2):
 def pos_floor(pos):
     """
     | 对坐标进行向下取整。
+    | 支持n维坐标。
 
     -----
 
-    :param tuple[float,float,float] pos: 坐标
+    :param tuple[float] pos: 坐标
 
     :return: 取整后的坐标
-    :rtype: tuple[int,int,int]
+    :rtype: tuple[int]
     """
     return tuple(int(_floor(i)) for i in pos)
 
 
 def pos_distance(first_point, second_point):
     """
-    | 计算两个坐标间的距离。支持多元坐标。
+    | 计算两个坐标间的距离。
+    | 支持n维坐标。
 
     -----
 
@@ -349,13 +347,13 @@ def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
     :return: 坐标
     :rtype: tuple[float,float,float]|None
     """
-    comp_factory = _get_comp_factory()
+    comp_factory = _sys.get_comp_factory()
     rot = comp_factory.CreateRot(entity_id).GetRot()
     if not rot:
         return
     if use_0yaw:
         rot = (0, rot[1])
-    dir_rot = _get_api().GetDirFromRot(rot)
+    dir_rot = _sys.get_api().GetDirFromRot(rot)
     ep = comp_factory.CreatePos(entity_id).GetFootPos()
     if not ep:
         return
@@ -379,7 +377,7 @@ def pos_forward_rot(pos, rot, dis):
     """
     if not rot or not pos:
         return
-    dir_rot = _get_api().GetDirFromRot(rot)
+    dir_rot = _sys.get_api().GetDirFromRot(rot)
     result_pos = tuple(pos[i] + dir_rot[i] * dis for i in range(3))
     return result_pos
 
@@ -491,6 +489,10 @@ def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_ang
     return False
 
 
+def _num_in_range(num, r1, r2):
+    return r1 <= num <= r2 or r2 <= num <= r1
+
+
 def is_in_cube(obj, pos1, pos2, ignore_y=False):
     """
     | 判断对象是否在立方体区域内。
@@ -506,17 +508,15 @@ def is_in_cube(obj, pos1, pos2, ignore_y=False):
     :rtype: bool
     """
     if isinstance(obj, str):
-        target_pos = _get_comp_factory().CreatePos(obj).GetFootPos()
+        target_pos = _sys.get_comp_factory().CreatePos(obj).GetFootPos()
     else:
         target_pos = obj
     if not target_pos or not pos1 or not pos2:
         return False
-    def num_in_range(num, r1, r2):
-        return r1 <= num <= r2 or r2 <= num <= r1
     for i in range(3):
         if ignore_y and i == 1:
             continue
-        if not num_in_range(target_pos[i], pos1[i], pos2[i]):
+        if not _num_in_range(target_pos[i], pos1[i], pos2[i]):
             return False
     return True
 
@@ -580,14 +580,16 @@ def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter
     ::
 
         {
-            "name": str, # 方块ID
-            "aux": int, # 方块特殊值
-            "pos": Tuple[float, float, float], # 方块坐标
-            "intersection": Tuple[float, float, float], # 射线与方块的第一个交点的坐标
+            'name': str,                                # 方块ID
+            'aux': int,                                 # 方块特殊值
+            'pos': Tuple[float, float, float],          # 方块坐标
+            'intersection': Tuple[float, float, float], # 射线与方块的第一个交点的坐标
         }
 
-    | *算法作者：头脑风暴*
-    | *修改：* `诺言Nuoyan <https://gitee.com/charming-lee>`_
+    -----
+
+    | 算法作者：头脑风暴
+    | 修改：`诺言Nuoyan <https://gitee.com/charming-lee>`_
 
     -----
 
@@ -616,7 +618,7 @@ def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter
             t_list.append((i - s) / d)
     t_list.sort()
     t_list = t_list[:-1]
-    comp = _get_comp_factory().CreateBlockInfo(_LEVEL_ID)
+    comp = _sys.get_comp_factory().CreateBlockInfo(_sys.LEVEL_ID)
     block_list = []
     for t in t_list:
         block_pos = [0, 0, 0]

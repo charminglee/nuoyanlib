@@ -12,17 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-08
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
 
-from .._core._client._comp import (
-    CompFactory as _CompFactory,
-)
-from .._core._client._lib_client import (
-    get_lib_system as _get_lib_system,
-)
+from .._core._client import _comp, _lib_client
 
 
 __all__ = [
@@ -46,14 +41,14 @@ class NeteaseParticle(object):
     """
 
     def __init__(self, json_path, pos=(0, 0, 0), bind_entity=None, bind_skeleton=None):
-        self.__lib_sys = _get_lib_system()
+        self.__lib_sys = _lib_client.instance()
         self._id = self.__lib_sys.CreateEngineParticle(json_path, pos)
         if not self._id:
             raise RuntimeError("Create particle failed. json_path='%s'." % json_path)
-        self._ctrl = _CompFactory.CreateParticleControl(self._id)
-        self._trans = _CompFactory.CreateParticleTrans(self._id)
-        self._bind_ent_comp = _CompFactory.CreateParticleEntityBind(self._id)
-        self._bind_skel_comp = _CompFactory.CreateParticleSkeletonBind(self._id)
+        self._ctrl = _comp.CompFactory.CreateParticleControl(self._id)
+        self._trans = _comp.CompFactory.CreateParticleTrans(self._id)
+        self._bind_ent_comp = _comp.CompFactory.CreateParticleEntityBind(self._id)
+        self._bind_skel_comp = _comp.CompFactory.CreateParticleSkeletonBind(self._id)
         self._bind_ent_id = ""
         self._bind_ent_offset = (0, 0, 0)
         self._bind_ent_rot = (0, 0, 0)
@@ -494,7 +489,7 @@ class NeteaseFrameAnim(object):
             bind_entity=None,
             bind_skeleton=None,
     ):
-        self.__lib_sys = _get_lib_system()
+        self.__lib_sys = _lib_client.instance()
         if json_path:
             self._id = self.__lib_sys.CreateEngineSfxFromEditor(json_path, pos, rot, scale)
         elif tex_path:
@@ -503,10 +498,10 @@ class NeteaseFrameAnim(object):
             raise ValueError("Parameters 'json_path' or 'tex_path' must be given.")
         if not self._id:
             raise RuntimeError("Create frame animation failed. path='%s'." % (json_path or tex_path))
-        self._ctrl = _CompFactory.CreateFrameAniControl(self._id)
-        self._trans = _CompFactory.CreateFrameAniTrans(self._id)
-        self._bind_ent_comp = _CompFactory.CreateFrameAniEntityBind(self._id)
-        self._bind_skel_comp = _CompFactory.CreateFrameAniSkeletonBind(self._id)
+        self._ctrl = _comp.CompFactory.CreateFrameAniControl(self._id)
+        self._trans = _comp.CompFactory.CreateFrameAniTrans(self._id)
+        self._bind_ent_comp = _comp.CompFactory.CreateFrameAniEntityBind(self._id)
+        self._bind_skel_comp = _comp.CompFactory.CreateFrameAniSkeletonBind(self._id)
         self._bind_ent_id = ""
         self._bind_ent_offset = (0, 0, 0)
         self._bind_ent_rot = (0, 0, 0)

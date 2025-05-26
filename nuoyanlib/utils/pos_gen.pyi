@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-04
+#   Last Modified : 2025-05-17
 #
 # ====================================================
 
@@ -24,17 +24,17 @@ from .._core._typing import FTuple3
 _T = TypeVar("_T")
 
 
-class __PosGenerator(object):
+class _PosGenerator(object):
     len: int
     __i: int
     def __iter__(self: _T) -> _T: ...
     def next(self) -> FTuple3: ...
     def __len__(self) -> int: ...
-    def _gen(self, i: int) -> NoReturn: ...
+    def __gen_pos__(self, i: int) -> NoReturn: ...
     def __getitem__(self, i: int) -> FTuple3: ...
 
 
-class gen_line_pos(__PosGenerator):
+class gen_line_pos(_PosGenerator):
     pos1: FTuple3
     pos2: FTuple3
     count: int
@@ -43,27 +43,27 @@ class gen_line_pos(__PosGenerator):
     __y_step: float
     __z_step: float
     def __init__(self, pos1: FTuple3, pos2: FTuple3, count: int, only: int = -1) -> None: ...
-    def _gen(self, i: int) -> FTuple3: ...
+    def __gen_pos__(self, i: int) -> FTuple3: ...
 
 
-class gen_circle_pos(__PosGenerator):
+class gen_circle_pos(_PosGenerator):
     center_pos: FTuple3
     radius: float
     count: int
     __step: float
     def __init__(self, center_pos: FTuple3, radius: float, count: int) -> None: ...
-    def _gen(self, i: int) -> FTuple3: ...
+    def __gen_pos__(self, i: int) -> FTuple3: ...
 
 
-class gen_sphere_pos(__PosGenerator):
+class gen_sphere_pos(_PosGenerator):
     center_pos: FTuple3
     radius: float
     count: int
     def __init__(self, center_pos: FTuple3, radius: float, count: int) -> None: ...
-    def _gen(self, i: int) -> FTuple3: ...
+    def __gen_pos__(self, i: int) -> FTuple3: ...
 
 
-class gen_cube_pos(__PosGenerator):
+class gen_cube_pos(_PosGenerator):
     pos1: FTuple3
     pos2: FTuple3
     count: int
@@ -80,12 +80,12 @@ class gen_cube_pos(__PosGenerator):
     __y_step: float
     __z_step: float
     def __init__(self, pos1: FTuple3, pos2: FTuple3, count: int) -> None: ...
-    def __calculate_axis_counts(self, count: int) -> Tuple[int, int, int]: ...
-    def _gen(self, i: int) -> FTuple3: ...
+    def _calculate_axis_counts(self, count: int) -> Tuple[int, int, int]: ...
+    def __gen_pos__(self, i: int) -> FTuple3: ...
 
 
-class gen_spiral_pos(__PosGenerator):
+class gen_spiral_pos(_PosGenerator):
     start_pos: FTuple3
     count: int
     def __init__(self, start_pos: FTuple3, count: int) -> None: ...
-    def _gen(self, i: int) -> FTuple3: ...
+    def __gen_pos__(self, i: int) -> FTuple3: ...

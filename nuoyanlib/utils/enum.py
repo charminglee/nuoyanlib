@@ -12,15 +12,25 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-28
+#   Last Modified : 2025-05-22
 #
 # ====================================================
 
 
 from mod.common.minecraftEnum import EntityType as _EntityType
+try:
+    from .mc_random import random_string as _random_string
+except:
+    from string import digits, ascii_lowercase, ascii_uppercase
+    from random import choice
+    def _random_string(length):
+        s = ascii_lowercase + ascii_uppercase + digits
+        return "".join(choice(s) for _ in range(length))
 
 
 __all__ = [
+    "auto",
+    "Enum",
     "search_data",
     "ITEM_LIST",
     "BLOCK_LIST",
@@ -34,6 +44,180 @@ __all__ = [
     "MOB_LIST",
     "ENTITY_LIST",
 ]
+
+
+class auto(object):
+    pass
+
+
+class EnumMeta(type):
+    def __new__(metacls, name, bases, dct, restrict_type=None):
+        dct['_flag'] = 0
+        cls = type.__new__(metacls, name, bases, dct) # type: type[Enum]
+        members = {}
+        if name != "Enum":
+            # 遍历当前Enum成员
+            for k, v in dct.items():
+                if k.startswith("_") or k in ("name", "value"):
+                    continue
+                if isinstance(v, auto):
+                    v = cls.__gen_auto_value__()
+                if cls._restrict_type:
+                    if type(v) is not cls._restrict_type:
+                        raise TypeError(
+                            "member of '%s' must be %s, not %s"
+                            % (name, cls._restrict_type.__name__, type(v).__name__)
+                        )
+                    member = v
+                else:
+                    member = cls(k, v) # type: Enum
+                members[k] = member
+                setattr(cls, k, member)
+            # 继承父Enum成员
+            for base in bases:
+                if issubclass(base, Enum):
+                    members.update(base.__members__)
+        else:
+            cls._restrict_type = restrict_type
+        cls.__members__ = members
+        cls._flag = 1
+        return cls
+
+    def __setattr__(cls, name, value):
+        # 禁止动态设置枚举值
+        if getattr(cls, "_flag", 0) == 1:
+            raise AttributeError("'%s' cannot set member '%s'" % (cls.__name__, name))
+        type.__setattr__(cls, name, value)
+
+    def __delattr__(cls, name):
+        # 禁止删除枚举值
+        raise AttributeError("'%s' cannot delete member '%s'" % (cls.__name__, name))
+
+    def __contains__(cls, member):
+        # 支持in
+        for v in cls.__members__.values():
+            if cls._restrict_type:
+                if v == member:
+                    return True
+            elif v.value == member:
+                return True
+        return False
+
+    def __len__(cls):
+        # 支持len()
+        return len(cls.__members__)
+
+    def __iter__(cls):
+        # 支持遍历
+        return iter(cls.__members__.values())
+
+    def __getitem__(cls, item):
+        # 支持Enum[type]/Enum['xxx']
+        if cls is Enum:
+            dct = dict(Enum.__dict__)
+            del dct['__dict__']
+            del dct['__weakref__']
+            del dct['__members__']
+            del dct['_flag']
+            new_cls = EnumMeta.__new__(EnumMeta, "Enum", (object,), dct, item)
+            return new_cls
+        else:
+            return cls.__members__[item]
+
+    def __gen_auto_value__(cls):
+        t = getattr(cls, "_restrict_type", None)
+        if t is str:
+            val = _random_string(16)
+        else:
+            val = getattr(cls, "_last_auto_value", -1) + 1
+            cls._last_auto_value = val
+        return val
+
+
+class Enum(object):
+    """
+    | 枚举类型，用于实现自定义枚举值。
+    | 支持以下功能：
+    - ``len()``: 获取枚举值数量
+    - 通过for循环等方式进行遍历
+    - 通过 ``in`` 关键字判断某个值是否在枚举范围内
+    - 可通过 ``Enum[type]`` 的方式定义特定类型的枚举值，如 ``Enum[int]`` 定义int类型枚举值
+    - 可通过 ``MyEnum.xxx`` 或 ``MyEnum['xxx']`` 的方式获取指定枚举值
+    | 注意事项：
+    - 枚举值是无序的（类似于字典），因此遍历顺序与编写顺序无关
+    - 不支持动态插入或删除枚举值
+    - 枚举名不能以下划线开头
+    """
+
+    __metaclass__ = EnumMeta
+
+    def __init__(self, name, value):
+        self.__name = name
+        self.__value = value
+
+    def __repr__(self):
+        return "<%s.%s: %s>" % (self.__class__.__name__, self.__name, repr(self.__value))
+
+    def __hash__(self):
+        return hash(self.__name)
+
+    @property
+    def name(self):
+        return self.__name
+
+    @property
+    def value(self):
+        return self.__value
+
+
+def _test_enum():
+    class A(Enum):
+        AA = 1
+        BB = 2
+        CC = 3
+    class B(A):
+        X = 7
+        Y = 8
+        Z = 9
+    print "B.__members__:"
+    for k, v in B.__members__.items():
+        print "   ", k, v
+    print "=" * 30
+    print "7 in B:", 7 in B
+    print "0 in B:", 0 in B
+    print "len(B):", len(B)
+    print "B.AA:", B.AA, B.AA.value
+    print "B.X:", B.X, B.X.value
+    print "=" * 30
+    for i in B:
+        print i.name, i.value
+    print "=" * 30
+    print {
+        B.X: 1,
+        B.AA: 2,
+    }
+    print "=" * 30
+    class C(Enum[str]):
+        Q = "114514"
+        E = "1919810"
+        # R = 1
+    print C.__members__
+    print repr(C.Q)
+    print "=" * 30
+    # B.Q = 123
+    # del B.X
+    print "=" * 30
+    class AutoEnum(Enum[int]):
+        a = auto()
+        b = auto()
+        c = auto()
+    print AutoEnum.a
+    print AutoEnum.b
+    print AutoEnum.c
+
+
+if __name__ == "__main__":
+    _test_enum()
 
 
 def search_data(data, lst):
@@ -551,7 +735,7 @@ EFFECT_DICT = {
     'jump_boost': "跳跃增强",
     'nausea': "反胃",
     'regeneration': "生命恢复",
-    'resistance': "抗性提升",
+    'resistance': "抗性",
     'fire_resistance': "抗火",
     'water_breathing': "水下呼吸",
     'invisibility': "隐身",
@@ -559,18 +743,23 @@ EFFECT_DICT = {
     'night_vision': "夜视",
     'hunger': "饥饿",
     'weakness': "虚弱",
-    'poison': "剧毒",
+    'poison': "中毒",
     'wither': "凋灵",
     'health_boost': "生命提升",
     'absorption': "伤害吸收",
     'saturation': "饱和",
     'levitation': "漂浮",
-    'fatal_poison': "剧毒（致命）",
+    'fatal_poison': "中毒",
     'conduit_power': "潮涌能量",
     'slow_falling': "缓降",
     'bad_omen': "凶兆",
     'village_hero': "村庄英雄",
     'darkness': "黑暗",
+    'trial_omen': "试炼之兆",
+    'weaving': "盘丝",
+    'wind_charged': "蓄风",
+    'infested': "寄生",
+    'oozing': "渗浆",
 }
 
 
@@ -2460,9 +2649,6 @@ ITEM_LIST = [
     "zombie_spawn_egg",
     "zombie_villager_spawn_egg",
 ]
-
-
-
 
 
 

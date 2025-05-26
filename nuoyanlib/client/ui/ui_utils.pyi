@@ -12,40 +12,78 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-21
 #
 # ====================================================
 
 
-from typing import List, Optional
+from typing import List, Optional, Callable, Dict, Tuple
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ..._core._typing import UiControl
+from mod.client.ui.controls.buttonUIControl import ButtonUIControl
+from ..._core._typing import UiControl, FTuple2
+from ...utils import Enum
 
 
-def register_item_grid(
-    key: str,
-    ui_cls_path: str,
-    grid_path: str,
-    grid_size: int = 1,
-    is_single: bool = False,
-) -> bool: ...
-def __get_path(control: UiControl) -> str: ...
-def get_direct_children_path(control: UiControl, ui_ins: ScreenNode) -> List[str]: ...
+def to_button(screen_node: ScreenNode, control: UiControl) -> Optional[ButtonUIControl]: ...
+def to_path(control: UiControl) -> str: ...
+def to_control(screen_node: ScreenNode, path: UiControl) -> Optional[BaseUIControl]: ...
+def save_ui_pos_data(key: str, data: Dict[str, List[Tuple[str, FTuple2]]]) -> bool: ...
+def get_ui_pos_data(key: str) -> Dict[str, List[Tuple[str, FTuple2]]]: ...
+
+
+class UIControlType:
+    All: int
+    Button: int
+    Custom: int
+    CollectionPanel: int
+    Dropdown: int
+    EditBox: int
+    Factory: int
+    Grid: int
+    Image: int
+    InputPanel: int
+    Label: int
+    Panel: int
+    Screen: int
+    ScrollbarBox: int
+    ScrollTrack: int
+    ScrollView: int
+    SelectionWheel: int
+    Slider: int
+    SliderBox: int
+    StackPanel: int
+    Toggle: int
+    ImageCycler: int
+    LabelCycler: int
+    GridPageIndicator: int
+    Combox: int
+    Layout: int
+    StackGrid: int
+    Joystick: int
+    RichText: int
+    SixteenNineLayout: int
+    MulLinesEdit: int
+    AminProcessBar: int
+    Unknown: int
+
+
+class ButtonCallback(Enum[int]):
+    touch_up: int
+    touch_down: int
+    touch_cancel: int
+    touch_move: int
+    touch_move_in: int
+    touch_move_out: int
+    double_click: int
+    long_click: int
+    hover_in: int
+    hover_out: int
+    screen_exit: int
+
+
+def get_all_children_path_by_level(control: UiControl, screen_node: ScreenNode, level: int = 1) -> List[str]: ...
 def get_parent_path(control: UiControl) -> Optional[str]: ...
-def get_parent_control(control: UiControl, ui_ins: ScreenNode) -> Optional[BaseUIControl]: ...
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def get_parent_control(control: UiControl, screen_node: ScreenNode) -> Optional[BaseUIControl]: ...
+def is_ui_out_of_screen(control: UiControl, screen_node: Optional[ScreenNode] = None) -> bool: ...
+def notify_server(func: Callable) -> Callable: ...

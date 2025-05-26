@@ -12,17 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-02
+#   Last Modified : 2025-05-23
 #
 # ====================================================
 
 
-from .._core._client._comp import (
-    CompFactory as _CompFactory,
-)
-from .._core._client._lib_client import (
-    get_lib_system as _get_lib_system,
-)
+from .._core._client import _comp, _lib_client
 
 
 __all__ = [
@@ -48,11 +43,11 @@ def set_query_mod_var(entity_id, name, value, sync=True):
     :return: 是否成功
     :rtype: bool
     """
-    lib_sys = _get_lib_system()
+    lib_sys = _lib_client.instance()
     if not lib_sys:
         return False
     data = {'entity_id': entity_id, 'name': name, 'value': value}
-    lib_sys.on_set_query_var(data)
+    lib_sys._SetQueryVar(data)
     if sync:
         lib_sys.NotifyToServer("_SetQueryVar", data)
     return True
@@ -81,7 +76,7 @@ def add_player_render_resources(player_id, rebuild, *res_tuple):
     :rtype: tuple[bool]
     """
     res = []
-    comp = _CompFactory.CreateActorRender(player_id)
+    comp = _comp.CompFactory.CreateActorRender(player_id)
     for arg in res_tuple:
         if arg[1].startswith("geometry."):
             res.append(comp.AddPlayerGeometry(*arg))
@@ -127,8 +122,8 @@ def add_entity_render_resources(entity_id, rebuild, *res_tuple):
     :rtype: tuple[bool]
     """
     res = []
-    comp = _CompFactory.CreateActorRender(entity_id)
-    etype = _CompFactory.CreateEngineType(entity_id).GetEngineTypeStr()
+    comp = _comp.CompFactory.CreateActorRender(entity_id)
+    etype = _comp.CompFactory.CreateEngineType(entity_id).GetEngineTypeStr()
     for arg in res_tuple:
         if arg[1].startswith("geometry."):
             res.append(comp.AddActorGeometry(etype, *arg))

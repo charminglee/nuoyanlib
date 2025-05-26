@@ -12,12 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-21
+#   Last Modified : 2025-05-23
 #
 # ====================================================
 
 
-from typing import Union, Dict, Tuple, Callable, Any, Optional
+from types import MethodType
+from typing import Union, Dict, Tuple, Callable, Any, Literal
 import mod.client.extraClientApi as client_api
 import mod.server.extraServerApi as server_api
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
@@ -26,6 +27,8 @@ from ._client._lib_client import NuoyanLibClientSystem
 from ._server._lib_server import NuoyanLibServerSystem
 
 
+def init_lib_sys() -> None: ...
+def check_env(target: Literal["client", "server"]) -> None: ...
 def get_lib_system() -> Union[NuoyanLibClientSystem, NuoyanLibServerSystem, None]: ...
 def is_apollo() -> bool: ...
 def is_client() -> bool: ...
@@ -37,13 +40,15 @@ LEVEL_ID: str
 
 
 class NuoyanLibBaseSystem(object):
-    _cond_func: Dict[int, Tuple[Callable[[], bool], Callable[[bool], Any], int]]
-    _cond_state: Dict[int, bool]
+    cond_func: Dict[int, Tuple[Callable[[], bool], Callable[[bool], Any], int]]
+    cond_state: Dict[int, bool]
     __tick: int
-    def __init__(self: ..., namespace: str, system_name: str) -> None: ...
-    def Update(self: ...): ...
+    def __init__(self: ..., *args, **kwargs) -> None: ...
+    def Update(self) -> None: ...
+    def add_event_callback(self, event: str, callback: MethodType) -> None: ...
+    def remove_event_callback(self, event: str, callback: MethodType) -> None: ...
     def add_condition_to_func(
-        self: ...,
+        self,
         cond: Callable[[], bool],
         func: Callable[[bool], Any],
         freq: int,

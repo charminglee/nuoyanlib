@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-20
+#   Last Modified : 2025-05-23
 #
 # ====================================================
 
@@ -25,9 +25,12 @@ from time import (
 from ..config import ENABLE_LOG as _ENABLE_LOG
 
 
-__all__ = [
-    "log",
-]
+def disable_modsdk_loggers():
+    import logging
+    logging.getLogger("Developer").disabled = 1
+    logging.getLogger("Engine").disabled = 1
+    logging.getLogger("Part").disabled = 1
+    # logging.getLogger("mcp").disabled = 1
 
 
 def log(msg, cls=None, level="INFO"):

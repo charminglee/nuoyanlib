@@ -12,13 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-04
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
 
 from re import match as _match
-from .._core._sys import is_client as _is_client
+from .._core import _sys
 
 
 __all__ = [
@@ -32,14 +32,6 @@ __all__ = [
     "is_method_overridden",
     "translate_time",
 ]
-
-
-def __get_lib_system():
-    if _is_client():
-        from .._core._client._lib_client import get_lib_system
-    else:
-        from .._core._server._lib_server import get_lib_system
-    return get_lib_system()
 
 
 def add_condition_to_func(cond, func, freq=1):
@@ -56,7 +48,7 @@ def add_condition_to_func(cond, func, freq=1):
     :rtype: int
     """
     freq = max(1, int(freq))
-    lib_sys = __get_lib_system()
+    lib_sys = _sys.get_lib_system()
     if not lib_sys:
         return -1
     return lib_sys.add_condition_to_func(cond, func, freq)
@@ -68,12 +60,12 @@ def remove_condition_to_func(cond_id):
 
     -----
 
-    :param cond_id: 由add_condition_to_func返回的ID
+    :param int cond_id: 由add_condition_to_func返回的ID
 
     :return: 是否成功
     :rtype: bool
     """
-    lib_sys = __get_lib_system()
+    lib_sys = _sys.get_lib_system()
     if not lib_sys:
         return False
     return lib_sys.remove_condition_to_func(cond_id)

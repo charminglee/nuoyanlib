@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-04
+#   Last Modified : 2025-05-17
 #
 # ====================================================
 
@@ -35,7 +35,7 @@ __all__ = [
 ]
 
 
-class __PosGenerator(object):
+class _PosGenerator(object):
     len = 0
     __i = 0
 
@@ -47,14 +47,14 @@ class __PosGenerator(object):
             self.__i = 0
             raise StopIteration
         # noinspection PyUnreachableCode
-        pos = self._gen(self.__i)
+        pos = self.__gen_pos__(self.__i)
         self.__i += 1
         return pos
 
     def __len__(self):
         return self.len
 
-    def _gen(self, i):
+    def __gen_pos__(self, i):
         raise NotImplementedError
 
     def __getitem__(self, i):
@@ -62,22 +62,23 @@ class __PosGenerator(object):
             raise TypeError("%s indices must be integers, not %s" % (type(self).__name__, type(i).__name__))
         if i >= self.len:
             raise IndexError("%s index out of range" % type(self).__name__)
-        return self._gen(i)
+        return self.__gen_pos__(i)
 
 
-class gen_line_pos(__PosGenerator):
+class gen_line_pos(_PosGenerator):
+    """
+    | 计算给定两点的连线上各点的坐标（包括 ``pos1`` 和 ``pos2`` ）。
+    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+
+    -----
+
+    :param tuple[float,float,float] pos1: 坐标1
+    :param tuple[float,float,float] pos2: 坐标2
+    :param int count: 生成的坐标数量
+    :param int only: 只取前only个点，-1表示取所有点，默认为-1
+    """
+
     def __init__(self, pos1, pos2, count, only=-1):
-        """
-        | 计算给定两点的连线上各点的坐标（包括 ``pos1`` 和 ``pos2`` ）。
-        | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
-
-        -----
-
-        :param tuple[float,float,float] pos1: 坐标1
-        :param tuple[float,float,float] pos2: 坐标2
-        :param int count: 生成的坐标数量
-        :param int only: 只取前only个点，-1表示取所有点，默认为-1
-        """
         self.pos1 = pos1
         self.pos2 = pos2
         self.count = count
@@ -91,32 +92,33 @@ class gen_line_pos(__PosGenerator):
         self.__i = 0
         self.len = only if only != -1 else count
 
-    def _gen(self, i):
+    def __gen_pos__(self, i):
         x = self.pos1[0] + self.__x_step * i
         y = self.pos1[1] + self.__y_step * i
         z = self.pos1[2] + self.__z_step * i
         return x, y, z
 
 
-class gen_circle_pos(__PosGenerator):
+class gen_circle_pos(_PosGenerator):
+    """
+    | 生成以某一坐标为圆心的圆上各点的坐标。
+    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+
+    -----
+
+    :param tuple[float,float,float] center_pos: 圆心坐标
+    :param float radius: 半径
+    :param int count: 生成的坐标数量
+    """
+
     def __init__(self, center_pos, radius, count):
-        """
-        | 生成以某一坐标为圆心的圆上各点的坐标。
-        | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
-
-        -----
-
-        :param tuple[float,float,float] center_pos: 圆心坐标
-        :param float radius: 半径
-        :param int count: 生成的坐标数量
-        """
         self.center_pos = center_pos
         self.radius = radius
         self.count = count
         self.len = count
         self.__step = (2 * _pi) / self.count
 
-    def _gen(self, i):
+    def __gen_pos__(self, i):
         angle = i * self.__step
         x = self.radius * _sin(angle) + self.center_pos[0]
         y = self.center_pos[1]
@@ -124,24 +126,25 @@ class gen_circle_pos(__PosGenerator):
         return x, y, z
 
 
-class gen_sphere_pos(__PosGenerator):
+class gen_sphere_pos(_PosGenerator):
+    """
+    | 根据球心、半径生成球面上各点的坐标。
+    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+
+    -----
+
+    :param tuple[float,float,float] center_pos: 球心坐标
+    :param float radius: 半径
+    :param int count: 生成的坐标数量
+    """
+
     def __init__(self, center_pos, radius, count):
-        """
-        | 根据球心、半径生成球面上各点的坐标。
-        | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
-
-        -----
-
-        :param tuple[float,float,float] center_pos: 球心坐标
-        :param float radius: 半径
-        :param int count: 生成的坐标数量
-        """
         self.center_pos = center_pos
         self.radius = radius
         self.count = count
         self.len = count
 
-    def _gen(self, i):
+    def __gen_pos__(self, i):
         if self.count == 1:
             theta = 0.0
             phi = 0.0
@@ -157,31 +160,32 @@ class gen_sphere_pos(__PosGenerator):
         return x, y, z
 
 
-class gen_cube_pos(__PosGenerator):
+class gen_cube_pos(_PosGenerator):
+    """
+    | 生成立方体区域内各点的坐标。
+    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+
+    -----
+
+    :param tuple[float,float,float] pos1: 立方体对角坐标1
+    :param tuple[float,float,float] pos2: 立方体对角坐标2
+    :param int count: 生成的坐标数量
+    """
+
     def __init__(self, pos1, pos2, count):
-        """
-        | 生成立方体区域内各点的坐标。
-        | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
-
-        -----
-
-        :param tuple[float,float,float] pos1: 立方体对角坐标1
-        :param tuple[float,float,float] pos2: 立方体对角坐标2
-        :param int count: 生成的坐标数量
-        """
         self.pos1 = pos1
         self.pos2 = pos2
         self.count = count
         self.__minx, self.__maxx = sorted([pos1[0], pos2[0]])
         self.__miny, self.__maxy = sorted([pos1[1], pos2[1]])
         self.__minz, self.__maxz = sorted([pos1[2], pos2[2]])
-        self.__count_x, self.__count_y, self.__count_z = self.__calculate_axis_counts(count)
+        self.__count_x, self.__count_y, self.__count_z = self._calculate_axis_counts(count)
         self.__x_step = float(self.__maxx - self.__minx) / (self.__count_x - 1) if self.__count_x > 1 else 0.0
         self.__y_step = float(self.__maxy - self.__miny) / (self.__count_y - 1) if self.__count_y > 1 else 0.0
         self.__z_step = float(self.__maxz - self.__minz) / (self.__count_z - 1) if self.__count_z > 1 else 0.0
         self.len = self.__count_x * self.__count_y * self.__count_z
 
-    def __calculate_axis_counts(self, count):
+    def _calculate_axis_counts(self, count):
         dx = self.__maxx - self.__minx
         dy = self.__maxy - self.__miny
         dz = self.__maxz - self.__minz
@@ -197,27 +201,28 @@ class gen_cube_pos(__PosGenerator):
                 count_z += 1
         return count_x, count_y, count_z
 
-    def _gen(self, i):
+    def __gen_pos__(self, i):
+        # todo
+        pass
 
-        return x, y, z
 
+class gen_spiral_pos(_PosGenerator):
+    """
+    | 生成螺旋轨迹坐标。
+    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
 
-class gen_spiral_pos(__PosGenerator):
+    -----
+
+    :param tuple[float,float,float] start_pos: 开始坐标
+    :param int count: 生成的坐标数量
+    """
+
     def __init__(self, start_pos, count):
-        """
-        | 生成螺旋轨迹坐标。
-        | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
-
-        -----
-
-        :param tuple[float,float,float] start_pos: 开始坐标
-        :param int count: 生成的坐标数量
-        """
         self.start_pos = start_pos
         self.count = count
         self.len = count
 
-    def _gen(self, i):
+    def __gen_pos__(self, i):
         axis = 0
         rel_x, rel_y = 0, 0
         init_step = step = 1

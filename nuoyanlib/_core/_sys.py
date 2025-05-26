@@ -12,27 +12,38 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-21
+#   Last Modified : 2025-05-23
 #
 # ====================================================
 
 
-__all__ = [
-    "get_lib_system",
-    "is_apollo",
-    "is_client",
-    "get_api",
-    "get_comp_factory",
-    "LEVEL_ID",
-]
+from . import _const
+
+
+def init_lib_sys():
+    if is_client():
+        import mod.client.extraClientApi as api
+        if not api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME):
+            api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
+    else:
+        import mod.server.extraServerApi as api
+        if not api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME):
+            api.RegisterSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME, _const.LIB_SERVER_PATH)
+
+
+def check_env(target):
+    if target == "client" and not is_client():
+        raise ImportError("Cannot import nuoyanlib.client in server environment.")
+    if target == "server" and is_client():
+        raise ImportError("Cannot import nuoyanlib.server in client environment.")
 
 
 def get_lib_system():
     if is_client():
-        from ._client._lib_client import get_lib_system
+        from ._client._lib_client import instance
     else:
-        from ._server._lib_server import get_lib_system
-    return get_lib_system()
+        from ._server._lib_server import instance
+    return instance()
 
 
 def is_apollo():
@@ -64,33 +75,44 @@ LEVEL_ID = get_api().GetLevelId()
 
 
 class NuoyanLibBaseSystem(object):
-    def __init__(self, namespace, system_name):
-        super(NuoyanLibBaseSystem, self).__init__(namespace, system_name)
-        self._cond_func = {}
-        self._cond_state = {}
+    def __init__(self, *args, **kwargs):
+        super(NuoyanLibBaseSystem, self).__init__(*args, **kwargs)
+        self.cond_func = {}
+        self.cond_state = {}
         self.__tick = 0
+        get_api().SetMcpModLogCanPostDump(True)
 
     def Update(self):
         self.__tick += 1
-        for cond_id, (cond, func, freq) in self._cond_func.items():
+        for cond_id, (cond, func, freq) in self.cond_func.items():
             if self.__tick % freq:
                 continue
             curr_state = cond()
-            old_state = self._cond_state[cond_id]
+            old_state = self.cond_state[cond_id]
             if curr_state != old_state:
                 func(curr_state)
-                self._cond_state[cond_id] = curr_state
+                self.cond_state[cond_id] = curr_state
+
+    def add_event_callback(self, event, callback):
+        api = get_api()
+        # noinspection PyUnresolvedReferences
+        self.ListenForEvent(api.GetEngineNamespace(), api.GetEngineSystemName(), event, callback.__self__, callback)
+
+    def remove_event_callback(self, event, callback):
+        api = get_api()
+        # noinspection PyUnresolvedReferences
+        self.UnListenForEvent(api.GetEngineNamespace(), api.GetEngineSystemName(), event, callback.__self__, callback)
 
     def add_condition_to_func(self, cond, func, freq):
-        cond_id = max(self._cond_func.iterkeys()) + 1 if self._cond_func else 0
-        self._cond_func[cond_id] = (cond, func, freq)
-        self._cond_state[cond_id] = False
+        cond_id = max(self.cond_func.iterkeys()) + 1 if self.cond_func else 0
+        self.cond_func[cond_id] = (cond, func, freq)
+        self.cond_state[cond_id] = False
         return cond_id
 
     def remove_condition_to_func(self, cond_id):
-        if cond_id in self._cond_func:
-            del self._cond_func[cond_id]
-            del self._cond_state[cond_id]
+        if cond_id in self.cond_func:
+            del self.cond_func[cond_id]
+            del self.cond_state[cond_id]
             return True
         return False
 

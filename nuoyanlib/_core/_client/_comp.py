@@ -12,27 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _client_api
-
-
-__all__ = [
-    "CLIENT_ENGINE_NAMESPACE",
-    "CLIENT_ENGINE_SYSTEM_NAME",
-    "ClientSystem",
-    "CompFactory",
-    "ScreenNode",
-    "ViewBinder",
-    "ViewRequest",
-    "PLAYER_ID",
-    "LEVEL_ID",
-    "PlrComp",
-    "LvComp",
-]
 
 
 CLIENT_ENGINE_NAMESPACE = _client_api.GetEngineNamespace()
@@ -46,6 +31,10 @@ CompFactory = _client_api.GetEngineCompFactory()
 ScreenNode = _client_api.GetScreenNodeCls()
 ViewBinder = _client_api.GetViewBinderCls()
 ViewRequest = _client_api.GetViewViewRequestCls()
+CustomUIScreenProxy = _client_api.GetUIScreenProxyCls()
+CustomUIControlProxy = _client_api.GetCustomUIControlProxyCls()
+# noinspection PyUnresolvedReferences
+NativeScreenManager = _client_api.GetNativeScreenManagerCls().instance()
 
 
 PLAYER_ID = _client_api.GetLocalPlayerId()

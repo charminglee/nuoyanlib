@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-04
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
@@ -23,21 +23,14 @@ from mod.common.minecraftEnum import (
     EntityType as _EntityType,
     AttrType as _AttrType,
     ActorDamageCause as _ActorDamageCause,
+    EntityComponentType as _EntityComponentType,
 )
-from .._core._server._comp import (
-    CompFactory as _CompFactory,
-    LvComp as _LvComp,
+from .._core._server import _comp
+from ..utils import (
+    mc_math as _mc_math,
+    vector as _vector,
 )
-from ..utils.mc_math import (
-    is_in_sector as _is_in_sector,
-    pos_distance_to_line as _pos_distance_to_line,
-)
-from ..utils.vector import vec_angle as _vec_angle
-from .entity import (
-    entity_filter as _entity_filter,
-    get_entities_in_area as _get_entities_in_area,
-    get_all_entities as _get_all_entities,
-)
+from . import entity as _entity
 
 
 __all__ = [
@@ -53,7 +46,11 @@ __all__ = [
 ]
 
 
-__sdk_damage_cause = [v for k, v in _ActorDamageCause.__dict__.items() if not k.startswith("_")]
+_SDK_DAMAGE_CAUSE = [
+    v
+    for k, v in _ActorDamageCause.__dict__.items()
+    if not k.startswith("_")
+]
 
 
 class EntityFilter:
@@ -65,7 +62,7 @@ class EntityFilter:
     @staticmethod
     def mob(eid):
         """
-        | 过滤生物实体。
+        | 过滤生物实体。（判定标准为是否具有 ``minecraft:health`` 组件）
 
         -----
 
@@ -74,13 +71,13 @@ class EntityFilter:
         :return: 返回True时表示该实体为生物实体
         :rtype: bool
         """
-        return _CompFactory.CreateEngineType(eid).GetEngineType() & _EntityType.Mob == _EntityType.Mob
+        return _comp.CompFactory.CreateEntityComponent(eid).HasComponent(_EntityComponentType.health)
 
 
     @staticmethod
     def non_mob(eid):
         """
-        | 过滤非生物实体。
+        | 过滤非生物实体。（判定标准为是否具有 ``minecraft:health`` 组件）
 
         -----
 
@@ -94,16 +91,16 @@ class EntityFilter:
     @staticmethod
     def has_health(eid):
         """
-        | 过滤当前生命值>0的实体。
+        | 过滤当前生命值大于0的实体。
 
         -----
 
         :param str eid: 实体ID
 
-        :return: 返回True时表示该实体当前生命值>0
+        :return: 返回True时表示该实体当前生命值大于0
         :rtype: bool
         """
-        return _CompFactory.CreateAttr(eid).GetAttrValue(_AttrType.HEALTH) > 0
+        return _comp.CompFactory.CreateAttr(eid).GetAttrValue(_AttrType.HEALTH) > 0
 
 
 def explode_hurt(
@@ -136,22 +133,22 @@ def explode_hurt(
     :rtype: None
     """
     for plr in _server_api.GetPlayerList():
-        if _CompFactory.CreateDimension(plr).GetEntityDimensionId() == dim:
+        if _comp.CompFactory.CreateDimension(plr).GetEntityDimensionId() == dim:
             player_id = plr
             break
     else:
         return
-    orig_rule = _LvComp.Game.GetGameRulesInfoServer()
-    _LvComp.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tile_drops, 'mob_loot': mob_loot}})
-    comp = _CompFactory.CreateHurt(source_id)
+    orig_rule = _comp.LvComp.Game.GetGameRulesInfoServer()
+    _comp.LvComp.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tile_drops, 'mob_loot': mob_loot}})
+    hurt_comp = _comp.CompFactory.CreateHurt(source_id)
     try:
         if not hurt_source:
-            comp.ImmuneDamage(True)
-        _LvComp.Explosion.CreateExplosion(pos, radius, fire, breaks, source_id, player_id)
+            hurt_comp.ImmuneDamage(True)
+        _comp.LvComp.Explosion.CreateExplosion(pos, radius, fire, breaks, source_id, player_id)
     finally:
-        _LvComp.Game.SetGameRulesInfoServer(orig_rule)
+        _comp.LvComp.Game.SetGameRulesInfoServer(orig_rule)
         if not hurt_source:
-            comp.ImmuneDamage(False)
+            hurt_comp.ImmuneDamage(False)
 
 
 def line_damage(
@@ -180,7 +177,7 @@ def line_damage(
     :param tuple[float,float,float] start_pos: 线段起点坐标
     :param tuple[float,float,float] end_pos: 线段终点坐标
     :param int dim: 维度
-    :param int damage: 伤害
+    :param float damage: 伤害
     :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
     :param str|None attacker_id: 攻击者实体ID，默认无攻击者
     :param str|None child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
@@ -203,19 +200,19 @@ def line_damage(
         filter_ids = filter_ids[:]
     if attacker_id:
         filter_ids.append(attacker_id)
-    entities = _get_all_entities()
-    entities = _entity_filter(
+    entities = _entity.get_all_entities()
+    entities = _entity.entity_filter(
         entities, {_EntityType.Mob}, {str(dim)}, filter_ids, filter_types, filter_type_str
     )
     hurt_ents = []
     for eid in entities:
-        ep = _CompFactory.CreatePos(eid).GetFootPos()
-        dis = _pos_distance_to_line(ep, start_pos, end_pos)
+        ep = _comp.CompFactory.CreatePos(eid).GetFootPos()
+        dis = _mc_math.pos_distance_to_line(ep, start_pos, end_pos)
         if dis > radius:
             continue
         v1 = tuple(a - b for a, b in zip(start_pos, ep))
         v2 = tuple(a - b for a, b in zip(end_pos, ep))
-        if _vec_angle(v1, v2) < 1.57:
+        if _vector.vec_angle(v1, v2) < 1.57:
             continue
         if before_hurt_callback:
             ret_eid = before_hurt_callback(eid, attacker_id, child_id)
@@ -243,7 +240,7 @@ def hurt_mobs(
     -----
 
     :param list[str] entity_id_list: 实体ID列表
-    :param int damage: 伤害
+    :param float damage: 伤害
     :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
     :param str|None attacker_id: 攻击者实体ID，默认无攻击者
     :param str|None child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
@@ -280,14 +277,14 @@ def aoe_damage(
     :param float radius: 伤害半径
     :param tuple[float,float,float] pos: 产生范围伤害的中心点坐标
     :param int dim: 维度
-    :param int damage: 伤害
+    :param float damage: 伤害
     :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
     :param str|None attacker_id: 攻击者实体ID，默认无攻击者
     :param str|None child_id: 攻击者的子实体ID，比如玩家使用抛射物造成伤害，该值应为抛射物实体ID，默认无子实体
     :param bool knocked: 是否产生击退，默认为是
     :param list[str]|None filter_ids: 过滤的实体ID列表，列表中的实体将不会受到伤害，默认为不过滤
     :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
-    :param function|None before_hurt_callback: 对生物造成伤害之前调用的函数，该函数第一个参数为受伤生物的实体ID，第二个为攻击者的实体ID，第三个参数为攻击者的子实体ID；该函数可返回一个新的实体ID，新的实体ID将会替换原受伤生物的实体ID进入最终返回的受伤生物实体ID列表中；默认为None
+    :param function|None before_hurt_callback: 对生物造成伤害之前调用的函数，该函数第一个参数为受伤生物的实体ID，第二个为攻击者的实体ID，第三个参数为攻击者的子实体ID；若该函数返回一个新的实体ID，本次伤害将转移给该实体；默认为None
     :param function|None after_hurt_callback: 对生物造成伤害之后调用的函数，该函数第一个参数为受伤生物的实体ID，第二个为攻击者的实体ID，第三个参数为攻击者的子实体ID；默认为None
     :param bool force: 是否无视攻击冷却或生物的无敌状态强制设置伤害，默认为否
 
@@ -304,8 +301,8 @@ def aoe_damage(
         filter_ids.append(attacker_id)
     start_pos = tuple(i - radius for i in pos)
     end_pos = tuple(i + radius for i in pos)
-    entities = _LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dim)
-    entities = _entity_filter(entities, (pos, radius), {_EntityType.Mob}, filter_ids, filter_types)
+    entities = _comp.LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dim)
+    entities = _entity.entity_filter(entities, (pos, radius), {_EntityType.Mob}, filter_ids, filter_types)
     hurt_ents = []
     for eid in entities:
         if before_hurt_callback:
@@ -338,7 +335,7 @@ def sector_aoe_damage(
 
     :param float sector_radius: 扇形半径
     :param float sector_angle: 扇形张开的角度
-    :param int damage: 伤害
+    :param float damage: 伤害
     :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
     :param str|None attacker_id: 攻击者ID，默认无攻击者
     :param str|None child_id: 伤害来源的子实体ID，默认无子实体
@@ -354,14 +351,14 @@ def sector_aoe_damage(
         filter_ids = []
     filter_ids = _copy(filter_ids)
     filter_ids.append(attacker_id)
-    attacker_pos = _CompFactory.CreatePos(attacker_id).GetFootPos()
-    attacker_rot = _CompFactory.CreateRot(attacker_id).GetRot()[1]
-    dim = _CompFactory.CreateDimension(attacker_id).GetEntityDimensionId()
-    entity_list = _get_entities_in_area(attacker_pos, sector_radius, dim, filter_ids, filter_types, True)
+    attacker_pos = _comp.CompFactory.CreatePos(attacker_id).GetFootPos()
+    attacker_rot = _comp.CompFactory.CreateRot(attacker_id).GetRot()[1]
+    dim = _comp.CompFactory.CreateDimension(attacker_id).GetEntityDimensionId()
+    entity_list = _entity.get_entities_in_area(attacker_pos, sector_radius, dim, filter_ids, filter_types, True)
     result = []
     for eid in entity_list:
-        pos = _CompFactory.CreatePos(eid).GetFootPos()
-        test = _is_in_sector(
+        pos = _comp.CompFactory.CreatePos(eid).GetFootPos()
+        test = _mc_math.is_in_sector(
             (pos[0], attacker_pos[1], pos[2]), attacker_pos, sector_radius, sector_angle, attacker_rot
         )
         if test:
@@ -392,7 +389,7 @@ def rectangle_aoe_damage(
     :param tuple[float,float,float] min_vertex: 矩形最小顶点坐标
     :param tuple[float,float,float] max_vertex: 矩形最大顶点坐标，最大顶点坐标必须大于最小顶点坐标，否则不会对任何实体造成伤害
     :param int dim: 维度
-    :param int damage: 伤害
+    :param float damage: 伤害
     :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
     :param str|None attacker_id: 攻击者ID，默认None
     :param str|None child_id: 伤害来源的子实体ID，默认None
@@ -406,7 +403,7 @@ def rectangle_aoe_damage(
     :rtype: list[str]
     """
     result = []
-    entities_list = _LvComp.Game.GetEntitiesInSquareArea(None, min_vertex, max_vertex, dim)
+    entities_list = _comp.LvComp.Game.GetEntitiesInSquareArea(None, min_vertex, max_vertex, dim)
     for eid in entities_list:
         if not hurt_attacker and eid == attacker_id:
             continue
@@ -431,9 +428,9 @@ def hurt_by_set_health(entity_id, damage):
     :return: 无
     :rtype: None
     """
-    attr = _CompFactory.CreateAttr(entity_id)
+    attr = _comp.CompFactory.CreateAttr(entity_id)
     health = attr.GetAttrValue(_AttrType.HEALTH)
-    new_health = int(health) - int(damage)
+    new_health = int(health - damage)
     attr.SetAttrValue(_AttrType.HEALTH, new_health)
 
 
@@ -452,7 +449,7 @@ def hurt(
     -----
 
     :param str entity_id: 生物ID
-    :param int damage: 伤害
+    :param float damage: 伤害
     :param str cause: 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
     :param str|None attacker: 攻击者实体ID，默认无攻击者
     :param str|None child_id: 伤害来源的子实体ID，默认无子实体
@@ -462,12 +459,12 @@ def hurt(
     :return: 无
     :rtype: None
     """
-    if cause in __sdk_damage_cause:
+    if cause in _SDK_DAMAGE_CAUSE:
         custom_tag = None
     else:
         custom_tag = cause
         cause = _ActorDamageCause.Custom
-    hurt_result = _CompFactory.CreateHurt(entity_id).Hurt(int(damage), cause, attacker, child_id, knocked, custom_tag)
+    hurt_result = _comp.CompFactory.CreateHurt(entity_id).Hurt(damage, cause, attacker, child_id, knocked, custom_tag)
     if not hurt_result and force:
         hurt_by_set_health(entity_id, damage)
 
@@ -499,7 +496,7 @@ def percent_damage(
     :return: 无
     :rtype: None
     """
-    attr = _CompFactory.CreateAttr(entity_id)
+    attr = _comp.CompFactory.CreateAttr(entity_id)
     value = 0
     if type_name == "max_health":
         value = attr.GetAttrMaxValue(_AttrType.HEALTH)
@@ -508,7 +505,7 @@ def percent_damage(
     elif type_name == "hunger":
         value = attr.GetAttrValue(_AttrType.HUNGER)
     elif type_name == "attacker_damage" and attacker:
-        value = _CompFactory.CreateAttr(attacker).GetAttrValue(_AttrType.DAMAGE)
+        value = _comp.CompFactory.CreateAttr(attacker).GetAttrValue(_AttrType.DAMAGE)
     if value > 0:
         damage = int(value * percent)
         if damage > 999999999:

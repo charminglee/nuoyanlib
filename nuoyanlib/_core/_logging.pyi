@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-06
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
@@ -20,4 +20,5 @@
 from typing import Any
 
 
+def disable_modsdk_loggers() -> None: ...
 def log(msg: str, cls: Any = None, level: str = "INFO") -> None: ...

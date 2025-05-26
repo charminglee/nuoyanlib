@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-20
+#   Last Modified : 2025-03-26
 #
 # ====================================================
 
@@ -27,13 +27,13 @@ item_grid_manager
 
 【名词解释】
 
-* 网格：即Grid控件，一种能够对模板控件多次克隆并排列成网状的控件。
-* 方格：即网格的单个子控件，也称为网格的元素，本质上是个按钮控件。
-* 网格的key：在 ``ItemGridManager`` 中，每个网格都有一个唯一的key，数据类型为字符串，可自定义，或使用预设的key来启用特定功能。
-* 方格索引：类似于物品栏槽位，从0开始，网格的第一个方格的索引为0，第二个为1，以此类推，从左到右从上到下递增。
-* 方格位置元组：用于表示指定方格，由两个元素组成：(方格所在网格的key, 方格索引)。
-* 方格路径：即方格控件的UI路径。
-* 分堆数据字典：保存了当前物品分堆数据的字典。
+- 网格：即Grid控件，一种能够对模板控件多次克隆并排列成网状的控件。
+- 方格：即网格的单个子控件，也称为网格的元素，本质上是个按钮控件。
+- 网格的key：在 ``ItemGridManager`` 中，每个网格都有一个唯一的key，数据类型为字符串，可自定义，或使用预设的key来启用特定功能。
+- 方格索引：类似于物品栏槽位，从0开始，网格的第一个方格的索引为0，第二个为1，以此类推，从左到右从上到下递增。
+- 方格位置元组：用于表示指定方格，由两个元素组成：(方格所在网格的key, 方格索引)。
+- 方格路径：即方格控件的UI路径。
+- 分堆数据字典：保存了当前物品分堆数据的字典。
 ::
 
     +----------------+----------------------+--------------------+
@@ -99,7 +99,7 @@ from ..._core._client._comp import (
     CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
 )
 from ..._core._client._lib_client import (
-    get_lib_system as _get_lib_system,
+    instance as _instance,
 )
 from ..._core._listener import (
     event as _event,
@@ -141,11 +141,11 @@ class ItemGridManager(object):
     """
 
     def __init__(self, nuoyan_screen_node, item_fly_anim, item_tips_box):
-        self.__lib_sys = _get_lib_system()
+        self.__lib_sys = _instance()
         self.__nsn_ins = nuoyan_screen_node
         self.__ifa_ins = item_fly_anim
         self.__itb_ins = item_tips_box
-        self.__screen_node = self.__nsn_ins._NuoyanScreenNode__screen_node
+        self.__screen_node = self.__nsn_ins._ScreenNodeExtension__screen_node
         self._item_heap_data = {}
         self._selected_item = {}
         self._cell_paths = {}
@@ -1144,8 +1144,8 @@ class ItemGridManager(object):
         """
         | 将指定位置物品均匀地分到多个方格上。与原版背包的滑动均分效果相同。
         | 均分必须满足以下规则，否则会失败：
-        * ``from_cell`` 物品不是空气；
-        * ``from_cell`` 物品数量必须大于 ``to_cell_list`` 的长度。
+        - ``from_cell`` 物品不是空气；
+        - ``from_cell`` 物品数量必须大于 ``to_cell_list`` 的长度。
         | 以上条件满足时，物品将会尽可能地被均分到 ``to_cell_list`` 的每个方格上，多余的无法被均分的物品会留在 ``from_cell`` 。
 
         -----

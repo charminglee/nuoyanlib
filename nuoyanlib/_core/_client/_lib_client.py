@@ -12,78 +12,39 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-21
+#   Last Modified : 2025-05-23
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _client_api
-from .._const import (
-    LIB_NAME as _LIB_NAME,
-    LIB_CLIENT_NAME as _LIB_CLIENT_NAME,
-    LIB_SERVER_NAME as _LIB_SERVER_NAME,
-)
-from ._comp import (
-    PLAYER_ID as _PLAYER_ID,
-    ClientSystem as _ClientSystem,
-    CompFactory as _CompFactory,
-)
-from .._listener import (
-    event as _event,
-    lib_sys_event as _lib_sys_event,
-    quick_listen as _quick_listen,
-)
-from .._utils import (
-    is_not_inv_key as _is_not_inv_key,
-)
-from .._sys import (
-    NuoyanLibBaseSystem as _NuoyanLibBaseSystem,
-)
-from .._logging import log as _log
-from ...utils.communicate import (
-    call_local as _call_local,
-    call_callback as _call_callback,
-)
+from . import _comp
+from .. import _const, _listener, _sys, _utils, _logging
+from ...utils import communicate as _communicate
 
 
-__all__ = [
-    "get_lib_system",
-    "NuoyanLibClientSystem",
-]
+def instance():
+    if not NuoyanLibClientSystem.instance:
+        NuoyanLibClientSystem.instance = _client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
+    return NuoyanLibClientSystem.instance
 
 
-_lib_sys = None
-def get_lib_system():
-    if not _lib_sys:
-        _log("Get client lib system failed!", level="ERROR")
-    return _lib_sys
-
-
-@_quick_listen
-class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
+@_utils.singleton
+class NuoyanLibClientSystem(_sys.NuoyanLibBaseSystem, _listener.ClientEventProxy, _comp.ClientSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
-        self.item_grid_path = {}
-        self.item_grid_size = {}
-        self.item_grid_items = {}
-        self.registered_keys = {}
-        global _lib_sys
-        _lib_sys = self
-        _log("Inited", NuoyanLibClientSystem)
+        _logging.log("Inited, ver: %s" % _const.__version__, NuoyanLibClientSystem)
 
     # General ==========================================================================================================
 
-    @_event("UiInitFinished")
-    def _on_ui_init_finished(self, args):
+    def UiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
-
-    # BroadcastToAllClient =============================================================================================
 
     def broadcast_to_all_client(self, event_name, event_data, namespace="", sys_name=""):
         if not namespace:
-            namespace = _LIB_NAME
+            namespace = _const.LIB_NAME
         if not sys_name:
-            sys_name = _LIB_CLIENT_NAME
+            sys_name = _const.LIB_CLIENT_NAME
         self.NotifyToServer("_BroadcastToAllClient", {
             'event_name': event_name,
             'event_data': event_data,
@@ -91,13 +52,11 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
             'sys_name': sys_name,
         })
 
-    # NotifyToMultiClients =============================================================================================
-
     def notify_to_multi_clients(self, player_ids, event_name, event_data, namespace="", sys_name=""):
         if not namespace:
-            namespace = _LIB_NAME
+            namespace = _const.LIB_NAME
         if not sys_name:
-            sys_name = _LIB_CLIENT_NAME
+            sys_name = _const.LIB_CLIENT_NAME
         self.NotifyToServer("_NotifyToMultiClients", {
             'player_ids': player_ids,
             'event_name': event_name,
@@ -106,34 +65,66 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
             'sys_name': sys_name,
         })
 
+    def register_and_create_ui(self, namespace, ui_key, cls_path, ui_screen_def, stack=False, param=None):
+        """
+        | 注册并创建UI。
+        | 如果UI已创建，则返回其实例。
+        | 使用该接口创建的UI，其UI类 ``__init__`` 方法的 ``param`` 参数会自带一个名为 ``__cs__`` 的key，对应的值为创建UI的客户端的实例，可以方便地调用客户端的属性、方法和接口。
+
+        -----
+
+        :param str namespace: 命名空间，建议为mod名字
+        :param str ui_key: UI唯一标识
+        :param str cls_path: UI类路径
+        :param str ui_screen_def: UI画布路径，格式为"namespace.scree_name"，namespace对应UI json文件中"namespace"的值，scree_name为想打开的画布的名称（一般为main）
+        :param bool stack: 是否使用堆栈管理的方式创建UI，默认为False
+        :param dict|None param: 创建UI的参数字典，会传到UI类__init__方法的param参数中，默认为空字典
+
+        :return: UI类实例，注册或创建失败时返回None
+        :rtype: _ScreenNode|None
+        """
+        node = _client_api.GetUI(namespace, ui_key)
+        if node:
+            return node
+        if not _client_api.RegisterUI(namespace, ui_key, cls_path, ui_screen_def):
+            return
+        if param is None:
+            param = {}
+        if isinstance(param, dict):
+            param['__cs__'] = self
+        if stack:
+            return _client_api.PushScreen(namespace, ui_key, param)
+        else:
+            return _client_api.CreateUI(namespace, ui_key, param)
+
     # set_query_mod_var ================================================================================================
 
-    @_lib_sys_event("_SetQueryCache")
-    def _on_set_query_cache(self, args):
+    @_listener.lib_sys_event
+    def _SetQueryCache(self, args):
         for entity_id, queries in args.items():
             for name, value in queries.items():
-                comp = _CompFactory.CreateQueryVariable(entity_id)
+                comp = _comp.CompFactory.CreateQueryVariable(entity_id)
                 if comp.Get(name) == -1.0:
                     comp.Register(name, 0.0)
                 comp.Set(name, value)
 
-    @_lib_sys_event("_SetQueryVar")
-    def on_set_query_var(self, args):
-        if args.get('__id__') == _PLAYER_ID:
+    @_listener.lib_sys_event
+    def _SetQueryVar(self, args):
+        if args.get('__id__') == _comp.PLAYER_ID:
             return
         entity_id = args['entity_id']
         name = args['name']
         value = args['value']
-        comp = _CompFactory.CreateQueryVariable(entity_id)
+        comp = _comp.CompFactory.CreateQueryVariable(entity_id)
         if comp.Get(name) == -1.0:
             comp.Register(name, 0.0)
         comp.Set(name, value)
 
     # call =============================================================================================================
 
-    @_event("_NuoyanLibCall", _LIB_NAME, _LIB_CLIENT_NAME)
-    @_event("_NuoyanLibCall", _LIB_NAME, _LIB_SERVER_NAME)
-    def _be_called(self, args):
+    @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_CLIENT_NAME)
+    @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_SERVER_NAME)
+    def _NuoyanLibCall(self, args):
         namespace = args['namespace']
         system_name = args['system_name']
         method = args['method']
@@ -152,35 +143,14 @@ class NuoyanLibClientSystem(_NuoyanLibBaseSystem, _ClientSystem):
                 )
             else:
                 self.NotifyToServer("_NuoyanLibCallReturn", {'uuid': uuid, 'cb_args': cb_args})
-        _call_local(target_sys, method, callback, delay_ret, call_args, call_kwargs)
+        _communicate.call_local(target_sys, method, callback, delay_ret, call_args, call_kwargs)
 
-    @_event("_NuoyanLibCallReturn", _LIB_NAME, _LIB_CLIENT_NAME)
-    @_event("_NuoyanLibCallReturn", _LIB_NAME, _LIB_SERVER_NAME)
-    def _call_return(self, args):
+    @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_CLIENT_NAME)
+    @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_SERVER_NAME)
+    def _NuoyanLibCallReturn(self, args):
         uuid = args['uuid']
         cb_args = args['cb_args']
-        _call_callback(uuid, **cb_args)
-
-    # Item Grid （已废弃） ===============================================================================================
-
-    @_lib_sys_event("_UpdateItemGrids")
-    def _on_update_item_grids(self, args):
-        data = args['data']
-        self.item_grid_items.update(data)
-        _log("Updated item grids: %s" % data.keys(), NuoyanLibClientSystem)
-
-    def register_item_grid(self, key, cls_path, path, size, is_single):
-        if key in self.item_grid_path:
-            _log("Register item grid failed: key '%s' already exists" % key, level="ERROR")
-            return False
-        self.registered_keys.setdefault(cls_path, []).append(key)
-        self.item_grid_path[key] = (path, is_single)
-        self.item_grid_size[key] = size
-        if _is_not_inv_key(key):
-            self.item_grid_items[key] = [None] * size
-            self.NotifyToServer("_RegisterItemGrid", {'key': key, 'size': size})
-        return True
-
+        _communicate.call_callback(uuid, **cb_args)
 
 
 

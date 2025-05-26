@@ -12,20 +12,15 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2023-11-30
+#   Last Modified : 2025-05-19
 #
 # ====================================================
 
 
-from typing import List, Dict
-
-
-CONSTRUCTION: List[Dict[str, ...]]
-EQUIPMENT: List[Dict[str, ...]]
-ITEMS: List[Dict[str, ...]]
-NATURE: List[Dict[str, ...]]
-SEARCH: List[Dict[str, ...]]
-
-
-def _remove_useless(item_list: List[Dict[str, ...]]) -> None: ...
-def _stack_to_search() -> None: ...
+def register_item_grid(
+    key: str,
+    ui_cls_path: str,
+    grid_path: str,
+    grid_size: int = 1,
+    is_single: bool = False,
+) -> bool: ...

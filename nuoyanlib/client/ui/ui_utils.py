@@ -12,85 +12,246 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-21
 #
 # ====================================================
 
 
+from functools import wraps as _wraps
 from ..._core._client._comp import (
     ScreenNode as _ScreenNode,
+    LvComp as _LvComp,
 )
-from ..._core._client._lib_client import (
-    get_lib_system as _get_lib_system,
+from ...utils import (
+    Enum as _Enum,
+    auto as _auto,
 )
+from ..._core._client import _lib_client
+from .. import setting as _setting
 
 
 __all__ = [
-    "register_item_grid",
+    "to_button",
+    "to_path",
+    "to_control",
+    "ButtonCallback",
     "get_parent_path",
-    "get_direct_children_path",
+    "get_all_children_path_by_level",
     "get_parent_control",
+    "notify_server",
 ]
 
 
-def register_item_grid(key, ui_cls_path, grid_path, grid_size=1, is_single=False):
+def to_button(screen_node, control):
     """
-    | 注册物品网格或注册单个方格按钮。如果注册的是单个方格按钮，则该方格按钮将被视为只有一个元素的网格。
-    | 注册后还需要在网格显示在屏幕上时调用 ``ItemGridManager`` 的 ``InitItemGrids`` 接口才能正常使用。
-    | 当网格的key以“_shortcut”、“_inv27”或“_inv36”结尾时（如“my_item_grid_inv36”），将获得以下特殊功能：
-    * 该网格将与本地玩家的背包进行绑定，"_shortcut"表示快捷栏，"_inv27"表示除快捷栏以外的物品栏，"_inv36"表示整个物品栏。
-    * 该网格会自动获取本地玩家背包物品数据，并显示物品。
-    * 在该网格进行的任何物品操作会自动与本地玩家的背包进行同步。
-    | key以“_shortcut”、“_inv27”或“_inv36”结尾的网格的方格数量分别为9、27、36时才能注册成功。
+    | 获取按钮的 ``ButtonUIControl`` 实例。
 
     -----
 
-    :param str key: 网格的key，请保证key唯一，不能与其他网格相同，建议格式为“模组名+网格名称”
-    :param str ui_cls_path: 网格所在UI类的路径（该UI类需要继承ItemGridManager）
-    :param str grid_path: 网格的UI路径
-    :param int grid_size: 网格的方格数量，默认为1
-    :param bool is_single: 是否是单个方格按钮，默认为False
+    :param _ScreenNode screen_node: 控件所在UI类的实例
+    :param str|BaseUIControl control: 控件路径或实例
 
-    :return: 是否注册成功
-    :rtype: bool
+    :return: ButtonUIControl实例，获取不到时返回None
+    :rtype: ButtonUIControl|None
     """
-    lib_sys = _get_lib_system()
-    if not lib_sys:
-        return False
-    return lib_sys.register_item_grid(key, ui_cls_path, grid_path, grid_size, is_single)
+    control = to_control(screen_node, control)
+    return control.asButton() if control else None
 
 
-def __get_path(control):
+def to_path(control):
+    """
+    | 获取控件路径，若传入的已经是路径，则返回该路径。
+
+    -----
+
+    :param str|BaseUIControl control: 控件实例
+
+    :return: 控件路径
+    :rtype: str
+    """
     return control if isinstance(control, str) else control.GetPath()
 
 
-def get_direct_children_path(control, ui_ins):
+def to_control(screen_node, path):
     """
-    | 获取控件的所有直接子控件的路径。
-    | 例如，某面板包含两个按钮，而每个按钮又包含三张图片，则按钮为面板的直接子控件，图片为面板的间接子控件。
+    | 根据路径获取控件的 ``BaseUIControl`` 实例，若传入的已经是实例，则返回该实例。
 
     -----
 
-    :param str|BaseUIControl control: 控件路径或控件实例
-    :param _ScreenNode ui_ins: 控件所在的UI类实例
+    :param _ScreenNode screen_node: 控件所在UI类的实例
+    :param str|BaseUIControl path: 控件路径
 
-    :return: 控件所有直接子控件的路径的列表，获取不到返回空列表
+    :return: 控件实例，获取不到时返回None
+    :rtype: BaseUIControl|None
+    """
+    return screen_node.GetBaseUIControl(path) if isinstance(path, str) else path
+
+
+def save_ui_pos_data(key, data):
+    return _setting.save_setting(key, data, False)
+
+
+def get_ui_pos_data(key):
+    data = _setting.read_setting(key, False)
+    if data:
+        for key, data_lst in data.items():
+            data_lst = [(str(path), tuple(pos)) for path, pos in data_lst]
+            data[key] = data_lst
+    return data or {}
+
+
+class UIControlType:
+    All = -1
+    Button = 0
+    Custom = 1
+    CollectionPanel = 2
+    Dropdown = 3
+    EditBox = 4
+    Factory = 5
+    Grid = 6
+    Image = 7
+    InputPanel = 8
+    Label = 9
+    Panel = 10
+    Screen = 11
+    ScrollbarBox = 12
+    ScrollTrack = 13
+    ScrollView = 14
+    SelectionWheel = 15
+    Slider = 16
+    SliderBox = 17
+    StackPanel = 18
+    Toggle = 19
+    ImageCycler = 20
+    LabelCycler = 21
+    GridPageIndicator = 22
+    Combox = 23
+    Layout = 24
+    StackGrid = 25
+    Joystick = 26
+    RichText = 27
+    SixteenNineLayout = 28
+    MulLinesEdit = 29
+    AminProcessBar = 30
+    Unknown = 31
+
+
+class ButtonCallback(_Enum[int]):
+    """
+    按钮回调函数类型枚举。
+    """
+
+    touch_up = _auto()
+    """
+    触控在按钮范围内抬起。
+    """
+
+    touch_down = _auto()
+    """
+    按钮按下。
+    """
+
+    touch_cancel = _auto()
+    """
+    触控在按钮范围外抬起。
+    """
+
+    touch_move = _auto()
+    """
+    按下后触控移动。
+    """
+
+    touch_move_in = _auto()
+    """
+    按下按钮后触控进入按钮。
+    """
+
+    touch_move_out = _auto()
+    """
+    按下按钮后触控退出按钮。
+    """
+
+    double_click = _auto()
+    """
+    双击按钮。
+    """
+
+    long_click = _auto()
+    """
+    长按按钮。
+    """
+
+    hover_in = _auto()
+    """
+    鼠标进入按钮。
+    """
+
+    hover_out = _auto()
+    """
+    鼠标退出按钮。
+    """
+
+    screen_exit = _auto()
+    """
+    按钮所在画布退出，且鼠标仍未抬起时触发。
+    """
+
+
+def is_ui_out_of_screen(control, screen_node=None):
+    """
+    | 判断控件是否超出屏幕范围。
+
+    -----
+
+    :param str|BaseUIControl control: 控件路径或实例
+    :param _ScreenNode|None screen_node: 当control参数传入控件路径时，需要指定控件所在UI类的实例；默认为None
+
+    :return: 是否超出屏幕范围
+    :rtype: bool
+    """
+    if isinstance(control, str):
+        control = screen_node.GetBaseUIControl(control)
+    px, py = control.GetGlobalPosition()
+    ctrl_sx, ctrl_sy = control.GetSize()
+    scr_sx, scr_sy = _LvComp.Game.GetScreenSize()
+    return (
+        px < 0
+        or py < 0
+        or px + ctrl_sx > scr_sx
+        or py + ctrl_sy > scr_sy
+    )
+
+
+def _get_path(control):
+    return control if isinstance(control, str) else control.GetPath()
+
+
+def get_all_children_path_by_level(control, screen_node, level=1):
+    """
+    | 获取控件的指定层级的所有子控件的路径。
+    | 例如，某面板包含两个按钮，而每个按钮又包含三张图片，则按钮为面板的一级子控件，按钮下的图片为面板的二级子控件，以此类推。
+
+    -----
+
+    :param str|BaseUIControl control: 控件路径或实例
+    :param _ScreenNode screen_node: 控件所在UI类的实例
+    :param int level: 子控件层级，默认为1
+
+    :return: 控件指定层级的所有子控件的路径列表，获取不到时返回空列表
     :rtype: list[str]
     """
-    path = __get_path(control)
+    path = _get_path(control)
+    control_level = path.count("/")
     if not path.startswith("/"):
-        path = "/" + path
-    path_level = path.count("/")
-    path_first = path if path_level == 1 else path[:path.index("/", 1)]
-    all_children = []
-    for p in ui_ins.GetAllChildrenPath(path):
-        p_first = p[:p.index("/", 1)]
-        if p_first != path_first:
-            p = path_first + p
-        p_level = p.count("/")
-        if p_level == path_level + 1:
-            all_children.append(p)
-    return all_children
+        control_level += 1
+    target_level = control_level + level
+    res = []
+    for p in screen_node.GetAllChildrenPath(path):
+        if p.startswith("/safezone_screen_matrix"):
+            p = "/variables_button_mappings_and_controls" + p
+        if p.count("/") == target_level:
+            res.append(p)
+    return res
 
 
 def get_parent_path(control):
@@ -99,34 +260,53 @@ def get_parent_path(control):
 
     -----
 
-    :param str|BaseUIControl control: 控件路径或控件实例
+    :param str|BaseUIControl control: 控件路径或实例
 
     :return: 父控件路径，获取不到返回None
     :rtype: str|None
     """
-    path = __get_path(control)
+    path = _get_path(control)
     return path[:path.rindex("/")] if path else None
 
 
-def get_parent_control(control, ui_ins):
+def get_parent_control(control, screen_node):
     """
     | 获取控件的父控件实例。
 
     -----
 
-    :param str|BaseUIControl control: 控件路径或控件实例
-    :param _ScreenNode ui_ins: 控件所在的UI类实例
+    :param str|BaseUIControl control: 控件路径或实例
+    :param _ScreenNode screen_node: 控件所在UI类的实例
 
     :return: 父控件实例（BaseUIControl），获取不到返回None
     :rtype: BaseUIControl|None
     """
-    path = get_parent_path(control)
-    return ui_ins.GetBaseUIControl(path) if path else None
+    return screen_node.GetBaseUIControl(get_parent_path(control))
 
 
+def notify_server(func):
+    """
+    【已废弃】
 
-
-
+    | 函数装饰器，用于按钮的回调函数。
+    | 被装饰的按钮回调函数每触发一次，服务端的同名函数也会触发一次。
+    | 服务端同名函数的参数与按钮回调函数的参数相同，且自带一个名为 ``__id__`` 的key，其value为触发按钮的玩家实体ID。
+    | 可通过 args['cancel_notify'] = True 或 return -1 的方式取消触发服务端函数。
+    | 若对按钮回调参数进行修改（如增加、修改或删除某个key或value），服务端得到的参数字典同样为修改后的字典，可通过该方式向服务端传递更多信息。
+    """
+    @_wraps(func)
+    def wrapper(self, args):
+        args['cancel_notify'] = False
+        ret = func(self, args)
+        if args['cancel_notify'] or ret == -1:
+            return ret
+        del args['cancel_notify']
+        _lib_client.instance().NotifyToServer(
+            "_ButtonCallbackTrigger",
+            {'name': func.__name__, 'args': args}
+        )
+        return ret
+    return wrapper
 
 
 

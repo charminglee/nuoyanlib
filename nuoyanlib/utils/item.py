@@ -12,16 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-04
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
 
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
-from .._core._sys import (
-    get_comp_factory as _get_comp_factory,
-    LEVEL_ID as _LEVEL_ID,
-)
+from .._core import _sys
 
 
 __all__ = [
@@ -124,7 +121,7 @@ def get_item_count(player_id, name, aux=-1):
     :rtype: int
     """
     count = 0
-    items = _get_comp_factory().CreateItem(player_id).GetPlayerAllItems(_ItemPosType.INVENTORY)
+    items = _sys.get_comp_factory().CreateItem(player_id).GetPlayerAllItems(_ItemPosType.INVENTORY)
     for item in items:
         if is_empty_item(item):
             continue
@@ -154,7 +151,7 @@ def set_namespace(name, namespace="minecraft"):
     return ":".join(name_lst)
 
 
-def __same(what1, what2):
+def _same(what1, what2):
     return (not what1 and not what2) or what1 == what2
 
 
@@ -188,7 +185,7 @@ def is_same_item(item_dict1, item_dict2):
     item_data2[0] = set_namespace(item_data2[0])
     extra_id1, extra_id2 = item_dict1.get('extraId'), item_dict2.get('extraId')
     user_data1, user_data2 = item_dict1.get('userData'), item_dict2.get('userData')
-    if not __same(extra_id1, extra_id2) or not __same(user_data1, user_data2):
+    if not _same(extra_id1, extra_id2) or not _same(user_data1, user_data2):
         return False
     return item_data1 == item_data2
 
@@ -211,7 +208,7 @@ def are_same_item(item, *other_item):
     return True
 
 
-__AIR = ("minecraft:air", "air")
+_AIR = ("minecraft:air", "air")
 
 
 def is_empty_item(item, zero_is_emp=True):
@@ -230,8 +227,8 @@ def is_empty_item(item, zero_is_emp=True):
         not item
         or ('newItemName' not in item and 'itemName' not in item)
         or (zero_is_emp and item.get('count', 1) <= 0)
-        or item.get('newItemName') in __AIR
-        or item.get('itemName') in __AIR
+        or item.get('newItemName') in _AIR
+        or item.get('itemName') in _AIR
     )
 
 
@@ -250,7 +247,7 @@ def get_max_stack(item):
     aux = item.get('newAuxValue', 0)
     if aux == -1:
         aux = 0
-    comp = _get_comp_factory().CreateItem(_LEVEL_ID)
+    comp = _sys.get_comp_factory().CreateItem(_sys.LEVEL_ID)
     try:
         return comp.GetItemBasicInfo(name, aux)['maxStackSize']
     except KeyError:

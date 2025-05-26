@@ -12,59 +12,59 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-21
+#   Last Modified : 2025-05-19
 #
 # ====================================================
 
 
-from typing import List, Optional, Dict, Tuple, Any
+from typing import List, Optional, Any
 from mod.client.system.clientSystem import ClientSystem
+from mod.client.ui.screenNode import ScreenNode
 from .._typing import EventArgs
-from .._listener import event, lib_sys_event, quick_listen
+from .._listener import event, lib_sys_event, ClientEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._const import LIB_NAME, LIB_CLIENT_NAME, LIB_SERVER_NAME
+from .._utils import singleton
 
 
-@quick_listen
-class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
-    item_grid_path: Dict[str, Tuple[str, bool]]
-    item_grid_size: Dict[str, int]
-    item_grid_items: Dict[str, List[Optional[dict]]]
-    registered_keys: Dict[str, List[str]]
+def instance() -> Optional[NuoyanLibClientSystem]: ...
+
+
+@singleton
+class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientEventProxy, ClientSystem):
+    instance: NuoyanLibClientSystem
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def broadcast_to_all_client(
-        self: ...,
+        self,
         event_name: str,
         event_data: Any,
         namespace: str = "",
         sys_name: str = "",
     ) -> None: ...
     def notify_to_multi_clients(
-        self: ...,
+        self,
         player_ids: List[str],
         event_name: str,
         event_data: Any,
         namespace: str = "",
         sys_name: str = "",
     ) -> None: ...
-    @event("_NuoyanLibCall", LIB_NAME, LIB_CLIENT_NAME)
-    @event("_NuoyanLibCall", LIB_NAME, LIB_SERVER_NAME)
-    def _be_called(self: ..., args: EventArgs) -> None: ...
-    @event("_NuoyanLibCallReturn", LIB_NAME, LIB_CLIENT_NAME)
-    @event("_NuoyanLibCallReturn", LIB_NAME, LIB_SERVER_NAME)
-    def _call_return(self: ..., args: EventArgs) -> None: ...
-    @event("UiInitFinished")
-    def _on_ui_init_finished(self: ..., args: EventArgs) -> None: ...
-    @lib_sys_event("_SetQueryCache")
-    def _on_set_query_cache(self: ..., args: EventArgs) -> None: ...
-    @lib_sys_event("_SetQueryVar")
-    def on_set_query_var(self: ..., args: EventArgs) -> None: ...
-    @lib_sys_event("_UpdateItemGrids")
-    def _on_update_item_grids(self: ..., args: EventArgs) -> None: ...
-    def register_item_grid(self: ..., key: str, ui_cls_path: str, path: str, size: int, is_single: bool) -> bool: ...
-
-
-_lib_sys: Optional[NuoyanLibClientSystem]
-
-
-def get_lib_system() -> Optional[NuoyanLibClientSystem]: ...
+    def register_and_create_ui(
+        self,
+        namespace: str,
+        ui_key: str,
+        cls_path: str,
+        ui_screen_def: str,
+        stack: bool = False,
+        param: Optional[dict] = None,
+    ) -> Optional[ScreenNode]: ...
+    @lib_sys_event
+    def _SetQueryCache(self, args: EventArgs) -> None: ...
+    @lib_sys_event
+    def _SetQueryVar(self, args: EventArgs) -> None: ...
+    @event(namespace=LIB_NAME, system_name=LIB_CLIENT_NAME)
+    @event(namespace=LIB_NAME, system_name=LIB_SERVER_NAME)
+    def _NuoyanLibCall(self, args: EventArgs) -> None: ...
+    @event(namespace=LIB_NAME, system_name=LIB_CLIENT_NAME)
+    @event(namespace=LIB_NAME, system_name=LIB_SERVER_NAME)
+    def _NuoyanLibCallReturn(self, args: EventArgs) -> None: ...

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
@@ -20,17 +20,10 @@
 from math import pi as _pi
 import mod.client.extraClientApi as _client_api
 from mod.common.minecraftEnum import RayFilterType as _RayFilterType
-from .._core._client._comp import (
-    CompFactory as _CompFactory,
-    PLAYER_ID as _PLAYER_ID,
-    LvComp as _LvComp,
-)
-from ..utils.vector import (
-    vec_p2p as _vec_p2p,
-    vec_angle as _vec_angle,
-)
-from ..utils.mc_math import (
-    pos_distance as _pos_distance,
+from .._core._client import _comp
+from ..utils import (
+    vector as _vector,
+    mc_math as _mc_math,
 )
 
 
@@ -64,15 +57,15 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=_pi / 5,
     """
     res = []
     all_ents = _client_api.GetEngineActor().keys() + _client_api.GetPlayerList()
-    center = _LvComp.Camera.GetPosition()
-    camera_dir = _LvComp.Camera.GetForward()
+    center = _comp.LvComp.Camera.GetPosition()
+    camera_dir = _comp.LvComp.Camera.GetForward()
     for eid in all_ents:
-        if eid == _PLAYER_ID:
+        if eid == _comp.PLAYER_ID:
             continue
-        ent_pos = _CompFactory.CreatePos(eid).GetFootPos()
-        target_dir = _vec_p2p(center, ent_pos)
-        angle = _vec_angle(camera_dir, target_dir)
-        w_dist = _pos_distance(center, ent_pos)
+        ent_pos = _comp.CompFactory.CreatePos(eid).GetFootPos()
+        target_dir = _vector.vec_p2p(center, ent_pos)
+        angle = _vector.vec_angle(camera_dir, target_dir)
+        w_dist = _mc_math.pos_distance(center, ent_pos)
         s_dist = 1 # todo
         if (
                 angle < angle_dist # todo

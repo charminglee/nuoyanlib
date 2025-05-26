@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-03
+#   Last Modified : 2025-05-20
 #
 # ====================================================
 
@@ -21,14 +21,8 @@ from mod.common.minecraftEnum import (
     ItemPosType as _ItemPosType,
     GameType as _GameType,
 )
-from .._core._server._comp import (
-    CompFactory as _CompFactory,
-    LvComp as _LvComp,
-)
-from .._core._server._lib_server import (
-    get_lib_system as _get_lib_system,
-)
-from ..utils.item import is_empty_item as _is_empty_item
+from .._core._server import _comp, _lib_server
+from ..utils import item as _item
 
 
 __all__ = [
@@ -55,7 +49,7 @@ def set_items_to_item_grid(player_id, key, item_dict_list):
     :return: 返回一个列表，列表元素为布尔值，对应item_dict_list中各物品是否设置成功
     :rtype: list[bool]
     """
-    lib_sys = _get_lib_system()
+    lib_sys = _lib_server.instance()
     if not lib_sys:
         return False
     return lib_sys.set_all_items(player_id, key, item_dict_list, True)
@@ -73,7 +67,7 @@ def get_items_from_item_grid(player_id, key):
     :return: 物品信息字典列表，获取不到返回空列表
     :rtype: list[dict|None]
     """
-    lib_sys = _get_lib_system()
+    lib_sys = _lib_server.instance()
     if not lib_sys:
         return []
     return lib_sys.get_all_items(player_id, key)
@@ -92,7 +86,7 @@ def update_item_grids(player_id, keys):
     :return: 是否成功
     :rtype: bool
     """
-    lib_sys = _get_lib_system()
+    lib_sys = _lib_server.instance()
     if not lib_sys:
         return False
     if isinstance(keys, str):
@@ -113,7 +107,7 @@ def clear_items(player_id, item_pos_type, pos):
     :return: 该位置被清除前的物品信息字典
     :rtype: dict
     """
-    comp = _CompFactory.CreateItem(player_id)
+    comp = _comp.CompFactory.CreateItem(player_id)
     item = comp.GetPlayerItem(item_pos_type, pos, True)
     comp.SetPlayerAllItems({(item_pos_type, pos): None})
     return item
@@ -137,8 +131,8 @@ def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     :return: 物品所在槽位的列表，获取不到返回空列表
     :rtype: list[int]
     """
-    is_player = (_CompFactory.CreateEngineType(entity_id).GetEngineTypeStr() == "minecraft:player")
-    item_comp = _CompFactory.CreateItem(entity_id)
+    is_player = (_comp.CompFactory.CreateEngineType(entity_id).GetEngineTypeStr() == "minecraft:player")
+    item_comp = _comp.CompFactory.CreateItem(entity_id)
     result = []
     for i in range(_ITEM_POS_SIZE[pos_type]):
         if len(result) >= count:
@@ -170,9 +164,9 @@ def change_item_count(player_id, pos_type=_ItemPosType.CARRIED, pos=0, change=-1
     :return: 无
     :rtype: None
     """
-    if _LvComp.Game.GetPlayerGameType(player_id) == _GameType.Creative:
+    if _comp.LvComp.Game.GetPlayerGameType(player_id) == _GameType.Creative:
         return
-    item_comp = _CompFactory.CreateItem(player_id)
+    item_comp = _comp.CompFactory.CreateItem(player_id)
     item = item_comp.GetPlayerItem(pos_type, pos, True)
     item['count'] += change
     if item['count'] <= 0:
@@ -195,11 +189,11 @@ def deduct_inv_item(player_id, name, aux=-1, count=1):
     :return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
     :rtype: bool
     """
-    comp = _CompFactory.CreateItem(player_id)
+    comp = _comp.CompFactory.CreateItem(player_id)
     items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
     items_dict_map = {}
     for i, item in enumerate(items):
-        if _is_empty_item(item):
+        if _item.is_empty_item(item):
             continue
         if item['newItemName'] != name:
             continue
