@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-21
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
@@ -35,23 +35,32 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
     | ScreenNode扩展类，提供更多UI界面功能。
     """
 
+    ROOT_PANEL_PATH = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel"
+
     # noinspection PyUnresolvedReferences
     def __init__(self, *args):
         super(ScreenNodeExtension, self).__init__(*args)
         self._lib_sys = _lib_client.instance()
         self._ui_pos_data_key = ""
-        if isinstance(self, _comp.CustomUIControlProxy):
+        self._screen_node = None
+        self.cs = None
+        if isinstance(self, _comp.CustomUIScreenProxy):
             # 兼容UI代理
             self._screen_node = args[1]
-            self.cs = None
             self._method_proxy("OnCreate", self.__Create)
             self._method_proxy("OnDestroy", self.__Destroy)
-        else:
+        elif isinstance(self, _comp.ScreenNode):
             self._screen_node = self
             self.cs = args[2].get('__cs__') if len(args) == 3 and isinstance(args[2], dict) else None
             self._method_proxy("Create", self.__Create)
             self._method_proxy("Destroy", self.__Destroy)
+        else:
+            raise TypeError("cannot find ScreenNode instance")
         self.ny_buttons = []
+        self.root_panel = (
+            self._screen_node.GetBaseUIControl(ScreenNodeExtension.ROOT_PANEL_PATH)
+            or self._screen_node.GetBaseUIControl("")
+        )
 
     # System Event Callbacks ===========================================================================================
 

@@ -20,6 +20,6 @@
 # 是否输出nuoyanlib日志信息
 ENABLE_LOG = True
 # 是否关闭ModSDK日志输出
-DISABLED_MODSDK_LOG = True
+DISABLED_MODSDK_LOG = False
 
 

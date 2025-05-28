@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
@@ -90,8 +90,8 @@ from mod.server.component.aiCommandCompServer import AiCommandComponentServer
 from mod.server.component.entityDefinitionsCompServer import EntityDefinitionsCompServer
 
 
-SERVER_ENGINE_NAMESPACE: str
-SERVER_ENGINE_SYSTEM_NAME: str
+ENGINE_NAMESPACE: str
+ENGINE_SYSTEM_NAME: str
 ServerSystem: Type[ServerSystem]
 CompFactory: EngineCompFactoryServer
 LEVEL_ID: str

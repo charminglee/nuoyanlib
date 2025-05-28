@@ -83,7 +83,7 @@ def set_vec_length(vec, length, convert_vec=False):
     vec_ = _to_Vector3(vec)
     orig_len = vec_.Length()
     if orig_len <= 0:
-        raise ValueError("Zero vector cannot set length")
+        raise ValueError("the length of zero vector cannot be set")
     res = vec_.Normalized() * length
     return _convert_return_vec(vec, res, convert_vec)
 

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-21
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
@@ -30,13 +30,21 @@ from .button import NyButton
 
 
 class ScreenNodeExtension(ClientEventProxy):
+    ROOT_PANEL_PATH: str
     _lib_sys: NuoyanLibClientSystem
     _ui_pos_data_key: str
-    _screen_node: ScreenNode
+    _screen_node: Optional[ScreenNode]
     cs: Optional[ClientSystem]
+    """
+    | 创建UI的客户端实例。
+    """
     ny_buttons: List[NyButton]
     """
     | 通过 ``CreateNyButton`` 创建的NyButton按钮实例的列表。
+    """
+    root_panel: Optional[BaseUIControl]
+    """
+    | 当前界面根节点的 ``BaseUIControl`` 实例。
     """
     @overload
     def __init__(self: ..., namespace: str, name: str, param: Optional[dict] = None, /) -> None: ...

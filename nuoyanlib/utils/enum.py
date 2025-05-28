@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-22
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
@@ -29,7 +29,6 @@ except:
 
 
 __all__ = [
-    "auto",
     "Enum",
     "search_data",
     "ITEM_LIST",
@@ -46,13 +45,9 @@ __all__ = [
 ]
 
 
-class auto(object):
-    pass
-
-
 class EnumMeta(type):
     def __new__(metacls, name, bases, dct, restrict_type=None):
-        dct['_flag'] = 0
+        dct['__flag__'] = 0
         cls = type.__new__(metacls, name, bases, dct) # type: type[Enum]
         members = {}
         if name != "Enum":
@@ -60,7 +55,7 @@ class EnumMeta(type):
             for k, v in dct.items():
                 if k.startswith("_") or k in ("name", "value"):
                     continue
-                if isinstance(v, auto):
+                if isinstance(v, Enum.auto):
                     v = cls.__gen_auto_value__()
                 if cls._restrict_type:
                     if type(v) is not cls._restrict_type:
@@ -80,12 +75,12 @@ class EnumMeta(type):
         else:
             cls._restrict_type = restrict_type
         cls.__members__ = members
-        cls._flag = 1
+        cls.__flag__ = 1
         return cls
 
     def __setattr__(cls, name, value):
         # 禁止动态设置枚举值
-        if getattr(cls, "_flag", 0) == 1:
+        if getattr(cls, "__flag__", 0) == 1:
             raise AttributeError("'%s' cannot set member '%s'" % (cls.__name__, name))
         type.__setattr__(cls, name, value)
 
@@ -118,7 +113,7 @@ class EnumMeta(type):
             del dct['__dict__']
             del dct['__weakref__']
             del dct['__members__']
-            del dct['_flag']
+            del dct['__flag__']
             new_cls = EnumMeta.__new__(EnumMeta, "Enum", (object,), dct, item)
             return new_cls
         else:
@@ -151,15 +146,19 @@ class Enum(object):
 
     __metaclass__ = EnumMeta
 
+    class auto(object):
+        pass
+
     def __init__(self, name, value):
         self.__name = name
         self.__value = value
+        self.__hash = hash(name)
 
     def __repr__(self):
         return "<%s.%s: %s>" % (self.__class__.__name__, self.__name, repr(self.__value))
 
     def __hash__(self):
-        return hash(self.__name)
+        return self.__hash
 
     @property
     def name(self):
@@ -208,9 +207,9 @@ def _test_enum():
     # del B.X
     print "=" * 30
     class AutoEnum(Enum[int]):
-        a = auto()
-        b = auto()
-        c = auto()
+        a = Enum.auto()
+        b = Enum.auto()
+        c = Enum.auto()
     print AutoEnum.a
     print AutoEnum.b
     print AutoEnum.c

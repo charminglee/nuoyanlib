@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-17
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
@@ -20,8 +20,8 @@
 import mod.server.extraServerApi as _server_api
 
 
-SERVER_ENGINE_NAMESPACE = _server_api.GetEngineNamespace()
-SERVER_ENGINE_SYSTEM_NAME = _server_api.GetEngineSystemName()
+ENGINE_NAMESPACE = _server_api.GetEngineNamespace()
+ENGINE_SYSTEM_NAME = _server_api.GetEngineSystemName()
 
 
 ServerSystem = _server_api.GetServerSystemCls()

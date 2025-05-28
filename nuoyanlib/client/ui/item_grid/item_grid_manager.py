@@ -95,8 +95,8 @@ from ..._core._const import (
 from ..._core._client._comp import (
     LvComp as _LvComp,
     PLAYER_ID as _PLAYER_ID,
-    CLIENT_ENGINE_NAMESPACE as _CLIENT_ENGINE_NAMESPACE,
-    CLIENT_ENGINE_SYSTEM_NAME as _CLIENT_ENGINE_SYSTEM_NAME,
+    ENGINE_NAMESPACE as _ENGINE_NAMESPACE,
+    ENGINE_SYSTEM_NAME as _ENGINE_SYSTEM_NAME,
 )
 from ..._core._client._lib_client import (
     instance as _instance,
@@ -167,7 +167,7 @@ class ItemGridManager(object):
 
     def Destroy(self):
         self.__lib_sys.UnListenForEvent(
-            _CLIENT_ENGINE_NAMESPACE, _CLIENT_ENGINE_SYSTEM_NAME, "GetEntityByCoordReleaseClientEvent",
+            _ENGINE_NAMESPACE, _ENGINE_SYSTEM_NAME, "GetEntityByCoordReleaseClientEvent",
             self, self._on_get_entity_by_coord_release
         )
         self.__lib_sys.UnListenForEvent(

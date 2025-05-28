@@ -12,25 +12,27 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-23
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _client_api
 from . import _comp
-from .. import _const, _listener, _sys, _utils, _logging
+from .. import _const, _listener, _sys, _logging
 from ...utils import communicate as _communicate
 
 
 def instance():
-    if not NuoyanLibClientSystem.instance:
-        NuoyanLibClientSystem.instance = _client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
     return NuoyanLibClientSystem.instance
 
 
-@_utils.singleton
-class NuoyanLibClientSystem(_sys.NuoyanLibBaseSystem, _listener.ClientEventProxy, _comp.ClientSystem):
+class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem, _comp.ClientSystem):
+    @staticmethod
+    def init():
+        if not _client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME):
+            _client_api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
+
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
         _logging.log("Inited, ver: %s" % _const.__version__, NuoyanLibClientSystem)

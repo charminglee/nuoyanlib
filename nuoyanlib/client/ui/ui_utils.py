@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-21
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
@@ -22,10 +22,7 @@ from ..._core._client._comp import (
     ScreenNode as _ScreenNode,
     LvComp as _LvComp,
 )
-from ...utils import (
-    Enum as _Enum,
-    auto as _auto,
-)
+from ...utils import Enum as _Enum
 from ..._core._client import _lib_client
 from .. import setting as _setting
 
@@ -141,57 +138,57 @@ class ButtonCallback(_Enum[int]):
     按钮回调函数类型枚举。
     """
 
-    touch_up = _auto()
+    touch_up = _Enum.auto()
     """
     触控在按钮范围内抬起。
     """
 
-    touch_down = _auto()
+    touch_down = _Enum.auto()
     """
     按钮按下。
     """
 
-    touch_cancel = _auto()
+    touch_cancel = _Enum.auto()
     """
     触控在按钮范围外抬起。
     """
 
-    touch_move = _auto()
+    touch_move = _Enum.auto()
     """
     按下后触控移动。
     """
 
-    touch_move_in = _auto()
+    touch_move_in = _Enum.auto()
     """
     按下按钮后触控进入按钮。
     """
 
-    touch_move_out = _auto()
+    touch_move_out = _Enum.auto()
     """
     按下按钮后触控退出按钮。
     """
 
-    double_click = _auto()
+    double_click = _Enum.auto()
     """
     双击按钮。
     """
 
-    long_click = _auto()
+    long_click = _Enum.auto()
     """
     长按按钮。
     """
 
-    hover_in = _auto()
+    hover_in = _Enum.auto()
     """
     鼠标进入按钮。
     """
 
-    hover_out = _auto()
+    hover_out = _Enum.auto()
     """
     鼠标退出按钮。
     """
 
-    screen_exit = _auto()
+    screen_exit = _Enum.auto()
     """
     按钮所在画布退出，且鼠标仍未抬起时触发。
     """

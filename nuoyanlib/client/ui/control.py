@@ -12,12 +12,22 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
 
+# todo
 class NyControl(object):
+    """
+    | 创建NyControl通用UI控件实例。
+    | 兼容ModSDK ``BaseUIControl`` 的相关接口。
+
+    -----
+
+    :param ScreenNode screen_node: 控件所在UI类的实例
+    :param BaseUIControl control: 通过GetBaseUIControl()获取的控件实例
+    """
     def __init__(self, screen_node, control):
         self.screen_node = screen_node
         self.control = control

@@ -39,9 +39,11 @@ _CALLBACK_API_MAP = {
 }
 
 
+# todo
 class NyButton(_NyControl):
     """
     | 创建NyButton按钮实例。
+    | 兼容ModSDK ``ButtonUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

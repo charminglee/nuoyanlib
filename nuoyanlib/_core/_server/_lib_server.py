@@ -12,37 +12,33 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-23
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
 
 import mod.server.extraServerApi as _server_api
 from . import _comp
-from .. import _listener, _sys, _utils, _logging, _const
+from .. import _listener, _sys, _logging, _const
 from ...utils import communicate as _communicate
 
 
 def instance():
-    if not NuoyanLibServerSystem.instance:
-        NuoyanLibServerSystem.instance = _server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
     return NuoyanLibServerSystem.instance
 
 
-@_utils.singleton
-class NuoyanLibServerSystem(_sys.NuoyanLibBaseSystem, _listener.ServerEventProxy, _comp.ServerSystem):
+class NuoyanLibServerSystem(_listener.ServerEventProxy, _sys.NuoyanLibBaseSystem, _comp.ServerSystem):
+    @staticmethod
+    def init():
+        if not _server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME):
+            _server_api.RegisterSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME, _const.LIB_SERVER_PATH)
+
     def __init__(self, namespace, system_name):
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
         self.query_cache = {}
-        self.first_player_id = "-1"
         _logging.log("Inited, ver: %s" % _const.__version__, NuoyanLibServerSystem)
 
     # General ==========================================================================================================
-
-    def AddServerPlayerEvent(self, args):
-        player_id = args['id']
-        if self.first_player_id == "-1":
-            self.first_player_id = player_id
 
     @_listener.lib_sys_event
     def _ButtonCallbackTrigger(self, args):

@@ -12,30 +12,19 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-23
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
 
-from . import _const
-
-
-def init_lib_sys():
-    if is_client():
-        import mod.client.extraClientApi as api
-        if not api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME):
-            api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
-    else:
-        import mod.server.extraServerApi as api
-        if not api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME):
-            api.RegisterSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME, _const.LIB_SERVER_PATH)
+from ._utils import singleton as _singleton
 
 
 def check_env(target):
     if target == "client" and not is_client():
-        raise ImportError("Cannot import nuoyanlib.client in server environment.")
+        raise ImportError("cannot import nuoyanlib.client in server environment")
     if target == "server" and is_client():
-        raise ImportError("Cannot import nuoyanlib.server in client environment.")
+        raise ImportError("cannot import nuoyanlib.server in client environment")
 
 
 def get_lib_system():
@@ -74,6 +63,7 @@ def get_comp_factory():
 LEVEL_ID = get_api().GetLevelId()
 
 
+@_singleton
 class NuoyanLibBaseSystem(object):
     def __init__(self, *args, **kwargs):
         super(NuoyanLibBaseSystem, self).__init__(*args, **kwargs)

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
@@ -21,12 +21,8 @@ from typing import Dict, List, Tuple, Any, Optional, Iterator, Union, overload
 from _typeshed import Self
 
 
-class auto(object):
-    pass
-
-
 class EnumMeta(type):
-    _flag: int
+    __flag__: int
     __members__: Dict[str, Any]
     _restrict_type: Optional[type]
     def __new__(
@@ -51,6 +47,8 @@ class EnumMeta(type):
 class Enum(metaclass=EnumMeta):
     __name: str
     __value: Any
+    __hash: int
+    class auto(object): ...
     def __init__(self, name: str, value: Any) -> None: ...
     def __repr__(self) -> str: ...
     def __hash__(self) -> int: ...

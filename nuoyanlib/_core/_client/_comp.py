@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
+#   Last Modified : 2025-05-28
 #
 # ====================================================
 
@@ -20,10 +20,10 @@
 import mod.client.extraClientApi as _client_api
 
 
-CLIENT_ENGINE_NAMESPACE = _client_api.GetEngineNamespace()
-CLIENT_ENGINE_SYSTEM_NAME = _client_api.GetEngineSystemName()
-
-
+ENGINE_NAMESPACE = _client_api.GetEngineNamespace()
+ENGINE_SYSTEM_NAME = _client_api.GetEngineSystemName()
+PLAYER_ID = _client_api.GetLocalPlayerId()
+LEVEL_ID = _client_api.GetLevelId()
 ClientSystem = _client_api.GetClientSystemCls()
 CompFactory = _client_api.GetEngineCompFactory()
 
@@ -35,10 +35,7 @@ CustomUIScreenProxy = _client_api.GetUIScreenProxyCls()
 CustomUIControlProxy = _client_api.GetCustomUIControlProxyCls()
 # noinspection PyUnresolvedReferences
 NativeScreenManager = _client_api.GetNativeScreenManagerCls().instance()
-
-
-PLAYER_ID = _client_api.GetLocalPlayerId()
-LEVEL_ID = _client_api.GetLevelId()
+MiniMapScreenNode = _client_api.GetMiniMapScreenNodeCls()
 
 
 class CompDescr(object):

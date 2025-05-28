@@ -44,7 +44,7 @@ class NeteaseParticle(object):
         self.__lib_sys = _lib_client.instance()
         self._id = self.__lib_sys.CreateEngineParticle(json_path, pos)
         if not self._id:
-            raise RuntimeError("Create particle failed. json_path='%s'." % json_path)
+            raise RuntimeError("create particle failed, json_path='%s'" % json_path)
         self._ctrl = _comp.CompFactory.CreateParticleControl(self._id)
         self._trans = _comp.CompFactory.CreateParticleTrans(self._id)
         self._bind_ent_comp = _comp.CompFactory.CreateParticleEntityBind(self._id)
@@ -62,9 +62,9 @@ class NeteaseParticle(object):
                 "Parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time."
             )
         if bind_entity and not self.BindEntity(**bind_entity):
-            raise RuntimeError("Bind particle to entity failed. bind_entity=%s." % bind_entity)
+            raise RuntimeError("bind particle to entity failed, bind_entity=%s" % bind_entity)
         if bind_skeleton and not self.BindSkeleton(**bind_skeleton):
-            raise RuntimeError("Bind particle to skeleton failed. bind_skeleton=%s." % bind_skeleton)
+            raise RuntimeError("bind particle to skeleton failed, bind_skeleton=%s" % bind_skeleton)
         self._playing = False
         self._destroyed = False
 
@@ -495,9 +495,9 @@ class NeteaseFrameAnim(object):
         elif tex_path:
             self._id = self.__lib_sys.CreateEngineSfx(tex_path, pos, rot, scale)
         else:
-            raise ValueError("Parameters 'json_path' or 'tex_path' must be given.")
+            raise ValueError("parameter 'json_path' or 'tex_path' must be given")
         if not self._id:
-            raise RuntimeError("Create frame animation failed. path='%s'." % (json_path or tex_path))
+            raise RuntimeError("create frame animation failed, path='%s'" % (json_path or tex_path))
         self._ctrl = _comp.CompFactory.CreateFrameAniControl(self._id)
         self._trans = _comp.CompFactory.CreateFrameAniTrans(self._id)
         self._bind_ent_comp = _comp.CompFactory.CreateFrameAniEntityBind(self._id)
@@ -514,9 +514,9 @@ class NeteaseFrameAnim(object):
                 "Parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time."
             )
         if bind_entity and not self.BindEntity(**bind_entity):
-            raise RuntimeError("Bind frame animation to entity failed. bind_entity=%s." % bind_entity)
+            raise RuntimeError("bind frame animation to entity failed, bind_entity=%s" % bind_entity)
         if bind_skeleton and not self.BindSkeleton(**bind_skeleton):
-            raise RuntimeError("Bind frame animation to skeleton failed. bind_skeleton=%s." % bind_skeleton)
+            raise RuntimeError("bind frame animation to skeleton failed, bind_skeleton=%s" % bind_skeleton)
         self._playing = False
         self._destroyed = False
 
