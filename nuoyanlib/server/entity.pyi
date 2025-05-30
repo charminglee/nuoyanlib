@@ -12,13 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-29
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
 from typing import Dict, List, Tuple, Optional, Union, Set, Callable
-from .._core._typing import FTuple3, FTuple2
+from .._core._types._typing import FTuple3, FTuple2
 
 
 def set_query_mod_var(entity_id: str, name: str, value: float) -> bool: ...

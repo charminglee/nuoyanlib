@@ -12,51 +12,45 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-23
+#   Last Modified : 2025-05-29
 #
 # ====================================================
 
 
-from time import (
-    time as _time,
-    strftime as _strftime,
-    localtime as _localtime,
-)
-from ..config import ENABLE_LOG as _ENABLE_LOG
+from ..config import ENABLED_LOG as _ENABLED_LOG
+
+
+try:
+    import logging
+except ImportError:
+    logging = None
+
+
+if _ENABLED_LOG and logging:
+    _lgr = logging.getLogger("nuoyanlib")
+    _lgr.setLevel(logging.INFO)
+    _hdr = logging.StreamHandler()
+    _hdr.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"))
+    _lgr.addHandler(_hdr)
+    info = _lgr.info
+    warning = _lgr.warning
+    error = _lgr.error
+    debug = _lgr.debug
+else:
+    info = lambda *_: None
+    warning = lambda *_: None
+    error = lambda *_: None
+    debug = lambda *_: None
 
 
 def disable_modsdk_loggers():
-    import logging
-    logging.getLogger("Developer").disabled = 1
-    logging.getLogger("Engine").disabled = 1
-    logging.getLogger("Part").disabled = 1
-    # logging.getLogger("mcp").disabled = 1
+    if logging:
+        logging.getLogger("Developer").disabled = 1
+        logging.getLogger("Engine").disabled = 1
+        logging.getLogger("Part").disabled = 1
+        # logging.getLogger("mcp").disabled = 1
 
 
-def log(msg, cls=None, level="INFO"):
-    if not _ENABLE_LOG:
-        return
-    ct = _time()
-    t = _strftime("%Y-%m-%d %H:%M:%S", _localtime(ct))
-    msecs = (ct - long(ct)) * 1000
-    s = "%s,%03d" % (t, msecs)
-    if cls:
-        msg = "(%s) %s" % (cls.__name__, msg)
-    print "[%s] [%s] [nuoyanlib] %s" % (s, level, msg)
-
-
-if __name__ == "__main__":
-    log("Hello, world!")
-    class Test(object): pass
-    log("Hello, world!", Test)
-    log("Hello, world!", Test, "ERROR")
-    import logging
-    lg = logging.getLogger()
-    lg.setLevel(logging.INFO)
-    hdlr = logging.StreamHandler()
-    hdlr.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] [nuoyanlib] %(message)s"))
-    lg.addHandler(hdlr)
-    lg.info("Hello, world!")
 
 
 

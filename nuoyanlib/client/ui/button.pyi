@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-21
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
@@ -22,7 +22,7 @@ from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.ui.screenNode import ScreenNode
 from mod.common.utils.timer import CallLater
-from ..._core._typing import EventArgs, FTuple2, UiControl
+from ..._core._types._typing import EventArgs, FTuple2, UiControl
 from ..._core._utils import param_type_check
 from ..._core._client._lib_client import NuoyanLibClientSystem
 from .control import NyControl

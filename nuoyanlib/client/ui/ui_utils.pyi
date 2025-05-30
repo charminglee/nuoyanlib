@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-21
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
@@ -21,7 +21,7 @@ from typing import List, Optional, Callable, Dict, Tuple
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
-from ..._core._typing import UiControl, FTuple2
+from ..._core._types._typing import UiControl, FTuple2
 from ...utils import Enum
 
 

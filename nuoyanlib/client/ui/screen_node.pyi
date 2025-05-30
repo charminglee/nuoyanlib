@@ -12,28 +12,29 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
 from types import MethodType
-from typing import Optional, List, overload
+from typing import Optional, List, overload, Dict
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.system.clientSystem import ClientSystem
-from ..._core._typing import UiControl
-from ..._core._client._lib_client import NuoyanLibClientSystem
+from ..._core._types._typing import UiControl
 from ..._core._listener import ClientEventProxy
-from ..._core._utils import method_cache
 from .button import NyButton
 
 
 class ScreenNodeExtension(ClientEventProxy):
     ROOT_PANEL_PATH: str
-    _lib_sys: NuoyanLibClientSystem
+    """
+    | 使用基类画布时的根节点路径，所有自定义控件均挂接在该路径下。
+    """
     _ui_pos_data_key: str
     _screen_node: Optional[ScreenNode]
+    _control_cache: Dict[str, NyButton]
     cs: Optional[ClientSystem]
     """
     | 创建UI的客户端实例。
@@ -52,8 +53,7 @@ class ScreenNodeExtension(ClientEventProxy):
     def __init__(self: ..., screen_name: str, screen_node: ScreenNode, /) -> None: ...
     def __Create(self): ...
     def __Destroy(self): ...
-    @method_cache
-    def CreateNyButton(self, path: str) -> Optional[NyButton]: ...
+    def CreateNyButton(self, path: str, touch_event_params: Optional[dict] = None) -> Optional[NyButton]: ...
     def ClearAllPosData(self) -> bool: ...
     def SaveAllPosData(self) -> bool: ...
     def GetAllChildrenPathByLevel(self, control: UiControl, level: int = 1) -> List[str]: ...

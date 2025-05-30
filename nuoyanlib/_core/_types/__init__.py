@@ -15,22 +15,3 @@
 #   Last Modified : 2025-05-30
 #
 # ====================================================
-
-
-from typing import List, Optional, Dict, Tuple
-from mod.client.system.clientSystem import ClientSystem
-from ...._core._listener import lib_sys_event, ClientEventProxy
-from ...._core._types._typing import EventArgs
-from ...._core._utils import singleton
-
-
-@singleton
-class ItemGridClient(ClientEventProxy, ClientSystem):
-    item_grid_path: Dict[str, Tuple[str, bool]]
-    item_grid_size: Dict[str, int]
-    item_grid_items: Dict[str, List[Optional[dict]]]
-    registered_keys: Dict[str, List[str]]
-    def __init__(self: ..., namespace: str, system_name: str) -> None: ...
-    @lib_sys_event
-    def _UpdateItemGrids(self, args: EventArgs) -> None: ...
-    def register_item_grid(self, key: str, ui_cls_path: str, path: str, size: int, is_single: bool) -> bool: ...

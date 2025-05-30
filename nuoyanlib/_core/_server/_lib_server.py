@@ -12,14 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
 import mod.server.extraServerApi as _server_api
 from . import _comp
-from .. import _listener, _sys, _logging, _const
+from .. import _listener, _sys, _logging, _const, _utils
 from ...utils import communicate as _communicate
 
 
@@ -27,6 +27,7 @@ def instance():
     return NuoyanLibServerSystem.instance
 
 
+@_utils.singleton
 class NuoyanLibServerSystem(_listener.ServerEventProxy, _sys.NuoyanLibBaseSystem, _comp.ServerSystem):
     @staticmethod
     def init():
@@ -36,7 +37,7 @@ class NuoyanLibServerSystem(_listener.ServerEventProxy, _sys.NuoyanLibBaseSystem
     def __init__(self, namespace, system_name):
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
         self.query_cache = {}
-        _logging.log("Inited, ver: %s" % _const.__version__, NuoyanLibServerSystem)
+        _logging.info("NuoyanLibServerSystem inited, ver: %s" % _const.__version__)
 
     # General ==========================================================================================================
 
@@ -49,10 +50,9 @@ class NuoyanLibServerSystem(_listener.ServerEventProxy, _sys.NuoyanLibBaseSystem
         if func:
             func(func_args)
 
-    def UiInitFinished(self, args):
-        player_id = args['__id__']
+    def UiInitFinished(self, event):
         if self.query_cache:
-            self.NotifyToClient(player_id, "_SetQueryCache", self.query_cache)
+            self.NotifyToClient(event.__id__, "_SetQueryCache", self.query_cache)
 
     # BroadcastToAllClient =============================================================================================
 

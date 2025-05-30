@@ -12,12 +12,9 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-29
 #
 # ====================================================
-
-
-from ._utils import singleton as _singleton
 
 
 def check_env(target):
@@ -63,7 +60,6 @@ def get_comp_factory():
 LEVEL_ID = get_api().GetLevelId()
 
 
-@_singleton
 class NuoyanLibBaseSystem(object):
     def __init__(self, *args, **kwargs):
         super(NuoyanLibBaseSystem, self).__init__(*args, **kwargs)

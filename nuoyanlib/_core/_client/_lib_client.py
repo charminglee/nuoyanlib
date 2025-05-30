@@ -12,14 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
 import mod.client.extraClientApi as _client_api
 from . import _comp
-from .. import _const, _listener, _sys, _logging
+from .. import _const, _listener, _sys, _logging, _utils
 from ...utils import communicate as _communicate
 
 
@@ -27,6 +27,7 @@ def instance():
     return NuoyanLibClientSystem.instance
 
 
+@_utils.singleton
 class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem, _comp.ClientSystem):
     @staticmethod
     def init():
@@ -35,11 +36,11 @@ class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem
 
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
-        _logging.log("Inited, ver: %s" % _const.__version__, NuoyanLibClientSystem)
+        _logging.info("NuoyanLibClientSystem inited, ver: %s" % _const.__version__)
 
     # General ==========================================================================================================
 
-    def UiInitFinished(self, args):
+    def UiInitFinished(self, event):
         self.NotifyToServer("UiInitFinished", {})
 
     def broadcast_to_all_client(self, event_name, event_data, namespace="", sys_name=""):

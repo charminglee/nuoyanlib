@@ -12,14 +12,14 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-02-03
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
 from typing import Tuple, Union, Optional, List, Dict
 from mod.common.minecraftEnum import Facing
-from .._core._typing import FTuple2, FTuple3
+from .._core._types._typing import FTuple2, FTuple3
 
 
 def pos_block_facing(pos: FTuple3, face: int = Facing.North, dist: float = 1.0) -> Optional[FTuple3]: ...

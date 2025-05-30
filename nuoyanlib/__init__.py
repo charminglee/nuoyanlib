@@ -12,12 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-29
 #
 # ====================================================
 
 
-from ._core._logging import log, disable_modsdk_loggers
+from ._core import _logging
 from .config import DISABLED_MODSDK_LOG
 
 
@@ -27,14 +27,15 @@ __authorqq__ = "1279735247"
 __authoremail__ = "1279735247@qq.com"
 
 
-log("Start loading, version: %s" % __version__)
+_logging.info("Start loading, version: %s" % __version__)
 
 
 if DISABLED_MODSDK_LOG:
-    disable_modsdk_loggers()
+    _logging.disable_modsdk_loggers()
 
 
 # todo：为函数添加调用失败时输出异常信息的功能，增加_error模块用于管理可能出现的异常
 # todo：Entity类、Player类
 # todo：UI动画
 # todo：完善Ny控件
+# todo：事件参数采用类形式

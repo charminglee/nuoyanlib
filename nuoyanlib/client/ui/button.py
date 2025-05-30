@@ -52,7 +52,7 @@ class NyButton(_NyControl):
     """
 
     def __init__(self, screen_node, btn_control):
-        super(NyButton, self).__init__(screen_node, btn_control)
+        _NyControl.__init__(self, screen_node, btn_control)
         self._lib_sys = _lib_client.instance()
         self._btn_callbacks = {}
         self._enabled_double_click = False

@@ -12,11 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
+from types import MethodType as _MethodType
 import mod.client.extraClientApi as _client_api
 import mod.server.extraServerApi as _server_api
 from . import _const, _logging, _sys
@@ -129,7 +130,6 @@ ALL_CLIENT_ENGINE_EVENTS = {
     "TapBeforeClientEvent",
     "TapOrHoldReleaseClientEvent",
 }
-ALL_CLIENT_LIB_EVENTS = {}
 ALL_SERVER_ENGINE_EVENTS = {
     "PlayerTryPutCustomContainerItemServerEvent",
     "MountTamingEvent",
@@ -295,25 +295,43 @@ ALL_SERVER_ENGINE_EVENTS = {
     "UrgeShipEvent",
     "lobbyGoodBuySucServerEvent",
 }
+ALL_CLIENT_LIB_EVENTS = {}
 ALL_SERVER_LIB_EVENTS = {
     'ItemGridChangedServerEvent': _const.LIB_CLIENT_NAME,
     'UiInitFinished': _const.LIB_CLIENT_NAME,
 }
 
 
+class _EventArgsProxy(object):
+    def __init__(self, arg_dict):
+        self.arg_dict = arg_dict
+
+    def __getattr__(self, key):
+        if key == 'from_':
+            key = 'from'
+        if key in self.arg_dict:
+            return self.arg_dict[key]
+        raise AttributeError("this event has no parameter '%s'" % key)
+
+    def __setattr__(self, key, value):
+        # 兼容可修改的事件参数
+        object.__setattr__(self, key, value)
+        if key in self.arg_dict:
+            self.arg_dict[key] = value
+
+    def __repr__(self):
+        s = "EventArgs:\n"
+        for k, v in self.arg_dict.items():
+            if k == "from":
+                k = "from_"
+            s += "    .%s = %s\n" % (k, repr(v))
+        return s
+
+
 class BaseEventProxy(object):
     def __init__(self, *args, **kwargs):
         super(BaseEventProxy, self).__init__(*args, **kwargs)
-        if _sys.is_client():
-            self._engine_events = ALL_CLIENT_ENGINE_EVENTS
-            self._engine_ns = _client_api.GetEngineNamespace()
-            self._engine_sys = _client_api.GetEngineSystemName()
-            self._lib_events = ALL_CLIENT_LIB_EVENTS
-        else:
-            self._engine_events = ALL_SERVER_ENGINE_EVENTS
-            self._engine_ns = _server_api.GetEngineNamespace()
-            self._engine_sys = _server_api.GetEngineSystemName()
-            self._lib_events = ALL_SERVER_LIB_EVENTS
+        self._lib_sys = _sys.get_lib_system()
         self._listen_events()
 
     def _listen_events(self):
@@ -325,10 +343,14 @@ class BaseEventProxy(object):
             if not callable(method):
                 continue
             args = self._parse_listen_args(method)
-            if not args:
+            if args is None:
                 continue
-            for namespace, system_name, event_name, priority in args:
-                self._listen(namespace, system_name, event_name, method, priority)
+            event_type, arg_lst = args
+            for a in arg_lst:
+                if event_type == 0:
+                    self._listen(a[0], a[1], a[2], method, a[3])
+                else:
+                    self._listen_proxy(a[0], a[1], a[2], method, a[3])
 
     def _parse_listen_args(self, method):
         if hasattr(method, "_nyl_listen_args"):
@@ -347,32 +369,46 @@ class BaseEventProxy(object):
                         arg_lst[1] = self._engine_sys
                     elif is_lib_event:
                         arg_lst[1] = self._lib_events[event_name]
-            return args
+            return 0, args
         else:
             method_name = method.__name__
             if method_name in self._engine_events:
-                return [[self._engine_ns, self._engine_sys, method_name, 0]]
+                return 1, [[self._engine_ns, self._engine_sys, method_name, 0]]
             elif method_name in self._lib_events:
-                return [[_const.LIB_NAME, self._lib_events[method_name], method_name, 0]]
+                return 2, [[_const.LIB_NAME, self._lib_events[method_name], method_name, 0]]
+
+    def _listen_proxy(self, namespace, system_name, event_name, method, priority=0):
+        def proxy(_, args=None):
+            arg_ins = _EventArgsProxy(args) if args else None
+            method(arg_ins)
+        proxy_name = "_proxy_%s" % event_name
+        proxy.__name__ = proxy_name
+        proxy = _MethodType(proxy, self)
+        setattr(self, proxy_name, proxy)
+        self._lib_sys.ListenForEvent(namespace, system_name, event_name, self, proxy, priority)
 
     def _listen(self, namespace, system_name, event_name, method, priority=0):
         if not namespace or not system_name or method.__self__ is not self:
-            _logging.log(
+            _logging.error(
                 "Failed to listen for event: namespace=%s, system_name=%s, event_name=%s"
-                % (namespace, system_name, event_name),
-                self.__class__,
-                "ERROR"
+                % (namespace, system_name, event_name)
             )
             return
-        _sys.get_lib_system().ListenForEvent(namespace, system_name, event_name, self, method, priority)
+        self._lib_sys.ListenForEvent(namespace, system_name, event_name, self, method, priority)
 
 
 class ClientEventProxy(BaseEventProxy):
-    pass
+    _engine_events = ALL_CLIENT_ENGINE_EVENTS
+    _engine_ns = _client_api.GetEngineNamespace()
+    _engine_sys = _client_api.GetEngineSystemName()
+    _lib_events = ALL_CLIENT_LIB_EVENTS
 
 
 class ServerEventProxy(BaseEventProxy):
-    pass
+    _engine_events = ALL_SERVER_ENGINE_EVENTS
+    _engine_ns = _server_api.GetEngineNamespace()
+    _engine_sys = _server_api.GetEngineSystemName()
+    _lib_events = ALL_SERVER_LIB_EVENTS
 
 
 def event(event_name="", namespace="", system_name="", priority=0):

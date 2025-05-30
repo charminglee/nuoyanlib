@@ -12,13 +12,13 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
+#   Last Modified : 2025-05-29
 #
 # ====================================================
 
 
 # 是否输出nuoyanlib日志信息
-ENABLE_LOG = True
+ENABLED_LOG = True
 # 是否关闭ModSDK日志输出
 DISABLED_MODSDK_LOG = False
 

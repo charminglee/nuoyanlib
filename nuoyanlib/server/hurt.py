@@ -12,11 +12,12 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
+#   Last Modified : 2025-05-29
 #
 # ====================================================
 
 
+from contextlib import contextmanager as _contextmanager
 from copy import copy as _copy
 import mod.server.extraServerApi as _server_api
 from mod.common.minecraftEnum import (
@@ -34,6 +35,7 @@ from . import entity as _entity
 
 
 __all__ = [
+    "ignore_dmg_cd",
     "EntityFilter",
     "explode_hurt",
     "aoe_damage",
@@ -44,6 +46,37 @@ __all__ = [
     "percent_damage",
     "line_damage",
 ]
+
+
+@_contextmanager
+def ignore_dmg_cd(restore_cd=10):
+    """
+    上下文管理器，用于忽略生物受击后的 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 。
+
+    -----
+
+    【示例】
+
+    ::
+
+        import myScripts.nuoyanlib.server as nyl
+
+        with nyl.ignore_dmg_cd():
+            # 在with范围内伤害免疫时间会被设为0
+            comp = nyl.CompFactory.CreateHurt(entity_id)
+            comp.Hurt(10, "entity_attack")
+        # 上下文管理器退出
+
+    -----
+
+    :param int restore_cd: 上下文管理器退出后恢复的伤害免疫时间（单位为游戏刻），默认为10
+
+    :return: 无
+    :rtype: None
+    """
+    _comp.LvComp.Game.SetHurtCD(0)
+    yield
+    _comp.LvComp.Game.SetHurtCD(restore_cd)
 
 
 _SDK_DAMAGE_CAUSE = [

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
@@ -80,7 +80,7 @@ from mod.common.component.baseComponent import BaseComponent
 from mod.client.ui.CustomUIScreenProxy import CustomUIScreenProxy
 from mod.client.ui.CustomUIControlProxy import CustomUIControlProxy
 from mod.client.ui.NativeScreenManager import NativeScreenManager
-from .._typing import FTuple2
+from .._types._typing import FTuple2
 
 
 class _MiniMapBaseScreen(ScreenNode):

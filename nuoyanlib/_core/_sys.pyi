@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-29
 #
 # ====================================================
 
@@ -25,7 +25,6 @@ from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 from ._client._lib_client import NuoyanLibClientSystem
 from ._server._lib_server import NuoyanLibServerSystem
-from ._utils import singleton
 
 
 def check_env(target: Literal["client", "server"]) -> None: ...
@@ -39,9 +38,7 @@ def get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer
 LEVEL_ID: str
 
 
-@singleton
 class NuoyanLibBaseSystem(object):
-    instance: NuoyanLibBaseSystem
     cond_func: Dict[int, Tuple[Callable[[], bool], Callable[[bool], Any], int]]
     cond_state: Dict[int, bool]
     __tick: int

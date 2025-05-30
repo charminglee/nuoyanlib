@@ -12,21 +12,23 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
 from typing import Dict, Optional
 from mod.server.system.serverSystem import ServerSystem
-from .._typing import EventArgs
+from .._types._typing import EventArgs
 from .._listener import lib_sys_event, ServerEventProxy
 from .._sys import NuoyanLibBaseSystem
+from .._utils import singleton
 
 
 def instance() -> Optional[NuoyanLibServerSystem]: ...
 
 
+@singleton
 class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem):
     instance: NuoyanLibServerSystem
     query_cache: Dict[str, Dict[str, float]]

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
@@ -20,7 +20,7 @@
 from typing import Any, Literal, Callable
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ..._core._typing import FTuple2
+from ..._core._types._typing import FTuple2
 
 
 class NyControl(object):

@@ -12,7 +12,7 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
@@ -20,15 +20,17 @@
 from typing import List, Optional, Any
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
-from .._typing import EventArgs
+from .._types._typing import EventArgs
 from .._listener import event, lib_sys_event, ClientEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._const import LIB_NAME, LIB_CLIENT_NAME, LIB_SERVER_NAME
+from .._utils import singleton
 
 
 def instance() -> Optional[NuoyanLibClientSystem]: ...
 
 
+@singleton
 class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
     instance: NuoyanLibClientSystem
     @staticmethod

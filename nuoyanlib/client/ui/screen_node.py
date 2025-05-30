@@ -12,15 +12,15 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
 from types import MethodType as _MethodType
 from functools import wraps as _wraps
-from ..._core._client import _lib_client, _comp
-from ..._core import _listener, _utils
+from ..._core._client import _comp
+from ..._core import _listener
 from . import ui_utils as _ui_utils
 from .button import NyButton as _NyButton
 
@@ -33,6 +33,7 @@ __all__ = [
 class ScreenNodeExtension(_listener.ClientEventProxy):
     """
     | ScreenNode扩展类，提供更多UI界面功能。
+    | 已继承 ``ClientEventProxy`` ，监听事件更方便。
     """
 
     ROOT_PANEL_PATH = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel"
@@ -40,9 +41,9 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
     # noinspection PyUnresolvedReferences
     def __init__(self, *args):
         super(ScreenNodeExtension, self).__init__(*args)
-        self._lib_sys = _lib_client.instance()
         self._ui_pos_data_key = ""
         self._screen_node = None
+        self._control_cache = {}
         self.cs = None
         if isinstance(self, _comp.CustomUIScreenProxy):
             # 兼容UI代理
@@ -75,22 +76,27 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
 
     # APIs =============================================================================================================
 
-    @_utils.method_cache
-    def CreateNyButton(self, path):
+    def CreateNyButton(self, path, touch_event_params=None):
         """
         | 创建NyButton按钮实例。
+        | 创建后无需调用ModSDK ``AddTouchEventParams`` 。
 
         -----
 
         :param str path: 按钮路径
+        :param dict|None touch_event_params: 按钮参数字典，默认为None，详细说明见AddTouchEventParams
 
         :return: 按钮实例，创建失败返回None
         :rtype: _NyButton|None
         """
+        if path in self._control_cache:
+            return self._control_cache[path]
         btn = _ui_utils.to_button(self._screen_node, path)
         if btn:
+            btn.AddTouchEventParams(touch_event_params)
             btn = _NyButton(self._screen_node, btn)
             self.ny_buttons.append(btn)
+            self._control_cache[path] = btn
             return btn
 
     def GetAllChildrenPathByLevel(self, control, level=1):

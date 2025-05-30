@@ -12,14 +12,19 @@
 #   Author        : 诺言Nuoyan
 #   Email         : 1279735247@qq.com
 #   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-17
+#   Last Modified : 2025-05-30
 #
 # ====================================================
 
 
+from contextlib import contextmanager
 from typing import List, Optional, Callable
 from mod.common.minecraftEnum import ActorDamageCause
-from .._core._typing import FTuple3
+from .._core._types._typing import FTuple3
+
+
+@contextmanager
+def ignore_dmg_cd(restore_cd: int = 10) -> None: ...
 
 
 class EntityFilter:
