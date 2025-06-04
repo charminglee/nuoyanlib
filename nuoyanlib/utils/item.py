@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
@@ -261,30 +257,30 @@ if __name__ == "__main__":
     item4 = {'itemName': "minecraft:apple", 'auxValue': 1}
     item5 = {'newItemName': "minecraft:apple"}
     item6 = {'itemName': "minecraft:apple"}
-    print "-" * 50
-    print is_same_item(item1, item2)  # True
-    print is_same_item(item3, item4)  # True
-    print is_same_item(item1, item3)  # False
-    print is_same_item(item2, item4)  # False
-    print is_same_item(item1, item4)  # False
-    print are_same_item(item1, item2, item3, item4)  # False
-    print are_same_item(item1, item2, item5, item6)  # True
-    print "-" * 50
+    print("-" * 50)
+    print(is_same_item(item1, item2))  # True
+    print(is_same_item(item3, item4))  # True
+    print(is_same_item(item1, item3))  # False
+    print(is_same_item(item2, item4))  # False
+    print(is_same_item(item1, item4))  # False
+    print(are_same_item(item1, item2, item3, item4))  # False
+    print(are_same_item(item1, item2, item5, item6))  # True
+    print("-" * 50)
     emp1 = {'newItemName': "minecraft:air"}
     emp2 = {'newItemName': "minecraft:apple", 'count': 0}
     emp3 = {}
     emp4 = {'itemName': "air"}
-    print is_empty_item(emp1)  # True
-    print is_empty_item(emp2)  # True
-    print is_empty_item(emp3)  # True
-    print is_empty_item(emp4)  # True
-    print is_empty_item(item1)  # False
-    print is_empty_item(item2)  # False
-    print is_empty_item(item3)  # False
-    print is_empty_item(item4)  # False
-    print "-" * 50
-    print set_namespace("apple")  # "minecraft:apple"
-    print set_namespace("minecraft:apple", "nuoyan")  # "nuoyan:apple"
+    print(is_empty_item(emp1))  # True
+    print(is_empty_item(emp2))  # True
+    print(is_empty_item(emp3))  # True
+    print(is_empty_item(emp4))  # True
+    print(is_empty_item(item1))  # False
+    print(is_empty_item(item2))  # False
+    print(is_empty_item(item3))  # False
+    print(is_empty_item(item4))  # False
+    print("-" * 50)
+    print(set_namespace("apple"))  # "minecraft:apple"
+    print(set_namespace("minecraft:apple", "nuoyan"))  # "nuoyan:apple"
 
 
 

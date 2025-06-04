@@ -1,32 +1,29 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from typing import Dict, List, Tuple
+from .._listener import EventArgsProxy
 
 
-class EventArgs0:
+class EventArgs0(EventArgsProxy):
     changedList: Tuple[dict]
     """
     修改后的按钮列表
     """
 
-class EventArgs1:
+class EventArgs1(EventArgsProxy):
     blockPos: Tuple[float, float, float]
     """
     方块坐标
@@ -40,7 +37,7 @@ class EventArgs1:
     方块附加值
     """
 
-class EventArgs2:
+class EventArgs2(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -58,19 +55,19 @@ class EventArgs2:
     本次攻击是否产生暴击，不支持修改
     """
 
-class EventArgs3:
+class EventArgs3(EventArgsProxy):
     actionType: int
     """
     动作事件枚举，详见Minecraft枚举值文档的 `PlayerActionType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerActionType.html>`_
     """
 
-class EventArgs4:
+class EventArgs4(EventArgsProxy):
     pass
 
-class EventArgs5:
+class EventArgs5(EventArgsProxy):
     pass
 
-class EventArgs6:
+class EventArgs6(EventArgsProxy):
     xDiff: float
     """
     x轴角速度，单位为弧度/s
@@ -92,7 +89,7 @@ class EventArgs6:
     触发时间戳，秒
     """
 
-class EventArgs7:
+class EventArgs7(EventArgsProxy):
     posX: int
     """
     自定义方块实体的位置X
@@ -114,7 +111,7 @@ class EventArgs7:
     方块的identifier，包含命名空间及名称
     """
 
-class EventArgs8:
+class EventArgs8(EventArgsProxy):
     posX: int
     """
     自定义方块实体的位置X
@@ -136,7 +133,7 @@ class EventArgs8:
     方块的identifier，包含命名空间及名称
     """
 
-class EventArgs9:
+class EventArgs9(EventArgsProxy):
     oldPosition: Tuple[float, float]
     """
     移动前该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
@@ -146,7 +143,7 @@ class EventArgs9:
     移动后该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
     """
 
-class EventArgs10:
+class EventArgs10(EventArgsProxy):
     action: str
     """
     行为
@@ -160,7 +157,7 @@ class EventArgs10:
     修改前的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
     """
 
-class EventArgs11:
+class EventArgs11(EventArgsProxy):
     action: str
     """
     行为
@@ -174,7 +171,7 @@ class EventArgs11:
     修改前的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
     """
 
-class EventArgs12:
+class EventArgs12(EventArgsProxy):
     key: int
     """
     键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
@@ -184,7 +181,7 @@ class EventArgs12:
     扣动扳机的力度，取值为 0 ~ 1.0
     """
 
-class EventArgs13:
+class EventArgs13(EventArgsProxy):
     key: int
     """
     键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
@@ -198,7 +195,7 @@ class EventArgs13:
     摇杆竖直方向的值，从下到上取值为 -1.0 ~ 1.0
     """
 
-class EventArgs14:
+class EventArgs14(EventArgsProxy):
     screenName: str
     """
     当前screenName
@@ -212,7 +209,7 @@ class EventArgs14:
     是否按下，按下为1，弹起为0
     """
 
-class EventArgs15:
+class EventArgs15(EventArgsProxy):
     posX: int
     """
     自定义方块实体的位置X
@@ -234,10 +231,10 @@ class EventArgs15:
     方块的identifier，包含命名空间及名称
     """
 
-class EventArgs16:
+class EventArgs16(EventArgsProxy):
     pass
 
-class EventArgs17:
+class EventArgs17(EventArgsProxy):
     screenName: str
     """
     UI名字
@@ -247,25 +244,25 @@ class EventArgs17:
     包含命名空间的UI名字，格式为namespace.screenName
     """
 
-class EventArgs18:
+class EventArgs18(EventArgsProxy):
     pass
 
-class EventArgs19:
+class EventArgs19(EventArgsProxy):
     cancel: bool
     """
     设置为True可拦截原版的攻击或放置响应
     """
 
-class EventArgs20:
+class EventArgs20(EventArgsProxy):
     pass
 
-class EventArgs21:
+class EventArgs21(EventArgsProxy):
     cancel: bool
     """
     设置为True可拦截原版的物品使用/实体交互响应
     """
 
-class EventArgs22:
+class EventArgs22(EventArgsProxy):
     isDown: str
     """
     是否按下，按下为1，弹起为0
@@ -279,7 +276,7 @@ class EventArgs22:
     按下时的y坐标
     """
 
-class EventArgs23:
+class EventArgs23(EventArgsProxy):
     screenName: str
     """
     当前screenName
@@ -293,37 +290,37 @@ class EventArgs23:
     是否按下，按下为1，弹起为0
     """
 
-class EventArgs24:
+class EventArgs24(EventArgsProxy):
     pass
 
-class EventArgs25:
+class EventArgs25(EventArgsProxy):
     pass
 
-class EventArgs26:
+class EventArgs26(EventArgsProxy):
     pass
 
-class EventArgs27:
+class EventArgs27(EventArgsProxy):
     direction: int
     """
     1为向上滚动，0为向下滚动
     """
 
-class EventArgs28:
+class EventArgs28(EventArgsProxy):
     pass
 
-class EventArgs29:
+class EventArgs29(EventArgsProxy):
     cancel: bool
     """
     设置为True可拦截原版的挖方块或攻击响应
     """
 
-class EventArgs30:
+class EventArgs30(EventArgsProxy):
     cancel: bool
     """
     设置为True可拦截原版的挖方块/使用物品/与实体交互响应
     """
 
-class EventArgs31:
+class EventArgs31(EventArgsProxy):
     x: int
     """
     手指点击位置x坐标
@@ -333,19 +330,19 @@ class EventArgs31:
     手指点击位置y坐标
     """
 
-class EventArgs32:
+class EventArgs32(EventArgsProxy):
     pass
 
-class EventArgs33:
+class EventArgs33(EventArgsProxy):
     pass
 
-class EventArgs34:
+class EventArgs34(EventArgsProxy):
     continueJump: bool
     """
     设置是否执行跳跃逻辑
     """
 
-class EventArgs35:
+class EventArgs35(EventArgsProxy):
     name: str
     """
     即资源包中sounds/sound_definitions.json中的key
@@ -367,7 +364,7 @@ class EventArgs35:
     设为True可屏蔽该次音效播放
     """
 
-class EventArgs36:
+class EventArgs36(EventArgsProxy):
     name: str
     """
     即资源包中sounds/music_definitions.json中的event_name，并且对应sounds/sound_definitions.json中的key
@@ -377,13 +374,13 @@ class EventArgs36:
     设为True可屏蔽该次音效播放
     """
 
-class EventArgs37:
+class EventArgs37(EventArgsProxy):
     musicName: str
     """
     音乐名称
     """
 
-class EventArgs38:
+class EventArgs38(EventArgsProxy):
     beforeX: float
     """
     屏幕大小改变前的宽度
@@ -401,7 +398,7 @@ class EventArgs38:
     屏幕大小改变后的高度
     """
 
-class EventArgs39:
+class EventArgs39(EventArgsProxy):
     screenName: str
     """
     UI名字
@@ -411,7 +408,7 @@ class EventArgs39:
     包含命名空间的UI名字，格式为namespace.screenName
     """
 
-class EventArgs40:
+class EventArgs40(EventArgsProxy):
     screenName: str
     """
     UI名字
@@ -421,22 +418,22 @@ class EventArgs40:
     包含命名空间的UI名字，格式为"namespace.screenName"
     """
 
-class EventArgs41:
+class EventArgs41(EventArgsProxy):
     pass
 
-class EventArgs42:
+class EventArgs42(EventArgsProxy):
     slotIndex: int
     """
     点击的物品槽的编号，编号对应位置详见 `物品栏 <https://minecraft.fandom.com/zh/wiki/%E7%89%A9%E5%93%81%E6%A0%8F>`_
     """
 
-class EventArgs43:
+class EventArgs43(EventArgsProxy):
     path: str
     """
     grid网格所在的路径（从UI根节点算起）
     """
 
-class EventArgs44:
+class EventArgs44(EventArgsProxy):
     isCreative: bool
     """
     是否是创造模式背包界面
@@ -446,10 +443,10 @@ class EventArgs44:
     是否取消打开物品背包界面。
     """
 
-class EventArgs45:
+class EventArgs45(EventArgsProxy):
     pass
 
-class EventArgs46:
+class EventArgs46(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -467,34 +464,34 @@ class EventArgs46:
     箱子z坐标
     """
 
-class EventArgs47:
+class EventArgs47(EventArgsProxy):
     pass
 
-class EventArgs48:
+class EventArgs48(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs49:
+class EventArgs49(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs50:
+class EventArgs50(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs51:
+class EventArgs51(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs52:
+class EventArgs52(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -504,7 +501,7 @@ class EventArgs52:
      `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs53:
+class EventArgs53(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -514,7 +511,7 @@ class EventArgs53:
      `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs54:
+class EventArgs54(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -528,13 +525,13 @@ class EventArgs54:
     是否取消此次操作
     """
 
-class EventArgs55:
+class EventArgs55(EventArgsProxy):
     itemDict: dict | None
     """
     切换后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs56:
+class EventArgs56(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -556,7 +553,7 @@ class EventArgs56:
     设置为True可以取消，需要同时取消服务端事件ItemReleaseUsingServerEvent
     """
 
-class EventArgs57:
+class EventArgs57(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -574,7 +571,7 @@ class EventArgs57:
     变化后槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs58:
+class EventArgs58(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -596,13 +593,13 @@ class EventArgs58:
     本次合成返还的经验
     """
 
-class EventArgs59:
+class EventArgs59(EventArgsProxy):
     recipeId: str
     """
     配方ID，对应配方json文件中的identifier字段
     """
 
-class EventArgs60:
+class EventArgs60(EventArgsProxy):
     entityId: str
     """
     玩家实体ID
@@ -652,7 +649,7 @@ class EventArgs60:
     设为True可取消物品的使用
     """
 
-class EventArgs61:
+class EventArgs61(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -666,7 +663,7 @@ class EventArgs61:
     是否取消使用物品
     """
 
-class EventArgs62:
+class EventArgs62(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -688,7 +685,7 @@ class EventArgs62:
     合成所使用材料的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第二个物品）
     """
 
-class EventArgs63:
+class EventArgs63(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -702,7 +699,7 @@ class EventArgs63:
     使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
     """
 
-class EventArgs64:
+class EventArgs64(EventArgsProxy):
     actor: str
     """
     获得物品玩家实体ID
@@ -720,7 +717,7 @@ class EventArgs64:
     获得物品的方法，详见 `ItemAcquisitionMethod <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
     """
 
-class EventArgs65:
+class EventArgs65(EventArgsProxy):
     cancel: bool
     """
     是否允许触发，默认为False，若设为True，可阻止触发后续原版逻辑
@@ -750,7 +747,7 @@ class EventArgs65:
     维度ID
     """
 
-class EventArgs66:
+class EventArgs66(EventArgsProxy):
     pos: Tuple[float, float, float]
     """
     方块的坐标
@@ -776,7 +773,7 @@ class EventArgs66:
     方块被敲击面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
     """
 
-class EventArgs67:
+class EventArgs67(EventArgsProxy):
     blockX: int
     """
     方块位置x
@@ -802,7 +799,7 @@ class EventArgs67:
     维度ID
     """
 
-class EventArgs68:
+class EventArgs68(EventArgsProxy):
     blockX: int
     """
     方块位置x
@@ -844,7 +841,7 @@ class EventArgs68:
     是否取消剪刀效果
     """
 
-class EventArgs69:
+class EventArgs69(EventArgsProxy):
     x: int
     """
     方块x坐标
@@ -878,7 +875,7 @@ class EventArgs69:
     默认为False，在脚本层设置为True就能取消该方块的破坏
     """
 
-class EventArgs70:
+class EventArgs70(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -932,7 +929,7 @@ class EventArgs70:
     可由脚本层回传True给引擎，阻止触发后续原版逻辑
     """
 
-class EventArgs71:
+class EventArgs71(EventArgsProxy):
     effectName: str
     """
     创建成功的特效的自定义键值名称
@@ -950,7 +947,7 @@ class EventArgs71:
     该特效绑定的自定义方块实体的世界坐标
     """
 
-class EventArgs72:
+class EventArgs72(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -992,7 +989,7 @@ class EventArgs72:
     可由脚本层回传True给引擎，阻止触发后续原版逻辑
     """
 
-class EventArgs73:
+class EventArgs73(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -1030,7 +1027,7 @@ class EventArgs73:
     是否按脚本层传值计算力
     """
 
-class EventArgs74:
+class EventArgs74(EventArgsProxy):
     fallingBlockId: str
     """
     下落的方块实体ID
@@ -1076,7 +1073,7 @@ class EventArgs74:
     对实体的伤害
     """
 
-class EventArgs75:
+class EventArgs75(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1118,8 +1115,8 @@ class EventArgs75:
     点击点的z比例位置
     """
 
-class EventArgs76:
-    from_: int
+class EventArgs76(EventArgsProxy):
+    from: int
     """
     切换前的视角
     """
@@ -1128,7 +1125,7 @@ class EventArgs76:
     切换后的视角
     """
 
-class EventArgs77:
+class EventArgs77(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1154,7 +1151,7 @@ class EventArgs77:
     碰撞方块的附加值
     """
 
-class EventArgs78:
+class EventArgs78(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1168,7 +1165,7 @@ class EventArgs78:
     切换后的游戏模式
     """
 
-class EventArgs79:
+class EventArgs79(EventArgsProxy):
     pos: Tuple[float, float, float]
     """
     火焰方块的坐标
@@ -1182,7 +1179,7 @@ class EventArgs79:
     修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireServerEvent一起修改。
     """
 
-class EventArgs80:
+class EventArgs80(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1200,7 +1197,7 @@ class EventArgs80:
     改变后的位置(x,y,z)，其中y值为脚底加上角色的身高值
     """
 
-class EventArgs81:
+class EventArgs81(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1238,7 +1235,7 @@ class EventArgs81:
     改变后的位置z
     """
 
-class EventArgs82:
+class EventArgs82(EventArgsProxy):
     motionId: int
     """
     运动器ID
@@ -1248,13 +1245,13 @@ class EventArgs82:
     是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除
     """
 
-class EventArgs83:
+class EventArgs83(EventArgsProxy):
     motionId: int
     """
     运动器ID
     """
 
-class EventArgs84:
+class EventArgs84(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1264,7 +1261,7 @@ class EventArgs84:
     远离的生物的实体ID
     """
 
-class EventArgs85:
+class EventArgs85(EventArgsProxy):
     actorId: str
     """
     骑乘者的实体ID
@@ -1274,7 +1271,7 @@ class EventArgs85:
     被骑乘者的实体ID
     """
 
-class EventArgs86:
+class EventArgs86(EventArgsProxy):
     mobId: str
     """
     当前生物的实体ID
@@ -1284,18 +1281,18 @@ class EventArgs86:
     当前生物碰撞到的其他所有生物的实体ID的list
     """
 
-class EventArgs87:
+class EventArgs87(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs88:
+class EventArgs88(EventArgsProxy):
     entityId: str
     """
     实体ID
     """
-    from_: float
+    from: float
     """
     变化前的生命值
     """
@@ -1304,7 +1301,7 @@ class EventArgs88:
     变化后的生命值
     """
 
-class EventArgs89:
+class EventArgs89(EventArgsProxy):
     id: str
     """
     实体ID
@@ -1330,7 +1327,7 @@ class EventArgs89:
     设置为True可以取消（需要与服务端事件一同取消）
     """
 
-class EventArgs90:
+class EventArgs90(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -1344,7 +1341,7 @@ class EventArgs90:
     旧的模型名字
     """
 
-class EventArgs91:
+class EventArgs91(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1354,28 +1351,28 @@ class EventArgs91:
     靠近的生物的实体ID
     """
 
-class EventArgs92:
+class EventArgs92(EventArgsProxy):
     pass
 
-class EventArgs93:
+class EventArgs93(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs94:
+class EventArgs94(EventArgsProxy):
     id: str
     """
     移除的实体ID
     """
 
-class EventArgs95:
+class EventArgs95(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs96:
+class EventArgs96(EventArgsProxy):
     command: str
     """
     命令名称
@@ -1385,10 +1382,10 @@ class EventArgs96:
     命令返回的消息
     """
 
-class EventArgs97:
+class EventArgs97(EventArgsProxy):
     pass
 
-class EventArgs98:
+class EventArgs98(EventArgsProxy):
     dimension: int
     """
     区块所在维度
@@ -1402,7 +1399,7 @@ class EventArgs98:
     区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
     """
 
-class EventArgs99:
+class EventArgs99(EventArgsProxy):
     dimension: int
     """
     区块所在维度
@@ -1416,19 +1413,19 @@ class EventArgs99:
     区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
     """
 
-class EventArgs100:
+class EventArgs100(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs101:
+class EventArgs101(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs102:
+class EventArgs102(EventArgsProxy):
     id: str
     """
     实体ID
@@ -1466,13 +1463,13 @@ class EventArgs102:
     物品附加值（仅当物品实体时存在该字段）
     """
 
-class EventArgs103:
+class EventArgs103(EventArgsProxy):
     pass
 
-class EventArgs104:
+class EventArgs104(EventArgsProxy):
     pass
 
-class EventArgs105:
+class EventArgs105(EventArgsProxy):
     itemDict: dict
     """
     尝试放入物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
@@ -1506,7 +1503,7 @@ class EventArgs105:
     是否取消该操作，默认为False，事件中改为True时拒绝此次放入自定义容器的操作
     """
 
-class EventArgs106:
+class EventArgs106(EventArgsProxy):
     eid: str
     """
     生物实体ID
@@ -1516,7 +1513,7 @@ class EventArgs106:
     玩家实体ID
     """
 
-class EventArgs107:
+class EventArgs107(EventArgsProxy):
     playerId: str
     """
     玩家实体ID
@@ -1526,7 +1523,7 @@ class EventArgs107:
     动作事件枚举，详见Minecraft枚举值文档的 `PlayerActionType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerActionType.html>`_
     """
 
-class EventArgs108:
+class EventArgs108(EventArgsProxy):
     command: str
     """
     自定义命令名称，对应json中的name字段
@@ -1552,7 +1549,7 @@ class EventArgs108:
     设置返回给玩家或命令方块的信息，支持在语言文件（.lang）中定义，默认值为commands.custom.success（自定义命令执行成功）
     """
 
-class EventArgs109:
+class EventArgs109(EventArgsProxy):
     entityId: str
     """
     执行命令的实体ID，命令方块执行时没有该参数
@@ -1574,7 +1571,7 @@ class EventArgs109:
     设置为True可以取消命令执行
     """
 
-class EventArgs110:
+class EventArgs110(EventArgsProxy):
     playerId: str
     """
     玩家实体ID
@@ -1596,7 +1593,7 @@ class EventArgs110:
     取消拾取后重新设置该物品的拾取cd，小于15帧将视作15帧，大于等于97813帧将视作无法拾取，每秒30帧
     """
 
-class EventArgs111:
+class EventArgs111(EventArgsProxy):
     dieEntityId: str
     """
     死亡实体ID
@@ -1614,7 +1611,7 @@ class EventArgs111:
     掉落物品的实体ID列表
     """
 
-class EventArgs112:
+class EventArgs112(EventArgsProxy):
     playerId: str
     """
     玩家实体ID
@@ -1632,7 +1629,7 @@ class EventArgs112:
     是否取消饥饿度变化
     """
 
-class EventArgs113:
+class EventArgs113(EventArgsProxy):
     entityId: str
     """
     物品拥有者的实体ID
@@ -1654,7 +1651,7 @@ class EventArgs113:
     是否支持修改，为True时支持通过durability修改，为False时不支持
     """
 
-class EventArgs114:
+class EventArgs114(EventArgsProxy):
     dimensionId: int
     """
     维度ID
@@ -1684,7 +1681,7 @@ class EventArgs114:
     设置为True时可阻止该大型结构的放置
     """
 
-class EventArgs115:
+class EventArgs115(EventArgsProxy):
     playerId: str
     """
     主动命名生物的玩家的实体ID
@@ -1706,7 +1703,7 @@ class EventArgs115:
     是否取消触发，默认为False，若设为True，可阻止触发后续的实体命名逻辑
     """
 
-class EventArgs116:
+class EventArgs116(EventArgsProxy):
     playerId: str
     """
     主动喂养生物的玩家的实体ID
@@ -1724,7 +1721,7 @@ class EventArgs116:
     是否取消触发，默认为False，若设为True，可阻止触发后续的生物喂养逻辑
     """
 
-class EventArgs117:
+class EventArgs117(EventArgsProxy):
     eid: str
     """
     玩家的实体ID
@@ -1734,13 +1731,13 @@ class EventArgs117:
     玩家登录时为False，玩家购买了商品时为True
     """
 
-class EventArgs118:
+class EventArgs118(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs119:
+class EventArgs119(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1750,37 +1747,37 @@ class EventArgs119:
     是否是创造模式背包界面
     """
 
-class EventArgs120:
+class EventArgs120(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs121:
+class EventArgs121(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs122:
+class EventArgs122(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs123:
+class EventArgs123(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs124:
+class EventArgs124(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs125:
+class EventArgs125(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1798,7 +1795,7 @@ class EventArgs125:
     生成的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs126:
+class EventArgs126(EventArgsProxy):
     blockX: int
     """
     方块x坐标
@@ -1840,7 +1837,7 @@ class EventArgs126:
     是否取消剪刀效果
     """
 
-class EventArgs127:
+class EventArgs127(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1862,7 +1859,7 @@ class EventArgs127:
     取消拾取后重新设置该物品的拾取cd，小于15帧将视作15帧，大于等于97813帧将视作无法拾取
     """
 
-class EventArgs128:
+class EventArgs128(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1876,7 +1873,7 @@ class EventArgs128:
     设为True可取消物品的使用
     """
 
-class EventArgs129:
+class EventArgs129(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1886,7 +1883,7 @@ class EventArgs129:
     物品的实体ID
     """
 
-class EventArgs130:
+class EventArgs130(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1904,7 +1901,7 @@ class EventArgs130:
     抵挡的伤害数值
     """
 
-class EventArgs131:
+class EventArgs131(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1922,7 +1919,7 @@ class EventArgs131:
     抵挡的伤害数值
     """
 
-class EventArgs132:
+class EventArgs132(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1944,7 +1941,7 @@ class EventArgs132:
     是否取消这次激活
     """
 
-class EventArgs133:
+class EventArgs133(EventArgsProxy):
     oldArmorDict: dict | None
     """
     旧物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当旧物品为空时，此项属性为None
@@ -1958,7 +1955,7 @@ class EventArgs133:
     玩家的实体ID
     """
 
-class EventArgs134:
+class EventArgs134(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1976,7 +1973,7 @@ class EventArgs134:
     新装备的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当新装备为空时，此项属性为None
     """
 
-class EventArgs135:
+class EventArgs135(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -1994,7 +1991,7 @@ class EventArgs135:
     传入True时，附魔台选项会被新传入的options覆盖
     """
 
-class EventArgs136:
+class EventArgs136(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -2044,7 +2041,7 @@ class EventArgs136:
     维度ID
     """
 
-class EventArgs137:
+class EventArgs137(EventArgsProxy):
     entityId: str
     """
     玩家的实体ID
@@ -2054,7 +2051,7 @@ class EventArgs137:
      `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs138:
+class EventArgs138(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -2080,7 +2077,7 @@ class EventArgs138:
     如果要在该事件的回调中修改当前使用槽位的物品，需设置这个参数为True，否则将修改物品失败，例如修改耐久度或者替换成新物品
     """
 
-class EventArgs139:
+class EventArgs139(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -2098,7 +2095,7 @@ class EventArgs139:
     变化后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs140:
+class EventArgs140(EventArgsProxy):
     dimensionId: int
     """
     维度ID
@@ -2120,7 +2117,7 @@ class EventArgs140:
      `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs141:
+class EventArgs141(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -2138,7 +2135,7 @@ class EventArgs141:
     是否取消生成物品
     """
 
-class EventArgs142:
+class EventArgs142(EventArgsProxy):
     pos: Tuple[int, int, int]
     """
     容器坐标
@@ -2164,7 +2161,7 @@ class EventArgs142:
     新 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
 
-class EventArgs143:
+class EventArgs143(EventArgsProxy):
     cancel: bool
     """
     是否允许触发，默认为False，若设为True，可阻止触发后续物理交互事件
@@ -2194,7 +2191,7 @@ class EventArgs143:
     维度ID
     """
 
-class EventArgs144:
+class EventArgs144(EventArgsProxy):
     blockX: int
     """
     方块x坐标
@@ -2220,7 +2217,7 @@ class EventArgs144:
     维度ID
     """
 
-class EventArgs145:
+class EventArgs145(EventArgsProxy):
     pos: Tuple[float, float, float]
     """
     方块坐标
@@ -2250,7 +2247,7 @@ class EventArgs145:
     方块被敲击面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
     """
 
-class EventArgs146:
+class EventArgs146(EventArgsProxy):
     blockX: int
     """
     方块x坐标
@@ -2292,7 +2289,7 @@ class EventArgs146:
     是否取消剪刀效果
     """
 
-class EventArgs147:
+class EventArgs147(EventArgsProxy):
     x: int
     """
     方块x坐标
@@ -2334,7 +2331,7 @@ class EventArgs147:
     是否生成掉落物，默认为True，在脚本层设置为False就能取消生成掉落物
     """
 
-class EventArgs148:
+class EventArgs148(EventArgsProxy):
     blockName: str
     """
     方块的identifier，包含命名空间及名称
@@ -2356,7 +2353,7 @@ class EventArgs148:
     方块z坐标
     """
 
-class EventArgs149:
+class EventArgs149(EventArgsProxy):
     x: int
     """
     方块x坐标，支持修改
@@ -2406,7 +2403,7 @@ class EventArgs149:
     点击点的z比例位置
     """
 
-class EventArgs150:
+class EventArgs150(EventArgsProxy):
     blockName: str
     """
     方块的identifier，包含命名空间及名称
@@ -2428,7 +2425,7 @@ class EventArgs150:
     方块z坐标
     """
 
-class EventArgs151:
+class EventArgs151(EventArgsProxy):
     cancel: bool
     """
     是否允许触发，默认为False，若设为True，可阻止触发后续的事件
@@ -2474,7 +2471,7 @@ class EventArgs151:
     活塞运动影响到产生被移动或被破坏效果的实体ID列表
     """
 
-class EventArgs152:
+class EventArgs152(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -2528,7 +2525,7 @@ class EventArgs152:
     可由脚本层回传True给引擎，阻止触发后续原版逻辑
     """
 
-class EventArgs153:
+class EventArgs153(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -2558,7 +2555,7 @@ class EventArgs153:
     是否取消引擎对实体下降伤害的计算
     """
 
-class EventArgs154:
+class EventArgs154(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -2596,7 +2593,7 @@ class EventArgs154:
     是否按脚本层传值计算力
     """
 
-class EventArgs155:
+class EventArgs155(EventArgsProxy):
     x: int
     """
     漏斗x坐标
@@ -2630,7 +2627,7 @@ class EventArgs155:
     是否允许容器往漏斗加东西(要关闭此交互，需先监听此事件再放置容器)
     """
 
-class EventArgs156:
+class EventArgs156(EventArgsProxy):
     x: int
     """
     漏斗x坐标
@@ -2664,7 +2661,7 @@ class EventArgs156:
     是否允许容器往漏斗加东西(要关闭此交互，需先监听此事件再放置容器)
     """
 
-class EventArgs157:
+class EventArgs157(EventArgsProxy):
     fallingBlockId: str
     """
     下落的方块实体ID
@@ -2690,7 +2687,7 @@ class EventArgs157:
     维度ID
     """
 
-class EventArgs158:
+class EventArgs158(EventArgsProxy):
     dimension: int
     """
     维度ID
@@ -2708,7 +2705,7 @@ class EventArgs158:
     方块z坐标
     """
 
-class EventArgs159:
+class EventArgs159(EventArgsProxy):
     dimension: int
     """
     维度ID
@@ -2730,7 +2727,7 @@ class EventArgs159:
     耕地退化为泥土的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
     """
 
-class EventArgs160:
+class EventArgs160(EventArgsProxy):
     fallingBlockId: str
     """
     下落的方块实体ID
@@ -2764,7 +2761,7 @@ class EventArgs160:
     下落的方块实体持续下落了多少tick
     """
 
-class EventArgs161:
+class EventArgs161(EventArgsProxy):
     fallingBlockId: str
     """
     下落的方块实体ID
@@ -2810,7 +2807,7 @@ class EventArgs161:
     对实体的伤害，引擎传来的值距离和json配置决定，可在脚本层修改传回引擎
     """
 
-class EventArgs162:
+class EventArgs162(EventArgsProxy):
     fallingBlockId: str
     """
     下落的方块实体ID
@@ -2844,7 +2841,7 @@ class EventArgs162:
     是否取消方块物品掉落，可以在脚本层中设置
     """
 
-class EventArgs163:
+class EventArgs163(EventArgsProxy):
     x: int
     """
     方块x坐标
@@ -2878,7 +2875,7 @@ class EventArgs163:
     点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
     """
 
-class EventArgs164:
+class EventArgs164(EventArgsProxy):
     dimension: int
     """
     维度ID
@@ -2896,7 +2893,7 @@ class EventArgs164:
     方块z坐标
     """
 
-class EventArgs165:
+class EventArgs165(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -2934,7 +2931,7 @@ class EventArgs165:
     修改为True时，可以阻止玩家修改命令方块的内置命令
     """
 
-class EventArgs166:
+class EventArgs166(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -2964,7 +2961,7 @@ class EventArgs166:
     修改为True时，可以阻止玩家打开命令方块的设置界面
     """
 
-class EventArgs167:
+class EventArgs167(EventArgsProxy):
     cancel: bool
     """
     是否允许触发，默认为False，若设为True，可阻止小箱子组合成为一个大箱子
@@ -2998,7 +2995,7 @@ class EventArgs167:
     维度ID
     """
 
-class EventArgs168:
+class EventArgs168(EventArgsProxy):
     posX: int
     """
     方块x坐标
@@ -3032,7 +3029,7 @@ class EventArgs168:
     维度ID
     """
 
-class EventArgs169:
+class EventArgs169(EventArgsProxy):
     dimension: int
     """
     维度ID
@@ -3058,7 +3055,7 @@ class EventArgs169:
     方块进入脱离含雪的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
     """
 
-class EventArgs170:
+class EventArgs170(EventArgsProxy):
     dimension: int
     """
     维度ID
@@ -3084,7 +3081,7 @@ class EventArgs170:
     方块进入脱离含雪的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
     """
 
-class EventArgs171:
+class EventArgs171(EventArgsProxy):
     x: int
     """
     方块x坐标
@@ -3110,7 +3107,7 @@ class EventArgs171:
     维度ID
     """
 
-class EventArgs172:
+class EventArgs172(EventArgsProxy):
     dimensionId: int
     """
     维度ID
@@ -3140,7 +3137,7 @@ class EventArgs172:
     方块的附加值
     """
 
-class EventArgs173:
+class EventArgs173(EventArgsProxy):
     dimensionId: int
     """
     维度ID
@@ -3190,7 +3187,7 @@ class EventArgs173:
     方块变化后附加值
     """
 
-class EventArgs174:
+class EventArgs174(EventArgsProxy):
     blockName: str
     """
     方块的identifier，包含命名空间及名称
@@ -3220,7 +3217,7 @@ class EventArgs174:
     是否转为含水，True则转为含水，False则脱离含水
     """
 
-class EventArgs175:
+class EventArgs175(EventArgsProxy):
     blockName: str
     """
     方块的identifier，包含命名空间及名称
@@ -3250,7 +3247,7 @@ class EventArgs175:
     是否转为含水，True则转为含水，False则脱离含水
     """
 
-class EventArgs176:
+class EventArgs176(EventArgsProxy):
     x: int
     """
     方块x坐标
@@ -3280,13 +3277,13 @@ class EventArgs176:
     方块所在维度ID
     """
 
-class EventArgs177:
+class EventArgs177(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs178:
+class EventArgs178(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -3300,7 +3297,7 @@ class EventArgs178:
     是否取消
     """
 
-class EventArgs179:
+class EventArgs179(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -3310,37 +3307,37 @@ class EventArgs179:
     是否取消
     """
 
-class EventArgs180:
+class EventArgs180(EventArgsProxy):
     id: str
     """
     玩家的实体ID
     """
 
-class EventArgs181:
+class EventArgs181(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs182:
+class EventArgs182(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs183:
+class EventArgs183(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs184:
+class EventArgs184(EventArgsProxy):
     id: str
     """
     玩家的实体ID
     """
 
-class EventArgs185:
+class EventArgs185(EventArgsProxy):
     id: str
     """
     玩家的实体ID
@@ -3358,7 +3355,7 @@ class EventArgs185:
     使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
 
-class EventArgs186:
+class EventArgs186(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -3376,7 +3373,7 @@ class EventArgs186:
     食物的营养价值，回复饱和度 = 食物增加的饥饿值 * 食物的营养价值 * 2，饱和度最大不超过当前饥饿值，可修改
     """
 
-class EventArgs187:
+class EventArgs187(EventArgsProxy):
     id: str
     """
     玩家的实体ID
@@ -3394,7 +3391,7 @@ class EventArgs187:
     使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
 
-class EventArgs188:
+class EventArgs188(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -3424,7 +3421,7 @@ class EventArgs188:
     维度ID
     """
 
-class EventArgs189:
+class EventArgs189(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID， `SetDefaultGameType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E8%A7%84%E5%88%99.html?key=SetDefaultGameType&docindex=2&type=0>`_ 接口改变游戏模式时该参数为空字符串
@@ -3438,7 +3435,7 @@ class EventArgs189:
     切换后的游戏模式
     """
 
-class EventArgs190:
+class EventArgs190(EventArgsProxy):
     pos: Tuple[float, float, float]
     """
     火焰方块的坐标
@@ -3452,7 +3449,7 @@ class EventArgs190:
     修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireClientEvent一起修改
     """
 
-class EventArgs191:
+class EventArgs191(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -3490,7 +3487,7 @@ class EventArgs191:
     改变后的位置z
     """
 
-class EventArgs192:
+class EventArgs192(EventArgsProxy):
     level: int
     """
     玩家当前等级
@@ -3504,7 +3501,7 @@ class EventArgs192:
     设置为True，重载玩家升级经验才会生效
     """
 
-class EventArgs193:
+class EventArgs193(EventArgsProxy):
     id: str
     """
     玩家的实体ID
@@ -3518,7 +3515,7 @@ class EventArgs193:
     新的等级
     """
 
-class EventArgs194:
+class EventArgs194(EventArgsProxy):
     id: str
     """
     玩家的实体ID
@@ -3528,7 +3525,7 @@ class EventArgs194:
     增加的经验值
     """
 
-class EventArgs195:
+class EventArgs195(EventArgsProxy):
     cancel: bool
     """
     是否允许触发，默认为False，若设为True，可阻止触发后续的传送
@@ -3574,7 +3571,7 @@ class EventArgs195:
     传送理由，详情见EntityTeleportCause枚举
     """
 
-class EventArgs196:
+class EventArgs196(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3600,7 +3597,7 @@ class EventArgs196:
     状态将会造成的伤害值，如药水；需要注意，该值不一定是最终的伤害值，例如被伤害吸收效果扣除。只有持续时间为0时有用
     """
 
-class EventArgs197:
+class EventArgs197(EventArgsProxy):
     cancel: bool
     """
     是否允许触发，默认为False，若设为True，可阻止触发后续的实体交互事件
@@ -3614,7 +3611,7 @@ class EventArgs197:
     被骑乘的实体ID
     """
 
-class EventArgs198:
+class EventArgs198(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3632,7 +3629,7 @@ class EventArgs198:
     被移除状态效果等级
     """
 
-class EventArgs199:
+class EventArgs199(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3654,7 +3651,7 @@ class EventArgs199:
     状态造成的伤害值，如药水
     """
 
-class EventArgs200:
+class EventArgs200(EventArgsProxy):
     id: str
     """
     抛射物的实体ID
@@ -3664,7 +3661,7 @@ class EventArgs200:
     碰撞目标的实体ID
     """
 
-class EventArgs201:
+class EventArgs201(EventArgsProxy):
     mobId: str
     """
     当前生物的实体ID
@@ -3674,13 +3671,13 @@ class EventArgs201:
     当前生物碰撞到的其他所有生物实体ID的list
     """
 
-class EventArgs202:
+class EventArgs202(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs203:
+class EventArgs203(EventArgsProxy):
     victim: str
     """
     受伤实体ID
@@ -3702,7 +3699,7 @@ class EventArgs203:
     是否取消点燃效果
     """
 
-class EventArgs204:
+class EventArgs204(EventArgsProxy):
     cancel: bool
     """
     是否允许触发，默认为False，若设为True，可阻止触发后续物理交互事件
@@ -3732,12 +3729,12 @@ class EventArgs204:
     维度ID
     """
 
-class EventArgs205:
+class EventArgs205(EventArgsProxy):
     entityId: str
     """
     实体ID
     """
-    from_: str
+    from: str
     """
     变化前的生命值
     """
@@ -3750,7 +3747,7 @@ class EventArgs205:
     是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
     """
 
-class EventArgs206:
+class EventArgs206(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3760,7 +3757,7 @@ class EventArgs206:
     实体identifier
     """
 
-class EventArgs207:
+class EventArgs207(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3774,7 +3771,7 @@ class EventArgs207:
     物品给予者的实体ID（一般是玩家），如果不存在给予者的话，这里为空字符串
     """
 
-class EventArgs208:
+class EventArgs208(EventArgsProxy):
     motionId: int
     """
     运动器ID
@@ -3788,7 +3785,7 @@ class EventArgs208:
     是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除，该参数设置只对非玩家实体有效
     """
 
-class EventArgs209:
+class EventArgs209(EventArgsProxy):
     motionId: int
     """
     运动器ID
@@ -3798,13 +3795,13 @@ class EventArgs209:
     实体ID
     """
 
-class EventArgs210:
+class EventArgs210(EventArgsProxy):
     args: list
     """
     该事件的参数为长度为2的list，而非dict，其中list的第一个元素为实体ID
     """
 
-class EventArgs211:
+class EventArgs211(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3834,7 +3831,7 @@ class EventArgs211:
     伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
     """
 
-class EventArgs212:
+class EventArgs212(EventArgsProxy):
     entityId: str
     """
     生物的实体ID
@@ -3848,7 +3845,7 @@ class EventArgs212:
     物品的实体ID
     """
 
-class EventArgs213:
+class EventArgs213(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3886,7 +3883,7 @@ class EventArgs213:
     改变后的位置z
     """
 
-class EventArgs214:
+class EventArgs214(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3900,7 +3897,7 @@ class EventArgs214:
     事件触发后，实体是否在游泳状态
     """
 
-class EventArgs215:
+class EventArgs215(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3922,7 +3919,7 @@ class EventArgs215:
     状态造成的伤害值（真实扣除生命值的量）。只有持续时间为0时有用
     """
 
-class EventArgs216:
+class EventArgs216(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3944,7 +3941,7 @@ class EventArgs216:
     使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
 
-class EventArgs217:
+class EventArgs217(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -3986,7 +3983,7 @@ class EventArgs217:
     是否取消生成该实体
     """
 
-class EventArgs218:
+class EventArgs218(EventArgsProxy):
     enable: bool
     """
     是否允许继续生成。若设为False，可阻止生成生物
@@ -4012,7 +4009,7 @@ class EventArgs218:
     即将生成生物的名字，如"minecraft:pig"
     """
 
-class EventArgs219:
+class EventArgs219(EventArgsProxy):
     entityId: str
     """
     生成生物的实体ID
@@ -4038,7 +4035,7 @@ class EventArgs219:
     维度ID
     """
 
-class EventArgs220:
+class EventArgs220(EventArgsProxy):
     username: str
     """
     玩家名称
@@ -4084,7 +4081,7 @@ class EventArgs220:
     设置当前玩家在网易聊天界面中前缀颜色rgb的b值，范围为[0,1]。颜色数值输入其他格式时会被置为0。若cancel为True，会取消掉本次的颜色修改
     """
 
-class EventArgs221:
+class EventArgs221(EventArgsProxy):
     id: str
     """
     玩家的实体ID
@@ -4102,7 +4099,7 @@ class EventArgs221:
     玩家离开游戏的提示文字，允许修改
     """
 
-class EventArgs222:
+class EventArgs222(EventArgsProxy):
     id: str
     """
     玩家的实体ID
@@ -4120,13 +4117,13 @@ class EventArgs222:
     玩家加入游戏的提示文字，允许修改
     """
 
-class EventArgs223:
+class EventArgs223(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs224:
+class EventArgs224(EventArgsProxy):
     structureName: str
     """
     结构名称
@@ -4160,7 +4157,7 @@ class EventArgs224:
     设置为True时可阻止该结构的放置
     """
 
-class EventArgs225:
+class EventArgs225(EventArgsProxy):
     oldLevel: float
     """
     改变前的下雨强度
@@ -4170,7 +4167,7 @@ class EventArgs225:
     改变后的下雨强度
     """
 
-class EventArgs226:
+class EventArgs226(EventArgsProxy):
     oldLevel: float
     """
     改变前的下雨强度
@@ -4184,7 +4181,7 @@ class EventArgs226:
     维度ID
     """
 
-class EventArgs227:
+class EventArgs227(EventArgsProxy):
     oldLevel: float
     """
     改变前的打雷强度
@@ -4198,7 +4195,7 @@ class EventArgs227:
     维度ID
     """
 
-class EventArgs228:
+class EventArgs228(EventArgsProxy):
     oldLevel: float
     """
     改变前的打雷强度
@@ -4208,7 +4205,7 @@ class EventArgs228:
     改变后的打雷强度
     """
 
-class EventArgs229:
+class EventArgs229(EventArgsProxy):
     loottable: str
     """
     奖励箱子所读取的loottable的json路径
@@ -4226,7 +4223,7 @@ class EventArgs229:
     默认为False，如果需要修改掉落列表需将该值设为True
     """
 
-class EventArgs230:
+class EventArgs230(EventArgsProxy):
     command: str
     """
     命令名称
@@ -4236,7 +4233,7 @@ class EventArgs230:
     命令返回的消息
     """
 
-class EventArgs231:
+class EventArgs231(EventArgsProxy):
     name: str
     """
     感应区域的名称
@@ -4250,10 +4247,10 @@ class EventArgs231:
     离开该感应区域的实体ID列表
     """
 
-class EventArgs232:
+class EventArgs232(EventArgsProxy):
     pass
 
-class EventArgs233:
+class EventArgs233(EventArgsProxy):
     id: str
     """
     玩家的实体ID
@@ -4267,7 +4264,7 @@ class EventArgs233:
     玩家的netease uid，玩家的唯一标识
     """
 
-class EventArgs234:
+class EventArgs234(EventArgsProxy):
     entityId: str
     """
     玩家的实体ID
@@ -4281,13 +4278,13 @@ class EventArgs234:
     是否取消
     """
 
-class EventArgs235:
+class EventArgs235(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
     """
 
-class EventArgs236:
+class EventArgs236(EventArgsProxy):
     dimension: int
     """
     维度ID
@@ -4305,7 +4302,7 @@ class EventArgs236:
     随区块加载而加载进世界的自定义方块实体的坐标的列表，列表元素dict包含posX，posY，posZ三个int表示自定义方块实体的坐标，blockName表示方块的identifier，包含命名空间及名称
     """
 
-class EventArgs237:
+class EventArgs237(EventArgsProxy):
     dimension: int
     """
     维度ID
@@ -4323,7 +4320,7 @@ class EventArgs237:
     该区块中的自定义方块实体列表，通常是由自定义特征生成的自定义方块，没有自定义方块实体时该值为None。列表元素dict的结构如下：{'blockName': str, 'posX': int, 'posY': int, 'posZ': int}
     """
 
-class EventArgs238:
+class EventArgs238(EventArgsProxy):
     dimension: int
     """
     维度ID
@@ -4345,7 +4342,7 @@ class EventArgs238:
     随区块卸载而从世界移除的自定义方块实体的坐标的列表，列表元素dict包含posX，posY，posZ三个int表示自定义方块实体的坐标。注意事件触发时已经无法获取到这些方块实体的信息，仅供脚本资源回收用
     """
 
-class EventArgs239:
+class EventArgs239(EventArgsProxy):
     id: str
     """
     玩家的实体ID
@@ -4375,7 +4372,7 @@ class EventArgs239:
     仅用于Apollo，当前客户端连接的proxy服务器id
     """
 
-class EventArgs240:
+class EventArgs240(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -4397,7 +4394,7 @@ class EventArgs240:
     成就描述
     """
 
-class EventArgs241:
+class EventArgs241(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -4427,7 +4424,7 @@ class EventArgs241:
     本次攻击是否产生暴击，不支持修改
     """
 
-class EventArgs242:
+class EventArgs242(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -4481,13 +4478,13 @@ class EventArgs242:
     维度ID
     """
 
-class EventArgs243:
+class EventArgs243(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs244:
+class EventArgs244(EventArgsProxy):
     projectileId: str
     """
     抛射物的实体ID
@@ -4501,7 +4498,7 @@ class EventArgs244:
     发射者的实体ID，没有发射者时为-1
     """
 
-class EventArgs245:
+class EventArgs245(EventArgsProxy):
     dieEntityId: str
     """
     死亡实体ID
@@ -4519,7 +4516,7 @@ class EventArgs245:
     默认为False，如果需要修改掉落列表需将该值设为True
     """
 
-class EventArgs246:
+class EventArgs246(EventArgsProxy):
     srcId: str
     """
     伤害源实体ID
@@ -4553,12 +4550,12 @@ class EventArgs246:
     使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
 
-class EventArgs247:
+class EventArgs247(EventArgsProxy):
     entityId: str
     """
     实体ID
     """
-    from_: float
+    from: float
     """
     变化前的生命值
     """
@@ -4575,7 +4572,7 @@ class EventArgs247:
     是否取消该变化
     """
 
-class EventArgs248:
+class EventArgs248(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -4593,7 +4590,7 @@ class EventArgs248:
     改变后的位置，其中y值为脚底加上角色的身高值
     """
 
-class EventArgs249:
+class EventArgs249(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -4603,7 +4600,7 @@ class EventArgs249:
     触发的事件名称
     """
 
-class EventArgs250:
+class EventArgs250(EventArgsProxy):
     playerId: str
     """
     玩家的实体ID
@@ -4617,7 +4614,7 @@ class EventArgs250:
     交互生物的实体ID
     """
 
-class EventArgs251:
+class EventArgs251(EventArgsProxy):
     cancel: bool
     """
     是否取消触发，默认为False，若设为True，可阻止触发后续的实体交互事件
@@ -4635,7 +4632,7 @@ class EventArgs251:
     交互生物的实体ID
     """
 
-class EventArgs252:
+class EventArgs252(EventArgsProxy):
     id: str
     """
     实体ID
@@ -4653,7 +4650,7 @@ class EventArgs252:
     使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
 
-class EventArgs253:
+class EventArgs253(EventArgsProxy):
     id: str
     """
     实体ID
@@ -4691,7 +4688,7 @@ class EventArgs253:
     物品附加值（仅当物品实体时存在该字段）
     """
 
-class EventArgs254:
+class EventArgs254(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -4721,7 +4718,7 @@ class EventArgs254:
     维度ID
     """
 
-class EventArgs255:
+class EventArgs255(EventArgsProxy):
     entityId: str
     """
     实体ID
@@ -4759,7 +4756,7 @@ class EventArgs255:
     可由脚本层回传True给引擎，阻止触发后续原版逻辑
     """
 
-class EventArgs256:
+class EventArgs256(EventArgsProxy):
     id: str
     """
     骑乘者实体ID
@@ -4769,7 +4766,7 @@ class EventArgs256:
     坐骑实体ID
     """
 
-class EventArgs257:
+class EventArgs257(EventArgsProxy):
     id: str
     """
     实体ID
@@ -4795,7 +4792,7 @@ class EventArgs257:
     设置为True可以取消（需要与客户端事件一同取消）
     """
 
-class EventArgs258:
+class EventArgs258(EventArgsProxy):
     entityId: str
     """
     玩家实体ID
@@ -4845,7 +4842,7 @@ class EventArgs258:
     设为True可取消物品的使用
     """
 
-class EventArgs259:
+class EventArgs259(EventArgsProxy):
     playerId: str
     """
     玩家的实体id
@@ -4859,7 +4856,7 @@ class EventArgs259:
     使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
     """
 
-class EventArgs260:
+class EventArgs260(EventArgsProxy):
     actor: str
     """
     获得物品玩家实体ID
@@ -4877,7 +4874,7 @@ class EventArgs260:
     获得物品的方法，详见 `ItemAcquisitionMethod枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
     """
 
-class EventArgs261:
+class EventArgs261(EventArgsProxy):
     x: int
     """
     方块x坐标
@@ -4915,7 +4912,7 @@ class EventArgs261:
     掉落物实体ID列表
     """
 
-class EventArgs262:
+class EventArgs262(EventArgsProxy):
     srcId: str
     """
     伤害源实体ID
@@ -4957,7 +4954,7 @@ class EventArgs262:
     使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
 
-class EventArgs263:
+class EventArgs263(EventArgsProxy):
     blocks: List[List[int, int, int, bool]]
     """
     爆炸涉及到的方块列表，每个方块以一个列表表示，前三个元素分别为方块坐标xyz，第四个元素为是否取消爆炸对该方块的影响，将第四个元素设置为True即可取消。
@@ -4979,7 +4976,7 @@ class EventArgs263:
     维度ID
     """
 
-class EventArgs264:
+class EventArgs264(EventArgsProxy):
     id: str
     """
     子弹的实体ID
@@ -5029,7 +5026,7 @@ class EventArgs264:
     是否取消这个碰撞事件，若取消可以设置为True
     """
 
-class EventArgs265:
+class EventArgs265(EventArgsProxy):
     oldItemDict: dict | None
     """
     旧物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当旧物品为空时，此项属性为None
@@ -5043,16 +5040,16 @@ class EventArgs265:
     玩家的实体ID
     """
 
-class EventArgs266:
+class EventArgs266(EventArgsProxy):
     id: str
     """
     实体ID
     """
 
-class EventArgs267:
+class EventArgs267(EventArgsProxy):
     pass
 
-class EventArgs268:
+class EventArgs268(EventArgsProxy):
     player_id: str
     """
     玩家的实体ID
@@ -5074,7 +5071,7 @@ class EventArgs268:
     是否取消本次变化
     """
 
-class EventArgs269:
+class EventArgs269(EventArgsProxy):
     __id__: str
     """
     玩家的实体ID

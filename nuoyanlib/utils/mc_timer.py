@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-04-28
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from threading import Timer as _Timer
@@ -159,23 +155,23 @@ class McTimer(object):
 
 if __name__ == "__main__":
     def func1(x, y):
-        print x + y
+        print(x + y)
     timer1 = McTimer("d", 1, func1, 1, 2)
     a = []
     def func2(x):
         a.append(x)
-        print a
+        print(a)
         if len(a) >= 3:
             timer2.Cancel()
     timer2 = McTimer("r", 2, func2, 1)
     timer1.Start()
     timer2.Start()
     def func3():
-        print 114514
+        print(114514)
     timer3 = McTimer("d", 2, func3).Start()
     def func4():
         timer3.Cancel()
-        print "stop 114514"
+        print("stop 114514")
     McTimer("d", 1, func4).Start()
 
 

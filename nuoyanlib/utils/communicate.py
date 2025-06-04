@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-23
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from uuid import uuid4 as _uuid4
@@ -71,7 +67,9 @@ def broadcast_to_all_systems(event_name, event_args, from_system):
                 from mod.client.system.clientSystem import ClientSystem
                 from_system = ClientSystem(*from_system)
         else:
-            lib_sys.broadcast_to_all_client(event_name, event_args, from_system.namespace, from_system.systemName)
+            lib_sys.broadcast_to_all_client(
+                event_name, event_args, from_system.namespace, from_system.systemName # NOQA
+            )
         from_system.NotifyToServer(event_name, event_args)
     else:
         if isinstance(from_system, tuple):
@@ -83,16 +81,16 @@ def broadcast_to_all_systems(event_name, event_args, from_system):
         from_system.BroadcastEvent(event_name, event_args)
 
 
-__callback_data = {}
+_callback_data = {}
 
 
 def call_callback(cb_or_uuid, delay_ret=-1, success=True, ret=None, error="", player_id=""):
     if isinstance(cb_or_uuid, str):
-        data = __callback_data[cb_or_uuid]
+        data = _callback_data[cb_or_uuid]
         callback = data['callback']
         data['count'] -= 1
         if data['count'] <= 0:
-            del __callback_data[cb_or_uuid]
+            del _callback_data[cb_or_uuid]
     else:
         callback = cb_or_uuid
     if not callback:
@@ -121,7 +119,7 @@ def call_local(target_sys, method, cb_or_uuid, delay_ret, args, kwargs):
             call_callback(cb_or_uuid, delay_ret, True, ret, player_id=player_id)
 
 
-def _notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs):
+def _notify(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs):
     uuid = str(_uuid4())
     notify_args = {
         'namespace': namespace,
@@ -132,7 +130,7 @@ def _notify_call(namespace, system_name, method, player_id, callback, delay_ret,
         'args': args,
         'kwargs': kwargs,
     }
-    __callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
+    _callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
     if _sys.is_client():
         from .._core._client._lib_client import instance
         lib_sys = instance()
@@ -189,7 +187,7 @@ def call(
     if _sys.is_client():
         # c to s
         if not target_sys and not player_id:
-            _notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+            _notify(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
         # c to c
         else:
             local_plr = api.GetLocalPlayerId()
@@ -197,7 +195,7 @@ def call(
                 call_local(target_sys, method, callback, delay_ret, args, kwargs)
                 player_id.remove(local_plr)
             if player_id:
-                _notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+                _notify(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
     else:
         # s to s
         if target_sys:
@@ -206,7 +204,7 @@ def call(
             call_callback(callback, delay_ret, False)
         # s to c
         else:
-            _notify_call(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+            _notify(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
 
 
 

@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from typing import Dict, List, Tuple, Any, Optional, Iterator, Union, overload
+from typing import Dict, List, Tuple, Any, Optional, Iterator, Union, overload, Type
 from _typeshed import Self
 
 
@@ -26,7 +22,7 @@ class EnumMeta(type):
     __members__: Dict[str, Any]
     _restrict_type: Optional[type]
     def __new__(
-        metacls: type[Self],
+        metacls: Type[Self],
         name: str,
         bases: Tuple[type, ...],
         dct: Dict[str, Any],
@@ -36,12 +32,12 @@ class EnumMeta(type):
     def __delattr__(cls, name: str) -> None: ...
     def __contains__(cls, member: Any) -> bool: ...
     def __len__(cls) -> int: ...
-    def __iter__(cls: type[Self]) -> Iterator[Self]: ...
+    def __iter__(cls: Type[Self]) -> Iterator[Self]: ...
     @overload
-    def __getitem__(cls, item: type) -> type[Enum]: ...
+    def __getitem__(cls, item: type) -> Type[Enum]: ...
     @overload
     def __getitem__(cls, item: str) -> Any: ...
-    def __gen_auto_value__(cls) -> Union[str, int]: ...
+    def __gen_auto_value__(cls, name: Optional[str] = None) -> Union[str, int]: ...
 
 
 class Enum(metaclass=EnumMeta):

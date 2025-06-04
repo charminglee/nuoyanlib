@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from .._core._client import _comp, _lib_client
@@ -30,7 +26,7 @@ class NeteaseParticle(object):
     """
     | 网易粒子特效管理器。
     | 切换维度后会自动隐藏非本维度创建的而且没有绑定实体的粒子，回到该维度后会自动重新显示。
-    | 粒子创建之后需要调用 ``Play`` 方法才会播放，如果播放非本维度创建的粒子，会同时修改该粒子的创建维度为当前维度。
+    | 粒子创建之后需要调用 ``Play()`` 方法才会播放，如果播放非本维度创建的粒子，会同时修改该粒子的创建维度为当前维度。
 
     -----
 
@@ -45,10 +41,11 @@ class NeteaseParticle(object):
         self._id = self.__lib_sys.CreateEngineParticle(json_path, pos)
         if not self._id:
             raise RuntimeError("create particle failed, json_path='%s'" % json_path)
-        self._ctrl = _comp.CompFactory.CreateParticleControl(self._id)
-        self._trans = _comp.CompFactory.CreateParticleTrans(self._id)
-        self._bind_ent_comp = _comp.CompFactory.CreateParticleEntityBind(self._id)
-        self._bind_skel_comp = _comp.CompFactory.CreateParticleSkeletonBind(self._id)
+        cf = _comp.CF(self._id)
+        self._ctrl = cf.ParticleControl
+        self._trans = cf.ParticleTrans
+        self._bind_ent_comp = cf.ParticleEntityBind
+        self._bind_skel_comp = cf.ParticleSkeletonBind
         self._bind_ent_id = ""
         self._bind_ent_offset = (0, 0, 0)
         self._bind_ent_rot = (0, 0, 0)
@@ -59,7 +56,7 @@ class NeteaseParticle(object):
         self._bind_skel_rot = (0, 0, 0)
         if bind_entity and bind_skeleton:
             raise ValueError(
-                "Parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time."
+                "parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time"
             )
         if bind_entity and not self.BindEntity(**bind_entity):
             raise RuntimeError("bind particle to entity failed, bind_entity=%s" % bind_entity)
@@ -71,125 +68,161 @@ class NeteaseParticle(object):
     @property
     def id(self):
         """
-        粒子特效ID。
+        [只读]
+
+        | 粒子特效ID。
         """
         return self._id
 
     @property
     def ent_id(self):
         """
-        粒子绑定的实体ID。
+        [可读写]
+
+        | 粒子绑定的实体ID。
         """
         return self._bind_ent_id
 
     @ent_id.setter
     def ent_id(self, value):
         """
-        设置粒子绑定的实体ID。
+        [可读写]
+
+        | 粒子绑定的实体ID。
         """
         self.BindEntity(value, self._bind_ent_offset, self._bind_ent_rot, self._bind_ent_corr)
 
     @property
     def ent_offset(self):
         """
-        粒子绑定实体时的偏移量。
+        [可读写]
+
+        | 粒子绑定实体时的偏移量。
         """
         return self._bind_ent_offset
 
     @ent_offset.setter
     def ent_offset(self, value):
         """
-        设置粒子绑定实体时的偏移量。
+        [可读写]
+
+        | 粒子绑定实体时的偏移量。
         """
         self.BindEntity(self._bind_ent_id, value, self._bind_ent_rot, self._bind_ent_corr)
 
     @property
     def ent_rot(self):
         """
-        粒子绑定实体时的旋转角度。
+        [可读写]
+
+        | 粒子绑定实体时的旋转角度。
         """
         return self._bind_ent_rot
 
     @ent_rot.setter
     def ent_rot(self, value):
         """
-        设置粒子绑定实体时的旋转角度。
+        [可读写]
+
+        | 粒子绑定实体时的旋转角度。
         """
         self.BindEntity(self._bind_ent_id, self._bind_ent_offset, value, self._bind_ent_corr)
 
     @property
     def correction(self):
         """
-        粒子绑定实体时是否开启特效旋转角度修正。
+        [可读写]
+
+        | 粒子绑定实体时是否开启特效旋转角度修正。
         """
         return self._bind_ent_corr
 
     @correction.setter
     def correction(self, value):
         """
-        设置粒子绑定实体时是否开启特效旋转角度修正。
+        [可读写]
+
+        | 粒子绑定实体时是否开启特效旋转角度修正。
         """
         self.BindEntity(self._bind_ent_id, self._bind_ent_offset, self._bind_ent_rot, value)
 
     @property
     def model_id(self):
         """
-        粒子绑定的骨骼模型的ID。
+        [可读写]
+
+        | 粒子绑定的骨骼模型的ID。
         """
         return self._bind_skel_model_id
 
     @model_id.setter
     def model_id(self, value):
         """
-        设置粒子绑定的骨骼模型的ID。
+        [可读写]
+
+        | 粒子绑定的骨骼模型的ID。
         """
         self.BindSkeleton(value, self._bind_skel_bone_name, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
     def bone_name(self):
         """
-        粒子绑定的具体骨骼的名称。
+        [可读写]
+
+        | 粒子绑定的具体骨骼的名称。
         """
         return self._bind_skel_bone_name
 
     @bone_name.setter
     def bone_name(self, value):
         """
-        设置粒子绑定的具体骨骼的名称。
+        [可读写]
+
+        | 粒子绑定的具体骨骼的名称。
         """
         self.BindSkeleton(self._bind_skel_model_id, value, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
     def skel_offset(self):
         """
-        粒子绑定骨骼时的偏移量。
+        [可读写]
+
+        | 粒子绑定骨骼时的偏移量。
         """
         return self._bind_skel_offset
 
     @skel_offset.setter
     def skel_offset(self, value):
         """
-        设置粒子绑定骨骼时的偏移量。
+        [可读写]
+
+        | 粒子绑定骨骼时的偏移量。
         """
         self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, value, self._bind_skel_rot)
 
     @property
     def skel_rot(self):
         """
-        粒子绑定骨骼时的旋转角度。
+        [可读写]
+
+        | 粒子绑定骨骼时的旋转角度。
         """
         return self._bind_skel_rot
 
     @skel_rot.setter
     def skel_rot(self, value):
         """
-        设置粒子绑定骨骼时的旋转角度。
+        [可读写]
+
+        | 粒子绑定骨骼时的旋转角度。
         """
         self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, self._bind_skel_offset, value)
 
     @property
     def emission_rate(self):
         """
+        [可读写]
+
         | 粒子发射器每帧发射粒子的频率，数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
         | 对应粒子特效json文件中 ``"emissionrate"`` 的值。
         """
@@ -198,6 +231,8 @@ class NeteaseParticle(object):
     @emission_rate.setter
     def emission_rate(self, value):
         """
+        [可读写]
+
         | 设置粒子发射器每帧发射粒子的频率，数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
         | 频率越大则每帧发射的粒子数量越多，但粒子数量不会超过粒子发射器的粒子容量，同时由于性能考虑，每帧发射的粒子数量也不会超过100个。
         | 每帧发射粒子的频率将在频率最小值和频率最大值之间取随机数进行插值。当值设置为负值时设置将会失败。
@@ -208,6 +243,8 @@ class NeteaseParticle(object):
     @property
     def max_num(self):
         """
+        [可读写]
+
         | 粒子发射器包含的最大粒子数量，数据类型为整数。
         | 对应粒子特效json文件中 ``"numparticles"`` 的值。
         """
@@ -216,6 +253,8 @@ class NeteaseParticle(object):
     @max_num.setter
     def max_num(self, value):
         """
+        [可读写]
+
         | 设置粒子发射器的粒子容量，即粒子发射器所包含的最大粒子数量，数据类型为整数，不能为负值，粒子的数量最大值不超过100000。
         | 该数量并不代表目前粒子发射器所发射的粒子数量，如需要增加发射的粒子数量，需同时改变粒子的发射频率。
         | 对应粒子特效json文件中 ``"numparticles"`` 的值。
@@ -225,6 +264,8 @@ class NeteaseParticle(object):
     @property
     def size(self):
         """
+        [可读写]
+
         | 粒子大小的最小值和最大值，数据类型为元组：((minx, miny), (maxx, maxy))，其中minx为粒子x轴大小的最小值，miny为粒子y轴大小的最小值，maxx为粒子x轴大小的最大值，maxy为粒子y轴大小的最大值。
         | 对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
         """
@@ -233,6 +274,8 @@ class NeteaseParticle(object):
     @size.setter
     def size(self, value):
         """
+        [可读写]
+
         | 设置粒子大小的最小值及最大值，数据类型为元组：((minx, miny), (maxx, maxy))，其中minx为粒子x轴大小的最小值，miny为粒子y轴大小的最小值，maxx为粒子x轴大小的最大值，maxy为粒子y轴大小的最大值。
         | 粒子大小会在最小值和最大值当中取随机值进行决定，当该值设置为负值时设置将会失败。
         | 对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
@@ -242,6 +285,8 @@ class NeteaseParticle(object):
     @property
     def volume_size(self):
         """
+        [可读写]
+
         粒子发射器的体积大小缩放值，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
         """
         return self._ctrl.GetParticleVolumeSize()
@@ -249,6 +294,8 @@ class NeteaseParticle(object):
     @volume_size.setter
     def volume_size(self, value):
         """
+        [可读写]
+
         | 设置粒子发射器的体积大小缩放，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
         | 不影响单个粒子的尺寸，粒子发射器的体积越大，则粒子的发射范围越大。
         | 当粒子绑定实体时该设置无效。
@@ -258,27 +305,35 @@ class NeteaseParticle(object):
     @property
     def pos(self):
         """
-        粒子发射器的世界坐标位置，数据类型为元组：(x, y, z)。
+        [可读写]
+
+        | 粒子发射器的世界坐标位置，数据类型为元组：(x, y, z)。
         """
         return self._trans.GetPos()
 
     @pos.setter
     def pos(self, value):
         """
-        设置粒子发射器的世界坐标位置，数据类型为元组：(x, y, z)。
+        [可读写]
+
+        | 粒子发射器的世界坐标位置，数据类型为元组：(x, y, z)。
         """
         self._trans.SetPos(value)
 
     @property
     def rot(self):
         """
-        粒子发射器的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
+        [可读写]
+
+        | 粒子发射器的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
         """
         return self._trans.GetRot()
 
     @rot.setter
     def rot(self, value):
         """
+        [可读写]
+
         | 粒子发射器的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
         | 旋转顺序按照绕z、x、y轴旋转。
         """
@@ -287,14 +342,18 @@ class NeteaseParticle(object):
     @property
     def playing(self):
         """
-        粒子是否正在播放。
+        [只读]
+
+        | 粒子是否正在播放。
         """
         return self._playing
 
     @property
     def destroyed(self):
         """
-        粒子是否已销毁。
+        [只读]
+
+        | 粒子是否已销毁。
         """
         return self._destroyed
 
@@ -466,7 +525,7 @@ class NeteaseFrameAnim(object):
     """
     | 网易序列帧特效管理器。
     | 切换维度后会自动隐藏非本维度创建的而且没有绑定实体的序列帧，回到该维度后会自动重新显示。
-    | 需要注意，序列帧创建之后需要调用 ``Play`` 方法才会播放，如果播放非本维度创建的序列帧，会同时修改该序列帧的创建维度为当前维度。
+    | 需要注意，序列帧创建之后需要调用 ``Play()`` 方法才会播放，如果播放非本维度创建的序列帧，会同时修改该序列帧的创建维度为当前维度。
 
     -----
 
@@ -498,10 +557,11 @@ class NeteaseFrameAnim(object):
             raise ValueError("parameter 'json_path' or 'tex_path' must be given")
         if not self._id:
             raise RuntimeError("create frame animation failed, path='%s'" % (json_path or tex_path))
-        self._ctrl = _comp.CompFactory.CreateFrameAniControl(self._id)
-        self._trans = _comp.CompFactory.CreateFrameAniTrans(self._id)
-        self._bind_ent_comp = _comp.CompFactory.CreateFrameAniEntityBind(self._id)
-        self._bind_skel_comp = _comp.CompFactory.CreateFrameAniSkeletonBind(self._id)
+        cf = _comp.CF(self._id)
+        self._ctrl = cf.FrameAniControl
+        self._trans = cf.FrameAniTrans
+        self._bind_ent_comp = cf.FrameAniEntityBind
+        self._bind_skel_comp = cf.FrameAniSkeletonBind
         self._bind_ent_id = ""
         self._bind_ent_offset = (0, 0, 0)
         self._bind_ent_rot = (0, 0, 0)
@@ -511,7 +571,7 @@ class NeteaseFrameAnim(object):
         self._bind_skel_rot = (0, 0, 0)
         if bind_entity and bind_skeleton:
             raise ValueError(
-                "Parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time."
+                "parameters 'bind_entity' and 'bind_skeleton' cannot be given at the same time"
             )
         if bind_entity and not self.BindEntity(**bind_entity):
             raise RuntimeError("bind frame animation to entity failed, bind_entity=%s" % bind_entity)
@@ -523,132 +583,170 @@ class NeteaseFrameAnim(object):
     @property
     def id(self):
         """
-        序列帧特效ID。
+        [只读]
+
+        | 序列帧特效ID。
         """
         return self._id
 
     @property
     def ent_id(self):
         """
-        序列帧绑定的实体ID。
+        [可读写]
+
+        | 序列帧绑定的实体ID。
         """
         return self._bind_ent_id
 
     @ent_id.setter
     def ent_id(self, value):
         """
-        设置序列帧绑定的实体ID。
+        [可读写]
+
+        | 序列帧绑定的实体ID。
         """
         self.BindEntity(value, self._bind_ent_offset, self._bind_ent_rot)
 
     @property
     def ent_offset(self):
         """
-        序列帧绑定实体时的偏移量。
+        [可读写]
+
+        | 序列帧绑定实体时的偏移量。
         """
         return self._bind_ent_offset
 
     @ent_offset.setter
     def ent_offset(self, value):
         """
-        设置序列帧绑定实体时的偏移量。
+        [可读写]
+
+        | 序列帧绑定实体时的偏移量。
         """
         self.BindEntity(self._bind_ent_id, value, self._bind_ent_rot)
 
     @property
     def ent_rot(self):
         """
-        序列帧绑定实体时的旋转角度。
+        [可读写]
+
+        | 序列帧绑定实体时的旋转角度。
         """
         return self._bind_ent_rot
 
     @ent_rot.setter
     def ent_rot(self, value):
         """
-        设置序列帧绑定实体时的旋转角度。
+        [可读写]
+
+        | 序列帧绑定实体时的旋转角度。
         """
         self.BindEntity(self._bind_ent_id, self._bind_ent_offset, value)
 
     @property
     def model_id(self):
         """
-        序列帧绑定的骨骼模型的ID。
+        [可读写]
+
+        | 序列帧绑定的骨骼模型的ID。
         """
         return self._bind_skel_model_id
 
     @model_id.setter
     def model_id(self, value):
         """
-        设置序列帧绑定的骨骼模型的ID。
+        [可读写]
+
+        | 序列帧绑定的骨骼模型的ID。
         """
         self.BindSkeleton(value, self._bind_skel_bone_name, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
     def bone_name(self):
         """
-        序列帧绑定的具体骨骼的名称。
+        [可读写]
+
+        | 序列帧绑定的具体骨骼的名称。
         """
         return self._bind_skel_bone_name
 
     @bone_name.setter
     def bone_name(self, value):
         """
-        设置序列帧绑定的具体骨骼的名称。
+        [可读写]
+
+        | 序列帧绑定的具体骨骼的名称。
         """
         self.BindSkeleton(self._bind_skel_model_id, value, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
     def skel_offset(self):
         """
-        序列帧绑定骨骼时的偏移量。
+        [可读写]
+
+        | 序列帧绑定骨骼时的偏移量。
         """
         return self._bind_skel_offset
 
     @skel_offset.setter
     def skel_offset(self, value):
         """
-        设置序列帧绑定骨骼时的偏移量。
+        [可读写]
+
+        | 序列帧绑定骨骼时的偏移量。
         """
         self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, value, self._bind_skel_rot)
 
     @property
     def skel_rot(self):
         """
-        序列帧绑定骨骼时的旋转角度。
+        [可读写]
+
+        | 序列帧绑定骨骼时的旋转角度。
         """
         return self._bind_skel_rot
 
     @skel_rot.setter
     def skel_rot(self, value):
         """
-        设置序列帧绑定骨骼时的旋转角度。
+        [可读写]
+
+        | 序列帧绑定骨骼时的旋转角度。
         """
         self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, self._bind_skel_offset, value)
 
     @property
     def pos(self):
         """
-        序列帧的世界坐标位置，数据类型为元组：(x, y, z)。
+        [可读写]
+
+        | 序列帧的世界坐标位置，数据类型为元组：(x, y, z)。
         """
         return self._trans.GetPos()
 
     @pos.setter
     def pos(self, value):
         """
-        设置序列帧的世界坐标位置，数据类型为元组：(x, y, z)。
+        [可读写]
+
+        | 序列帧的世界坐标位置，数据类型为元组：(x, y, z)。
         """
         self._trans.SetPos(value)
 
     @property
     def rot(self):
         """
-        序列帧的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
+        [可读写]
+
+        | 序列帧的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
         """
         return self._trans.GetRot()
 
     @rot.setter
     def rot(self, value):
         """
+        [可读写]
+
         | 序列帧的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
         | 旋转顺序按照绕z、x、y轴旋转。
         """
@@ -657,6 +755,8 @@ class NeteaseFrameAnim(object):
     @property
     def scale(self):
         """
+        [可读写]
+
         | 序列帧的缩放值，数据类型为元组：(x, y, z)。
         | 对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
         | 对于环状序列帧，三个参数分别为三个坐标轴上的缩放。
@@ -666,7 +766,9 @@ class NeteaseFrameAnim(object):
     @scale.setter
     def scale(self, value):
         """
-        | 设置序列帧的缩放值，数据类型为元组：(x, y, z)。
+        [可读写]
+
+        | 序列帧的缩放值，数据类型为元组：(x, y, z)。
         | 对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
         | 对于环状序列帧，三个参数分别为三个坐标轴上的缩放。
         """
@@ -675,14 +777,18 @@ class NeteaseFrameAnim(object):
     @property
     def playing(self):
         """
-        序列帧是否正在播放。
+        [只读]
+
+        | 序列帧是否正在播放。
         """
         return self._playing
 
     @property
     def destroyed(self):
         """
-        序列帧是否已销毁。
+        [只读]
+
+        | 序列帧是否已销毁。
         """
         return self._destroyed
 

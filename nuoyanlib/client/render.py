@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-23
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from .._core._client import _comp, _lib_client
@@ -76,7 +72,7 @@ def add_player_render_resources(player_id, rebuild, *res_tuple):
     :rtype: tuple[bool]
     """
     res = []
-    comp = _comp.CompFactory.CreateActorRender(player_id)
+    comp = _comp.CF(player_id).ActorRender
     for arg in res_tuple:
         if arg[1].startswith("geometry."):
             res.append(comp.AddPlayerGeometry(*arg))
@@ -122,27 +118,28 @@ def add_entity_render_resources(entity_id, rebuild, *res_tuple):
     :rtype: tuple[bool]
     """
     res = []
-    comp = _comp.CompFactory.CreateActorRender(entity_id)
-    etype = _comp.CompFactory.CreateEngineType(entity_id).GetEngineTypeStr()
+    cf = _comp.CF(entity_id)
+    render = cf.ActorRender
+    etype = cf.EngineType.GetEngineTypeStr()
     for arg in res_tuple:
         if arg[1].startswith("geometry."):
-            res.append(comp.AddActorGeometry(etype, *arg))
+            res.append(render.AddActorGeometry(etype, *arg))
         elif "/" in arg[1]:
-            res.append(comp.AddActorTexture(etype, *arg))
+            res.append(render.AddActorTexture(etype, *arg))
         elif arg[0].startswith("controller.render."):
-            res.append(comp.AddActorRenderController(etype, *arg))
+            res.append(render.AddActorRenderController(etype, *arg))
         elif arg[1].startswith("animation."):
-            res.append(comp.AddActorAnimation(etype, *arg))
+            res.append(render.AddActorAnimation(etype, *arg))
         elif arg[1].startswith("controller.animation."):
-            res.append(comp.AddActorAnimationController(etype, *arg))
+            res.append(render.AddActorAnimationController(etype, *arg))
         elif ":" in arg[1]:
-            res.append(comp.AddActorParticleEffect(etype, *arg))
+            res.append(render.AddActorParticleEffect(etype, *arg))
         elif "." in arg[1]:
-            res.append(comp.AddActorSoundEffect(etype, *arg))
+            res.append(render.AddActorSoundEffect(etype, *arg))
         else:
-            res.append(comp.AddActorRenderMaterial(etype, *arg))
+            res.append(render.AddActorRenderMaterial(etype, *arg))
     if rebuild:
-        comp.RebuildActorRender(etype)
+        render.RebuildActorRender(etype)
     return tuple(res)
 
 

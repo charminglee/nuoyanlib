@@ -1,29 +1,51 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from typing import TypeVar, Callable
+from types import MethodType
+from typing import Tuple, TypeVar, Callable, Union, Any, Type, Optional, Dict, NoReturn
+from ._types._typing import ITuple
 
 
 _T = TypeVar("_T")
 
 
-def param_type_check(*typ: type) -> Callable[[_T], _T]: ...
+class cache_property(object):
+    getter: Callable[[Any], Any]
+    prop_name: str
+    cached_data: Any
+    def __init__(self, getter: Callable[[Any], Any]) -> None: ...
+    def __get__(self, obj: Any, typ: Optional[type] = None) -> Any: ...
+    def __set__(self, obj: Any, value: Any) -> NoReturn: ...
+    def __delete__(self, obj: Any) -> NoReturn: ...
+
+
+def join_chr(*seq: int) -> str: ...
+
+
+class _CacheObjectMeta(type):
+    def __new__(metacls, name: str, bases: Tuple[type, ...], dct: Dict[str, Any]) -> _CacheObjectMeta: ...
+
+
+class CacheObject(metaclass=_CacheObjectMeta):
+    __cache__: Dict[tuple, CacheObject]
+    __cache_key_idx__: Optional[ITuple]
+    def __new__(cls: Type[_T], *args: Any) -> _T: ...
+
+
+def hook_method(ins: Any, org_method_name: str, my_method: MethodType) -> None: ...
+def args_type_check(*typ: Union[type, Tuple[type, ...]], is_method: bool = False) -> Callable[[_T], _T]: ...
 def method_cache(method: _T) -> _T: ...
 def func_cache(func: _T) -> _T: ...
 def singleton(cls: _T) -> _T: ...

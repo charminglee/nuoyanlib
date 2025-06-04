@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from mod.common.minecraftEnum import (
@@ -107,7 +103,7 @@ def clear_items(player_id, item_pos_type, pos):
     :return: 该位置被清除前的物品信息字典
     :rtype: dict
     """
-    comp = _comp.CompFactory.CreateItem(player_id)
+    comp = _comp.CF(player_id).Item
     item = comp.GetPlayerItem(item_pos_type, pos, True)
     comp.SetPlayerAllItems({(item_pos_type, pos): None})
     return item
@@ -131,16 +127,16 @@ def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     :return: 物品所在槽位的列表，获取不到返回空列表
     :rtype: list[int]
     """
-    is_player = (_comp.CompFactory.CreateEngineType(entity_id).GetEngineTypeStr() == "minecraft:player")
-    item_comp = _comp.CompFactory.CreateItem(entity_id)
+    cf = _comp.CF(entity_id)
+    is_player = (cf.EngineType.GetEngineTypeStr() == "minecraft:player")
     result = []
     for i in range(_ITEM_POS_SIZE[pos_type]):
         if len(result) >= count:
             break
         if is_player:
-            item_dict = item_comp.GetPlayerItem(pos_type, i)
+            item_dict = cf.Item.GetPlayerItem(pos_type, i)
         else:
-            item_dict = item_comp.GetEntityItem(pos_type, i)
+            item_dict = cf.Item.GetEntityItem(pos_type, i)
         if (
                 item_dict
                 and item_dict['newItemName'] == item_id
@@ -166,7 +162,7 @@ def change_item_count(player_id, pos_type=_ItemPosType.CARRIED, pos=0, change=-1
     """
     if _comp.LvComp.Game.GetPlayerGameType(player_id) == _GameType.Creative:
         return
-    item_comp = _comp.CompFactory.CreateItem(player_id)
+    item_comp = _comp.CF(player_id).Item
     item = item_comp.GetPlayerItem(pos_type, pos, True)
     item['count'] += change
     if item['count'] <= 0:
@@ -189,7 +185,7 @@ def deduct_inv_item(player_id, name, aux=-1, count=1):
     :return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
     :rtype: bool
     """
-    comp = _comp.CompFactory.CreateItem(player_id)
+    comp = _comp.CF(player_id).Item
     items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
     items_dict_map = {}
     for i, item in enumerate(items):

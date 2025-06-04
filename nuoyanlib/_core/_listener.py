@@ -1,26 +1,22 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from types import MethodType as _MethodType
 import mod.client.extraClientApi as _client_api
 import mod.server.extraServerApi as _server_api
-from . import _const, _logging, _sys
+from . import _const, _logging, _sys, _error
 
 
 ALL_CLIENT_ENGINE_EVENTS = {
@@ -302,16 +298,25 @@ ALL_SERVER_LIB_EVENTS = {
 }
 
 
-class _EventArgsProxy(object):
+class EventArgsProxy(object):
     def __init__(self, arg_dict):
         self.arg_dict = arg_dict
+        self.copy = arg_dict.copy
+        self.iterkeys = arg_dict.iterkeys
+        self.itervalues = arg_dict.itervalues
+        self.iteritems = arg_dict.iteritems
+        self.viewkeys = arg_dict.viewkeys
+        self.viewvalues = arg_dict.viewvalues
+        self.viewitems = arg_dict.viewitems
+        self.get = arg_dict.get
+        self.keys = arg_dict.keys
+        self.values = arg_dict.values
+        self.items = arg_dict.items
 
     def __getattr__(self, key):
-        if key == 'from_':
-            key = 'from'
         if key in self.arg_dict:
             return self.arg_dict[key]
-        raise AttributeError("this event has no parameter '%s'" % key)
+        raise _error.EventArgsError(key)
 
     def __setattr__(self, key, value):
         # 兼容可修改的事件参数
@@ -322,10 +327,22 @@ class _EventArgsProxy(object):
     def __repr__(self):
         s = "EventArgs:\n"
         for k, v in self.arg_dict.items():
-            if k == "from":
-                k = "from_"
             s += "    .%s = %s\n" % (k, repr(v))
         return s
+
+    __len__ = lambda self: self.arg_dict.__len__()
+    __contains__ = lambda self, *a: self.arg_dict.__contains__(*a)
+    __getitem__ = lambda self, *a: self.arg_dict.__getitem__(*a)
+    __setitem__ = lambda self, *a: self.arg_dict.__setitem__(*a)
+    __cmp__ = lambda self, *a: self.arg_dict.__cmp__(*a)
+    __delitem__ = lambda self, *a: self.arg_dict.__delitem__(*a)
+    __eq__ = lambda self, *a: self.arg_dict.__eq__(*a)
+    __ge__ = lambda self, *a: self.arg_dict.__ge__(*a)
+    __gt__ = lambda self, *a: self.arg_dict.__gt__(*a)
+    __iter__ = lambda self: self.arg_dict.__iter__()
+    __le__ = lambda self, *a: self.arg_dict.__le__(*a)
+    __lt__ = lambda self, *a: self.arg_dict.__lt__(*a)
+    __ne__ = lambda self, *a: self.arg_dict.__ne__(*a)
 
 
 class BaseEventProxy(object):
@@ -379,8 +396,7 @@ class BaseEventProxy(object):
 
     def _listen_proxy(self, namespace, system_name, event_name, method, priority=0):
         def proxy(_, args=None):
-            arg_ins = _EventArgsProxy(args) if args else None
-            method(arg_ins)
+            method(EventArgsProxy(args) if args else None)
         proxy_name = "_proxy_%s" % event_name
         proxy.__name__ = proxy_name
         proxy = _MethodType(proxy, self)
@@ -398,6 +414,11 @@ class BaseEventProxy(object):
 
 
 class ClientEventProxy(BaseEventProxy):
+    """
+    | 客户端事件代理类，继承该类的客户端将获得以下功能：
+    - 所有客户端事件无需监听，编写一个与事件同名的方法即可使用该事件，且事件参数采用对象形式，支持补全。
+    - 可使用 ``@event`` 装饰器便捷监听自定义事件。
+    """
     _engine_events = ALL_CLIENT_ENGINE_EVENTS
     _engine_ns = _client_api.GetEngineNamespace()
     _engine_sys = _client_api.GetEngineSystemName()
@@ -405,6 +426,11 @@ class ClientEventProxy(BaseEventProxy):
 
 
 class ServerEventProxy(BaseEventProxy):
+    """
+    | 服务端事件代理类，继承该类的服务端将获得以下功能：
+    - 所有服务端事件无需监听，编写一个与事件同名的方法即可使用该事件，且事件参数采用对象形式，支持补全。
+    - 可使用 ``@event`` 装饰器便捷监听自定义事件。
+    """
     _engine_events = ALL_SERVER_ENGINE_EVENTS
     _engine_ns = _server_api.GetEngineNamespace()
     _engine_sys = _server_api.GetEngineSystemName()
@@ -413,7 +439,9 @@ class ServerEventProxy(BaseEventProxy):
 
 def event(event_name="", namespace="", system_name="", priority=0):
     """
-    | 函数装饰器，用于事件监听，须配合 ``quick_listen`` 使用。
+    [装饰器]
+
+    | 用于事件监听，被装饰函数所在的类需继承 ``ClientEventProxy`` 或 ``ServerEventProxy`` 。
     | 监听ModSDK事件（ ``event_name`` 或函数名为ModSDK事件名）时，可省略 ``namespace`` 和 ``system_name`` 参数。
 
     -----

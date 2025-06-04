@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from math import (
@@ -146,12 +142,12 @@ def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False,
 
 
 if __name__ == "__main__":
-    print random_string(20, lower=False)
-    print random_string(20, upper=False)
-    print random_string(20, num=False)
-    print random_string(20, num=False, seed=20230315, generate_num=5)
+    print(random_string(20, lower=False))
+    print(random_string(20, upper=False))
+    print(random_string(20, num=False))
+    print(random_string(20, num=False, seed=20230315, generate_num=5))
     for i in range(5):
-        print random_string(20, num=False, seed=20230315)
+        print(random_string(20, num=False, seed=20230315))
 
 
 

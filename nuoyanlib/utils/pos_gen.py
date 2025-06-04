@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-17
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from math import (
@@ -46,7 +42,6 @@ class _PosGenerator(object):
         if self.__i >= self.len:
             self.__i = 0
             raise StopIteration
-        # noinspection PyUnreachableCode
         pos = self.__gen_pos__(self.__i)
         self.__i += 1
         return pos
@@ -250,12 +245,12 @@ class gen_spiral_pos(_PosGenerator):
 
 if __name__ == "__main__":
     poses = gen_line_pos((0, 0, 0), (5, 0, 0), 6, only=3)
-    print len(poses)
+    print(len(poses))
     for i in poses:
-        print i
-    print poses[0], poses[1], poses[2]
+        print(i)
+    print(poses[0], poses[1], poses[2])
     for i in poses:
-        print i
+        print(i)
     # poses[3]
     poses[:3]
 

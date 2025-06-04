@@ -1,26 +1,22 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from typing import List, Optional, Any
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
-from .._types._typing import EventArgs
+from .._types._typing import ArgsDict
 from .._listener import event, lib_sys_event, ClientEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._const import LIB_NAME, LIB_CLIENT_NAME, LIB_SERVER_NAME
@@ -34,7 +30,7 @@ def instance() -> Optional[NuoyanLibClientSystem]: ...
 class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
     instance: NuoyanLibClientSystem
     @staticmethod
-    def init() -> None: ...
+    def register() -> None: ...
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def broadcast_to_all_client(
         self,
@@ -61,12 +57,12 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         param: Optional[dict] = None,
     ) -> Optional[ScreenNode]: ...
     @lib_sys_event
-    def _SetQueryCache(self, args: EventArgs) -> None: ...
+    def _SetQueryCache(self, args: ArgsDict) -> None: ...
     @lib_sys_event
-    def _SetQueryVar(self, args: EventArgs) -> None: ...
+    def _SetQueryVar(self, args: ArgsDict) -> None: ...
     @event(namespace=LIB_NAME, system_name=LIB_CLIENT_NAME)
     @event(namespace=LIB_NAME, system_name=LIB_SERVER_NAME)
-    def _NuoyanLibCall(self, args: EventArgs) -> None: ...
+    def _NuoyanLibCall(self, args: ArgsDict) -> None: ...
     @event(namespace=LIB_NAME, system_name=LIB_CLIENT_NAME)
     @event(namespace=LIB_NAME, system_name=LIB_SERVER_NAME)
-    def _NuoyanLibCallReturn(self, args: EventArgs) -> None: ...
+    def _NuoyanLibCallReturn(self, args: ArgsDict) -> None: ...

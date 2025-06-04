@@ -1,31 +1,22 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from mod.common.minecraftEnum import EntityType as _EntityType
 try:
-    from .mc_random import random_string as _random_string
+    from mod.common.minecraftEnum import EntityType as _EntityType
 except:
-    from string import digits, ascii_lowercase, ascii_uppercase
-    from random import choice
-    def _random_string(length):
-        s = ascii_lowercase + ascii_uppercase + digits
-        return "".join(choice(s) for _ in range(length))
+    pass
 
 
 __all__ = [
@@ -53,11 +44,11 @@ class EnumMeta(type):
         if name != "Enum":
             # 遍历当前Enum成员
             for k, v in dct.items():
-                if k.startswith("_") or k in ("name", "value"):
+                if k.startswith("_"):
                     continue
                 if isinstance(v, Enum.auto):
-                    v = cls.__gen_auto_value__()
-                if cls._restrict_type:
+                    member = cls.__gen_auto_value__(k) # NOQA
+                elif cls._restrict_type:
                     if type(v) is not cls._restrict_type:
                         raise TypeError(
                             "member of '%s' must be %s, not %s"
@@ -70,7 +61,7 @@ class EnumMeta(type):
                 setattr(cls, k, member)
             # 继承父Enum成员
             for base in bases:
-                if issubclass(base, Enum):
+                if isinstance(base, EnumMeta):
                     members.update(base.__members__)
         else:
             cls._restrict_type = restrict_type
@@ -81,12 +72,12 @@ class EnumMeta(type):
     def __setattr__(cls, name, value):
         # 禁止动态设置枚举值
         if getattr(cls, "__flag__", 0) == 1:
-            raise AttributeError("'%s' cannot set member '%s'" % (cls.__name__, name))
+            raise AttributeError("can't set member '%s' in '%s'" % (name, cls.__name__))
         type.__setattr__(cls, name, value)
 
     def __delattr__(cls, name):
         # 禁止删除枚举值
-        raise AttributeError("'%s' cannot delete member '%s'" % (cls.__name__, name))
+        raise AttributeError("can't delete member '%s' in '%s'" % (name, cls.__name__))
 
     def __contains__(cls, member):
         # 支持in
@@ -119,13 +110,15 @@ class EnumMeta(type):
         else:
             return cls.__members__[item]
 
-    def __gen_auto_value__(cls):
+    def __gen_auto_value__(cls, name=None):
         t = getattr(cls, "_restrict_type", None)
         if t is str:
-            val = _random_string(16)
-        else:
+            val = name
+        elif t is int:
             val = getattr(cls, "_last_auto_value", -1) + 1
             cls._last_auto_value = val
+        else:
+            raise TypeError("unsupported type '%s'" % t.__name__)
         return val
 
 
@@ -170,53 +163,61 @@ class Enum(object):
 
 
 def _test_enum():
-    class A(Enum):
-        AA = 1
-        BB = 2
-        CC = 3
-    class B(A):
-        X = 7
-        Y = 8
-        Z = 9
-    print "B.__members__:"
-    for k, v in B.__members__.items():
-        print "   ", k, v
-    print "=" * 30
-    print "7 in B:", 7 in B
-    print "0 in B:", 0 in B
-    print "len(B):", len(B)
-    print "B.AA:", B.AA, B.AA.value
-    print "B.X:", B.X, B.X.value
-    print "=" * 30
-    for i in B:
-        print i.name, i.value
-    print "=" * 30
-    print {
-        B.X: 1,
-        B.AA: 2,
-    }
-    print "=" * 30
-    class C(Enum[str]):
-        Q = "114514"
-        E = "1919810"
-        # R = 1
-    print C.__members__
-    print repr(C.Q)
-    print "=" * 30
-    # B.Q = 123
-    # del B.X
-    print "=" * 30
-    class AutoEnum(Enum[int]):
+    class E(Enum[str]):
         a = Enum.auto()
         b = Enum.auto()
         c = Enum.auto()
-    print AutoEnum.a
-    print AutoEnum.b
-    print AutoEnum.c
+    class T(E):
+        d = Enum.auto()
+        e = Enum.auto()
+    # class A(Enum):
+    #     AA = 1
+    #     BB = 2
+    #     CC = 3
+    # class B(A):
+    #     X = 7
+    #     Y = 8
+    #     Z = 9
+    # print "B.__members__:"
+    # for k, v in B.__members__.items():
+    #     print "   ", k, v
+    # print "=" * 30
+    # print "7 in B:", 7 in B
+    # print "0 in B:", 0 in B
+    # print "len(B):", len(B)
+    # print "B.AA:", B.AA, B.AA.value
+    # print "B.X:", B.X, B.X.value
+    # print "=" * 30
+    # for i in B:
+    #     print i.name, i.value
+    # print "=" * 30
+    # print {
+    #     B.X: 1,
+    #     B.AA: 2,
+    # }
+    # print "=" * 30
+    # class C(Enum[str]):
+    #     Q = "114514"
+    #     E = "1919810"
+    #     # R = 1
+    # print C.__members__
+    # print repr(C.Q)
+    # print "=" * 30
+    # # B.Q = 123
+    # # del B.X
+    # print "=" * 30
+    # class AutoEnum(Enum[int]):
+    #     a = Enum.auto()
+    #     b = Enum.auto()
+    #     c = Enum.auto()
+    # print AutoEnum.a
+    # print AutoEnum.b
+    # print AutoEnum.c
 
 
 if __name__ == "__main__":
     _test_enum()
+    raise SystemExit
 
 
 def search_data(data, lst):

@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 import mod.client.extraClientApi as _client_api
@@ -24,13 +20,15 @@ from ...utils import communicate as _communicate
 
 
 def instance():
+    if not NuoyanLibClientSystem.instance:
+        NuoyanLibClientSystem.instance = _client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
     return NuoyanLibClientSystem.instance
 
 
 @_utils.singleton
 class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem, _comp.ClientSystem):
     @staticmethod
-    def init():
+    def register():
         if not _client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME):
             _client_api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
 
@@ -72,7 +70,7 @@ class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem
         """
         | 注册并创建UI。
         | 如果UI已创建，则返回其实例。
-        | 使用该接口创建的UI，其UI类 ``__init__`` 方法的 ``param`` 参数会自带一个名为 ``__cs__`` 的key，对应的值为创建UI的客户端的实例，可以方便地调用客户端的属性、方法和接口。
+        | 使用该接口创建的UI，其UI类 ``__init__()`` 方法的 ``param`` 参数会自带一个名为 ``__cs__`` 的key，对应的值为创建UI的客户端的实例，可以方便地调用客户端的属性、方法和接口。
 
         -----
 
@@ -106,7 +104,7 @@ class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem
     def _SetQueryCache(self, args):
         for entity_id, queries in args.items():
             for name, value in queries.items():
-                comp = _comp.CompFactory.CreateQueryVariable(entity_id)
+                comp = _comp.CF(entity_id).QueryVariable
                 if comp.Get(name) == -1.0:
                     comp.Register(name, 0.0)
                 comp.Set(name, value)
@@ -118,7 +116,7 @@ class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem
         entity_id = args['entity_id']
         name = args['name']
         value = args['value']
-        comp = _comp.CompFactory.CreateQueryVariable(entity_id)
+        comp = _comp.CF(entity_id).QueryVariable
         if comp.Get(name) == -1.0:
             comp.Register(name, 0.0)
         comp.Set(name, value)
@@ -138,14 +136,11 @@ class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem
         player_id = args.get('__id__')
         target_sys = _client_api.GetSystem(namespace, system_name)
         def callback(cb_args):
+            ret_args = {'uuid': uuid, 'cb_args': cb_args}
             if player_id:
-                self.notify_to_multi_clients(
-                    [player_id],
-                    "_NuoyanLibCallReturn",
-                    {'uuid': uuid, 'cb_args': cb_args},
-                )
+                self.notify_to_multi_clients([player_id], "_NuoyanLibCallReturn", ret_args)
             else:
-                self.NotifyToServer("_NuoyanLibCallReturn", {'uuid': uuid, 'cb_args': cb_args})
+                self.NotifyToServer("_NuoyanLibCallReturn", ret_args)
         _communicate.call_local(target_sys, method, callback, delay_ret, call_args, call_kwargs)
 
     @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_CLIENT_NAME)

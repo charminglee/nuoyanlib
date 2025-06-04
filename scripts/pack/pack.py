@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN AS IS BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2024-07-07
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 import shutil
@@ -88,7 +84,7 @@ for res in copy_res:
                     src_ui_def = json.load(file_)['ui_defs']
                     dest_ui_def['ui_defs'].extend(src_ui_def)
             elif os.path.exists(dp):
-                print >> sys.stderr, "[Res Conflict] " + fp
+                print >> sys.stderr, "[Res Conflict] " + fp # NOQA
             else:
                 dir_name = os.path.dirname(dp)
                 if not os.path.exists(dir_name):
@@ -111,7 +107,7 @@ for root, dirs, files in os.walk(dest_path):
         with open(src_path, "r") as file_:
             src_content = file_.read()
         if content != src_content:
-            print >> sys.stderr, "[Diff] " + fp
+            print >> sys.stderr, "[Diff] " # NOQA
 
 
 import _version

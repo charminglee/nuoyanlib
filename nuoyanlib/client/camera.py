@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from math import pi as _pi
@@ -62,7 +58,7 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=_pi / 5,
     for eid in all_ents:
         if eid == _comp.PLAYER_ID:
             continue
-        ent_pos = _comp.CompFactory.CreatePos(eid).GetFootPos()
+        ent_pos = _comp.CF(eid).Pos.GetFootPos()
         target_dir = _vector.vec_p2p(center, ent_pos)
         angle = _vector.vec_angle(camera_dir, target_dir)
         w_dist = _mc_math.pos_distance(center, ent_pos)

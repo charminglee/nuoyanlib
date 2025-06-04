@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-29
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 def check_env(target):
@@ -37,20 +33,16 @@ def is_apollo():
 
 
 def is_client():
-    try:
-        import mod.client.extraClientApi as client_api
-        return client_api.GetLocalPlayerId() != "-1"
-    except ImportError:
-        return False
+    from threading import current_thread
+    return current_thread().name == "MainThread"
 
 
 def get_api():
     if is_client():
-        import mod.client.extraClientApi as client_api
-        return client_api
+        import mod.client.extraClientApi as api
     else:
-        import mod.server.extraServerApi as server_api
-        return server_api
+        import mod.server.extraServerApi as api
+    return api
 
 
 def get_comp_factory():
@@ -66,7 +58,6 @@ class NuoyanLibBaseSystem(object):
         self.cond_func = {}
         self.cond_state = {}
         self.__tick = 0
-        get_api().SetMcpModLogCanPostDump(True)
 
     def Update(self):
         self.__tick += 1
@@ -81,13 +72,11 @@ class NuoyanLibBaseSystem(object):
 
     def add_event_callback(self, event, callback):
         api = get_api()
-        # noinspection PyUnresolvedReferences
-        self.ListenForEvent(api.GetEngineNamespace(), api.GetEngineSystemName(), event, callback.__self__, callback)
+        self.ListenForEvent(api.GetEngineNamespace(), api.GetEngineSystemName(), event, callback.__self__, callback) # NOQA
 
     def remove_event_callback(self, event, callback):
         api = get_api()
-        # noinspection PyUnresolvedReferences
-        self.UnListenForEvent(api.GetEngineNamespace(), api.GetEngineSystemName(), event, callback.__self__, callback)
+        self.UnListenForEvent(api.GetEngineNamespace(), api.GetEngineSystemName(), event, callback.__self__, callback) # NOQA
 
     def add_condition_to_func(self, cond, func, freq):
         cond_id = max(self.cond_func.iterkeys()) + 1 if self.cond_func else 0

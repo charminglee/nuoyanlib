@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-20
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
+from functools import wraps as _wraps
+from time import time as _time
 from re import match as _match
 from .._core import _sys
 
 
 __all__ = [
+    "call_interval",
     "add_condition_to_func",
     "remove_condition_to_func",
     "all_indexes",
@@ -32,6 +31,28 @@ __all__ = [
     "is_method_overridden",
     "translate_time",
 ]
+
+
+def call_interval(interval):
+    """
+    [装饰器]
+
+    | 用于限制函数调用的最小时间间隔。
+
+    -----
+
+    :param float interval: 最小时间间隔，单位为秒
+    """
+    def decorator(func):
+        func._last_call_time = 0
+        @_wraps(func)
+        def wrapper(*args, **kwargs):
+            now = _time()
+            if now - func._last_call_time >= interval:
+                func._last_call_time = now
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 def add_condition_to_func(cond, func, freq=1):
@@ -56,7 +77,7 @@ def add_condition_to_func(cond, func, freq=1):
 
 def remove_condition_to_func(cond_id):
     """
-    | 移除由 ``add_condition_to_func`` 添加的条件和函数。
+    | 移除由 ``add_condition_to_func()`` 添加的条件和函数。
 
     -----
 
@@ -216,37 +237,37 @@ def translate_time(sec):
 
 
 if __name__ == "__main__":
-    print all_indexes([1, 1, 4, 5, 1, 4], 1)  # [0, 1, 4]
-    print all_indexes([1, 1, 4, 5, 1, 4], 1, 4)  # [0, 1, 2, 4, 5]
-    print all_indexes("abcdefg", "c", "g")  # [2, 6]
-    print "-" * 50
-    print check_string("11112222", "1", "2")  # True
-    print check_string("11112222", "1")  # False
-    print check_string("1234567890", "0-9")  # True
-    print check_string2("abc123", "a", "c", "3")  # ["b", "1", "2"]
-    print check_string2("abc123", "a-z")  # ["1", "2", "3"]
-    print check_string2("abc123", "0-9")  # ["a", "b", "c"]
-    print "-" * 50
+    print(all_indexes([1, 1, 4, 5, 1, 4], 1))  # [0, 1, 4]
+    print(all_indexes([1, 1, 4, 5, 1, 4], 1, 4))  # [0, 1, 2, 4, 5]
+    print(all_indexes("abcdefg", "c", "g"))  # [2, 6]
+    print("-" * 50)
+    print(check_string("11112222", "1", "2"))  # True
+    print(check_string("11112222", "1"))  # False
+    print(check_string("1234567890", "0-9"))  # True
+    print(check_string2("abc123", "a", "c", "3"))  # ["b", "1", "2"]
+    print(check_string2("abc123", "a-z"))  # ["1", "2", "3"]
+    print(check_string2("abc123", "0-9"))  # ["a", "b", "c"]
+    print("-" * 50)
     a = {'b': [1, 2, 3], 'c': "hahaha", 'd': [4, 5]}
     turn_dict_value_to_tuple(a)
-    print a  # {'b': (1, 2, 3), 'c': "hahaha", 'd': (4, 5)}
+    print(a)  # {'b': (1, 2, 3), 'c': "hahaha", 'd': (4, 5)}
     a = [1, [2, 3], "abc"]
-    print turn_list_to_tuple(a)  # (1, (2, 3), "abc")
-    print "-" * 50
+    print(turn_list_to_tuple(a))  # (1, (2, 3), "abc")
+    print("-" * 50)
     class A:
         def printIn(self, s):
-            print s
+            print(s)
     class B(A):
         def printIn(self, s):
-            print 1
+            print(1)
     class C(A):
         pass
-    print is_method_overridden(B, A, "printIn")  # True
-    print is_method_overridden(C, A, "printIn")  # False
-    print "-" * 50
-    print translate_time(4000)  # "1h6m40s"
-    print "-" * 50
-    print 2 / 3.0
+    print(is_method_overridden(B, A, "printIn"))  # True
+    print(is_method_overridden(C, A, "printIn"))  # False
+    print("-" * 50)
+    print(translate_time(4000))  # "1h6m40s"
+    print("-" * 50)
+    print(2 / 3.0)
 
 
 

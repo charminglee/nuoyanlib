@@ -1,26 +1,22 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-28
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from typing import Type, Dict
+from typing import Type, Dict, Any
 from mod.server.system.serverSystem import ServerSystem
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
-from mod.common.component.baseComponent import BaseComponent
+from mod.server.component.queryVariableCompServer import QueryVariableComponentServer
 from mod.server.component.effectCompServer import EffectComponentServer
 from mod.server.component.actorMotionCompServer import ActorMotionComponentServer
 from mod.server.component.blockInfoCompServer import BlockInfoComponentServer
@@ -88,109 +84,88 @@ from mod.server.component.actorLootCompServer import ActorLootComponentServer
 from mod.server.component.blockEntityCompServer import BlockEntityCompServer
 from mod.server.component.aiCommandCompServer import AiCommandComponentServer
 from mod.server.component.entityDefinitionsCompServer import EntityDefinitionsCompServer
+from .._utils import CacheObject
 
 
 ENGINE_NAMESPACE: str
 ENGINE_SYSTEM_NAME: str
+LEVEL_ID: str
 ServerSystem: Type[ServerSystem]
 CompFactory: EngineCompFactoryServer
-LEVEL_ID: str
 
 
-class CompDescr(object):
-    _comp_name: str
-    def __init__(self: ..., comp_name: str) -> None: ...
-    def __get__(self, ins: LvComp, cls: Type[LvComp]) -> BaseComponent: ...
-
-
-class __CompPool(object):
-    EntityDefinitions: EntityDefinitionsCompServer
-    AiCommand: AiCommandComponentServer
-    BlockEntity: BlockEntityCompServer
-    Loot: LootComponentServer
-    Interact: InteractComponentServer
-    Feature: FeatureCompServer
-    ActorMotion: ActorMotionComponentServer
-    CollisionBox: CollisionBoxComponentServer
-    Dimension: DimensionCompServer
-    BulletAttributes: BulletAttributesComponentServer
-    EngineType: EngineTypeComponentServer
-    ActorCollidable: ActorCollidableCompServer
-    Player: PlayerCompServer
-    RedStone: RedStoneComponentServer
-    BlockInfo: BlockInfoComponentServer
-    Item: ItemCompServer
-    Block: BlockCompServer
-    Pet: PetComponentServer
-    Attr: AttrCompServer
-    Persistence: PersistenceCompServer
-    Gravity: GravityComponentServer
-    Recipe: RecipeCompServer
-    Ride: RideCompServer
-    BlockUseEventWhiteList: BlockUseEventWhiteListComponentServer
-    Explosion: ExplosionComponentServer
-    Scale: ScaleComponentServer
-    Biome: BiomeCompServer
-    Pos: PosComponentServer
-    Fly: FlyComponentServer
-    Hurt: HurtCompServer
-    Projectile: ProjectileComponentServer
-    ExtraData: ExDataCompServer
-    ItemBanned: ItemBannedCompServer
-    ActorLoot: ActorLootComponentServer
-    EntityComponent: EntityComponentServer
-    Tag: TagComponentServer
-    Breath: BreathCompServer
-    BlockState: BlockStateComponentServer
+class CF(CacheObject):
+    _target: str
+    def __init__(self: ..., target: str) -> None: ...
+    def __getattr__(self, name: str) -> Any: ...
     Achievement: AchievementCompServer
-    ChestBlock: ChestContainerCompServer
-    Weather: WeatherComponentServer
-    Lv: LevelComponentServer
-    AuxValue: AuxValueComponentServer
-    MoveTo: MoveToComponentServer
     Action: ActionCompServer
-    Command: CommandCompServer
-    BlockEntityData: BlockEntityExDataCompServer
+    ActorCollidable: ActorCollidableCompServer
+    ActorLoot: ActorLootComponentServer
+    ActorMotion: ActorMotionComponentServer
     ActorOwner: ActorOwnerComponentServer
-    Tame: TameComponentServer
-    Http: HttpToWebServerCompServer
-    Portal: PortalComponentServer
-    ChunkSource: ChunkSourceCompServer
-    ControlAi: ControlAiCompServer
-    MobSpawn: MobSpawnComponentServer 
-    Model: ModelComponentServer
-    ChatExtension: ChatExtensionComponentServer
     ActorPushable: ActorPushableCompServer
-    Exp: ExpComponentServer
-    Rot: RotComponentServer
-    Game: GameComponentServer
-    Shareables: ShareableComponentServer
+    AiCommand: AiCommandComponentServer
+    Attr: AttrCompServer
+    AuxValue: AuxValueComponentServer
+    Biome: BiomeCompServer
+    Block: BlockCompServer
+    BlockEntity: BlockEntityCompServer
+    BlockEntityData: BlockEntityExDataCompServer
+    BlockInfo: BlockInfoComponentServer
+    BlockState: BlockStateComponentServer
+    BlockUseEventWhiteList: BlockUseEventWhiteListComponentServer
+    Breath: BreathCompServer
+    BulletAttributes: BulletAttributesComponentServer
+    ChatExtension: ChatExtensionComponentServer
+    ChestBlock: ChestContainerCompServer
+    ChunkSource: ChunkSourceCompServer
+    CollisionBox: CollisionBoxComponentServer
+    Command: CommandCompServer
+    ControlAi: ControlAiCompServer
+    Dimension: DimensionCompServer
     Effect: EffectComponentServer
-    Msg: MsgComponentServer
-    ModAttr: ModAttrComponentServer
-    Time: TimeComponentServer
+    EngineType: EngineTypeComponentServer
+    EntityComponent: EntityComponentServer
+    EntityDefinitions: EntityDefinitionsCompServer
     EntityEvent: EntityEventComponentServer
+    Exp: ExpComponentServer
+    Explosion: ExplosionComponentServer
+    ExtraData: ExDataCompServer
+    Feature: FeatureCompServer
+    Fly: FlyComponentServer
+    Game: GameComponentServer
+    Gravity: GravityComponentServer
+    Http: HttpToWebServerCompServer
+    Hurt: HurtCompServer
+    Interact: InteractComponentServer
+    Item: ItemCompServer
+    ItemBanned: ItemBannedCompServer
+    Loot: LootComponentServer
+    Lv: LevelComponentServer
+    MobSpawn: MobSpawnComponentServer
+    ModAttr: ModAttrComponentServer
+    Model: ModelComponentServer
+    MoveTo: MoveToComponentServer
+    Msg: MsgComponentServer
     Name: NameComponentServer
+    Persistence: PersistenceCompServer
+    Pet: PetComponentServer
+    Player: PlayerCompServer
+    Portal: PortalComponentServer
+    Pos: PosComponentServer
+    Projectile: ProjectileComponentServer
+    QueryVariable: QueryVariableComponentServer
+    Recipe: RecipeCompServer
+    RedStone: RedStoneComponentServer
+    Ride: RideCompServer
+    Rot: RotComponentServer
+    Scale: ScaleComponentServer
+    Shareables: ShareableComponentServer
+    Tag: TagComponentServer
+    Tame: TameComponentServer
+    Time: TimeComponentServer
+    Weather: WeatherComponentServer
 
 
-class LvComp(__CompPool):
-    _cache: Dict[str, BaseComponent]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+LvComp: CF

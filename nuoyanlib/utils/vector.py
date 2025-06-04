@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-23
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from math import (
@@ -30,7 +26,7 @@ from mod.common.utils.mcmath import (
     Matrix as _Matrix,
 )
 from . import mc_math as _mc_math
-from .._core import _sys
+from .._core import _sys, _error
 
 
 __all__ = [
@@ -65,7 +61,7 @@ def is_zero_vec(vec):
     :return: 是否是零向量
     :rtype: bool
     """
-    return not any(vec[i] for i in range(3))
+    return all(vec[i] == 0 for i in range(3))
 
 def set_vec_length(vec, length, convert_vec=False):
     """
@@ -79,11 +75,13 @@ def set_vec_length(vec, length, convert_vec=False):
 
     :return: 设置后的向量
     :rtype: tuple[float,float,float]|_Vector3
+
+    :raise VectorError: 向量长度为0时抛出
     """
     vec_ = _to_Vector3(vec)
     orig_len = vec_.Length()
     if orig_len <= 0:
-        raise ValueError("the length of zero vector cannot be set")
+        raise _error.VectorError("can't set the length of zero vector")
     res = vec_.Normalized() * length
     return _convert_return_vec(vec, res, convert_vec)
 
@@ -101,8 +99,6 @@ def vec_orthogonal_decomposition(vec, basis1, basis2, convert_vec=False):
 
     :return: 分解后的两个向量，第一个向量沿basis1方向，第二个向量沿basis2方向
     :rtype: tuple[tuple[float,float,float]|_Vector3, tuple[float,float,float]|_Vector3]
-
-    :raise ValueError: 两个向量非正交时抛出
     """
     vec_ = _to_Vector3(vec)
     basis1 = _to_Vector3(basis1)

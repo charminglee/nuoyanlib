@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from typing import Type, Any, Dict, Union
+from typing import Type, Any, Dict
 from mod.client.system.clientSystem import ClientSystem
-from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.viewBinder import ViewBinder
 from mod.client.ui.viewRequest import ViewRequest
+from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
+from mod.client.component.dimensionCompClient import DimensionCompClient
+from mod.client.component.neteaseWindowCompClient import NeteaseWindowCompClient
+from mod.client.component.achievementCompClient import AchievementCompClient
 from mod.client.component.skyRenderCompClient import SkyRenderCompClient
 from mod.client.component.frameAniTransComp import FrameAniTransComp
 from mod.client.component.actorRenderCompClient import ActorRenderCompClient
@@ -76,11 +75,11 @@ from mod.client.component.particleControlComp import ParticleControlComp
 from mod.client.component.tameCompClient import TameComponentClient
 from mod.client.component.modAttrCompClient import ModAttrComponentClient
 from mod.client.component.playerAnimCompClient import PlayerAnimCompClient
-from mod.common.component.baseComponent import BaseComponent
 from mod.client.ui.CustomUIScreenProxy import CustomUIScreenProxy
 from mod.client.ui.CustomUIControlProxy import CustomUIControlProxy
 from mod.client.ui.NativeScreenManager import NativeScreenManager
 from .._types._typing import FTuple2
+from .._utils import CacheObject
 
 
 class _MiniMapBaseScreen(ScreenNode):
@@ -241,8 +240,9 @@ class _MiniMapBaseScreen(ScreenNode):
 
 ENGINE_NAMESPACE: str
 ENGINE_SYSTEM_NAME: str
+PLAYER_ID: str
+LEVEL_ID: str
 ClientSystem: Type[ClientSystem]
-CompFactory: EngineCompFactoryClient
 ScreenNode: Type[ScreenNode]
 ViewBinder: Type[ViewBinder]
 ViewRequest: Type[ViewRequest]
@@ -250,19 +250,15 @@ CustomUIScreenProxy: Type[CustomUIScreenProxy]
 CustomUIControlProxy: Type[CustomUIControlProxy]
 NativeScreenManager: NativeScreenManager
 MiniMapScreenNode: Type[_MiniMapBaseScreen]
-PLAYER_ID: str
-LEVEL_ID: str
+CompFactory: EngineCompFactoryClient
 
 
-class CompDescr(object):
-    comp_name: str
-    def __init__(self: ..., comp_name: str) -> None: ...
-    def __get__(self, ins: Union[PlrComp, LvComp], cls: Union[Type[PlrComp], Type[LvComp]]) -> BaseComponent: ...
-
-
-class __CompPool(object):
+class CF(CacheObject):
+    _target: str
+    def __init__(self: ..., target: str) -> None: ...
+    def __getattr__(self, name: str) -> Any: ...
+    Achievement: AchievementCompClient
     Action: ActionCompClient
-    ActorCollidable: Any
     ActorMotion: ActorMotionComponentClient
     ActorRender: ActorRenderCompClient
     Attr: AttrCompClient
@@ -279,6 +275,7 @@ class __CompPool(object):
     ConfigClient: ConfigCompClient
     CustomAudio: AudioCustomComponentClient
     Device: DeviceCompClient
+    Dimension: DimensionCompClient
     Effect: EffectComponentClient
     EngineEffectBindControl: EngineEffectBindControlComp
     EngineType: EngineTypeComponentClient
@@ -294,6 +291,7 @@ class __CompPool(object):
     Model: ModelComponentClient
     Name: NameComponentClient
     NeteaseShop: NeteaseShopCompClient
+    NeteaseWindow: NeteaseWindowCompClient
     Operation: OperationCompClient
     ParticleControl: ParticleControlComp
     ParticleEntityBind: ParticleEntityBindComp
@@ -317,30 +315,5 @@ class __CompPool(object):
     VirtualWorld: VirtualWorldCompClient
 
 
-class PlrComp(__CompPool):
-    _cache: Dict[str, BaseComponent]
-    _target: str
-
-
-class LvComp(__CompPool):
-    _cache: Dict[str, BaseComponent]
-    _target: str
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+PlrComp: CF
+LvComp: CF

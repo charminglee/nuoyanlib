@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-21
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from time import time as _time
@@ -24,35 +20,65 @@ from ..._core._client._comp import LvComp as _LvComp
 from ..._core._client import _lib_client
 from ..._core import _utils
 from .control import NyControl as _NyControl
+from ...utils.enum import Enum as _Enum
 
 
-_CALLBACK_API_MAP = {
-    _ButtonCallback.touch_up: "SetButtonTouchUpCallback",
-    _ButtonCallback.touch_down: "SetButtonTouchDownCallback",
-    _ButtonCallback.touch_cancel: "SetButtonTouchCancelCallback",
-    _ButtonCallback.touch_move: "SetButtonTouchMoveCallback",
-    _ButtonCallback.touch_move_in: "SetButtonTouchMoveInCallback",
-    _ButtonCallback.touch_move_out: "SetButtonTouchMoveOutCallback",
-    _ButtonCallback.hover_in: "SetButtonHoverInCallback",
-    _ButtonCallback.hover_out: "SetButtonHoverOutCallback",
-    _ButtonCallback.screen_exit: "SetButtonScreenExitCallback",
-}
+__all__ = [
+    "NyButton",
+]
 
 
-# todo
 class NyButton(_NyControl):
     """
-    | 创建NyButton按钮实例。
+    | 创建 ``NyButton`` 按钮实例。
     | 兼容ModSDK ``ButtonUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 
-    :param ScreenNode screen_node: 按钮所在UI类的实例
+    :param ScreenNodeExtension screen_node_ex: 按钮所在UI类的实例
     :param ButtonUIControl btn_control: 通过asButton()获取的按钮实例
     """
 
-    def __init__(self, screen_node, btn_control):
-        _NyControl.__init__(self, screen_node, btn_control)
+    _CONTROL_TYPE = _ui_utils.ControlType.button
+    _CALLBACK_API_MAP = {
+        _ButtonCallback.touch_up: "SetButtonTouchUpCallback",
+        _ButtonCallback.touch_down: "SetButtonTouchDownCallback",
+        _ButtonCallback.touch_cancel: "SetButtonTouchCancelCallback",
+        _ButtonCallback.touch_move: "SetButtonTouchMoveCallback",
+        _ButtonCallback.touch_move_in: "SetButtonTouchMoveInCallback",
+        _ButtonCallback.touch_move_out: "SetButtonTouchMoveOutCallback",
+        _ButtonCallback.hover_in: "SetButtonHoverInCallback",
+        _ButtonCallback.hover_out: "SetButtonHoverOutCallback",
+        _ButtonCallback.screen_exit: "SetButtonScreenExitCallback",
+    }
+
+    class CommonChildPath(_Enum[str]):
+        """
+        按钮通用子控件路径枚举。
+        """
+
+        default = _Enum.auto()
+        """
+        | 默认图片控件。
+        """
+
+        hover = _Enum.auto()
+        """
+        | 悬浮图片控件。
+        """
+
+        pressed = _Enum.auto()
+        """
+        | 按下图片控件。
+        """
+
+        label = _Enum.auto()
+        """
+        | 文本控件。
+        """
+
+    def __init__(self, screen_node_ex, btn_control):
+        _NyControl.__init__(self, screen_node_ex, btn_control)
         self._lib_sys = _lib_client.instance()
         self._btn_callbacks = {}
         self._enabled_double_click = False
@@ -61,8 +87,7 @@ class NyButton(_NyControl):
         self._long_click_timer = None
         self._movable_controls = []
         self._finger_pos = None
-        # noinspection PyUnresolvedReferences
-        self._ui_pos_data_key = "nyl_ui_pos_data_%s_%s" % (screen_node.namespace, screen_node.name)
+        self._ui_pos_data_key = screen_node_ex._ui_pos_data_key
         self.__vibrate_time = 100
         self.is_movable = False
         self.auto_save_pos = False
@@ -71,35 +96,97 @@ class NyButton(_NyControl):
             "GetEntityByCoordReleaseClientEvent", self._GetEntityByCoordReleaseClientEvent
         )
 
-    def Destroy(self):
+    def __destroy__(self):
+        if self.is_movable:
+            self.cancel_movable()
+        _LvComp.Game.CancelTimer(self._long_click_timer)
+        self._btn_callbacks = None
         self._lib_sys.remove_event_callback(
             "GetEntityByCoordReleaseClientEvent", self._GetEntityByCoordReleaseClientEvent
         )
+        self._lib_sys = None
+        _NyControl.__destroy__(self)
 
     def _GetEntityByCoordReleaseClientEvent(self, args):
         if self.auto_save_pos:
-            self.SavePosData()
+            self.save_pos_data()
         self._finger_pos = None
+
+    def set_default_texture(self, tex_path, path="default"):
+        """
+        | 设置按钮的默认（default）贴图。
+
+        -----
+
+        :param str tex_path: 贴图路径
+        :param str path: 图片控件的名称或相对路径，默认为"default"
+
+        :return: 无
+        :rtype: None
+        """
+        (self / path).image.SetSprite(tex_path)
+
+    def set_hover_texture(self, tex_path, path="hover"):
+        """
+        | 设置按钮的悬浮（hover）贴图。
+
+        -----
+
+        :param str tex_path: 贴图路径
+        :param str path: 图片控件的名称或相对路径，默认为"hover"
+
+        :return: 无
+        :rtype: None
+        """
+        (self / path).image.SetSprite(tex_path)
+
+    def set_pressed_texture(self, tex_path, path="pressed"):
+        """
+        | 设置按钮的按下（pressed）贴图。
+
+        -----
+
+        :param str tex_path: 贴图路径
+        :param str path: 图片控件的名称或相对路径，默认为"pressed"
+
+        :return: 无
+        :rtype: None
+        """
+        (self / path).image.SetSprite(tex_path)
+
+    def set_text(self, text, path="label"):
+        """
+        | 设置按钮文本。
+
+        -----
+
+        :param str text: 按钮文本
+        :param str path: 图片控件的名称或相对路径，默认为"label"
+
+        :return: 无
+        :rtype: None
+        """
+        (self / path).label.SetText(text)
 
     @property
     def vibrate_time(self):
         """
-        长按震动反馈的时长，单位为毫秒。
+        | 长按震动反馈的时长，单位为毫秒。
         """
         return self.__vibrate_time
 
     @vibrate_time.setter
-    @_utils.param_type_check(int)
+    @_utils.args_type_check(int, is_method=True)
     def vibrate_time(self, val):
         """
-        长按震动反馈的时长，单位为毫秒。
+        | 长按震动反馈的时长，单位为毫秒。
         """
         self.__vibrate_time = val
 
-    def SetCallback(self, callback_type, func):
+    def set_callback(self, callback_type, func):
         """
         | 添加按钮回调函数，支持对同一个按钮添加多个同类型的回调，按添加顺序依次触发。
-        | 注意：调用本方法后请勿再调用ModSDK的设置按钮回调的接口（如 ``SetButtonTouchUpCallback``），否则所有通过本方法添加的回调函数将无效。
+        | 注意：调用本方法后请勿再调用ModSDK的设置按钮回调的接口（如 ``SetButtonTouchUpCallback()``），否则所有通过本方法添加的回调函数将无效。
 
         -----
 
@@ -119,23 +206,25 @@ class NyButton(_NyControl):
         if callback_type == _ButtonCallback.double_click:
             if not self._enabled_double_click:
                 self._enabled_double_click = True
-                self.SetCallback(_ButtonCallback.touch_up, self._on_touch_up_dc)
+                self.set_callback(_ButtonCallback.touch_up, self._on_touch_up_dc)
         elif callback_type == _ButtonCallback.long_click:
             if not self._enabled_long_click:
                 self._enabled_long_click = True
-                self.SetCallback(_ButtonCallback.touch_down, self._on_touch_down_lc)
-                self.SetCallback(_ButtonCallback.touch_move, self._cancel_long_click)
-                self.SetCallback(_ButtonCallback.touch_up, self._cancel_long_click)
+                self.set_callback(_ButtonCallback.touch_down, self._on_touch_down_lc)
+                self.set_callback(_ButtonCallback.touch_move, self._cancel_long_click)
+                self.set_callback(_ButtonCallback.touch_up, self._cancel_long_click)
         else:
-            def callback_proxy(args):
+            def proxy(args):
                 self._exec_callbacks(callback_type, args)
-            set_callback_api = getattr(self.control, _CALLBACK_API_MAP[callback_type])
-            set_callback_api(callback_proxy)
+            set_callback_api = getattr(self.base_control, NyButton._CALLBACK_API_MAP[callback_type])
+            set_callback_api(proxy)
         return True
+    
+    SetCallback = set_callback
 
-    def RemoveCallback(self, callback_type, func):
+    def remove_callback(self, callback_type, func):
         """
-        | 移除通过 ``SetCallback`` 添加的按钮回调函数。
+        | 移除通过 ``set_callback()`` 添加的按钮回调函数。
 
         -----
 
@@ -154,20 +243,22 @@ class NyButton(_NyControl):
             if callback_type == _ButtonCallback.double_click:
                 if self._enabled_double_click:
                     self._enabled_double_click = False
-                    self.RemoveCallback(_ButtonCallback.touch_up, self._on_touch_up_dc)
+                    self.remove_callback(_ButtonCallback.touch_up, self._on_touch_up_dc)
             elif callback_type == _ButtonCallback.long_click:
                 if self._enabled_long_click:
                     self._enabled_long_click = False
-                    self.RemoveCallback(_ButtonCallback.touch_down, self._on_touch_down_lc)
-                    self.RemoveCallback(_ButtonCallback.touch_move, self._cancel_long_click)
-                    self.RemoveCallback(_ButtonCallback.touch_up, self._cancel_long_click)
+                    self.remove_callback(_ButtonCallback.touch_down, self._on_touch_down_lc)
+                    self.remove_callback(_ButtonCallback.touch_move, self._cancel_long_click)
+                    self.remove_callback(_ButtonCallback.touch_up, self._cancel_long_click)
         return True
 
-    def SetMovable(self, move_parent=False, associated_uis=None, auto_save=False):
+    RemoveCallback = remove_callback
+
+    def set_movable(self, move_parent=False, associated_uis=None, auto_save=False):
         """
         | 设置按钮可拖动（随时拖动）。
-        | 注意：设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``SetCallback`` ，不要使用ModSDK中的接口。
-        | 请勿同时设置 ``SetMovable`` 和 ``SetMovableByLongClick`` 。
+        | 注意：设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``set_callback()`` ，不要使用ModSDK中的接口。
+        | 请勿同时设置 ``set_movable()`` 和 ``set_movable_by_long_click()`` 。
 
         -----
 
@@ -179,13 +270,15 @@ class NyButton(_NyControl):
         :rtype: None
         """
         self._set_movable_data(True, move_parent, associated_uis, auto_save)
-        self.SetCallback(_ButtonCallback.touch_move, self._on_move)
+        self.set_callback(_ButtonCallback.touch_move, self._on_move)
 
-    def SetMovableByLongClick(self, move_parent=False, associated_uis=None, auto_save=False):
+    SetMovable = set_movable
+
+    def set_movable_by_long_click(self, move_parent=False, associated_uis=None, auto_save=False):
         """
         | 设置按钮长按拖动（长按后才能拖动）。
-        | 注意：设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``SetCallback`` ，不要使用ModSDK中的接口。
-        | 请勿同时设置 ``SetMovable`` 和 ``SetMovableByLongClick`` 。
+        | 注意：设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``set_callback()`` ，不要使用ModSDK中的接口。
+        | 请勿同时设置 ``set_movable()`` 和 ``set_movable_by_long_click()`` 。
 
         -----
 
@@ -197,10 +290,12 @@ class NyButton(_NyControl):
         :rtype: None
         """
         self._set_movable_data(True, move_parent, associated_uis, auto_save)
-        self.SetCallback(_ButtonCallback.long_click, self._on_long_click_mov)
-        self.SetCallback(_ButtonCallback.touch_down, self._on_touch_down_mov)
+        self.set_callback(_ButtonCallback.long_click, self._on_long_click_mov)
+        self.set_callback(_ButtonCallback.touch_down, self._on_touch_down_mov)
 
-    def CancelMovable(self):
+    SetMovableByLongClick = set_movable_by_long_click
+
+    def cancel_movable(self):
         """
         | 取消按钮可拖动。
 
@@ -210,11 +305,13 @@ class NyButton(_NyControl):
         :rtype: None
         """
         self._set_movable_data(False)
-        self.RemoveCallback(_ButtonCallback.touch_move, self._on_move)
-        self.RemoveCallback(_ButtonCallback.long_click, self._on_long_click_mov)
-        self.RemoveCallback(_ButtonCallback.touch_down, self._on_touch_down_mov)
+        self.remove_callback(_ButtonCallback.touch_move, self._on_move)
+        self.remove_callback(_ButtonCallback.long_click, self._on_long_click_mov)
+        self.remove_callback(_ButtonCallback.touch_down, self._on_touch_down_mov)
 
-    def ClearPosData(self):
+    CancelMovable = cancel_movable
+
+    def clear_pos_data(self):
         """
         | 删除按钮位置数据，关联拖动的其他控件的位置数据也会一并删除。
 
@@ -229,7 +326,9 @@ class NyButton(_NyControl):
             return _ui_utils.save_ui_pos_data(self._ui_pos_data_key, data)
         return False
 
-    def SavePosData(self):
+    ClearPosData = clear_pos_data
+
+    def save_pos_data(self):
         """
         | 保存按钮位置数据，关联拖动的其他控件的位置数据也会一并保存，下次进入游戏时会自动恢复位置。
         | 为保证安全，当控件超出屏幕边界时，将保存失败。
@@ -240,7 +339,7 @@ class NyButton(_NyControl):
         :rtype: bool
         """
         data = _ui_utils.get_ui_pos_data(self._ui_pos_data_key)
-        controls = self._movable_controls or [self.control]
+        controls = self._movable_controls or [self.base_control]
         this_data = []
         for c in controls:
             if not _ui_utils.is_ui_out_of_screen(c):
@@ -250,13 +349,15 @@ class NyButton(_NyControl):
         data[self.path] = this_data
         return _ui_utils.save_ui_pos_data(self._ui_pos_data_key, data)
 
+    SavePosData = save_pos_data
+
     def _set_movable_data(self, movable, move_parent=False, associated_uis=None, auto_save=False):
         if movable:
             movable_controls = []
             if move_parent:
-                movable_controls.append(_ui_utils.get_parent_control(self.control, self.screen_node))
+                movable_controls.append(_ui_utils.get_parent_control(self.base_control, self._screen_node))
             else:
-                movable_controls.append(self.control)
+                movable_controls.append(self.base_control)
             if associated_uis:
                 if isinstance(associated_uis, (list, tuple)):
                     movable_controls.extend(associated_uis)
@@ -307,22 +408,21 @@ class NyButton(_NyControl):
             self._set_offset(c, offset)
 
     def _on_long_click_mov(self, args):
-        self.SetCallback(_ButtonCallback.touch_move, self._on_move)
+        self.set_callback(_ButtonCallback.touch_move, self._on_move)
 
     def _on_touch_down_mov(self, args):
-        self.RemoveCallback(_ButtonCallback.touch_move, self._on_move)
+        self.remove_callback(_ButtonCallback.touch_move, self._on_move)
 
     def _vibrate(self):
         _LvComp.Device.SetDeviceVibrate(self.__vibrate_time)
 
     def _set_offset(self, control, offset):
-        control = _ui_utils.to_control(self.screen_node, control)
+        control = _ui_utils.to_control(self._screen_node, control)
         orig_pos = control.GetPosition()
         new_pos = (orig_pos[0] + offset[0], orig_pos[1] + offset[1])
         control.SetPosition(new_pos)
         if _ui_utils.is_ui_out_of_screen(control):
             control.SetPosition(orig_pos)
-
 
 
 

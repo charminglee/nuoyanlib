@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-29
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from contextlib import contextmanager as _contextmanager
@@ -51,7 +47,9 @@ __all__ = [
 @_contextmanager
 def ignore_dmg_cd(restore_cd=10):
     """
-    上下文管理器，用于忽略生物受击后的 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 。
+    [上下文管理器]
+
+    | 用于忽略生物受击后的 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 。
 
     -----
 
@@ -63,7 +61,8 @@ def ignore_dmg_cd(restore_cd=10):
 
         with nyl.ignore_dmg_cd():
             # 在with范围内伤害免疫时间会被设为0
-            comp = nyl.CompFactory.CreateHurt(entity_id)
+            comp = nyl.CF(entity_id).Hurt
+            comp.Hurt(10, "entity_attack")
             comp.Hurt(10, "entity_attack")
         # 上下文管理器退出
 
@@ -88,8 +87,8 @@ _SDK_DAMAGE_CAUSE = [
 
 class EntityFilter:
     """
-    实体过滤器，预设了一些常用的过滤条件。
-    过滤器接受一个实体ID作为参数，且返回一个bool值，返回True时表示该实体符合条件。
+    | 实体过滤器，预设了一些常用的过滤条件。
+    | 过滤器接受一个实体ID作为参数，且返回一个 ``bool`` 值，返回 ``True`` 时表示该实体符合条件。
     """
 
     @staticmethod
@@ -104,7 +103,7 @@ class EntityFilter:
         :return: 返回True时表示该实体为生物实体
         :rtype: bool
         """
-        return _comp.CompFactory.CreateEntityComponent(eid).HasComponent(_EntityComponentType.health)
+        return _comp.CF(eid).EntityComponent.HasComponent(_EntityComponentType.health)
 
 
     @staticmethod
@@ -133,7 +132,7 @@ class EntityFilter:
         :return: 返回True时表示该实体当前生命值大于0
         :rtype: bool
         """
-        return _comp.CompFactory.CreateAttr(eid).GetAttrValue(_AttrType.HEALTH) > 0
+        return _comp.CF(eid).Attr.GetAttrValue(_AttrType.HEALTH) > 0
 
 
 def explode_hurt(
@@ -166,14 +165,14 @@ def explode_hurt(
     :rtype: None
     """
     for plr in _server_api.GetPlayerList():
-        if _comp.CompFactory.CreateDimension(plr).GetEntityDimensionId() == dim:
+        if _comp.CF(plr).Dimension.GetEntityDimensionId() == dim:
             player_id = plr
             break
     else:
         return
     orig_rule = _comp.LvComp.Game.GetGameRulesInfoServer()
     _comp.LvComp.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tile_drops, 'mob_loot': mob_loot}})
-    hurt_comp = _comp.CompFactory.CreateHurt(source_id)
+    hurt_comp = _comp.CF(source_id).Hurt
     try:
         if not hurt_source:
             hurt_comp.ImmuneDamage(True)
@@ -239,7 +238,7 @@ def line_damage(
     )
     hurt_ents = []
     for eid in entities:
-        ep = _comp.CompFactory.CreatePos(eid).GetFootPos()
+        ep = _comp.CF(eid).Pos.GetFootPos()
         dis = _mc_math.pos_distance_to_line(ep, start_pos, end_pos)
         if dis > radius:
             continue
@@ -384,13 +383,14 @@ def sector_aoe_damage(
         filter_ids = []
     filter_ids = _copy(filter_ids)
     filter_ids.append(attacker_id)
-    attacker_pos = _comp.CompFactory.CreatePos(attacker_id).GetFootPos()
-    attacker_rot = _comp.CompFactory.CreateRot(attacker_id).GetRot()[1]
-    dim = _comp.CompFactory.CreateDimension(attacker_id).GetEntityDimensionId()
+    cf = _comp.CF(attacker_id)
+    attacker_pos = cf.Pos.GetFootPos()
+    attacker_rot = cf.Rot.GetRot()[1]
+    dim = cf.Dimension.GetEntityDimensionId()
     entity_list = _entity.get_entities_in_area(attacker_pos, sector_radius, dim, filter_ids, filter_types, True)
     result = []
     for eid in entity_list:
-        pos = _comp.CompFactory.CreatePos(eid).GetFootPos()
+        pos = _comp.CF(eid).Pos.GetFootPos()
         test = _mc_math.is_in_sector(
             (pos[0], attacker_pos[1], pos[2]), attacker_pos, sector_radius, sector_angle, attacker_rot
         )
@@ -461,7 +461,7 @@ def hurt_by_set_health(entity_id, damage):
     :return: 无
     :rtype: None
     """
-    attr = _comp.CompFactory.CreateAttr(entity_id)
+    attr = _comp.CF(entity_id).Attr
     health = attr.GetAttrValue(_AttrType.HEALTH)
     new_health = int(health - damage)
     attr.SetAttrValue(_AttrType.HEALTH, new_health)
@@ -497,7 +497,7 @@ def hurt(
     else:
         custom_tag = cause
         cause = _ActorDamageCause.Custom
-    hurt_result = _comp.CompFactory.CreateHurt(entity_id).Hurt(damage, cause, attacker, child_id, knocked, custom_tag)
+    hurt_result = _comp.CF(entity_id).Hurt.Hurt(damage, cause, attacker, child_id, knocked, custom_tag)
     if not hurt_result and force:
         hurt_by_set_health(entity_id, damage)
 
@@ -529,7 +529,7 @@ def percent_damage(
     :return: 无
     :rtype: None
     """
-    attr = _comp.CompFactory.CreateAttr(entity_id)
+    attr = _comp.CF(entity_id).Attr
     value = 0
     if type_name == "max_health":
         value = attr.GetAttrMaxValue(_AttrType.HEALTH)
@@ -538,7 +538,7 @@ def percent_damage(
     elif type_name == "hunger":
         value = attr.GetAttrValue(_AttrType.HUNGER)
     elif type_name == "attacker_damage" and attacker:
-        value = _comp.CompFactory.CreateAttr(attacker).GetAttrValue(_AttrType.DAMAGE)
+        value = _comp.CF(attacker).Attr.GetAttrValue(_AttrType.DAMAGE)
     if value > 0:
         damage = int(value * percent)
         if damage > 999999999:

@@ -1,41 +1,51 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-29
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from ..config import ENABLED_LOG as _ENABLED_LOG
+from time import (
+    time as _time,
+    strftime as _strftime,
+    localtime as _localtime,
+)
 
 
 try:
     import logging
+    from ..config import ENABLED_LOG as _ENABLED_LOG
 except ImportError:
+    _ENABLED_LOG = False
     logging = None
+except ValueError:
+    _ENABLED_LOG = True
 
 
 if _ENABLED_LOG and logging:
-    _lgr = logging.getLogger("nuoyanlib")
-    _lgr.setLevel(logging.INFO)
-    _hdr = logging.StreamHandler()
-    _hdr.setFormatter(logging.Formatter("[%(asctime)s] [%(levelname)s] [%(name)s] %(message)s"))
-    _lgr.addHandler(_hdr)
-    info = _lgr.info
-    warning = _lgr.warning
-    error = _lgr.error
-    debug = _lgr.debug
+    class _logger(object):
+        def __init__(self, level):
+            self.level = level
+
+        def log(self, msg):
+            ct = _time()
+            t = _strftime("%Y-%m-%d %H:%M:%S", _localtime(ct))
+            msecs = (ct - long(ct)) * 1000
+            s = "%s,%03d" % (t, msecs)
+            print("[%s] [%s] [nuoyanlib] %s" % (s, self.level, msg))
+
+    info = _logger("INFO").log
+    warning = _logger("WARNING").log
+    error = _logger("ERROR").log
+    debug = _logger("DEBUG").log
 else:
     info = lambda *_: None
     warning = lambda *_: None
@@ -51,18 +61,8 @@ def disable_modsdk_loggers():
         # logging.getLogger("mcp").disabled = 1
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    info("test")
 
 
 

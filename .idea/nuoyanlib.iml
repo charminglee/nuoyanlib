@@ -3,10 +3,10 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/nuoyanlib" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/release/nuoyanlib/behavior_packs/nuoyanlibBeh" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/release/nuoyanlib/developer_mods/nuoyanlibDev" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/inspectionProfiles" />
+      <excludeFolder url="file://$MODULE_DIR$/.idea/scopes" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 2.7" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.12" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PackageRequirementsSettings">
@@ -14,5 +14,6 @@
   </component>
   <component name="PyDocumentationSettings">
     <option name="analyzeDoctest" value="false" />
+    <option name="renderExternalDocumentation" value="true" />
   </component>
 </module>

@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from ._event_typing import *
@@ -23,7 +19,7 @@ from ._event_typing import *
 class ClientEvent:
     def HudButtonChangedClientEvent(self, event: EventArgs0):
         """
-        [event]
+        [事件]
 
         | 当原生HUD按钮位置或大小发生改变时触发，例如玩家使用了自定义控件功能会触发，可在该事件中修改mod按钮的位置防止重叠。
         | 修改后的按钮列表中，每个按钮的字段如下：
@@ -39,7 +35,7 @@ class ClientEvent:
         """
     def BlockAnimateRandomTickEvent(self, event: EventArgs1):
         """
-        [event]
+        [事件]
 
         | 以摄像机为中心，随机选取周围的方块触发Tick，触发的数量取决于设备性能。只有添加了 ``netease:block_animate_random_tick`` 的自定义方块才会触发此事件。
 
@@ -53,7 +49,7 @@ class ClientEvent:
         """
     def PlayerAttackEntityEvent(self, event: EventArgs2):
         """
-        [event]
+        [事件]
 
         | 当本地玩家攻击时触发该事件。
 
@@ -68,7 +64,7 @@ class ClientEvent:
         """
     def OnLocalPlayerActionClientEvent(self, event: EventArgs3):
         """
-        [event]
+        [事件]
 
         | 玩家动作事件，当本地玩家开始/停止某些动作时触发该事件。
 
@@ -80,7 +76,7 @@ class ClientEvent:
         """
     def OnLocalPlayerStartJumpClientEvent(self, event: EventArgs4):
         """
-        [event]
+        [事件]
 
         | 本地玩家开始跳跃时触发。
 
@@ -92,7 +88,7 @@ class ClientEvent:
         """
     def GameRenderTickEvent(self, event: EventArgs5):
         """
-        [event]
+        [事件]
 
         | 客户端渲染帧开始时触发该事件，一秒触发次数为当前的帧数。
 
@@ -104,7 +100,7 @@ class ClientEvent:
         """
     def GyroSensorChangedClientEvent(self, event: EventArgs6):
         """
-        [event]
+        [事件]
 
         | 陀螺仪传感器姿态发生变化时触发。
         | 该事件只适用于移动端。
@@ -121,7 +117,7 @@ class ClientEvent:
         """
     def ModBlockEntityTickClientEvent(self, event: EventArgs7):
         """
-        [event]
+        [事件]
 
         | 客户端自定义方块实体tick事件。
         | 只有 ``client_tick`` 字段为 ``true`` 的自定义方块实体才能触发该事件（见 `自定义方块实体 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93.html>`_）。
@@ -139,7 +135,7 @@ class ClientEvent:
         """
     def ModBlockEntityRemoveClientEvent(self, event: EventArgs8):
         """
-        [event]
+        [事件]
 
         | 客户端自定义方块实体卸载时触发。
 
@@ -155,7 +151,7 @@ class ClientEvent:
         """
     def AchievementButtonMovedClientEvent(self, event: EventArgs9):
         """
-        [event]
+        [事件]
 
         | 使用自定义成就系统的时，拖动成就入口结束时触发。
 
@@ -168,7 +164,7 @@ class ClientEvent:
         """
     def OnKeyboardControllerLayoutChangeClientEvent(self, event: EventArgs10):
         """
-        [event]
+        [事件]
 
         | 键盘按键映射改变事件。
 
@@ -182,7 +178,7 @@ class ClientEvent:
         """
     def OnGamepadControllerLayoutChangeClientEvent(self, event: EventArgs11):
         """
-        [event]
+        [事件]
 
         | 游戏手柄按键映射改变事件。
 
@@ -196,7 +192,7 @@ class ClientEvent:
         """
     def OnGamepadTriggerClientEvent(self, event: EventArgs12):
         """
-        [event]
+        [事件]
 
         | 游戏手柄扳机事件。当扣动扳机的力度发生改变时触发。
 
@@ -209,7 +205,7 @@ class ClientEvent:
         """
     def OnGamepadStickClientEvent(self, event: EventArgs13):
         """
-        [event]
+        [事件]
 
         | 游戏手柄摇杆事件。当摇杆摇动位置发生改变时触发。
 
@@ -223,7 +219,7 @@ class ClientEvent:
         """
     def OnGamepadKeyPressClientEvent(self, event: EventArgs14):
         """
-        [event]
+        [事件]
 
         | 游戏手柄按键事件。
 
@@ -237,7 +233,7 @@ class ClientEvent:
         """
     def ModBlockEntityLoadedClientEvent(self, event: EventArgs15):
         """
-        [event]
+        [事件]
 
         | 客户端自定义方块实体加载完成后第一次出现在玩家视野中时触发。
         | 只有在客户端自定义方块实体加载完成后，第一次出现在玩家视野中时才会触发该事件。注意：只有添加了自定义方块实体扩展功能的自定义方块实体才能触发该事件（见 `自定义方块实体外观 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4.1-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93%E5%A4%96%E8%A7%82.html>`_ ）；出生点是常加载区域，来回传送不会重复触发此事件。
@@ -254,7 +250,7 @@ class ClientEvent:
         """
     def CloseNeteaseShopEvent(self, event: EventArgs16):
         """
-        [event]
+        [事件]
 
         | 关闭商城界面时触发，包括脚本商城和Apollo插件商城。
 
@@ -266,7 +262,7 @@ class ClientEvent:
         """
     def PopScreenAfterClientEvent(self, event: EventArgs17):
         """
-        [event]
+        [事件]
 
         | screen移除触发。
         | 与 ``PopScreenEvent`` 不同， ``PopScreenAfterClientEvent`` 触发时机是在完全把UI弹出后，返回的 ``screenName`` 是弹出后最顶层UI的Screen名。
@@ -280,7 +276,7 @@ class ClientEvent:
         """
     def TapOrHoldReleaseClientEvent(self, event: EventArgs18):
         """
-        [event]
+        [事件]
 
         | 玩家点击屏幕后松手时触发。
         | 仅在移动端或pc的F11模式下触发，pc的非F11模式可以使用 ``LeftClickReleaseClientEvent`` 与 ``RightClickReleaseClientEvent`` 事件监听鼠标松开。
@@ -294,7 +290,7 @@ class ClientEvent:
         """
     def TapBeforeClientEvent(self, event: EventArgs19):
         """
-        [event]
+        [事件]
 
         | 玩家点击屏幕并松手，即将响应到游戏内时触发。
         | 仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用 ``LeftClickBeforeClientEvent`` 事件监听鼠标左键。
@@ -315,7 +311,7 @@ class ClientEvent:
         """
     def RightClickReleaseClientEvent(self, event: EventArgs20):
         """
-        [event]
+        [事件]
 
         | 玩家松开鼠标右键时触发。
         | 仅在pc的普通控制模式（即非F11模式）下触发。
@@ -330,7 +326,7 @@ class ClientEvent:
         """
     def RightClickBeforeClientEvent(self, event: EventArgs21):
         """
-        [event]
+        [事件]
 
         | 玩家按下鼠标右键时触发。仅在pc下触发（普通控制模式及F11模式都会触发）。
 
@@ -342,7 +338,7 @@ class ClientEvent:
         """
     def OnMouseMiddleDownClientEvent(self, event: EventArgs22):
         """
-        [event]
+        [事件]
 
         | 鼠标按下中键时触发。
         | 仅通过 ``PushScreen`` 创建的界面能够正常返回坐标，开启F11模式的时候，返回最后点击屏幕时的坐标。
@@ -357,7 +353,7 @@ class ClientEvent:
         """
     def OnKeyPressInGame(self, event: EventArgs23):
         """
-        [event]
+        [事件]
 
         | 按键按下或按键释放时触发。
 
@@ -371,7 +367,7 @@ class ClientEvent:
         """
     def OnClientPlayerStopMove(self, event: EventArgs24):
         """
-        [event]
+        [事件]
 
         | 移动按钮按下释放时触发事件，同时按下多个方向键，需要释放所有的方向键才会触发事件。
 
@@ -383,7 +379,7 @@ class ClientEvent:
         """
     def OnClientPlayerStartMove(self, event: EventArgs25):
         """
-        [event]
+        [事件]
 
         | 移动按钮按下触发事件，在按住一个方向键的同时，去按另外一个方向键，不会触发第二次。
 
@@ -395,7 +391,7 @@ class ClientEvent:
         """
     def OnBackButtonReleaseClientEvent(self, event: EventArgs26):
         """
-        [event]
+        [事件]
 
         | 返回按钮（目前特指安卓系统导航中的返回按钮）松开时触发。
 
@@ -407,7 +403,7 @@ class ClientEvent:
         """
     def MouseWheelClientEvent(self, event: EventArgs27):
         """
-        [event]
+        [事件]
 
         | 鼠标滚轮滚动时触发。
 
@@ -419,7 +415,7 @@ class ClientEvent:
         """
     def LeftClickReleaseClientEvent(self, event: EventArgs28):
         """
-        [event]
+        [事件]
 
         | 玩家松开鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
 
@@ -431,7 +427,7 @@ class ClientEvent:
         """
     def LeftClickBeforeClientEvent(self, event: EventArgs29):
         """
-        [event]
+        [事件]
 
         | 玩家按下鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
 
@@ -443,7 +439,7 @@ class ClientEvent:
         """
     def HoldBeforeClientEvent(self, event: EventArgs30):
         """
-        [event]
+        [事件]
 
         | 玩家长按屏幕，即将响应到游戏内时触发。
         | 仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用 ``RightClickBeforeClientEvent`` 事件监听鼠标右键。
@@ -462,7 +458,7 @@ class ClientEvent:
         """
     def GetEntityByCoordReleaseClientEvent(self, event: EventArgs31):
         """
-        [event]
+        [事件]
 
         | 玩家点击屏幕后松开时触发，多个手指点在屏幕上时，只有最后一个手指松开时触发。
 
@@ -475,7 +471,7 @@ class ClientEvent:
         """
     def GetEntityByCoordEvent(self, event: EventArgs32):
         """
-        [event]
+        [事件]
 
         | 玩家点击屏幕时触发，多个手指点在屏幕上时，只有第一个会触发。
 
@@ -487,7 +483,7 @@ class ClientEvent:
         """
     def ClientJumpButtonReleaseEvent(self, event: EventArgs33):
         """
-        [event]
+        [事件]
 
         | 跳跃按钮按下释放事件。
 
@@ -499,7 +495,7 @@ class ClientEvent:
         """
     def ClientJumpButtonPressDownEvent(self, event: EventArgs34):
         """
-        [event]
+        [事件]
 
         | 跳跃按钮按下事件，返回值设置参数只对当次按下事件起作用。
 
@@ -511,7 +507,7 @@ class ClientEvent:
         """
     def PlaySoundClientEvent(self, event: EventArgs35):
         """
-        [event]
+        [事件]
 
         | 播放场景音效或UI音效时触发。
 
@@ -527,7 +523,7 @@ class ClientEvent:
         """
     def PlayMusicClientEvent(self, event: EventArgs36):
         """
-        [event]
+        [事件]
 
         | 播放背景音乐时触发。
 
@@ -540,7 +536,7 @@ class ClientEvent:
         """
     def OnMusicStopClientEvent(self, event: EventArgs37):
         """
-        [event]
+        [事件]
 
         | 音乐停止时，当玩家调用 ``StopCustomMusic`` 来停止自定义背景音乐时，会触发该事件。
 
@@ -552,7 +548,7 @@ class ClientEvent:
         """
     def ScreenSizeChangedClientEvent(self, event: EventArgs38):
         """
-        [event]
+        [事件]
 
         | 改变屏幕大小时会触发的事件。该事件仅支持PC。
 
@@ -567,7 +563,7 @@ class ClientEvent:
         """
     def PushScreenEvent(self, event: EventArgs39):
         """
-        [event]
+        [事件]
 
         | screen创建触发。
 
@@ -580,7 +576,7 @@ class ClientEvent:
         """
     def PopScreenEvent(self, event: EventArgs40):
         """
-        [event]
+        [事件]
 
         | screen移除触发。
         | ``screenName`` 为正在弹出的Screen名，如果需要获取下一个Screen可使用 ``PopScreenAfterClientEvent`` 。
@@ -594,7 +590,7 @@ class ClientEvent:
         """
     def PlayerChatButtonClickClientEvent(self, event: EventArgs41):
         """
-        [event]
+        [事件]
 
         | 玩家点击聊天按钮或回车键触发呼出聊天窗口时客户端抛出的事件。
 
@@ -606,7 +602,7 @@ class ClientEvent:
         """
     def OnItemSlotButtonClickedEvent(self, event: EventArgs42):
         """
-        [event]
+        [事件]
 
         | 点击快捷栏、背包栏、盔甲栏、副手栏的物品槽时触发。
 
@@ -618,7 +614,7 @@ class ClientEvent:
         """
     def GridComponentSizeChangedClientEvent(self, event: EventArgs43):
         """
-        [event]
+        [事件]
 
         | UI grid组件里格子数目发生变化时触发。
 
@@ -630,7 +626,7 @@ class ClientEvent:
         """
     def ClientPlayerInventoryOpenEvent(self, event: EventArgs44):
         """
-        [event]
+        [事件]
 
         | 打开物品背包界面时触发。
 
@@ -643,7 +639,7 @@ class ClientEvent:
         """
     def ClientPlayerInventoryCloseEvent(self, event: EventArgs45):
         """
-        [event]
+        [事件]
 
         | 关闭物品背包界面时触发。
 
@@ -655,7 +651,7 @@ class ClientEvent:
         """
     def ClientChestOpenEvent(self, event: EventArgs46):
         """
-        [event]
+        [事件]
 
         | 打开箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
 
@@ -670,7 +666,7 @@ class ClientEvent:
         """
     def ClientChestCloseEvent(self, event: EventArgs47):
         """
-        [event]
+        [事件]
 
         | 关闭箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
 
@@ -682,7 +678,7 @@ class ClientEvent:
         """
     def WalkAnimEndClientEvent(self, event: EventArgs48):
         """
-        [event]
+        [事件]
 
         | 走路动作结束时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
 
@@ -694,7 +690,7 @@ class ClientEvent:
         """
     def WalkAnimBeginClientEvent(self, event: EventArgs49):
         """
-        [event]
+        [事件]
 
         | 走路动作开始时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
 
@@ -706,7 +702,7 @@ class ClientEvent:
         """
     def AttackAnimEndClientEvent(self, event: EventArgs50):
         """
-        [event]
+        [事件]
 
         | 攻击动作结束时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
 
@@ -718,7 +714,7 @@ class ClientEvent:
         """
     def AttackAnimBeginClientEvent(self, event: EventArgs51):
         """
-        [event]
+        [事件]
 
         | 攻击动作开始时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
 
@@ -730,7 +726,7 @@ class ClientEvent:
         """
     def StopUsingItemClientEvent(self, event: EventArgs52):
         """
-        [event]
+        [事件]
 
         | 玩家停止使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
 
@@ -743,7 +739,7 @@ class ClientEvent:
         """
     def StartUsingItemClientEvent(self, event: EventArgs53):
         """
-        [event]
+        [事件]
 
         | 玩家使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
 
@@ -756,7 +752,7 @@ class ClientEvent:
         """
     def PlayerTryDropItemClientEvent(self, event: EventArgs54):
         """
-        [event]
+        [事件]
 
         | 玩家丢弃物品时触发。
 
@@ -770,7 +766,7 @@ class ClientEvent:
         """
     def OnCarriedNewItemChangedClientEvent(self, event: EventArgs55):
         """
-        [event]
+        [事件]
 
         | 手持物品发生变化时，触发该事件；数量改变不会触发。
 
@@ -787,7 +783,7 @@ class ClientEvent:
         """
     def ItemReleaseUsingClientEvent(self, event: EventArgs56):
         """
-        [event]
+        [事件]
 
         | 释放正在使用的物品时触发。
 
@@ -803,7 +799,7 @@ class ClientEvent:
         """
     def InventoryItemChangedClientEvent(self, event: EventArgs57):
         """
-        [event]
+        [事件]
 
         | 玩家背包物品变化时客户端抛出的事件。
         | 如果槽位变空，变化后槽位中物品为空气。
@@ -821,7 +817,7 @@ class ClientEvent:
         """
     def GrindStoneRemovedEnchantClientEvent(self, event: EventArgs58):
         """
-        [event]
+        [事件]
 
         | 玩家点击砂轮合成得到的物品时抛出的事件。
 
@@ -837,7 +833,7 @@ class ClientEvent:
         """
     def ClientShapedRecipeTriggeredEvent(self, event: EventArgs59):
         """
-        [event]
+        [事件]
 
         | 玩家合成物品时触发。
 
@@ -849,7 +845,7 @@ class ClientEvent:
         """
     def ClientItemUseOnEvent(self, event: EventArgs60):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 玩家在对方块使用物品时客户端抛出的事件。
         | 注：如果需要取消物品的使用需要同时在 ``ClientItemUseOnEvent`` 和 ``ServerItemUseOnEvent`` 中将 ``ret`` 设置为 ``True`` 才能正确取消。
@@ -874,7 +870,7 @@ class ClientEvent:
         """
     def ClientItemTryUseEvent(self, event: EventArgs61):
         """
-        [event]
+        [事件]
 
         | 玩家点击右键尝试使用物品时客户端抛出的事件，可以通过设置 ``cancel`` 为 ``True`` 取消使用物品。
         | 注：如果需要取消物品的使用需要同时在 ``ClientItemTryUseEvent`` 和 ``ServerItemTryUseEvent`` 中将 ``cancel`` 设置为 ``True`` 才能正确取消。
@@ -891,7 +887,7 @@ class ClientEvent:
         """
     def AnvilCreateResultItemAfterClientEvent(self, event: EventArgs62):
         """
-        [event]
+        [事件]
 
         | 玩家点击铁砧合成得到的物品时抛出的事件。
 
@@ -907,7 +903,7 @@ class ClientEvent:
         """
     def ActorUseItemClientEvent(self, event: EventArgs63):
         """
-        [event]
+        [事件]
 
         | 玩家使用物品时客户端抛出的事件（比较特殊不走该事件的例子：1.喝牛奶；2.染料对有水的炼药锅使用；3.盔甲架装备盔甲）。
 
@@ -921,7 +917,7 @@ class ClientEvent:
         """
     def ActorAcquiredItemClientEvent(self, event: EventArgs64):
         """
-        [event]
+        [事件]
 
         | 玩家获得物品时客户端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
 
@@ -936,7 +932,7 @@ class ClientEvent:
         """
     def StepOnBlockClientEvent(self, event: EventArgs65):
         """
-        [event]
+        [事件]
 
         | 实体刚移动至一个新实心方块时触发。
         | 在合并微软更新之后，本事件触发时机与微软molang实验性玩法组件 ``minecraft:on_step_on`` 一致。
@@ -966,7 +962,7 @@ class ClientEvent:
         """
     def StartDestroyBlockClientEvent(self, event: EventArgs66):
         """
-        [event]
+        [事件]
 
         | 玩家开始挖方块时触发。创造模式下不触发。
         | 如果是隔着火焰挖方块，即使将该事件cancel掉，火焰也会被扑灭。如果要阻止火焰扑灭，需要配合 ``ExtinguishFireClientEvent`` 使用。
@@ -984,7 +980,7 @@ class ClientEvent:
         """
     def StepOffBlockClientEvent(self, event: EventArgs67):
         """
-        [event]
+        [事件]
 
         | 实体移动离开一个实心方块时触发。
         | 不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnStepOff`` 接口注册才能触发。
@@ -1010,7 +1006,7 @@ class ClientEvent:
         """
     def ShearsDestoryBlockBeforeClientEvent(self, event: EventArgs68):
         """
-        [event]
+        [事件]
 
         | 玩家手持剪刀破坏方块时，有剪刀特殊效果的方块会在客户端线程触发该事件。
         | 目前仅绊线会触发，需要取消剪刀效果得配合 ``ShearsDestoryBlockBeforeServerEvent`` 同时使用。
@@ -1032,7 +1028,7 @@ class ClientEvent:
         """
     def PlayerTryDestroyBlockClientEvent(self, event: EventArgs69):
         """
-        [event]
+        [事件]
 
         | 当玩家即将破坏方块时，客户端线程触发该事件。
         | 主要用于床，旗帜，箱子这些根据方块实体数据进行渲染的方块，一般情况下请使用 ``ServerPlayerTryDestroyBlockEvent`` 。
@@ -1052,7 +1048,7 @@ class ClientEvent:
         """
     def OnStandOnBlockClientEvent(self, event: EventArgs70):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 当实体站立到方块上时客户端持续触发。
         | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnStandOn`` 接口注册才能触发。
@@ -1086,7 +1082,7 @@ class ClientEvent:
         """
     def OnModBlockNeteaseEffectCreatedClientEvent(self, event: EventArgs71):
         """
-        [event]
+        [事件]
 
         | 自定义方块实体绑定的特效创建成功事件。
         | 以及使用接口 ``CreateFrameEffectForBlockEntity`` 或 ``CreateParticleEffectForBlockEntity`` 为自定义方块实体添加特效成功时触发。
@@ -1102,7 +1098,7 @@ class ClientEvent:
         """
     def OnEntityInsideBlockClientEvent(self, event: EventArgs72):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 当实体碰撞盒所在区域有方块时，客户端持续触发。
         | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnEntityInside`` 接口注册才能触发。
@@ -1135,7 +1131,7 @@ class ClientEvent:
         """
     def OnAfterFallOnBlockClientEvent(self, event: EventArgs73):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 当实体降落到方块后客户端触发，主要用于力的计算。
         | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
@@ -1160,7 +1156,7 @@ class ClientEvent:
         """
     def FallingBlockCauseDamageBeforeClientEvent(self, event: EventArgs74):
         """
-        [event]
+        [事件]
 
         | 当下落的方块开始计算砸到实体的伤害时，客户端触发该事件。
         | 不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
@@ -1184,7 +1180,7 @@ class ClientEvent:
         """
     def ClientBlockUseEvent(self, event: EventArgs75):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 玩家右键点击新版自定义方块（或者通过接口 ``AddBlockItemListenForUseEvent`` 增加监听的MC原生游戏方块）时客户端抛出该事件。
         | 有的方块是在 ``ServerBlockUseEvent`` 中设置 ``cancel`` 生效，但是有部分方块是在 ``ClientBlockUseEvent`` 中设置 ``cancel`` 才生效，如有需求建议在两个事件中同时设置 ``cancel`` 以保证生效。
@@ -1206,7 +1202,7 @@ class ClientEvent:
         """
     def PerspChangeClientEvent(self, event: EventArgs76):
         """
-        [event]
+        [事件]
 
         | 视角切换时会触发的事件。
         | 视角数字代表含义 0`` -- 第一人称 1`` -- 第三人称背面 2`` -- 第三人称正面。
@@ -1215,12 +1211,12 @@ class ClientEvent:
 
         【事件参数】
 
-        - ``from_`` -- int，切换前的视角
+        - ``from`` -- int，切换前的视角
         - ``to`` -- int，切换后的视角
         """
     def OnPlayerHitBlockClientEvent(self, event: EventArgs77):
         """
-        [event]
+        [事件]
 
         | 通过 ``OpenPlayerHitBlockDetection`` 打开方块碰撞检测后，当玩家碰撞到方块时触发该事件。
         | 玩家着地时会触发 ``OnGroundClientEvent`` ，而不是该事件。
@@ -1246,7 +1242,7 @@ class ClientEvent:
         """
     def GameTypeChangedClientEvent(self, event: EventArgs78):
         """
-        [event]
+        [事件]
 
         | 个人游戏模式发生变化时客户端触发。
         | 游戏模式：生存，创造，冒险分别为0~2。
@@ -1262,7 +1258,7 @@ class ClientEvent:
         """
     def ExtinguishFireClientEvent(self, event: EventArgs79):
         """
-        [event]
+        [事件]
 
         | 玩家扑灭火焰时触发。下雨，倒水等方式熄灭火焰不会触发。
 
@@ -1276,7 +1272,7 @@ class ClientEvent:
         """
     def DimensionChangeFinishClientEvent(self, event: EventArgs80):
         """
-        [event]
+        [事件]
 
         | 玩家维度改变完成后触发。
         | 当通过传送门从末地回到主世界时， ``toPos`` 的y值为32767，其他情况一般会比设置值高1.62。
@@ -1292,7 +1288,7 @@ class ClientEvent:
         """
     def DimensionChangeClientEvent(self, event: EventArgs81):
         """
-        [event]
+        [事件]
 
         | 玩家维度改变时触发。
         | 当通过传送门从末地回到主世界时， ``toY`` 值为32767，其他情况一般会比设置值高1.62。
@@ -1313,7 +1309,7 @@ class ClientEvent:
         """
     def CameraMotionStopClientEvent(self, event: EventArgs82):
         """
-        [event]
+        [事件]
 
         | 相机运动器停止事件。相机添加运动器并开始运行后，运动器自动停止时触发。
         | 注意：该事件触发表示运动器播放顺利完成，手动调用的 ``StopCameraMotion`` 、 ``RemoveCameraMotion`` 不会触发该事件。
@@ -1327,7 +1323,7 @@ class ClientEvent:
         """
     def CameraMotionStartClientEvent(self, event: EventArgs83):
         """
-        [event]
+        [事件]
 
         | 相机运动器开始事件。相机添加运动器后，运动器开始运行时触发。
 
@@ -1339,7 +1335,7 @@ class ClientEvent:
         """
     def LeaveEntityClientEvent(self, event: EventArgs84):
         """
-        [event]
+        [事件]
 
         | 玩家远离生物时触发。
 
@@ -1352,7 +1348,7 @@ class ClientEvent:
         """
     def StartRidingClientEvent(self, event: EventArgs85):
         """
-        [event]
+        [事件]
 
         | 一个实体即将骑乘另外一个实体时触发。
         | 如果需要修改 ``cancel`` ，请通过服务端事件 ``StartRidingServerEvent`` 修改，客户端触发该事件时，实体已经骑乘成功。
@@ -1366,7 +1362,7 @@ class ClientEvent:
         """
     def OnMobHitMobClientEvent(self, event: EventArgs86):
         """
-        [event]
+        [事件]
 
         | 通过 ``OpenPlayerHitMobDetection`` 打开生物碰撞检测后，当生物间（包含玩家）碰撞时触发该事件。
         | 注：客户端和服务端分别作碰撞检测，可能两个事件返回的略有差异。
@@ -1388,7 +1384,7 @@ class ClientEvent:
         """
     def OnGroundClientEvent(self, event: EventArgs87):
         """
-        [event]
+        [事件]
 
         | 实体着地事件。玩家，沙子，铁砧，掉落的物品，点燃的TNT掉落地面时触发，其余实体着地不触发。
 
@@ -1400,7 +1396,7 @@ class ClientEvent:
         """
     def HealthChangeClientEvent(self, event: EventArgs88):
         """
-        [event]
+        [事件]
 
         | 生物生命值发生变化时触发。
 
@@ -1409,12 +1405,12 @@ class ClientEvent:
         【事件参数】
 
         - ``entityId`` -- str，实体ID
-        - ``from_`` -- float，变化前的生命值
+        - ``from`` -- float，变化前的生命值
         - ``to`` -- float，变化后的生命值
         """
     def EntityStopRidingEvent(self, event: EventArgs89):
         """
-        [event]
+        [事件]
 
         | 当实体停止骑乘时触发。
         | 以下情况不允许取消：
@@ -1440,7 +1436,7 @@ class ClientEvent:
         """
     def EntityModelChangedClientEvent(self, event: EventArgs90):
         """
-        [event]
+        [事件]
 
         | 实体模型切换时触发。
 
@@ -1454,7 +1450,7 @@ class ClientEvent:
         """
     def ApproachEntityClientEvent(self, event: EventArgs91):
         """
-        [event]
+        [事件]
 
         | 玩家靠近生物时触发。
 
@@ -1467,7 +1463,7 @@ class ClientEvent:
         """
     def UnLoadClientAddonScriptsBefore(self, event: EventArgs92):
         """
-        [event]
+        [事件]
 
         | 客户端卸载mod之前触发。
 
@@ -1479,7 +1475,7 @@ class ClientEvent:
         """
     def RemovePlayerAOIClientEvent(self, event: EventArgs93):
         """
-        [event]
+        [事件]
 
         | 玩家离开当前玩家同一个区块时触发AOI事件。
 
@@ -1491,7 +1487,7 @@ class ClientEvent:
         """
     def RemoveEntityClientEvent(self, event: EventArgs94):
         """
-        [event]
+        [事件]
 
         | 客户端侧实体被移除时触发。
         | 客户端接收服务端AOI事件时触发，原事件名 ``RemoveEntityPacketEvent`` 。
@@ -1504,7 +1500,7 @@ class ClientEvent:
         """
     def OnLocalPlayerStopLoading(self, event: EventArgs95):
         """
-        [event]
+        [事件]
 
         | 玩家进入存档，出生点地形加载完成时触发。该事件触发时可以进行切换维度的操作。
 
@@ -1516,7 +1512,7 @@ class ClientEvent:
         """
     def OnCommandOutputClientEvent(self, event: EventArgs96):
         """
-        [event]
+        [事件]
 
         | 当command命令有成功消息输出时触发。
         | 部分命令在返回的时候没有命令名称，命令组件需要 ``showOutput`` 参数为 ``True`` 时才会有返回。
@@ -1530,7 +1526,7 @@ class ClientEvent:
         """
     def LoadClientAddonScriptsAfter(self, event: EventArgs97):
         """
-        [event]
+        [事件]
 
         | 客户端加载mod完成事件。
 
@@ -1542,7 +1538,7 @@ class ClientEvent:
         """
     def ChunkLoadedClientEvent(self, event: EventArgs98):
         """
-        [event]
+        [事件]
 
         | 客户端区块加载完成时触发。
 
@@ -1556,7 +1552,7 @@ class ClientEvent:
         """
     def ChunkAcquireDiscardedClientEvent(self, event: EventArgs99):
         """
-        [event]
+        [事件]
 
         | 客户端区块即将被卸载时触发。
         | 区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载，参考 `区块介绍 <https://minecraft.fandom.com/zh/wiki/%E5%8C%BA%E5%9D%97>`_。
@@ -1571,7 +1567,7 @@ class ClientEvent:
         """
     def AddPlayerCreatedClientEvent(self, event: EventArgs100):
         """
-        [event]
+        [事件]
 
         | 玩家进入当前玩家所在的区块AOI后，玩家皮肤数据异步加载完成后触发的事件。
         | 由于玩家皮肤是异步加载的原因，该事件触发时机比 ``AddPlayerAOIClientEvent`` 晚，触发该事件后可以对该玩家调用相关玩家渲染接口。
@@ -1585,7 +1581,7 @@ class ClientEvent:
         """
     def AddPlayerAOIClientEvent(self, event: EventArgs101):
         """
-        [event]
+        [事件]
 
         | 玩家加入游戏或者其余玩家进入当前玩家所在的区块时触发的AOI事件，替换 ``AddPlayerEvent`` 。
         | 该事件触发只表明在服务端数据中接收到了新玩家，并不能代表此时玩家在客户端中可见，若想在玩家进入AOI后立马调用玩家渲染相关接口，建议使用 ``AddPlayerCreatedClientEvent`` 。
@@ -1598,7 +1594,7 @@ class ClientEvent:
         """
     def AddEntityClientEvent(self, event: EventArgs102):
         """
-        [event]
+        [事件]
 
         | 客户端侧创建新实体时触发。创建玩家时不会触发该事件。
 
@@ -1618,7 +1614,7 @@ class ClientEvent:
         """
     def OnScriptTickClient(self, event: EventArgs103):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 客户端tick事件，1秒30次。
 
@@ -1630,7 +1626,7 @@ class ClientEvent:
         """
     def UiInitFinished(self, event: EventArgs104):
         """
-        [event]
+        [事件]
 
         | UI初始化框架完成，此时可以创建UI。
         | 切换维度后会重新初始化UI并触发该事件。
@@ -1646,7 +1642,7 @@ class ClientEvent:
 class ServerEvent:
     def PlayerTryPutCustomContainerItemServerEvent(self, event: EventArgs105):
         """
-        [event]
+        [事件]
 
         | 玩家尝试将物品放入自定义容器时触发该事件。
 
@@ -1665,7 +1661,7 @@ class ServerEvent:
         """
     def MountTamingEvent(self, event: EventArgs106):
         """
-        [event]
+        [事件]
 
         | 玩家通过骑乘驯服生物后触发该事件。
         | 该事件是检测 ``minecraft:tamemount`` 行为包组件，即玩家通过不断骑乘生物，使其冒出爱心时触发。
@@ -1679,7 +1675,7 @@ class ServerEvent:
         """
     def OnPlayerActionServerEvent(self, event: EventArgs107):
         """
-        [event]
+        [事件]
 
         | 玩家动作事件，当玩家开始/停止某些动作时触发该事件。
 
@@ -1692,7 +1688,7 @@ class ServerEvent:
         """
     def CustomCommandTriggerServerEvent(self, event: EventArgs108):
         """
-        [event]
+        [事件]
 
         | 自定义命令触发事件。
         | ``args`` 中的某个dict参数说明如下：
@@ -1721,7 +1717,7 @@ class ServerEvent:
         """
     def GlobalCommandServerEvent(self, event: EventArgs109):
         """
-        [event]
+        [事件]
 
         | 服务端全局命令事件。包括聊天输入指令、 ``SetCommand`` 接口、命令方块、命令方块矿车执行指令时触发、行为包动画执行指令。
 
@@ -1737,7 +1733,7 @@ class ServerEvent:
         """
     def PlayerPickupArrowServerEvent(self, event: EventArgs110):
         """
-        [event]
+        [事件]
 
         | 玩家即将捡起抛射物时触发，包括使用 ``netease:pick_up`` 的自定义抛射物。
 
@@ -1753,7 +1749,7 @@ class ServerEvent:
         """
     def EntityDieLoottableAfterServerEvent(self, event: EventArgs111):
         """
-        [event]
+        [事件]
 
         | 生物死亡掉落物品之后触发。
         | 该事件为生物死亡掉落物品生成后触发，可以得到掉落物的id列表，如果需要更改掉落物，请使用 ``EntityDieLoottableServerEvent`` 。
@@ -1771,7 +1767,7 @@ class ServerEvent:
         """
     def PlayerHungerChangeServerEvent(self, event: EventArgs112):
         """
-        [event]
+        [事件]
 
         | 玩家饥饿度变化时触发该事件。
         | 当通过 ``SetPlayerHunger`` 接口设置饥饿度时，不会触发服务端对应的事件。
@@ -1788,7 +1784,7 @@ class ServerEvent:
         """
     def ItemDurabilityChangedServerEvent(self, event: EventArgs113):
         """
-        [event]
+        [事件]
 
         | 物品耐久度变化事件。
         | 目前只有存在耐久的物品，并且有物主的物品才会触发该事件，存在发射器中发射导致的物品耐久变化不会触发该事件。
@@ -1806,7 +1802,7 @@ class ServerEvent:
         """
     def PlaceNeteaseLargeFeatureServerEvent(self, event: EventArgs114):
         """
-        [event]
+        [事件]
 
         | 网易版大型结构即将生成时服务端抛出该事件。
 
@@ -1824,7 +1820,7 @@ class ServerEvent:
         """
     def PlayerNamedEntityServerEvent(self, event: EventArgs115):
         """
-        [event]
+        [事件]
 
         | 玩家用命名牌重命名实体时触发，例如玩家手持命名牌对羊修改名字、玩家手持命名牌对盔甲架修改名字。
 
@@ -1840,7 +1836,7 @@ class ServerEvent:
         """
     def PlayerFeedEntityServerEvent(self, event: EventArgs116):
         """
-        [event]
+        [事件]
 
         | 玩家喂养生物时触发，例如玩家手持小麦喂养牛、玩家手持胡萝卜喂养幼年猪。
         | 对于幼年生物，用对应的物品喂养后就可以触发事件，例如用小麦喂养幼年牛、用生鲑鱼喂养幼年猫；对于成年生物，用对应的物品喂养后，该生物要进入“求爱模式”（持续散发红心粒子），才可以触发事件。
@@ -1861,7 +1857,7 @@ class ServerEvent:
         """
     def lobbyGoodBuySucServerEvent(self, event: EventArgs117):
         """
-        [event]
+        [事件]
 
         | 玩家登录联机大厅服务器，或者联机大厅游戏内购买商品时触发。如果是玩家登录，触发时玩家客户端已经触发了 ``UiInitFinished`` 事件。
 
@@ -1874,7 +1870,7 @@ class ServerEvent:
         """
     def UrgeShipEvent(self, event: EventArgs118):
         """
-        [event]
+        [事件]
 
         | 玩家点击商城催促发货按钮时触发该事件。
 
@@ -1886,7 +1882,7 @@ class ServerEvent:
         """
     def PlayerInventoryOpenScriptServerEvent(self, event: EventArgs119):
         """
-        [event]
+        [事件]
 
         | 某个客户端打开物品背包界面时触发。可以监听此事件判定客户端是否打开了创造背包。
 
@@ -1899,7 +1895,7 @@ class ServerEvent:
         """
     def WalkAnimEndServerEvent(self, event: EventArgs120):
         """
-        [event]
+        [事件]
 
         | 当走路动作结束时触发。
         | 使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
@@ -1912,7 +1908,7 @@ class ServerEvent:
         """
     def WalkAnimBeginServerEvent(self, event: EventArgs121):
         """
-        [event]
+        [事件]
 
         | 当走路动作开始时触发。
         | 使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
@@ -1925,7 +1921,7 @@ class ServerEvent:
         """
     def JumpAnimBeginServerEvent(self, event: EventArgs122):
         """
-        [event]
+        [事件]
 
         | 当跳跃动作开始时触发。
         | 使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
@@ -1938,7 +1934,7 @@ class ServerEvent:
         """
     def AttackAnimEndServerEvent(self, event: EventArgs123):
         """
-        [event]
+        [事件]
 
         | 当攻击动作结束时触发。
         | 使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
@@ -1951,7 +1947,7 @@ class ServerEvent:
         """
     def AttackAnimBeginServerEvent(self, event: EventArgs124):
         """
-        [event]
+        [事件]
 
         | 当攻击动作开始时触发。
         | 使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
@@ -1964,7 +1960,7 @@ class ServerEvent:
         """
     def UIContainerItemChangedServerEvent(self, event: EventArgs125):
         """
-        [event]
+        [事件]
 
         | 合成容器物品发生变化时触发。
         | 合成容器包括工作台、铁砧、附魔台、织布机、砂轮、切石机、制图台、锻造台，输入物品发生变化时会触发本事件。
@@ -1983,7 +1979,7 @@ class ServerEvent:
         """
     def ShearsUseToBlockBeforeServerEvent(self, event: EventArgs126):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 实体手持剪刀对方块使用时，有剪刀特殊效果的方块会在服务端线程触发该事件。
         | 目前会触发该事件的方块：南瓜、蜂巢。
@@ -2007,7 +2003,7 @@ class ServerEvent:
         """
     def ServerPlayerTryTouchEvent(self, event: EventArgs127):
         """
-        [event]
+        [事件]
 
         | 玩家即将捡起物品时触发。
 
@@ -2023,7 +2019,7 @@ class ServerEvent:
         """
     def ServerItemTryUseEvent(self, event: EventArgs128):
         """
-        [event]
+        [事件]
 
         | 玩家点击右键尝试使用物品时服务端抛出的事件。
         | 注：如果需要取消物品的使用需要同时在 ``ClientItemTryUseEvent`` 和 ``ServerItemTryUseEvent`` 中将 ``cancel`` 设置为 ``True`` 才能正确取消。
@@ -2039,7 +2035,7 @@ class ServerEvent:
         """
     def PlayerDropItemServerEvent(self, event: EventArgs129):
         """
-        [event]
+        [事件]
 
         | 玩家丢弃物品时触发。
 
@@ -2052,7 +2048,7 @@ class ServerEvent:
         """
     def OnPlayerBlockedByShieldBeforeServerEvent(self, event: EventArgs130):
         """
-        [event]
+        [事件]
 
         | 玩家使用盾牌抵挡伤害之前触发。
         | 盾牌抵挡了所有伤害时，才会触发事件；部分抛射物造成的伤害无法全部抵挡，无法触发事件，例如带有穿透魔咒的弩。
@@ -2068,7 +2064,7 @@ class ServerEvent:
         """
     def OnPlayerBlockedByShieldAfterServerEvent(self, event: EventArgs131):
         """
-        [event]
+        [事件]
 
         | 玩家使用盾牌抵挡伤害之后触发.
 
@@ -2083,7 +2079,7 @@ class ServerEvent:
         """
     def OnPlayerActiveShieldServerEvent(self, event: EventArgs132):
         """
-        [event]
+        [事件]
 
         | 玩家激活/取消激活盾牌触发的事件。包括玩家持盾进入潜行状态，以及在潜行状态切换盾牌（切换耐久度不同的相同盾牌不会触发）。
 
@@ -2099,7 +2095,7 @@ class ServerEvent:
         """
     def OnOffhandItemChangedServerEvent(self, event: EventArgs133):
         """
-        [event]
+        [事件]
 
         | 玩家切换副手物品时触发该事件。
         | 当原有的物品槽内容为空时， ``oldItemName`` 值为 ``"minecraft:air"`` ，且 ``oldItem`` 其余字段不存在。
@@ -2115,7 +2111,7 @@ class ServerEvent:
         """
     def OnNewArmorExchangeServerEvent(self, event: EventArgs134):
         """
-        [event]
+        [事件]
 
         | 玩家切换盔甲时触发该事件。
         | 当玩家登录时，每个盔甲槽位会触发两次该事件，第一次为 ``None`` 切换到身上的装备，第二次的 ``oldArmorDict`` 和 ``newArmorDict`` 都为身上装备。如果槽位为空，则是触发两次从 ``None`` 切换到 ``None`` 的事件。
@@ -2132,7 +2128,7 @@ class ServerEvent:
         """
     def OnItemPutInEnchantingModelServerEvent(self, event: EventArgs135):
         """
-        [event]
+        [事件]
 
         | 玩家将可附魔物品放到附魔台上时触发。
         | ``options`` 为包含三个 ``dict`` 的 ``list`` ，单个 ``dict`` 的格式如下：
@@ -2157,7 +2153,7 @@ class ServerEvent:
         """
     def ItemUseOnAfterServerEvent(self, event: EventArgs136):
         """
-        [event]
+        [事件]
 
         | 玩家在对方块使用物品之后服务端抛出的事件。
         | 在 ``ServerItemUseOnEvent`` 和原版物品使用事件（例如 ``StartUsingItemClientEvent`` ）之后触发。
@@ -2181,7 +2177,7 @@ class ServerEvent:
         """
     def ItemUseAfterServerEvent(self, event: EventArgs137):
         """
-        [event]
+        [事件]
 
         | 玩家在使用物品之后服务端抛出的事件。
         | 做出使用物品这个动作之后触发，一些需要蓄力的物品使用事件（ ``ActorUseItemServerEvent`` ）会在之后触发。如投掷三叉戟，先触发本事件，投出去之后再触发 ``ActorUseItemServerEvent`` 。
@@ -2195,7 +2191,7 @@ class ServerEvent:
         """
     def ItemReleaseUsingServerEvent(self, event: EventArgs138):
         """
-        [event]
+        [事件]
 
         | 释放正在使用的物品时触发。
 
@@ -2212,7 +2208,7 @@ class ServerEvent:
         """
     def InventoryItemChangedServerEvent(self, event: EventArgs139):
         """
-        [event]
+        [事件]
 
         | 玩家背包物品变化时服务端抛出的事件。
         | 如果槽位变空，变化后槽位中物品为空气。
@@ -2231,7 +2227,7 @@ class ServerEvent:
         """
     def FurnaceBurnFinishedServerEvent(self, event: EventArgs140):
         """
-        [event]
+        [事件]
 
         | 服务端熔炉烧制触发事件。熔炉、高炉、烟熏炉烧出物品时触发。
 
@@ -2247,7 +2243,7 @@ class ServerEvent:
         """
     def CraftItemOutputChangeServerEvent(self, event: EventArgs141):
         """
-        [event]
+        [事件]
 
         | 玩家从容器拿出生成物品时触发。
         | 支持工作台，铁砧，砂轮等工作方块。
@@ -2267,7 +2263,7 @@ class ServerEvent:
         """
     def ContainerItemChangedServerEvent(self, event: EventArgs142):
         """
-        [event]
+        [事件]
 
         | 容器物品变化事件。
         | 储物容器（箱子，潜影箱），熔炉，酿造台，发射器，投掷器，漏斗，炼药锅，唱片机，高炉，烟熏炉中物品发生变化会触发此事件。
@@ -2288,7 +2284,7 @@ class ServerEvent:
         """
     def StepOnBlockServerEvent(self, event: EventArgs143):
         """
-        [event]
+        [事件]
 
         | 实体刚移动至一个新实心方块时触发。
         | 在合并微软更新之后，本事件触发时机与微软molang实验性玩法组件 ``"minecraft:on_step_on"`` 一致。
@@ -2310,7 +2306,7 @@ class ServerEvent:
         """
     def StepOffBlockServerEvent(self, event: EventArgs144):
         """
-        [event]
+        [事件]
 
         | 实体移动离开一个实心方块时触发。
         | 不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnStepOff`` 接口注册才能触发。
@@ -2336,7 +2332,7 @@ class ServerEvent:
         """
     def StartDestroyBlockServerEvent(self, event: EventArgs145):
         """
-        [event]
+        [事件]
 
         | 玩家开始挖方块时触发。创造模式下不触发。
         | 如果是隔着火焰挖方块，即使将该事件 ``cancel`` 掉，火焰也会被扑灭。如果要阻止火焰扑灭，需要配合 ``ExtinguishFireServerEvent`` 使用。
@@ -2359,7 +2355,7 @@ class ServerEvent:
         """
     def ShearsDestoryBlockBeforeServerEvent(self, event: EventArgs146):
         """
-        [event]
+        [事件]
 
         | 玩家手持剪刀破坏方块时，有剪刀特殊效果的方块会在服务端线程触发该事件。
         | 该事件触发在 ``ServerPlayerTryDestroyBlockEvent`` 之后，如果在 ``ServerPlayerTryDestroyBlockEvent`` 事件中设置了取消Destroy或取消掉落物会导致该事件不触发。
@@ -2383,7 +2379,7 @@ class ServerEvent:
         """
     def ServerPlayerTryDestroyBlockEvent(self, event: EventArgs147):
         """
-        [event]
+        [事件]
 
         | 当玩家即将破坏方块时，服务端线程触发该事件。
         | 若需要禁止某些特殊方块的破坏，需要配合 ``PlayerTryDestroyBlockClientEvent`` 一起使用，例如床，旗帜，箱子这些根据方块实体数据进行渲染的方块。
@@ -2405,7 +2401,7 @@ class ServerEvent:
         """
     def ServerPlaceBlockEntityEvent(self, event: EventArgs148):
         """
-        [event]
+        [事件]
 
         | 手动放置或通过接口创建含自定义方块实体的方块时触发，此时可向该方块实体中存放数据。
 
@@ -2421,7 +2417,7 @@ class ServerEvent:
         """
     def ServerEntityTryPlaceBlockEvent(self, event: EventArgs149):
         """
-        [event]
+        [事件]
 
         | 当生物试图放置方块时触发该事件。
         | 部分放置后会产生实体的方块、可操作的方块、带有特殊逻辑的方块，不会触发该事件，包括但不限于床、门、告示牌、花盆、红石中继器、船、炼药锅、头部模型、蛋糕、酿造台、盔甲架等。
@@ -2446,7 +2442,7 @@ class ServerEvent:
         """
     def ServerBlockEntityTickEvent(self, event: EventArgs150):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 自定义方块配置了 ``"netease:block_entity"`` 组件并设 ``tick`` 为 ``true`` ，方块在玩家的模拟距离（新建存档时可以设置，默认为4个区块）内，或者在tickingarea内的时候触发。
         | 方块实体的tick事件频率为每秒钟20次。
@@ -2464,7 +2460,7 @@ class ServerEvent:
         """
     def PistonActionServerEvent(self, event: EventArgs151):
         """
-        [event]
+        [事件]
 
         | 活塞或者粘性活塞推送/缩回影响附近方块时触发。
 
@@ -2486,7 +2482,7 @@ class ServerEvent:
         """
     def OnStandOnBlockServerEvent(self, event: EventArgs152):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 当实体站立到方块上时服务端持续触发。
         | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnStandOn`` 接口注册才能触发。
@@ -2513,7 +2509,7 @@ class ServerEvent:
         """
     def OnBeforeFallOnBlockServerEvent(self, event: EventArgs153):
         """
-        [event]
+        [事件]
 
         | 当实体刚降落到方块上时服务端触发，主要用于伤害计算。
         | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
@@ -2534,7 +2530,7 @@ class ServerEvent:
         """
     def OnAfterFallOnBlockServerEvent(self, event: EventArgs154):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 当实体降落到方块后服务端触发，主要用于力的计算。
         | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
@@ -2559,7 +2555,7 @@ class ServerEvent:
         """
     def HopperTryPullOutServerEvent(self, event: EventArgs155):
         """
-        [event]
+        [事件]
 
         | 当漏斗以毗邻的方式连接容器时，即从旁边连接容器时，漏斗向容器开始输出物品时触发，事件仅触发一次。
 
@@ -2578,7 +2574,7 @@ class ServerEvent:
         """
     def HopperTryPullInServerEvent(self, event: EventArgs156):
         """
-        [event]
+        [事件]
 
         | 当漏斗上方连接容器后，容器往漏斗开始输入物品时触发，事件仅触发一次。
 
@@ -2597,7 +2593,7 @@ class ServerEvent:
         """
     def HeavyBlockStartFallingServerEvent(self, event: EventArgs157):
         """
-        [event]
+        [事件]
 
         | 当重力方块变为下落的方块实体后，服务端触发该事件。
         | 不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
@@ -2615,7 +2611,7 @@ class ServerEvent:
         """
     def GrassBlockToDirtBlockServerEvent(self, event: EventArgs158):
         """
-        [event]
+        [事件]
 
         | 草方块变成泥土方块时触发。
         | 指令或者接口的设置不会触发该事件。
@@ -2631,7 +2627,7 @@ class ServerEvent:
         """
     def FarmBlockToDirtBlockServerEvent(self, event: EventArgs159):
         """
-        [event]
+        [事件]
 
         | 耕地退化为泥土时触发。
         | 指令或者接口的设置不会触发该事件。
@@ -2648,7 +2644,7 @@ class ServerEvent:
         """
     def FallingBlockReturnHeavyBlockServerEvent(self, event: EventArgs160):
         """
-        [event]
+        [事件]
 
         | 当下落的方块实体变回普通重力方块时，服务端触发该事件。
         | 不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
@@ -2668,7 +2664,7 @@ class ServerEvent:
         """
     def FallingBlockCauseDamageBeforeServerEvent(self, event: EventArgs161):
         """
-        [event]
+        [事件]
 
         | 当下落的方块开始计算砸到实体的伤害时，服务端触发该事件。
         | 不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
@@ -2692,7 +2688,7 @@ class ServerEvent:
         """
     def FallingBlockBreakServerEvent(self, event: EventArgs162):
         """
-        [event]
+        [事件]
 
         | 当下落的方块实体被破坏时，服务端触发该事件。
         | 不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
@@ -2712,7 +2708,7 @@ class ServerEvent:
         """
     def EntityPlaceBlockAfterServerEvent(self, event: EventArgs163):
         """
-        [event]
+        [事件]
 
         | 当生物成功放置方块后触发。
         | 部分放置后会产生实体的方块、可操作的方块、带有特殊逻辑的方块，不会触发该事件，包括但不限于床、门、告示牌、花盆、红石中继器、船、炼药锅、头部模型、蛋糕、酿造台、盔甲架等。
@@ -2732,7 +2728,7 @@ class ServerEvent:
         """
     def DirtBlockToGrassBlockServerEvent(self, event: EventArgs164):
         """
-        [event]
+        [事件]
 
         | 泥土方块变成草方块时触发。
         | 指令或者接口的设置不会触发该事件。
@@ -2748,7 +2744,7 @@ class ServerEvent:
         """
     def CommandBlockUpdateEvent(self, event: EventArgs165):
         """
-        [event]
+        [事件]
 
         | 玩家尝试修改命令方块的内置命令时。
         | 当修改的目标为命令方块矿车时（此时 ``isBlock`` 为 ``False`` ），设置 ``cancel`` 为 ``True`` ，依旧可以阻止修改命令方块矿车的内部指令，但是从客户端能够看到命令方块矿车的内部指令变化了，不过这仅仅是假象，重新登录或者其他客户端打开命令方块矿车的设置界面，就会发现其实内部指令没有变化。
@@ -2769,7 +2765,7 @@ class ServerEvent:
         """
     def CommandBlockContainerOpenEvent(self, event: EventArgs166):
         """
-        [event]
+        [事件]
 
         | 玩家点击命令方块，尝试打开命令方块的设置界面。
 
@@ -2787,7 +2783,7 @@ class ServerEvent:
         """
     def ChestBlockTryPairWithServerEvent(self, event: EventArgs167):
         """
-        [event]
+        [事件]
 
         | 两个并排的小箱子方块准备组合为一个大箱子方块时触发。
 
@@ -2806,7 +2802,7 @@ class ServerEvent:
         """
     def BlockStrengthChangedServerEvent(self, event: EventArgs168):
         """
-        [event]
+        [事件]
 
         | 自定义机械元件方块红石信号量发生变化时触发。
 
@@ -2825,7 +2821,7 @@ class ServerEvent:
         """
     def BlockSnowStateChangeServerEvent(self, event: EventArgs169):
         """
-        [event]
+        [事件]
 
         | 方块转为含雪或者脱离含雪前触发。
 
@@ -2842,7 +2838,7 @@ class ServerEvent:
         """
     def BlockSnowStateChangeAfterServerEvent(self, event: EventArgs170):
         """
-        [event]
+        [事件]
 
         | 方块转为含雪或者脱离含雪后触发。
 
@@ -2859,7 +2855,7 @@ class ServerEvent:
         """
     def BlockRemoveServerEvent(self, event: EventArgs171):
         """
-        [event]
+        [事件]
 
         | 监听该事件的方块在销毁时触发，可以通过 `ListenOnBlockRemoveEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=ListenOnBlockRemoveEvent&docindex=3&type=0>`_ 方法进行监听，或者通过json组件 `netease:listen_block_remove <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html#netease-listen-block-remove>`_ 进行配置。
 
@@ -2882,7 +2878,7 @@ class ServerEvent:
         """
     def BlockRandomTickServerEvent(self, event: EventArgs172):
         """
-        [event]
+        [事件]
 
         | 自定义方块配置 ``"netease:random_tick"`` 随机tick时触发。
 
@@ -2900,7 +2896,7 @@ class ServerEvent:
         """
     def BlockNeighborChangedServerEvent(self, event: EventArgs173):
         """
-        [event]
+        [事件]
 
         | 自定义方块周围的方块发生变化时，需要配置 ``"netease:neighborchanged_sendto_script"`` 。
 
@@ -2923,7 +2919,7 @@ class ServerEvent:
         """
     def BlockLiquidStateChangeServerEvent(self, event: EventArgs174):
         """
-        [event]
+        [事件]
 
         | 方块转为含水或者脱离含水(流体)前触发。
 
@@ -2941,7 +2937,7 @@ class ServerEvent:
         """
     def BlockLiquidStateChangeAfterServerEvent(self, event: EventArgs175):
         """
-        [event]
+        [事件]
 
         | 方块转为含水或者脱离含水(流体)后触发。
 
@@ -2959,7 +2955,7 @@ class ServerEvent:
         """
     def BlockDestroyByLiquidServerEvent(self, event: EventArgs176):
         """
-        [event]
+        [事件]
 
         | 方块被水流破坏的事件。
         | 指令或者接口的设置不会触发该事件。
@@ -2978,7 +2974,7 @@ class ServerEvent:
         """
     def StoreBuySuccServerEvent(self, event: EventArgs177):
         """
-        [event]
+        [事件]
 
         | 玩家游戏内购买商品时服务端抛出的事件。
 
@@ -2990,7 +2986,7 @@ class ServerEvent:
         """
     def ServerPlayerGetExperienceOrbEvent(self, event: EventArgs178):
         """
-        [event]
+        [事件]
 
         | 玩家获取经验球时触发的事件。
         | ``cancel`` 值设为 ``True`` 时，捡起的经验球不会增加经验值，但是经验球一样会消失。
@@ -3005,7 +3001,7 @@ class ServerEvent:
         """
     def PlayerTrySleepServerEvent(self, event: EventArgs179):
         """
-        [event]
+        [事件]
 
         | 玩家尝试使用床睡觉时触发。
 
@@ -3018,7 +3014,7 @@ class ServerEvent:
         """
     def PlayerTeleportEvent(self, event: EventArgs180):
         """
-        [event]
+        [事件]
 
         | 当玩家传送时触发该事件，如：玩家使用末影珍珠或tp指令时。
 
@@ -3030,7 +3026,7 @@ class ServerEvent:
         """
     def PlayerStopSleepServerEvent(self, event: EventArgs181):
         """
-        [event]
+        [事件]
 
         | 玩家停止睡觉时触发。
 
@@ -3042,7 +3038,7 @@ class ServerEvent:
         """
     def PlayerSleepServerEvent(self, event: EventArgs182):
         """
-        [event]
+        [事件]
 
         | 玩家使用床睡觉成功时触发。
 
@@ -3054,7 +3050,7 @@ class ServerEvent:
         """
     def PlayerRespawnFinishServerEvent(self, event: EventArgs183):
         """
-        [event]
+        [事件]
 
         | 玩家复活完毕时触发。
         | 该事件触发时玩家已重生完毕，可以安全使用切维度等操作。
@@ -3068,7 +3064,7 @@ class ServerEvent:
         """
     def PlayerRespawnEvent(self, event: EventArgs184):
         """
-        [event]
+        [事件]
 
         | 玩家复活时触发该事件。
         | 该事件为玩家点击重生按钮时触发，但是触发时玩家可能尚未完成复活，此时请勿对玩家进行切维度或设置生命值等操作，一般情况下推荐使用 ``PlayerRespawnFinishServerEvent`` 。
@@ -3081,7 +3077,7 @@ class ServerEvent:
         """
     def PlayerHurtEvent(self, event: EventArgs185):
         """
-        [event]
+        [事件]
 
         | 当玩家受伤害前触发该事件。
 
@@ -3096,7 +3092,7 @@ class ServerEvent:
         """
     def PlayerEatFoodServerEvent(self, event: EventArgs186):
         """
-        [event]
+        [事件]
 
         | 玩家吃下食物时触发。
         | 由于牛奶本身并没有饱食度的概念，因此，当喝牛奶触发该事件时，饥饿度、营养价值字段无效并始终为0。
@@ -3112,7 +3108,7 @@ class ServerEvent:
         """
     def PlayerDieEvent(self, event: EventArgs187):
         """
-        [event]
+        [事件]
 
         | 当玩家死亡时触发该事件。
 
@@ -3127,7 +3123,7 @@ class ServerEvent:
         """
     def OnPlayerHitBlockServerEvent(self, event: EventArgs188):
         """
-        [event]
+        [事件]
 
         | 通过 ``OpenPlayerHitBlockDetection`` 打开方块碰撞检测后，当玩家碰撞到方块时触发该事件。
         | 监听玩家着地请使用客户端的 ``OnGroundClientEvent`` 。
@@ -3154,7 +3150,7 @@ class ServerEvent:
         """
     def GameTypeChangedServerEvent(self, event: EventArgs189):
         """
-        [event]
+        [事件]
 
         | 个人游戏模式发生变化时服务端触发。
         | 游戏模式：生存、创造、冒险分别为0、1、2。
@@ -3170,7 +3166,7 @@ class ServerEvent:
         """
     def ExtinguishFireServerEvent(self, event: EventArgs190):
         """
-        [event]
+        [事件]
 
         | 玩家扑灭火焰时触发。
         | 下雨，倒水等方式熄灭火焰不会触发。
@@ -3185,7 +3181,7 @@ class ServerEvent:
         """
     def DimensionChangeServerEvent(self, event: EventArgs191):
         """
-        [event]
+        [事件]
 
         | 玩家维度改变时服务端抛出。
         | 当通过传送门从末地回到主世界时， ``toY`` 值为32767，其他情况一般会比设置值高1.62。
@@ -3206,7 +3202,7 @@ class ServerEvent:
         """
     def ChangeLevelUpCostServerEvent(self, event: EventArgs192):
         """
-        [event]
+        [事件]
 
         | 获取玩家下一个等级升级经验时触发，用于重载玩家的升级经验，每个等级在重置之前都只会触发一次。
 
@@ -3226,7 +3222,7 @@ class ServerEvent:
         """
     def AddLevelEvent(self, event: EventArgs193):
         """
-        [event]
+        [事件]
 
         | 当玩家升级时触发该事件。
 
@@ -3240,7 +3236,7 @@ class ServerEvent:
         """
     def AddExpEvent(self, event: EventArgs194):
         """
-        [event]
+        [事件]
 
         | 当玩家增加经验时触发该事件。
 
@@ -3253,7 +3249,7 @@ class ServerEvent:
         """
     def WillTeleportToServerEvent(self, event: EventArgs195):
         """
-        [event]
+        [事件]
 
         | 实体即将传送或切换维度时触发。
         | 假如目标维度尚未在内存中创建（即服务器启动之后，到传送之前，没有玩家进入过这个维度），那么此时事件中返回的目标地点坐标是算法生成的，不能保证正确。
@@ -3276,7 +3272,7 @@ class ServerEvent:
         """
     def WillAddEffectServerEvent(self, event: EventArgs196):
         """
-        [event]
+        [事件]
 
         | 实体即将获得状态效果前触发。
 
@@ -3293,7 +3289,7 @@ class ServerEvent:
         """
     def StartRidingServerEvent(self, event: EventArgs197):
         """
-        [event]
+        [事件]
 
         | 一个实体即将骑乘另外一个实体时触发。
 
@@ -3307,7 +3303,7 @@ class ServerEvent:
         """
     def RemoveEffectServerEvent(self, event: EventArgs198):
         """
-        [event]
+        [事件]
 
         | 实体身上状态效果被移除时触发。
 
@@ -3322,7 +3318,7 @@ class ServerEvent:
         """
     def RefreshEffectServerEvent(self, event: EventArgs199):
         """
-        [event]
+        [事件]
 
         | 实体身上状态效果更新时触发，更新条件1、新增状态等级较高，更新状态等级及时间；2、新增状态等级不变，时间较长，更新状态持续时间。
 
@@ -3338,7 +3334,7 @@ class ServerEvent:
         """
     def ProjectileCritHitEvent(self, event: EventArgs200):
         """
-        [event]
+        [事件]
 
         | 当抛射物与头部碰撞时触发该事件。
         | 注：需调用 ``OpenPlayerCritBox`` 开启玩家爆头后才能触发。
@@ -3359,7 +3355,7 @@ class ServerEvent:
         """
     def OnMobHitMobServerEvent(self, event: EventArgs201):
         """
-        [event]
+        [事件]
 
         | 通过 ``OpenPlayerHitMobDetection`` 打开生物碰撞检测后，当生物间（包含玩家）碰撞时触发该事件。
         | 注：客户端和服务端分别作碰撞检测，可能两个事件返回的略有差异。
@@ -3381,7 +3377,7 @@ class ServerEvent:
         """
     def OnKnockBackServerEvent(self, event: EventArgs202):
         """
-        [event]
+        [事件]
 
         | 实体被击退时触发。
 
@@ -3393,7 +3389,7 @@ class ServerEvent:
         """
     def OnFireHurtEvent(self, event: EventArgs203):
         """
-        [event]
+        [事件]
 
         | 生物受到火焰伤害时触发。
 
@@ -3409,7 +3405,7 @@ class ServerEvent:
         """
     def MobGriefingBlockServerEvent(self, event: EventArgs204):
         """
-        [event]
+        [事件]
 
         | 环境生物改变方块时触发，触发的时机与 ``mobgriefing`` 游戏规则影响的行为相同。
         | 触发的时机包括：生物踩踏耕地、破坏单个方块、破门、火矢点燃方块、凋灵boss破坏方块、末影龙破坏方块、末影人捡起方块、蠹虫破坏被虫蚀的方块、蠹虫把方块变成被虫蚀的方块、凋零杀死生物生成凋零玫瑰、生物踩坏海龟蛋。
@@ -3428,7 +3424,7 @@ class ServerEvent:
         """
     def HealthChangeServerEvent(self, event: EventArgs205):
         """
-        [event]
+        [事件]
 
         | 生物生命值发生变化时触发。
 
@@ -3437,13 +3433,13 @@ class ServerEvent:
         【事件参数】
 
         - ``entityId`` -- str，实体ID
-        - ``from_`` -- str，变化前的生命值
+        - ``from`` -- str，变化前的生命值
         - ``to`` -- str，变化后的生命值
         - ``byScript`` -- str，是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
         """
     def EntityTickServerEvent(self, event: EventArgs206):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 实体tick时触发。该事件为20帧每秒。需要使用 ``AddEntityTickEventWhiteList`` 添加触发该事件的实体类型白名单。
 
@@ -3462,7 +3458,7 @@ class ServerEvent:
         """
     def EntityPickupItemServerEvent(self, event: EventArgs207):
         """
-        [event]
+        [事件]
 
         | 有 ``"minecraft:behavior.pickup_items"`` 行为的生物拾取物品时触发该事件，例如村民拾取面包、猪灵拾取金锭。
 
@@ -3476,7 +3472,7 @@ class ServerEvent:
         """
     def EntityMotionStopServerEvent(self, event: EventArgs208):
         """
-        [event]
+        [事件]
 
         | 实体运动器停止事件。实体（包含玩家）添加运动器并开始运行后，运动器自动停止时触发。
         | 注意：该事件触发表示运动器播放顺利完成，手动调用的 ``StopEntityMotion`` 、 ``RemoveEntityMotion`` 以及实体被销毁导致的运动器停止不会触发该事件。
@@ -3491,7 +3487,7 @@ class ServerEvent:
         """
     def EntityMotionStartServerEvent(self, event: EventArgs209):
         """
-        [event]
+        [事件]
 
         | 实体运动器开始事件。实体（包含玩家）添加运动器后，运动器开始运行时触发。
 
@@ -3504,7 +3500,7 @@ class ServerEvent:
         """
     def EntityLoadScriptEvent(self, event: EventArgs210):
         """
-        [event]
+        [事件]
 
         | 数据库加载实体自定义数据时触发。
         | 只有使用过extraData组件的 ``SetExtraData`` 接口的实体才有此事件，触发时可以通过extraData组件的 ``GetExtraData`` 或 ``GetWholeExtraData`` 接口获取该实体的自定义数据。
@@ -3517,7 +3513,7 @@ class ServerEvent:
         """
     def EntityEffectDamageServerEvent(self, event: EventArgs211):
         """
-        [event]
+        [事件]
 
         | 生物受到状态伤害/回复事件。
 
@@ -3535,7 +3531,7 @@ class ServerEvent:
         """
     def EntityDroppedItemServerEvent(self, event: EventArgs212):
         """
-        [event]
+        [事件]
 
         | 生物扔出物品时触发。
 
@@ -3549,7 +3545,7 @@ class ServerEvent:
         """
     def EntityChangeDimensionServerEvent(self, event: EventArgs213):
         """
-        [event]
+        [事件]
 
         | 实体维度改变时服务端抛出。
         | 实体转移维度时，如果对应维度的对应位置的区块尚未加载，实体会缓存在维度自身的缓冲区中，直到对应区块被加载时才会创建对应的实体，此事件的抛出只代表实体从原维度消失，不代表必定会在对应维度出现。
@@ -3571,7 +3567,7 @@ class ServerEvent:
         """
     def ChangeSwimStateServerEvent(self, event: EventArgs214):
         """
-        [event]
+        [事件]
 
         | 实体开始或者结束游泳时触发。
         | 当实体的状态没有变化时，不会触发此事件，即 ``formState`` 和 ``toState`` 必定一真一假。
@@ -3586,7 +3582,7 @@ class ServerEvent:
         """
     def AddEffectServerEvent(self, event: EventArgs215):
         """
-        [event]
+        [事件]
 
         | 实体获得状态效果时触发。
 
@@ -3602,7 +3598,7 @@ class ServerEvent:
         """
     def ActorHurtServerEvent(self, event: EventArgs216):
         """
-        [event]
+        [事件]
 
         | 生物（包括玩家）受伤时触发。
 
@@ -3618,7 +3614,7 @@ class ServerEvent:
         """
     def ServerSpawnMobEvent(self, event: EventArgs217):
         """
-        [event]
+        [事件]
 
         | 游戏内自动生成生物，以及使用api生成生物时触发。
         | 如果通过MOD API生成， ``identifier`` 命名空间为 ``custom`` 。
@@ -3641,7 +3637,7 @@ class ServerEvent:
         """
     def ServerPreBlockPatternEvent(self, event: EventArgs218):
         """
-        [event]
+        [事件]
 
         | 用方块组合生成生物，在放置最后一个组成方块时触发该事件。
 
@@ -3658,7 +3654,7 @@ class ServerEvent:
         """
     def ServerPostBlockPatternEvent(self, event: EventArgs219):
         """
-        [event]
+        [事件]
 
         | 用方块组合生成生物，生成生物之后触发该事件。
 
@@ -3675,7 +3671,7 @@ class ServerEvent:
         """
     def ServerChatEvent(self, event: EventArgs220):
         """
-        [event]
+        [事件]
 
         | 玩家发送聊天信息时触发。
 
@@ -3697,7 +3693,7 @@ class ServerEvent:
         """
     def PlayerLeftMessageServerEvent(self, event: EventArgs221):
         """
-        [event]
+        [事件]
 
         | 准备显示“xxx离开游戏”的玩家离开提示文字时服务端抛出的事件。
 
@@ -3712,7 +3708,7 @@ class ServerEvent:
         """
     def PlayerJoinMessageEvent(self, event: EventArgs222):
         """
-        [event]
+        [事件]
 
         | 准备显示“xxx加入游戏”的玩家登录提示文字时服务端抛出的事件。
         | 对于联机类游戏（如联机大厅、网络游戏等），请勿在此事件的回调函数中使用 ``SetFootPos`` 接口修改玩家的位置，否则可能会因为触发服务端反作弊机制而传送失败。如需要在进入游戏时使用 ``SetFootPos`` 接口，建议监听 ``AddServerPlayerEvent`` 并设置位置。
@@ -3728,7 +3724,7 @@ class ServerEvent:
         """
     def PlayerIntendLeaveServerEvent(self, event: EventArgs223):
         """
-        [event]
+        [事件]
 
         | 即将删除玩家时触发该事件。
         | 与 ``DelServerPlayerEvent`` 事件不同，此时可以通过各种API获取玩家的当前状态。
@@ -3741,7 +3737,7 @@ class ServerEvent:
         """
     def PlaceNeteaseStructureFeatureEvent(self, event: EventArgs224):
         """
-        [event]
+        [事件]
 
         | 首次生成地形时，结构特征即将生成时服务端抛出该事件。
         | 需要配合 ``AddNeteaseFeatureWhiteList`` 接口一同使用。
@@ -3771,7 +3767,7 @@ class ServerEvent:
         """
     def OnRainLevelChangeServerEvent(self, event: EventArgs225):
         """
-        [event]
+        [事件]
 
         | 下雨强度发生改变时触发。
 
@@ -3784,7 +3780,7 @@ class ServerEvent:
         """
     def OnLocalRainLevelChangeServerEvent(self, event: EventArgs226):
         """
-        [event]
+        [事件]
 
         | 独立维度天气下雨强度发生改变时触发。
 
@@ -3798,7 +3794,7 @@ class ServerEvent:
         """
     def OnLocalLightningLevelChangeServerEvent(self, event: EventArgs227):
         """
-        [event]
+        [事件]
 
         | 独立维度天气打雷强度发生改变时触发。
 
@@ -3812,7 +3808,7 @@ class ServerEvent:
         """
     def OnLightningLevelChangeServerEvent(self, event: EventArgs228):
         """
-        [event]
+        [事件]
 
         | 打雷强度发生改变时触发。
 
@@ -3825,7 +3821,7 @@ class ServerEvent:
         """
     def OnContainerFillLoottableServerEvent(self, event: EventArgs229):
         """
-        [event]
+        [事件]
 
         | 随机奖励箱第一次打开根据loottable生成物品时。
         | 只有当 ``dirty`` 为 ``True`` 时才会重新读取 ``itemList`` 并生成对应的掉落物，如果不需要修改掉落结果的话请勿随意修改 ``dirty`` 值。
@@ -3841,7 +3837,7 @@ class ServerEvent:
         """
     def OnCommandOutputServerEvent(self, event: EventArgs230):
         """
-        [event]
+        [事件]
 
         | Command命令执行成功事件。
         | 部分命令在返回的时候没有命令名称， ``SetCommand`` 接口需要 ``showOutput`` 参数为 ``True`` 时才会有返回。
@@ -3855,7 +3851,7 @@ class ServerEvent:
         """
     def NewOnEntityAreaEvent(self, event: EventArgs231):
         """
-        [event]
+        [事件]
 
         | 通过 ``RegisterEntityAOIEvent`` 注册过AOI事件后，当有实体进入或离开注册感应区域时触发该事件。
         | 本事件代替原有的 ``OnEntityAreaEvent`` 事件。
@@ -3877,7 +3873,7 @@ class ServerEvent:
         """
     def LoadServerAddonScriptsAfter(self, event: EventArgs232):
         """
-        [event]
+        [事件]
 
         | 服务器加载完mod时触发。
 
@@ -3889,7 +3885,7 @@ class ServerEvent:
         """
     def DelServerPlayerEvent(self, event: EventArgs233):
         """
-        [event]
+        [事件]
 
         | 删除玩家时触发该事件。
 
@@ -3903,7 +3899,7 @@ class ServerEvent:
         """
     def CommandEvent(self, event: EventArgs234):
         """
-        [event]
+        [事件]
 
         | 玩家请求执行指令时触发。
         | 该事件是玩家请求执行指令时触发的Hook，该事件不响应命令方块的指令和通过modSDK调用的指令，阻止玩家的该条指令只需要将 ``cancel`` 设置为 ``True`` 。
@@ -3918,7 +3914,7 @@ class ServerEvent:
         """
     def ClientLoadAddonsFinishServerEvent(self, event: EventArgs235):
         """
-        [event]
+        [事件]
 
         | 客户端mod加载完成时，服务端触发此事件。服务器可以使用此事件，往客户端发送数据给其初始化。
 
@@ -3930,7 +3926,7 @@ class ServerEvent:
         """
     def ChunkLoadedServerEvent(self, event: EventArgs236):
         """
-        [event]
+        [事件]
 
         | 服务端区块加载完成时。
         | 注意：服务端的自定义方块实体加载完成时对应的客户端的自定义方块实体并没有初始化完成，无法使用该事件对客户端的自定义方块实体进行相关操作。
@@ -3946,7 +3942,7 @@ class ServerEvent:
         """
     def ChunkGeneratedServerEvent(self, event: EventArgs237):
         """
-        [event]
+        [事件]
 
         | 区块创建完成时触发。
 
@@ -3961,7 +3957,7 @@ class ServerEvent:
         """
     def ChunkAcquireDiscardedServerEvent(self, event: EventArgs238):
         """
-        [event]
+        [事件]
 
         | 服务端区块即将被卸载时触发。
         | 区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载。
@@ -3978,7 +3974,7 @@ class ServerEvent:
         """
     def AddServerPlayerEvent(self, event: EventArgs239):
         """
-        [event]
+        [事件]
 
         | 玩家加入时触发该事件。
         | 触发此事件时，客户端mod未加载完毕，因此响应本事件时不能客户端发送事件。
@@ -3999,7 +3995,7 @@ class ServerEvent:
         """
     def AchievementCompleteEvent(self, event: EventArgs240):
         """
-        [event]
+        [事件]
 
         | 玩家完成自定义成就时触发该事件。
 
@@ -4015,7 +4011,7 @@ class ServerEvent:
         """
     def PlayerAttackEntityEvent(self, event: EventArgs241):
         """
-        [event]
+        [事件]
 
         | 当玩家攻击时触发该事件。
 
@@ -4033,7 +4029,7 @@ class ServerEvent:
         """
     def ServerBlockUseEvent(self, event: EventArgs242):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 玩家右键点击新版自定义方块（或者通过接口 ``AddBlockItemListenForUseEvent`` 增加监听的MC原生游戏方块）时服务端抛出该事件（该事件tick执行，需要注意效率问题）。
         | 当对原生方块进行使用时，如堆肥桶等类似有使用功能的方块使用物品时，会触发该事件，而 ``ServerItemUseOnEvent`` 则不会被触发。
@@ -4068,7 +4064,7 @@ class ServerEvent:
         """
     def OnGroundServerEvent(self, event: EventArgs243):
         """
-        [event]
+        [事件]
 
         | 实体着地事件。实体，掉落的物品，点燃的TNT掉落地面时触发。
 
@@ -4080,7 +4076,7 @@ class ServerEvent:
         """
     def SpawnProjectileServerEvent(self, event: EventArgs244):
         """
-        [event]
+        [事件]
 
         | 抛射物生成时触发。
         | 该事件里无法获取弹射物实体的auxvalue。如有需要可以延迟一帧获取，或者在 ``ProjectileDoHitEffectEvent`` 获取。
@@ -4095,7 +4091,7 @@ class ServerEvent:
         """
     def EntityDieLoottableServerEvent(self, event: EventArgs245):
         """
-        [event]
+        [事件]
 
         | 生物死亡掉落物品时触发。
         | 只有当 ``dirty`` 为 ``True`` 时才会重新读取 ``itemList`` 并生成对应的掉落物，如果不需要修改掉落结果的话请勿随意修改 ``dirty`` 值。
@@ -4113,7 +4109,7 @@ class ServerEvent:
         """
     def ActuallyHurtServerEvent(self, event: EventArgs246):
         """
-        [event]
+        [事件]
 
         | 实体实际受到伤害时触发，相比于 ``DamageEvent`` ，该伤害为经过护甲及buff计算后，实际的扣血量。
         | 药水与状态效果造成的伤害不触发，可以使用 ``ActorHurtServerEvent`` 。
@@ -4137,7 +4133,7 @@ class ServerEvent:
         """
     def HealthChangeBeforeServerEvent(self, event: EventArgs247):
         """
-        [event]
+        [事件]
 
         | 生物生命值发生变化之前触发。
 
@@ -4146,14 +4142,14 @@ class ServerEvent:
         【事件参数】
 
         - ``entityId`` -- str，实体ID
-        - ``from_`` -- float，变化前的生命值
+        - ``from`` -- float，变化前的生命值
         - ``to`` -- float，将要变化到的生命值，cancel设置为True时可以取消该变化，但是此参数不变
         - ``byScript`` -- bool，是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
         - ``$cancel`` -- bool，是否取消该变化
         """
     def DimensionChangeFinishServerEvent(self, event: EventArgs248):
         """
-        [event]
+        [事件]
 
         | 玩家维度改变完成后服务端抛出。
         | 当通过传送门从末地回到主世界时， ``toPos`` 的y值为32767，其他情况一般会比设置值高1.62。
@@ -4169,7 +4165,7 @@ class ServerEvent:
         """
     def EntityDefinitionsEventServerEvent(self, event: EventArgs249):
         """
-        [event]
+        [事件]
 
         | 生物定义json文件中设置的event触发时同时触发。
 
@@ -4182,7 +4178,7 @@ class ServerEvent:
         """
     def PlayerDoInteractServerEvent(self, event: EventArgs250):
         """
-        [event]
+        [事件]
 
         | 玩家与有 ``"minecraft:interact"`` 组件的生物交互时触发该事件，例如玩家手持空桶对牛挤奶、玩家手持打火石点燃苦力怕。
 
@@ -4196,7 +4192,7 @@ class ServerEvent:
         """
     def PlayerInteractServerEvent(self, event: EventArgs251):
         """
-        [event]
+        [事件]
 
         | 玩家可以与实体交互时触发。
         | 如果是鼠标控制模式，则当准心对着实体时触发。如果是触屏模式，则触发时机与屏幕下方的交互按钮显示的时机相同。
@@ -4213,7 +4209,7 @@ class ServerEvent:
         """
     def MobDieEvent(self, event: EventArgs252):
         """
-        [event]
+        [事件]
 
         | 生物死亡时触发。
         | 注意：不能在该事件回调中对攻击者手持物品进行修改，如 ``SpawnItemToPlayerCarried`` 、 ``ChangePlayerItemTipsAndExtraId`` 等接口。
@@ -4229,7 +4225,7 @@ class ServerEvent:
         """
     def AddEntityServerEvent(self, event: EventArgs253):
         """
-        [event]
+        [事件]
 
         | 服务端侧创建新实体，或实体从存档加载时触发。
         | 创建玩家时不会触发该事件。
@@ -4250,7 +4246,7 @@ class ServerEvent:
         """
     def OnMobHitBlockServerEvent(self, event: EventArgs254):
         """
-        [event]
+        [事件]
 
         | 通过 ``OpenMobHitBlockDetection`` 打开方块碰撞检测后，当生物（不包括玩家）碰撞到方块时触发该事件。
 
@@ -4275,7 +4271,7 @@ class ServerEvent:
         """
     def OnEntityInsideBlockServerEvent(self, event: EventArgs255):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 当实体碰撞盒所在区域有方块时，服务端持续触发。
         | 不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），原版方块需要先通过 ``RegisterOnEntityInside`` 接口注册才能触发。
@@ -4307,7 +4303,7 @@ class ServerEvent:
         """
     def EntityStartRidingEvent(self, event: EventArgs256):
         """
-        [event]
+        [事件]
 
         | 当实体骑乘上另一个实体时触发。
 
@@ -4320,7 +4316,7 @@ class ServerEvent:
         """
     def EntityStopRidingEvent(self, event: EventArgs257):
         """
-        [event]
+        [事件]
 
         | 当实体停止骑乘时触发。
         | 以下情况不允许取消：
@@ -4346,7 +4342,7 @@ class ServerEvent:
         """
     def ServerItemUseOnEvent(self, event: EventArgs258):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 玩家在对方块使用物品之前服务端抛出的事件。
         | 注：如果需要取消物品的使用需要同时在 ``ClientItemUseOnEvent`` 和 ``ServerItemUseOnEvent`` 中将 ``ret`` 设置为 ``True`` 才能正确取消。
@@ -4372,7 +4368,7 @@ class ServerEvent:
         """
     def ActorUseItemServerEvent(self, event: EventArgs259):
         """
-        [event]
+        [事件]
 
         | 玩家使用物品生效之前服务端抛出的事件。
         | 比较特殊不走该事件的例子：
@@ -4390,7 +4386,7 @@ class ServerEvent:
         """
     def ActorAcquiredItemServerEvent(self, event: EventArgs260):
         """
-        [event]
+        [事件]
 
         | 玩家获得物品时服务端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
 
@@ -4405,7 +4401,7 @@ class ServerEvent:
         """
     def DestroyBlockEvent(self, event: EventArgs261):
         """
-        [event]
+        [事件]
 
         | 当方块已经被玩家破坏时触发该事件。
         | 在生存模式或创造模式下都会触发。
@@ -4426,7 +4422,7 @@ class ServerEvent:
         """
     def DamageEvent(self, event: EventArgs262):
         """
-        [event]
+        [事件]
 
         | 实体受到伤害时触发。
         | ``damage`` 值会被护甲和absorption等吸收，不一定是最终扣血量。通过设置这个伤害值可以取消伤害，但不会取消由击退效果或者点燃效果带来的伤害。
@@ -4453,7 +4449,7 @@ class ServerEvent:
         """
     def ExplosionServerEvent(self, event: EventArgs263):
         """
-        [event]
+        [事件]
 
         | 当发生爆炸时触发。
         | 可以通过修改 ``blocks`` 取消爆炸对指定方块的影响。
@@ -4471,7 +4467,7 @@ class ServerEvent:
         """
     def ProjectileDoHitEffectEvent(self, event: EventArgs264):
         """
-        [event]
+        [事件]
 
         | 当抛射物碰撞时触发该事件。
 
@@ -4494,7 +4490,7 @@ class ServerEvent:
         """
     def OnCarriedNewItemChangedServerEvent(self, event: EventArgs265):
         """
-        [event]
+        [事件]
 
         | 玩家切换主手物品时触发该事件。
         | 切换耐久度不同的相同物品，不会触发该事件。
@@ -4509,7 +4505,7 @@ class ServerEvent:
         """
     def EntityRemoveEvent(self, event: EventArgs266):
         """
-        [event]
+        [事件]
 
         | 实体被删除时触发。
         | 触发情景：实体从场景中被删除，例如：生物死亡，生物被 `清除 <https://minecraft.fandom.com/zh/wiki/%E7%94%9F%E6%88%90#.E6.B8.85.E9.99.A4>`_，玩家退出游戏，船/盔甲架被破坏，掉落物/经验球被捡起或清除。
@@ -4525,7 +4521,7 @@ class ServerEvent:
         """
     def OnScriptTickServer(self, event: EventArgs267):
         """
-        [tick] [event]
+        [事件] [tick]
 
         | 服务端tick事件，1秒30次。
 
@@ -4537,7 +4533,7 @@ class ServerEvent:
         """
     def ItemGridChangedServerEvent(self, event: EventArgs268):
         """
-        [nuoyanlib] [event]
+        [nuoyanlib] [事件]
 
         | 物品网格内的物品发生改变时触发。
 
@@ -4553,7 +4549,7 @@ class ServerEvent:
         """
     def UiInitFinished(self, event: EventArgs269):
         """
-        [nuoyanlib] [event]
+        [nuoyanlib] [事件]
 
         | 客户端玩家UI框架初始化完成时，服务端触发。
 

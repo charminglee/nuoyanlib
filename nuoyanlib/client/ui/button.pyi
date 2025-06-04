@@ -1,34 +1,37 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
 from typing import Callable, Optional, Dict, Union, List, Any
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from mod.client.ui.screenNode import ScreenNode
 from mod.common.utils.timer import CallLater
-from ..._core._types._typing import EventArgs, FTuple2, UiControl
-from ..._core._utils import param_type_check
+from ..._core._types._typing import ArgsDict, FTuple2, UiPathOrControl, ItemDict
+from ..._core._utils import args_type_check
 from ..._core._client._lib_client import NuoyanLibClientSystem
 from .control import NyControl
+from .screen_node import ScreenNodeExtension
+from ...utils.enum import Enum
 
 
 class NyButton(NyControl):
+    _CALLBACK_API_MAP: Dict[int, str]
+    class CommonChildPath(Enum[str]):
+        default: str
+        hover: str
+        pressed: str
+        label: str
     _lib_sys: NuoyanLibClientSystem
     _btn_callbacks: Dict[int, List[Callable]]
     _enabled_double_click: bool
@@ -39,7 +42,11 @@ class NyButton(NyControl):
     _finger_pos: Optional[FTuple2]
     _ui_pos_data_key: str
     __vibrate_time: int
-    is_movable: bool
+    base_control: ButtonUIControl
+    """
+    | 按钮 ``ButtonUIControl`` 实例。
+    """
+    is_movable: ItemDict
     """
     | 按钮是否可拖动。
     """
@@ -51,47 +58,58 @@ class NyButton(NyControl):
     """
     | 按钮最近一次的按下中是否触发了长按。
     """
-    def __init__(self: ..., screen_node: ScreenNode, btn_control: ButtonUIControl) -> None: ...
-    def Destroy(self) -> None: ...
-    def _GetEntityByCoordReleaseClientEvent(self, args: EventArgs) -> None: ...
+    def __init__(self: ..., screen_node_ex: ScreenNodeExtension, btn_control: ButtonUIControl) -> None: ...
+    def _GetEntityByCoordReleaseClientEvent(self, args: ArgsDict) -> None: ...
+    def set_default_texture(self, tex_path: str, path: str = "default") -> None: ...
+    def set_hover_texture(self, tex_path: str, path: str = "hover") -> None: ...
+    def set_pressed_texture(self, tex_path: str, path: str = "pressed") -> None: ...
+    def set_text(self, text: str, path: str = "label") -> None: ...
     @property
     def vibrate_time(self) -> int: ...
     @vibrate_time.setter
-    @param_type_check(int)
+    @args_type_check(int, is_method=True)
     def vibrate_time(self, val: int) -> None: ...
-    def SetCallback(self, callback_type: int, func: Callable) -> bool: ...
-    def RemoveCallback(self, callback_type: int, func: Callable) -> bool: ...
-    def SetMovable(
+    def set_callback(self, callback_type: int, func: Callable) -> bool: ...
+    SetCallback = set_callback
+    def remove_callback(self, callback_type: int, func: Callable) -> bool: ...
+    RemoveCallback = remove_callback
+    def set_movable(
         self,
         move_parent: bool = False,
-        associated_uis: Optional[Union[UiControl, List[UiControl]]] = None,
+        associated_uis: Union[UiPathOrControl, List[UiPathOrControl], None] = None,
         auto_save: bool = False,
     ) -> None: ...
-    def SetMovableByLongClick(
+    SetMovable = set_movable
+    def set_movable_by_long_click(
         self,
         move_parent: bool = False,
-        associated_uis: Optional[Union[UiControl, List[UiControl]]] = None,
+        associated_uis: Union[UiPathOrControl, List[UiPathOrControl], None] = None,
         auto_save: bool = False,
     ) -> None: ...
-    def CancelMovable(self) -> None: ...
-    def ClearPosData(self) -> bool: ...
-    def SavePosData(self) -> bool: ...
+    SetMovableByLongClick = set_movable_by_long_click
+    def cancel_movable(self) -> None: ...
+    CancelMovable = cancel_movable
+    def clear_pos_data(self) -> bool: ...
+    ClearPosData = clear_pos_data
+    def save_pos_data(self) -> bool: ...
+    SavePosData = save_pos_data
     def _set_movable_data(
         self,
         movable: bool,
         move_parent: bool = False,
-        associated_uis: Optional[Union[UiControl, List[UiControl]]] = None,
+        associated_uis: Union[UiPathOrControl, List[UiPathOrControl], None] = None,
         auto_save: bool = False,
     ) -> None: ...
     def _exec_callbacks(self, callback_type: int, args: Dict[str, Any]) -> None: ...
-    def _on_touch_up_dc(self, args: EventArgs) -> None: ...
-    def _on_touch_down_lc(self, args: EventArgs) -> None: ...
-    def _cancel_long_click(self, args: EventArgs) -> None: ...
-    def _on_move(self, args: EventArgs) -> None: ...
-    def _on_long_click_mov(self, args: EventArgs) -> None: ...
-    def _on_touch_down_mov(self, args: EventArgs) -> None: ...
+    def _on_touch_up_dc(self, args: ArgsDict) -> None: ...
+    def _on_touch_down_lc(self, args: ArgsDict) -> None: ...
+    def _cancel_long_click(self, args: ArgsDict) -> None: ...
+    def _on_move(self, args: ArgsDict) -> None: ...
+    def _on_long_click_mov(self, args: ArgsDict) -> None: ...
+    def _on_touch_down_mov(self, args: ArgsDict) -> None: ...
     def _vibrate(self) -> None: ...
-    def _set_offset(self, control: UiControl, offset: FTuple2) -> None: ...
+    def _set_offset(self, control: UiPathOrControl, offset: FTuple2) -> None: ...
+
     def AddTouchEventParams(self, args: Optional[dict] = None) -> None:
         """
         | 开启按钮回调功能，不调用该函数则按钮无回调。
@@ -117,7 +135,7 @@ class NyButton(NyControl):
         """
     def SetButtonTouchDownCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 
@@ -141,7 +159,7 @@ class NyButton(NyControl):
         """
     def SetButtonHoverInCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 
@@ -164,7 +182,7 @@ class NyButton(NyControl):
         """
     def SetButtonHoverOutCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 
@@ -180,7 +198,7 @@ class NyButton(NyControl):
         """
     def SetButtonTouchUpCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 
@@ -196,7 +214,7 @@ class NyButton(NyControl):
         """
     def SetButtonTouchCancelCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 
@@ -212,7 +230,7 @@ class NyButton(NyControl):
         """
     def SetButtonTouchMoveCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 
@@ -229,7 +247,7 @@ class NyButton(NyControl):
         """
     def SetButtonTouchMoveInCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 
@@ -245,7 +263,7 @@ class NyButton(NyControl):
         """
     def SetButtonTouchMoveOutCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 
@@ -261,7 +279,7 @@ class NyButton(NyControl):
         """
     def SetButtonScreenExitCallback(self, callback_func: Callable) -> None:
         """
-        | 不推荐，建议使用 ``SetCallback`` 。
+        | 不推荐，建议使用 ``set_callback()`` 。
 
         -----
 

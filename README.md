@@ -1,7 +1,7 @@
 <h1 align="center" style="line-height: 0;">「nuoyanlib」</h1>
 <h1 align="center" style="line-height: 0;">🐱</h1>
 <h1 align="center" style="line-height: 0;">基于ModSDK的开发工具库</h1>
-<h2 align="center" style="line-height: 0.5;">v0.8.0-beta</h2>
+<h2 align="center" style="line-height: 0.5;">v0.9.3-beta</h2>
 
 <br></br>
 
@@ -12,29 +12,17 @@
 ---
 
 > **[注意]**  
-目前该项目仍处于测试阶段，部分功能仍未开发完成或存在较多bug，且其中的函数名称、功能等随时可能会发生变化，请开发者谨慎使用。
+目前该项目仍处于测试阶段，部分功能仍未开发完成或存在未知bug，且其中的函数命名、具体实现等随时可能发生变化，请谨慎使用。
 
-「nuoyanlib」是基于我的世界中国版ModSDK开发的开源函数库，整合了众多开发中常用的算法，封装了常用官方接口，致力于提高代码编写效率以及更轻松地实现复杂效果。  
-「nuoyanlib」可供大家学习参考，也可以直接应用于您个人/团队的项目中（可商业）。  
-「nuoyanlib」的定位为开发工具库，并非开发框架，因此可以与目前市面上任何一款开发框架兼容，且您无需对您现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。
+「nuoyanlib」是基于我的世界中国版[ModSDK](https://mc.163.com/dev/index.html)开发的开源工具库，封装了许多开发中常用的功能算法，致力于为广大开发者提高代码编写效率，更轻松地实现复杂效果。  
+「nuoyanlib」可供大家学习参考，也可应用于任何个人/团队的商业/非商业项目中。  
+您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
 
-### **兼容框架：ModSDK 3.2**
-
-<br></br>
-
-## ⬇️ 下载
-
----
-
-在右侧的发行版处选择一个版本下载。
-
-<p align="center">
-  <img src="img/download_nyl.png"/>
-</p>
+#### **兼容ModSDK版本：3.4及以下**
 
 <br></br>
 
-## ✨ 功能一览
+## ✨ 亮点
 
 ---
 
@@ -51,27 +39,79 @@
 
 <br></br>
 
-## ⚙️ 使用说明
+## ⬇️ 下载
 
 ---
 
-1. 解压下载的压缩包，将`nuoyanlib`文件夹放至您的行为包Python脚本根目录下（即`modMain.py`文件所在位置）即可。
-2. 推荐使用以下方式在您的代码中导入「nuoyanlib」，其中`scripts_dir_name`是你的Python脚本根目录（scripts文件夹）名称：
-
-   #### 导入客户端库
-    ```python
-    import scripts_dir_name.nuoyanlib.client as nyl
-    ```
-   #### 导入服务端库
-    ```python
-    import scripts_dir_name.nuoyanlib.server as nyl
-    ```
-    > **[警告]**  
-    请严格区分客户端与服务端文件，禁止将客户端和服务端代码写在同一个py文件内，禁止导入对立端的库（如在客户端导入服务端库，在服务端导入客户端库），否则可能会导致「nuoyanlib」功能瘫痪甚至游戏闪退等严重问题。
+- [v0.6.0-beta](https://gitee.com/charming-lee/nuoyanLib/releases/tag/v0.6.0-beta)
 
 <br></br>
 
-## 🔍 参考文档
+## ⚙️ 配置
+
+---
+
+1. 解压下载的压缩包，将`nuoyanlib`文件夹放至行为包Python脚本根目录下（即`modMain.py`文件所在位置）。  
+    安装好后，你的行为包结构应为： 
+    ```
+    行为包/  
+    ├── entities/  
+    ├── 脚本根目录/  
+    │   ├── nuoyanlib/  
+    │   │   ├── _core/  
+    │   │   ├── client/  
+    │   │   ├── server/  
+    │   │   ├── utils/  
+    │   │   ├── __init__.py  
+    │   │   ├── config.py  
+    │   │   └── LICENSE  
+    │   ├── __init__.py  
+    │   ├── modMain.py  
+    │   ...  
+    ...
+    ```
+2. 在`modMain.py`中添加以下代码以启动「nuoyanlib」：
+    ```python
+    from nuoyanlib import run_nuoyanlib
+    run_nuoyanlib(globals())
+    ```
+   例如：
+    ```python
+    from mod.common.mod import Mod
+    import mod.client.extraClientApi as client_api
+    import mod.server.extraServerApi as server_api
+   
+   
+    from nuoyanlib import run_nuoyanlib
+    run_nuoyanlib(globals())
+
+
+    @Mod.Binding(name="MyMod", version="1.0.0")
+    class ModMain(object):
+        @Mod.InitServer()
+        def init_server(self):
+            server_api.RegisterSystem("MyMod", "MyServerSystem", "myScripts.myServerSystem.MyServerSystem")
+    
+        @Mod.InitClient()
+        def init_client(self):
+            client_api.RegisterSystem("MyMod", "MyClientSystem", "myScripts.myClientSystem.MyClientSystem")
+    ```
+3. 之后，在需要时导入「nuoyanlib」即可，推荐使用以下方式进行导入，其中`<scripts_root>`是你的Python脚本根目录名称：
+   #### 导入客户端库
+    ```python
+    import <scripts_root>.nuoyanlib.client as nyl
+    ```
+   #### 导入服务端库
+    ```python
+    import <scripts_root>.nuoyanlib.server as nyl
+    ```
+    > **[警告]**  
+    为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且禁止导入对立端库（如在客户端导入服务端库，在服务端导入客户端库），否则可能导致「nuoyanlib」功能异常甚至游戏闪退。
+4. 更多信息请参见[入门指南]()。
+
+<br></br>
+
+## 🎉 更新信息
 
 ---
 
@@ -79,7 +119,7 @@
 
 <br></br>
 
-## 🎉 更新信息
+## 🔍 参考文档
 
 ---
 
@@ -108,14 +148,6 @@
 
 [什么是Issue？](https://help.gitee.com/base/issue/intro)
 [什么是Pull Request？](https://help.gitee.com/base/pullrequest/intro)
-
-<br></br>
-
-## ⚖️ 版权
-
----
-
-本项目遵循[MulanPSL-2.0](https://gitee.com/charming-lee/nuoyanLib/blob/master/LICENSE)开源许可协议，您可以将「nuoyanlib」应用于任何商业/非商业项目中，允许修改其中的内容，但必须保留「nuoyanlib」中每个文件头部的版权注释。
 
 <br></br>
 

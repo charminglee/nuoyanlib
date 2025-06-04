@@ -1,25 +1,21 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from typing import Tuple, Union, Optional, List, Dict
+from typing import Union, Optional, List, Dict
 from mod.common.minecraftEnum import Facing
-from .._core._types._typing import FTuple2, FTuple3
+from .._core._types._typing import FTuple2, FTuple3, FTuple, ITuple
 
 
 def pos_block_facing(pos: FTuple3, face: int = Facing.North, dist: float = 1.0) -> Optional[FTuple3]: ...
@@ -28,8 +24,8 @@ def to_cartesian_coordinate(coordinate: FTuple2, rad: bool = False, origin: FTup
 def probability_true_i(n: int, d: int) -> bool: ...
 def probability_true_f(f: float) -> bool: ...
 def pos_distance_to_line(pos: FTuple3, line_pos1: FTuple3, line_pos2: FTuple3) -> float: ...
-def pos_floor(pos: Tuple[float, ...]) -> Tuple[int, ...]: ...
-def pos_distance(first_point: Tuple[float, ...], second_point: Tuple[float, ...]) -> float: ...
+def pos_floor(pos: FTuple) -> ITuple: ...
+def pos_distance(first_point: FTuple, second_point: FTuple) -> float: ...
 def to_relative_pos(entity_pos1: FTuple3, entity_pos2: FTuple3) -> Optional[FTuple3]: ...
 def to_screen_pos(
     entity_pos: FTuple3,
@@ -40,7 +36,7 @@ def to_screen_pos(
     player_rot: float,
 ) -> Optional[FTuple2]: ...
 def pos_rotate(angle: float, pos: FTuple2) -> Optional[FTuple2]: ...
-def midpoint(first_point: Tuple[float, ...], second_point: Tuple[float, ...]) -> Tuple[float, ...]: ...
+def midpoint(first_point: FTuple, second_point: FTuple) -> FTuple: ...
 def camera_rot_p2p(pos1: FTuple3, pos2: FTuple3) -> Optional[FTuple2]: ...
 def pos_entity_facing(
     entity_id: str,

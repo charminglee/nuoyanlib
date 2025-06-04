@@ -1,32 +1,53 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-01-29
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable
+from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable, Literal, Any
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.mcmath import Vector3
 
 
-ItemDict = Optional[dict]
+PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
+FTuple = Tuple[float, ...]
+FTuple2 = Tuple[float, float]
+FTuple3 = Tuple[float, float, float]
+ITuple = Tuple[int, ...]
+ITuple2 = Tuple[int, int]
+ITuple3 = Tuple[int, int, int]
+STuple = Tuple[str, ...]
+Vector = Union[FTuple3, List[float], Vector3]
+VectorNoList = Union[FTuple3, Vector3]
+Matrix = List[List[float]]
+
+
+class ItemDict(TypedDict, total=False):
+    newItemName: str
+    newAuxValue: str
+    count: int
+    itemName: str
+    auxValue: int
+    showInHand: bool
+    enchantData: List[ITuple2]
+    modEnchantData: List[ITuple2]
+    customTips: str
+    extraId: str
+    userData: Dict[str, Any]
+    durability: int
 ItemCellPos = Tuple[str, int]
 ItemCell = Union[str, ItemCellPos]
-ItemGridKeys = Union[str, Tuple[str, ...], None]
+ItemGridKeys = Union[str, STuple, None]
 class ItemSelectedData(TypedDict):
     item_dict: dict
     cell_path: str
@@ -40,15 +61,51 @@ class ItemHeapData(TypedDict):
     bar_ctrl: ProgressBarUIControl
 
 
-PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
-FTuple2 = Tuple[float, float]
-FTuple3 = Tuple[float, float, float]
-Vector = Union[FTuple3, List[float], Vector3]
-VectorNotList = Union[FTuple3, Vector3]
-Matrix = List[List[float]]
-EventArgs = Dict[str, PyBasicTypes]
-
-
-UiControl = Union[str, BaseUIControl]
+ArgsDict = Dict[str, PyBasicTypes]
 EntFilter = Optional[Callable[[str], bool]]
 
+
+UiPathOrControl = Union[str, BaseUIControl]
+Anchor = Literal[
+    "top_left",
+    "top_middle",
+    "top_right",
+    "left_middle",
+    "center",
+    "right_middle",
+    "bottom_left",
+    "bottom_middle",
+    "bottom_right",
+]
+class FullPositionDict(TypedDict, total=False):
+    followType: Literal["none", "parent", "maxChildren", "maxSibling", "children", "x", "y"]
+    relativeValue: float
+    absoluteValue: float
+class FullSizeDict(TypedDict, total=False):
+    fit: bool
+    followType: Literal["none", "parent", "maxChildren", "maxSibling", "children", "x", "y"]
+    relativeValue: float
+    absoluteValue: float
+UiPropertyNameAll = Literal[
+    "all",
+    "size",
+    "offset",
+    "alpha",
+    "clip",
+    "color",
+    "flip_book",
+    "aseprite_flip_book",
+    "uv",
+    "wait",
+]
+UiPropertyName = Literal[
+    "size",
+    "offset",
+    "alpha",
+    "clip",
+    "color",
+    "flip_book",
+    "aseprite_flip_book",
+    "uv",
+    "wait",
+]

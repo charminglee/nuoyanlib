@@ -1,47 +1,190 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from typing import Any, Literal, Callable
+from typing import Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Generator, Type
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ..._core._types._typing import FTuple2
+from mod.client.ui.controls.buttonUIControl import ButtonUIControl
+from mod.client.ui.controls.imageUIControl import ImageUIControl
+from mod.client.ui.controls.labelUIControl import LabelUIControl
+from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
+from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
+from mod.client.ui.controls.textEditBoxUIControl import TextEditBoxUIControl
+from mod.client.ui.controls.neteasePaperDollUIControl import NeteasePaperDollUIControl
+from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
+from mod.client.ui.controls.scrollViewUIControl import ScrollViewUIControl
+from mod.client.ui.controls.gridUIControl import GridUIControl
+from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
+from mod.client.ui.controls.switchToggleUIControl import SwitchToggleUIControl
+from mod.client.ui.controls.sliderUIControl import SliderUIControl
+from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
+from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUIControl
+from mod.client.ui.controls.minimapUIControl import MiniMapUIControl
+from ..._core._types._typing import FTuple2, Anchor, FullSizeDict, FullPositionDict, UiPropertyName, UiPropertyNameAll
+from ..._core._utils import args_type_check, cache_property
+from .screen_node import ScreenNodeExtension
+
+
+_T = TypeVar("_T")
 
 
 class NyControl(object):
-    screen_node: ScreenNode
+    _CONTROL_TYPE: str
+    _screen_node: ScreenNode
+    screen_node: ScreenNodeExtension
     """
     | 控件所在UI类的实例。
     """
-    control: BaseUIControl
+    base_control: BaseUIControl
     """
-    | 控件实例。
+    | 控件 ``BaseUIControl`` 实例。
     """
-    path: str
-    """
-    | 控件路径。
-    """
-    def __init__(self: ..., screen_node: ScreenNode, control: BaseUIControl) -> None: ...
+    def __new__(cls, screen_node_ex: ScreenNodeExtension, control: BaseUIControl) -> NyControl: ...
+    def __init__(self: ..., screen_node_ex: ScreenNodeExtension, control: BaseUIControl) -> None: ...
     def __getattr__(self, name: str) -> Any: ...
+    @args_type_check(str, is_method=True)
+    def __div__(self, other: str) -> Optional[NyControl]: ...
+    def __destroy__(self) -> None: ...
+    def iter_children(self, level: int = 1) -> Generator[NyControl]: ...
+    def iter_path(self, level: int = 1) -> Generator[str]: ...
+    @classmethod
+    def from_path(
+        cls: Type[_T],
+        screen_node_ex: ScreenNodeExtension,
+        path: str,
+        **kwargs: Any,
+    ) -> Optional[_T]: ...
+    @classmethod
+    def from_control(
+        cls: Type[_T],
+        screen_node_ex: ScreenNodeExtension,
+        control: BaseUIControl,
+        **kwargs: Any,
+    ) -> Optional[_T]: ...
+    @cache_property
+    def path(self) -> str: ...
+    @cache_property
+    def parent_path(self) -> str: ...
+    @cache_property
+    def parent_ny_control(self) -> Optional[NyControl]: ...
+    def remove(self) -> None: ...
+    @property
+    def button(self) -> ButtonUIControl: ...
+    @property
+    def image(self) -> ImageUIControl: ...
+    @property
+    def label(self) -> LabelUIControl: ...
+    @property
+    def input_panel(self) -> InputPanelUIControl: ...
+    @property
+    def stack_panel(self) -> StackPanelUIControl: ...
+    @property
+    def edit_box(self) -> TextEditBoxUIControl: ...
+    @property
+    def netease_paper_doll(self) -> NeteasePaperDollUIControl: ...
+    @property
+    def item_renderer(self) -> ItemRendererUIControl: ...
+    @property
+    def scroll_view(self) -> ScrollViewUIControl: ...
+    @property
+    def grid(self) -> GridUIControl: ...
+    @property
+    def progress_bar(self) -> ProgressBarUIControl: ...
+    @property
+    def toggle(self) -> SwitchToggleUIControl: ...
+    @property
+    def slider(self) -> SliderUIControl: ...
+    @property
+    def selection_wheel(self) -> SelectionWheelUIControl: ...
+    @property
+    def combo_box(self) -> NeteaseComboBoxUIControl: ...
+    @property
+    def mini_map(self) -> MiniMapUIControl: ...
     @property
     def position(self) -> FTuple2: ...
     @position.setter
     def position(self, val: FTuple2) -> None: ...
+    @property
+    def anchor_from(self) -> Anchor: ...
+    @anchor_from.setter
+    def anchor_from(self, val: Anchor) -> None: ...
+    @property
+    def anchor_to(self) -> Anchor: ...
+    @anchor_to.setter
+    def anchor_to(self, val: Anchor) -> None: ...
+    @property
+    def clip_offset(self) -> FTuple2: ...
+    @clip_offset.setter
+    def clip_offset(self, val: FTuple2) -> None: ...
+    @property
+    def clip_children(self) -> bool: ...
+    @clip_children.setter
+    def clip_children(self, val: bool) -> None: ...
+    @property
+    def full_position_x(self) -> FullPositionDict: ...
+    @full_position_x.setter
+    def full_position_x(self, val: FullPositionDict) -> None: ...
+    @property
+    def full_position_y(self) -> FullPositionDict: ...
+    @full_position_y.setter
+    def full_position_y(self, val: FullPositionDict) -> None: ...
+    @property
+    def full_size_x(self) -> FullSizeDict: ...
+    @full_size_x.setter
+    def full_size_x(self, val: FullSizeDict) -> None: ...
+    @property
+    def full_size_y(self) -> FullSizeDict: ...
+    @full_size_y.setter
+    def full_size_y(self, val: FullSizeDict) -> None: ...
+    @property
+    def global_position(self) -> FTuple2: ...
+    @global_position.setter
+    def global_position(self, val: FTuple2) -> None: ...
+    @property
+    def max_size(self) -> FTuple2: ...
+    @max_size.setter
+    def max_size(self, val: FTuple2) -> None: ...
+    @property
+    def min_size(self) -> FTuple2: ...
+    @min_size.setter
+    def min_size(self, val: FTuple2) -> None: ...
+    @property
+    def size(self) -> FTuple2: ...
+    @size.setter
+    def size(self, val: FTuple2) -> None: ...
+    @property
+    def visible(self) -> bool: ...
+    @visible.setter
+    def visible(self, val: bool) -> None: ...
+    @property
+    def alpha(self) -> NoReturn: ...
+    @alpha.setter
+    def alpha(self, val: float) -> None: ...
+    @property
+    def layer(self) -> int: ...
+    @layer.setter
+    def layer(self, val: int) -> None: ...
+    @property
+    def touch_enable(self) -> NoReturn: ...
+    @touch_enable.setter
+    def touch_enable(self, val: bool) -> None: ...
+    @property
+    def property_bag(self) -> Dict[str, Any]: ...
+    @property_bag.setter
+    def property_bag(self, val: Dict[str, Any]) -> None: ...
+
     def SetPosition(self, pos: FTuple2) -> None:
         """
         | 设置控件相对父节点的坐标。
@@ -53,7 +196,7 @@ class NyControl(object):
         :return: 无
         :rtype: None
         """
-    def SetFullSize(self, axis: Literal["x", "y"], param_dict: dict) -> bool:
+    def SetFullSize(self, axis: Literal["x", "y"], param_dict: FullSizeDict) -> bool:
         """
         | 设置控件的大小，支持比例形式以及绝对值。
         | ``param_dict`` 参数：
@@ -81,7 +224,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetFullSize(self, axis: Literal["x", "y"]) -> dict:
+    def GetFullSize(self, axis: Literal["x", "y"]) -> FullSizeDict:
         """
         获取控件的大小，支持百分比以及绝对值。
 
@@ -92,7 +235,7 @@ class NyControl(object):
         :return: 控件的大小信息，详见SetFullSize
         :rtype: dict
         """
-    def SetFullPosition(self, axis: Literal["x", "y"], param_dict: dict) -> bool:
+    def SetFullPosition(self, axis: Literal["x", "y"], param_dict: FullPositionDict) -> bool:
         """
         | 设置控件的锚点坐标（全局坐标），支持比例值以及绝对值。
         | ``param_dict`` 参数：
@@ -118,7 +261,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetFullPosition(self, axis: Literal["x", "y"]) -> dict:
+    def GetFullPosition(self, axis: Literal["x", "y"]) -> FullPositionDict:
         """
         | 获取控件的锚点坐标，支持比例值以及绝对值。
 
@@ -129,20 +272,7 @@ class NyControl(object):
         :return: 控件的位置信息，详见SetFullPosition
         :rtype: dict
         """
-    def SetAnchorFrom(
-        self,
-        ancho_from: Literal[
-            "top_left",
-            "top_middle",
-            "top_right",
-            "left_middle",
-            "center",
-            "right_middle",
-            "bottom_left",
-            "bottom_middle",
-            "bottom_right",
-        ]
-    ) -> bool:
+    def SetAnchorFrom(self, ancho_from: Anchor) -> bool:
         """
         | 设置控件相对于父节点的锚点。
         | ``anchor_from`` 可选的值：
@@ -163,17 +293,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetAnchorFrom(self) -> Literal[
-        "top_left",
-        "top_middle",
-        "top_right",
-        "left_middle",
-        "center",
-        "right_middle",
-        "bottom_left",
-        "bottom_middle",
-        "bottom_right",
-    ]:
+    def GetAnchorFrom(self) -> Anchor:
         """
         | 判断控件相对于父节点的哪个锚点来计算位置与大小。
 
@@ -182,20 +302,7 @@ class NyControl(object):
         :return: 控件计算位置大小所依赖的父节点锚点位置信息，详见SetAnchorFrom
         :rtype: str
         """
-    def SetAnchorTo(
-        self,
-        anchor_to: Literal[
-            "top_left",
-            "top_middle",
-            "top_right",
-            "left_middle",
-            "center",
-            "right_middle",
-            "bottom_left",
-            "bottom_middle",
-            "bottom_right",
-        ],
-    ) -> bool:
+    def SetAnchorTo(self, anchor_to: Anchor) -> bool:
         """
         | 设置控件自身锚点位置。
 
@@ -206,17 +313,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetAnchorTo(self) -> Literal[
-        "top_left",
-        "top_middle",
-        "top_right",
-        "left_middle",
-        "center",
-        "right_middle",
-        "bottom_left",
-        "bottom_middle",
-        "bottom_right",
-    ]:
+    def GetAnchorTo(self) -> Anchor:
         """
         | 获取控件自身锚点位置信息。
 
@@ -442,19 +539,7 @@ class NyControl(object):
         :return: 无
         :rtype: None
         """
-    def PauseAnimation(
-        self,
-        property_name: Literal[
-            "all",
-            "size",
-            "offset",
-            "alpha",
-            "clip",
-            "color",
-            "flip_book",
-            "uv",
-        ] = "all"
-    ) -> bool:
+    def PauseAnimation(self, property_name: UiPropertyNameAll = "all") -> bool:
         """
         | 暂停动画，暂停后的动画会停在当前的状态。
         | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
@@ -466,19 +551,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def PlayAnimation(
-        self,
-        property_name: Literal[
-            "all",
-            "size",
-            "offset",
-            "alpha",
-            "clip",
-            "color",
-            "flip_book",
-            "uv",
-        ] = "all"
-    ) -> bool:
+    def PlayAnimation(self, property_name: UiPropertyNameAll = "all") -> bool:
         """
         | 继续播放动画，从动画当前状态开始播放
         | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
@@ -490,19 +563,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def StopAnimation(
-        self,
-        property_name: Literal[
-            "all",
-            "size",
-            "offset",
-            "alpha",
-            "clip",
-            "color",
-            "flip_book",
-            "uv",
-        ] = "all"
-    ) -> bool:
+    def StopAnimation(self, property_name: UiPropertyNameAll = "all") -> bool:
         """
         | 停止动画，动画将恢复到第一段动画片段的 ``from`` 状态。
         | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
@@ -516,18 +577,10 @@ class NyControl(object):
         """
     def SetAnimation(
         self,
-        property_name: Literal[
-            "size",
-            "offset",
-            "alpha",
-            "clip",
-            "color",
-            "flip_book",
-            "uv",
-        ],
+        property_name: UiPropertyName,
         namespace: str,
         anim_name: str,
-        auto_play: bool = False
+        auto_play: bool = False,
     ) -> bool:
         """
         | 给单一属性设置动画，已有重复的会设置失败，需要先remove。
@@ -544,18 +597,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def RemoveAnimation(
-        self,
-        property_name: Literal[
-            "size",
-            "offset",
-            "alpha",
-            "clip",
-            "color",
-            "flip_book",
-            "uv",
-        ]
-    ) -> bool:
+    def RemoveAnimation(self, property_name: UiPropertyName) -> bool:
         """
         | 删除单一属性的动画，删除后的值与当前状态有关，建议删除后重新设置该属性值。
         | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
@@ -603,4 +645,24 @@ class NyControl(object):
 
         :return: 是否对名称为anim_name的动画进行了注册回调
         :rtype: bool
+        """
+    def GetPropertyBag(self) -> Dict[str, Any]:
+        """
+        | 获取PropertyBag。
+
+        -----
+
+        :return: PropertyBag字典
+        :rtype: dict[str,Any]
+        """
+    def SetPropertyBag(self, params: Dict[str, Any]) -> None:
+        """
+        | 设置PropertyBag，将使用字典中的每个值来覆盖原本PropertyBag中的值。
+
+        -----
+
+        :param dict[str,Any] params: PropertyBag字典
+
+        :return: 无
+        :rtype: None
         """

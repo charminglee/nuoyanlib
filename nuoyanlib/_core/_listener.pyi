@@ -1,25 +1,22 @@
 # -*- coding: utf-8 -*-
-# ====================================================
-#
-#   Copyright (c) 2023 Nuoyan
-#   nuoyanlib is licensed under Mulan PSL v2.
-#   You can use this software according to the terms and conditions of the Mulan PSL v2.
-#   You may obtain a copy of Mulan PSL v2 at:
-#            http://license.coscl.org.cn/MulanPSL2
-#   THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-#   See the Mulan PSL v2 for more details.
-#
-#   Author        : 诺言Nuoyan
-#   Email         : 1279735247@qq.com
-#   Gitee         : https://gitee.com/charming-lee
-#   Last Modified : 2025-05-30
-#
-# ====================================================
+"""
+| ===================================
+|
+|   Copyright (c) 2025 Nuoyan
+|
+|   Author: Nuoyan
+|   Email : 1279735247@qq.com
+|   Gitee : https://gitee.com/charming-lee
+|   Date  : 2025-06-05
+|
+| ===================================
+"""
 
 
-from typing import Callable, Tuple, Union, Dict, Set, Optional, List
+from typing import Callable, Tuple, Union, Dict, Set, List
 from types import MethodType
-from ._types._listener import ClientEvent, ServerEvent
+from ._types._events import ClientEvent, ServerEvent
+from ._types._typing import ArgsDict, PyBasicTypes
 from ._client._lib_client import NuoyanLibClientSystem
 from ._server._lib_server import NuoyanLibServerSystem
 
@@ -28,6 +25,38 @@ ALL_CLIENT_ENGINE_EVENTS: Set[str]
 ALL_CLIENT_LIB_EVENTS: Dict[str, str]
 ALL_SERVER_ENGINE_EVENTS: Set[str]
 ALL_SERVER_LIB_EVENTS: Dict[str, str]
+
+
+class EventArgsProxy(object):
+    arg_dict: ArgsDict
+    def __init__(self: ..., arg_dict: ArgsDict) -> None: ...
+    def __getattr__(self, key: str) -> PyBasicTypes: ...
+    def __setattr__(self, key: str, value: PyBasicTypes) -> None: ...
+    def __repr__(self) -> str: ...
+    copy = dict.copy
+    iterkeys = dict.iterkeys
+    itervalues = dict.itervalues
+    iteritems = dict.iteritems
+    viewkeys = dict.viewkeys
+    viewvalues = dict.viewvalues
+    viewitems = dict.viewitems
+    get = dict.get
+    keys = dict.keys
+    values = dict.values
+    items = dict.items
+    __len__ = dict.__len__
+    __contains__ = dict.__contains__
+    __getitem__ = dict.__getitem__
+    __setitem__ = dict.__setitem__
+    __cmp__ = dict.__cmp__
+    __delitem__ = dict.__delitem__
+    __eq__ = dict.__eq__
+    __ge__ = dict.__ge__
+    __gt__ = dict.__gt__
+    __iter__ = dict.__iter__
+    __le__ = dict.__le__
+    __lt__ = dict.__lt__
+    __ne__ = dict.__ne__
 
 
 class BaseEventProxy(object):
