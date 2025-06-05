@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,7 +9,7 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
@@ -29,7 +29,8 @@ ALL_SERVER_LIB_EVENTS: Dict[str, str]
 
 class EventArgsProxy(object):
     arg_dict: ArgsDict
-    def __init__(self: ..., arg_dict: ArgsDict) -> None: ...
+    event_name: str
+    def __init__(self: ..., arg_dict: ArgsDict, event_name: str) -> None: ...
     def __getattr__(self, key: str) -> PyBasicTypes: ...
     def __setattr__(self, key: str, value: PyBasicTypes) -> None: ...
     def __repr__(self) -> str: ...
@@ -59,7 +60,7 @@ class EventArgsProxy(object):
     __ne__ = dict.__ne__
 
 
-class BaseEventProxy(object):
+class _BaseEventProxy(object):
     _lib_sys: Union[NuoyanLibClientSystem, NuoyanLibServerSystem]
     _engine_events: Set[str]
     _engine_ns: str
@@ -84,8 +85,8 @@ class BaseEventProxy(object):
         method: MethodType,
         priority: int = 0
     ) -> None: ...
-class ClientEventProxy(ClientEvent, BaseEventProxy): ...
-class ServerEventProxy(ServerEvent, BaseEventProxy): ...
+class ClientEventProxy(ClientEvent, _BaseEventProxy): ...
+class ServerEventProxy(ServerEvent, _BaseEventProxy): ...
 
 
 def event(

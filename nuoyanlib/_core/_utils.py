@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,7 +9,7 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
@@ -88,11 +88,13 @@ if _ENABLED_TYPE_CHECKING:
                     if is_method and i == 0:
                         continue
                     idx = i - 1 if is_method else i
-                    if type(a) not in typ[idx]:
-                        expect_type = "/".join(t.__name__ for t in typ[idx])
+                    a_type = type(a)
+                    expect_types = typ[idx]
+                    if a_type not in expect_types:
+                        types = "/".join(t.__name__ for t in expect_types)
                         raise TypeError(
                             "the %dth argument of %s() should be %s, got %s"
-                            % (i + 1, func.__name__, expect_type, type(a).__name__)
+                            % (i + 1, func.__name__, types, a_type.__name__)
                         )
                 return func(*args)
             return wrapper

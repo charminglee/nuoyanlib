@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,22 +9,33 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-import mod.server.extraServerApi as _server_api
-from .._utils import CacheObject as _CacheObject
+import mod.server.extraServerApi as server_api
+from .._utils import CacheObject
 
 
-ENGINE_NAMESPACE = _server_api.GetEngineNamespace()
-ENGINE_SYSTEM_NAME = _server_api.GetEngineSystemName()
-LEVEL_ID = _server_api.GetLevelId()
-ServerSystem = _server_api.GetServerSystemCls()
-CompFactory = _server_api.GetEngineCompFactory()
+__all__ = [
+    "ENGINE_NAMESPACE",
+    "ENGINE_SYSTEM_NAME",
+    "LEVEL_ID",
+    "ServerSystem",
+    "CompFactory",
+    "CF",
+    "LvComp",
+]
 
 
-class CF(_CacheObject):
+ENGINE_NAMESPACE = server_api.GetEngineNamespace()
+ENGINE_SYSTEM_NAME = server_api.GetEngineSystemName()
+LEVEL_ID = server_api.GetLevelId()
+ServerSystem = server_api.GetServerSystemCls()
+CompFactory = server_api.GetEngineCompFactory()
+
+
+class CF(CacheObject):
     def __init__(self, target):
         self._target = target
 
@@ -35,6 +46,7 @@ class CF(_CacheObject):
 LvComp = CF(LEVEL_ID)
 
 
+del server_api, CacheObject
 
 
 

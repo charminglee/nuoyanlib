@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,11 +9,17 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-from ._core import _logging
+# todo：为函数添加调用失败时输出异常信息的功能
+# todo：Entity类、Player类
+# todo：UI动画
+# todo：完善Ny控件
+
+
+from ._core._logging import info as _info
 
 
 __version__ = "0.9.3-beta"
@@ -22,10 +28,11 @@ __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"
 
 
-_logging.info("Start loading, ver: %s" % __version__)
+_info("Start loading, ver: %s" % __version__)
+del _info
 
 
-def run_nuoyanlib(dct):
+def run(dct):
     from mod.common.mod import Mod
     import mod.client.extraClientApi as client_api
     import mod.server.extraServerApi as server_api
@@ -54,7 +61,6 @@ def run_nuoyanlib(dct):
     dct['NuoyanLibMain'] = NuoyanLibMain
 
 
-# todo：为函数添加调用失败时输出异常信息的功能
-# todo：Entity类、Player类
-# todo：UI动画
-# todo：完善Ny控件
+
+
+

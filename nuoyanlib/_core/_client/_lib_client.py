@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,43 +9,50 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-import mod.client.extraClientApi as _client_api
-from . import _comp
-from .. import _const, _listener, _sys, _logging, _utils
-from ...utils import communicate as _communicate
+import mod.client.extraClientApi as client_api
+from ._comp import ClientSystem, CF, PLAYER_ID
+from .._const import LIB_NAME, LIB_CLIENT_NAME, LIB_SERVER_NAME, LIB_CLIENT_PATH, __version__
+from .._listener import ClientEventProxy, event, lib_sys_event
+from .._sys import NuoyanLibBaseSystem
+from .._logging import info
+from .._utils import singleton
+from ...utils.communicate import call_local, call_callback
 
 
 def instance():
     if not NuoyanLibClientSystem.instance:
-        NuoyanLibClientSystem.instance = _client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
+        NuoyanLibClientSystem.instance = client_api.GetSystem(LIB_NAME, LIB_CLIENT_NAME)
     return NuoyanLibClientSystem.instance
 
 
-@_utils.singleton
-class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem, _comp.ClientSystem):
+@singleton
+class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
     @staticmethod
     def register():
-        if not _client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME):
-            _client_api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
+        if not client_api.GetSystem(LIB_NAME, LIB_CLIENT_NAME):
+            client_api.RegisterSystem(LIB_NAME, LIB_CLIENT_NAME, LIB_CLIENT_PATH)
 
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
-        _logging.info("NuoyanLibClientSystem inited, ver: %s" % _const.__version__)
+        info("NuoyanLibClientSystem inited, ver: %s" % __version__)
 
     # General ==========================================================================================================
+
+    def HudButtonChangedClientEvent(self, event):
+        event
 
     def UiInitFinished(self, event):
         self.NotifyToServer("UiInitFinished", {})
 
     def broadcast_to_all_client(self, event_name, event_data, namespace="", sys_name=""):
         if not namespace:
-            namespace = _const.LIB_NAME
+            namespace = LIB_NAME
         if not sys_name:
-            sys_name = _const.LIB_CLIENT_NAME
+            sys_name = LIB_CLIENT_NAME
         self.NotifyToServer("_BroadcastToAllClient", {
             'event_name': event_name,
             'event_data': event_data,
@@ -55,9 +62,9 @@ class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem
 
     def notify_to_multi_clients(self, player_ids, event_name, event_data, namespace="", sys_name=""):
         if not namespace:
-            namespace = _const.LIB_NAME
+            namespace = LIB_NAME
         if not sys_name:
-            sys_name = _const.LIB_CLIENT_NAME
+            sys_name = LIB_CLIENT_NAME
         self.NotifyToServer("_NotifyToMultiClients", {
             'player_ids': player_ids,
             'event_name': event_name,
@@ -84,47 +91,47 @@ class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem
         :return: UI类实例，注册或创建失败时返回None
         :rtype: _ScreenNode|None
         """
-        node = _client_api.GetUI(namespace, ui_key)
+        node = client_api.GetUI(namespace, ui_key)
         if node:
             return node
-        if not _client_api.RegisterUI(namespace, ui_key, cls_path, ui_screen_def):
+        if not client_api.RegisterUI(namespace, ui_key, cls_path, ui_screen_def):
             return
         if param is None:
             param = {}
         if isinstance(param, dict):
             param['__cs__'] = self
         if stack:
-            return _client_api.PushScreen(namespace, ui_key, param)
+            return client_api.PushScreen(namespace, ui_key, param)
         else:
-            return _client_api.CreateUI(namespace, ui_key, param)
+            return client_api.CreateUI(namespace, ui_key, param)
 
     # set_query_mod_var ================================================================================================
 
-    @_listener.lib_sys_event
+    @lib_sys_event
     def _SetQueryCache(self, args):
         for entity_id, queries in args.items():
             for name, value in queries.items():
-                comp = _comp.CF(entity_id).QueryVariable
+                comp = CF(entity_id).QueryVariable
                 if comp.Get(name) == -1.0:
                     comp.Register(name, 0.0)
                 comp.Set(name, value)
 
-    @_listener.lib_sys_event
+    @lib_sys_event
     def _SetQueryVar(self, args):
-        if args.get('__id__') == _comp.PLAYER_ID:
+        if args.get('__id__') == PLAYER_ID:
             return
         entity_id = args['entity_id']
         name = args['name']
         value = args['value']
-        comp = _comp.CF(entity_id).QueryVariable
+        comp = CF(entity_id).QueryVariable
         if comp.Get(name) == -1.0:
             comp.Register(name, 0.0)
         comp.Set(name, value)
 
     # call =============================================================================================================
 
-    @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_CLIENT_NAME)
-    @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_SERVER_NAME)
+    @event(namespace=LIB_NAME, system_name=LIB_CLIENT_NAME)
+    @event(namespace=LIB_NAME, system_name=LIB_SERVER_NAME)
     def _NuoyanLibCall(self, args):
         namespace = args['namespace']
         system_name = args['system_name']
@@ -134,21 +141,21 @@ class NuoyanLibClientSystem(_listener.ClientEventProxy, _sys.NuoyanLibBaseSystem
         call_args = args['args']
         call_kwargs = args['kwargs']
         player_id = args.get('__id__')
-        target_sys = _client_api.GetSystem(namespace, system_name)
+        target_sys = client_api.GetSystem(namespace, system_name)
         def callback(cb_args):
             ret_args = {'uuid': uuid, 'cb_args': cb_args}
             if player_id:
                 self.notify_to_multi_clients([player_id], "_NuoyanLibCallReturn", ret_args)
             else:
                 self.NotifyToServer("_NuoyanLibCallReturn", ret_args)
-        _communicate.call_local(target_sys, method, callback, delay_ret, call_args, call_kwargs)
+        call_local(target_sys, method, callback, delay_ret, call_args, call_kwargs)
 
-    @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_CLIENT_NAME)
-    @_listener.event(namespace=_const.LIB_NAME, system_name=_const.LIB_SERVER_NAME)
+    @event(namespace=LIB_NAME, system_name=LIB_CLIENT_NAME)
+    @event(namespace=LIB_NAME, system_name=LIB_SERVER_NAME)
     def _NuoyanLibCallReturn(self, args):
         uuid = args['uuid']
         cb_args = args['cb_args']
-        _communicate.call_callback(uuid, **cb_args)
+        call_callback(uuid, **cb_args)
 
 
 

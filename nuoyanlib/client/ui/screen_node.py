@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,7 +9,7 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
@@ -67,7 +67,7 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
             _utils.hook_method(self, "OnDestroy", self.__Destroy)
         elif isinstance(self, _comp.ScreenNode):
             self._screen_node = self
-            self.cs = args[2].get('__cs__') if len(args) == 3 and isinstance(args[2], dict) else None
+            self.cs = args[2].get('__cs__') if args[2] else None
             _utils.hook_method(self, "Create", self.__Create)
             _utils.hook_method(self, "Destroy", self.__Destroy)
         else:

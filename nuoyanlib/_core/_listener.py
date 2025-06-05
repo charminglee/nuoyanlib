@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,7 +9,7 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
@@ -299,8 +299,9 @@ ALL_SERVER_LIB_EVENTS = {
 
 
 class EventArgsProxy(object):
-    def __init__(self, arg_dict):
+    def __init__(self, arg_dict, event_name):
         self.arg_dict = arg_dict
+        self.event_name = event_name
         self.copy = arg_dict.copy
         self.iterkeys = arg_dict.iterkeys
         self.itervalues = arg_dict.itervalues
@@ -325,29 +326,29 @@ class EventArgsProxy(object):
             self.arg_dict[key] = value
 
     def __repr__(self):
-        s = "EventArgs:\n"
+        s = "EventArgs of %s:\n" % self.event_name
         for k, v in self.arg_dict.items():
             s += "    .%s = %s\n" % (k, repr(v))
         return s
 
-    __len__ = lambda self: self.arg_dict.__len__()
-    __contains__ = lambda self, *a: self.arg_dict.__contains__(*a)
-    __getitem__ = lambda self, *a: self.arg_dict.__getitem__(*a)
-    __setitem__ = lambda self, *a: self.arg_dict.__setitem__(*a)
-    __cmp__ = lambda self, *a: self.arg_dict.__cmp__(*a)
-    __delitem__ = lambda self, *a: self.arg_dict.__delitem__(*a)
-    __eq__ = lambda self, *a: self.arg_dict.__eq__(*a)
-    __ge__ = lambda self, *a: self.arg_dict.__ge__(*a)
-    __gt__ = lambda self, *a: self.arg_dict.__gt__(*a)
-    __iter__ = lambda self: self.arg_dict.__iter__()
-    __le__ = lambda self, *a: self.arg_dict.__le__(*a)
-    __lt__ = lambda self, *a: self.arg_dict.__lt__(*a)
-    __ne__ = lambda self, *a: self.arg_dict.__ne__(*a)
+    __len__      = lambda self:    self.arg_dict.__len__()
+    __contains__ = lambda self, a: self.arg_dict.__contains__(a)
+    __getitem__  = lambda self, a: self.arg_dict.__getitem__(a)
+    __setitem__  = lambda self, a: self.arg_dict.__setitem__(a)
+    __cmp__      = lambda self, a: self.arg_dict.__cmp__(a)
+    __delitem__  = lambda self, a: self.arg_dict.__delitem__(a)
+    __eq__       = lambda self, a: self.arg_dict.__eq__(a)
+    __ge__       = lambda self, a: self.arg_dict.__ge__(a)
+    __gt__       = lambda self, a: self.arg_dict.__gt__(a)
+    __iter__     = lambda self:    self.arg_dict.__iter__()
+    __le__       = lambda self, a: self.arg_dict.__le__(a)
+    __lt__       = lambda self, a: self.arg_dict.__lt__(a)
+    __ne__       = lambda self, a: self.arg_dict.__ne__(a)
 
 
-class BaseEventProxy(object):
+class _BaseEventProxy(object):
     def __init__(self, *args, **kwargs):
-        super(BaseEventProxy, self).__init__(*args, **kwargs)
+        super(_BaseEventProxy, self).__init__(*args, **kwargs)
         self._lib_sys = _sys.get_lib_system()
         self._listen_events()
 
@@ -396,7 +397,7 @@ class BaseEventProxy(object):
 
     def _listen_proxy(self, namespace, system_name, event_name, method, priority=0):
         def proxy(_, args=None):
-            method(EventArgsProxy(args) if args else None)
+            method(EventArgsProxy(args, event_name) if args else None)
         proxy_name = "_proxy_%s" % event_name
         proxy.__name__ = proxy_name
         proxy = _MethodType(proxy, self)
@@ -413,7 +414,7 @@ class BaseEventProxy(object):
         self._lib_sys.ListenForEvent(namespace, system_name, event_name, self, method, priority)
 
 
-class ClientEventProxy(BaseEventProxy):
+class ClientEventProxy(_BaseEventProxy):
     """
     | 客户端事件代理类，继承该类的客户端将获得以下功能：
     - 所有客户端事件无需监听，编写一个与事件同名的方法即可使用该事件，且事件参数采用对象形式，支持补全。
@@ -425,7 +426,7 @@ class ClientEventProxy(BaseEventProxy):
     _lib_events = ALL_CLIENT_LIB_EVENTS
 
 
-class ServerEventProxy(BaseEventProxy):
+class ServerEventProxy(_BaseEventProxy):
     """
     | 服务端事件代理类，继承该类的服务端将获得以下功能：
     - 所有服务端事件无需监听，编写一个与事件同名的方法即可使用该事件，且事件参数采用对象形式，支持补全。

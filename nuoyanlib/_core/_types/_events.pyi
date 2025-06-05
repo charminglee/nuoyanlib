@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,15 +9,16 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
 from ._event_typing import *
+from ._typing import EventArgs
 
 
 class ClientEvent:
-    def HudButtonChangedClientEvent(self, event: EventArgs0):
+    def HudButtonChangedClientEvent(self, event: EventArgs[EventArgs0]):
         """
         [事件]
 

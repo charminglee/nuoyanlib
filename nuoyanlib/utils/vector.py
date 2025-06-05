@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,7 +9,7 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
@@ -310,7 +310,7 @@ def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", co
     -----
 
     :param tuple[float,float,float]|list[float]|_Vector3 vec: 要旋转的向量（支持tuple、list或Vector3表示）
-    :param float x_angle: 绕x轴的旋转角度
+    :param float x_angle: 绕x轴的旋转角度（角度制，下同）
     :param float y_angle: 绕y轴的旋转角度
     :param float z_angle: 绕z轴的旋转角度
     :param str order: 旋转顺序，默认为"zyx"，即先按z轴旋转，再按y轴旋转，最后按x轴旋转

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,32 +9,52 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-import mod.client.extraClientApi as _client_api
-from .._utils import CacheObject as _CacheObject
+import mod.client.extraClientApi as client_api
+from .._utils import CacheObject
 
 
-ENGINE_NAMESPACE = _client_api.GetEngineNamespace()
-ENGINE_SYSTEM_NAME = _client_api.GetEngineSystemName()
-PLAYER_ID = _client_api.GetLocalPlayerId()
-LEVEL_ID = _client_api.GetLevelId()
-ClientSystem = _client_api.GetClientSystemCls()
-CompFactory = _client_api.GetEngineCompFactory()
+__all__ = [
+    "ENGINE_NAMESPACE",
+    "ENGINE_SYSTEM_NAME",
+    "PLAYER_ID",
+    "LEVEL_ID",
+    "ClientSystem",
+    "CompFactory",
+    "ScreenNode",
+    "ViewBinder",
+    "ViewRequest",
+    "CustomUIScreenProxy",
+    "CustomUIControlProxy",
+    "NativeScreenManager",
+    "MiniMapScreenNode",
+    "CF",
+    "PlrComp",
+    "LvComp",
+]
 
 
-ScreenNode = _client_api.GetScreenNodeCls()
-ViewBinder = _client_api.GetViewBinderCls()
-ViewRequest = _client_api.GetViewViewRequestCls()
-CustomUIScreenProxy = _client_api.GetUIScreenProxyCls()
-CustomUIControlProxy = _client_api.GetCustomUIControlProxyCls()
-NativeScreenManager = _client_api.GetNativeScreenManagerCls().instance() # NOQA
-MiniMapScreenNode = _client_api.GetMiniMapScreenNodeCls()
+ENGINE_NAMESPACE = client_api.GetEngineNamespace()
+ENGINE_SYSTEM_NAME = client_api.GetEngineSystemName()
+PLAYER_ID = client_api.GetLocalPlayerId()
+LEVEL_ID = client_api.GetLevelId()
+ClientSystem = client_api.GetClientSystemCls()
+CompFactory = client_api.GetEngineCompFactory()
 
 
-class CF(_CacheObject):
+ScreenNode = client_api.GetScreenNodeCls()
+ViewBinder = client_api.GetViewBinderCls()
+ViewRequest = client_api.GetViewViewRequestCls()
+CustomUIScreenProxy = client_api.GetUIScreenProxyCls()
+CustomUIControlProxy = client_api.GetCustomUIControlProxyCls()
+NativeScreenManager = client_api.GetNativeScreenManagerCls().instance() # NOQA
+MiniMapScreenNode = client_api.GetMiniMapScreenNodeCls()
+
+
+class CF(CacheObject):
     def __init__(self, target):
         self._target = target
 
@@ -46,7 +66,7 @@ PlrComp = CF(PLAYER_ID)
 LvComp = CF(LEVEL_ID)
 
 
-
+del client_api, CacheObject
 
 
 

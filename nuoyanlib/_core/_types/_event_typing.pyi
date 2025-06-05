@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,7 +9,7 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
@@ -1116,7 +1116,7 @@ class EventArgs75(EventArgsProxy):
     """
 
 class EventArgs76(EventArgsProxy):
-    from: int
+    from_: int
     """
     切换前的视角
     """
@@ -1292,7 +1292,7 @@ class EventArgs88(EventArgsProxy):
     """
     实体ID
     """
-    from: float
+    from_: float
     """
     变化前的生命值
     """
@@ -3734,7 +3734,7 @@ class EventArgs205(EventArgsProxy):
     """
     实体ID
     """
-    from: str
+    from_: str
     """
     变化前的生命值
     """
@@ -4555,7 +4555,7 @@ class EventArgs247(EventArgsProxy):
     """
     实体ID
     """
-    from: float
+    from_: float
     """
     变化前的生命值
     """

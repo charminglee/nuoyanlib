@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,11 +9,11 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-from typing import Tuple
+from typing import Literal, Tuple
 from .._core._types._typing import FTuple3, FTuple2, Vector, VectorNoList
 
 
@@ -39,7 +39,7 @@ def vec_euler_rotate(
     x_angle: float = 0.0,
     y_angle: float = 0.0,
     z_angle: float = 0.0,
-    order: str = "zyx",
+    order: Literal["zyx", "zxy", "xyz", "xzy", "yxz", "yzx"] = "zyx",
     convert_vec: bool = False,
 ) -> Vector: ...
 def vec_rotate_around(v: Vector, u: Vector, angle: float, convert_vec: bool = False) -> Vector: ...

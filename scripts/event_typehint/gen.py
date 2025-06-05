@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,7 +9,7 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
@@ -87,9 +87,11 @@ with open("_event_typing.pyi", "r") as f:
 with open("_event_typing.pyi", "w") as f:
     # 按顺序编写事件参数注解
     for i, args in enumerate(typehint_data):
-        _event_typing += 'class EventArgs%d(EventArgsProxy):\n' % i
+        _event_typing += 'class EventArgs%d(_EventArgsProxy):\n' % i
         if args:
             for name, typ, doc in args:
+                if name == "from":
+                    name += "_"
                 _event_typing += "    %s: %s\n" % (name, typ)
                 _event_typing += '    """\n    %s\n    """\n' % doc
         else:

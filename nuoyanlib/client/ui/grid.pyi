@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,26 +9,27 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-from typing import Union, Tuple, Callable, TypeVar, Optional, Iterator, Generator
+from typing import Union, Tuple, Callable, TypeVar, Optional, Iterator, Generator, Any, List
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.gridUIControl import GridUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from .control import NyControl
-from ..._core._types._typing import ITuple2
+from ..._core._types._typing import ITuple2, FunctionType
 from ..._core._utils import args_type_check
 
 
 _T = TypeVar("_T")
 _Item = Union[int, slice, Tuple[Union[int, slice], Union[int, slice]]]
+_GridUpdateCallback = Callable[[], Any]
 
 
 class _ElemGroup(Iterator[Optional[NyGrid]]): # NOQA
     _grid: NyGrid
-    _coord_gen: Generator[ITuple2]
+    _coord_gen: Generator[ITuple2, None, None]
     _len: int
     def __init__(self, grid: NyGrid, item: _Item) -> None: ...
     def __iter__(self: _T) -> _T: ...
@@ -39,7 +40,7 @@ class _ElemGroup(Iterator[Optional[NyGrid]]): # NOQA
 
 
 class NyGrid(NyControl):
-    __get_dim: Callable[[str, str], ITuple2]
+    _update_cbs: List[_GridUpdateCallback]
     base_control: GridUIControl
     """
     | 网格 ``GridUIControl`` 实例。
@@ -57,6 +58,10 @@ class NyGrid(NyControl):
     ) -> None: ...
     @args_type_check((int, slice, tuple), is_method=True)
     def __getitem__(self, item: _Item) -> _ElemGroup: ...
+    @args_type_check(FunctionType, is_method=True)
+    def set_gird_update_callback(self, func: _GridUpdateCallback) -> bool: ...
+    @args_type_check(FunctionType, is_method=True)
+    def remove_gird_update_callback(self, func: _GridUpdateCallback) -> bool: ...
     @property
     def grid_size(self) -> int: ...
     @property

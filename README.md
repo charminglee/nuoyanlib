@@ -72,8 +72,8 @@
     ```
 2. 在`modMain.py`中添加以下代码以启动「nuoyanlib」：
     ```python
-    from nuoyanlib import run_nuoyanlib
-    run_nuoyanlib(globals())
+    import nuoyanlib
+    nuoyanlib.run(globals())
     ```
    例如：
     ```python
@@ -82,8 +82,8 @@
     import mod.server.extraServerApi as server_api
    
    
-    from nuoyanlib import run_nuoyanlib
-    run_nuoyanlib(globals())
+    import nuoyanlib
+    nuoyanlib.run(globals())
 
 
     @Mod.Binding(name="MyMod", version="1.0.0")
@@ -107,7 +107,7 @@
     ```
     > **[警告]**  
     为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且禁止导入对立端库（如在客户端导入服务端库，在服务端导入客户端库），否则可能导致「nuoyanlib」功能异常甚至游戏闪退。
-4. 更多信息请参见[入门指南]()。
+4. 更多信息请参见[入门指南](/doc/入门指南.md)。
 
 <br></br>
 

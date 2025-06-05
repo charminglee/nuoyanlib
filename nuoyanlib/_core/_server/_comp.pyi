@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,11 +9,11 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-from typing import Type, Dict, Any
+from typing import Type, Any
 from mod.server.system.serverSystem import ServerSystem
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 from mod.server.component.queryVariableCompServer import QueryVariableComponentServer

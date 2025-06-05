@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,25 +9,20 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-from .control import NyControl as _NyControl
-from ..._core import _utils
-from . import ui_utils as _ui_utils
-from ..._core._client._comp import ScreenNode as _ScreenNode
+from ..._core._utils import args_type_check, join_chr
+from ..._core._client._comp import ScreenNode
+from ..._core._types._typing import FunctionType
+from .ui_utils import ControlType
+from .control import NyControl
 
 
 __all__ = [
     "NyGrid",
 ]
-
-
-_seq1 = _utils.join_chr(95, 95, 102, 117, 110, 99, 95, 95)
-_seq2 = _utils.join_chr(95, 95, 103, 108, 111, 98, 97, 108, 115, 95, 95)
-_seq3 = _utils.join_chr(103, 117, 105)
-_seq4 = _utils.join_chr(103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)
 
 
 class _ElemGroup(object):
@@ -58,7 +53,7 @@ class _ElemGroup(object):
     def next(self):
         elem = self._grid.base_control.GetGridItem(*next(self._coord_gen))
         if elem:
-            return _NyControl.from_control(self._grid.screen_node, elem)
+            return NyControl.from_control(self._grid.screen_node, elem)
         return None
 
     def __len__(self):
@@ -80,7 +75,7 @@ class _ElemGroup(object):
         pass
 
 
-class NyGrid(_NyControl):
+class NyGrid(NyControl):
     """
     | 创建 ``NyGrid`` 网格实例。
     | 兼容ModSDK ``GridUIControl`` 和 ``BaseUIControl`` 的相关接口。
@@ -94,18 +89,23 @@ class NyGrid(_NyControl):
     """
 
     __get_dim = None
-    _CONTROL_TYPE = _ui_utils.ControlType.grid
+    _CONTROL_TYPE = ControlType.grid
 
     def __init__(self, screen_node_ex, grid_control, **kwargs):
-        _NyControl.__init__(self, screen_node_ex, grid_control)
+        NyControl.__init__(self, screen_node_ex, grid_control)
         if not NyGrid.__get_dim:
-            f = getattr(_ScreenNode.__init__, _seq1)
-            m = getattr(f, _seq2)[_seq3]
-            g = getattr(m, _seq4)
+            seq1 = join_chr(95, 95, 102, 117, 110, 99, 95, 95)
+            seq2 = join_chr(95, 95, 103, 108, 111, 98, 97, 108, 115, 95, 95)
+            seq3 = join_chr(103, 117, 105)
+            seq4 = join_chr(103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)
+            f = getattr(ScreenNode.__init__, seq1)
+            m = getattr(f, seq2)[seq3]
+            g = getattr(m, seq4)
             NyGrid.__get_dim = staticmethod(g)
         self.is_stack_grid = kwargs.get('is_stack_grid', False)
+        self._update_cbs = []
 
-    @_utils.args_type_check((int, slice, tuple), is_method=True)
+    @args_type_check((int, slice, tuple), is_method=True)
     def __getitem__(self, item):
         """
         | 根据特定规则获取网格元素，返回 ``ElemGroup`` 对象，规则如下：
@@ -125,8 +125,43 @@ class NyGrid(_NyControl):
         """
         return _ElemGroup(self, item)
 
+    @args_type_check(FunctionType, is_method=True)
     def set_gird_update_callback(self, func):
-        pass
+        """
+        设置网格更新时触发的回调函数。
+
+        -----
+
+        :param function func: 回调函数
+
+        :return: 是否成功
+        :rtype: bool
+        """
+        if func not in self._update_cbs:
+            self._update_cbs.append(func)
+            return True
+        return False
+
+    @args_type_check(FunctionType, is_method=True)
+    def remove_gird_update_callback(self, func):
+        """
+        移除网格更新时触发的回调函数。
+
+        -----
+
+        :param function func: 回调函数
+
+        :return: 是否成功
+        :rtype: bool
+        """
+        if func in self._update_cbs:
+            self._update_cbs.remove(func)
+            return True
+        return False
+
+    def _GridComponentSizeChangedClientEvent(self, event):
+        for cb in self._update_cbs:
+            cb()
 
     @property
     def grid_size(self):

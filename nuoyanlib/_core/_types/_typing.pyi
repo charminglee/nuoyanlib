@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-| ===================================
+| ==============================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
@@ -9,17 +9,19 @@
 |   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-06-05
 |
-| ===================================
+| ==============================================
 """
 
 
-from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable, Literal, Any
+from typing import Tuple, Dict, Optional, TypeVar, Union, TypedDict, List, Callable, Literal, Any
+from types import FunctionType as _FunctionType
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.mcmath import Vector3
 
 
 PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
+FunctionType = _FunctionType
 FTuple = Tuple[float, ...]
 FTuple2 = Tuple[float, float]
 FTuple3 = Tuple[float, float, float]
@@ -63,6 +65,7 @@ class ItemHeapData(TypedDict):
 
 ArgsDict = Dict[str, PyBasicTypes]
 EntFilter = Optional[Callable[[str], bool]]
+EventArgs = TypeVar("EventArgs")
 
 
 UiPathOrControl = Union[str, BaseUIControl]
