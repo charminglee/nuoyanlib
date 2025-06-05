@@ -1,2 +1,6 @@
 /.idea/
 /nuoyanlib.zip
+/scripts/event_typehint/_event_typing.pyi
+/scripts/event_typehint/_events.pyi
+*.pyc
+/.run/

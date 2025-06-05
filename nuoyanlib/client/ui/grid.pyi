@@ -13,7 +13,7 @@
 """
 
 
-from typing import Union, Tuple, Callable, TypeVar, Optional, Iterator, Generator, Any, List
+from typing import Union, Tuple, Callable, TypeVar, Optional, Iterator, Generator, Any, List, TypeAlias
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.gridUIControl import GridUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
@@ -23,7 +23,7 @@ from ..._core._utils import args_type_check
 
 
 _T = TypeVar("_T")
-_Item = Union[int, slice, Tuple[Union[int, slice], Union[int, slice]]]
+_Item: TypeAlias = Union[int, slice, Tuple[Union[int, slice], Union[int, slice]]]
 _GridUpdateCallback = Callable[[], Any]
 
 

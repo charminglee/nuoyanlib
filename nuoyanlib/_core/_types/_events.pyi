@@ -7,18 +7,17 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
 from ._event_typing import *
-from ._typing import EventArgs
 
 
 class ClientEvent:
-    def HudButtonChangedClientEvent(self, event: EventArgs[EventArgs0]):
+    def HudButtonChangedClientEvent(self, event: EventArgs0):
         """
         [事件]
 
