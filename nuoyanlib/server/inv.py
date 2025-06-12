@@ -7,18 +7,16 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from mod.common.minecraftEnum import (
-    ItemPosType as _ItemPosType,
-    GameType as _GameType,
-)
-from .._core._server import _comp, _lib_server
-from ..utils import item as _item
+from mod.common.minecraftEnum import ItemPosType, GameType
+from .._core._server.comp import CF, LvComp
+from .._core._server import _lib_server
+from ..utils.item import is_empty_item
 
 
 __all__ = [
@@ -103,7 +101,7 @@ def clear_items(player_id, item_pos_type, pos):
     :return: 该位置被清除前的物品信息字典
     :rtype: dict
     """
-    comp = _comp.CF(player_id).Item
+    comp = CF(player_id).Item
     item = comp.GetPlayerItem(item_pos_type, pos, True)
     comp.SetPlayerAllItems({(item_pos_type, pos): None})
     return item
@@ -127,7 +125,7 @@ def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     :return: 物品所在槽位的列表，获取不到返回空列表
     :rtype: list[int]
     """
-    cf = _comp.CF(entity_id)
+    cf = CF(entity_id)
     is_player = (cf.EngineType.GetEngineTypeStr() == "minecraft:player")
     result = []
     for i in range(_ITEM_POS_SIZE[pos_type]):
@@ -146,7 +144,7 @@ def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     return result
 
 
-def change_item_count(player_id, pos_type=_ItemPosType.CARRIED, pos=0, change=-1):
+def change_item_count(player_id, pos_type=ItemPosType.CARRIED, pos=0, change=-1):
     """
     | 改变玩家指定槽位物品的数量。（创造模式下不生效）
 
@@ -160,9 +158,9 @@ def change_item_count(player_id, pos_type=_ItemPosType.CARRIED, pos=0, change=-1
     :return: 无
     :rtype: None
     """
-    if _comp.LvComp.Game.GetPlayerGameType(player_id) == _GameType.Creative:
+    if LvComp.Game.GetPlayerGameType(player_id) == GameType.Creative:
         return
-    item_comp = _comp.CF(player_id).Item
+    item_comp = CF(player_id).Item
     item = item_comp.GetPlayerItem(pos_type, pos, True)
     item['count'] += change
     if item['count'] <= 0:
@@ -185,11 +183,11 @@ def deduct_inv_item(player_id, name, aux=-1, count=1):
     :return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
     :rtype: bool
     """
-    comp = _comp.CF(player_id).Item
-    items = comp.GetPlayerAllItems(_ItemPosType.INVENTORY, True)
+    comp = CF(player_id).Item
+    items = comp.GetPlayerAllItems(ItemPosType.INVENTORY, True)
     items_dict_map = {}
     for i, item in enumerate(items):
-        if _item.is_empty_item(item):
+        if is_empty_item(item):
             continue
         if item['newItemName'] != name:
             continue
@@ -200,7 +198,7 @@ def deduct_inv_item(player_id, name, aux=-1, count=1):
         count -= c
         if item['count'] <= 0:
             item = None
-        items_dict_map[(_ItemPosType.INVENTORY, i)] = item
+        items_dict_map[(ItemPosType.INVENTORY, i)] = item
         if count <= 0:
             break
     else:

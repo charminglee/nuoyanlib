@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from .._core._client._comp import LvComp as _LvComp
+from .._core._client.comp import LvComp
 
 
 __all__ = [
@@ -38,7 +38,7 @@ def play_custom_sound(sound_name, pos=(0, 0, 0), volume=1.0, speed=1.0, is_loop=
     :return: 音效ID
     :rtype: str
     """
-    return _LvComp.CustomAudio.PlayCustomMusic(sound_name, pos, volume, speed, is_loop, entity_id)
+    return LvComp.CustomAudio.PlayCustomMusic(sound_name, pos, volume, speed, is_loop, entity_id)
 
 
 def stop_custom_sound(sound_id, fade_out_time=0.0):
@@ -53,7 +53,7 @@ def stop_custom_sound(sound_id, fade_out_time=0.0):
     :return: 是否成功
     :rtype: bool
     """
-    return _LvComp.CustomAudio.StopCustomMusicById(sound_id, fade_out_time)
+    return LvComp.CustomAudio.StopCustomMusicById(sound_id, fade_out_time)
 
 
 

@@ -7,92 +7,76 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-11
 |
 | ==============================================
 """
 
 
-from typing import Callable, Tuple, Union, Dict, Set, List
-from types import MethodType
+from typing import Callable, Optional, Tuple, Union, Any, List, Generator
+from types import MethodType, FunctionType, InstanceType
+from weakref import ReferenceType
 from ._types._events import ClientEvent, ServerEvent
 from ._types._typing import ArgsDict, PyBasicTypes
-from ._client._lib_client import NuoyanLibClientSystem
-from ._server._lib_server import NuoyanLibServerSystem
 
 
-ALL_CLIENT_ENGINE_EVENTS: Set[str]
-ALL_CLIENT_LIB_EVENTS: Dict[str, str]
-ALL_SERVER_ENGINE_EVENTS: Set[str]
-ALL_SERVER_LIB_EVENTS: Dict[str, str]
+def _get_event_source(client: bool, event_name: str, ns: str = "", sys_name: str = "") -> Optional[Tuple[str, str]]: ...
+def listen_for(ns: str, sys_name: str, event_name: str, func: Callable, priority: int = 0) -> None: ...
+def unlisten_for(ns: str, sys_name: str, event_name: str, func: Callable, priority: int = 0) -> None: ...
 
 
-class EventArgsProxy(object):
+class EventArgsProxy(dict):
     arg_dict: ArgsDict
     event_name: str
     def __init__(self: ..., arg_dict: ArgsDict, event_name: str) -> None: ...
     def __getattr__(self, key: str) -> PyBasicTypes: ...
     def __setattr__(self, key: str, value: PyBasicTypes) -> None: ...
     def __repr__(self) -> str: ...
-    copy = dict.copy
-    iterkeys = dict.iterkeys
-    itervalues = dict.itervalues
-    iteritems = dict.iteritems
-    viewkeys = dict.viewkeys
-    viewvalues = dict.viewvalues
-    viewitems = dict.viewitems
-    get = dict.get
-    keys = dict.keys
-    values = dict.values
-    items = dict.items
-    __len__ = dict.__len__
-    __contains__ = dict.__contains__
-    __getitem__ = dict.__getitem__
-    __setitem__ = dict.__setitem__
-    __cmp__ = dict.__cmp__
-    __delitem__ = dict.__delitem__
-    __eq__ = dict.__eq__
-    __ge__ = dict.__ge__
-    __gt__ = dict.__gt__
-    __iter__ = dict.__iter__
-    __le__ = dict.__le__
-    __lt__ = dict.__lt__
-    __ne__ = dict.__ne__
 
 
 class _BaseEventProxy(object):
-    _lib_sys: Union[NuoyanLibClientSystem, NuoyanLibServerSystem]
-    _engine_events: Set[str]
-    _engine_ns: str
-    _engine_sys: str
-    _lib_events: Dict[str, str]
     def __init__(self: ..., *args, **kwargs) -> None: ...
     def _listen_events(self) -> None: ...
-    def _parse_listen_args(self, method: MethodType) -> Tuple[int, List[List[str, str, str, int]]]: ...
-    def _listen_proxy(
+    def _proxy_listen(
         self,
-        namespace: str,
-        system_name: str,
+        ns: str,
+        sys_name: str,
         event_name: str,
         method: MethodType,
-        priority: int = 0
-    ) -> None: ...
-    def _listen(
-        self,
-        namespace: str,
-        system_name: str,
-        event_name: str,
-        method: MethodType,
-        priority: int = 0
+        priority: int = 0,
     ) -> None: ...
 class ClientEventProxy(ClientEvent, _BaseEventProxy): ...
 class ServerEventProxy(ServerEvent, _BaseEventProxy): ...
 
 
-def event(
-    event_name: Union[str, Callable] = "",
-    namespace: str = "",
-    system_name: str = "",
-    priority: int = 0,
-) -> Callable: ...
-def lib_sys_event(name: str) -> Callable: ...
+class event(object):
+    _ns: str
+    _sys_name: str
+    _priority: int
+    _event_name: str
+    _func: Callable
+    __self__: Optional[ReferenceType[InstanceType]]
+    _is_method: bool
+    listen_args: List[Tuple[str, str, str, int]]
+    def __init__(
+        self: ...,
+        event_name: Union[str, FunctionType, event] = "",
+        ns: str = "",
+        sys_name: str = "",
+        priority: int = 0,
+        is_method: bool = True,
+    ) -> None: ...
+    def __call__(self, *args: Any, **kwargs: Any) -> Union[event, Any]: ...
+    def __get__(self, ins: Any, cls: Any) -> event: ...
+    def _bind_func(self, func: Union[FunctionType, event]) -> None: ...
+    def _listen(self, args: Tuple[str, str, str, int]) -> None: ...
+    @staticmethod
+    def _get_all_event_ins(ins: InstanceType) -> Generator[event, None, None]: ...
+    @staticmethod
+    def listen_all(ins: Any) -> None: ...
+    @staticmethod
+    def unlisten_all(ins: Any) -> None: ...
+    def unlisten(self) -> None: ...
+
+
+def lib_sys_event(name: str) -> event: ...

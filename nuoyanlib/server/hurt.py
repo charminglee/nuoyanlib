@@ -7,27 +7,20 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-09
 |
 | ==============================================
 """
 
 
-from contextlib import contextmanager as _contextmanager
-from copy import copy as _copy
-import mod.server.extraServerApi as _server_api
-from mod.common.minecraftEnum import (
-    EntityType as _EntityType,
-    AttrType as _AttrType,
-    ActorDamageCause as _ActorDamageCause,
-    EntityComponentType as _EntityComponentType,
-)
-from .._core._server import _comp
-from ..utils import (
-    mc_math as _mc_math,
-    vector as _vector,
-)
-from . import entity as _entity
+from contextlib import contextmanager
+from copy import copy
+import mod.server.extraServerApi as server_api
+from mod.common.minecraftEnum import EntityType, AttrType, ActorDamageCause, EntityComponentType
+from .._core._server.comp import CF, LvComp
+from ..utils.mc_math import pos_distance_to_line, is_in_sector
+from ..utils.vector import vec_angle
+from .entity import get_all_entities, entity_filter, get_entities_in_area
 
 
 __all__ = [
@@ -44,7 +37,7 @@ __all__ = [
 ]
 
 
-@_contextmanager
+@contextmanager
 def ignore_dmg_cd(restore_cd=10):
     """
     [上下文管理器]
@@ -73,14 +66,14 @@ def ignore_dmg_cd(restore_cd=10):
     :return: 无
     :rtype: None
     """
-    _comp.LvComp.Game.SetHurtCD(0)
+    LvComp.Game.SetHurtCD(0)
     yield
-    _comp.LvComp.Game.SetHurtCD(restore_cd)
+    LvComp.Game.SetHurtCD(restore_cd)
 
 
 _SDK_DAMAGE_CAUSE = [
     v
-    for k, v in _ActorDamageCause.__dict__.items()
+    for k, v in ActorDamageCause.__dict__.items()
     if not k.startswith("_")
 ]
 
@@ -103,8 +96,7 @@ class EntityFilter:
         :return: 返回True时表示该实体为生物实体
         :rtype: bool
         """
-        return _comp.CF(eid).EntityComponent.HasComponent(_EntityComponentType.health)
-
+        return CF(eid).EntityComponent.HasComponent(EntityComponentType.health)
 
     @staticmethod
     def non_mob(eid):
@@ -132,7 +124,7 @@ class EntityFilter:
         :return: 返回True时表示该实体当前生命值大于0
         :rtype: bool
         """
-        return _comp.CF(eid).Attr.GetAttrValue(_AttrType.HEALTH) > 0
+        return CF(eid).Attr.GetAttrValue(AttrType.HEALTH) > 0
 
 
 def explode_hurt(
@@ -164,21 +156,21 @@ def explode_hurt(
     :return: 无
     :rtype: None
     """
-    for plr in _server_api.GetPlayerList():
-        if _comp.CF(plr).Dimension.GetEntityDimensionId() == dim:
+    for plr in server_api.GetPlayerList():
+        if CF(plr).Dimension.GetEntityDimensionId() == dim:
             player_id = plr
             break
     else:
         return
-    orig_rule = _comp.LvComp.Game.GetGameRulesInfoServer()
-    _comp.LvComp.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tile_drops, 'mob_loot': mob_loot}})
-    hurt_comp = _comp.CF(source_id).Hurt
+    orig_rule = LvComp.Game.GetGameRulesInfoServer()
+    LvComp.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tile_drops, 'mob_loot': mob_loot}})
+    hurt_comp = CF(source_id).Hurt
     try:
         if not hurt_source:
             hurt_comp.ImmuneDamage(True)
-        _comp.LvComp.Explosion.CreateExplosion(pos, radius, fire, breaks, source_id, player_id)
+        LvComp.Explosion.CreateExplosion(pos, radius, fire, breaks, source_id, player_id)
     finally:
-        _comp.LvComp.Game.SetGameRulesInfoServer(orig_rule)
+        LvComp.Game.SetGameRulesInfoServer(orig_rule)
         if not hurt_source:
             hurt_comp.ImmuneDamage(False)
 
@@ -189,7 +181,7 @@ def line_damage(
         end_pos,
         dim,
         damage,
-        cause=_ActorDamageCause.EntityAttack,
+        cause=ActorDamageCause.EntityAttack,
         attacker_id=None,
         child_id=None,
         knocked=True,
@@ -232,19 +224,19 @@ def line_damage(
         filter_ids = filter_ids[:]
     if attacker_id:
         filter_ids.append(attacker_id)
-    entities = _entity.get_all_entities()
-    entities = _entity.entity_filter(
-        entities, {_EntityType.Mob}, {str(dim)}, filter_ids, filter_types, filter_type_str
+    entities = get_all_entities()
+    entities = entity_filter(
+        entities, {EntityType.Mob}, {str(dim)}, filter_ids, filter_types, filter_type_str
     )
     hurt_ents = []
     for eid in entities:
-        ep = _comp.CF(eid).Pos.GetFootPos()
-        dis = _mc_math.pos_distance_to_line(ep, start_pos, end_pos)
+        ep = CF(eid).Pos.GetFootPos()
+        dis = pos_distance_to_line(ep, start_pos, end_pos)
         if dis > radius:
             continue
         v1 = tuple(a - b for a, b in zip(start_pos, ep))
         v2 = tuple(a - b for a, b in zip(end_pos, ep))
-        if _vector.vec_angle(v1, v2) < 1.57:
+        if vec_angle(v1, v2) < 1.57:
             continue
         if before_hurt_callback:
             ret_eid = before_hurt_callback(eid, attacker_id, child_id)
@@ -260,7 +252,7 @@ def line_damage(
 def hurt_mobs(
         entity_id_list,
         damage,
-        cause=_ActorDamageCause.EntityAttack,
+        cause=ActorDamageCause.EntityAttack,
         attacker_id=None,
         child_id=None,
         knocked=True,
@@ -291,7 +283,7 @@ def aoe_damage(
         pos,
         dim,
         damage,
-        cause=_ActorDamageCause.EntityAttack,
+        cause=ActorDamageCause.EntityAttack,
         attacker_id=None,
         child_id=None,
         knocked=True,
@@ -333,8 +325,8 @@ def aoe_damage(
         filter_ids.append(attacker_id)
     start_pos = tuple(i - radius for i in pos)
     end_pos = tuple(i + radius for i in pos)
-    entities = _comp.LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dim)
-    entities = _entity.entity_filter(entities, (pos, radius), {_EntityType.Mob}, filter_ids, filter_types)
+    entities = LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dim)
+    entities = entity_filter(entities, (pos, radius), {EntityType.Mob}, filter_ids, filter_types)
     hurt_ents = []
     for eid in entities:
         if before_hurt_callback:
@@ -352,7 +344,7 @@ def sector_aoe_damage(
         sector_radius,
         sector_angle,
         damage,
-        cause=_ActorDamageCause.EntityAttack,
+        cause=ActorDamageCause.EntityAttack,
         attacker_id=None,
         child_id=None,
         knocked=True,
@@ -381,17 +373,17 @@ def sector_aoe_damage(
     """
     if filter_ids is None:
         filter_ids = []
-    filter_ids = _copy(filter_ids)
+    filter_ids = copy(filter_ids)
     filter_ids.append(attacker_id)
-    cf = _comp.CF(attacker_id)
+    cf = CF(attacker_id)
     attacker_pos = cf.Pos.GetFootPos()
     attacker_rot = cf.Rot.GetRot()[1]
     dim = cf.Dimension.GetEntityDimensionId()
-    entity_list = _entity.get_entities_in_area(attacker_pos, sector_radius, dim, filter_ids, filter_types, True)
+    entity_list = get_entities_in_area(attacker_pos, sector_radius, dim, filter_ids, filter_types, True)
     result = []
     for eid in entity_list:
-        pos = _comp.CF(eid).Pos.GetFootPos()
-        test = _mc_math.is_in_sector(
+        pos = CF(eid).Pos.GetFootPos()
+        test = is_in_sector(
             (pos[0], attacker_pos[1], pos[2]), attacker_pos, sector_radius, sector_angle, attacker_rot
         )
         if test:
@@ -405,7 +397,7 @@ def rectangle_aoe_damage(
         max_vertex,
         dim,
         damage,
-        cause=_ActorDamageCause.EntityAttack,
+        cause=ActorDamageCause.EntityAttack,
         attacker_id=None,
         child_id=None,
         knocked=True,
@@ -436,7 +428,7 @@ def rectangle_aoe_damage(
     :rtype: list[str]
     """
     result = []
-    entities_list = _comp.LvComp.Game.GetEntitiesInSquareArea(None, min_vertex, max_vertex, dim)
+    entities_list = LvComp.Game.GetEntitiesInSquareArea(None, min_vertex, max_vertex, dim)
     for eid in entities_list:
         if not hurt_attacker and eid == attacker_id:
             continue
@@ -461,16 +453,16 @@ def hurt_by_set_health(entity_id, damage):
     :return: 无
     :rtype: None
     """
-    attr = _comp.CF(entity_id).Attr
-    health = attr.GetAttrValue(_AttrType.HEALTH)
+    attr = CF(entity_id).Attr
+    health = attr.GetAttrValue(AttrType.HEALTH)
     new_health = int(health - damage)
-    attr.SetAttrValue(_AttrType.HEALTH, new_health)
+    attr.SetAttrValue(AttrType.HEALTH, new_health)
 
 
 def hurt(
         entity_id,
         damage,
-        cause=_ActorDamageCause.EntityAttack,
+        cause=ActorDamageCause.EntityAttack,
         attacker=None,
         child_id=None,
         knocked=True,
@@ -496,8 +488,8 @@ def hurt(
         custom_tag = None
     else:
         custom_tag = cause
-        cause = _ActorDamageCause.Custom
-    hurt_result = _comp.CF(entity_id).Hurt.Hurt(damage, cause, attacker, child_id, knocked, custom_tag)
+        cause = ActorDamageCause.Custom
+    hurt_result = CF(entity_id).Hurt.Hurt(damage, cause, attacker, child_id, knocked, custom_tag)
     if not hurt_result and force:
         hurt_by_set_health(entity_id, damage)
 
@@ -506,7 +498,7 @@ def percent_damage(
         entity_id,
         percent,
         type_name,
-        cause=_ActorDamageCause.EntityAttack,
+        cause=ActorDamageCause.EntityAttack,
         attacker=None,
         child_id=None,
         knocked=True,
@@ -529,16 +521,16 @@ def percent_damage(
     :return: 无
     :rtype: None
     """
-    attr = _comp.CF(entity_id).Attr
+    attr = CF(entity_id).Attr
     value = 0
     if type_name == "max_health":
-        value = attr.GetAttrMaxValue(_AttrType.HEALTH)
+        value = attr.GetAttrMaxValue(AttrType.HEALTH)
     elif type_name == "health":
-        value = attr.GetAttrValue(_AttrType.HEALTH)
+        value = attr.GetAttrValue(AttrType.HEALTH)
     elif type_name == "hunger":
-        value = attr.GetAttrValue(_AttrType.HUNGER)
+        value = attr.GetAttrValue(AttrType.HUNGER)
     elif type_name == "attacker_damage" and attacker:
-        value = _comp.CF(attacker).Attr.GetAttrValue(_AttrType.DAMAGE)
+        value = CF(attacker).Attr.GetAttrValue(AttrType.DAMAGE)
     if value > 0:
         damage = int(value * percent)
         if damage > 999999999:

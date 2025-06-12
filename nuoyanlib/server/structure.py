@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from .._core._server._comp import LvComp as _LvComp
+from .._core._server.comp import LvComp
 
 
 __all__ = [
@@ -42,7 +42,7 @@ def place_large_structure(pos, dimension_id, json_list, namespace):
         thisPos = i['pos']
         placePos = tuple(pos[p] + thisPos[p] - orgPos[p] for p in range(3))
         structureName = "%s:%s" % (namespace, name)
-        result[structureName] = _LvComp.Game.PlaceStructure(
+        result[structureName] = LvComp.Game.PlaceStructure(
             None, placePos, structureName, dimension_id
         )
     return result

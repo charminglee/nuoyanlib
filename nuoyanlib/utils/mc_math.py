@@ -7,30 +7,17 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from math import (
-    atan as _atan,
-    degrees as _degrees,
-    atan2 as _atan2,
-    sqrt as _sqrt,
-    pi as _pi,
-    sin as _sin,
-    cos as _cos,
-    floor as _floor,
-    radians as _radians,
-)
-from random import (
-    randint as _randint,
-    uniform as _uniform,
-)
-from mod.common.utils.mcmath import Vector3 as _Vector3
-from mod.common.minecraftEnum import Facing as _Facing
-from .._core import _sys
+from math import atan, degrees, atan2, sqrt, pi, sin, cos, floor, radians
+from random import randint, uniform
+from mod.common.utils.mcmath import Vector3
+from mod.common.minecraftEnum import Facing
+from .._core._sys import get_comp_factory, get_api, LEVEL_ID
 
 
 __all__ = [
@@ -59,7 +46,7 @@ __all__ = [
 ]
 
 
-def pos_block_facing(pos, face=_Facing.North, dist=1.0):
+def pos_block_facing(pos, face=Facing.North, dist=1.0):
     """
     | 计算方块某个面朝向的坐标。
 
@@ -75,17 +62,17 @@ def pos_block_facing(pos, face=_Facing.North, dist=1.0):
     if not pos:
         return
     pos = map(float, pos) # type: list[float]
-    if face == _Facing.Up:
+    if face == Facing.Up:
         return pos[0], pos[1] + dist, pos[2]
-    elif face == _Facing.Down:
+    elif face == Facing.Down:
         return pos[0], pos[1] - dist, pos[2]
-    elif face == _Facing.East:
+    elif face == Facing.East:
         return pos[0] + dist, pos[1], pos[2]
-    elif face == _Facing.West:
+    elif face == Facing.West:
         return pos[0] - dist, pos[1], pos[2]
-    elif face == _Facing.South:
+    elif face == Facing.South:
         return pos[0], pos[1], pos[2] + dist
-    elif face == _Facing.North:
+    elif face == Facing.North:
         return pos[0], pos[1], pos[2] - dist
 
 
@@ -105,10 +92,10 @@ def to_polar_coordinate(coordinate, rad=False, origin=(0, 0)):
     x, y = coordinate
     x -= origin[0]
     y -= origin[1]
-    r = _sqrt(x ** 2 + y ** 2)
-    theta = _atan2(y, x)
+    r = sqrt(x ** 2 + y ** 2)
+    theta = atan2(y, x)
     if not rad:
-        theta = _degrees(theta)
+        theta = degrees(theta)
     return r, theta
 
 
@@ -127,9 +114,9 @@ def to_cartesian_coordinate(coordinate, rad=False, origin=(0, 0)):
     """
     r, theta = coordinate
     if not rad:
-        theta = _radians(theta)
-    x = r * _cos(theta) + origin[0]
-    y = r * _sin(theta) + origin[1]
+        theta = radians(theta)
+    x = r * cos(theta) + origin[0]
+    y = r * sin(theta) + origin[1]
     return x, y
 
 
@@ -145,7 +132,7 @@ def probability_true_i(n, d):
     :return: 以a/b的概率返回True
     :rtype: bool
     """
-    return n * d > 0 and _randint(1, d) <= n
+    return n * d > 0 and randint(1, d) <= n
 
 
 def probability_true_f(f):
@@ -159,7 +146,7 @@ def probability_true_f(f):
     :return: 以f的概率返回True
     :rtype: bool
     """
-    return f > 0 and _uniform(0, 1) <= f
+    return f > 0 and uniform(0, 1) <= f
 
 
 def pos_distance_to_line(pos, line_pos1, line_pos2):
@@ -179,7 +166,7 @@ def pos_distance_to_line(pos, line_pos1, line_pos2):
     b = pos_distance(pos, line_pos2)
     c = pos_distance(line_pos1, line_pos2)
     p = (a + b + c) / 2
-    s = _sqrt(p * (p - a) * (p - b) * (p - c)) # 海伦公式
+    s = sqrt(p * (p - a) * (p - b) * (p - c)) # 海伦公式
     h = s / c * 2
     return h
 
@@ -196,7 +183,7 @@ def pos_floor(pos):
     :return: 取整后的坐标
     :rtype: tuple[int]
     """
-    return tuple(int(_floor(i)) for i in pos)
+    return tuple(int(floor(i)) for i in pos)
 
 
 def pos_distance(first_point, second_point):
@@ -214,7 +201,7 @@ def pos_distance(first_point, second_point):
     """
     if not first_point or not second_point:
         return -1.0
-    return _sqrt(sum((a - b) ** 2 for a, b in zip(first_point, second_point)))
+    return sqrt(sum((a - b) ** 2 for a, b in zip(first_point, second_point)))
 
 
 def to_relative_pos(entity_pos1, entity_pos2):
@@ -279,9 +266,9 @@ def pos_rotate(angle, pos):
     """
     if not angle or not pos:
         return
-    radian = (-angle / 180) * _pi
-    rotate_x = _cos(radian) * pos[0] - _sin(radian) * pos[1]
-    rotate_y = _cos(radian) * pos[1] + _sin(radian) * pos[0]
+    radian = (-angle / 180) * pi
+    rotate_x = cos(radian) * pos[0] - sin(radian) * pos[1]
+    rotate_y = cos(radian) * pos[1] + sin(radian) * pos[0]
     return rotate_x, rotate_y
 
 
@@ -324,8 +311,8 @@ def camera_rot_p2p(pos1, pos2):
     hori_dis = pos_distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
     if hori_dis == 0:
         hori_dis = 0.000000001
-    horizontal_rot = 90 + (_atan(z / x) / _pi) * 180 + (0 if x > 0 else -180)
-    vertical_rot = -(_atan(y / hori_dis) / _pi) * 180
+    horizontal_rot = 90 + (atan(z / x) / pi) * 180 + (0 if x > 0 else -180)
+    vertical_rot = -(atan(y / hori_dis) / pi) * 180
     return vertical_rot, horizontal_rot
 
 
@@ -343,13 +330,13 @@ def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
     :return: 坐标
     :rtype: tuple[float,float,float]|None
     """
-    comp_factory = _sys.get_comp_factory()
+    comp_factory = get_comp_factory()
     rot = comp_factory.CreateRot(entity_id).GetRot()
     if not rot:
         return
     if use_0yaw:
         rot = (0, rot[1])
-    dir_rot = _sys.get_api().GetDirFromRot(rot)
+    dir_rot = get_api().GetDirFromRot(rot)
     ep = comp_factory.CreatePos(entity_id).GetFootPos()
     if not ep:
         return
@@ -373,7 +360,7 @@ def pos_forward_rot(pos, rot, dis):
     """
     if not rot or not pos:
         return
-    dir_rot = _sys.get_api().GetDirFromRot(rot)
+    dir_rot = get_api().GetDirFromRot(rot)
     result_pos = tuple(pos[i] + dir_rot[i] * dis for i in range(3))
     return result_pos
 
@@ -463,7 +450,7 @@ def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_ang
             sector_angle = 0
         dx = test_pos[0] - vertex_pos[0]
         dz = test_pos[2] - vertex_pos[2]
-        test_pos_angle = -_degrees(_atan2(dx, dz))
+        test_pos_angle = -degrees(atan2(dx, dz))
         min_angle = sector_bisector_angle - sector_angle / 2
         max_angle = sector_bisector_angle + sector_angle / 2
         range_list = []
@@ -504,7 +491,7 @@ def is_in_cube(obj, pos1, pos2, ignore_y=False):
     :rtype: bool
     """
     if isinstance(obj, str):
-        target_pos = _sys.get_comp_factory().CreatePos(obj).GetFootPos()
+        target_pos = get_comp_factory().CreatePos(obj).GetFootPos()
     else:
         target_pos = obj
     if not target_pos or not pos1 or not pos2:
@@ -552,9 +539,9 @@ def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_
     :return: 射线与立方体的第一个交点坐标，不相交时返回None
     :rtype: tuple[float,float,float]|None
     """
-    ray_start_pos = _Vector3(ray_start_pos)
-    ray_dir = _Vector3(ray_dir)
-    cube_center_pos = _Vector3(cube_center_pos)
+    ray_start_pos = Vector3(ray_start_pos)
+    ray_dir = Vector3(ray_dir)
+    cube_center_pos = Vector3(cube_center_pos)
     local_start_pos = ray_start_pos - cube_center_pos
     t_min = -float('inf')
     t_max = float('inf')
@@ -607,14 +594,14 @@ def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter
         d = direction[n]
         if d == 0:
             continue
-        start = int(_floor(s))
-        end = int(_floor(s + d * length))
+        start = int(floor(s))
+        end = int(floor(s + d * length))
         step_range = range(start + 1, end + 1) if d > 0 else range(start, end, -1)
         for i in step_range:
             t_list.append((i - s) / d)
     t_list.sort()
     t_list = t_list[:-1]
-    comp = _sys.get_comp_factory().CreateBlockInfo(_sys.LEVEL_ID)
+    comp = get_comp_factory().CreateBlockInfo(LEVEL_ID)
     block_list = []
     for t in t_list:
         block_pos = [0, 0, 0]
@@ -624,7 +611,7 @@ def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter
             intersection[n] = pos_val
             if pos_val.is_integer() and direction[n] < 0:
                 pos_val -= 1
-            block_pos[n] = int(_floor(pos_val))
+            block_pos[n] = int(floor(pos_val))
         block_pos = tuple(block_pos)
         block = comp.GetBlockNew(block_pos, dimension)
         if block and block['name'] not in filter_blocks:

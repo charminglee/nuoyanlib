@@ -7,12 +7,16 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-11
 |
 |   nuoyanlib客户端库。
 |
 | ==============================================
 """
+
+
+from time import clock
+_t = clock()
 
 
 from .._core._sys import check_env
@@ -24,7 +28,7 @@ NuoyanLibClientSystem.register()
 del check_env, NuoyanLibClientSystem
 
 
-from .._core._client._comp import (
+from .._core._client.comp import (
     ENGINE_NAMESPACE,
     ENGINE_SYSTEM_NAME,
     ClientSystem,
@@ -36,8 +40,25 @@ from .._core._client._comp import (
     LvComp,
 )
 from .._core._listener import (
+    listen_for,
+    unlisten_for,
+    EventArgsProxy,
     event,
     ClientEventProxy,
+)
+from .._core._error import *
+from .._core._utils import (
+    cached_property,
+    CachedObject,
+    hook_method,
+    cached_method,
+    cached_func,
+    singleton,
+)
+from .._core._types._events import (
+    ClientEventEnum as Events,
+    ALL_CLIENT_ENGINE_EVENTS,
+    ALL_CLIENT_LIB_EVENTS,
 )
 
 
@@ -49,3 +70,9 @@ from .render import *
 from .camera import *
 from .ui import *
 from ..utils import *
+
+
+_consume = (clock() - _t) * 1000
+from .._core._logging import info
+info("nuoyanlib.client loaded in %.3fms" % _consume)
+del clock, _t, info, _consume

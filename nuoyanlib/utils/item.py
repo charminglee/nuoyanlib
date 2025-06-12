@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from mod.common.minecraftEnum import ItemPosType as _ItemPosType
-from .._core import _sys
+from mod.common.minecraftEnum import ItemPosType
+from .._core._sys import get_comp_factory, LEVEL_ID
 
 
 __all__ = [
@@ -117,7 +117,7 @@ def get_item_count(player_id, name, aux=-1):
     :rtype: int
     """
     count = 0
-    items = _sys.get_comp_factory().CreateItem(player_id).GetPlayerAllItems(_ItemPosType.INVENTORY)
+    items = get_comp_factory().CreateItem(player_id).GetPlayerAllItems(ItemPosType.INVENTORY)
     for item in items:
         if is_empty_item(item):
             continue
@@ -198,10 +198,7 @@ def are_same_item(item, *other_item):
     :return: 相同则返回True，否则返回False
     :rtype: bool
     """
-    for it in other_item:
-        if not is_same_item(item, it):
-            return False
-    return True
+    return all(is_same_item(item, i) for i in other_item)
 
 
 _AIR = ("minecraft:air", "air")
@@ -243,44 +240,43 @@ def get_max_stack(item):
     aux = item.get('newAuxValue', 0)
     if aux == -1:
         aux = 0
-    comp = _sys.get_comp_factory().CreateItem(_sys.LEVEL_ID)
+    comp = get_comp_factory().CreateItem(LEVEL_ID)
     try:
         return comp.GetItemBasicInfo(name, aux)['maxStackSize']
     except KeyError:
         return -1
 
 
-if __name__ == "__main__":
+def __test__():
     item1 = {'newItemName': "minecraft:apple"}
     item2 = {'itemName': "minecraft:apple"}
     item3 = {'newItemName': "minecraft:apple", 'newAuxValue': 1}
     item4 = {'itemName': "minecraft:apple", 'auxValue': 1}
     item5 = {'newItemName': "minecraft:apple"}
     item6 = {'itemName': "minecraft:apple"}
-    print("-" * 50)
-    print(is_same_item(item1, item2))  # True
-    print(is_same_item(item3, item4))  # True
-    print(is_same_item(item1, item3))  # False
-    print(is_same_item(item2, item4))  # False
-    print(is_same_item(item1, item4))  # False
-    print(are_same_item(item1, item2, item3, item4))  # False
-    print(are_same_item(item1, item2, item5, item6))  # True
-    print("-" * 50)
+    assert is_same_item(item1, item2)
+    assert is_same_item(item3, item4)
+    assert not is_same_item(item1, item3)
+    assert not is_same_item(item2, item4)
+    assert not is_same_item(item1, item4)
+    assert not are_same_item(item1, item2, item3, item4)
+    assert are_same_item(item1, item2, item5, item6)
+
     emp1 = {'newItemName': "minecraft:air"}
     emp2 = {'newItemName': "minecraft:apple", 'count': 0}
     emp3 = {}
     emp4 = {'itemName': "air"}
-    print(is_empty_item(emp1))  # True
-    print(is_empty_item(emp2))  # True
-    print(is_empty_item(emp3))  # True
-    print(is_empty_item(emp4))  # True
-    print(is_empty_item(item1))  # False
-    print(is_empty_item(item2))  # False
-    print(is_empty_item(item3))  # False
-    print(is_empty_item(item4))  # False
-    print("-" * 50)
-    print(set_namespace("apple"))  # "minecraft:apple"
-    print(set_namespace("minecraft:apple", "nuoyan"))  # "nuoyan:apple"
+    assert is_empty_item(emp1)
+    assert is_empty_item(emp2)
+    assert is_empty_item(emp3)
+    assert is_empty_item(emp4)
+    assert not is_empty_item(item1)
+    assert not is_empty_item(item2)
+    assert not is_empty_item(item3)
+    assert not is_empty_item(item4)
+
+    assert set_namespace("apple") == "minecraft:apple"
+    assert set_namespace("minecraft:apple", "nuoyan") == "nuoyan:apple"
 
 
 

@@ -7,13 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from .._core._client import _comp, _lib_client
+from .._core._client.comp import CF
+from .._core._client import _lib_client
 
 
 __all__ = [
@@ -72,7 +73,7 @@ def add_player_render_resources(player_id, rebuild, *res_tuple):
     :rtype: tuple[bool]
     """
     res = []
-    comp = _comp.CF(player_id).ActorRender
+    comp = CF(player_id).ActorRender
     for arg in res_tuple:
         if arg[1].startswith("geometry."):
             res.append(comp.AddPlayerGeometry(*arg))
@@ -118,7 +119,7 @@ def add_entity_render_resources(entity_id, rebuild, *res_tuple):
     :rtype: tuple[bool]
     """
     res = []
-    cf = _comp.CF(entity_id)
+    cf = CF(entity_id)
     render = cf.ActorRender
     etype = cf.EngineType.GetEngineTypeStr()
     for arg in res_tuple:

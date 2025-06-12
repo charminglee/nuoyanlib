@@ -7,10 +7,32 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-11
 |
 | ==============================================
 """
+
+
+__all__ = [
+    "NotInClientError",
+    "NotInServerError",
+    "GetPropertyError",
+    "ScreenNodeNotFoundError",
+    "EventParameterError",
+    "VectorError",
+    "EventSourceError",
+    "EventNotFoundError",
+]
+
+
+class NotInClientError(ImportError):
+    def __str__(self):
+        return "cannot import 'nuoyanlib.client' in server environment"
+
+
+class NotInServerError(ImportError):
+    def __str__(self):
+        return "cannot import 'nuoyanlib.server' in client environment"
 
 
 class GetPropertyError(AttributeError):
@@ -26,20 +48,38 @@ class ScreenNodeNotFoundError(RuntimeError):
         return "can't find ScreenNode instance, check if your UI class inherits 'ScreenNode' or 'CustomUIScreenProxy'"
 
 
-class EventArgsError(AttributeError):
-    def __init__(self, name):
-        self.name = name
+class EventParameterError(AttributeError):
+    def __init__(self, event_name, param):
+        self.event_name = event_name
+        self.param = param
 
     def __str__(self):
-        return "event has no parameter '%s'" % self.name
+        return "'%s' has no parameter '%s'" % (self.event_name, self.param)
 
 
 class VectorError(Exception):
     pass
 
 
+class EventSourceError(TypeError):
+    def __init__(self, name, ns, sys_name):
+        self.args = (name, ns, sys_name)
+
+    def __str__(self):
+        return "the source of '%s' (ns='%s', sys_name='%s') is wrong" % self.args
+
+
+class EventNotFoundError(AttributeError):
+    def __init__(self, name, is_client):
+        self.name = name
+        self.is_client = is_client
+
+    def __str__(self):
+        return "%s has no event '%s'" % ("client" if self.is_client else "server", self.name)
+
+
 if __name__ == "__main__":
-    raise ScreenNodeNotFoundError
+    raise EventSourceError("TestEvent", "Test", "TestSystem")
 
 
 

@@ -7,20 +7,18 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from math import pi as _pi
-import mod.client.extraClientApi as _client_api
-from mod.common.minecraftEnum import RayFilterType as _RayFilterType
-from .._core._client import _comp
-from ..utils import (
-    vector as _vector,
-    mc_math as _mc_math,
-)
+from math import pi
+import mod.client.extraClientApi as client_api
+from mod.common.minecraftEnum import RayFilterType
+from .._core._client.comp import LvComp, PLAYER_ID, CF
+from ..utils.vector import vec_p2p, vec_angle
+from ..utils.mc_math import pos_distance
 
 
 __all__ = [
@@ -38,7 +36,7 @@ def __get_viewport_args():
     pass
 
 
-def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=_pi / 5, ent_filter=None):
+def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=pi / 5, ent_filter=None):
     """
     获取当前屏幕内的实体，返回实体ID列表，按与准星的屏幕距离（screen_dist）从小到大排序。
 
@@ -52,16 +50,16 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=_pi / 5,
     :rtype: list[str]
     """
     res = []
-    all_ents = _client_api.GetEngineActor().keys() + _client_api.GetPlayerList()
-    center = _comp.LvComp.Camera.GetPosition()
-    camera_dir = _comp.LvComp.Camera.GetForward()
+    all_ents = client_api.GetEngineActor().keys() + client_api.GetPlayerList()
+    center = LvComp.Camera.GetPosition()
+    camera_dir = LvComp.Camera.GetForward()
     for eid in all_ents:
-        if eid == _comp.PLAYER_ID:
+        if eid == PLAYER_ID:
             continue
-        ent_pos = _comp.CF(eid).Pos.GetFootPos()
-        target_dir = _vector.vec_p2p(center, ent_pos)
-        angle = _vector.vec_angle(camera_dir, target_dir)
-        w_dist = _mc_math.pos_distance(center, ent_pos)
+        ent_pos = CF(eid).Pos.GetFootPos()
+        target_dir = vec_p2p(center, ent_pos)
+        angle = vec_angle(camera_dir, target_dir)
+        w_dist = pos_distance(center, ent_pos)
         s_dist = 1 # todo
         if (
                 angle < angle_dist # todo
@@ -69,8 +67,8 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=_pi / 5,
                 and s_dist <= screen_dist
                 and (ent_filter is None or ent_filter(eid))
         ):
-            ray_result = _client_api.getEntitiesOrBlockFromRay(
-                center, target_dir, int(w_dist) + 1, False, _RayFilterType.BothEntitiesAndBlock
+            ray_result = client_api.getEntitiesOrBlockFromRay(
+                center, target_dir, int(w_dist) + 1, False, RayFilterType.BothEntitiesAndBlock
             )
             for r in ray_result:
                 if r['type'] == "Entity" and r['entityId'] == eid:

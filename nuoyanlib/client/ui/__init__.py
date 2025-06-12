@@ -15,7 +15,7 @@
 """
 
 
-from ..._core._client._comp import (
+from ..._core._client.comp import (
     ScreenNode,
     ViewBinder,
     ViewRequest,

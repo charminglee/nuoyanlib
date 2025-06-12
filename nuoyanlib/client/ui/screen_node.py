@@ -7,18 +7,23 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-11
 |
 | ==============================================
 """
 
 
-from ..._core._client import _comp
-from ..._core import _listener, _utils, _error
-from . import ui_utils as _ui_utils
-from .control import NyControl as _NyControl
-from .button import NyButton as _NyButton
-from .grid import NyGrid as _NyGrid
+from types import GeneratorType
+from ..._core._client.comp import CustomUIScreenProxy, ScreenNode
+from ..._core import _error
+from ..._core._listener import ClientEventProxy
+from ..._core._utils import hook_method
+from .ui_utils import (
+    to_control, get_ui_pos_data, save_ui_pos_data,
+    get_children_path_by_level, get_parent_path,
+    UiControlType, to_path,
+)
+from .nyc import *
 
 
 __all__ = [
@@ -26,13 +31,32 @@ __all__ = [
 ]
 
 
-class ScreenNodeExtension(_listener.ClientEventProxy):
+_UI_CONTROL_TYPE_2_NY_CLS = {
+    UiControlType.button: NyButton,
+    UiControlType.image: NyImage,
+    UiControlType.label: NyLabel,
+    UiControlType.input_panel: NyInputPanel,
+    UiControlType.stack_panel: NyStackPanel,
+    UiControlType.edit_box: NyEditBox,
+    UiControlType.scroll_view: NyScrollView,
+    UiControlType.grid: NyGrid,
+    UiControlType.toggle: NyToggle,
+    UiControlType.slider: NySlider,
+    UiControlType.selection_wheel: NySelectionWheel,
+
+    # UiControlType.panel: NyComboBox,
+    # UiControlType.panel: NyProgressBar,
+    # UiControlType.custom: NyMiniMap,
+    # UiControlType.custom: NyItemRenderer,
+}
+
+
+class ScreenNodeExtension(ClientEventProxy):
     """
     | ScreenNode扩展类，提供更多UI界面功能。
     | 已继承 ``ClientEventProxy`` ，监听事件更便捷。
     """
 
-    ROOT_PANEL_PATH = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel"
     _LIMIT_ATTR = [
         "namespace",
         "name",
@@ -52,30 +76,30 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         "dirty",
         "fresh_async",
     ]
+    ROOT_PANEL_PATH = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel"
 
-    # noinspection PyUnresolvedReferences
     def __init__(self, *args):
         super(ScreenNodeExtension, self).__init__(*args)
-        self._ny_control_cache = {}
+        self._nyc_cache = {}
         self._ui_pos_data_key = ""
         self._screen_node = None
-        if isinstance(self, _comp.CustomUIScreenProxy):
+        self.cs = None
+        if isinstance(self, CustomUIScreenProxy):
             # 兼容UI代理
             self._screen_node = args[1]
-            self.cs = None
-            _utils.hook_method(self, "OnCreate", self.__Create)
-            _utils.hook_method(self, "OnDestroy", self.__Destroy)
-        elif isinstance(self, _comp.ScreenNode):
+            hook_method(self, "OnCreate", self.__create__) # NOQA
+            hook_method(self, "OnDestroy", self.__destroy__) # NOQA
+        elif isinstance(self, ScreenNode):
             self._screen_node = self
-            self.cs = args[2].get('__cs__') if args[2] else None
-            _utils.hook_method(self, "Create", self.__Create)
-            _utils.hook_method(self, "Destroy", self.__Destroy)
+            if len(args) == 3 and args[2]:
+                self.cs = args[2].get('__cs__')
+            hook_method(self, "Create", self.__create__) # NOQA
+            hook_method(self, "Destroy", self.__destroy__) # NOQA
         else:
             raise _error.ScreenNodeNotFoundError
-        self.ny_controls = {}
         self.root_panel = (
-            self._screen_node.GetBaseUIControl(ScreenNodeExtension.ROOT_PANEL_PATH)
-            or self._screen_node.GetBaseUIControl("")
+            self._screen_node.GetBaseUIControl(ScreenNodeExtension.ROOT_PANEL_PATH) # NOQA
+            or self._screen_node.GetBaseUIControl("") # NOQA
         )
 
     # def __setattr__(self, key, value):
@@ -84,19 +108,21 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
     #         raise AttributeError("can't set attribute '%s' to '%s'" % (key, self.__class__.__name__))
     #     super(ScreenNodeExtension, self).__setattr__(key, value)
 
-    # System Event Callbacks ===========================================================================================
-
-    def __Create(self):
+    def __create__(self):
         self._ui_pos_data_key = "nyl_ui_pos_data_%s_%s" % (self._screen_node.namespace, self._screen_node.name) # NOQA
         self._recover_ui_pos()
 
-    def __Destroy(self):
-        for nyc in self.ny_controls.values():
+    def __destroy__(self):
+        for nyc in self._nyc_cache.values():
             nyc.__destroy__()
+        self._nyc_cache.clear()
+        self._screen_node = None
+        self.cs = None
+        self.root_panel = None
 
-    # APIs =============================================================================================================
+    # region API ===================================================================================
 
-    def CreateNyControl(self, path_or_control):
+    def create_ny_control(self, path_or_control):
         """
         | 创建 ``NyControl`` 通用控件实例，可替代 ``GetBaseUIControl()`` 的返回值使用。
 
@@ -105,11 +131,11 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
 
         :return: NyControl控件实例，创建失败返回None
-        :rtype: _NyControl|None
+        :rtype: NyControl|None
         """
-        return self._create_nyc(_ui_utils.to_path(path_or_control))
+        return self._create_nyc(path_or_control, NyControl)
 
-    def CreateNyButton(self, path_or_control, touch_event_params=None):
+    def create_ny_button(self, path_or_control, touch_event_params=None):
         """
         | 创建 ``NyButton`` 按钮实例，可替代 ``asButton()`` 的返回值使用。
         | 创建后无需调用 ``AddTouchEventParams()`` 或 ``AddTouchEventParams()`` 接口。
@@ -120,15 +146,11 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         :param dict|None touch_event_params: 按钮参数字典，默认为None，详细说明见AddTouchEventParams
 
         :return: NyButton按钮实例，创建失败返回None
-        :rtype: _NyButton|None
+        :rtype: NyButton|None
         """
-        control = self._create_nyc(_ui_utils.to_path(path_or_control), _NyButton)
-        if control:
-            control.AddTouchEventParams(touch_event_params)
-            control.AddHoverEventParams()
-            return control
+        return self._create_nyc(path_or_control, NyButton, touch_event_params=touch_event_params)
 
-    def CreateNyGrid(self, path_or_control):
+    def create_ny_grid(self, path_or_control, is_stack_grid=False):
         """
         | 创建 ``NyGrid`` 网格实例，可替代 ``asGrid()`` 的返回值使用。
         | 对网格进行操作需要注意一些细节，详见开发指南-界面与交互- `UI说明文档 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/30-UI%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.html?key=grid&docindex=4&type=0>`_ 中对Grid控件的描述。
@@ -136,15 +158,18 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         -----
 
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param bool is_stack_grid: 是否是StackGrid，默认为False
 
         :return: NyGrid网格实例，创建失败返回None
-        :rtype: _NyGrid|None
+        :rtype: NyGrid|None
         """
-        return self._create_nyc(_ui_utils.to_path(path_or_control), _NyGrid)
+        return self._create_nyc(path_or_control, NyGrid, is_stack_grid=is_stack_grid)
 
-    def GetAllChildrenPathByLevel(self, path_or_control, level=1):
+    def get_children_path_by_level(self, path_or_control, level=1):
         """
-        | 获取控件的指定层级的所有子控件的路径。
+        [迭代器]
+
+        | 获取控件的指定层级的所有子控件的路径，返回迭代器。
         | 例如，某面板包含两个按钮，而每个按钮又包含三张图片，则按钮为面板的一级子控件，按钮下的图片为面板的二级子控件，以此类推。
 
         -----
@@ -152,14 +177,16 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
         :param int level: 子控件层级，默认为1
 
-        :return: 控件指定层级的所有子控件的路径列表，获取不到时返回空列表
-        :rtype: list[str]
+        :return: 控件指定层级所有子控件路径的迭代器，获取不到时返回空迭代器
+        :rtype: GeneratorType
         """
-        return _ui_utils.get_all_children_path_by_level(path_or_control, self._screen_node, level)
+        return get_children_path_by_level(path_or_control, self._screen_node, level)
 
-    def GetAllChildrenNyControlByLevel(self, path_or_control, level=1):
+    def get_children_ny_control_by_level(self, path_or_control, level=1):
         """
-        | 获取控件的指定层级的所有子控件的 ``NyControl`` 实例。
+        [迭代器]
+
+        | 获取控件的指定层级的所有子控件的 ``NyControl`` 实例，返回迭代器。
         | 例如，某面板包含两个按钮，而每个按钮又包含三张图片，则按钮为面板的一级子控件，按钮下的图片为面板的二级子控件，以此类推。
 
         -----
@@ -167,15 +194,14 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
         :param int level: 子控件层级，默认为1
 
-        :return: 控件指定层级的所有子控件的NyControl实例列表，获取不到时返回空列表
-        :rtype: list[_NyControl]
+        :return: 控件指定层级所有子控件的NyControl实例的迭代器，获取不到时返回空迭代器
+        :rtype: GeneratorType
         """
-        all_children = _ui_utils.get_all_children_control_by_level(
-            path_or_control, self._screen_node, level
-        )
-        return [self._create_nyc(c.GetPath()) for c in all_children]
+        all_path = get_children_path_by_level(path_or_control, self._screen_node, level)
+        for p in all_path:
+            yield self._create_nyc(p, NyControl)
 
-    def GetParentPath(self, path_or_control):
+    def get_parent_path(self, path_or_control):
         """
         | 获取控件的父控件路径。
 
@@ -186,24 +212,24 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         :return: 父控件路径，获取不到返回None
         :rtype: str|None
         """
-        return _ui_utils.get_parent_path(path_or_control)
+        return get_parent_path(path_or_control)
 
-    def GetParentNyControl(self, path_or_control):
+    def get_parent_ny_control(self, path_or_control):
         """
-        | 获取控件的父控件的 ``NyControl`` 实例。
+        | 获取控件的父控件 ``NyControl`` 实例。
 
         -----
 
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
 
-        :return: 父控件NyControl实例，获取不到返回None
-        :rtype: _NyControl|None
+        :return: 父控件的NyControl实例，获取不到返回None
+        :rtype: NyControl|None
         """
-        parent_path = _ui_utils.get_parent_path(path_or_control)
+        parent_path = get_parent_path(path_or_control)
         if parent_path:
-            return self._create_nyc(parent_path)
+            return self._create_nyc(parent_path, NyControl)
 
-    def ClearAllPosData(self):
+    def clear_all_pos_data(self):
         """
         | 删除所有控件的位置数据。
 
@@ -214,9 +240,9 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         """
         if not self._ui_pos_data_key:
             return False
-        return _ui_utils.save_ui_pos_data(self._ui_pos_data_key, {})
+        return save_ui_pos_data(self._ui_pos_data_key, {})
 
-    def SaveAllPosData(self):
+    def save_all_pos_data(self):
         """
         | 保存所有通过 ``set_movable()`` 或 ``set_movable_by_long_click()`` 设置了可拖动的控件的位置数据，下次进入游戏时自动恢复。
         | 为保证安全，超出屏幕边界的按钮不会被保存。
@@ -228,34 +254,59 @@ class ScreenNodeExtension(_listener.ClientEventProxy):
         """
         if not self._ui_pos_data_key:
             return False
-        for control in self.ny_controls.values():
-            if isinstance(control, _NyButton) and control.is_movable:
-                control.save_pos_data()
+        for nyc in self._nyc_cache.values():
+            if isinstance(nyc, NyButton) and nyc.is_movable:
+                nyc.save_pos_data()
         return True
 
-    # Internal =========================================================================================================
+    CreateNyControl = create_ny_control
+    CreateNyButton = create_ny_button
+    CreateNyGrid = create_ny_grid
+    GetChildrenPathByLevel = get_children_path_by_level
+    GetChildrenNyControlByLevel = get_children_ny_control_by_level
+    GetParentPath = get_parent_path
+    GetParentNyControl = get_parent_ny_control
+    ClearAllPosData = clear_all_pos_data
+    SaveAllPosData = save_all_pos_data
 
-    def _create_nyc(self, path, typ=_NyControl, **kwargs):
-        control = _ui_utils.to_control(self._screen_node, path, typ._CONTROL_TYPE)
-        if not control:
-            return
-        nyc = typ(self, control, **kwargs)
-        self.ny_controls[path] = nyc
-        return nyc
+    # endregion
+
+    # region Internal ===================================================================================
+
+    def _create_nyc(self, path_or_control, typ, **kwargs):
+        path = to_path(path_or_control)
+        if path in self._nyc_cache:
+            return self._nyc_cache[path]
+        control = to_control(self._screen_node, path_or_control, typ._CONTROL_TYPE)
+        if control:
+            nyc = typ(self, control, **kwargs)
+            self._nyc_cache[path] = nyc
+            return nyc
+
+    def _destroy_nyc(self, nyc):
+        nyc.__destroy__()
+        self._nyc_cache.pop(nyc.path, None)
+        self._screen_node.RemoveChildControl(nyc.base_control)
 
     def _recover_ui_pos(self):
-        data = _ui_utils.get_ui_pos_data(self._ui_pos_data_key)
+        data = get_ui_pos_data(self._ui_pos_data_key)
         for data_lst in data.values():
             for path, pos in data_lst:
-                control = _ui_utils.to_control(self._screen_node, path)
+                control = to_control(self._screen_node, path)
                 if control:
                     control.SetPosition(pos)
 
+    # endregion
 
 
-
-
-
+def __test__():
+    class SN(ScreenNodeExtension, ScreenNode):
+        def __init__(self, namespace, name, param):
+            super(SN, self).__init__(namespace, name, param)
+    sn = SN("abc", "ui", {})
+    c1 = sn.create_ny_control("/path/to/control1")
+    c2 = sn.create_ny_button("/path/to/control2")
+    c3 = sn.create_ny_grid("/path/to/control3")
 
 
 

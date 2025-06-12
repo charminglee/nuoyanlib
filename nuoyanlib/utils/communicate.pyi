@@ -22,10 +22,10 @@ _CallbackType = Optional[Callable[[Dict[str, Any]], Any]]
 
 
 class Caller(object):
-    namespace: str
-    system_name: str
+    ns: str
+    sys_name: str
     method: str
-    def __init__(self, namespace: str, system_name: str, method: str = "") -> None: ...
+    def __init__(self, ns: str, sys_name: str, method: str = "") -> None: ...
     def __call__(
         self,
         args: Optional[Tuple[Any, ...]] = None,
@@ -75,8 +75,8 @@ def call_local(
     kwargs: Optional[Dict[str, Any]],
 ) -> None: ...
 def call(
-    namespace: str,
-    system_name: str,
+    ns: str,
+    sys_name: str,
     method: str,
     args: Optional[Tuple[Any, ...]] = None,
     kwargs: Optional[Dict[str, Any]] = None,

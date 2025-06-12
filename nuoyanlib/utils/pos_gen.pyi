@@ -7,25 +7,27 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from typing import TypeVar, NoReturn, Tuple
+from abc import abstractmethod, ABCMeta
+from typing import TypeVar, NoReturn, Iterator
 from .._core._types._typing import FTuple3, ITuple3
 
 
 _T = TypeVar("_T")
 
 
-class _PosGenerator(object):
-    len: int
+class _PosGenerator(Iterator[FTuple3], metaclass=ABCMeta):
     __i: int
+    len: int
     def __iter__(self: _T) -> _T: ...
     def next(self) -> FTuple3: ...
     def __len__(self) -> int: ...
+    @abstractmethod
     def __gen_pos__(self, i: int) -> NoReturn: ...
     def __getitem__(self, i: int) -> FTuple3: ...
 

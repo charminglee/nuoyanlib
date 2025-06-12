@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-11
 |
 | ==============================================
 """
 
 
-from typing import Callable
+from typing import Callable, Iterator
 
 
 _TEType = Callable[[float], float]
@@ -54,7 +54,7 @@ class TimeEaseFunc:
     in_out_elastic: _TEType
 
 
-class TimeEase(object):
+class TimeEase(Iterator):
     start_val: float
     end_val: float
     total_tm: float
@@ -75,6 +75,6 @@ class TimeEase(object):
         hold_on_last_frame: bool = False,
         ease_func: _TEType = TimeEaseFunc.linear,
     ) -> None: ...
-    def __iter__(self) -> None: ...
+    def __iter__(self) -> TimeEase: ...
     def next(self) -> None: ...
     def reset(self) -> None: ...

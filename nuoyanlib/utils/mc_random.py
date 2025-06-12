@@ -7,29 +7,17 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from math import (
-    pi as _pi,
-    sin as _sin,
-    cos as _cos,
-)
-from random import (
-    uniform as _uniform,
-    Random as _Random,
-    randint as _randint,
-)
-from string import (
-    digits as _digits,
-    ascii_lowercase as _ascii_lowercase,
-    ascii_uppercase as _ascii_uppercase,
-)
-from .._core import _sys
-from . import mc_math as _mc_math
+from math import pi, sin, cos
+from random import uniform, Random, randint
+from string import digits, ascii_lowercase, ascii_uppercase
+from .._core._sys import get_api, is_client, LEVEL_ID
+from .mc_math import pos_distance
 
 
 __all__ = [
@@ -55,12 +43,12 @@ def random_pos(center_pos, grid, use_top_height=False, dimension=0):
     """
     if not center_pos:
         return
-    ran_x = _randint(-grid, grid)
-    ran_z = _randint(-grid, grid)
+    ran_x = randint(-grid, grid)
+    ran_z = randint(-grid, grid)
     x = center_pos[0] + ran_x
     z = center_pos[2] + ran_z
-    if use_top_height and not _sys.is_client():
-        y = _sys.get_api().GetEngineCompFactory().CreateBlockInfo(_sys.LEVEL_ID).GetTopBlockHeight(
+    if use_top_height and not is_client():
+        y = get_api().GetEngineCompFactory().CreateBlockInfo(LEVEL_ID).GetTopBlockHeight(
             (x, z), dimension
         )
         if y is not None:
@@ -68,7 +56,7 @@ def random_pos(center_pos, grid, use_top_height=False, dimension=0):
         else:
             return None
     else:
-        ran_y = _randint(-grid, grid)
+        ran_y = randint(-grid, grid)
         y = center_pos[1] + ran_y
         return x, y, z
 
@@ -96,8 +84,8 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
     :return: 随机字符串
     :rtype: str|list[str]
     """
-    s = (_ascii_lowercase if lower else "") + (_ascii_uppercase if upper else "") + (_digits if num else "")
-    random = _random_ins.setdefault(seed, _Random(seed))
+    s = (ascii_lowercase if lower else "") + (ascii_uppercase if upper else "") + (digits if num else "")
+    random = _random_ins.setdefault(seed, Random(seed))
     if generate_num == 1:
         return _gen_str(random.choice, s, length)
     else:
@@ -106,7 +94,7 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
 
 def _is_pos_far_enough(poses, x, y, z, min_distance):
     for pos in poses:
-        if _mc_math.pos_distance(pos, (x, y, z)) < min_distance:
+        if pos_distance(pos, (x, y, z)) < min_distance:
             return False
     return True
 
@@ -130,12 +118,12 @@ def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False,
     """
     poses = []
     while len(poses) < pos_num:
-        theta = _uniform(0, 2 * _pi)
-        phi = _uniform(0, _pi)
-        r = _uniform(0, radius)
-        x = center_pos[0] if fixed_x else center_pos[0] + r * _sin(phi) * _cos(theta)
-        y = center_pos[1] if fixed_y else center_pos[1] + r * _sin(phi) * _sin(theta)
-        z = center_pos[2] if fixed_z else center_pos[2] + r * _cos(phi)
+        theta = uniform(0, 2 * pi)
+        phi = uniform(0, pi)
+        r = uniform(0, radius)
+        x = center_pos[0] if fixed_x else center_pos[0] + r * sin(phi) * cos(theta)
+        y = center_pos[1] if fixed_y else center_pos[1] + r * sin(phi) * sin(theta)
+        z = center_pos[2] if fixed_z else center_pos[2] + r * cos(phi)
         if not poses or _is_pos_far_enough(poses, x, y, z, min_distance):
             poses.append((x, y, z))
     return poses

@@ -7,19 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-11
 |
 | ==============================================
 """
 
 
-from math import (
-    sin as _sin,
-    cos as _cos,
-    pi as _pi,
-    acos as _acos,
-    sqrt as _sqrt,
-)
+from abc import abstractmethod, ABCMeta
+from math import sin, cos, pi, acos, sqrt
 
 
 __all__ = [
@@ -32,8 +27,10 @@ __all__ = [
 
 
 class _PosGenerator(object):
-    len = 0
+    __metaclass__ = ABCMeta
+
     __i = 0
+    len = 0
 
     def __iter__(self):
         return self
@@ -42,15 +39,16 @@ class _PosGenerator(object):
         if self.__i >= self.len:
             self.__i = 0
             raise StopIteration
-        pos = self.__gen_pos__(self.__i)
+        pos = self.__gen_pos__(self.__i) # NOQA
         self.__i += 1
         return pos
 
     def __len__(self):
         return self.len
 
+    @abstractmethod
     def __gen_pos__(self, i):
-        raise NotImplementedError
+        pass
 
     def __getitem__(self, i):
         if not isinstance(i, int):
@@ -62,8 +60,10 @@ class _PosGenerator(object):
 
 class gen_line_pos(_PosGenerator):
     """
+    [迭代器]
+
     | 计算给定两点的连线上各点的坐标（包括 ``pos1`` 和 ``pos2`` ）。
-    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+    | 返回一个迭代器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用 ``len()`` 获取长度。
 
     -----
 
@@ -96,8 +96,10 @@ class gen_line_pos(_PosGenerator):
 
 class gen_circle_pos(_PosGenerator):
     """
+    [迭代器]
+
     | 生成以某一坐标为圆心的圆上各点的坐标。
-    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+    | 返回一个迭代器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用 ``len()`` 获取长度。
 
     -----
 
@@ -111,20 +113,22 @@ class gen_circle_pos(_PosGenerator):
         self.radius = radius
         self.count = count
         self.len = count
-        self.__step = (2 * _pi) / self.count
+        self.__step = (2 * pi) / self.count
 
     def __gen_pos__(self, i):
         angle = i * self.__step
-        x = self.radius * _sin(angle) + self.center_pos[0]
+        x = self.radius * sin(angle) + self.center_pos[0]
         y = self.center_pos[1]
-        z = self.radius * _cos(angle) + self.center_pos[2]
+        z = self.radius * cos(angle) + self.center_pos[2]
         return x, y, z
 
 
 class gen_sphere_pos(_PosGenerator):
     """
+    [迭代器]
+
     | 根据球心、半径生成球面上各点的坐标。
-    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+    | 返回一个迭代器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用 ``len()`` 获取长度。
 
     -----
 
@@ -145,20 +149,22 @@ class gen_sphere_pos(_PosGenerator):
             phi = 0.0
         else:
             # 使用斐波那契球采样算法生成均匀分布的点
-            theta = _acos(1 - 2.0 * i / (self.count - 1))
-            golden_ratio = (_sqrt(5) + 1) / 2
+            theta = acos(1 - 2.0 * i / (self.count - 1))
+            golden_ratio = (sqrt(5) + 1) / 2
             # 使用黄金角度避免周期性重叠
-            phi = (2 * _pi * i) / golden_ratio
-        x = self.center_pos[0] + self.radius * _sin(theta) * _cos(phi)
-        y = self.center_pos[1] + self.radius * _sin(theta) * _sin(phi)
-        z = self.center_pos[2] + self.radius * _cos(theta)
+            phi = (2 * pi * i) / golden_ratio
+        x = self.center_pos[0] + self.radius * sin(theta) * cos(phi)
+        y = self.center_pos[1] + self.radius * sin(theta) * sin(phi)
+        z = self.center_pos[2] + self.radius * cos(theta)
         return x, y, z
 
 
 class gen_cube_pos(_PosGenerator):
     """
+    [迭代器]
+
     | 生成立方体区域内各点的坐标。
-    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+    | 返回一个迭代器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用 ``len()`` 获取长度。
 
     -----
 
@@ -203,8 +209,10 @@ class gen_cube_pos(_PosGenerator):
 
 class gen_spiral_pos(_PosGenerator):
     """
+    [迭代器]
+
     | 生成螺旋轨迹坐标。
-    | 返回一个生成器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用len()获取长度。
+    | 返回一个迭代器，支持使用 ``for`` 或 ``next()`` 进行遍历、使用下标获取元素、使用 ``len()`` 获取长度。
 
     -----
 

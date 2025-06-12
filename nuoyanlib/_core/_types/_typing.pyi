@@ -7,21 +7,21 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-06-11
 |
 | ==============================================
 """
 
 
 from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable, Literal, Any
-from types import FunctionType as _FunctionType
+from types import InstanceType
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.mcmath import Vector3
+from ...client.ui.nyc import *
 
 
 PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
-FunctionType = _FunctionType
 FTuple = Tuple[float, ...]
 FTuple2 = Tuple[float, float]
 FTuple3 = Tuple[float, float, float]
@@ -65,6 +65,8 @@ class ItemHeapData(TypedDict):
 
 ArgsDict = Dict[str, PyBasicTypes]
 EntFilter = Optional[Callable[[str], bool]]
+EventCallbackFunc = Callable[[ArgsDict], Any]
+EventCallbackMethod = Callable[[InstanceType, ArgsDict], Any]
 
 
 UiPathOrControl = Union[str, BaseUIControl]
@@ -88,7 +90,7 @@ class FullSizeDict(TypedDict, total=False):
     followType: Literal["none", "parent", "maxChildren", "maxSibling", "children", "x", "y"]
     relativeValue: float
     absoluteValue: float
-UiPropertyNameAll = Literal[
+UiPropertyNamesAll = Literal[
     "all",
     "size",
     "offset",
@@ -100,7 +102,7 @@ UiPropertyNameAll = Literal[
     "uv",
     "wait",
 ]
-UiPropertyName = Literal[
+UiPropertyNames = Literal[
     "size",
     "offset",
     "alpha",
@@ -110,4 +112,23 @@ UiPropertyName = Literal[
     "aseprite_flip_book",
     "uv",
     "wait",
+]
+NyControlTypes = Union[
+    NyButton,
+    NyComboBox,
+    NyControl,
+    NyEditBox,
+    NyGrid,
+    NyImage,
+    NyInputPanel,
+    NyItemRenderer,
+    NyLabel,
+    NyMiniMap,
+    NyPaperDoll,
+    NyProgressBar,
+    NyScrollView,
+    NySelectionWheel,
+    NySlider,
+    NyStackPanel,
+    NyToggle,
 ]

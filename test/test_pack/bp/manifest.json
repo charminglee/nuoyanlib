@@ -1,0 +1,18 @@
+{
+    "format_version": 1,
+    "modules": [
+        {
+            "description": "Test By @Nuoyan",
+            "type": "data",
+            "uuid": "a3b26108-74ec-4d02-90a9-7d98c2aa4a93",
+            "version": [ 0, 0, 1 ]
+        }
+    ],
+    "header": {
+        "description": "Test By @Nuoyan",
+        "name": "Test",
+        "uuid": "394d2579-2f90-40ed-bdbc-c3b18b2d638c",
+        "version": [ 0, 0, 1 ],
+        "min_engine_version": [ 1, 18, 0 ]
+    }
+}

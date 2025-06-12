@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-import mod.client.extraClientApi as _client_api
-from .._core._client._comp import PlrComp as _PlrComp
+import mod.client.extraClientApi as client_api
+from .._core._client.comp import PlrComp
 
 
 __all__ = [
@@ -33,10 +33,10 @@ def player_plunge(speed):
     :return: 无
     :rtype: None
     """
-    rot = _PlrComp.Rot.GetRot()
-    dir_rot = _client_api.GetDirFromRot(rot)
+    rot = PlrComp.Rot.GetRot()
+    dir_rot = client_api.GetDirFromRot(rot)
     motion = tuple(map(lambda x: x * speed, dir_rot))
-    _PlrComp.ActorMotion.SetMotion(motion)
+    PlrComp.ActorMotion.SetMotion(motion)
 
 
 

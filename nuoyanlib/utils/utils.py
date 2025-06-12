@@ -7,22 +7,22 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-07
 |
 | ==============================================
 """
 
 
-from functools import wraps as _wraps
-from time import time as _time
-from re import match as _match
-from .._core import _sys
+from functools import wraps
+from time import time
+from re import match
+from .._core._sys import get_lib_system
 
 
 __all__ = [
     "call_interval",
     "add_condition_to_func",
-    "remove_condition_to_func",
+    "rm_condition_to_func",
     "all_indexes",
     "check_string",
     "check_string2",
@@ -42,12 +42,15 @@ def call_interval(interval):
     -----
 
     :param float interval: 最小时间间隔，单位为秒
+
+    :return: 返回wrapper函数
+    :rtype: function
     """
     def decorator(func):
         func._last_call_time = 0
-        @_wraps(func)
+        @wraps(func)
         def wrapper(*args, **kwargs):
-            now = _time()
+            now = time()
             if now - func._last_call_time >= interval:
                 func._last_call_time = now
                 return func(*args, **kwargs)
@@ -69,13 +72,13 @@ def add_condition_to_func(cond, func, freq=1):
     :rtype: int
     """
     freq = max(1, int(freq))
-    lib_sys = _sys.get_lib_system()
+    lib_sys = get_lib_system()
     if not lib_sys:
         return -1
     return lib_sys.add_condition_to_func(cond, func, freq)
 
 
-def remove_condition_to_func(cond_id):
+def rm_condition_to_func(cond_id):
     """
     | 移除由 ``add_condition_to_func()`` 添加的条件和函数。
 
@@ -86,10 +89,10 @@ def remove_condition_to_func(cond_id):
     :return: 是否成功
     :rtype: bool
     """
-    lib_sys = _sys.get_lib_system()
+    lib_sys = get_lib_system()
     if not lib_sys:
         return False
-    return lib_sys.remove_condition_to_func(cond_id)
+    return lib_sys.rm_condition_to_func(cond_id)
 
 
 def all_indexes(seq, *elements):
@@ -120,11 +123,11 @@ def check_string(string, *check):
     :rtype: bool
     """
     for i in string:
-        if "a-z" in check and _match("[a-z]", i):
+        if "a-z" in check and match("[a-z]", i):
             continue
-        if "A-Z" in check and _match("[A-Z]", i):
+        if "A-Z" in check and match("[A-Z]", i):
             continue
-        if "0-9" in check and _match("[0-9]", i):
+        if "0-9" in check and match("[0-9]", i):
             continue
         if i in check:
             continue
@@ -148,11 +151,11 @@ def check_string2(string, *check):
     for i in string:
         if i in check:
             continue
-        if "a-z" in check and _match("[a-z]", i):
+        if "a-z" in check and match("[a-z]", i):
             continue
-        if "A-Z" in check and _match("[A-Z]", i):
+        if "A-Z" in check and match("[A-Z]", i):
             continue
-        if "0-9" in check and _match("[0-9]", i):
+        if "0-9" in check and match("[0-9]", i):
             continue
         result.append(i)
     return result
@@ -236,24 +239,24 @@ def translate_time(sec):
         return "%dh%dm%ds" % (h, m, s)
 
 
-if __name__ == "__main__":
-    print(all_indexes([1, 1, 4, 5, 1, 4], 1))  # [0, 1, 4]
-    print(all_indexes([1, 1, 4, 5, 1, 4], 1, 4))  # [0, 1, 2, 4, 5]
-    print(all_indexes("abcdefg", "c", "g"))  # [2, 6]
-    print("-" * 50)
-    print(check_string("11112222", "1", "2"))  # True
-    print(check_string("11112222", "1"))  # False
-    print(check_string("1234567890", "0-9"))  # True
-    print(check_string2("abc123", "a", "c", "3"))  # ["b", "1", "2"]
-    print(check_string2("abc123", "a-z"))  # ["1", "2", "3"]
-    print(check_string2("abc123", "0-9"))  # ["a", "b", "c"]
-    print("-" * 50)
+def __test__():
+    assert all_indexes([1, 1, 4, 5, 1, 4], 1) == [0, 1, 4]
+    assert all_indexes([1, 1, 4, 5, 1, 4], 1, 4) == [0, 1, 2, 4, 5]
+    assert all_indexes("abcdefg", "c", "g") == [2, 6]
+    assert check_string("11112222", "1", "2")
+    assert not check_string("11112222", "1")
+    assert check_string("1234567890", "0-9")
+    assert check_string2("abc123", "a", "c", "3") == ["b", "1", "2"]
+    assert check_string2("abc123", "a-z") == ["1", "2", "3"]
+    assert check_string2("abc123", "0-9") == ["a", "b", "c"]
+
     a = {'b': [1, 2, 3], 'c': "hahaha", 'd': [4, 5]}
     turn_dict_value_to_tuple(a)
-    print(a)  # {'b': (1, 2, 3), 'c': "hahaha", 'd': (4, 5)}
+    assert a == {'b': (1, 2, 3), 'c': "hahaha", 'd': (4, 5)}
+
     a = [1, [2, 3], "abc"]
-    print(turn_list_to_tuple(a))  # (1, (2, 3), "abc")
-    print("-" * 50)
+    assert turn_list_to_tuple(a) == (1, (2, 3), "abc")
+
     class A:
         def printIn(self, s):
             print(s)
@@ -262,12 +265,10 @@ if __name__ == "__main__":
             print(1)
     class C(A):
         pass
-    print(is_method_overridden(B, A, "printIn"))  # True
-    print(is_method_overridden(C, A, "printIn"))  # False
-    print("-" * 50)
-    print(translate_time(4000))  # "1h6m40s"
-    print("-" * 50)
-    print(2 / 3.0)
+    assert is_method_overridden(B, A, "printIn")
+    assert not is_method_overridden(C, A, "printIn")
+
+    assert translate_time(4000) == "1h6m40s"
 
 
 

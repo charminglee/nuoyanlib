@@ -7,13 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-09
 |
 | ==============================================
 """
 
 
-from .._core._client import _comp, _lib_client
+from .._core._client.comp import CF
+from .._core._client import _lib_client
 
 
 __all__ = [
@@ -41,7 +42,7 @@ class NeteaseParticle(object):
         self._id = self.__lib_sys.CreateEngineParticle(json_path, pos)
         if not self._id:
             raise RuntimeError("create particle failed, json_path='%s'" % json_path)
-        cf = _comp.CF(self._id)
+        cf = CF(self._id)
         self._ctrl = cf.ParticleControl
         self._trans = cf.ParticleTrans
         self._bind_ent_comp = cf.ParticleEntityBind
@@ -68,292 +69,354 @@ class NeteaseParticle(object):
     @property
     def id(self):
         """
-        [只读]
+        [只读属性]
 
         | 粒子特效ID。
+
+        :rtype: int
         """
         return self._id
 
     @property
     def ent_id(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定的实体ID。
+
+        :rtype: str
         """
         return self._bind_ent_id
 
     @ent_id.setter
     def ent_id(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定的实体ID。
+
+        :type value: str
         """
         self.BindEntity(value, self._bind_ent_offset, self._bind_ent_rot, self._bind_ent_corr)
 
     @property
     def ent_offset(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定实体时的偏移量。
+
+        :rtype: tuple[float,float,float]
         """
         return self._bind_ent_offset
 
     @ent_offset.setter
     def ent_offset(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定实体时的偏移量。
+
+        :type value: tuple[float,float,float]
         """
         self.BindEntity(self._bind_ent_id, value, self._bind_ent_rot, self._bind_ent_corr)
 
     @property
     def ent_rot(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定实体时的旋转角度。
+
+        :rtype: tuple[float,float,float]
         """
         return self._bind_ent_rot
 
     @ent_rot.setter
     def ent_rot(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定实体时的旋转角度。
+
+        :type value: tuple[float,float,float]
         """
         self.BindEntity(self._bind_ent_id, self._bind_ent_offset, value, self._bind_ent_corr)
 
     @property
     def correction(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定实体时是否开启特效旋转角度修正。
+
+        :rtype: bool
         """
         return self._bind_ent_corr
 
     @correction.setter
     def correction(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定实体时是否开启特效旋转角度修正。
+
+        :type value: bool
         """
         self.BindEntity(self._bind_ent_id, self._bind_ent_offset, self._bind_ent_rot, value)
 
     @property
     def model_id(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定的骨骼模型的ID。
+
+        :rtype: int
         """
         return self._bind_skel_model_id
 
     @model_id.setter
     def model_id(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定的骨骼模型的ID。
+
+        :type value: int
         """
         self.BindSkeleton(value, self._bind_skel_bone_name, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
     def bone_name(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定的具体骨骼的名称。
+
+        :rtype: str
         """
         return self._bind_skel_bone_name
 
     @bone_name.setter
     def bone_name(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定的具体骨骼的名称。
+
+        :type value: str
         """
         self.BindSkeleton(self._bind_skel_model_id, value, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
     def skel_offset(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定骨骼时的偏移量。
+
+        :rtype: tuple[float,float,float]
         """
         return self._bind_skel_offset
 
     @skel_offset.setter
     def skel_offset(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定骨骼时的偏移量。
+
+        :type value: tuple[float,float,float]
         """
         self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, value, self._bind_skel_rot)
 
     @property
     def skel_rot(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定骨骼时的旋转角度。
+
+        :rtype: tuple[float,float,float]
         """
         return self._bind_skel_rot
 
     @skel_rot.setter
     def skel_rot(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子绑定骨骼时的旋转角度。
+
+        :type value: tuple[float,float,float]
         """
         self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, self._bind_skel_offset, value)
 
     @property
     def emission_rate(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子发射器每帧发射粒子的频率，数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
         | 对应粒子特效json文件中 ``"emissionrate"`` 的值。
+
+        :rtype: tuple[float,float]
         """
         return self._ctrl.GetParticleEmissionRate()
 
     @emission_rate.setter
     def emission_rate(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 设置粒子发射器每帧发射粒子的频率，数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
         | 频率越大则每帧发射的粒子数量越多，但粒子数量不会超过粒子发射器的粒子容量，同时由于性能考虑，每帧发射的粒子数量也不会超过100个。
         | 每帧发射粒子的频率将在频率最小值和频率最大值之间取随机数进行插值。当值设置为负值时设置将会失败。
         | 对应粒子特效json文件中 ``"emissionrate"`` 的值。
+
+        :type value: tuple[float,float]
         """
         self._ctrl.SetParticleEmissionRate(*value)
 
     @property
     def max_num(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子发射器包含的最大粒子数量，数据类型为整数。
         | 对应粒子特效json文件中 ``"numparticles"`` 的值。
+
+        :rtype: int
         """
         return self._ctrl.GetParticleMaxNum()
 
     @max_num.setter
     def max_num(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 设置粒子发射器的粒子容量，即粒子发射器所包含的最大粒子数量，数据类型为整数，不能为负值，粒子的数量最大值不超过100000。
         | 该数量并不代表目前粒子发射器所发射的粒子数量，如需要增加发射的粒子数量，需同时改变粒子的发射频率。
         | 对应粒子特效json文件中 ``"numparticles"`` 的值。
+
+        :type value: int
         """
         self._ctrl.SetParticleMaxNum(value)
 
     @property
     def size(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子大小的最小值和最大值，数据类型为元组：((minx, miny), (maxx, maxy))，其中minx为粒子x轴大小的最小值，miny为粒子y轴大小的最小值，maxx为粒子x轴大小的最大值，maxy为粒子y轴大小的最大值。
         | 对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
+
+        :rtype: tuple[tuple[float,float],tuple[float,float]]
         """
         return self._ctrl.GetParticleMinSize(), self._ctrl.GetParticleMaxSize()
 
     @size.setter
     def size(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 设置粒子大小的最小值及最大值，数据类型为元组：((minx, miny), (maxx, maxy))，其中minx为粒子x轴大小的最小值，miny为粒子y轴大小的最小值，maxx为粒子x轴大小的最大值，maxy为粒子y轴大小的最大值。
         | 粒子大小会在最小值和最大值当中取随机值进行决定，当该值设置为负值时设置将会失败。
         | 对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
+
+        :type value: tuple[tuple[float,float],tuple[float,float]]
         """
         self._ctrl.SetParticleSize(*value)
 
     @property
     def volume_size(self):
         """
-        [可读写]
+        [可读写属性]
 
-        粒子发射器的体积大小缩放值，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
+        | 粒子发射器的体积大小缩放值，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
+
+        :rtype: tuple[float,float,float]
         """
         return self._ctrl.GetParticleVolumeSize()
 
     @volume_size.setter
     def volume_size(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 设置粒子发射器的体积大小缩放，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
         | 不影响单个粒子的尺寸，粒子发射器的体积越大，则粒子的发射范围越大。
         | 当粒子绑定实体时该设置无效。
+
+        :type value: tuple[float,float,float]
         """
         self._ctrl.SetParticleVolumeSize(value)
 
     @property
     def pos(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子发射器的世界坐标位置，数据类型为元组：(x, y, z)。
+
+        :rtype: tuple[float,float,float]
         """
         return self._trans.GetPos()
 
     @pos.setter
     def pos(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子发射器的世界坐标位置，数据类型为元组：(x, y, z)。
+
+        :type value: tuple[float,float,float]
         """
         self._trans.SetPos(value)
 
     @property
     def rot(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子发射器的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
+
+        :rtype: tuple[float,float,float]
         """
         return self._trans.GetRot()
 
     @rot.setter
     def rot(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 粒子发射器的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
         | 旋转顺序按照绕z、x、y轴旋转。
+
+        :type value: tuple[float,float,float]
         """
         self._trans.SetRotUseZXY(value)
 
     @property
     def playing(self):
         """
-        [只读]
+        [只读属性]
 
         | 粒子是否正在播放。
+
+        :rtype: bool
         """
         return self._playing
 
     @property
     def destroyed(self):
         """
-        [只读]
+        [只读属性]
 
         | 粒子是否已销毁。
+
+        :rtype: bool
         """
         return self._destroyed
 
@@ -557,7 +620,7 @@ class NeteaseFrameAnim(object):
             raise ValueError("parameter 'json_path' or 'tex_path' must be given")
         if not self._id:
             raise RuntimeError("create frame animation failed, path='%s'" % (json_path or tex_path))
-        cf = _comp.CF(self._id)
+        cf = CF(self._id)
         self._ctrl = cf.FrameAniControl
         self._trans = cf.FrameAniTrans
         self._bind_ent_comp = cf.FrameAniEntityBind
@@ -583,212 +646,258 @@ class NeteaseFrameAnim(object):
     @property
     def id(self):
         """
-        [只读]
+        [只读属性]
 
         | 序列帧特效ID。
+
+        :rtype: int
         """
         return self._id
 
     @property
     def ent_id(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定的实体ID。
+
+        :rtype: str
         """
         return self._bind_ent_id
 
     @ent_id.setter
     def ent_id(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定的实体ID。
+
+        :type value: str
         """
         self.BindEntity(value, self._bind_ent_offset, self._bind_ent_rot)
 
     @property
     def ent_offset(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定实体时的偏移量。
+
+        :rtype: tuple[float,float,float]
         """
         return self._bind_ent_offset
 
     @ent_offset.setter
     def ent_offset(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定实体时的偏移量。
+
+        :type value: tuple[float,float,float]
         """
         self.BindEntity(self._bind_ent_id, value, self._bind_ent_rot)
 
     @property
     def ent_rot(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定实体时的旋转角度。
+
+        :rtype: tuple[float,float,float]
         """
         return self._bind_ent_rot
 
     @ent_rot.setter
     def ent_rot(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定实体时的旋转角度。
+
+        :type value: tuple[float,float,float]
         """
         self.BindEntity(self._bind_ent_id, self._bind_ent_offset, value)
 
     @property
     def model_id(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定的骨骼模型的ID。
+
+        :rtype: int
         """
         return self._bind_skel_model_id
 
     @model_id.setter
     def model_id(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定的骨骼模型的ID。
+
+        :type value: int
         """
         self.BindSkeleton(value, self._bind_skel_bone_name, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
     def bone_name(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定的具体骨骼的名称。
+
+        :rtype: str
         """
         return self._bind_skel_bone_name
 
     @bone_name.setter
     def bone_name(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定的具体骨骼的名称。
+
+        :type value: str
         """
         self.BindSkeleton(self._bind_skel_model_id, value, self._bind_skel_offset, self._bind_skel_rot)
 
     @property
     def skel_offset(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定骨骼时的偏移量。
+
+        :rtype: tuple[float,float,float]
         """
         return self._bind_skel_offset
 
     @skel_offset.setter
     def skel_offset(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定骨骼时的偏移量。
+
+        :type value: tuple[float,float,float]
         """
         self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, value, self._bind_skel_rot)
 
     @property
     def skel_rot(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定骨骼时的旋转角度。
+
+        :rtype: tuple[float,float,float]
         """
         return self._bind_skel_rot
 
     @skel_rot.setter
     def skel_rot(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧绑定骨骼时的旋转角度。
+
+        :type value: tuple[float,float,float]
         """
         self.BindSkeleton(self._bind_skel_model_id, self._bind_skel_bone_name, self._bind_skel_offset, value)
 
     @property
     def pos(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧的世界坐标位置，数据类型为元组：(x, y, z)。
+
+        :rtype: tuple[float,float,float]
         """
         return self._trans.GetPos()
 
     @pos.setter
     def pos(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧的世界坐标位置，数据类型为元组：(x, y, z)。
+
+        :type value: tuple[float,float,float]
         """
         self._trans.SetPos(value)
 
     @property
     def rot(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
+
+        :rtype: tuple[float,float,float]
         """
         return self._trans.GetRot()
 
     @rot.setter
     def rot(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
         | 旋转顺序按照绕z、x、y轴旋转。
+
+        :type value: tuple[float,float,float]
         """
         self._trans.SetRotUseZXY(value)
 
     @property
     def scale(self):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧的缩放值，数据类型为元组：(x, y, z)。
         | 对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
         | 对于环状序列帧，三个参数分别为三个坐标轴上的缩放。
+
+        :rtype: tuple[float,float,float]
         """
         return self._trans.GetScale()
 
     @scale.setter
     def scale(self, value):
         """
-        [可读写]
+        [可读写属性]
 
         | 序列帧的缩放值，数据类型为元组：(x, y, z)。
         | 对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
         | 对于环状序列帧，三个参数分别为三个坐标轴上的缩放。
+
+        :type value: tuple[float,float,float]
         """
         self._trans.SetScale(value)
 
     @property
     def playing(self):
         """
-        [只读]
+        [只读属性]
 
         | 序列帧是否正在播放。
+
+        :rtype: bool
         """
         return self._playing
 
     @property
     def destroyed(self):
         """
-        [只读]
+        [只读属性]
 
         | 序列帧是否已销毁。
+
+        :rtype: bool
         """
         return self._destroyed
 

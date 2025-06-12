@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-06-11
 |
 | ==============================================
 """
@@ -72,11 +72,23 @@ shutil.copyfile(types_dir + r"\_event_typing.pyi", "_event_typing.pyi")
 with open("_events.pyi", "r") as f:
     _events = f.read()
 with open("_events.pyi", "w") as f:
-    # 重新编号EventArgs，第一次替换附加三个下划线，目的是避免正则表达式总是匹配到第一个EventArgs
+    # 重新编号EventArgs，第一次替换时附加三个下划线，目的是避免正则表达式总是匹配到第一个EventArgs
     for i, _ in enumerate(typehint_data):
-        _events = re.sub("EventArgs[0-9]+", "EventArgs___%d" % i, _events, 1)
+        _events = re.sub(r"EventArgs[0-9]+\):", "EventArgs___%d):" % i, _events, 1)
     # 去掉所有三下划线
     _events = _events.replace("___", "")
+    # 编辑事件枚举
+    _events = re.sub(r"# clear.*", "# clear\n\n\n", _events, 1, re.S)
+    match = re.search(r"class ClientEvent:.*# clear", _events, re.S)
+    enum = match.group(0)[:-7]
+    enum = (
+        enum.replace("class ClientEvent:", "class ClientEventEnum:", 1)
+        .replace("class ServerEvent:", "class ServerEventEnum:", 1)
+        .replace("    def ", "    ")
+    )
+    enum = re.sub(r"\(self, event: EventArgs[0-9]+\):", ": str", enum)
+    enum = enum.replace(" " * 8, " " * 4)
+    _events += enum
     f.write(_events)
 
 

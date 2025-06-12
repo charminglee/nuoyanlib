@@ -7,13 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-10
 |
 | ==============================================
 """
 
 
-from typing import List, Optional, Callable, Dict, Tuple, Union
+from typing import List, Optional, Callable, Dict, Tuple, Union, Generator
+from typing_extensions import deprecated
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.ui.controls.labelUIControl import LabelUIControl
@@ -36,6 +37,42 @@ from ..._core._types._typing import UiPathOrControl, FTuple2, STuple
 from ...utils import Enum
 
 
+class UiControlType(Enum[int]):
+    all: int
+    button: int
+    custom: int
+    collection_panel: int
+    dropdown: int
+    edit_box: int
+    factory: int
+    grid: int
+    image: int
+    input_panel: int
+    label: int
+    panel: int
+    screen: int
+    scrollbar_box: int
+    scroll_track: int
+    scroll_view: int
+    selection_wheel: int
+    slider: int
+    slider_box: int
+    stack_panel: int
+    toggle: int
+    image_cycler: int
+    label_cycler: int
+    grid_page_indicator: int
+    combox: int
+    layout: int
+    stack_grid: int
+    joystick: int
+    rich_text: int
+    sixteen_nine_layout: int
+    mul_lines_edit: int
+    amin_process_bar: int
+    unknown: int
+
+
 class ControlType(Enum[str]):
     base_control: str
     button: str
@@ -50,7 +87,6 @@ class ControlType(Enum[str]):
     item_renderer: str
     gradient_renderer: str
     scroll_view: str
-    item_renderer: str
     grid: str
     progress_bar: str
     toggle: str
@@ -104,17 +140,18 @@ class ButtonCallback(Enum[int]):
     screen_exit: int
 
 
-def get_all_children_path_by_level(
+def get_children_path_by_level(
     control: UiPathOrControl,
     screen_node: ScreenNode,
     level: int = 1,
-) -> List[str]: ...
-def get_all_children_control_by_level(
+) -> Generator[str, None, None]: ...
+def get_children_control_by_level(
     control: UiPathOrControl,
     screen_node: ScreenNode,
     level: int = 1,
-) -> List[BaseUIControl]: ...
+) -> Generator[BaseUIControl, None, None]: ...
 def get_parent_path(control: UiPathOrControl) -> Optional[str]: ...
 def get_parent_control(control: UiPathOrControl, screen_node: ScreenNode) -> Optional[BaseUIControl]: ...
 def is_ui_out_of_screen(control: UiPathOrControl, screen_node: Optional[ScreenNode] = None) -> bool: ...
+@deprecated("已废弃，将在未来版本中移除。")
 def notify_server(func: Callable) -> Callable: ...

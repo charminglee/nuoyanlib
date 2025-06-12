@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-07
 |
 | ==============================================
 """
@@ -19,7 +19,7 @@
 # todo：完善Ny控件
 
 
-from ._core._logging import info as _info
+from ._core import _logging
 
 
 __version__ = "0.9.3-beta"
@@ -28,11 +28,20 @@ __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"
 
 
-_info("Start loading, ver: %s" % __version__)
-del _info
+_logging.info("Start loading, ver: %s" % __version__)
 
 
 def run(dct):
+    """
+    | 启动「nuoyanlib」。
+
+    -----
+
+    :param dict dct: 请传入globals()
+
+    :return: 无
+    :rtype: None
+    """
     from mod.common.mod import Mod
     import mod.client.extraClientApi as client_api
     import mod.server.extraServerApi as server_api
@@ -60,6 +69,8 @@ def run(dct):
 
     dct['NuoyanLibMain'] = NuoyanLibMain
 
+
+del _logging
 
 
 

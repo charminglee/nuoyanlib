@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from threading import Timer as _Timer
+from threading import Timer
 
 
 __all__ = [
@@ -43,7 +43,7 @@ class McTimer(object):
         self.kwargs = kwargs
         self._pause = False
         self._cancel = False
-        self.__timer = _Timer(sec, self.__func)
+        self.__timer = Timer(sec, self.__func)
 
     def _execute(self):
         return self.func(*self.args, **self.kwargs)
@@ -51,7 +51,7 @@ class McTimer(object):
     def __func(self):
         self._execute()
         if self.type == "r" and not self._cancel:
-            self.__timer = _Timer(self.sec, self.__func)
+            self.__timer = Timer(self.sec, self.__func)
             self.__timer.start()
         else:
             self._release()

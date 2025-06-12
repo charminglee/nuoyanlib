@@ -7,15 +7,15 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from uuid import uuid4 as _uuid4
-from traceback import format_exc as _format_exc
-from .._core import _sys
+from uuid import uuid4
+from traceback import format_exc
+from .._core._sys import get_api, is_client, get_comp_factory, LEVEL_ID
 
 
 __all__ = [
@@ -27,14 +27,14 @@ __all__ = [
 
 # todo
 class Caller(object):
-    def __init__(self, namespace, system_name, method=""):
-        self.namespace = namespace
-        self.system_name = system_name
+    def __init__(self, ns, sys_name, method=""):
+        self.ns = ns
+        self.sys_name = sys_name
         self.method = method
 
     def __call__(self, args=None, kwargs=None, method="", player_id=None, callback=None, delay_ret=-1):
         method = method or self.method
-        return call(self.namespace, self.system_name, method, args, kwargs, player_id, callback, delay_ret)
+        return call(self.ns, self.sys_name, method, args, kwargs, player_id, callback, delay_ret)
 
 
 # todo
@@ -56,8 +56,8 @@ def broadcast_to_all_systems(event_name, event_args, from_system):
     :return: 无
     :rtype: None
     """
-    api = _sys.get_api()
-    if _sys.is_client():
+    api = get_api()
+    if is_client():
         from .._core._client._lib_client import instance
         lib_sys = instance()
         if isinstance(from_system, tuple):
@@ -97,13 +97,13 @@ def call_callback(cb_or_uuid, delay_ret=-1, success=True, ret=None, error="", pl
         return
     cb_args = {'success': success, 'ret': ret, 'error': error, 'player_id': player_id}
     if delay_ret >= 0:
-        _sys.get_comp_factory().CreateGame(_sys.LEVEL_ID).AddTimer(delay_ret, callback, cb_args)
+        get_comp_factory().CreateGame(LEVEL_ID).AddTimer(delay_ret, callback, cb_args)
     else:
         callback(cb_args)
 
 
 def call_local(target_sys, method, cb_or_uuid, delay_ret, args, kwargs):
-    player_id = _sys.get_api().GetLocalPlayerId() if _sys.is_client() else ""
+    player_id = get_api().GetLocalPlayerId() if is_client() else ""
     if not target_sys:
         call_callback(cb_or_uuid, delay_ret, False, player_id=player_id)
     else:
@@ -114,16 +114,16 @@ def call_local(target_sys, method, cb_or_uuid, delay_ret, args, kwargs):
                 kwargs = {}
             ret = getattr(target_sys, method)(*args, **kwargs)
         except:
-            call_callback(cb_or_uuid, delay_ret, False, error=_format_exc(), player_id=player_id)
+            call_callback(cb_or_uuid, delay_ret, False, error=format_exc(), player_id=player_id)
         else:
             call_callback(cb_or_uuid, delay_ret, True, ret, player_id=player_id)
 
 
-def _notify(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs):
-    uuid = str(_uuid4())
+def _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs):
+    uuid = str(uuid4())
     notify_args = {
-        'namespace': namespace,
-        'system_name': system_name,
+        'ns': ns,
+        'sys_name': sys_name,
         'method': method,
         'uuid': uuid,
         'delay_ret': delay_ret,
@@ -131,7 +131,7 @@ def _notify(namespace, system_name, method, player_id, callback, delay_ret, args
         'kwargs': kwargs,
     }
     _callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
-    if _sys.is_client():
+    if is_client():
         from .._core._client._lib_client import instance
         lib_sys = instance()
         if player_id is None:
@@ -144,8 +144,8 @@ def _notify(namespace, system_name, method, player_id, callback, delay_ret, args
 
 
 def call(
-        namespace,
-        system_name,
+        ns,
+        sys_name,
         method,
         args=None,
         kwargs=None,
@@ -164,8 +164,8 @@ def call(
 
     -----
 
-    :param str namespace: 被调用函数所在系统的命名空间
-    :param str system_name: 被调用函数所在系统的名称
+    :param str ns: 被调用函数所在系统的命名空间
+    :param str sys_name: 被调用函数所在系统的名称
     :param str method: 被调用函数名
     :param tuple args: 位置参数元组，展开后传入被调用函数中
     :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数中
@@ -176,18 +176,18 @@ def call(
     :return: 无
     :rtype: None
     """
-    api = _sys.get_api()
-    target_sys = api.GetSystem(namespace, system_name)
+    api = get_api()
+    target_sys = api.GetSystem(ns, sys_name)
     if player_id == "*":
         player_id = api.GetPlayerList()
     elif isinstance(player_id, str):
         player_id = [player_id]
     elif isinstance(player_id, list):
         player_id = player_id[:]
-    if _sys.is_client():
+    if is_client():
         # c to s
         if not target_sys and not player_id:
-            _notify(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+            _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
         # c to c
         else:
             local_plr = api.GetLocalPlayerId()
@@ -195,7 +195,7 @@ def call(
                 call_local(target_sys, method, callback, delay_ret, args, kwargs)
                 player_id.remove(local_plr)
             if player_id:
-                _notify(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+                _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
     else:
         # s to s
         if target_sys:
@@ -204,7 +204,7 @@ def call(
             call_callback(callback, delay_ret, False)
         # s to c
         else:
-            _notify(namespace, system_name, method, player_id, callback, delay_ret, args, kwargs)
+            _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
 
 
 

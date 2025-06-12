@@ -7,37 +7,33 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-09
 |
 | ==============================================
 """
 
 
-from time import (
-    time as _time,
-    strftime as _strftime,
-    localtime as _localtime,
-)
+from time import time, strftime, localtime
+from .. import config
+
+
+__all__ = []
 
 
 try:
     import logging
-    from ..config import ENABLED_LOG as _ENABLED_LOG
 except ImportError:
-    _ENABLED_LOG = False
     logging = None
-except ValueError:
-    _ENABLED_LOG = True
 
 
-if _ENABLED_LOG and logging:
+if config.ENABLED_LOG and logging:
     class _logger(object):
         def __init__(self, level):
             self.level = level
 
         def log(self, msg):
-            ct = _time()
-            t = _strftime("%Y-%m-%d %H:%M:%S", _localtime(ct))
+            ct = time()
+            t = strftime("%Y-%m-%d %H:%M:%S", localtime(ct))
             msecs = (ct - long(ct)) * 1000
             s = "%s,%03d" % (t, msecs)
             print("[%s] [%s] [nuoyanlib] %s" % (s, self.level, msg))

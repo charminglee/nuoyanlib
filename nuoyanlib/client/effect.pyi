@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-09
 |
 | ==============================================
 """
@@ -28,11 +28,11 @@ from .._core._types._typing import FTuple3, FTuple2
 
 class NeteaseParticle(object):
     __lib_sys: NuoyanLibClientSystem
-    _id: Optional[int]
-    _ctrl: Optional[ParticleControlComp]
-    _trans: Optional[ParticleTransComp]
-    _bind_ent_comp: Optional[ParticleEntityBindComp]
-    _bind_skel_comp: Optional[ParticleSkeletonBindComp]
+    _id: int
+    _ctrl: ParticleControlComp
+    _trans: ParticleTransComp
+    _bind_ent_comp: ParticleEntityBindComp
+    _bind_skel_comp: ParticleSkeletonBindComp
     _bind_ent_id: str
     _bind_ent_offset: FTuple3
     _bind_ent_rot: FTuple3
@@ -137,11 +137,11 @@ class NeteaseParticle(object):
 
 class NeteaseFrameAnim(object):
     __lib_sys: NuoyanLibClientSystem
-    _id: Optional[int]
-    _ctrl: Optional[FrameAniControlComp]
-    _trans: Optional[FrameAniTransComp]
-    _bind_ent_comp: Optional[FrameAniEntityBindComp]
-    _bind_skel_comp: Optional[FrameAniSkeletonBindComp]
+    _id: int
+    _ctrl: FrameAniControlComp
+    _trans: FrameAniTransComp
+    _bind_ent_comp: FrameAniEntityBindComp
+    _bind_skel_comp: FrameAniSkeletonBindComp
     _bind_ent_id: str
     _bind_ent_offset: FTuple3
     _bind_ent_rot: FTuple3

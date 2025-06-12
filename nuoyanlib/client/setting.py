@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-06
 |
 | ==============================================
 """
 
 
-from .._core._client._comp import LvComp as _LvComp
+from .._core._client.comp import LvComp
 
 
 __all__ = [
@@ -36,7 +36,7 @@ def save_setting(name, data_dict, is_global=True):
     :return: 是否保存成功
     :rtype: bool
     """
-    return _LvComp.ConfigClient.SetConfigData(name, data_dict, is_global)
+    return LvComp.ConfigClient.SetConfigData(name, data_dict, is_global)
 
 
 def read_setting(name, is_global=True):
@@ -51,7 +51,7 @@ def read_setting(name, is_global=True):
     :return: 数据字典
     :rtype: dict
     """
-    data = _LvComp.ConfigClient.GetConfigData(name, is_global)
+    data = LvComp.ConfigClient.GetConfigData(name, is_global)
     if data:
         data = {(str(k) if isinstance(k, unicode) else k): v for k, v in data.items()}
     return data
