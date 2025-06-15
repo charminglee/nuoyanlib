@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-16
 |
 | ==============================================
 """
@@ -69,7 +69,7 @@ class NyButton(NyControl):
         **kwargs: Any,
     ) -> None: ...
     @event(Events.GetEntityByCoordReleaseClientEvent)
-    def _finger_release(self, args: ArgsDict) -> None: ...
+    def _on_finger_release(self, args: ArgsDict) -> None: ...
     def set_texture(self, tex_path: str) -> None: ...
     def set_text(self, text: str) -> None: ...
     @property

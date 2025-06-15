@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-12
+|   Date  : 2025-06-16
 |
 | ==============================================
 """
@@ -20,7 +20,7 @@ from ..ui_utils import (
 )
 from ...._core._client.comp import LvComp
 from ...._core._utils import args_type_check
-from ...._core._listener import event
+from ...._core._listener import event, listen_event, unlisten_event
 from .control import NyControl
 from ....utils.enum import Enum
 from ...._core._types._events import ClientEventEnum as Events
@@ -98,10 +98,10 @@ class NyButton(NyControl):
         self.touch_event_params = kwargs.get('touch_event_params')
         self.base_control.AddTouchEventParams(self.touch_event_params)
         self.base_control.AddHoverEventParams()
-        self._finger_release._listen()
+        listen_event(self._on_finger_release)
 
     def __destroy__(self):
-        self._finger_release.unlisten()
+        unlisten_event(self._on_finger_release)
         if self.is_movable:
             self.cancel_movable()
         LvComp.Game.CancelTimer(self._long_click_timer)
@@ -109,7 +109,7 @@ class NyButton(NyControl):
         NyControl.__destroy__(self)
 
     @event(Events.GetEntityByCoordReleaseClientEvent)
-    def _finger_release(self, args):
+    def _on_finger_release(self, args):
         if self.auto_save_pos:
             self.save_pos_data()
         self._finger_pos = None
@@ -127,7 +127,7 @@ class NyButton(NyControl):
         :return: 无
         :rtype: None
         """
-        (self / NyButton.CommonChildPath.default).image.SetSprite(tex_path)
+        (self / NyButton.CommonChildPath.default).to_image().SetSprite(tex_path)
 
     def set_hover_texture(self, tex_path):
         """
@@ -140,7 +140,7 @@ class NyButton(NyControl):
         :return: 无
         :rtype: None
         """
-        (self / NyButton.CommonChildPath.hover).image.SetSprite(tex_path)
+        (self / NyButton.CommonChildPath.hover).to_image().SetSprite(tex_path)
 
     def set_pressed_texture(self, tex_path):
         """
@@ -153,7 +153,7 @@ class NyButton(NyControl):
         :return: 无
         :rtype: None
         """
-        (self / NyButton.CommonChildPath.pressed).image.SetSprite(tex_path)
+        (self / NyButton.CommonChildPath.pressed).to_image().SetSprite(tex_path)
 
     def set_text(self, text):
         """
@@ -166,7 +166,7 @@ class NyButton(NyControl):
         :return: 无
         :rtype: None
         """
-        (self / NyButton.CommonChildPath.button_label).label.SetText(text)
+        (self / NyButton.CommonChildPath.button_label).to_label().SetText(text)
 
     @property
     def vibrate_time(self):
@@ -194,7 +194,7 @@ class NyButton(NyControl):
     def set_callback(self, callback_type, func):
         """
         | 添加按钮回调函数，支持对同一个按钮添加多个同类型的回调，按添加顺序依次触发。
-        | 注意：调用本方法后请勿再调用ModSDK的设置按钮回调的接口（如 ``SetButtonTouchUpCallback()``），否则所有通过本方法添加的回调函数将无效。
+        | 注意：调用本方法后请勿再调用ModSDK的设置按钮回调的接口（如 ``.SetButtonTouchUpCallback()``），否则所有通过本方法添加的回调函数将无效。
 
         -----
 
@@ -232,7 +232,7 @@ class NyButton(NyControl):
 
     def remove_callback(self, callback_type, func):
         """
-        | 移除通过 ``set_callback()`` 添加的按钮回调函数。
+        | 移除通过 ``.set_callback()`` 添加的按钮回调函数。
 
         -----
 
@@ -265,8 +265,8 @@ class NyButton(NyControl):
     def set_movable(self, move_parent=False, associated_uis=None, auto_save=False):
         """
         | 设置按钮可拖动（随时拖动）。
-        | 注意：设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``set_callback()`` ，不要使用ModSDK中的接口。
-        | 请勿同时设置 ``set_movable()`` 和 ``set_movable_by_long_click()`` 。
+        | 注意：设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``.set_callback()`` ，不要使用ModSDK中的接口。
+        | 请勿同时设置 ``.set_movable()`` 和 ``.set_movable_by_long_click()`` 。
 
         -----
 
@@ -285,8 +285,8 @@ class NyButton(NyControl):
     def set_movable_by_long_click(self, move_parent=False, associated_uis=None, auto_save=False):
         """
         | 设置按钮长按拖动（长按后才能拖动）。
-        | 注意：设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``set_callback()`` ，不要使用ModSDK中的接口。
-        | 请勿同时设置 ``set_movable()`` 和 ``set_movable_by_long_click()`` 。
+        | 注意：设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``.set_callback()`` ，不要使用ModSDK中的接口。
+        | 请勿同时设置 ``.set_movable()`` 和 ``.set_movable_by_long_click()`` 。
 
         -----
 

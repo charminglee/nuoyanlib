@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-12
+|   Date  : 2025-06-16
 |
 | ==============================================
 """
@@ -15,7 +15,7 @@
 
 from ...._core._utils import args_type_check, get_func
 from ...._core._client.comp import ScreenNode
-from ...._core._listener import event
+from ...._core._listener import event, listen_event, unlisten_event
 from ..ui_utils import ControlType
 from .control import NyControl
 from ...._core._types._events import ClientEventEnum as Events
@@ -97,7 +97,7 @@ class NyGrid(NyControl):
         NyControl.__init__(self, screen_node_ex, grid_control)
         self.is_stack_grid = kwargs.get('is_stack_grid', False)
         self._update_cbs = []
-        self._on_grid_update._listen()
+        listen_event(self._on_grid_update)
 
     @args_type_check((int, slice, tuple), is_method=True)
     def __getitem__(self, item):
@@ -120,7 +120,7 @@ class NyGrid(NyControl):
         return _ElemGroup(self, item)
 
     def __destroy__(self):
-        self._on_grid_update.unlisten()
+        unlisten_event(self._on_grid_update)
         self._update_cbs = []
         NyControl.__destroy__(self)
 

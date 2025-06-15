@@ -7,14 +7,12 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-16
 |
 | ==============================================
 """
 
 
-import weakref
-from functools import update_wrapper
 from types import MethodType
 import mod.client.extraClientApi as client_api
 import mod.server.extraServerApi as server_api
@@ -29,12 +27,14 @@ from ._types._events import (
 
 
 __all__ = [
-    "listen_for",
-    "unlisten_for",
     "EventArgsProxy",
     "ClientEventProxy",
     "ServerEventProxy",
     "event",
+    "listen_event",
+    "unlisten_event",
+    "listen_all_events",
+    "unlisten_all_events",
 ]
 
 
@@ -52,41 +52,12 @@ def _get_event_source(client, event_name, ns="", sys_name=""):
     return (ns, sys_name) if ns and sys_name else None
 
 
-def listen_for(*args, **kwargs):
-    """
-    | 通用事件监听。支持对普通函数与实例方法添加事件监听，回调函数不再需要与类绑定。
-    | 若要移除监听，请使用 ``unlisten_for()`` 。
-
-    -----
-
-    :param str ns: 事件来源命名空间
-    :param str sys_name: 事件来源系统名称
-    :param str event_name: 事件名称
-    :param function func: 事件回调函数
-    :param int priority: 优先级，默认为0
-
-    :return: 无
-    :rtype: None
-    """
-    get_lib_system().listen_for(*args, **kwargs)
+def _listen_for(ns, sys_name, event_name, func, priority):
+    get_lib_system().listen_for(ns, sys_name, event_name, func, priority)
 
 
-def unlisten_for(*args, **kwargs):
-    """
-    | 移除通过 ``listen_for()`` 或 ``@event`` 添加的事件监听。
-
-    -----
-
-    :param str ns: 事件来源命名空间
-    :param str sys_name: 事件来源系统名称
-    :param str event_name: 事件名称
-    :param function func: 事件回调函数
-    :param int priority: 优先级，默认为0
-
-    :return: 无
-    :rtype: None
-    """
-    get_lib_system().unlisten_for(*args, **kwargs)
+def _unlisten_for(ns, sys_name, event_name, func, priority):
+    get_lib_system().unlisten_for(ns, sys_name, event_name, func, priority)
 
 
 class EventArgsProxy(object):
@@ -156,7 +127,7 @@ class _BaseEventProxy(object):
         proxy.__name__ = proxy_name
         proxy = MethodType(proxy, self)
         setattr(self, proxy_name, proxy)
-        listen_for(ns, sys_name, event_name, proxy, priority)
+        _listen_for(ns, sys_name, event_name, proxy, priority)
 
 
 class ClientEventProxy(_BaseEventProxy):
@@ -173,12 +144,62 @@ class ServerEventProxy(_BaseEventProxy):
     """
 
 
-class event(object):
+_LISTEN_ARGS_KEY = "_nyl_listen_args"
+
+
+def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
     """
     [装饰器]
 
-    | 事件监听器。监听ModSDK事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
-    | 适用于普通函数与实例方法，若用于普通函数，请将 ``is_method`` 参数设为 ``False`` 。
+    | 事件监听器，适用于静态函数与方法，若用于静态函数，请将 ``is_method`` 参数设为 ``False`` 。
+    | 事件名与函数名相同时，可省略 ``event_name`` 参数。监听ModSDK事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
+    | 注意：在类中使用时，需要在 ``.__init__()`` 方法中调用一下 ``listen_all_events()`` ，详见示例。
+    | 支持嵌套使用 ``@event`` ，但相同参数的事件只会被监听一次。
+
+    -----
+
+    【示例】
+
+    ::
+
+        import mod.client.extraClientApi as client_api
+        import <scripts_root>.nuoyanlib.client as nyl
+
+        class MyClientSystem(client_api.GetClientSystemCls()):
+            def __init__(self, namespace, system_name):
+                # 对当前类中所有被@event装饰的方法执行事件监听
+                nyl.listen_all_events(self)
+
+            def Destroy(self):
+                # 必要时，对当前类中所有被@event装饰的方法执行事件反监听
+                nyl.unlisten_all_events(self)
+
+            # 监听MyCustomEvent事件，事件来源为MyMod:MyServerSystem
+            @nyl.event("MyCustomEvent", "MyMod", "MyServerSystem")
+            def EventCallback(self, args):
+                ...
+
+            # 事件名与函数名相同时，可省略event_name参数
+            @nyl.event(ns="MyMod", sys_name="MyServerSystem")
+            def MyCustomEvent(self, args):
+                ...
+
+            # 监听ModSDK事件且事件名与函数名相同时，可省略所有参数
+            @nyl.event
+            def UiInitFinished(self, args):
+                ...
+
+            def unlisten_MyCustomEvent(self):
+                # 反监听特定事件
+                nyl.unlisten_event(self.MyCustomEvent)
+
+    | 对静态函数使用时，事件将被立即监听，无需手动调用 ``listen_all_events()`` 。
+
+    ::
+
+        @nyl.event(ns="MyMod", sys_name="MyServerSystem", is_method=False)
+        def MyCustomEvent(args):
+            ...
 
     -----
 
@@ -188,121 +209,117 @@ class event(object):
     :param int priority: 优先级，默认为0
     :param bool is_method: 回调函数是否是实例方法，默认为True
 
-    :return: 返回event类
-    :rtype: event
+    :return: 返回原函数
+    :rtype: function
     """
-
-    def __init__(self, event_name="", ns="", sys_name="", priority=0, is_method=True):
-        self._ns = ns
-        self._sys_name = sys_name
-        self._priority = priority
-        self._is_method = is_method
-        self._func = None
-        self.__self__ = None
-        self.listen_args = []
-        if callable(event_name):
-            # @event
-            self._event_name = ""
-            self._bind_func(event_name)
+    def add_listener(func):
+        if event_name and isinstance(event_name, str):
+            _event_name = event_name
         else:
-            self._event_name = event_name
-
-    def __call__(self, *args, **kwargs):
-        if not self._func:
-            # @event(...)
-            self._bind_func(args[0])
-            return self
-        else:
-            # 调用原函数
-            return (
-                self._func(self.__self__(), *args, **kwargs)
-                if self._is_method
-                else self._func(*args, **kwargs)
-            )
-
-    def _bind_func(self, func):
-        if isinstance(func, event):
-            # 处理嵌套@event
-            self.listen_args.extend(func.listen_args)
-            func = func._func
-        self._func = func
-        update_wrapper(self, func)
-        if not self._event_name:
-            self._event_name = func.__name__
-        if not self._ns or not self._sys_name:
-            source = _get_event_source(is_client(), self._event_name, self._ns, self._sys_name)
+            _event_name = func.__name__
+        if not ns or not sys_name:
+            source = _get_event_source(is_client(), _event_name, ns, sys_name)
             if not source:
-                raise _error.EventSourceError(self._event_name, self._ns, self._sys_name)
-            self._ns, self._sys_name = source
-        args = (self._ns, self._sys_name, self._event_name, self._priority)
-        self.listen_args.append(args)
-        if not self._is_method:
-            self._listen(args)
+                raise _error.EventSourceError(_event_name, ns, sys_name)
+            _ns, _sys_name = source
+        else:
+            _ns, _sys_name = ns, sys_name
+        args = (_ns, _sys_name, _event_name, priority)
+        if not hasattr(func, _LISTEN_ARGS_KEY):
+            func._nyl_listen_args = []
+        func._nyl_listen_args.append(args)
+        if not is_method:
+            _unlisten_for(_ns, _sys_name, _event_name, func, priority) # 防止重复监听相同参数的事件
+            _listen_for(_ns, _sys_name, _event_name, func, priority)
+        return func
+    # @event(...)
+    if isinstance(event_name, str):
+        return add_listener
+    # @event
+    else:
+        return add_listener(event_name)
 
-    def _listen(self, args):
-        func = self if self._is_method else self._func
-        unlisten_for(args[0], args[1], args[2], func, args[3]) # 防止重复监听相同参数的事件
-        listen_for(args[0], args[1], args[2], func, args[3])
 
-    def unlisten(self):
-        """
-        | 移除事件监听。
+def _get_event_args(func):
+    if isinstance(func, MethodType):
+        func = func.__func__
+    args = getattr(func, _LISTEN_ARGS_KEY, None)
+    return args if args else []
 
-        -----
 
-        :return: 无
-        :rtype: None
-        """
-        func = self if self._is_method else self._func
-        for args in self.listen_args:
-            unlisten_for(args[0], args[1], args[2], func, args[3])
+def listen_event(func):
+    """
+    | 执行事件监听。
 
-    def __get__(self, ins, cls):
-        # 用于获取回调函数所在实例
-        if self.__self__ is None:
-            self.__self__ = weakref.ref(ins)
-        return self
+    -----
 
-    @staticmethod
-    def _get_all_event_ins(ins):
-        for name in dir(ins):
-            try:
-                attr = getattr(ins, name) # 获取到event描述符时将触发event.__get__
-            except AttributeError:
-                continue
-            if isinstance(attr, event):
-                yield attr
+    :param function func: 事件回调函数
 
-    @staticmethod
-    def listen_all(ins):
-        """
-        | 对当前类中所有被 ``@event`` 装饰的方法执行事件监听。
+    :return: 无
+    :rtype: None
+    """
+    for a in _get_event_args(func):
+        _unlisten_for(a[0], a[1], a[2], func, a[3])
+        _listen_for(a[0], a[1], a[2], func, a[3])
 
-        -----
 
-        :param Any ins: 当前类的实例
+def unlisten_event(func):
+    """
+    | 移除事件监听。
 
-        :return: 无
-        :rtype: None
-        """
-        for e in event._get_all_event_ins(ins):
-            for args in e.listen_args:
-                e._listen(args)
+    -----
 
-    @staticmethod
-    def unlisten_all(ins):
-        """
-        | 对当前类中所有被 ``@event`` 装饰的方法执行事件反监听。
+    :param function func: 事件回调函数
 
-        -----
+    :return: 无
+    :rtype: None
+    """
+    for a in _get_event_args(func):
+        _unlisten_for(a[0], a[1], a[2], func, a[3])
 
-        :param Any ins: 当前类的实例
 
-        :return: 无
-        :rtype: None
-        """
-        for e in event._get_all_event_ins(ins):
-            e.unlisten()
+def _get_all_event_args(ins):
+    for name in dir(ins):
+        try:
+            attr = getattr(ins, name)
+        except AttributeError:
+            continue
+        args = _get_event_args(attr)
+        if args:
+            yield attr, args
+
+
+def listen_all_events(ins):
+    """
+    | 对实例中所有被 ``@event`` 装饰的方法执行事件监听。
+
+    -----
+
+    :param Any ins: 类实例（通常为self参数）
+
+    :return: 无
+    :rtype: None
+    """
+    for method, args in _get_all_event_args(ins):
+        for a in args:
+            _unlisten_for(a[0], a[1], a[2], method, a[3])
+            _listen_for(a[0], a[1], a[2], method, a[3])
+
+
+def unlisten_all_events(ins):
+    """
+    | 对实例中所有被 ``@event`` 装饰的方法执行事件反监听。
+
+    -----
+
+    :param Any ins: 类实例（通常为self参数）
+
+    :return: 无
+    :rtype: None
+    """
+    for method, args in _get_all_event_args(ins):
+        for a in args:
+            _unlisten_for(a[0], a[1], a[2], method, a[3])
 
 
 def lib_sys_event(name):
@@ -349,21 +366,24 @@ def __test__():
             pass
     assert_error(f, (), _error.EventSourceError)
 
-    def call(event_obj, args):
-        key = (
-            event_obj._ns,
-            event_obj._sys_name,
-            event_obj._event_name,
-            id(event_obj if event_obj._is_method else event_obj._func),
-            event_obj._priority,
-        )
-        cb = get_lib_system().listen_map[key]
-        ins = cb.__self__
-        if isinstance(ins, weakref.ReferenceType):
-            ins = ins() # NOQA
-        func = getattr(ins, cb.__name__) # 模拟引擎触发回调函数
+    def call(func, args):
+        if isinstance(func, MethodType):
+            cb = func
+        else:
+            listen_args = getattr(func, _LISTEN_ARGS_KEY)[0]
+            key = (
+                listen_args[0],
+                listen_args[1],
+                listen_args[2],
+                id(func),
+                listen_args[3],
+            )
+            cb = get_lib_system().listen_map[key]
+        # 模拟引擎触发回调函数
+        func = getattr(cb.__self__, cb.__name__)
         func(args)
 
+    lm = get_lib_system().listen_map.copy()
     a = {'arg': 1}
     @event(is_method=False)
     @event(ns="abc", sys_name="system", is_method=False)
@@ -374,55 +394,37 @@ def __test__():
     call(LoadClientAddonScriptsAfter, a)
     LoadClientAddonScriptsAfter(a)
     assert LoadClientAddonScriptsAfter.__name__ == "LoadClientAddonScriptsAfter"
-    assert (
-        LoadClientAddonScriptsAfter._ns,
-        LoadClientAddonScriptsAfter._sys_name,
-        LoadClientAddonScriptsAfter._event_name,
-    ) == ("Minecraft", "Engine", "LoadClientAddonScriptsAfter")
-    assert [i[:3] for i in LoadClientAddonScriptsAfter.listen_args] == [
-        ("mihoyo", "StarRail", "event"),
-        ("Minecraft", "Engine", "LoadClientAddonScriptsAfter"),
-        ("abc", "system", "LoadClientAddonScriptsAfter"),
-        ("Minecraft", "Engine", "LoadClientAddonScriptsAfter"),
-    ]
-    LoadClientAddonScriptsAfter.unlisten()
+    assert getattr(LoadClientAddonScriptsAfter, _LISTEN_ARGS_KEY) == [
+        ("mihoyo", "StarRail", "event", 6),
+        ("Minecraft", "Engine", "LoadClientAddonScriptsAfter", 0),
+        ("abc", "system", "LoadClientAddonScriptsAfter", 0),
+        ("Minecraft", "Engine", "LoadClientAddonScriptsAfter", 0),
+    ], getattr(LoadClientAddonScriptsAfter, _LISTEN_ARGS_KEY)
+    unlisten_event(LoadClientAddonScriptsAfter)
 
-    a = {'a': 1}
     class T(object):
         def __init__(self):
-            event.listen_all(self)
+            listen_all_events(self)
         @event("LoadClientAddonScriptsAfter")
         @event(ns="a", sys_name="b")
         def CustomEvent(self, args):
-            assert self is t
-            assert args is a
+            assert self is args['ins']
     t = T()
-    call(t.CustomEvent, a)
-    t.CustomEvent(a)
-    assert [i[:3] for i in t.CustomEvent.listen_args] == [
-        ("a", "b", "CustomEvent"),
-        ("Minecraft", "Engine", "LoadClientAddonScriptsAfter"),
+    a = {'ins': t}
+    t2 = T()
+    a2 = {'ins': t2}
+    assert getattr(t.CustomEvent, _LISTEN_ARGS_KEY) == [
+        ("a", "b", "CustomEvent", 0),
+        ("Minecraft", "Engine", "LoadClientAddonScriptsAfter", 0),
     ]
     assert t.CustomEvent.__name__ == "CustomEvent"
-    event.unlisten_all(t)
-
-    # class A(object):
-    #     pass
-    # a = A()
-    # @event("LoadClientAddonScriptsAfter")
-    # @event(ns="a", sys_name="b")
-    # def _CustomEvent(self, args):
-    #     assert self is a
-    #     assert args == {'a': 1}
-    # a.CustomEvent = _CustomEvent
-    # a.CustomEvent({'a': 1})
-    # for i in a.CustomEvent.listen_args:
-    #     print(i)
-    # assert a.CustomEvent.__name__ == "_CustomEvent"
-    # a.CustomEvent.unlisten()
-    # assert not a.CustomEvent.listen_args
-
-
+    call(t.CustomEvent, a)
+    t.CustomEvent(a)
+    call(t2.CustomEvent, a2)
+    t2.CustomEvent(a2)
+    unlisten_all_events(t)
+    unlisten_event(t2.CustomEvent)
+    assert get_lib_system().listen_map == lm
 
 
 

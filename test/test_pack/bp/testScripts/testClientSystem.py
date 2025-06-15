@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-09
+|   Date  : 2025-06-16
 |
 | ==============================================
 """
@@ -26,8 +26,8 @@ from nuoyanlib.client import (
 )
 
 
-clientEvent = event(namespace=MOD_NAME, system_name=CLIENT_SYSTEM_NAME)
-serverEvent = event(namespace=MOD_NAME, system_name=SERVER_SYSTEM_NAME)
+clientEvent = event(ns=MOD_NAME, sys_name=CLIENT_SYSTEM_NAME)
+serverEvent = event(ns=MOD_NAME, sys_name=SERVER_SYSTEM_NAME)
 
 
 class TemplateClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):

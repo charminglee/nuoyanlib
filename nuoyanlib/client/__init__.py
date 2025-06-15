@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-15
 |
 |   nuoyanlib客户端库。
 |
@@ -40,11 +40,13 @@ from .._core._client.comp import (
     LvComp,
 )
 from .._core._listener import (
-    listen_for,
-    unlisten_for,
     EventArgsProxy,
-    event,
     ClientEventProxy,
+    event,
+    listen_event,
+    unlisten_event,
+    listen_all_events,
+    unlisten_all_events,
 )
 from .._core._error import *
 from .._core._utils import (

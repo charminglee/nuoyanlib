@@ -227,7 +227,7 @@ class TimeEase(object):
     def __init__(self, start_val, end_val, total_tm, fps=0, hold_on_last_frame=False, ease_func=TimeEaseFunc.linear):
         """
         | 创建一个时间缓动对象，内置各种时间缓动函数，可用于实现UI动画、运镜等的平滑过渡效果。
-        | 时间缓动对象为一个迭代器，每次迭代或调用 ``next()`` 方法时，会返回一个新的缓动值。
+        | 时间缓动对象为一个迭代器，每次迭代或调用 ``.next()`` 方法时，会返回一个新的缓动值。
 
         -----
 

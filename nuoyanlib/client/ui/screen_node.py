@@ -124,7 +124,7 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def create_ny_control(self, path_or_control):
         """
-        | 创建 ``NyControl`` 通用控件实例，可替代 ``GetBaseUIControl()`` 的返回值使用。
+        | 创建 ``NyControl`` 通用控件实例，可替代 ``.GetBaseUIControl()`` 的返回值使用。
 
         -----
 
@@ -137,8 +137,8 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def create_ny_button(self, path_or_control, touch_event_params=None):
         """
-        | 创建 ``NyButton`` 按钮实例，可替代 ``asButton()`` 的返回值使用。
-        | 创建后无需调用 ``AddTouchEventParams()`` 或 ``AddTouchEventParams()`` 接口。
+        | 创建 ``NyButton`` 按钮实例，可替代 ``.asButton()`` 的返回值使用。
+        | 创建后无需调用 ``.AddTouchEventParams()`` 或 ``.AddTouchEventParams()`` 接口。
 
         -----
 
@@ -152,7 +152,7 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def create_ny_grid(self, path_or_control, is_stack_grid=False):
         """
-        | 创建 ``NyGrid`` 网格实例，可替代 ``asGrid()`` 的返回值使用。
+        | 创建 ``NyGrid`` 网格实例，可替代 ``.asGrid()`` 的返回值使用。
         | 对网格进行操作需要注意一些细节，详见开发指南-界面与交互- `UI说明文档 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/30-UI%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.html?key=grid&docindex=4&type=0>`_ 中对Grid控件的描述。
 
         -----
@@ -244,7 +244,7 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def save_all_pos_data(self):
         """
-        | 保存所有通过 ``set_movable()`` 或 ``set_movable_by_long_click()`` 设置了可拖动的控件的位置数据，下次进入游戏时自动恢复。
+        | 保存所有通过 ``.set_movable()`` 或 ``.set_movable_by_long_click()`` 设置了可拖动的控件的位置数据，下次进入游戏时自动恢复。
         | 为保证安全，超出屏幕边界的按钮不会被保存。
 
         -----

@@ -7,13 +7,12 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-10
+|   Date  : 2025-06-15
 |
 | ==============================================
 """
 
 
-from weakref import WeakValueDictionary
 from types import MethodType, InstanceType
 from typing import Union, Dict, Tuple, Callable, Any, Literal
 from mod.client import extraClientApi
@@ -22,7 +21,6 @@ from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 from ._client._lib_client import NuoyanLibClientSystem
 from ._server._lib_server import NuoyanLibServerSystem
-from ._listener import event
 
 
 def check_env(target: Literal["client", "server"]) -> None: ...
@@ -40,11 +38,10 @@ class NuoyanLibBaseSystem(object):
     cond_func: Dict[int, Tuple[Callable[[], bool], Callable[[bool], Any], int]]
     cond_state: Dict[int, bool]
     __tick: int
-    listen_map: WeakValueDictionary[Tuple[str, str, str, int, int], MethodType]
+    listen_map: Dict[Tuple[str, str, str, int, int], MethodType]
     def __init__(self: ..., *args, **kwargs) -> None: ...
     def Update(self) -> None: ...
     def Destroy(self) -> None: ...
-    def _get_self(self, method: Union[MethodType, event]) -> InstanceType: ...
     def native_listen(self, ns: str, sys_name: str, event_name: str, method: MethodType, priority: int = 0) -> None: ...
     def native_unlisten(self, ns: str, sys_name: str, event_name: str, method: MethodType, priority: int = 0) -> None: ...
     def listen_for(self, ns: str, sys_name: str, event_name: str, func: Callable, priority: int = 0) -> bool: ...

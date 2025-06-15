@@ -7,13 +7,12 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-10
+|   Date  : 2025-06-15
 |
 | ==============================================
 """
 
 
-from weakref import WeakValueDictionary
 from types import FunctionType, MethodType
 from . import _error
 
@@ -74,7 +73,7 @@ class NuoyanLibBaseSystem(object):
         self.cond_func = {}
         self.cond_state = {}
         self.__tick = 0
-        self.listen_map = WeakValueDictionary()
+        self.listen_map = {}
 
     def Update(self):
         self.__tick += 1
@@ -91,22 +90,13 @@ class NuoyanLibBaseSystem(object):
         self.UnListenAllEvents() # NOQA
         self.listen_map.clear()
 
-    def _get_self(self, method):
-        from ._listener import event
-        return method.__self__() if isinstance(method, event) else method.__self__
-
     def native_listen(self, ns, sys_name, event_name, method, priority=0):
-        ins = self._get_self(method)
-        self.ListenForEvent(ns, sys_name, event_name, ins, method, priority) # NOQA
+        self.ListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # NOQA
 
     def native_unlisten(self, ns, sys_name, event_name, method, priority=0):
-        ins = self._get_self(method)
-        self.UnListenForEvent(ns, sys_name, event_name, ins, method, priority) # NOQA
+        self.UnListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # NOQA
 
     def listen_for(self, ns, sys_name, event_name, func, priority=0):
-        key = (ns, sys_name, event_name, id(func), priority)
-        if key in self.listen_map:
-            return False
         if isinstance(func, FunctionType):
             def method(_, a=None):
                 func(a if a else {})
@@ -115,19 +105,20 @@ class NuoyanLibBaseSystem(object):
             method.__name__ = rand
             method = MethodType(method, self)
             setattr(self, rand, method)
+            key = (ns, sys_name, event_name, id(func), priority)
+            self.listen_map[key] = method
         else:
             method = func
-        self.listen_map[key] = method
         self.native_listen(ns, sys_name, event_name, method, priority)
-        return True
 
     def unlisten_for(self, ns, sys_name, event_name, func, priority=0):
-        key = (ns, sys_name, event_name, id(func), priority)
-        method = self.listen_map.pop(key, None)
+        if isinstance(func, FunctionType):
+            key = (ns, sys_name, event_name, id(func), priority)
+            method = self.listen_map.pop(key, None)
+        else:
+            method = func
         if method:
             self.native_unlisten(ns, sys_name, event_name, method, priority)
-            return True
-        return False
 
     def add_condition_to_func(self, cond, func, freq):
         cond_id = max(self.cond_func.iterkeys()) + 1 if self.cond_func else 0

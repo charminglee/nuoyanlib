@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-12
+|   Date  : 2025-06-13
 |
 | ==============================================
 """
@@ -15,7 +15,6 @@
 
 from weakref import proxy
 from types import GeneratorType
-from .combo_box import NyComboBox
 from ...._core import _error
 from ...._core._utils import args_type_check, cached_property
 from ....client.ui.ui_utils import ControlType, get_children_path_by_level, get_parent_path

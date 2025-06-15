@@ -84,7 +84,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         """
         | 注册并创建UI。
         | 如果UI已创建，则返回其实例。
-        | 使用该接口创建的UI，其UI类 ``__init__()`` 方法的 ``param`` 参数会自带一个名为 ``__cs__`` 的key，对应的值为创建UI的客户端的实例，可以方便地调用客户端的属性、方法和接口。
+        | 使用该接口创建的UI，其UI类 ``.__init__()`` 方法的 ``param`` 参数会自带一个名为 ``__cs__`` 的key，对应的值为创建UI的客户端的实例，可以方便地调用客户端的属性、方法和接口。
 
         -----
 
