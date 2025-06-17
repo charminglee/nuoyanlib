@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-06-16
 |
 | ==============================================
 """
@@ -21,6 +21,7 @@ from .._core._sys import get_comp_factory, get_api, LEVEL_ID
 
 
 __all__ = [
+    "clamp",
     "pos_block_facing",
     "to_polar_coordinate",
     "to_cartesian_coordinate",
@@ -44,6 +45,23 @@ __all__ = [
     "rot_diff",
     "ray_aabb_intersection",
 ]
+
+
+def clamp(x, min_value, max_value):
+    """
+    | 将数值限制在指定范围内。
+    | 小于 ``min_value`` 的值将被限制为 ``min_value`` ，大于 ``max_value`` 的值将被限制为 ``max_value`` 。
+
+    -----
+
+    :param float x: 数值
+    :param float min_value: 最小值
+    :param float max_value: 最大值
+
+    :return: 限制后的值
+    :rtype: float
+    """
+    return max(min_value, min(max_value, x))
 
 
 def pos_block_facing(pos, face=Facing.North, dist=1.0):

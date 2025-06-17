@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="ui" pattern="file[nuoyanlib]:nuoyanlib/client/ui//*&amp;&amp;!file[nuoyanlib]:nuoyanlib/client/ui/item_grid//*" />
+</component>
