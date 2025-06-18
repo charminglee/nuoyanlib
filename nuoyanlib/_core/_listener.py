@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-16
+|   Date  : 2025-06-17
 |
 | ==============================================
 """
@@ -62,43 +62,43 @@ def _unlisten_for(ns, sys_name, event_name, func, priority):
 
 class EventArgsProxy(object):
     def __init__(self, arg_dict, event_name):
-        self.arg_dict = arg_dict
-        self.event_name = event_name
+        self._arg_dict = arg_dict
+        self._event_name = event_name
 
     def __getattr__(self, key):
-        if key in self.arg_dict:
-            return self.arg_dict[key]
+        if key in self._arg_dict:
+            return self._arg_dict[key]
         # 代理dict方法
-        if hasattr(self.arg_dict, key):
-            return getattr(self.arg_dict, key)
-        raise _error.EventParameterError(self.event_name, key)
+        if hasattr(self._arg_dict, key):
+            return getattr(self._arg_dict, key)
+        raise _error.EventParameterError(self._event_name, key)
 
     def __setattr__(self, key, value):
         # 兼容可修改的事件参数
         object.__setattr__(self, key, value)
-        if key in self.arg_dict:
-            self.arg_dict[key] = value
+        if key in self._arg_dict:
+            self._arg_dict[key] = value
 
     def __repr__(self):
-        s = "<EventArgsProxy of '%s':" % self.event_name
-        for k, v in self.arg_dict.items():
+        s = "<EventArgsProxy of '%s':" % self._event_name
+        for k, v in self._arg_dict.items():
             s += "\n  .%s = %s" % (k, repr(v))
         s += "\n>"
         return s
 
-    __len__      = lambda self:    self.arg_dict.__len__()
-    __contains__ = lambda self, a: self.arg_dict.__contains__(a)
-    __getitem__  = lambda self, a: self.arg_dict.__getitem__(a)
-    __setitem__  = lambda self, a: self.arg_dict.__setitem__(a)
-    __cmp__      = lambda self, a: self.arg_dict.__cmp__(a)
-    __delitem__  = lambda self, a: self.arg_dict.__delitem__(a)
-    __eq__       = lambda self, a: self.arg_dict.__eq__(a)
-    __ge__       = lambda self, a: self.arg_dict.__ge__(a)
-    __gt__       = lambda self, a: self.arg_dict.__gt__(a)
-    __iter__     = lambda self:    self.arg_dict.__iter__()
-    __le__       = lambda self, a: self.arg_dict.__le__(a)
-    __lt__       = lambda self, a: self.arg_dict.__lt__(a)
-    __ne__       = lambda self, a: self.arg_dict.__ne__(a)
+    __len__      = lambda self:    self._arg_dict.__len__()
+    __contains__ = lambda self, a: self._arg_dict.__contains__(a)
+    __getitem__  = lambda self, a: self._arg_dict.__getitem__(a)
+    __setitem__  = lambda self, a: self._arg_dict.__setitem__(a)
+    __cmp__      = lambda self, a: self._arg_dict.__cmp__(a)
+    __delitem__  = lambda self, a: self._arg_dict.__delitem__(a)
+    __eq__       = lambda self, a: self._arg_dict.__eq__(a)
+    __ge__       = lambda self, a: self._arg_dict.__ge__(a)
+    __gt__       = lambda self, a: self._arg_dict.__gt__(a)
+    __iter__     = lambda self:    self._arg_dict.__iter__()
+    __le__       = lambda self, a: self._arg_dict.__le__(a)
+    __lt__       = lambda self, a: self._arg_dict.__lt__(a)
+    __ne__       = lambda self, a: self._arg_dict.__ne__(a)
 
 
 class _BaseEventProxy(object):

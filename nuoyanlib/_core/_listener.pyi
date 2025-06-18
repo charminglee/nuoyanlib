@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-16
+|   Date  : 2025-06-17
 |
 | ==============================================
 """
@@ -25,8 +25,8 @@ def _unlisten_for(ns: str, sys_name: str, event_name: str, func: Callable, prior
 
 
 class EventArgsProxy(dict):
-    arg_dict: ArgsDict
-    event_name: str
+    _arg_dict: ArgsDict
+    _event_name: str
     def __init__(self: ..., arg_dict: ArgsDict, event_name: str) -> None: ...
     def __getattr__(self, key: str) -> PyBasicTypes: ...
     def __setattr__(self, key: str, value: PyBasicTypes) -> None: ...
