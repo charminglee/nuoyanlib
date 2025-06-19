@@ -22,7 +22,7 @@
 from ._core import _logging
 
 
-__version__ = "0.9.3-beta"
+__version__ = "0.9.4-beta"
 __author_name__ = "Nuoyan"
 __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"

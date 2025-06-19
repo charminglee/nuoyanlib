@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-15
+|   Date  : 2025-06-19
 |
 |   nuoyanlib服务端库。
 |
@@ -15,17 +15,17 @@
 """
 
 
-from time import clock
-t = clock()
+from time import clock as _clock
+_t = _clock()
 
 
-from .._core._sys import check_env
-from .._core._server._lib_server import NuoyanLibServerSystem
+from .._core._sys import check_env as _check_env
+from .._core._server._lib_server import NuoyanLibServerSystem as _lib_sys
 
 
-check_env("server")
-NuoyanLibServerSystem.register()
-del check_env, NuoyanLibServerSystem
+_check_env("server")
+_lib_sys.register()
+del _check_env, _lib_sys
 
 
 from .._core._server.comp import (
@@ -69,7 +69,7 @@ from .structure import *
 from ..utils import *
 
 
-consume = (clock() - t) * 1000
-from .._core._logging import info
-info("nuoyanlib.server loaded in %.3fms" % consume)
-del clock, t, info, consume
+_consume = (_clock() - _t) * 1000
+from .._core._logging import info as _info
+_info("nuoyanlib.server loaded in %.3fms" % _consume)
+del _clock, _t, _info, _consume

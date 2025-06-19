@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-19
 |
 |   nuoyanlib UI库。
 |
@@ -26,6 +26,5 @@ from ..._core._client.comp import (
 )
 
 
-from .item_grid import *
 from .screen_node import *
 from .ui_utils import *
