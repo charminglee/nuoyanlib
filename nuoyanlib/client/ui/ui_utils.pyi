@@ -15,6 +15,7 @@
 
 from typing import List, Optional, Callable, Dict, Tuple, Union, Generator
 from typing_extensions import deprecated
+from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.ui.controls.labelUIControl import LabelUIControl
@@ -35,6 +36,18 @@ from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
 from ..._core._types._typing import UiPathOrControl, FTuple2, STuple
 from ...utils import Enum
+
+
+def create_ui(
+    namespace: str,
+    ui_key: str,
+    cls_path: str,
+    screen_def: str,
+    register: bool = True,
+    param: Optional[dict] = None,
+    push: bool = False,
+    client_system: Optional[ClientSystem] = None
+) -> Optional[ScreenNode]: ...
 
 
 class UiControlType(Enum[int]):
