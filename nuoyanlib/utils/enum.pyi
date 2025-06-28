@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-25
 |
 | ==============================================
 """
@@ -15,6 +15,7 @@
 
 from typing import Dict, List, Tuple, Any, Optional, Iterator, Union, overload, Type
 from _typeshed import Self
+from .._core._types._typing import STuple
 
 
 class EnumMeta(type):
@@ -52,6 +53,80 @@ class Enum(metaclass=EnumMeta):
     def name(self) -> str: ...
     @property
     def value(self) -> Any: ...
+
+
+class ButtonCallbackType(Enum[str]):
+    UP: str
+    DOWN: str
+    CANCEL: str
+    MOVE: str
+    MOVE_IN: str
+    MOVE_OUT: str
+    DOUBLE_CLICK: str
+    LONG_CLICK: str
+    HOVER_IN: str
+    HOVER_OUT: str
+    SCREEN_EXIT: str
+
+
+class UiControlType(Enum[int]):
+    all: int
+    button: int
+    custom: int
+    collection_panel: int
+    dropdown: int
+    edit_box: int
+    factory: int
+    grid: int
+    image: int
+    input_panel: int
+    label: int
+    panel: int
+    screen: int
+    scrollbar_box: int
+    scroll_track: int
+    scroll_view: int
+    selection_wheel: int
+    slider: int
+    slider_box: int
+    stack_panel: int
+    toggle: int
+    image_cycler: int
+    label_cycler: int
+    grid_page_indicator: int
+    combox: int
+    layout: int
+    stack_grid: int
+    joystick: int
+    rich_text: int
+    sixteen_nine_layout: int
+    mul_lines_edit: int
+    amin_process_bar: int
+    unknown: int
+
+
+class ControlType(Enum[str]):
+    base_control: str
+    button: str
+    image: str
+    label: str
+    panel: str
+    input_panel: str
+    stack_panel: str
+    edit_box: str
+    paper_doll: str
+    netease_paper_doll: str
+    item_renderer: str
+    gradient_renderer: str
+    scroll_view: str
+    grid: str
+    progress_bar: str
+    toggle: str
+    slider: str
+    selection_wheel: str
+    combo_box: str
+    mini_map: str
+    _not_special: STuple
 
 
 def search_data(data: Any, lst: list) -> bool: ...

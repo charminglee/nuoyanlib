@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-06-25
 |
 | ==============================================
 """
@@ -18,6 +18,8 @@ from mod.common.minecraftEnum import EntityType
 
 __all__ = [
     "Enum",
+    "ButtonCallbackType",
+    "ControlType",
     "search_data",
     "ITEM_LIST",
     "BLOCK_LIST",
@@ -92,7 +94,7 @@ class EnumMeta(type):
 
     def __iter__(cls):
         # 支持遍历
-        return iter(cls.__members__.values())
+        return iter(cls.__members__.items())
 
     def __getitem__(cls, item):
         # 支持Enum[type]/Enum['xxx']
@@ -157,6 +159,211 @@ class Enum(object):
     @property
     def value(self):
         return self.__value
+
+
+class ButtonCallbackType(Enum[str]):
+    """
+    按钮回调函数类型枚举。
+    """
+
+    UP = Enum.auto()
+    """
+    触控在按钮范围内抬起。
+    """
+
+    DOWN = Enum.auto()
+    """
+    按钮按下。
+    """
+
+    CANCEL = Enum.auto()
+    """
+    触控在按钮范围外抬起。
+    """
+
+    MOVE = Enum.auto()
+    """
+    按下后触控移动。
+    """
+
+    MOVE_IN = Enum.auto()
+    """
+    按下按钮后触控进入按钮。
+    """
+
+    MOVE_OUT = Enum.auto()
+    """
+    按下按钮后触控退出按钮。
+    """
+
+    DOUBLE_CLICK = Enum.auto()
+    """
+    双击按钮。
+    """
+
+    LONG_CLICK = Enum.auto()
+    """
+    长按按钮。
+    """
+
+    HOVER_IN = Enum.auto()
+    """
+    鼠标进入按钮。
+    """
+
+    HOVER_OUT = Enum.auto()
+    """
+    鼠标退出按钮。
+    """
+
+    SCREEN_EXIT = Enum.auto()
+    """
+    按钮所在画布退出，且鼠标仍未抬起时触发。
+    """
+
+
+class UiControlType(Enum[int]):
+    all = -1
+    button = 0
+    custom = 1
+    collection_panel = 2
+    dropdown = 3
+    edit_box = 4
+    factory = 5
+    grid = 6
+    image = 7
+    input_panel = 8
+    label = 9
+    panel = 10
+    screen = 11
+    scrollbar_box = 12
+    scroll_track = 13
+    scroll_view = 14
+    selection_wheel = 15
+    slider = 16
+    slider_box = 17
+    stack_panel = 18
+    toggle = 19
+    image_cycler = 20
+    label_cycler = 21
+    grid_page_indicator = 22
+    combox = 23
+    layout = 24
+    stack_grid = 25
+    joystick = 26
+    rich_text = 27
+    sixteen_nine_layout = 28
+    mul_lines_edit = 29
+    amin_process_bar = 30
+    unknown = 31
+
+
+class ControlType(Enum[str]):
+    """
+    | UI控件类型枚举。
+    """
+
+    base_control = "BaseControl"
+    """
+    | 通用控件。
+    """
+
+    button = "Button"
+    """
+    | 按钮。
+    """
+
+    image = "Image"
+    """
+    | 图片。
+    """
+
+    label = "Label"
+    """
+    | 文本。
+    """
+
+    panel = "Panel"
+    """
+    | 面板。
+    """
+
+    input_panel = "InputPanel"
+    """
+    | 输入面板。
+    """
+
+    stack_panel = "StackPanel"
+    """
+    | 栈面板。
+    """
+
+    edit_box = "TextEditBox"
+    """
+    | 文本编辑框。
+    """
+
+    paper_doll = "PaperDoll"
+    """
+    | 纸娃娃。
+    """
+
+    netease_paper_doll = "NeteasePaperDoll"
+    """
+    | 网易纸娃娃。
+    """
+
+    item_renderer = "ItemRenderer"
+    """
+    | 物品渲染器。
+    """
+
+    gradient_renderer = "GradientRenderer"
+    """
+    | 渐变渲染器。
+    """
+
+    scroll_view = "ScrollView"
+    """
+    | 滚动视图。
+    """
+
+    grid = "Grid"
+    """
+    | 网格。
+    """
+
+    progress_bar = "ProgressBar"
+    """
+    | 进度条。
+    """
+
+    toggle = "SwitchToggle"
+    """
+    | 开关。
+    """
+
+    slider = "Slider"
+    """
+    | 滑动条。
+    """
+
+    selection_wheel = "SelectionWheel"
+    """
+    | 轮盘。
+    """
+
+    combo_box = "NeteaseComboBox"
+    """
+    | 下拉框。
+    """
+
+    mini_map = "MiniMap"
+    """
+    | 小地图。
+    """
+
+    _not_special = (base_control, panel, paper_doll, gradient_renderer)
 
 
 def __test__():

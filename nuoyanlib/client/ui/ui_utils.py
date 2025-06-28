@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-19
+|   Date  : 2025-06-20
 |
 | ==============================================
 """
@@ -19,16 +19,14 @@ import mod.client.extraClientApi as client_api
 from mod.client.system.clientSystem import ClientSystem
 from ..._core._client.comp import ScreenNode, LvComp
 from ..._core._client import _lib_client
-from ...utils import Enum
 from ..setting import read_setting, save_setting
+from ...utils.enum import ControlType
 
 
 __all__ = [
     "create_ui",
-    "ControlType",
     "to_path",
     "to_control",
-    "ButtonCallback",
     "get_parent_path",
     "get_children_path_by_level",
     "get_children_control_by_level",
@@ -66,150 +64,6 @@ def create_ui(namespace, ui_key, cls_path, screen_def, register=True, param=None
     else:
         node = client_api.CreateUI(namespace, ui_key, param)
     return node
-
-
-class UiControlType(Enum[int]):
-    all = -1
-    button = 0
-    custom = 1
-    collection_panel = 2
-    dropdown = 3
-    edit_box = 4
-    factory = 5
-    grid = 6
-    image = 7
-    input_panel = 8
-    label = 9
-    panel = 10
-    screen = 11
-    scrollbar_box = 12
-    scroll_track = 13
-    scroll_view = 14
-    selection_wheel = 15
-    slider = 16
-    slider_box = 17
-    stack_panel = 18
-    toggle = 19
-    image_cycler = 20
-    label_cycler = 21
-    grid_page_indicator = 22
-    combox = 23
-    layout = 24
-    stack_grid = 25
-    joystick = 26
-    rich_text = 27
-    sixteen_nine_layout = 28
-    mul_lines_edit = 29
-    amin_process_bar = 30
-    unknown = 31
-
-
-class ControlType(Enum[str]):
-    """
-    | UI控件类型枚举。
-    """
-
-    base_control = "BaseControl"
-    """
-    | 通用控件。
-    """
-
-    button = "Button"
-    """
-    | 按钮。
-    """
-
-    image = "Image"
-    """
-    | 图片。
-    """
-
-    label = "Label"
-    """
-    | 文本。
-    """
-
-    panel = "Panel"
-    """
-    | 面板。
-    """
-
-    input_panel = "InputPanel"
-    """
-    | 输入面板。
-    """
-
-    stack_panel = "StackPanel"
-    """
-    | 栈面板。
-    """
-
-    edit_box = "TextEditBox"
-    """
-    | 文本编辑框。
-    """
-
-    paper_doll = "PaperDoll"
-    """
-    | 纸娃娃。
-    """
-
-    netease_paper_doll = "NeteasePaperDoll"
-    """
-    | 网易纸娃娃。
-    """
-
-    item_renderer = "ItemRenderer"
-    """
-    | 物品渲染器。
-    """
-
-    gradient_renderer = "GradientRenderer"
-    """
-    | 渐变渲染器。
-    """
-
-    scroll_view = "ScrollView"
-    """
-    | 滚动视图。
-    """
-
-    grid = "Grid"
-    """
-    | 网格。
-    """
-
-    progress_bar = "ProgressBar"
-    """
-    | 进度条。
-    """
-
-    toggle = "SwitchToggle"
-    """
-    | 开关。
-    """
-
-    slider = "Slider"
-    """
-    | 滑动条。
-    """
-
-    selection_wheel = "SelectionWheel"
-    """
-    | 轮盘。
-    """
-
-    combo_box = "NeteaseComboBox"
-    """
-    | 下拉框。
-    """
-
-    mini_map = "MiniMap"
-    """
-    | 小地图。
-    """
-
-    _not_special = (base_control, panel, paper_doll, gradient_renderer)
 
 
 def to_path(control):
@@ -256,67 +110,6 @@ def get_ui_pos_data(key):
             data_lst = [(str(path), tuple(pos)) for path, pos in data_lst]
             data[key] = data_lst
     return data or {}
-
-
-class ButtonCallback(Enum[int]):
-    """
-    按钮回调函数类型枚举。
-    """
-
-    touch_up = Enum.auto()
-    """
-    触控在按钮范围内抬起。
-    """
-
-    touch_down = Enum.auto()
-    """
-    按钮按下。
-    """
-
-    touch_cancel = Enum.auto()
-    """
-    触控在按钮范围外抬起。
-    """
-
-    touch_move = Enum.auto()
-    """
-    按下后触控移动。
-    """
-
-    touch_move_in = Enum.auto()
-    """
-    按下按钮后触控进入按钮。
-    """
-
-    touch_move_out = Enum.auto()
-    """
-    按下按钮后触控退出按钮。
-    """
-
-    double_click = Enum.auto()
-    """
-    双击按钮。
-    """
-
-    long_click = Enum.auto()
-    """
-    长按按钮。
-    """
-
-    hover_in = Enum.auto()
-    """
-    鼠标进入按钮。
-    """
-
-    hover_out = Enum.auto()
-    """
-    鼠标退出按钮。
-    """
-
-    screen_exit = Enum.auto()
-    """
-    按钮所在画布退出，且鼠标仍未抬起时触发。
-    """
 
 
 def is_ui_out_of_screen(control, screen_node=None):

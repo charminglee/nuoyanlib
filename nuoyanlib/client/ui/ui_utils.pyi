@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-10
+|   Date  : 2025-06-20
 |
 | ==============================================
 """
@@ -34,8 +34,8 @@ from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUICon
 from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
 from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
-from ..._core._types._typing import UiPathOrControl, FTuple2, STuple
-from ...utils import Enum
+from ..._core._types._typing import UiPathOrControl, FTuple2
+from ...utils.enum import ControlType
 
 
 def create_ui(
@@ -48,68 +48,6 @@ def create_ui(
     push: bool = False,
     client_system: Optional[ClientSystem] = None
 ) -> Optional[ScreenNode]: ...
-
-
-class UiControlType(Enum[int]):
-    all: int
-    button: int
-    custom: int
-    collection_panel: int
-    dropdown: int
-    edit_box: int
-    factory: int
-    grid: int
-    image: int
-    input_panel: int
-    label: int
-    panel: int
-    screen: int
-    scrollbar_box: int
-    scroll_track: int
-    scroll_view: int
-    selection_wheel: int
-    slider: int
-    slider_box: int
-    stack_panel: int
-    toggle: int
-    image_cycler: int
-    label_cycler: int
-    grid_page_indicator: int
-    combox: int
-    layout: int
-    stack_grid: int
-    joystick: int
-    rich_text: int
-    sixteen_nine_layout: int
-    mul_lines_edit: int
-    amin_process_bar: int
-    unknown: int
-
-
-class ControlType(Enum[str]):
-    base_control: str
-    button: str
-    image: str
-    label: str
-    panel: str
-    input_panel: str
-    stack_panel: str
-    edit_box: str
-    paper_doll: str
-    netease_paper_doll: str
-    item_renderer: str
-    gradient_renderer: str
-    scroll_view: str
-    grid: str
-    progress_bar: str
-    toggle: str
-    slider: str
-    selection_wheel: str
-    combo_box: str
-    mini_map: str
-    _not_special: STuple
-
-
 def to_path(control: UiPathOrControl) -> str: ...
 def to_control(
     screen_node: ScreenNode,
@@ -137,22 +75,6 @@ def to_control(
 ]: ...
 def save_ui_pos_data(key: str, data: Dict[str, List[Tuple[str, FTuple2]]]) -> bool: ...
 def get_ui_pos_data(key: str) -> Dict[str, List[Tuple[str, FTuple2]]]: ...
-
-
-class ButtonCallback(Enum[int]):
-    touch_up: int
-    touch_down: int
-    touch_cancel: int
-    touch_move: int
-    touch_move_in: int
-    touch_move_out: int
-    double_click: int
-    long_click: int
-    hover_in: int
-    hover_out: int
-    screen_exit: int
-
-
 def get_children_path_by_level(
     control: UiPathOrControl,
     screen_node: ScreenNode,
