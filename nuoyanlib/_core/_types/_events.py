@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-27
 |
 | ==============================================
 """
@@ -15,6 +15,7 @@
 
 from .._error import EventNotFoundError
 from .._utils import assert_error
+from ..._core import _const
 
 
 __all__ = [
@@ -299,14 +300,14 @@ ALL_SERVER_ENGINE_EVENTS = {
     "UrgeShipEvent",
     "lobbyGoodBuySucServerEvent",
 }
-ALL_CLIENT_LIB_EVENTS = set()
+ALL_CLIENT_LIB_EVENTS = {}
 ALL_SERVER_LIB_EVENTS = {
-    "ItemGridChangedServerEvent",
-    "UiInitFinished",
+    "ItemGridChangedServerEvent": _const.LIB_CLIENT_NAME,
+    "UiInitFinished": _const.LIB_CLIENT_NAME,
 }
 
 
-class _Event:
+class _EventEnum:
     def __init__(self, pool, is_client):
         self.pool = pool
         self.is_client = is_client
@@ -317,8 +318,8 @@ class _Event:
         return item
 
 
-ClientEventEnum = _Event(ALL_CLIENT_ENGINE_EVENTS.union(ALL_CLIENT_LIB_EVENTS), True)
-ServerEventEnum = _Event(ALL_SERVER_ENGINE_EVENTS.union(ALL_SERVER_LIB_EVENTS), False)
+ClientEventEnum = _EventEnum(ALL_CLIENT_ENGINE_EVENTS.union(ALL_CLIENT_LIB_EVENTS), True)
+ServerEventEnum = _EventEnum(ALL_SERVER_ENGINE_EVENTS.union(ALL_SERVER_LIB_EVENTS), False)
 
 
 def __test__():
