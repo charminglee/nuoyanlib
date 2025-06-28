@@ -172,16 +172,19 @@ class NyControl(object):
 
     # region conversion ===================================================================================
 
-    def to_button(self):
+    def to_button(self, touch_event_params=None):
         """
-        [只读属性]
-
         | 转换为 ``NyButton`` 实例。
 
+        -----
+
+        :param dict[str,Any]|None touch_event_params: 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+
+        :return: NyButton实例
         :rtype: NyButton
         """
         from . import NyButton
-        return NyButton.create(self.ui_node, self.path)
+        return NyButton.create(self.ui_node, self.path, touch_event_params=touch_event_params)
 
     def to_image(self):
         """

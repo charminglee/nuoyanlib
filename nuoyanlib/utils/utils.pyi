@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-23
 |
 | ==============================================
 """
 
 
-from typing import Sequence, Any, List, Callable
+from typing import Sequence, Any, List, Callable, Tuple, Optional
 
 
 def call_interval(interval: float) -> Callable: ...
@@ -25,4 +25,9 @@ def check_string2(string: str, *check: str) -> bool: ...
 def turn_dict_value_to_tuple(orig_dict: dict) -> None: ...
 def turn_list_to_tuple(lst: list) -> tuple: ...
 def is_method_overridden(subclass: Any, father: Any, method: str) -> bool: ...
-def translate_time(sec: int) -> str: ...
+def translate_time(
+    sec: int,
+    separator: str = "",
+    unit: Optional[Tuple[str, str, str]] = ("h", "m", "s"),
+    zfill: bool = False,
+) -> str: ...

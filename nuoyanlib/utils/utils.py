@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-07
+|   Date  : 2025-06-23
 |
 | ==============================================
 """
@@ -215,28 +215,43 @@ def is_method_overridden(subclass, father, method):
     return subclass_method != father_method
 
 
-def translate_time(sec):
+def translate_time(sec, separator="", unit=("h", "m", "s"), zfill=False):
     """
-    | 将秒数转换成h/m/s的格式。
-    
+    | 将秒数转换成h/m/s的格式字符串。
+
     -----
 
     :param int sec: 秒数
+    :param str separator: 分隔符，默认为空字符串
+    :param tuple[str,str,str] unit: 时间单位，三元组，对应时分秒，传入None则表示不带单位；默认为("h", "m", "s")
+    :param bool zfill: 是否在数字前补零，默认为False
 
     :return: h/m/s格式字符串
     :rtype: str
     """
-    if sec <= 60:
-        return "%ds" % sec
-    elif 60 < sec < 3600:
-        m = sec // 60
-        s = sec - m * 60
-        return "%dm%ds" % (m, s)
-    else:
-        h = sec // 3600
-        m = (sec - h * 3600) // 60
-        s = sec - h * 3600 - m * 60
-        return "%dh%dm%ds" % (h, m, s)
+    sec = int(sec)
+    if unit is None:
+        unit = ("", "", "")
+    h, rem = divmod(sec, 3600)
+    m, s = divmod(rem, 60)
+    parts = []
+    hs = ms = ss = ""
+    if h:
+        hs = str(h) + unit[0]
+        parts.append(hs)
+    if m or zfill:
+        ms = str(m)
+        if zfill and hs:
+            ms = ms.zfill(2)
+        ms += unit[1]
+        parts.append(ms)
+    if s or zfill or (not hs and not ms):
+        ss = str(s)
+        if zfill and (hs or ms):
+            ss = ss.zfill(2)
+        ss += unit[2]
+        parts.append(ss)
+    return separator.join(parts)
 
 
 def __test__():
@@ -268,13 +283,28 @@ def __test__():
     assert is_method_overridden(B, A, "printIn")
     assert not is_method_overridden(C, A, "printIn")
 
-    assert translate_time(4000) == "1h6m40s"
+    assert translate_time(3660, ":", ("H", "M", "S"), True) == "1H:01M:00S"
+    assert translate_time(3660, unit=("H", "M", "S"), zfill=True) == "1H01M00S"
+    assert translate_time(3660, unit=("H", "M", "S"), zfill=False) == "1H1M"
+    assert translate_time(3661, ":", None, True) == "1:01:01"
+    assert translate_time(3660, ":", None, True) == "1:01:00"
+    assert translate_time(3600, ":", None, True) == "1:00:00"
+    assert translate_time(61, ":", None, True) == "1:01"
+    assert translate_time(60, ":", None, True) == "1:00"
+    assert translate_time(1, ":", None, True) == "0:01"
+    assert translate_time(0, ":", None, True) == "0:00"
+    assert translate_time(3700) == "1h1m40s"
+    assert translate_time(3660) == "1h1m"
+    assert translate_time(3601) == "1h1s"
+    assert translate_time(61) == "1m1s"
+    assert translate_time(3600) == "1h"
+    assert translate_time(60) == "1m"
+    assert translate_time(1) == "1s"
+    assert translate_time(0) == "0s"
 
 
-
-
-
-
+if __name__ == "__main__":
+    __test__()
 
 
 
