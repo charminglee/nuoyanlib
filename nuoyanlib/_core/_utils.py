@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-09
+|   Date  : 2025-06-20
 |
 | ==============================================
 """
@@ -20,6 +20,8 @@ from .. import config
 
 
 __all__ = [
+    "try_exec",
+    "iter_obj_attrs",
     "cached_property",
     "CachedObject",
     "hook_method",
@@ -27,6 +29,24 @@ __all__ = [
     "cached_func",
     "singleton",
 ]
+
+
+def try_exec(func, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except:
+        import traceback
+        traceback.print_exc()
+        return None
+
+
+def iter_obj_attrs(obj):
+    for name in dir(obj):
+        try:
+            attr = getattr(obj, name)
+        except AttributeError:
+            continue
+        yield attr
 
 
 def get_func(cls, module, func):
@@ -100,14 +120,15 @@ class CachedObject(object):
         return args
 
 
-def hook_method(ins, org_method_name, my_method):
-    org_method = getattr(ins, org_method_name)
+def hook_method(org_method, my_method):
+    ins = org_method.__self__
+    org_name = org_method.__name__
     @wraps(org_method.__func__)
     def wrapper(self, *args, **kwargs):
-        my_method(*args, **kwargs)
+        try_exec(my_method, *args, **kwargs)
         org_method(*args, **kwargs)
     wrapper = MethodType(wrapper, ins)
-    setattr(ins, org_method_name, wrapper)
+    setattr(ins, org_name, wrapper)
 
 
 if config.ENABLED_TYPE_CHECKING:
