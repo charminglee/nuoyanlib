@@ -13,7 +13,7 @@
 """
 
 
-from ..ui_utils import ControlType
+from ....utils.enum import ControlType
 from .control import NyControl
 
 

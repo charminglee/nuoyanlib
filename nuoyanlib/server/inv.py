@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-06-19
 |
 | ==============================================
 """
@@ -88,7 +88,7 @@ def update_item_grids(player_id, keys):
     return lib_sys.on_update_item_grids({'__id__': player_id, 'keys': keys})
 
 
-def clear_items(player_id, item_pos_type, pos):
+def clear_items(player_id, item_pos_type, pos=0):
     """
     | 清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
 
@@ -96,7 +96,7 @@ def clear_items(player_id, item_pos_type, pos):
 
     :param str player_id: 玩家的实体ID
     :param int item_pos_type: 槽位类型，ItemPosType枚举
-    :param int pos: 槽位编号
+    :param int pos: 槽位索引，默认为0
 
     :return: 该位置被清除前的物品信息字典
     :rtype: dict

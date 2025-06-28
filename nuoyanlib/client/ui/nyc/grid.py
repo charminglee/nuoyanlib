@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-16
+|   Date  : 2025-06-22
 |
 | ==============================================
 """
@@ -15,8 +15,8 @@
 
 from ...._core._utils import args_type_check, get_func
 from ...._core._client.comp import ScreenNode
-from ...._core._listener import event, listen_event, unlisten_event
-from ..ui_utils import ControlType
+from ...._core.listener import event, listen_event, unlisten_event
+from ....utils.enum import ControlType
 from .control import NyControl
 from ...._core._types._events import ClientEventEnum as Events
 

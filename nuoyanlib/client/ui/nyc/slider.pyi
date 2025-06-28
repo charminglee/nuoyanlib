@@ -7,15 +7,17 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-12
+|   Date  : 2025-06-22
 |
 | ==============================================
 """
 
 
+from typing import Optional
 from mod.client.ui.controls.sliderUIControl import SliderUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
+from ...._core._utils import args_type_check
 
 
 class NySlider(NyControl):
@@ -28,4 +30,7 @@ class NySlider(NyControl):
         screen_node_ex: ScreenNodeExtension,
         slider_control: SliderUIControl,
     ) -> None: ...
+    @args_type_check(str, is_method=True)
+    def __div__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
 

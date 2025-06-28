@@ -7,14 +7,15 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-27
 |
 | ==============================================
 """
 
 
-from ..ui_utils import ControlType
+from ....utils.enum import ControlType
 from .control import NyControl
+from ...._core import _error
 
 
 __all__ = [
@@ -46,6 +47,28 @@ class NyProgressBar(NyControl):
     # endregion
 
     # region property proxy ===================================================================================
+
+    @property
+    def value(self):
+        """
+        [只写属性]
+
+        | 进度条进度，范围为[0, 1]。
+
+        :rtype: None
+        """
+        raise _error.GetPropertyError("value")
+
+    @value.setter
+    def value(self, val):
+        """
+        [只写属性]
+
+        | 进度条进度，范围为[0, 1]。
+
+        :type val: float
+        """
+        self.base_control.SetValue(val)
 
     # endregion
 

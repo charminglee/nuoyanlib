@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-22
 |
 | ==============================================
 """
@@ -19,7 +19,7 @@ from mod.client.ui.controls.baseUIControl import BaseUIControl
 from .control import NyControl
 from ...._core._types._typing import ITuple2, ArgsDict
 from ...._core._utils import args_type_check
-from ...._core._listener import event
+from ...._core.listener import event
 from ..screen_node import ScreenNodeExtension
 from ...._core._types._events import ClientEventEnum as Events
 
@@ -57,6 +57,9 @@ class NyGrid(NyControl):
         *,
         is_stack_grid: bool = False,
     ) -> None: ...
+    @args_type_check(str, is_method=True)
+    def __div__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
     @args_type_check((int, slice, tuple), is_method=True)
     def __getitem__(self, item: _Item) -> _ElemGroup: ...
     @event(Events.GridComponentSizeChangedClientEvent)

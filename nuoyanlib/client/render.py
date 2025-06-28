@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-06-20
 |
 | ==============================================
 """
@@ -67,7 +67,7 @@ def add_player_render_resources(player_id, rebuild, *res_tuple):
 
     :param str player_id: 玩家实体ID
     :param bool rebuild: 是否重建玩家的数据渲染器，传入True时会自动调用RebuildPlayerRender接口
-    :param tuple[str,str] res_tuple: 变长参数，渲染资源元组，第一个元素为资源键名（短名称），第二个参数为具体资源名称（模型ID、贴图路径、动画名称等）
+    :param tuple[str,str] res_tuple: [变长参数] 渲染资源元组，第一个元素为资源键名（短名称），第二个参数为具体资源名称（模型ID、贴图路径、动画名称等）
 
     :return: 返回添加结果（是否成功），结果为一个元组，元素类型为bool，与res_tuple一一对应
     :rtype: tuple[bool]
@@ -113,7 +113,7 @@ def add_entity_render_resources(entity_id, rebuild, *res_tuple):
 
     :param str entity_id: 实体ID
     :param bool rebuild: 是否重建实体的数据渲染器，传入True时会自动调用RebuildActorRender接口
-    :param tuple[str,str] res_tuple: 变长参数，渲染资源元组，第一个元素为资源键名（短名称），第二个参数为具体资源名称（模型ID、贴图路径、动画名称等）
+    :param tuple[str,str] res_tuple: [变长参数] 渲染资源元组，第一个元素为资源键名（短名称），第二个参数为具体资源名称（模型ID、贴图路径、动画名称等）
 
     :return: 返回添加结果（是否成功），结果为一个元组，元素类型为bool，与res_tuple一一对应
     :rtype: tuple[bool]

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-06-20
 |
 | ==============================================
 """
@@ -31,8 +31,8 @@ class McTimer(object):
     :param str ttype: 定时器类型，可选值为"d"和"r"，分别表示普通定时器和重复定时器
     :param float sec: 延迟秒数
     :param function func: 延迟函数
-    :param Any args: 变长参数，调用func时传入
-    :param Any kwargs: 字典变长参数，调用func时传入
+    :param Any args: [变长参数] 调用func时传入
+    :param Any kwargs: [字典变长参数] 调用func时传入
     """
 
     def __init__(self, ttype, sec, func, *args, **kwargs):
