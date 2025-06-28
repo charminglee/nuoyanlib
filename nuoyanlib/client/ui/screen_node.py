@@ -7,48 +7,30 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-23
 |
 | ==============================================
 """
 
 
+from itertools import product
+from fnmatch import fnmatchcase
 from types import GeneratorType
 from ..._core._client.comp import CustomUIScreenProxy, ScreenNode
 from ..._core import _error
-from ..._core._listener import ClientEventProxy
-from ..._core._utils import hook_method
+from ..._core.listener import ClientEventProxy
+from ..._core._utils import hook_method, iter_obj_attrs
 from .ui_utils import (
     to_control, get_ui_pos_data, save_ui_pos_data,
-    get_children_path_by_level, get_parent_path,
-    UiControlType, to_path,
+    get_children_path_by_level, get_parent_path, to_path,
 )
+from ...utils.enum import ButtonCallbackType
 from .nyc import *
 
 
 __all__ = [
     "ScreenNodeExtension",
 ]
-
-
-_UI_CONTROL_TYPE_2_NY_CLS = {
-    UiControlType.button: NyButton,
-    UiControlType.image: NyImage,
-    UiControlType.label: NyLabel,
-    UiControlType.input_panel: NyInputPanel,
-    UiControlType.stack_panel: NyStackPanel,
-    UiControlType.edit_box: NyEditBox,
-    UiControlType.scroll_view: NyScrollView,
-    UiControlType.grid: NyGrid,
-    UiControlType.toggle: NyToggle,
-    UiControlType.slider: NySlider,
-    UiControlType.selection_wheel: NySelectionWheel,
-
-    # UiControlType.panel: NyComboBox,
-    # UiControlType.panel: NyProgressBar,
-    # UiControlType.custom: NyMiniMap,
-    # UiControlType.custom: NyItemRenderer,
-}
 
 
 class ScreenNodeExtension(ClientEventProxy):
@@ -84,23 +66,20 @@ class ScreenNodeExtension(ClientEventProxy):
         self._ui_pos_data_key = ""
         self._screen_node = None
         self.cs = None
+        self.root_panel = None
         if isinstance(self, CustomUIScreenProxy):
             # 兼容UI代理
             self._screen_node = args[1]
-            hook_method(self, "OnCreate", self.__create__) # NOQA
-            hook_method(self, "OnDestroy", self.__destroy__) # NOQA
+            hook_method(self.OnCreate, self.__create__) # NOQA
+            hook_method(self.OnDestroy, self.__destroy__) # NOQA
         elif isinstance(self, ScreenNode):
             self._screen_node = self
-            if len(args) == 3 and args[2]:
+            if len(args) == 3 and isinstance(args[2], dict):
                 self.cs = args[2].get('__cs__')
-            hook_method(self, "Create", self.__create__) # NOQA
-            hook_method(self, "Destroy", self.__destroy__) # NOQA
+            hook_method(self.Create, self.__create__) # NOQA
+            hook_method(self.Destroy, self.__destroy__) # NOQA
         else:
             raise _error.ScreenNodeNotFoundError
-        self.root_panel = (
-            self._screen_node.GetBaseUIControl(ScreenNodeExtension.ROOT_PANEL_PATH) # NOQA
-            or self._screen_node.GetBaseUIControl("") # NOQA
-        )
 
     # def __setattr__(self, key, value):
     #     # 网易ScreenNode中某些属性被覆盖会导致功能异常且难以排查（如name），因此添加一个限制
@@ -111,6 +90,13 @@ class ScreenNodeExtension(ClientEventProxy):
     def __create__(self):
         self._ui_pos_data_key = "nyl_ui_pos_data_%s_%s" % (self._screen_node.namespace, self._screen_node.name) # NOQA
         self._recover_ui_pos()
+        root_panel = (
+            self._screen_node.GetBaseUIControl(ScreenNodeExtension.ROOT_PANEL_PATH)
+            or self._screen_node.GetBaseUIControl("")
+        )
+        if root_panel:
+            self.root_panel = self.create_ny_control(root_panel)
+        self._process_button_callback()
 
     def __destroy__(self):
         for nyc in self._nyc_cache.values():
@@ -121,6 +107,33 @@ class ScreenNodeExtension(ClientEventProxy):
         self.root_panel = None
 
     # region API ===================================================================================
+
+    @staticmethod
+    def button_callback(btn_path, *callback_types, **kwargs):
+        """
+        [装饰器]
+
+        | 设置按钮回调。
+        | UI类需继承 ``ScreenNodeExtension`` 。
+
+        -----
+
+        :param str btn_path: 按钮路径，支持通配符"*"（目前仅支持最后一级控件名称使用通配符）
+        :param str callback_types: [变长参数] 按钮回调类型，支持设置多种回调，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
+        :param dict|None touch_event_param: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+
+        :return: 返回原函数
+        :rtype: function
+        """
+        if not callback_types:
+            callback_types = (ButtonCallbackType.UP,)
+        touch_event_param = kwargs.get('touch_event_params', None)
+        def decorator(func):
+            func._nyl_callback_types = callback_types
+            func._nyl_btn_path = btn_path
+            func._nyl_touch_event_param = touch_event_param
+            return func
+        return decorator
 
     def create_ny_control(self, path_or_control):
         """
@@ -164,6 +177,32 @@ class ScreenNodeExtension(ClientEventProxy):
         :rtype: NyGrid|None
         """
         return self._create_nyc(path_or_control, NyGrid, is_stack_grid=is_stack_grid)
+
+    def create_ny_label(self, path_or_control):
+        """
+        | 创建 ``NyLabel`` 文本实例，可替代 ``.asLabel()`` 的返回值使用。
+
+        -----
+
+        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+
+        :return: NyLabel文本实例，创建失败返回None
+        :rtype: NyLabel|None
+        """
+        return self._create_nyc(path_or_control, NyLabel)
+
+    def create_ny_progress_bar(self, path_or_control):
+        """
+        | 创建 ``NyProgressBar`` 进度条实例，可替代 ``.asProgressBar()`` 的返回值使用。
+
+        -----
+
+        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+
+        :return: NyProgressBar进度条实例，创建失败返回None
+        :rtype: NyProgressBar|None
+        """
+        return self._create_nyc(path_or_control, NyProgressBar)
 
     def get_children_path_by_level(self, path_or_control, level=1):
         """
@@ -259,24 +298,65 @@ class ScreenNodeExtension(ClientEventProxy):
                 nyc.save_pos_data()
         return True
 
-    CreateNyControl = create_ny_control
-    CreateNyButton = create_ny_button
-    CreateNyGrid = create_ny_grid
-    GetChildrenPathByLevel = get_children_path_by_level
+    CreateNyControl             = create_ny_control
+    CreateNyButton              = create_ny_button
+    CreateNyGrid                = create_ny_grid
+    CreateNyLabel               = create_ny_label
+    CreateNyProgressBar         = create_ny_progress_bar
+    GetChildrenPathByLevel      = get_children_path_by_level
     GetChildrenNyControlByLevel = get_children_ny_control_by_level
-    GetParentPath = get_parent_path
-    GetParentNyControl = get_parent_ny_control
-    ClearAllPosData = clear_all_pos_data
-    SaveAllPosData = save_all_pos_data
+    GetParentPath               = get_parent_path
+    GetParentNyControl          = get_parent_ny_control
+    ClearAllPosData             = clear_all_pos_data
+    SaveAllPosData              = save_all_pos_data
 
     # endregion
 
     # region Internal ===================================================================================
 
+    def _process_button_callback(self):
+        for attr in iter_obj_attrs(self):
+            if not hasattr(attr, "_nyl_callback_types"):
+                continue
+            path = attr._nyl_btn_path
+            path_lst = self._expend_path(path)
+            for p in path_lst:
+                nyb = self._create_nyc(p, NyButton, touch_event_param=attr._nyl_touch_event_param)
+                for t in attr._nyl_callback_types:
+                    nyb.set_callback(t, attr)
+
+    def _expend_path(self, path):
+        if "*" not in path:
+            yield path
+        else:
+            # 通配符匹配
+            if not path.startswith("/"):
+                path = "/" + path
+            path_split = path.split("/")  # type: list[str | list[str]]
+            parent_path = ""
+            for i, ps in enumerate(path_split):
+                if "*" in ps:
+                    # 获取当前层级所有控件的名称并匹配
+                    children_name = self._screen_node.GetChildrenName(parent_path)
+                    if not children_name:
+                        raise _error.PathMatchError(path)
+                    path_split[i] = [cn for cn in children_name if fnmatchcase(cn, ps)]
+                    if not path_split[i]:
+                        raise _error.PathMatchError(path)
+                else:
+                    path_split[i] = [ps]
+                if i != 0:
+                    parent_path += "/" + ps
+            # 生成所有匹配的路径
+            for p in product(*path_split):
+                yield "/".join(p)
+
     def _create_nyc(self, path_or_control, typ, **kwargs):
         path = to_path(path_or_control)
         if path in self._nyc_cache:
-            return self._nyc_cache[path]
+            nyc = self._nyc_cache[path]
+            if type(nyc) is typ or type(nyc) is not NyControl:
+                return nyc
         control = to_control(self._screen_node, path_or_control, typ._CONTROL_TYPE)
         if control:
             nyc = typ(self, control, **kwargs)

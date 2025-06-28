@@ -7,25 +7,22 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-23
 |
 | ==============================================
 """
 
 
-from typing import Optional, overload, Any, TypeVar, Dict, Type, Generator
+from typing import Optional, overload, Any, TypeVar, Dict, Type, Generator, Callable
+from types import FunctionType
 from mod.client.ui.screenNode import ScreenNode
-from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.client.system.clientSystem import ClientSystem
 from ..._core._types._typing import UiPathOrControl, STuple, NyControlTypes
-from ..._core._listener import ClientEventProxy
+from ..._core.listener import ClientEventProxy
 from .nyc import *
 
 
 _T = TypeVar("_T")
-
-
-_UI_CONTROL_TYPE_2_NY_CLS: Dict[int, NyControlTypes]
 
 
 class ScreenNodeExtension(ClientEventProxy):
@@ -41,9 +38,9 @@ class ScreenNodeExtension(ClientEventProxy):
     """
     | 创建UI的客户端实例。
     """
-    root_panel: BaseUIControl
+    root_panel: NyControl
     """
-    | 当前界面根节点的 ``BaseUIControl`` 实例。
+    | 当前界面根节点的 ``NyControl`` 实例。
     """
     @overload
     def __init__(self: ..., namespace: str, name: str, param: Optional[dict] = None, /) -> None: ...
@@ -51,9 +48,17 @@ class ScreenNodeExtension(ClientEventProxy):
     def __init__(self: ..., screen_name: str, screen_node: ScreenNode, /) -> None: ...
     def __create__(self): ...
     def __destroy__(self): ...
+    @staticmethod
+    def button_callback(
+        btn_path: str,
+        *callback_types: str,
+        touch_event_param: Optional[dict] = None,
+    ) -> Callable[[FunctionType], FunctionType]: ...
     def create_ny_control(self, path_or_control: UiPathOrControl) -> Optional[NyControl]: ...
     def create_ny_button(self, path_or_control: UiPathOrControl, touch_event_params: Optional[dict] = None) -> Optional[NyButton]: ...
     def create_ny_grid(self, path_or_control: UiPathOrControl, is_stack_grid: bool = False) -> Optional[NyGrid]: ...
+    def create_ny_label(self, path_or_control: str) -> Optional[NyLabel]: ...
+    def create_ny_progress_bar(self, path_or_control: str) -> Optional[NyProgressBar]: ...
     def get_children_path_by_level(
         self,
         path_or_control: UiPathOrControl,
@@ -71,12 +76,16 @@ class ScreenNodeExtension(ClientEventProxy):
     CreateNyControl = create_ny_control
     CreateNyButton = create_ny_button
     CreateNyGrid = create_ny_grid
+    CreateNyLabel = create_ny_label
+    CreateNyProgressBar = create_ny_progress_bar
     GetChildrenPathByLevel = get_children_path_by_level
     GetChildrenNyControlByLevel = get_children_ny_control_by_level
     GetParentPath = get_parent_path
     GetParentNyControl = get_parent_ny_control
     ClearAllPosData = clear_all_pos_data
     SaveAllPosData = save_all_pos_data
+    def _process_button_callback(self) -> None: ...
+    def _expend_path(self, path: str) -> Generator[str, None, None]: ...
     def _create_nyc(self, path_or_control: UiPathOrControl, typ: Type[_T], **kwargs: Any) -> _T: ...
     def _destroy_nyc(self, nyc: NyControl) -> None: ...
     def _recover_ui_pos(self) -> None: ...
