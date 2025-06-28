@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-06-25
 |
 | ==============================================
 """
@@ -15,7 +15,7 @@
 
 from uuid import uuid4
 from traceback import format_exc
-from .._core._sys import get_api, is_client, get_comp_factory, LEVEL_ID
+from .._core._sys import get_api, is_client, get_comp_factory, LEVEL_ID, get_lib_system
 
 
 __all__ = [
@@ -119,7 +119,7 @@ def call_local(target_sys, method, cb_or_uuid, delay_ret, args, kwargs):
             call_callback(cb_or_uuid, delay_ret, True, ret, player_id=player_id)
 
 
-def _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs):
+def call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs):
     uuid = str(uuid4())
     notify_args = {
         'ns': ns,
@@ -131,16 +131,14 @@ def _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs):
         'kwargs': kwargs,
     }
     _callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
+    lib_sys = get_lib_system()
     if is_client():
-        from .._core._client._lib_client import instance
-        lib_sys = instance()
         if player_id is None:
             lib_sys.NotifyToServer("_NuoyanLibCall", notify_args)
         else:
             lib_sys.notify_to_multi_clients(player_id, "_NuoyanLibCall", notify_args)
     else:
-        from .._core._server._lib_server import instance
-        instance().NotifyToMultiClients(player_id, "_NuoyanLibCall", notify_args)
+        lib_sys.NotifyToMultiClients(player_id, "_NuoyanLibCall", notify_args)
 
 
 def call(
@@ -187,7 +185,7 @@ def call(
     if is_client():
         # c to s
         if not target_sys and not player_id:
-            _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
+            call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
         # c to c
         else:
             local_plr = api.GetLocalPlayerId()
@@ -195,7 +193,7 @@ def call(
                 call_local(target_sys, method, callback, delay_ret, args, kwargs)
                 player_id.remove(local_plr)
             if player_id:
-                _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
+                call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
     else:
         # s to s
         if target_sys:
@@ -204,7 +202,7 @@ def call(
             call_callback(callback, delay_ret, False)
         # s to c
         else:
-            _notify(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
+            call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
 
 
 
