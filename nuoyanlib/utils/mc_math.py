@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-16
+|   Date  : 2025-06-29
 |
 | ==============================================
 """
@@ -21,6 +21,7 @@ from .._core._sys import get_comp_factory, get_api, LEVEL_ID
 
 
 __all__ = [
+    "pos_distance_square",
     "clamp",
     "pos_block_facing",
     "to_polar_coordinate",
@@ -45,6 +46,21 @@ __all__ = [
     "rot_diff",
     "ray_aabb_intersection",
 ]
+
+
+def pos_distance_square(pos1, pos2):
+    """
+    | 计算两个坐标间距离的平方，相比于直接计算距离速度更快。
+
+    -----
+
+    :param tuple[float] pos1: 坐标1
+    :param tuple[float] pos2: 坐标2
+
+    :return: 距离的平方
+    :rtype: float
+    """
+    return sum((a - b) ** 2 for a, b in zip(pos1, pos2))
 
 
 def clamp(x, min_value, max_value):
