@@ -7,13 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-22
 |
 | ==============================================
 """
 
 
 __all__ = [
+    "PathMatchError",
     "NotInClientError",
     "NotInServerError",
     "GetPropertyError",
@@ -23,6 +24,14 @@ __all__ = [
     "EventSourceError",
     "EventNotFoundError",
 ]
+
+
+class PathMatchError(RuntimeError):
+    def __init__(self, pattern):
+        self.pattern = pattern
+
+    def __str__(self):
+        return "control path '%s' not matched" % self.pattern
 
 
 class NotInClientError(ImportError):
@@ -75,7 +84,7 @@ class EventNotFoundError(AttributeError):
         self.is_client = is_client
 
     def __str__(self):
-        return "%s has no event '%s'" % ("client" if self.is_client else "server", self.name)
+        return "%s event '%s' doesn't exist" % ("client" if self.is_client else "server", self.name)
 
 
 if __name__ == "__main__":

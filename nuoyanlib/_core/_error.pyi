@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-06-20
 |
 | ==============================================
 """
@@ -16,6 +16,9 @@
 from typing import Tuple
 
 
+class PathMatchError(RuntimeError):
+    pattern: str
+    def __init__(self: ..., pattern: str) -> None: ...
 class NotInClientError(ImportError): ...
 class NotInServerError(ImportError): ...
 class GetPropertyError(AttributeError):
