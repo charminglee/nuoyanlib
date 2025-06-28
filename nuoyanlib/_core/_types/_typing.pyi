@@ -132,3 +132,14 @@ NyControlTypes = Union[
     NyStackPanel,
     NyToggle,
 ]
+TextFontType = Literal[
+    "rune",
+    "unicode",
+    "smooth",
+    "default",
+]
+TextAlignmentType = Literal[
+    "left",
+    "right",
+    "center",
+]

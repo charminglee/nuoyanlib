@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-09
+|   Date  : 2025-06-24
 |
 | ==============================================
 """
@@ -16,7 +16,7 @@
 import mod.client.extraClientApi as client_api
 from .comp import ClientSystem, CF, PLAYER_ID
 from .. import _const, _logging
-from .._listener import ClientEventProxy
+from ..listener import ClientEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
 
@@ -32,11 +32,6 @@ def instance():
 
 @singleton
 class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
-    @staticmethod
-    def register():
-        if not client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME):
-            client_api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
-
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
         ln = _const.LIB_NAME
@@ -50,9 +45,14 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         self.native_listen(ln, lsn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
         _logging.info("NuoyanLibClientSystem inited, ver: %s" % _const.__version__)
 
+    @staticmethod
+    def register():
+        if not client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME):
+            client_api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
+
     # General ==========================================================================================================
 
-    def UiInitFinished(self, event):
+    def UiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
 
     def broadcast_to_all_client(self, event_name, event_data, ns="", sys_name=""):

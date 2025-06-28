@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-09
+|   Date  : 2025-06-24
 |
 | ==============================================
 """
@@ -16,7 +16,7 @@
 import mod.server.extraServerApi as server_api
 from .comp import ServerSystem
 from .. import _const, _logging
-from .._listener import ServerEventProxy
+from ..listener import ServerEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
 
@@ -32,11 +32,6 @@ def instance():
 
 @singleton
 class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem):
-    @staticmethod
-    def register():
-        if not server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME):
-            server_api.RegisterSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME, _const.LIB_SERVER_PATH)
-
     def __init__(self, namespace, system_name):
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
         self.query_cache = {}
@@ -51,6 +46,11 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         self.native_listen(ln, lcn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
         _logging.info("NuoyanLibServerSystem inited, ver: %s" % _const.__version__)
 
+    @staticmethod
+    def register():
+        if not server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME):
+            server_api.RegisterSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME, _const.LIB_SERVER_PATH)
+
     # General ==========================================================================================================
 
     def _ButtonCallbackTrigger(self, args):
@@ -61,9 +61,9 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         if func:
             func(func_args)
 
-    def UiInitFinished(self, event):
+    def UiInitFinished(self, args):
         if self.query_cache:
-            self.NotifyToClient(event.__id__, "_SetQueryCache", self.query_cache)
+            self.NotifyToClient(args.__id__, "_SetQueryCache", self.query_cache)
 
     # BroadcastToAllClient =============================================================================================
 

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-07
+|   Date  : 2025-06-22
 |
 | ==============================================
 """
@@ -17,7 +17,7 @@ from typing import List, Optional, Any
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from .._types._typing import ArgsDict
-from .._listener import ClientEventProxy
+from ..listener import ClientEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
 
