@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-22
 |
 | ==============================================
 """
 
 
 from typing import Dict, List, Tuple
-from .._listener import EventArgsProxy
+from ..listener import EventArgsProxy
 
 
 class EventArgs0(EventArgsProxy):

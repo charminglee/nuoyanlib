@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-15
+|   Date  : 2025-06-22
 |
 | ==============================================
 """
 
 
-from types import MethodType, InstanceType
-from typing import Union, Dict, Tuple, Callable, Any, Literal
+from types import MethodType
+from typing import Union, Dict, Tuple, Callable, Any, Literal, List
 from mod.client import extraClientApi
 from mod.server import extraServerApi
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
@@ -35,16 +35,28 @@ LEVEL_ID: str
 
 
 class NuoyanLibBaseSystem(object):
+    __tick: int
     cond_func: Dict[int, Tuple[Callable[[], bool], Callable[[bool], Any], int]]
     cond_state: Dict[int, bool]
-    __tick: int
-    listen_map: Dict[Tuple[str, str, str, int, int], MethodType]
+    event_pool: Dict[str, List[Callable[[dict], Any]]]
     def __init__(self: ..., *args, **kwargs) -> None: ...
     def Update(self) -> None: ...
     def Destroy(self) -> None: ...
-    def native_listen(self, ns: str, sys_name: str, event_name: str, method: MethodType, priority: int = 0) -> None: ...
-    def native_unlisten(self, ns: str, sys_name: str, event_name: str, method: MethodType, priority: int = 0) -> None: ...
-    def listen_for(self, ns: str, sys_name: str, event_name: str, func: Callable, priority: int = 0) -> bool: ...
-    def unlisten_for(self, ns: str, sys_name: str, event_name: str, func: Callable, priority: int = 0) -> bool: ...
+    def native_listen(
+        self,
+        ns: str,
+        sys_name: str,
+        event_name: str,
+        method: MethodType,
+        priority: int = 0
+    ) -> None: ...
+    def native_unlisten(
+        self,
+        ns: str,
+        sys_name: str,
+        event_name: str,
+        method: MethodType,
+        priority: int = 0
+    ) -> None: ...
     def add_condition_to_func(self, cond: Callable[[], bool], func: Callable[[bool], Any], freq: int) -> int: ...
     def rm_condition_to_func(self, cond_id: int) -> bool: ...
