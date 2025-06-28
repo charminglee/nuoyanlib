@@ -7,17 +7,17 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-13
+|   Date  : 2025-06-26
 |
 | ==============================================
 """
 
 
-from weakref import proxy
 from types import GeneratorType
 from ...._core import _error
 from ...._core._utils import args_type_check, cached_property
-from ....client.ui.ui_utils import ControlType, get_children_path_by_level, get_parent_path
+from ....client.ui.ui_utils import get_children_path_by_level, get_parent_path
+from ....utils.enum import ControlType
 
 
 __all__ = [
@@ -45,8 +45,8 @@ class NyControl(object):
                 "the UI class where '%s' is located must inherit 'ScreenNodeExtension'"
                 % self.__class__.__name__
             )
-        self._screen_node = proxy(screen_node_ex._screen_node)
-        self.ui_node = proxy(screen_node_ex)
+        self._screen_node = screen_node_ex._screen_node
+        self.ui_node = screen_node_ex
         self.base_control = control
 
     def __getattr__(self, name):
@@ -188,10 +188,11 @@ class NyControl(object):
 
     def to_image(self):
         """
-        [只读属性]
-
         | 转换为 ``NyImage`` 实例。
 
+        -----
+
+        :return: NyImage实例
         :rtype: NyImage
         """
         from . import NyImage
@@ -199,10 +200,11 @@ class NyControl(object):
 
     def to_label(self):
         """
-        [只读属性]
-
         | 转换为 ``NyLabel`` 实例。
 
+        -----
+
+        :return: NyLabel实例
         :rtype: NyLabel
         """
         from . import NyLabel
@@ -210,10 +212,11 @@ class NyControl(object):
 
     def to_input_panel(self):
         """
-        [只读属性]
-
         | 转换为 ``NyInputPanel`` 实例。
 
+        -----
+
+        :return: NyInputPanel实例
         :rtype: NyInputPanel
         """
         from . import NyInputPanel
@@ -221,10 +224,11 @@ class NyControl(object):
 
     def to_stack_panel(self):
         """
-        [只读属性]
-
         | 转换为 ``NyStackPanel`` 实例。
 
+        -----
+
+        :return: NyStackPanel实例
         :rtype: NyStackPanel
         """
         from . import NyStackPanel
@@ -232,10 +236,11 @@ class NyControl(object):
 
     def to_edit_box(self):
         """
-        [只读属性]
-
         | 转换为 ``NyEditBox`` 实例。
 
+        -----
+
+        :return: NyEditBox实例
         :rtype: NyEditBox
         """
         from . import NyEditBox
@@ -243,10 +248,11 @@ class NyControl(object):
 
     def to_netease_paper_doll(self):
         """
-        [只读属性]
-
         | 转换为 ``NyPaperDoll`` 实例。
 
+        -----
+
+        :return: NyPaperDoll实例
         :rtype: NyPaperDoll
         """
         from . import NyPaperDoll
@@ -254,10 +260,11 @@ class NyControl(object):
 
     def to_item_renderer(self):
         """
-        [只读属性]
-
         | 转换为 ``NyItemRenderer`` 实例。
 
+        -----
+
+        :return: NyItemRenderer实例
         :rtype: NyItemRenderer
         """
         from . import NyItemRenderer
@@ -265,32 +272,37 @@ class NyControl(object):
 
     def to_scroll_view(self):
         """
-        [只读属性]
-
         | 转换为 ``NyScrollView`` 实例。
 
+        -----
+
+        :return: NyScrollView实例
         :rtype: NyScrollView
         """
         from . import NyScrollView
         return NyScrollView.create(self.ui_node, self.path)
 
-    def to_grid(self):
+    def to_grid(self, is_stack_grid=False):
         """
-        [只读属性]
-
         | 转换为 ``NyGrid`` 实例。
 
+        -----
+
+        :param bool is_stack_grid: 是否是StackGrid，默认为False
+
+        :return: NyGrid实例
         :rtype: NyGrid
         """
         from . import NyGrid
-        return NyGrid.create(self.ui_node, self.path)
+        return NyGrid.create(self.ui_node, self.path, is_stack_grid=is_stack_grid)
 
     def to_progress_bar(self):
         """
-        [只读属性]
-
         | 转换为 ``NyProgressBar`` 实例。
 
+        -----
+
+        :return: NyProgressBar实例
         :rtype: NyProgressBar
         """
         from . import NyProgressBar
@@ -298,10 +310,11 @@ class NyControl(object):
 
     def to_toggle(self):
         """
-        [只读属性]
-
         | 转换为 ``NyToggle`` 实例。
 
+        -----
+
+        :return: NyToggle实例
         :rtype: NyToggle
         """
         from . import NyToggle
@@ -309,10 +322,11 @@ class NyControl(object):
 
     def to_slider(self):
         """
-        [只读属性]
-
         | 转换为 ``NySlider`` 实例。
 
+        -----
+
+        :return: NySlider实例
         :rtype: NySlider
         """
         from . import NySlider
@@ -320,10 +334,11 @@ class NyControl(object):
 
     def to_selection_wheel(self):
         """
-        [只读属性]
-
         | 转换为 ``NySelectionWheel`` 实例。
 
+        -----
+
+        :return: NySelectionWheel实例
         :rtype: NySelectionWheel
         """
         from . import NySelectionWheel
@@ -331,10 +346,11 @@ class NyControl(object):
 
     def to_combo_box(self):
         """
-        [只读属性]
-
         | 转换为 ``NyComboBox`` 实例。
 
+        -----
+
+        :return: NyComboBox实例
         :rtype: NyComboBox
         """
         from . import NyComboBox
@@ -342,10 +358,11 @@ class NyControl(object):
 
     def to_mini_map(self):
         """
-        [只读属性]
-
         | 转换为 ``NyMiniMap`` 实例。
 
+        -----
+
+        :return: NyMiniMap实例
         :rtype: NyMiniMap
         """
         from . import NyMiniMap
@@ -375,7 +392,7 @@ class NyControl(object):
 
         :type val: tuple[float,float]
         """
-        self.base_control.SetPosition(val)
+        self.base_control.SetPosition(tuple(val))
 
     @property
     def anchor_from(self):
@@ -441,7 +458,7 @@ class NyControl(object):
 
         :type val: tuple[float,float]
         """
-        self.base_control.SetClipOffset(val)
+        self.base_control.SetClipOffset(tuple(val))
 
     @property
     def clip_children(self):
@@ -463,7 +480,7 @@ class NyControl(object):
 
         :type val: bool
         """
-        self.base_control.SetClipsChildren(val)
+        self.base_control.SetClipsChildren(bool(val))
 
     @property
     def full_position_x(self):
@@ -573,7 +590,7 @@ class NyControl(object):
 
         :type val: tuple[float,float]
         """
-        self.base_control.SetGlobalPosition(val) # NOQA
+        self.base_control.SetGlobalPosition(tuple(val)) # NOQA
 
     @property
     def max_size(self):
@@ -595,7 +612,7 @@ class NyControl(object):
 
         :type val: tuple[float,float]
         """
-        self.base_control.SetMaxSize(val)
+        self.base_control.SetMaxSize(tuple(val))
 
     @property
     def min_size(self):
@@ -617,7 +634,7 @@ class NyControl(object):
 
         :type val: tuple[float,float]
         """
-        self.base_control.SetMinSize(val)
+        self.base_control.SetMinSize(tuple(val))
 
     @property
     def size(self):
@@ -639,7 +656,7 @@ class NyControl(object):
 
         :type val: tuple[float,float]
         """
-        self.base_control.SetSize(val, True)
+        self.base_control.SetSize(tuple(val), True)
 
     @property
     def visible(self):
@@ -661,7 +678,7 @@ class NyControl(object):
 
         :type val: bool
         """
-        self.base_control.SetVisible(val)
+        self.base_control.SetVisible(bool(val))
 
     @property
     def alpha(self):
@@ -669,6 +686,8 @@ class NyControl(object):
         [只写属性]
 
         | 控件不透明度。
+
+        :rtype: None
         """
         raise _error.GetPropertyError("alpha")
 
@@ -703,7 +722,7 @@ class NyControl(object):
 
         :type val: int
         """
-        self.base_control.SetLayer(val)
+        self.base_control.SetLayer(int(val))
 
     @property
     def touch_enable(self):
@@ -711,6 +730,8 @@ class NyControl(object):
         [只写属性]
 
         | 控件是否可点击交互。
+
+        :rtype: None
         """
         raise _error.GetPropertyError("touch_enable")
 
@@ -723,7 +744,7 @@ class NyControl(object):
 
         :type val: bool
         """
-        self.base_control.SetTouchEnable(val)
+        self.base_control.SetTouchEnable(bool(val))
 
     # endregion
 
