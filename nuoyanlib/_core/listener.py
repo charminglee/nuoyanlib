@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-27
+|   Date  : 2025-06-29
 |
 | ==============================================
 """
@@ -332,29 +332,29 @@ class EventArgsProxy(object):
         return s
 
     get          = lambda self, *a: self._arg_dict.get(*a)
-    keys         = lambda self    : self._arg_dict.keys()
-    values       = lambda self    : self._arg_dict.values()
-    items        = lambda self    : self._arg_dict.items()
-    has_key      = lambda self, a : self._arg_dict.has_key(a)
-    copy         = lambda self    : self._arg_dict.copy()
-    iterkeys     = lambda self    : self._arg_dict.iterkeys()
-    itervalues   = lambda self    : self._arg_dict.itervalues()
-    iteritems    = lambda self    : self._arg_dict.iteritems()
-    viewkeys     = lambda self    : self._arg_dict.viewkeys()
-    viewvalues   = lambda self    : self._arg_dict.viewvalues()
-    viewitems    = lambda self    : self._arg_dict.viewitems()
-    __len__      = lambda self    : self._arg_dict.__len__()
-    __contains__ = lambda self, a : self._arg_dict.__contains__(a)
-    __getitem__  = lambda self, a : self._arg_dict.__getitem__(a)
-    __setitem__  = lambda self, a : self._arg_dict.__setitem__(a)
-    __cmp__      = lambda self, a : self._arg_dict.__cmp__(a)
-    __eq__       = lambda self, a : self._arg_dict.__eq__(a)
-    __ge__       = lambda self, a : self._arg_dict.__ge__(a)
-    __gt__       = lambda self, a : self._arg_dict.__gt__(a)
-    __iter__     = lambda self    : self._arg_dict.__iter__()
-    __le__       = lambda self, a : self._arg_dict.__le__(a)
-    __lt__       = lambda self, a : self._arg_dict.__lt__(a)
-    __ne__       = lambda self, a : self._arg_dict.__ne__(a)
+    keys         = lambda self, *a: self._arg_dict.keys(*a)
+    values       = lambda self, *a: self._arg_dict.values(*a)
+    items        = lambda self, *a: self._arg_dict.items(*a)
+    has_key      = lambda self, *a: self._arg_dict.has_key(a*a)
+    copy         = lambda self, *a: self._arg_dict.copy(*a)
+    iterkeys     = lambda self, *a: self._arg_dict.iterkeys(*a)
+    itervalues   = lambda self, *a: self._arg_dict.itervalues(*a)
+    iteritems    = lambda self, *a: self._arg_dict.iteritems(*a)
+    viewkeys     = lambda self, *a: self._arg_dict.viewkeys(*a)
+    viewvalues   = lambda self, *a: self._arg_dict.viewvalues(*a)
+    viewitems    = lambda self, *a: self._arg_dict.viewitems(*a)
+    __len__      = lambda self, *a: self._arg_dict.__len__(*a)
+    __contains__ = lambda self, *a: self._arg_dict.__contains__(*a)
+    __getitem__  = lambda self, *a: self._arg_dict.__getitem__(*a)
+    __setitem__  = lambda self, *a: self._arg_dict.__setitem__(*a)
+    __cmp__      = lambda self, *a: self._arg_dict.__cmp__(*a)
+    __eq__       = lambda self, *a: self._arg_dict.__eq__(*a)
+    __ge__       = lambda self, *a: self._arg_dict.__ge__(*a)
+    __gt__       = lambda self, *a: self._arg_dict.__gt__(*a)
+    __iter__     = lambda self, *a: self._arg_dict.__iter__(*a)
+    __le__       = lambda self, *a: self._arg_dict.__le__(*a)
+    __lt__       = lambda self, *a: self._arg_dict.__lt__(*a)
+    __ne__       = lambda self, *a: self._arg_dict.__ne__(*a)
 
 
 class _BaseEventProxy(object):
