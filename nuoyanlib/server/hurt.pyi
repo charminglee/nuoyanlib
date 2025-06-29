@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-06-29
 |
 | ==============================================
 """
@@ -32,8 +32,31 @@ class EntityFilter:
     def has_health(eid: str) -> bool: ...
 
 
-def explode_hurt(
-    radius: float,
+def hurt(
+    entity_id: str,
+    damage: float,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker: Optional[str] = None,
+    child_id: Optional[str] = None,
+    knocked: bool = True,
+    force: bool = False,
+) -> bool: ...
+def hurt_mobs(
+    entities: List[str],
+    damage: float,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
+    knocked: bool = True,
+    force: bool = False,
+    hurt_attacker: bool = False,
+    hurt_child: bool = False,
+    ent_filter: Optional[Callable[[str], bool]] = None,
+    on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
+    on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
+) -> List[str]: ...
+def explode_damage(
+    r: float,
     pos: FTuple3,
     source_id: str,
     dim: int,
@@ -43,83 +66,70 @@ def explode_hurt(
     mob_loot: bool = True,
     hurt_source: bool = False,
 ) -> None: ...
-def line_damage(
-    radius: float,
-    start_pos: FTuple3,
-    end_pos: FTuple3,
+def cylinder_damage(
+    damage: float,
+    r: float,
+    pos1: FTuple3,
+    pos2: FTuple3,
     dim: int,
-    damage: float,
-    cause: str = ActorDamageCause.EntityAttack,
-    attacker_id: Optional[str] = None,
-    child_id: Optional[str] = None,
-    knocked: bool = True,
-    filter_ids: Optional[List[str]] = None,
-    filter_types: Optional[List[int]] = None,
-    filter_type_str: Optional[List[str]] = None,
-    before_hurt_callback: Optional[Callable[[str, str, str], Optional[str]]] = None,
-    after_hurt_callback: Optional[Callable[[str, str, str], Optional[str]]] = None,
-    force: bool = False,
-) -> List[str]: ...
-def hurt_mobs(
-    entity_id_list: List[str],
-    damage: float,
     cause: str = ActorDamageCause.EntityAttack,
     attacker_id: Optional[str] = None,
     child_id: Optional[str] = None,
     knocked: bool = True,
     force: bool = False,
-) -> None: ...
-def aoe_damage(
-    radius: float,
-    pos: FTuple3,
-    dim: int,
-    damage: float,
-    cause: str = ActorDamageCause.EntityAttack,
-    attacker_id: Optional[str] = None,
-    child_id: Optional[str] = None,
-    knocked: bool = True,
-    filter_ids: Optional[List[str]] = None,
-    filter_types: Optional[List[int]] = None,
-    before_hurt_callback: Optional[Callable[[str, str, str], Optional[str]]] = None,
-    after_hurt_callback: Optional[Callable[[str, str, str], Optional[str]]] = None,
-    force: bool = False,
-) -> List[str]: ...
-def sector_aoe_damage(
-    sector_radius: float,
-    sector_angle: float,
-    damage: float,
-    cause: str = ActorDamageCause.EntityAttack,
-    attacker_id: Optional[str] = None,
-    child_id: Optional[str] = None,
-    knocked: bool = True,
-    filter_ids: Optional[List[str]] = None,
-    filter_types: Optional[List[int]] = None,
-    force: bool = False,
-) -> List[str]: ...
-def rectangle_aoe_damage(
-    min_vertex: FTuple3,
-    max_vertex: FTuple3,
-    dim: int,
-    damage: float,
-    cause: str = ActorDamageCause.EntityAttack,
-    attacker_id: Optional[str] = None,
-    child_id: Optional[str] = None,
-    knocked: bool = True,
     hurt_attacker: bool = False,
     hurt_child: bool = False,
     ent_filter: Optional[Callable[[str], bool]] = None,
-    force: bool = False,
+    on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
+    on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
 ) -> List[str]: ...
-def hurt_by_set_health(entity_id: str, damage: int) -> None: ...
-def hurt(
-    entity_id: str,
+def ball_damage(
     damage: float,
+    r: float,
+    pos: FTuple3,
+    dim: int,
     cause: str = ActorDamageCause.EntityAttack,
-    attacker: Optional[str] = None,
+    attacker_id: Optional[str] = None,
     child_id: Optional[str] = None,
     knocked: bool = True,
     force: bool = False,
-) -> None: ...
+    hurt_attacker: bool = False,
+    hurt_child: bool = False,
+    ent_filter: Optional[Callable[[str], bool]] = None,
+    on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
+    on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
+) -> List[str]: ...
+def sector_damage(
+    damage: float,
+    r: float,
+    angle: float,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
+    knocked: bool = True,
+    force: bool = False,
+    hurt_attacker: bool = False,
+    hurt_child: bool = False,
+    ent_filter: Optional[Callable[[str], bool]] = None,
+    on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
+    on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
+) -> List[str]: ...
+def rectangle_damage(
+    damage: float,
+    min_vertex: FTuple3,
+    max_vertex: FTuple3,
+    dim: int,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
+    knocked: bool = True,
+    force: bool = False,
+    hurt_attacker: bool = False,
+    hurt_child: bool = False,
+    ent_filter: Optional[Callable[[str], bool]] = None,
+    on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
+    on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
+) -> List[str]: ...
 def percent_damage(
     entity_id: str,
     percent: float,
