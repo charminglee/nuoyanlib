@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-20
+|   Date  : 2025-07-04
 |
 | ==============================================
 """
@@ -16,11 +16,14 @@
 from typing import Tuple
 
 
+class NuoyanLibServerSystemRegisterError(RuntimeError):
+    pass
+class NuoyanLibClientSystemRegisterError(RuntimeError):
+    pass
 class PathMatchError(RuntimeError):
     pattern: str
     def __init__(self: ..., pattern: str) -> None: ...
-class NotInClientError(ImportError): ...
-class NotInServerError(ImportError): ...
+class AcrossImportError(ImportError): ...
 class GetPropertyError(AttributeError):
     name: str
     def __init__(self: ..., name: str) -> None: ...

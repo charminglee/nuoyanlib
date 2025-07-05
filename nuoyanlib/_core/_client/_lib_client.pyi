@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-01
 |
 | ==============================================
 """
 
 
-from typing import List, Optional, Any
+from typing import List, Optional, Any, Dict
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from .._types._typing import ArgsDict
@@ -29,8 +29,10 @@ def instance() -> Optional[NuoyanLibClientSystem]: ...
 class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
     __instance__: NuoyanLibClientSystem
     __inited__: bool
+    __lib_flag__: int
     @staticmethod
-    def register() -> None: ...
+    def register() -> NuoyanLibClientSystem: ...
+    def get_lib_dict(self) -> Dict[str, Any]: ...
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def broadcast_to_all_client(
         self,

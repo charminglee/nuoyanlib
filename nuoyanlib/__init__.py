@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-07
+|   Date  : 2025-07-01
 |
 | ==============================================
 """
@@ -43,13 +43,7 @@ def run(dct):
     :rtype: None
     """
     from mod.common.mod import Mod
-    import mod.client.extraClientApi as client_api
-    import mod.server.extraServerApi as server_api
-    from _core import _const
-    from . import config
-
-    if config.DISABLED_MODSDK_LOG:
-        _logging.disable_modsdk_loggers()
+    from ._core import _const
 
     @Mod.Binding(_const.LIB_NAME, _const.LIB_VERSION)
     class NuoyanLibMain(object):
@@ -57,15 +51,11 @@ def run(dct):
         def server_init(self):
             from _core._server._lib_server import NuoyanLibServerSystem
             NuoyanLibServerSystem.register()
-            if config.ENABLED_MCP_MOD_LOG_DUMPING:
-                server_api.SetMcpModLogCanPostDump(True)
 
         @Mod.InitClient()
         def client_init(self):
             from _core._client._lib_client import NuoyanLibClientSystem
             NuoyanLibClientSystem.register()
-            if config.ENABLED_MCP_MOD_LOG_DUMPING:
-                client_api.SetMcpModLogCanPostDump(True)
 
     dct['NuoyanLibMain'] = NuoyanLibMain
 

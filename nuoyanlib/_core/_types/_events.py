@@ -7,14 +7,12 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-27
+|   Date  : 2025-07-04
 |
 | ==============================================
 """
 
 
-from .._error import EventNotFoundError
-from .._utils import assert_error
 from ..._core import _const
 
 
@@ -314,6 +312,7 @@ class _EventEnum:
 
     def __getattr__(self, item):
         if item not in self.pool:
+            from .._error import EventNotFoundError
             raise EventNotFoundError(item, self.is_client)
         return item
 
@@ -327,6 +326,8 @@ def __test__():
     assert ServerEventEnum.DamageEvent == "DamageEvent"
     def f():
         ClientEventEnum.ABC
+    from .._utils import assert_error
+    from .._error import EventNotFoundError
     assert_error(f, (), EventNotFoundError)
 
 

@@ -7,16 +7,20 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-04
 |
 | ==============================================
 """
 
 
+from ._sys import is_client
+
+
 __all__ = [
+    "NuoyanLibServerSystemRegisterError",
+    "NuoyanLibClientSystemRegisterError",
     "PathMatchError",
-    "NotInClientError",
-    "NotInServerError",
+    "AcrossImportError",
     "GetPropertyError",
     "ScreenNodeNotFoundError",
     "EventParameterError",
@@ -24,6 +28,14 @@ __all__ = [
     "EventSourceError",
     "EventNotFoundError",
 ]
+
+
+class NuoyanLibServerSystemRegisterError(RuntimeError):
+    pass
+
+
+class NuoyanLibClientSystemRegisterError(RuntimeError):
+    pass
 
 
 class PathMatchError(RuntimeError):
@@ -34,14 +46,12 @@ class PathMatchError(RuntimeError):
         return "control path '%s' not matched" % self.pattern
 
 
-class NotInClientError(ImportError):
+class AcrossImportError(ImportError):
     def __str__(self):
-        return "cannot import 'nuoyanlib.client' in server environment"
-
-
-class NotInServerError(ImportError):
-    def __str__(self):
-        return "cannot import 'nuoyanlib.server' in client environment"
+        if is_client():
+            return "cannot import 'nuoyanlib.server' in client environment"
+        else:
+            return "cannot import 'nuoyanlib.client' in server environment"
 
 
 class GetPropertyError(AttributeError):
@@ -84,7 +94,10 @@ class EventNotFoundError(AttributeError):
         self.is_client = is_client
 
     def __str__(self):
-        return "%s event '%s' doesn't exist" % ("client" if self.is_client else "server", self.name)
+        if self.is_client:
+            return "client event '%s' doesn't exist" % self.name
+        else:
+            return "server event '%s' doesn't exist" % self.name
 
 
 if __name__ == "__main__":

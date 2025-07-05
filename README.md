@@ -95,7 +95,7 @@
         def init_client(self):
             client_api.RegisterSystem("MyMod", "MyClientSystem", "myScripts.myClientSystem.MyClientSystem")
     ```
-3. 之后，在需要时导入「nuoyanlib」即可，推荐使用以下方式进行导入，其中`<scripts_root>`是你的Python脚本根目录名称：
+3. 之后，在你的业务代码中导入「nuoyanlib」即可使用，推荐使用以下方式进行导入，其中`<scripts_root>`是你的Python脚本根目录名称：
    #### 导入客户端库
     ```python
     import <scripts_root>.nuoyanlib.client as nyl
@@ -105,7 +105,7 @@
     import <scripts_root>.nuoyanlib.server as nyl
     ```
     > **[警告]**  
-    为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且禁止导入对立端库（如在客户端导入服务端库，在服务端导入客户端库），否则可能导致「nuoyanlib」功能异常甚至游戏闪退。
+    为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且禁止跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。
 4. 更多信息请参见[入门指南](/doc/入门指南.md)。
 
 <br></br>

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-01
 |
 |   nuoyanlib客户端库。
 |
@@ -20,63 +20,84 @@ _t = _clock()
 
 
 from .._core._sys import check_env as _check_env
-from .._core._client._lib_client import NuoyanLibClientSystem as _lib_sys
+from .._core import _error
+from .._core._client._lib_client import NuoyanLibClientSystem as _lib_sys_cls
+from .._core._logging import info as _info
 
 
 _check_env("client")
-_lib_sys.register()
-del _check_env, _lib_sys
+_ins = _lib_sys_cls.register()
+if not _ins:
+    raise _error.NuoyanLibClientSystemRegisterError
 
 
-from .._core._client.comp import (
-    ENGINE_NAMESPACE,
-    ENGINE_SYSTEM_NAME,
-    ClientSystem,
-    CompFactory,
-    CF,
-    PLAYER_ID,
-    LEVEL_ID,
-    PlrComp,
-    LvComp,
-)
-from .._core.listener import (
-    EventArgsProxy,
-    ClientEventProxy,
-    event,
-    listen_event,
-    unlisten_event,
-    listen_all_events,
-    unlisten_all_events,
-)
-from .._core._error import *
-from .._core._utils import (
-    try_exec,
-    iter_obj_attrs,
-    cached_property,
-    CachedObject,
-    hook_method,
-    cached_method,
-    cached_func,
-    singleton,
-)
-from .._core._types._events import (
-    ClientEventEnum as Events,
-    ALL_CLIENT_ENGINE_EVENTS,
-    ALL_CLIENT_LIB_EVENTS,
-)
+if _ins.__lib_flag__ == 0:
+    # 首次加载
+    from .._core._client.comp import (
+        ENGINE_NAMESPACE,
+        ENGINE_SYSTEM_NAME,
+        ClientSystem,
+        CompFactory,
+        CF,
+        PLAYER_ID,
+        LEVEL_ID,
+        PlrComp,
+        LvComp,
+    )
+    from .._core.listener import (
+        EventArgsProxy,
+        ClientEventProxy,
+        event,
+        listen_event,
+        unlisten_event,
+        listen_all_events,
+        unlisten_all_events,
+    )
+    from .._core._error import *
+    from .._core._utils import (
+        try_exec,
+        iter_obj_attrs,
+        cached_property,
+        CachedObject,
+        hook_method,
+        cached_method,
+        cached_func,
+        singleton,
+    )
+    from .._core._types._events import (
+        ClientEventEnum as Events,
+        ALL_CLIENT_ENGINE_EVENTS,
+        ALL_CLIENT_LIB_EVENTS,
+    )
+
+    from .effect import *
+    from .player import *
+    from .setting import *
+    from .sound import *
+    from .render import *
+    from .camera import *
+    from .ui import *
+    from ..utils import *
+
+    _ins.__lib_flag__ = 1
+
+    _consume = (_clock() - _t) * 1000
+    _info("nuoyanlib.client loaded in %.3fms (first loading)" % _consume)
+    del _consume
+else:
+    # 引用内存中已加载的库，确保相同版本的代码只加载一次
+    _dct = {
+        k: v
+        for k, v in _ins.get_lib_dict().items()
+        if not k.startswith("_")
+    }
+    globals().update(_dct)
+    del _dct
+
+    _consume = (_clock() - _t) * 1000
+    _info("nuoyanlib.client loaded in %.3fms (ref)" % _consume)
+    del _consume
 
 
-from .effect import *
-from .player import *
-from .setting import *
-from .sound import *
-from .render import *
-from .camera import *
-from .ui import *
-from ..utils import *
-
-
-_consume = (_clock() - _t) * 1000
-from .._core._logging import info as _info
-_info("nuoyanlib.client loaded in %.3fms" % _consume)
-del _clock, _t, _info, _consume
+del _check_env, _lib_sys_cls, _ins, _error, _info
+del _clock, _t

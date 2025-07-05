@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-01
 |
 | ==============================================
 """
 
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 from mod.server.system.serverSystem import ServerSystem
 from .._types._typing import ArgsDict
 from ..listener import ServerEventProxy
@@ -28,9 +28,11 @@ def instance() -> Optional[NuoyanLibServerSystem]: ...
 class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem):
     __instance__: NuoyanLibServerSystem
     __inited__: bool
+    __lib_flag__: int
     query_cache: Dict[str, Dict[str, float]]
     @staticmethod
-    def register() -> None: ...
+    def register() -> NuoyanLibServerSystem: ...
+    def get_lib_dict(self) -> Dict[str, Any]: ...
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def _ButtonCallbackTrigger(self, args: ArgsDict) -> None: ...
     def _BroadcastToAllClient(self, args: ArgsDict) -> None: ...

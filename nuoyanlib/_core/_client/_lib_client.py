@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-24
+|   Date  : 2025-07-01
 |
 | ==============================================
 """
@@ -19,6 +19,7 @@ from .. import _const, _logging
 from ..listener import ClientEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
+from ... import config
 
 
 __all__ = []
@@ -34,6 +35,7 @@ def instance():
 class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
+        self.__lib_flag__ = 0
         ln = _const.LIB_NAME
         lsn = _const.LIB_SERVER_NAME
         lcn = _const.LIB_CLIENT_NAME
@@ -43,12 +45,23 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         self.native_listen(ln, lsn, "_NuoyanLibCall", self._NuoyanLibCall)
         self.native_listen(ln, lcn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
         self.native_listen(ln, lsn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
+        if config.DISABLED_MODSDK_LOG:
+            _logging.disable_modsdk_loggers()
+        if config.ENABLED_MCP_MOD_LOG_DUMPING:
+            client_api.SetMcpModLogCanPostDump(True)
         _logging.info("NuoyanLibClientSystem inited, ver: %s" % _const.__version__)
 
     @staticmethod
     def register():
-        if not client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME):
+        system = client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
+        if not system:
             client_api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
+            system = client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
+        return system
+
+    def get_lib_dict(self):
+        from ... import client
+        return client.__dict__
 
     # General ==========================================================================================================
 
@@ -116,8 +129,8 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
 
     def _SetQueryCache(self, args):
         for entity_id, queries in args.items():
+            comp = CF(entity_id).QueryVariable
             for name, value in queries.items():
-                comp = CF(entity_id).QueryVariable
                 if comp.Get(name) == -1.0:
                     comp.Register(name, 0.0)
                 comp.Set(name, value)

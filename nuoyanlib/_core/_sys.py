@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-04
 |
 | ==============================================
 """
@@ -20,10 +20,9 @@ __all__ = []
 
 
 def check_env(target):
-    if target == "client" and not is_client():
-        raise _error.NotInClientError
-    if target == "server" and is_client():
-        raise _error.NotInServerError
+    ic = is_client()
+    if (target == "client" and not ic) or (target == "server" and ic):
+        raise _error.AcrossImportError
 
 
 def get_lib_system():

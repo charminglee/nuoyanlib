@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-24
+|   Date  : 2025-07-01
 |
 | ==============================================
 """
@@ -19,6 +19,7 @@ from .. import _const, _logging
 from ..listener import ServerEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
+from ... import config
 
 
 __all__ = []
@@ -34,6 +35,7 @@ def instance():
 class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
+        self.__lib_flag__ = 0
         self.query_cache = {}
         ln = _const.LIB_NAME
         lsn = _const.LIB_SERVER_NAME
@@ -44,12 +46,21 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         self.native_listen(ln, lcn, "_SetQueryVar", self._SetQueryVar)
         self.native_listen(ln, lcn, "_NuoyanLibCall", self._NuoyanLibCall)
         self.native_listen(ln, lcn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
+        if config.ENABLED_MCP_MOD_LOG_DUMPING:
+            server_api.SetMcpModLogCanPostDump(True)
         _logging.info("NuoyanLibServerSystem inited, ver: %s" % _const.__version__)
 
     @staticmethod
     def register():
-        if not server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME):
+        system = server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
+        if not system:
             server_api.RegisterSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME, _const.LIB_SERVER_PATH)
+            system = server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
+        return system
+
+    def get_lib_dict(self):
+        from ... import server
+        return server.__dict__
 
     # General ==========================================================================================================
 
