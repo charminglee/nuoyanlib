@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-29
+|   Date  : 2025-07-03
 |
 | ==============================================
 """
 
 
-from math import atan, degrees, atan2, sqrt, pi, sin, cos, floor, radians
+from math import degrees, atan2, sqrt, pi, sin, cos, floor, radians
 from random import randint, uniform
 from mod.common.utils.mcmath import Vector3
 from mod.common.minecraftEnum import Facing
@@ -337,17 +337,9 @@ def camera_rot_p2p(pos1, pos2):
     """
     if not pos1 or not pos2:
         return
-    x = pos2[0] - pos1[0]
-    if x == 0:
-        x = 0.000000001
-    y = pos2[1] - pos1[1]
-    z = pos2[2] - pos1[2]
-    hori_dis = pos_distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
-    if hori_dis == 0:
-        hori_dis = 0.000000001
-    horizontal_rot = 90 + (atan(z / x) / pi) * 180 + (0 if x > 0 else -180)
-    vertical_rot = -(atan(y / hori_dis) / pi) * 180
-    return vertical_rot, horizontal_rot
+    vec = Vector3(pos2) - Vector3(pos1)
+    rot = get_api().GetRotFromDir(vec.ToTuple())
+    return rot
 
 
 def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
