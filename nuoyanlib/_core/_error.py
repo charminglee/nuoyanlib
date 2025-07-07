@@ -7,13 +7,10 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-04
+|   Date  : 2025-07-05
 |
 | ==============================================
 """
-
-
-from ._sys import is_client
 
 
 __all__ = [
@@ -48,6 +45,7 @@ class PathMatchError(RuntimeError):
 
 class AcrossImportError(ImportError):
     def __str__(self):
+        from ._sys import is_client
         if is_client():
             return "cannot import 'nuoyanlib.server' in client environment"
         else:

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-01
+|   Date  : 2025-07-08
 |
 |   nuoyanlib客户端库。
 |
@@ -15,8 +15,12 @@
 """
 
 
-from time import clock as _clock
-_t = _clock()
+try:
+    from time import clock as _clock
+    _t = _clock()
+except ImportError:
+    _clock = None
+    _t = 0
 
 
 from .._core._sys import check_env as _check_env
@@ -81,9 +85,10 @@ if _ins.__lib_flag__ == 0:
 
     _ins.__lib_flag__ = 1
 
-    _consume = (_clock() - _t) * 1000
-    _info("nuoyanlib.client loaded in %.3fms (first loading)" % _consume)
-    del _consume
+    if _clock:
+        _consume = (_clock() - _t) * 1000
+        _info("nuoyanlib.client loaded in %.3fms (first loading)" % _consume)
+        del _consume
 else:
     # 引用内存中已加载的库，确保相同版本的代码只加载一次
     _dct = {
@@ -94,10 +99,12 @@ else:
     globals().update(_dct)
     del _dct
 
-    _consume = (_clock() - _t) * 1000
-    _info("nuoyanlib.client loaded in %.3fms (ref)" % _consume)
-    del _consume
+    if _clock:
+        _consume = (_clock() - _t) * 1000
+        _info("nuoyanlib.client loaded in %.3fms (ref)" % _consume)
+        del _consume
 
 
 del _check_env, _lib_sys_cls, _ins, _error, _info
 del _clock, _t
+
