@@ -481,16 +481,16 @@ def __test__():
             n[0] += 1
     t = T()
     t2 = T()
-    a = [t, t2]
+    tl = [t, t2]
     assert t.CustomEvent._nyl_listen_args == [
         ("a", "b", "CustomEvent", 0),
         ("Minecraft", "Engine", "LoadClientAddonScriptsAfter", 0),
     ]
     assert t.CustomEvent.__name__ == "CustomEvent"
-    call("a", "b", "CustomEvent", a)
+    call("a", "b", "CustomEvent", tl)
     n = [0]
-    t.CustomEvent(a)
-    t2.CustomEvent(a)
+    t.CustomEvent(tl)
+    t2.CustomEvent(tl)
     unlisten_all_events(t)
     unlisten_event(t2.CustomEvent)
     assert not getattr(lib_sys, "a:b:CustomEvent")
