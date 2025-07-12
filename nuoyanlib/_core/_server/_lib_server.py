@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-01
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
@@ -23,12 +23,6 @@ from ... import config
 
 
 __all__ = []
-
-
-def instance():
-    if not NuoyanLibServerSystem.__instance__:
-        NuoyanLibServerSystem.__instance__ = server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
-    return NuoyanLibServerSystem.__instance__
 
 
 @singleton
@@ -49,13 +43,17 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         self.native_listen(ln, lcn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
         if config.ENABLED_MCP_MOD_LOG_DUMPING:
             server_api.SetMcpModLogCanPostDump(True)
-        _logging.info("NuoyanLibServerSystem inited, ver: %s" % _const.__version__)
+        _logging.info(
+            "NuoyanLibServerSystem inited (ver: %s, script: %s)"
+            % (_const.__version__, self.__class__.__module__.split(".")[0])
+        )
 
-    @staticmethod
-    def register():
+    @classmethod
+    def register(cls):
         system = server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
         if not system:
-            server_api.RegisterSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME, _const.LIB_SERVER_PATH)
+            path = cls.__module__ + "." + cls.__name__
+            server_api.RegisterSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME, path)
             system = server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
         return system
 
@@ -133,6 +131,12 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         method = args['method']
         from ...utils.communicate import call_callback
         call_callback(uuid, **cb_args)
+
+
+def instance():
+    if not NuoyanLibServerSystem.__instance__:
+        NuoyanLibServerSystem.__instance__ = server_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
+    return NuoyanLibServerSystem.__instance__
 
 
 

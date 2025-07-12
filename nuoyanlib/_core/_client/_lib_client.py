@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-01
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
@@ -23,12 +23,6 @@ from ... import config
 
 
 __all__ = []
-
-
-def instance():
-    if not NuoyanLibClientSystem.__instance__:
-        NuoyanLibClientSystem.__instance__ = client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
-    return NuoyanLibClientSystem.__instance__
 
 
 @singleton
@@ -50,13 +44,17 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
             _logging.disable_modsdk_loggers()
         if config.ENABLED_MCP_MOD_LOG_DUMPING:
             client_api.SetMcpModLogCanPostDump(True)
-        _logging.info("NuoyanLibClientSystem inited, ver: %s" % _const.__version__)
+        _logging.info(
+            "NuoyanLibClientSystem inited (ver: %s, script: %s)"
+            % (_const.__version__, self.__class__.__module__.split(".")[0])
+        )
 
-    @staticmethod
-    def register():
+    @classmethod
+    def register(cls):
         system = client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
         if not system:
-            client_api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_CLIENT_PATH)
+            path = cls.__module__ + "." + cls.__name__
+            client_api.RegisterSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME, path)
             system = client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
         return system
 
@@ -174,6 +172,12 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         method = args['method']
         from ...utils.communicate import call_callback
         call_callback(uuid, **cb_args)
+
+
+def instance():
+    if not NuoyanLibClientSystem.__instance__:
+        NuoyanLibClientSystem.__instance__ = client_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
+    return NuoyanLibClientSystem.__instance__
 
 
 

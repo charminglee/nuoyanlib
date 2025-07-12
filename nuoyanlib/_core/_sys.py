@@ -7,12 +7,10 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-05
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
-
-
 
 
 __all__ = []
@@ -72,6 +70,13 @@ class NuoyanLibBaseSystem(object):
         self.cond_func = {}
         self.cond_state = {}
         self.event_pool = {}
+
+    @classmethod
+    def register(cls):
+        raise NotImplementedError
+
+    def get_lib_dict(self):
+        raise NotImplementedError
 
     def Update(self):
         self.__tick += 1

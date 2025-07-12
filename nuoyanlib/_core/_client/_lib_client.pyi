@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-01
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
@@ -29,9 +29,6 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     __instance__: NuoyanLibClientSystem
     __inited__: bool
     __lib_flag__: int
-    @staticmethod
-    def register() -> NuoyanLibClientSystem: ...
-    def get_lib_dict(self) -> Dict[str, Any]: ...
     callback_data: Dict[str, Dict[str, Union[Callable, int]]]
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def broadcast_to_all_client(
