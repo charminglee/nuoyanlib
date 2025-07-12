@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-26
+|   Date  : 2025-07-11
 |
 | ==============================================
 """
@@ -20,10 +20,9 @@ from ..ui_utils import (
 )
 from ...._core._client.comp import LvComp
 from ...._core._utils import args_type_check
-from ...._core.listener import event, listen_event, unlisten_event
+from ...._core.listener import listen_event, unlisten_event
 from .control import NyControl
 from ....utils.enum import Enum, ButtonCallbackType, ControlType
-from ...._core._types._events import ClientEventEnum as Events
 
 
 __all__ = [
@@ -98,18 +97,17 @@ class NyButton(NyControl):
         self.touch_event_params = kwargs.get('touch_event_params')
         self.base_control.AddTouchEventParams(self.touch_event_params)
         self.base_control.AddHoverEventParams()
-        listen_event(self._on_finger_release)
+        listen_event(self.GetEntityByCoordReleaseClientEvent)
 
     def __destroy__(self):
-        unlisten_event(self._on_finger_release)
+        unlisten_event(self.GetEntityByCoordReleaseClientEvent)
         if self.is_movable:
             self.cancel_movable()
         LvComp.Game.CancelTimer(self._long_click_timer)
         self._btn_callbacks.clear()
         NyControl.__destroy__(self)
 
-    @event(Events.GetEntityByCoordReleaseClientEvent)
-    def _on_finger_release(self, args):
+    def GetEntityByCoordReleaseClientEvent(self, args):
         if self.auto_save_pos:
             self.save_pos_data()
         self._finger_pos = None

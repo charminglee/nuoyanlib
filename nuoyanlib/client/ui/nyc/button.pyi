@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-11
 |
 | ==============================================
 """
@@ -19,7 +19,6 @@ from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.timer import CallLater
 from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrControl, ItemDict
 from ...._core._utils import args_type_check
-from ...._core.listener import event
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....utils.enum import Enum
@@ -71,8 +70,7 @@ class NyButton(NyControl):
     @args_type_check(str, is_method=True)
     def __div__(self, other: str) -> Optional[NyControl]: ...
     def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
-    @event(Events.GetEntityByCoordReleaseClientEvent)
-    def _on_finger_release(self, args: ArgsDict) -> None: ...
+    def GetEntityByCoordReleaseClientEvent(self, args: ArgsDict) -> None: ...
     def set_default_texture(self, tex_path: str) -> None: ...
     def set_hover_texture(self, tex_path: str) -> None: ...
     def set_pressed_texture(self, tex_path: str) -> None: ...

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-11
 |
 | ==============================================
 """
@@ -15,10 +15,9 @@
 
 from ...._core._utils import args_type_check, get_func
 from ...._core._client.comp import ScreenNode
-from ...._core.listener import event, listen_event, unlisten_event
+from ...._core.listener import listen_event, unlisten_event
 from ....utils.enum import ControlType
 from .control import NyControl
-from ...._core._types._events import ClientEventEnum as Events
 
 
 __all__ = [
@@ -97,7 +96,7 @@ class NyGrid(NyControl):
         NyControl.__init__(self, screen_node_ex, grid_control)
         self.is_stack_grid = kwargs.get('is_stack_grid', False)
         self._update_cbs = []
-        listen_event(self._on_grid_update)
+        listen_event(self.GridComponentSizeChangedClientEvent)
 
     @args_type_check((int, slice, tuple), is_method=True)
     def __getitem__(self, item):
@@ -120,12 +119,11 @@ class NyGrid(NyControl):
         return _ElemGroup(self, item)
 
     def __destroy__(self):
-        unlisten_event(self._on_grid_update)
+        unlisten_event(self.GridComponentSizeChangedClientEvent)
         self._update_cbs = []
         NyControl.__destroy__(self)
 
-    @event(Events.GridComponentSizeChangedClientEvent)
-    def _on_grid_update(self, args):
+    def GridComponentSizeChangedClientEvent(self, args):
         for cb in self._update_cbs:
             cb(args['path'])
 

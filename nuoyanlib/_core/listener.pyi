@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
 
 
-from typing import Callable, Optional, Tuple, Union, Generator, List, Any, Dict, DefaultDict
+from typing import Callable, Optional, Tuple, Union, Generator, List, Any, DefaultDict, Set, overload
 from types import MethodType
 from ._types._events import ClientEvent, ServerEvent
 from ._types._typing import ArgsDict, PyBasicTypes, STuple
@@ -21,8 +21,11 @@ from ._types._typing import ArgsDict, PyBasicTypes, STuple
 
 class _EventPool(object):
     __slots__: STuple
-    pool: DefaultDict[int, List[Callable]]
+    pool: DefaultDict[int, Set[Callable]]
     priorities: List[int]
+    lock: bool
+    remove_lst: List[Tuple[Callable, int]]
+    add_lst: List[Tuple[Callable, int]]
     __name__: str
     def __init__(self: ...) -> None: ...
     def __nonzero__(self) -> bool: ...
@@ -35,6 +38,8 @@ class _EventPool(object):
     def listen_for(cls, ns: str, sys_name: str, event_name: str, func: Callable, priority: int = 0) -> None: ...
     @classmethod
     def unlisten_for(cls, ns: str, sys_name: str, event_name: str, func: Callable, priority: int = 0) -> None: ...
+    @classmethod
+    def has_listened(cls, ns: str, sys_name: str, event_name: str, func: Callable, priority: int = 0) -> bool: ...
 
 
 class EventArgsProxy(object):
@@ -49,7 +54,7 @@ class EventArgsProxy(object):
     keys = dict.keys
     values = dict.values
     items = dict.items
-    has_key = dict.has_key
+    has_key = dict.has_key # NOQA
     copy = dict.copy
     iterkeys = dict.iterkeys
     itervalues = dict.itervalues
@@ -71,10 +76,12 @@ class EventArgsProxy(object):
     __ne__ = dict.__ne__
 
 
-def _get_event_source(client: bool, event_name: str, ns: str = "", sys_name: str = "") -> Optional[Tuple[str, str]]: ...
+def _get_event_source(in_client: bool, event_name: str, ns: str = "", sys_name: str = "") -> Optional[Tuple[str, str]]: ...
+def _parse_event_args(func: Callable, event_name: str, ns: str, sys_name: str) -> Tuple[str, str, str]: ...
 
 
 class _BaseEventProxy(object):
+    _is_client: bool
     def __init__(self: ..., *args, **kwargs) -> None: ...
     def _process_engine_events(self) -> None: ...
     def _create_proxy(
@@ -88,29 +95,41 @@ class ClientEventProxy(ClientEvent, _BaseEventProxy): ...
 class ServerEventProxy(ServerEvent, _BaseEventProxy): ...
 
 
+@overload
 def event(
-    event_name: Union[str, Callable] = "",
+    event_name: str = "",
     ns: str = "",
     sys_name: str = "",
     priority: int = 0,
     is_method: bool = True,
 ) -> Callable: ...
+@overload
+def event(func: Callable) -> Callable: ...
 def _get_event_args(func: Callable) -> List[Tuple[str, str, str, int]]: ...
 def listen_event(
     func: Callable,
+    event_name: str = "",
     ns: str = "",
     sys_name: str = "",
-    event_name: str = "",
-    priority: int = 0
+    priority: int = 0,
+    use_decorator: bool = False,
 ) -> None: ...
 def unlisten_event(
     func: Callable,
+    event_name: str = "",
     ns: str = "",
     sys_name: str = "",
-    event_name: str = "",
-    priority: int = 0
+    priority: int = 0,
+    use_decorator: bool = False,
 ) -> None: ...
 def _get_all_event_args(ins: Any) -> Generator[Tuple[MethodType, List[Tuple[str, str, str, int]]], None, None]: ...
 def listen_all_events(ins: Any) -> None: ...
 def unlisten_all_events(ins: Any) -> None: ...
+def has_listened(
+    func: Callable,
+    event_name: str = "",
+    ns: str = "",
+    sys_name: str = "",
+    priority: int = 0,
+) -> bool: ...
 def lib_sys_event(name: str) -> Callable: ...

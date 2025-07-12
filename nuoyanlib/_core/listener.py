@@ -7,12 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-29
+|   Date  : 2025-07-12
 |
 | ==============================================
 """
 
 
+from bisect import insort
 from collections import defaultdict
 from types import MethodType
 import mod.client.extraClientApi as client_api
@@ -25,7 +26,7 @@ from ._types._events import (
     ALL_SERVER_ENGINE_EVENTS,
     ALL_SERVER_LIB_EVENTS,
 )
-from ._utils import iter_obj_attrs
+from ._utils import iter_obj_attrs, try_exec
 
 
 __all__ = [
@@ -34,6 +35,7 @@ __all__ = [
     "unlisten_event",
     "listen_all_events",
     "unlisten_all_events",
+    "has_listened",
     "EventArgsProxy",
     "ClientEventProxy",
     "ServerEventProxy",
@@ -41,41 +43,57 @@ __all__ = [
 
 
 class _EventPool(object):
-    __slots__ = ("pool", "priorities", "__name__")
+    __slots__ = ("__name__", "pool", "priorities", "lock", "remove_lst", "add_lst")
 
     def __init__(self):
-        self.pool = defaultdict(list)
+        self.pool = defaultdict(set)
         self.priorities = []
+        self.lock = False
+        self.remove_lst = []
+        self.add_lst = []
 
     def __nonzero__(self): # __bool__
-        return any(l for l in self.pool.values())
+        return any(s for s in self.pool.values())
 
     def __call__(self, args=None):
         # 事件触发（modsdk调用入口）
         if args is None:
             args = {}
-        for p in self.priorities:
+        self.lock = True
+        for p in reversed(self.priorities):
             for f in self.pool[p]:
-                f(args)
+                try_exec(f, args)
+        self.lock = False
+        while self.remove_lst:
+            func, priority = self.remove_lst.pop()
+            self.pool[priority].remove(func)
+        while self.add_lst:
+            func, priority = self.add_lst.pop()
+            self.pool[priority].add(func)
 
     def add(self, func, priority=0):
-        func_lst = self.pool[priority]
-        if func in func_lst:
+        func_set = self.pool[priority]
+        if func in func_set:
             return
-        func_lst.append(func)
+        if not self.lock:
+            func_set.add(func)
+        else:
+            self.add_lst.append((func, priority))
         if priority not in self.priorities:
-            self.priorities.append(priority)
-            self.priorities.sort(reverse=True)
+            insort(self.priorities, priority)
 
     def remove(self, func, priority=0):
         if priority not in self.pool:
             return
         if func in self.pool[priority]:
-            self.pool[priority].remove(func)
+            if not self.lock:
+                self.pool[priority].remove(func)
+            else:
+                self.remove_lst.append((func, priority))
 
     @classmethod
     def get(cls, ns, sys_name, event_name):
-        event_id = ":".join([ns, sys_name, event_name])
+        event_id = "_".join([ns, sys_name, event_name])
         lib_sys = get_lib_system()
         ep = getattr(lib_sys, event_id, None)
         if ep is None:
@@ -96,11 +114,18 @@ class _EventPool(object):
         ep = cls.get(ns, sys_name, event_name)
         ep.remove(func, priority)
 
+    @classmethod
+    def has_listened(cls, ns, sys_name, event_name, func, priority=0):
+        ep = cls.get(ns, sys_name, event_name)
+        if priority not in ep.pool:
+            return False
+        return func in ep.pool[priority]
 
-def _get_event_source(client, event_name, ns="", sys_name=""):
+
+def _get_event_source(in_client, event_name, ns="", sys_name=""):
     if ns and sys_name:
         return ns, sys_name
-    if client:
+    if in_client:
         if event_name in ALL_CLIENT_ENGINE_EVENTS:
             return client_api.GetEngineNamespace(), client_api.GetEngineSystemName()
         elif event_name in ALL_CLIENT_LIB_EVENTS:
@@ -112,14 +137,27 @@ def _get_event_source(client, event_name, ns="", sys_name=""):
             return _const.LIB_NAME, ALL_SERVER_LIB_EVENTS[event_name]
 
 
+def _parse_event_args(func, event_name, ns, sys_name):
+    if event_name and isinstance(event_name, str):
+        event_name = event_name
+    else:
+        event_name = func.__name__
+    if not ns or not sys_name:
+        source = _get_event_source(is_client(), event_name, ns, sys_name)
+        if not source:
+            raise _error.EventSourceError(event_name, ns, sys_name)
+        ns, sys_name = source
+    return event_name, ns, sys_name
+
+
 def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
     """
     [装饰器]
 
-    | 事件监听器，适用于静态函数与方法，若用于静态函数，请将 ``is_method`` 参数设为 ``False`` 。
+    | 基于事件池机制的事件监听器，在高频监听/反监听场景下性能较好。
+    | 适用于普通函数与实例方法，若用于普通函数，请将 ``is_method`` 参数设为 ``False`` 。
     | 事件名与函数名相同时，可省略 ``event_name`` 参数。监听ModSDK事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
-    | 注意：在类中使用时，需要在 ``.__init__()`` 方法中调用一下 ``listen_all_events()`` ，详见示例。
-    | 支持嵌套使用 ``@event`` ，但相同参数的事件只会被监听一次。
+    | 注意：在类中使用时，需在 ``.__init__()`` 方法中调用一下 ``listen_all_events()`` 方可生效，详见示例。
 
     -----
 
@@ -134,10 +172,8 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
             def __init__(self, namespace, system_name):
                 # 对当前类中所有被@event装饰的方法执行事件监听
                 nyl.listen_all_events(self)
-
-            def Destroy(self):
-                # 必要时，对当前类中所有被@event装饰的方法执行事件反监听
-                nyl.unlisten_all_events(self)
+                # 调用以下函数可监听特定事件
+                nyl.listen_event(self.MyCustomEvent)
 
             # 监听MyCustomEvent事件，事件来源为MyMod:MyServerSystem
             @nyl.event("MyCustomEvent", "MyMod", "MyServerSystem")
@@ -154,11 +190,14 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
             def UiInitFinished(self, args):
                 ...
 
-            def unlisten_MyCustomEvent(self):
-                # 反监听特定事件
+            def Destroy(self):
+                # 必要时，调用以下函数可取消当前类中所有被@event装饰的方法的事件监听
+                nyl.unlisten_all_events(self)
+                # 调用以下函数可取消监听特定事件
                 nyl.unlisten_event(self.MyCustomEvent)
 
-    | 对静态函数使用时，事件将被立即监听，无需手动调用 ``listen_all_events()`` 。
+    |
+    | 对静态函数使用时，事件将被立即监听，无需手动调用 ``listen_all_events()`` 或 ``listen_event()``。
 
     ::
 
@@ -171,25 +210,15 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
     :param str event_name: 事件名称，默认为被装饰函数名
     :param str ns: 事件来源命名空间
     :param str sys_name: 事件来源系统名称
-    :param int priority: 优先级，默认为0，值越大优先级越高
-    :param bool is_method: 回调函数是否是实例方法，默认为True
+    :param int priority: 优先级，值越大优先级越高，默认为0
+    :param bool is_method: 被装饰函数是否是实例方法，默认为True
 
     :return: 返回原函数
     :rtype: function
     """
     def add_listener(func):
         # 解析事件参数
-        if event_name and isinstance(event_name, str):
-            _event_name = event_name
-        else:
-            _event_name = func.__name__
-        if not ns or not sys_name:
-            source = _get_event_source(is_client(), _event_name, ns, sys_name)
-            if not source:
-                raise _error.EventSourceError(_event_name, ns, sys_name)
-            _ns, _sys_name = source
-        else:
-            _ns, _sys_name = ns, sys_name
+        _event_name, _ns, _sys_name = _parse_event_args(func, event_name, ns, sys_name)
         args = (_ns, _sys_name, _event_name, priority)
         # 插入标记
         if not hasattr(func, '_nyl_listen_args'):
@@ -214,51 +243,54 @@ def _get_event_args(func):
     return args
 
 
-def listen_event(func, ns="", sys_name="", event_name="", priority=0):
+def listen_event(func, event_name="", ns="", sys_name="", priority=0, use_decorator=False):
     """
-    | 基于事件池机制的事件监听，在高频监听/反监听场景下性能较好。
-    | 若函数已被 ``@event`` 装饰，可省略 ``ns``、``sys_name``、``event_name`` 和 ``priority`` 参数。
+    | 基于事件池机制的事件监听，在高频监听/反监听场景下性能较好，适用于普通函数与实例方法。
+    | 事件名与函数名相同时，可省略 ``event_name`` 参数。监听ModSDK事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
 
     -----
 
     :param function func: 事件回调函数
+    :param str event_name: 事件名称
     :param str ns: 事件来源命名空间
     :param str sys_name: 事件来源系统名称
-    :param str event_name: 事件名称
-    :param int priority: 优先级，值越大优先级越高
+    :param int priority: 优先级，值越大优先级越高，默认为0
+    :param bool use_decorator: 是否使用从@event装饰器传入的参数，设为True时，忽略ns、sys_name、event_name和priority参数；默认为False
 
     :return: 无
     :rtype: None
     """
-    if ns:
-        _EventPool.listen_for(ns, sys_name, event_name, func, priority)
-    else:
+    if use_decorator:
         for a in _get_event_args(func):
             _EventPool.listen_for(a[0], a[1], a[2], func, a[3])
+    else:
+        event_name, ns, sys_name = _parse_event_args(func, event_name, ns, sys_name)
+        _EventPool.listen_for(ns, sys_name, event_name, func, priority)
 
 
-def unlisten_event(func, ns="", sys_name="", event_name="", priority=0):
+def unlisten_event(func, event_name="", ns="", sys_name="", priority=0, use_decorator=False):
     """
-    | 取消事件监听。
-    | 基于事件池机制，在高频监听/反监听场景下性能较好。
-    | 若函数已被 ``@event`` 装饰，可省略 ``ns``、``sys_name``、``event_name`` 和 ``priority`` 参数。
+    | 取消事件监听，基于事件池机制，在高频监听/反监听场景下性能较好，适用于普通函数与实例方法。
+    | 事件名与函数名相同时，可省略 ``event_name`` 参数。监听ModSDK事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
 
     -----
 
     :param function func: 事件回调函数
+    :param str event_name: 事件名称
     :param str ns: 事件来源命名空间
     :param str sys_name: 事件来源系统名称
-    :param str event_name: 事件名称
-    :param int priority: 优先级，值越大优先级越高
+    :param int priority: 优先级，值越大优先级越高，默认为0
+    :param bool use_decorator: 是否使用从@event装饰器传入的参数，设为True时，忽略ns、sys_name、event_name和priority参数；默认为False
 
     :return: 无
     :rtype: None
     """
-    if ns:
-        _EventPool.listen_for(ns, sys_name, event_name, func, priority)
-    else:
+    if use_decorator:
         for a in _get_event_args(func):
             _EventPool.unlisten_for(a[0], a[1], a[2], func, a[3])
+    else:
+        event_name, ns, sys_name = _parse_event_args(func, event_name, ns, sys_name)
+        _EventPool.unlisten_for(ns, sys_name, event_name, func, priority)
 
 
 def _get_all_event_args(ins):
@@ -302,6 +334,26 @@ def unlisten_all_events(ins):
             _EventPool.unlisten_for(a[0], a[1], a[2], method, a[3])
 
 
+def has_listened(func, event_name="", ns="", sys_name="", priority=0):
+    """
+    | 判断函数是否已经监听指定事件。
+    | 事件名与函数名相同时，可省略 ``event_name`` 参数。监听ModSDK事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
+
+    -----
+
+    :param function func: 事件回调函数
+    :param str ns: 事件来源命名空间
+    :param str sys_name: 事件来源系统名称
+    :param str event_name: 事件名称
+    :param int priority: 优先级，值越大优先级越高，默认为0
+
+    :return: 函数是否已经监听指定事件
+    :rtype: bool
+    """
+    event_name, ns, sys_name = _parse_event_args(func, event_name, ns, sys_name)
+    return _EventPool.has_listened(ns, sys_name, event_name, func, priority)
+
+
 class EventArgsProxy(object):
     __slots__ = ("_arg_dict", "_event_name")
 
@@ -310,6 +362,7 @@ class EventArgsProxy(object):
         self._event_name = event_name
 
     def __getattr__(self, key):
+        # 事件参数获取
         if key in self._arg_dict:
             return self._arg_dict[key]
         raise _error.EventParameterError(self._event_name, key)
@@ -327,10 +380,11 @@ class EventArgsProxy(object):
     def __repr__(self):
         s = "<EventArgsProxy of '%s':" % self._event_name
         for k, v in self._arg_dict.items():
-            s += "\n  .%s = %s" % (k, repr(v))
+            s += "\n    .%s = %s" % (k, repr(v))
         s += "\n>"
         return s
 
+    # 兼容字典方法
     get          = lambda self, *a: self._arg_dict.get(*a)
     keys         = lambda self, *a: self._arg_dict.keys(*a)
     values       = lambda self, *a: self._arg_dict.values(*a)
@@ -364,23 +418,22 @@ class _BaseEventProxy(object):
         listen_all_events(self)
 
     def _process_engine_events(self):
-        client = is_client()
         for attr in iter_obj_attrs(self):
             if not isinstance(attr, MethodType) or hasattr(attr, '_nyl_listen_args'):
                 continue
-            name = attr.__name__
-            source = _get_event_source(client, name)
+            event_name = attr.__name__
+            source = _get_event_source(self._is_client, event_name)
             if source:
-                self._create_proxy(source[0], source[1], name, attr)
+                self._create_proxy(source[0], source[1], event_name, attr)
 
     def _create_proxy(self, ns, sys_name, event_name, method):
         @event(event_name, ns, sys_name)
-        def proxy(self, args=None):
+        def proxy(_, args=None):
             method(EventArgsProxy(args, event_name) if args else None)
-        proxy_name = "_nyl_proxy_listen_" + event_name
-        proxy.__name__ = proxy_name
+        name = "_nyl_proxy_" + event_name
+        proxy.__name__ = name
         proxy = MethodType(proxy, self)
-        setattr(self, proxy_name, proxy)
+        setattr(self, name, proxy)
 
 
 class ClientEventProxy(_BaseEventProxy):
@@ -389,6 +442,7 @@ class ClientEventProxy(_BaseEventProxy):
     - 所有ModSDK客户端事件无需监听，编写一个与事件同名的方法即可使用，且事件参数采用对象形式，支持补全。
     - 支持使用 ``@event`` 装饰器监听事件，且无需在 ``.__init__()`` 方法手动调用 ``listen_all_events()``。
     """
+    _is_client = True
 
 
 class ServerEventProxy(_BaseEventProxy):
@@ -397,6 +451,7 @@ class ServerEventProxy(_BaseEventProxy):
     - 所有ModSDK服务端事件无需监听，编写一个与事件同名的方法即可使用，且事件参数采用对象形式，支持补全。
     - 支持使用 ``@event`` 装饰器监听事件，且无需在 ``.__init__()`` 方法手动调用 ``listen_all_events()``。
     """
+    _is_client = False
 
 
 def lib_sys_event(name):
@@ -446,7 +501,7 @@ def __test__():
     lib_sys = get_lib_system()
     def call(ns, sys_name, event_name, args):
         # 模拟引擎触发回调函数
-        func = getattr(lib_sys, ":".join([ns, sys_name, event_name]))
+        func = getattr(lib_sys, "_".join([ns, sys_name, event_name]))
         func(args)
 
     a = {'arg': 1}

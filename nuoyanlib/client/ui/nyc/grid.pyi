@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-11
 |
 | ==============================================
 """
@@ -19,7 +19,6 @@ from mod.client.ui.controls.baseUIControl import BaseUIControl
 from .control import NyControl
 from ...._core._types._typing import ITuple2, ArgsDict
 from ...._core._utils import args_type_check
-from ...._core.listener import event
 from ..screen_node import ScreenNodeExtension
 from ...._core._types._events import ClientEventEnum as Events
 
@@ -62,8 +61,7 @@ class NyGrid(NyControl):
     def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
     @args_type_check((int, slice, tuple), is_method=True)
     def __getitem__(self, item: _Item) -> _ElemGroup: ...
-    @event(Events.GridComponentSizeChangedClientEvent)
-    def _on_grid_update(self, args: ArgsDict) -> None: ...
+    def GridComponentSizeChangedClientEvent(self, args: ArgsDict) -> None: ...
     def set_gird_update_callback(self, func: _GridUpdateCallback) -> bool: ...
     def remove_gird_update_callback(self, func: _GridUpdateCallback) -> bool: ...
     @property
