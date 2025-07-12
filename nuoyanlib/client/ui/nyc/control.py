@@ -74,7 +74,7 @@ class NyControl(object):
         self.base_control = None
         self.ui_node = None
 
-    # region API ===================================================================================
+    # region API =======================================================================================================
 
     def iter_children_ny_control(self, level=1):
         """
@@ -170,7 +170,7 @@ class NyControl(object):
 
     # endregion
 
-    # region conversion ===================================================================================
+    # region conversion ================================================================================================
 
     def to_button(self, touch_event_params=None):
         """
@@ -370,7 +370,7 @@ class NyControl(object):
 
     # endregion
 
-    # region property proxy ===================================================================================
+    # region property proxy ============================================================================================
 
     @property
     def position(self):

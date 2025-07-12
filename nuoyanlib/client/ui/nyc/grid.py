@@ -129,7 +129,7 @@ class NyGrid(NyControl):
         for cb in self._update_cbs:
             cb(args['path'])
 
-    # region API ===================================================================================
+    # region API =======================================================================================================
 
     def set_gird_update_callback(self, func):
         """
@@ -165,7 +165,7 @@ class NyGrid(NyControl):
 
     # endregion
 
-    # region property proxy ===================================================================================
+    # region property proxy ============================================================================================
 
     @property
     def grid_size(self):

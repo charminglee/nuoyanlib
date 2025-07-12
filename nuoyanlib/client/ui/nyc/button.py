@@ -114,7 +114,7 @@ class NyButton(NyControl):
             self.save_pos_data()
         self._finger_pos = None
 
-    # region API ===================================================================================
+    # region API =======================================================================================================
 
     def set_default_texture(self, tex_path):
         """
@@ -361,7 +361,7 @@ class NyButton(NyControl):
 
     # endregion
 
-    # region Internal ===================================================================================
+    # region Internal ==================================================================================================
 
     def _set_movable_data(self, movable, move_parent=False, associated_uis=None, auto_save=False):
         if movable:
