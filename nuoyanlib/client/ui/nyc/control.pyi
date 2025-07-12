@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-26
+|   Date  : 2025-07-11
 |
 | ==============================================
 """
@@ -495,7 +495,7 @@ class NyControl(object):
     def resetAnimation(self) -> None:
         """
         | 重置该控件的动画。
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
 
         -----
 
@@ -505,7 +505,7 @@ class NyControl(object):
     def PauseAnimation(self, property_name: UiPropertyNamesAll = "all") -> bool:
         """
         | 暂停动画，暂停后的动画会停在当前的状态。
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
 
         -----
 
@@ -517,7 +517,7 @@ class NyControl(object):
     def PlayAnimation(self, property_name: UiPropertyNamesAll = "all") -> bool:
         """
         | 继续播放动画，从动画当前状态开始播放
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
 
         -----
 
@@ -529,7 +529,7 @@ class NyControl(object):
     def StopAnimation(self, property_name: UiPropertyNamesAll = "all") -> bool:
         """
         | 停止动画，动画将恢复到第一段动画片段的 ``from`` 状态。
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
 
         -----
 
@@ -547,7 +547,7 @@ class NyControl(object):
     ) -> bool:
         """
         | 给单一属性设置动画，已有重复的会设置失败，需要先remove。
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
         | 需要注意，设置动画本质上是拷贝动画数据到控件的动画组件里面，所以如果动画数据发生了改变（比如通过接口 ``RegisterUIAnimations`` 修改了动画数据），如果想要控件应用修改需要再次调用 ``SetAnimation`` 进行更新。
 
         -----
@@ -563,7 +563,7 @@ class NyControl(object):
     def RemoveAnimation(self, property_name: UiPropertyNames) -> bool:
         """
         | 删除单一属性的动画，删除后的值与当前状态有关，建议删除后重新设置该属性值。
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
 
         -----
 
@@ -575,7 +575,7 @@ class NyControl(object):
     def SetAnimEndCallback(self, anim_name: str, func: Callable) -> bool:
         """
         | 设置动画播放结束后的回调，每次设置都会覆盖上一次的设置。
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
 
         -----
 
@@ -588,7 +588,7 @@ class NyControl(object):
     def RemoveAnimEndCallback(self, anim_name: str) -> bool:
         """
         | 移除动画播放结束后的回调。
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
 
         -----
 
@@ -600,7 +600,7 @@ class NyControl(object):
     def IsAnimEndCallbackRegistered(self, anim_name: str) -> bool:
         """
         | 控件是否对名称为 ``anim_name`` 的动画进行了注册回调。
-        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_
+        | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
 
         -----
 

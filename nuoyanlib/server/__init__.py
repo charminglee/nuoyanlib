@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-08
+|   Date  : 2025-07-09
 |
 |   nuoyanlib服务端库。
 |
@@ -85,7 +85,7 @@ if _ins.__lib_flag__ == 0:
         _info("nuoyanlib.server loaded in %.3fms (first loading)" % _consume)
         del _consume
 else:
-    # 引用内存中已加载的库，确保相同版本的代码只加载一次
+    # 引用内存中已加载的对象，确保相同版本的代码只加载一次
     _dct = {
         k: v
         for k, v in _ins.get_lib_dict().items()
