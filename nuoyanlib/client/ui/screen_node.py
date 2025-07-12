@@ -7,19 +7,21 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-23
+|   Date  : 2025-07-12
 |
 | ==============================================
 """
 
 
-from itertools import product
+from time import time
+from itertools import product, cycle
 from fnmatch import fnmatchcase
 from types import GeneratorType
 from ..._core._client.comp import CustomUIScreenProxy, ScreenNode
 from ..._core import _error
-from ..._core.listener import ClientEventProxy
+from ..._core.listener import ClientEventProxy, listen_event, unlisten_event, has_listened, unlisten_all_events
 from ..._core._utils import hook_method, iter_obj_attrs
+from ..._core._types._events import ClientEventEnum as Events
 from .ui_utils import (
     to_control, get_ui_pos_data, save_ui_pos_data,
     get_children_path_by_level, get_parent_path, to_path,
@@ -65,6 +67,7 @@ class ScreenNodeExtension(ClientEventProxy):
         self._nyc_cache = {}
         self._ui_pos_data_key = ""
         self._screen_node = None
+        self._frame_anim_data = {}
         self.cs = None
         self.root_panel = None
         if isinstance(self, CustomUIScreenProxy):
@@ -99,6 +102,8 @@ class ScreenNodeExtension(ClientEventProxy):
         self._process_button_callback()
 
     def __destroy__(self):
+        unlisten_all_events(self)
+        unlisten_event(self._GameRenderTickEvent, Events.GameRenderTickEvent)
         for nyc in self._nyc_cache.values():
             nyc.__destroy__()
         self._nyc_cache.clear()
@@ -106,10 +111,27 @@ class ScreenNodeExtension(ClientEventProxy):
         self.cs = None
         self.root_panel = None
 
-    # region API ===================================================================================
+    def _GameRenderTickEvent(self, args):
+        for path, data in self._frame_anim_data.items():
+            if data['is_pausing']:
+                continue
+            now = time()
+            if now - data['last_time'] >= data['frame_time']:
+                try:
+                    index = next(data['indexes'])
+                except StopIteration:
+                    del self._frame_anim_data[path]
+                    data['control'].texture = data['tex_path'] % data['stop_frame']
+                    if data['callback']:
+                        data['callback'](*data['args'], **data['kwargs'])
+                else:
+                    data['control'].texture = data['tex_path'] % index
+                    data['last_time'] = now
+
+    # region Public APIs ===============================================================================================
 
     @staticmethod
-    def button_callback(btn_path, *callback_types, **kwargs):
+    def button_callback(btn_path, *callback_types, **kwargs): # todo
         """
         [装饰器]
 
@@ -312,7 +334,54 @@ class ScreenNodeExtension(ClientEventProxy):
 
     # endregion
 
-    # region Internal ===================================================================================
+    # region Image APIs ================================================================================================
+
+    def _play_frame_anim(
+            self,
+            ny_image,
+            tex_path,
+            frame_count,
+            frame_rate,
+            stop_frame=-1,
+            loop=False,
+            callback=None,
+            args=None,
+            kwargs=None,
+    ):
+        if loop:
+            indexes = cycle(xrange(frame_count))
+        else:
+            indexes = iter(xrange(frame_count))
+        if stop_frame < 0:
+            stop_frame += frame_count
+        self._frame_anim_data[ny_image.path] = {
+            'control': ny_image,
+            'tex_path': tex_path,
+            'frame_time': 1.0 / frame_rate,
+            'stop_frame': stop_frame,
+            'last_time': time(),
+            'indexes': indexes,
+            'is_pausing': False,
+            'callback': callback,
+            'args': args or (),
+            'kwargs': kwargs or {},
+        }
+        if not has_listened(self._GameRenderTickEvent, Events.GameRenderTickEvent):
+            listen_event(self._GameRenderTickEvent, Events.GameRenderTickEvent)
+
+    def _pause_frame_anim(self, ny_image):
+        path = ny_image.path
+        if path in self._frame_anim_data:
+            self._frame_anim_data[path]['is_pausing'] = True
+
+    def _stop_frame_anim(self, ny_image):
+        path = ny_image.path
+        if path in self._frame_anim_data:
+            del self._frame_anim_data[path]
+
+    # endregion
+
+    # region Button APIs ===============================================================================================
 
     def _process_button_callback(self):
         for attr in iter_obj_attrs(self):
@@ -350,6 +419,10 @@ class ScreenNodeExtension(ClientEventProxy):
             # 生成所有匹配的路径
             for p in product(*path_split):
                 yield "/".join(p)
+
+    # endregion
+
+    # region Internal ==================================================================================================
 
     def _create_nyc(self, path_or_control, typ, **kwargs):
         path = to_path(path_or_control)

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-23
+|   Date  : 2025-07-11
 |
 | ==============================================
 """
@@ -17,7 +17,7 @@ from typing import Optional, overload, Any, TypeVar, Dict, Type, Generator, Call
 from types import FunctionType
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
-from ..._core._types._typing import UiPathOrControl, STuple, NyControlTypes
+from ..._core._types._typing import Args, Kwargs, UiPathOrControl, STuple, NyControlTypes, ArgsDict, FrameAnimDataType
 from ..._core.listener import ClientEventProxy
 from .nyc import *
 
@@ -34,6 +34,7 @@ class ScreenNodeExtension(ClientEventProxy):
     _nyc_cache: Dict[str, NyControlTypes]
     _ui_pos_data_key: str
     _screen_node: ScreenNode
+    _frame_anim_data: Dict[str, FrameAnimDataType]
     cs: Optional[ClientSystem]
     """
     | 创建UI的客户端实例。
@@ -48,6 +49,7 @@ class ScreenNodeExtension(ClientEventProxy):
     def __init__(self: ..., screen_name: str, screen_node: ScreenNode, /) -> None: ...
     def __create__(self): ...
     def __destroy__(self): ...
+    def _GameRenderTickEvent(self, args: ArgsDict) -> None: ...
     @staticmethod
     def button_callback(
         btn_path: str,
@@ -84,6 +86,20 @@ class ScreenNodeExtension(ClientEventProxy):
     GetParentNyControl = get_parent_ny_control
     ClearAllPosData = clear_all_pos_data
     SaveAllPosData = save_all_pos_data
+    def _play_frame_anim(
+        self,
+        ny_image: NyImage,
+        tex_path: str,
+        frame_count: int,
+        frame_rate: int,
+        stop_frame: int = -1,
+        loop: bool = False,
+        callback: Optional[Callable] = None,
+        args: Optional[Args] = None,
+        kwargs: Optional[Kwargs] = None,
+    ) -> None: ...
+    def _pause_frame_anim(self, ny_image: NyImage) -> None: ...
+    def _stop_frame_anim(self, ny_image: NyImage) -> None: ...
     def _process_button_callback(self) -> None: ...
     def _expend_path(self, path: str) -> Generator[str, None, None]: ...
     def _create_nyc(self, path_or_control: UiPathOrControl, typ: Type[_T], **kwargs: Any) -> _T: ...

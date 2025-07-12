@@ -16,7 +16,7 @@
 from typing import Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Generator, Type
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ...._core._types._typing import UiPathOrControl, FTuple2, Anchor, FullSizeDict, FullPositionDict, UiPropertyNames, UiPropertyNamesAll, NyControlTypes
+from ...._core._types._typing import UiPathOrControl, FTuple2, AnchorType, FullSizeDict, FullPositionDict, UiPropertyNames, UiPropertyNamesAll
 from ...._core._utils import args_type_check, cached_property
 from ..screen_node import ScreenNodeExtension
 from . import *
@@ -84,13 +84,13 @@ class NyControl(object):
     @position.setter
     def position(self, val: FTuple2) -> None: ...
     @property
-    def anchor_from(self) -> Anchor: ...
+    def anchor_from(self) -> AnchorType: ...
     @anchor_from.setter
-    def anchor_from(self, val: Anchor) -> None: ...
+    def anchor_from(self, val: AnchorType) -> None: ...
     @property
-    def anchor_to(self) -> Anchor: ...
+    def anchor_to(self) -> AnchorType: ...
     @anchor_to.setter
-    def anchor_to(self, val: Anchor) -> None: ...
+    def anchor_to(self, val: AnchorType) -> None: ...
     @property
     def clip_offset(self) -> FTuple2: ...
     @clip_offset.setter
@@ -235,7 +235,7 @@ class NyControl(object):
         :return: 控件的位置信息，详见SetFullPosition
         :rtype: dict
         """
-    def SetAnchorFrom(self, ancho_from: Anchor) -> bool:
+    def SetAnchorFrom(self, ancho_from: AnchorType) -> bool:
         """
         | 设置控件相对于父节点的锚点。
         | ``anchor_from`` 可选的值：
@@ -256,7 +256,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetAnchorFrom(self) -> Anchor:
+    def GetAnchorFrom(self) -> AnchorType:
         """
         | 判断控件相对于父节点的哪个锚点来计算位置与大小。
 
@@ -265,7 +265,7 @@ class NyControl(object):
         :return: 控件计算位置大小所依赖的父节点锚点位置信息，详见SetAnchorFrom
         :rtype: str
         """
-    def SetAnchorTo(self, anchor_to: Anchor) -> bool:
+    def SetAnchorTo(self, anchor_to: AnchorType) -> bool:
         """
         | 设置控件自身锚点位置。
 
@@ -276,7 +276,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetAnchorTo(self) -> Anchor:
+    def GetAnchorTo(self) -> AnchorType:
         """
         | 获取控件自身锚点位置信息。
 

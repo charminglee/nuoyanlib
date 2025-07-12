@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-07-11
 |
 | ==============================================
 """
 
 
-from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable, Literal, Any
+from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable, Literal, Any, Iterator
 from types import InstanceType
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
@@ -25,6 +25,7 @@ PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
 FTuple = Tuple[float, ...]
 FTuple2 = Tuple[float, float]
 FTuple3 = Tuple[float, float, float]
+FTuple4 = Tuple[float, float, float, float]
 ITuple = Tuple[int, ...]
 ITuple2 = Tuple[int, int]
 ITuple3 = Tuple[int, int, int]
@@ -32,6 +33,8 @@ STuple = Tuple[str, ...]
 Vector = Union[FTuple3, List[float], Vector3]
 VectorNoList = Union[FTuple3, Vector3]
 Matrix = List[List[float]]
+Args = Tuple[Any, ...]
+Kwargs = Dict[str, Any]
 
 
 class ItemDict(TypedDict, total=False):
@@ -70,7 +73,7 @@ EventCallbackMethod = Callable[[InstanceType, ArgsDict], Any]
 
 
 UiPathOrControl = Union[str, BaseUIControl]
-Anchor = Literal[
+AnchorType = Literal[
     "top_left",
     "top_middle",
     "top_right",
@@ -142,4 +145,29 @@ TextAlignmentType = Literal[
     "left",
     "right",
     "center",
+]
+class FrameAnimDataType(TypedDict):
+    control: NyImage
+    tex_path: str
+    frame_time: float
+    stop_frame: int
+    loop: bool
+    last_time: float
+    indexes: Iterator[int]
+    is_pausing: bool
+    callback: Callable
+    args: Tuple[Any, ...]
+    kwargs: Dict[str, Any]
+ClipDirectionType = Literal[
+    "fromLeftToRight",
+    "fromRightToLeft",
+    "fromOutsideToInside",
+    "fromTopToBottom",
+    "fromBottomToTop",
+]
+ImageAdaptionType = Literal[
+    "normal",
+    "filled",
+    "oldNineSlice",
+    "originNineSlice",
 ]
