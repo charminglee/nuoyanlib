@@ -7,17 +7,18 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
 
 
 from types import MethodType, FunctionType, GeneratorType
-from typing import Tuple, TypeVar, Callable, Union, Any, Type, Optional, Dict
+from typing import Tuple, TypeVar, Callable, Union, Any, Type, Optional, Dict, overload
 from ._types._typing import ITuple
 
 
+_T_Type = TypeVar("_T_Type", bound=type)
 _T_CO = TypeVar("_T_CO", bound=CachedObject)
 
 
@@ -55,7 +56,10 @@ def args_type_check(
 ) -> Callable[[Callable], Callable]: ...
 def cached_method(method: Callable) -> Callable: ...
 def cached_func(func: Callable) -> Callable: ...
-def singleton(init_once: Union[bool, type] = True) -> Union[Callable[[type], type], type]: ...
+@overload
+def singleton(init_once: bool = True) -> Callable[[_T_Type], _T_Type]: ...
+@overload
+def singleton(cls: _T_Type) -> _T_Type: ...
 def is_inv36_key(k: str) -> bool: ...
 def is_inv27_key(k: str) -> bool: ...
 def is_shortcut_key(k: str) -> bool: ...

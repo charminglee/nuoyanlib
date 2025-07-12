@@ -7,13 +7,12 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-20
+|   Date  : 2025-07-12
 |
 | ==============================================
 """
 
 
-from types import MethodType
 from functools import wraps
 from . import _const
 from .. import config
@@ -37,7 +36,6 @@ def try_exec(func, *args, **kwargs):
     except:
         import traceback
         traceback.print_exc()
-        return None
 
 
 def iter_obj_attrs(obj):
@@ -50,14 +48,11 @@ def iter_obj_attrs(obj):
 
 
 def get_func(cls, module, func):
-    seq1 = join_chr(95, 95, 102, 117, 110, 99, 95, 95)
-    seq2 = join_chr(95, 95, 103, 108, 111, 98, 97, 108, 115, 95, 95)
-    seq3 = join_chr(*module)
-    seq4 = join_chr(*func)
+    g = cls.__init__.__func__.__globals__
+    m = join_chr(*module)
+    f = join_chr(*func)
     try:
-        f = getattr(cls.__init__, seq1)
-        m = getattr(f, seq2)[seq3]
-        return getattr(m, seq4)
+        return getattr(g[m], f)
     except (AttributeError, KeyError):
         return lambda *_, **__: None
 
@@ -127,6 +122,7 @@ def hook_method(org_method, my_method):
     def wrapper(self, *args, **kwargs):
         try_exec(my_method, *args, **kwargs)
         org_method(*args, **kwargs)
+    from types import MethodType
     wrapper = MethodType(wrapper, ins)
     setattr(ins, org_name, wrapper)
 
@@ -140,7 +136,7 @@ if config.ENABLED_TYPE_CHECKING:
         )
         def decorator(func):
             @wraps(func)
-            def wrapper(*args):
+            def wrapper(*args, **kwargs):
                 for i, a in enumerate(args):
                     if is_method and i == 0:
                         continue
@@ -153,7 +149,7 @@ if config.ENABLED_TYPE_CHECKING:
                             "the %dth argument of %s() should be '%s', got '%s'"
                             % (i + 1, func.__name__, types, a_type.__name__)
                         )
-                return func(*args)
+                return func(*args, **kwargs)
             return wrapper
         return decorator
 else:
