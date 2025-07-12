@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
@@ -16,15 +16,15 @@
 import threading
 import time
 import mod.client.extraClientApi as api
-from _core._const import LIB_NAME, LIB_CLIENT_NAME, LIB_SERVER_NAME
-from _core._client._lib_client import NuoyanLibClientSystem
-from _core._server._lib_server import NuoyanLibServerSystem
+from ._core._const import LIB_NAME, LIB_CLIENT_NAME, LIB_SERVER_NAME
+from ._core._client._lib_client import NuoyanLibClientSystem
+from ._core._server._lib_server import NuoyanLibServerSystem
 
 
-# circular import test
-import nuoyanlib.client
+# 循环导入测试
+from . import client
 def import_server():
-    import nuoyanlib.server
+    from . import server
 threading.Thread(target=import_server).start()
 
 
