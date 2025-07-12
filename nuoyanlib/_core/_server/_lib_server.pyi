@@ -13,7 +13,7 @@
 """
 
 
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Callable, Union
 from mod.server.system.serverSystem import ServerSystem
 from .._types._typing import ArgsDict
 from ..listener import ServerEventProxy
@@ -33,6 +33,7 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
     @staticmethod
     def register() -> NuoyanLibServerSystem: ...
     def get_lib_dict(self) -> Dict[str, Any]: ...
+    callback_data: Dict[str, Dict[str, Union[Callable, int]]]
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def _ButtonCallbackTrigger(self, args: ArgsDict) -> None: ...
     def _BroadcastToAllClient(self, args: ArgsDict) -> None: ...

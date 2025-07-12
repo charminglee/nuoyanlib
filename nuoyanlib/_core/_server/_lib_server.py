@@ -37,6 +37,7 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
         self.__lib_flag__ = 0
         self.query_cache = {}
+        self.callback_data = {}
         ln = _const.LIB_NAME
         lsn = _const.LIB_SERVER_NAME
         lcn = _const.LIB_CLIENT_NAME
@@ -121,13 +122,15 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         playerId = args['__id__']
         target_sys = server_api.GetSystem(ns, sys_name)
         def callback(cb_args):
-            self.NotifyToClient(playerId, "_NuoyanLibCallReturn", {'uuid': uuid, 'cb_args': cb_args})
+            ret_args = {'uuid': uuid, 'cb_args': cb_args, 'method': method}
+            self.NotifyToClient(playerId, "_NuoyanLibCallReturn", ret_args)
         from ...utils.communicate import call_local
         call_local(target_sys, method, callback, delay_ret, call_args, call_kwargs)
 
     def _NuoyanLibCallReturn(self, args):
         uuid = args['uuid']
         cb_args = args['cb_args']
+        method = args['method']
         from ...utils.communicate import call_callback
         call_callback(uuid, **cb_args)
 

@@ -56,8 +56,6 @@ def broadcast_to_all_systems(
     event_args: Any,
     from_system: Tuple[str, str],
 ) -> None: ...
-
-
 def call_callback(
     cb_or_uuid: Union[_CallbackType, str],
     delay_ret: float = -1,

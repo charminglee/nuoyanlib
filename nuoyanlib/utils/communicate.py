@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-25
+|   Date  : 2025-07-12
 |
 | ==============================================
 """
@@ -81,16 +81,14 @@ def broadcast_to_all_systems(event_name, event_args, from_system):
         from_system.BroadcastEvent(event_name, event_args)
 
 
-_callback_data = {}
-
-
 def call_callback(cb_or_uuid, delay_ret=-1, success=True, ret=None, error="", player_id=""):
+    lib_sys = get_lib_system()
     if isinstance(cb_or_uuid, str):
-        data = _callback_data[cb_or_uuid]
+        data = lib_sys.callback_data[cb_or_uuid]
         callback = data['callback']
         data['count'] -= 1
         if data['count'] <= 0:
-            del _callback_data[cb_or_uuid]
+            del lib_sys.callback_data[cb_or_uuid]
     else:
         callback = cb_or_uuid
     if not callback:
@@ -130,8 +128,8 @@ def call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwar
         'args': args,
         'kwargs': kwargs,
     }
-    _callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
     lib_sys = get_lib_system()
+    lib_sys.callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
     if is_client():
         if player_id is None:
             lib_sys.NotifyToServer("_NuoyanLibCall", notify_args)

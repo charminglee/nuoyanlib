@@ -13,9 +13,8 @@
 """
 
 
-from typing import List, Optional, Any, Dict
+from typing import List, Optional, Any, Dict, Callable, Union
 from mod.client.system.clientSystem import ClientSystem
-from mod.client.ui.screenNode import ScreenNode
 from .._types._typing import ArgsDict
 from ..listener import ClientEventProxy
 from .._sys import NuoyanLibBaseSystem
@@ -33,6 +32,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     @staticmethod
     def register() -> NuoyanLibClientSystem: ...
     def get_lib_dict(self) -> Dict[str, Any]: ...
+    callback_data: Dict[str, Dict[str, Union[Callable, int]]]
     def __init__(self: ..., namespace: str, system_name: str) -> None: ...
     def broadcast_to_all_client(
         self,

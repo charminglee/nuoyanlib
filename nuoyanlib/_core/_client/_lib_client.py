@@ -36,6 +36,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
         self.__lib_flag__ = 0
+        self.callback_data = {}
         ln = _const.LIB_NAME
         lsn = _const.LIB_SERVER_NAME
         lcn = _const.LIB_CLIENT_NAME
@@ -159,7 +160,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         player_id = args.get('__id__')
         target_sys = client_api.GetSystem(ns, sys_name)
         def callback(cb_args):
-            ret_args = {'uuid': uuid, 'cb_args': cb_args}
+            ret_args = {'uuid': uuid, 'cb_args': cb_args, 'method': method}
             if player_id:
                 self.notify_to_multi_clients([player_id], "_NuoyanLibCallReturn", ret_args)
             else:
@@ -170,6 +171,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     def _NuoyanLibCallReturn(self, args):
         uuid = args['uuid']
         cb_args = args['cb_args']
+        method = args['method']
         from ...utils.communicate import call_callback
         call_callback(uuid, **cb_args)
 
