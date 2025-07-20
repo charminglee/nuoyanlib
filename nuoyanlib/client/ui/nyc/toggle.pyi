@@ -7,20 +7,25 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-22
+|   Date  : 2025-07-14
 |
 | ==============================================
 """
 
 
-from typing import Optional
+from typing import Optional, Callable, Any, List
 from mod.client.ui.controls.switchToggleUIControl import SwitchToggleUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ...._core._utils import args_type_check
+from ...._core._types._typing import ToggleCallbackArgs
+
+
+__ToggleChangedCallbackType = Callable[[ToggleCallbackArgs], Any]
 
 
 class NyToggle(NyControl):
+    _changed_cbs: List[__ToggleChangedCallbackType]
     base_control: SwitchToggleUIControl
     """
     | 开关 ``SwitchToggleUIControl`` 实例。
@@ -33,4 +38,33 @@ class NyToggle(NyControl):
     @args_type_check(str, is_method=True)
     def __div__(self, other: str) -> Optional[NyControl]: ...
     def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
+    def set_callback(self, func: __ToggleChangedCallbackType) -> bool: ...
+    def remove_callback(self, func: __ToggleChangedCallbackType) -> bool: ...
+    @property
+    def state(self) -> bool: ...
+    @state.setter
+    def state(self, val: bool) -> None: ...
 
+    def SetToggleState(self, is_on: bool, toggle_path: str = "/this_toggle") -> None:
+        """
+        | 设置Toggle开关控件的值。
+
+        -----
+
+        :param bool is_on: 开关状态
+        :param str toggle_path: 实际toggle控件相对路径，由UI编辑器生成的开关控件该参数即为默认值"/this_toggle"
+
+        :return: 无
+        :rtype: None
+        """
+    def GetToggleState(self, toggle_path: str = "/this_toggle") -> bool:
+        """
+        | 获取Toggle开关控件的状态。
+
+        -----
+
+        :param str toggle_path: 实际toggle控件相对路径，由UI编辑器生成的开关控件该参数即为默认值"/this_toggle"
+
+        :return: 开关状态
+        :rtype: bool
+        """

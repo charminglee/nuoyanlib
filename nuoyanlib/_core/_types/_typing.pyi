@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-11
+|   Date  : 2025-07-14
 |
 | ==============================================
 """
@@ -171,3 +171,5 @@ ImageAdaptionType = Literal[
     "oldNineSlice",
     "originNineSlice",
 ]
+class ToggleCallbackArgs(TypedDict):
+    state: bool
