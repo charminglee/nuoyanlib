@@ -76,7 +76,7 @@ class NyControl(object):
 
     # region API =======================================================================================================
 
-    def iter_children_ny_control(self, level=1):
+    def iter_children_control(self, level=1):
         """
         [迭代器]
 
@@ -124,14 +124,14 @@ class NyControl(object):
         """
         [只读属性]
 
-        | 父控件路径。
+        | 父控件路径，没有父控件时返回None，若父控件为根画布（main），返回空字符串。
 
         :rtype: str
         """
         return get_parent_path(self.path)
 
     @cached_property
-    def parent_ny_control(self):
+    def parent_control(self):
         """
         [只读属性]
 

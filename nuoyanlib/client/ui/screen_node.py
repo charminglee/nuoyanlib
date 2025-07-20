@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-12
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
@@ -243,7 +243,7 @@ class ScreenNodeExtension(ClientEventProxy):
         """
         return get_children_path_by_level(path_or_control, self._screen_node, level)
 
-    def get_children_ny_control_by_level(self, path_or_control, level=1):
+    def get_children_control_by_level(self, path_or_control, level=1):
         """
         [迭代器]
 
@@ -275,7 +275,7 @@ class ScreenNodeExtension(ClientEventProxy):
         """
         return get_parent_path(path_or_control)
 
-    def get_parent_ny_control(self, path_or_control):
+    def get_parent_control(self, path_or_control):
         """
         | 获取控件的父控件 ``NyControl`` 实例。
 
@@ -326,9 +326,9 @@ class ScreenNodeExtension(ClientEventProxy):
     CreateNyLabel               = create_ny_label
     CreateNyProgressBar         = create_ny_progress_bar
     GetChildrenPathByLevel      = get_children_path_by_level
-    GetChildrenNyControlByLevel = get_children_ny_control_by_level
+    GetChildrenNyControlByLevel = get_children_control_by_level
     GetParentPath               = get_parent_path
-    GetParentNyControl          = get_parent_ny_control
+    GetParentNyControl          = get_parent_control
     ClearAllPosData             = clear_all_pos_data
     SaveAllPosData              = save_all_pos_data
 

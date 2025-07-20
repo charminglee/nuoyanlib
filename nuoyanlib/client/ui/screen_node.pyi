@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-11
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
@@ -66,13 +66,13 @@ class ScreenNodeExtension(ClientEventProxy):
         path_or_control: UiPathOrControl,
         level: int = 1
     ) -> Generator[str, None, None]: ...
-    def get_children_ny_control_by_level(
+    def get_children_control_by_level(
         self,
         path_or_control: UiPathOrControl,
         level: int = 1
     ) -> Generator[NyControl, None, None]: ...
     def get_parent_path(self, path_or_control: UiPathOrControl) -> Optional[str]: ...
-    def get_parent_ny_control(self, path_or_control: UiPathOrControl) -> Optional[NyControl]: ...
+    def get_parent_control(self, path_or_control: UiPathOrControl) -> Optional[NyControl]: ...
     def clear_all_pos_data(self) -> bool: ...
     def save_all_pos_data(self) -> bool: ...
     CreateNyControl = create_ny_control
@@ -81,9 +81,9 @@ class ScreenNodeExtension(ClientEventProxy):
     CreateNyLabel = create_ny_label
     CreateNyProgressBar = create_ny_progress_bar
     GetChildrenPathByLevel = get_children_path_by_level
-    GetChildrenNyControlByLevel = get_children_ny_control_by_level
+    GetChildrenNyControlByLevel = get_children_control_by_level
     GetParentPath = get_parent_path
-    GetParentNyControl = get_parent_ny_control
+    GetParentNyControl = get_parent_control
     ClearAllPosData = clear_all_pos_data
     SaveAllPosData = save_all_pos_data
     def _play_frame_anim(
