@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-07-13
 |
 | ==============================================
 """
@@ -46,6 +46,72 @@ class NyScrollView(NyControl):
     # endregion
 
     # region property proxy ============================================================================================
+
+    @property
+    def scroll_pos(self):
+        """
+        [可读写属性]
+
+        | 当前ScrollView最上方内容的位置。
+
+        :rtype: float
+        """
+        return self.base_control.GetScrollViewPos()
+
+    @scroll_pos.setter
+    def scroll_pos(self, val):
+        """
+        [可读写属性]
+
+        | 当前ScrollView最上方内容的位置。
+
+        :type val: float
+        """
+        self.base_control.SetScrollViewPos(val)
+
+    @property
+    def scroll_pct(self):
+        """
+        [可读写属性]
+
+        | 当前ScrollView内容的百分比位置。
+
+        :rtype: int
+        """
+        return self.base_control.GetScrollViewPercentValue()
+
+    @scroll_pct.setter
+    def scroll_pct(self, val):
+        """
+        [可读写属性]
+
+        | 当前ScrollView内容的百分比位置。
+
+        :type val: int
+        """
+        self.base_control.SetScrollViewPercentValue(int(val))
+
+    @property
+    def content_path(self):
+        """
+        [只读属性]
+
+        | ScrollView内容控件的路径。
+
+        :rtype: str
+        """
+        return self.base_control.GetScrollViewContentPath()
+
+    @property
+    def content_control(self):
+        """
+        [只读属性]
+
+        | ScrollView内容控件的 ``NyControl`` 实例。
+
+        :rtype: NyControl
+        """
+        return NyControl.from_path(self.ui_node, self.content_path)
 
     # endregion
 
