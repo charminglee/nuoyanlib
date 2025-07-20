@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-26
+|   Date  : 2025-07-14
 |
 | ==============================================
 """
@@ -67,7 +67,7 @@ class NyControl(object):
         """
         if not other.startswith("/"):
             other = "/" + other
-        return NyControl.create(self.ui_node, self.path + other)
+        return NyControl.from_path(self.ui_node, self.path + other)
 
     def __destroy__(self):
         self._screen_node = None
@@ -91,7 +91,7 @@ class NyControl(object):
         """
         all_path = get_children_path_by_level(self.base_control, self._screen_node, level)
         for p in all_path:
-            yield NyControl.create(self.ui_node, p)
+            yield NyControl.from_path(self.ui_node, p)
 
     def iter_children_path(self, level=1):
         """
@@ -107,6 +107,36 @@ class NyControl(object):
         :rtype: GeneratorType
         """
         return get_children_path_by_level(self.base_control, self._screen_node, level)
+
+    @classmethod
+    def from_path(cls, screen_node_ex, path, **kwargs):
+        """
+        | 根据控件路径创建一个类型与调用该方法的类相同的Ny控件实例。
+
+        -----
+
+        :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例
+        :param str path: 控件路径
+
+        :return: Ny控件实例
+        :rtype: NyControl
+        """
+        return screen_node_ex._create_nyc(path, cls, **kwargs)
+
+    @classmethod
+    def from_control(cls, screen_node_ex, control, **kwargs):
+        """
+        | 根据 ``BaseUIControl`` 实例创建一个类型与调用该方法的类相同的Ny控件实例。
+
+        -----
+
+        :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例
+        :param BaseUIControl control: BaseUIControl实例
+
+        :return: Ny控件实例
+        :rtype: NyControl
+        """
+        return screen_node_ex._create_nyc(control.GetPath(), cls, **kwargs)
 
     @cached_property
     def path(self):
@@ -139,23 +169,6 @@ class NyControl(object):
 
         :rtype: NyControl
         """
-        return NyControl.create(self.ui_node, self.parent_path)
-
-    @classmethod
-    def create(cls, screen_node_ex, path_or_control, **kwargs):
-        """
-        | 创建一个类型与调用该方法的类相同的Ny控件实例。
-
-        -----
-
-        :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例
-        :param str path_or_control: 控件路径或BaseUIControl实例
-        :param Any kwargs: 参数
-
-        :return: Ny控件实例
-        :rtype: NyControl
-        """
-        return screen_node_ex._create_nyc(path_or_control, cls, **kwargs)
 
     def destroy(self):
         """
@@ -167,6 +180,7 @@ class NyControl(object):
         :rtype: None
         """
         self.ui_node._destroy_nyc(self)
+        return NyControl.from_path(self.ui_node, self.parent_path)
 
     # endregion
 
@@ -184,7 +198,7 @@ class NyControl(object):
         :rtype: NyButton
         """
         from . import NyButton
-        return NyButton.create(self.ui_node, self.path, touch_event_params=touch_event_params)
+        return NyButton.from_path(self.ui_node, self.path, touch_event_params=touch_event_params)
 
     def to_image(self):
         """
@@ -196,7 +210,7 @@ class NyControl(object):
         :rtype: NyImage
         """
         from . import NyImage
-        return NyImage.create(self.ui_node, self.path)
+        return NyImage.from_path(self.ui_node, self.path)
 
     def to_label(self):
         """
@@ -208,7 +222,7 @@ class NyControl(object):
         :rtype: NyLabel
         """
         from . import NyLabel
-        return NyLabel.create(self.ui_node, self.path)
+        return NyLabel.from_path(self.ui_node, self.path)
 
     def to_input_panel(self):
         """
@@ -220,7 +234,7 @@ class NyControl(object):
         :rtype: NyInputPanel
         """
         from . import NyInputPanel
-        return NyInputPanel.create(self.ui_node, self.path)
+        return NyInputPanel.from_path(self.ui_node, self.path)
 
     def to_stack_panel(self):
         """
@@ -232,7 +246,7 @@ class NyControl(object):
         :rtype: NyStackPanel
         """
         from . import NyStackPanel
-        return NyStackPanel.create(self.ui_node, self.path)
+        return NyStackPanel.from_path(self.ui_node, self.path)
 
     def to_edit_box(self):
         """
@@ -244,7 +258,7 @@ class NyControl(object):
         :rtype: NyEditBox
         """
         from . import NyEditBox
-        return NyEditBox.create(self.ui_node, self.path)
+        return NyEditBox.from_path(self.ui_node, self.path)
 
     def to_netease_paper_doll(self):
         """
@@ -256,7 +270,7 @@ class NyControl(object):
         :rtype: NyPaperDoll
         """
         from . import NyPaperDoll
-        return NyPaperDoll.create(self.ui_node, self.path)
+        return NyPaperDoll.from_path(self.ui_node, self.path)
 
     def to_item_renderer(self):
         """
@@ -268,7 +282,7 @@ class NyControl(object):
         :rtype: NyItemRenderer
         """
         from . import NyItemRenderer
-        return NyItemRenderer.create(self.ui_node, self.path)
+        return NyItemRenderer.from_path(self.ui_node, self.path)
 
     def to_scroll_view(self):
         """
@@ -280,7 +294,7 @@ class NyControl(object):
         :rtype: NyScrollView
         """
         from . import NyScrollView
-        return NyScrollView.create(self.ui_node, self.path)
+        return NyScrollView.from_path(self.ui_node, self.path)
 
     def to_grid(self, is_stack_grid=False):
         """
@@ -294,7 +308,7 @@ class NyControl(object):
         :rtype: NyGrid
         """
         from . import NyGrid
-        return NyGrid.create(self.ui_node, self.path, is_stack_grid=is_stack_grid)
+        return NyGrid.from_path(self.ui_node, self.path, is_stack_grid=is_stack_grid)
 
     def to_progress_bar(self):
         """
@@ -306,7 +320,7 @@ class NyControl(object):
         :rtype: NyProgressBar
         """
         from . import NyProgressBar
-        return NyProgressBar.create(self.ui_node, self.path)
+        return NyProgressBar.from_path(self.ui_node, self.path)
 
     def to_toggle(self):
         """
@@ -318,7 +332,7 @@ class NyControl(object):
         :rtype: NyToggle
         """
         from . import NyToggle
-        return NyToggle.create(self.ui_node, self.path)
+        return NyToggle.from_path(self.ui_node, self.path)
 
     def to_slider(self):
         """
@@ -330,7 +344,7 @@ class NyControl(object):
         :rtype: NySlider
         """
         from . import NySlider
-        return NySlider.create(self.ui_node, self.path)
+        return NySlider.from_path(self.ui_node, self.path)
 
     def to_selection_wheel(self):
         """
@@ -342,7 +356,7 @@ class NyControl(object):
         :rtype: NySelectionWheel
         """
         from . import NySelectionWheel
-        return NySelectionWheel.create(self.ui_node, self.path)
+        return NySelectionWheel.from_path(self.ui_node, self.path)
 
     def to_combo_box(self):
         """
@@ -354,7 +368,7 @@ class NyControl(object):
         :rtype: NyComboBox
         """
         from . import NyComboBox
-        return NyComboBox.create(self.ui_node, self.path)
+        return NyComboBox.from_path(self.ui_node, self.path)
 
     def to_mini_map(self):
         """
@@ -366,7 +380,7 @@ class NyControl(object):
         :rtype: NyMiniMap
         """
         from . import NyMiniMap
-        return NyMiniMap.create(self.ui_node, self.path)
+        return NyMiniMap.from_path(self.ui_node, self.path)
 
     # endregion
 
@@ -757,7 +771,7 @@ def __test__():
     s = SN("", "")
     c = s.create_ny_control("/control")
     c2 = s.create_ny_control("/control2")
-    abc = NyControl.create(s, "/abc")
+    abc = NyControl.from_path(s, "/abc")
     assert "/abc" in s._nyc_cache
     c = abc / "child"
     assert c.GetPath() == c.path == "/abc/child"

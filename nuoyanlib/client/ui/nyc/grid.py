@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-11
+|   Date  : 2025-07-14
 |
 | ==============================================
 """
@@ -53,7 +53,7 @@ class _ElemGroup(object):
     def next(self):
         elem = self._grid.base_control.GetGridItem(*next(self._coord_gen))
         if elem:
-            return NyControl.create(self._grid.ui_node, elem)
+            return NyControl.from_control(self._grid.ui_node, elem)
         return None
 
     def __len__(self):

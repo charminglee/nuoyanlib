@@ -72,7 +72,7 @@ EventCallbackFunc = Callable[[ArgsDict], Any]
 EventCallbackMethod = Callable[[InstanceType, ArgsDict], Any]
 
 
-UiPathOrControl = Union[str, BaseUIControl]
+UiPathOrControl = Union[str, BaseUIControl, NyControl]
 AnchorType = Literal[
     "top_left",
     "top_middle",

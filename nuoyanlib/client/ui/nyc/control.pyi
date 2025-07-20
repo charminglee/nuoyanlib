@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-11
+|   Date  : 2025-07-14
 |
 | ==============================================
 """
@@ -50,10 +50,17 @@ class NyControl(object):
     def iter_children_control(self, level: int = 1) -> Generator[NyControl, None, None]: ...
     def iter_children_path(self, level: int = 1) -> Generator[str, None, None]: ...
     @classmethod
-    def create(
+    def from_path(
         cls: Type[_T],
         screen_node_ex: ScreenNodeExtension,
-        path_or_control: UiPathOrControl,
+        path: str,
+        **kwargs: Any,
+    ) -> Optional[_T]: ...
+    @classmethod
+    def from_control(
+        cls: Type[_T],
+        screen_node_ex: ScreenNodeExtension,
+        control: BaseUIControl,
         **kwargs: Any,
     ) -> Optional[_T]: ...
     @cached_property
