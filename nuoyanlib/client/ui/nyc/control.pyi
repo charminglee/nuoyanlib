@@ -28,6 +28,7 @@ _T = TypeVar("_T")
 class NyControl(object):
     _CONTROL_TYPE: str
     _screen_node: ScreenNode
+    _kwargs: Dict[str, Any]
     ui_node: ScreenNodeExtension
     """
     | 控件所在UI类的实例。
@@ -47,6 +48,23 @@ class NyControl(object):
     def __div__(self, other: str) -> Optional[NyControl]: ...
     def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
     def __destroy__(self) -> None: ...
+    @property
+    def real_visible(self) -> bool: ...
+    def new_child_control(self, def_name: str, child_name: str, force_update: bool = True) -> Optional[NyControl]: ...
+    def clone_to(
+        self: _T,
+        parent: UiPathOrControl,
+        name: str = "",
+        sync_refresh: bool = True,
+        force_update: bool = True,
+    ) -> Optional[_T]: ...
+    def clone_from(
+        self,
+        control: UiPathOrControl,
+        name: str = "",
+        sync_refresh: bool = True,
+        force_update: bool = True,
+    ) -> Optional[NyControl]: ...
     def iter_children_control(self, level: int = 1) -> Generator[NyControl, None, None]: ...
     def iter_children_path(self, level: int = 1) -> Generator[str, None, None]: ...
     @classmethod
@@ -63,6 +81,8 @@ class NyControl(object):
         control: BaseUIControl,
         **kwargs: Any,
     ) -> Optional[_T]: ...
+    @cached_property
+    def name(self) -> str: ...
     @cached_property
     def path(self) -> str: ...
     @cached_property

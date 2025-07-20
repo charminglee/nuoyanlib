@@ -46,6 +46,7 @@ class NyControl(object):
                 % self.__class__.__name__
             )
         self._screen_node = screen_node_ex._screen_node
+        self._kwargs = kwargs
         self.ui_node = screen_node_ex
         self.base_control = control
 
@@ -75,6 +76,67 @@ class NyControl(object):
         self.ui_node = None
 
     # region API =======================================================================================================
+
+    def new_child_control(self, def_name, child_name, force_update=True):
+        """
+        | 为当前控件创建一个新的子控件
+
+        -----
+
+        :param str def_name: UI控件路径，格式为"namespace.control_name"；namespace对应UI json文件中"namespace"对应的值，UI编辑器生成的UI json文件该值等于文件名；control_name对应想创建的控件的名称，该控件需要置于UI json文件顶层（即与main画布同级，不能是任何一个控件的子控件），或在UI编辑器中将该控件添加至控件库
+        :param str child_name: 子控件名称
+        :param bool force_update: 是否需要强制刷新，默认为True；设为True则进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量新建子控件操作且在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+
+        :return: 子控件NyControl实例，如果该子控件已经存在则返回已存在的子控件
+        :rtype: NyControl
+        """
+        child = self._screen_node.CreateChildControl(def_name, child_name, self.base_control, force_update)
+        if child:
+            return NyControl.from_control(self.ui_node, child)
+
+    def clone_to(self, parent, name="", sync_refresh=True, force_update=True):
+        """
+        | 将当前控件克隆到指定控件下。
+
+        -----
+
+        :param str|BaseUIControl|NyControl parent: 父控件路径或实例
+        :param str name: 新控件的名称，默认使用当前控件的名称；若名称已存在，则自动在名称后添加数字后缀
+        :param bool sync_refresh: 是否需要同步刷新，默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新，默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+
+        :return: 新控件的Ny控件实例，类型与当前控件实例相同，克隆失败时返回None
+        :rtype: NyControl|None
+        """
+        parent_path = parent if isinstance(parent, str) else parent.GetPath()
+        if not name:
+            name = self.name
+        ret = self._screen_node.Clone(self.path, parent_path, name, sync_refresh, force_update)
+        if ret:
+            new_path = parent_path + "/" + name
+            return self.__class__.from_path(self.ui_node, new_path, **self._kwargs)
+
+    def clone_from(self, control, name="", sync_refresh=True, force_update=True):
+        """
+        | 将指定控件克隆到当前控件下。
+
+        -----
+
+        :param str|BaseUIControl|NyControl control: 控件路径或实例
+        :param str name: 新控件的名称，默认使用当前控件的名称；若名称已存在，则自动在名称后添加数字后缀
+        :param bool sync_refresh: 是否需要同步刷新，默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新，默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+
+        :return: 新控件的NyControl实例，克隆失败时返回None
+        :rtype: NyControl|None
+        """
+        control_path = control if isinstance(control, str) else control.GetPath()
+        if not name:
+            name = self.name
+        ret = self._screen_node.Clone(control_path, self.path, name, sync_refresh, force_update)
+        if ret:
+            new_path = self.path + "/" + name
+            return NyControl.from_path(self.ui_node, new_path)
 
     def iter_children_control(self, level=1):
         """
@@ -138,6 +200,45 @@ class NyControl(object):
         """
         return screen_node_ex._create_nyc(control.GetPath(), cls, **kwargs)
 
+    def destroy(self):
+        """
+        | 销毁控件，将控件从画布上移除。
+
+        -----
+
+        :return: 无
+        :rtype: None
+        """
+        self.ui_node._destroy_nyc(self)
+
+    @property
+    def real_visible(self):
+        """
+        [只读属性]
+
+        | 判断控件是否真正可见。
+        | 与ModSDK接口 ``.GetVisible()`` 不同的是， ``.GetVisible()`` 获取的是当前控件的 ``visible`` 值。当父控件的 ``visible`` 为 ``False`` ，而当前控件的 ``visible`` 仍为 ``True`` 时，实际上当前控件是不可见的，此时 ``.real_visible`` 将返回 ``False`` 。
+
+        :rtype: bool
+        """
+        parent = self.parent_control
+        while parent:
+            if not parent.visible:
+                return False
+            parent = parent.parent_control
+        return self.visible
+
+    @cached_property
+    def name(self):
+        """
+        [只读属性]
+
+        | 控件名称。
+
+        :rtype: str
+        """
+        return self.path.split("/")[-1]
+
     @cached_property
     def path(self):
         """
@@ -169,17 +270,6 @@ class NyControl(object):
 
         :rtype: NyControl
         """
-
-    def destroy(self):
-        """
-        | 销毁控件，将控件从画布上移除。
-
-        -----
-
-        :return: 无
-        :rtype: None
-        """
-        self.ui_node._destroy_nyc(self)
         return NyControl.from_path(self.ui_node, self.parent_path)
 
     # endregion
