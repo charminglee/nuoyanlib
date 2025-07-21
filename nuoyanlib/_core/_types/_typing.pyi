@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-14
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
 
 
-from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable, Literal, Any, Iterator
+from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, Iterator
 from types import InstanceType
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
@@ -64,6 +64,8 @@ class ItemHeapData(TypedDict):
     selected_count: int
     animating: bool
     bar_ctrl: ProgressBarUIControl
+UserData = Dict[str, Any]
+
 
 
 ArgsDict = Dict[str, PyBasicTypes]
@@ -73,49 +75,6 @@ EventCallbackMethod = Callable[[InstanceType, ArgsDict], Any]
 
 
 UiPathOrControl = Union[str, BaseUIControl, NyControl]
-AnchorType = Literal[
-    "top_left",
-    "top_middle",
-    "top_right",
-    "left_middle",
-    "center",
-    "right_middle",
-    "bottom_left",
-    "bottom_middle",
-    "bottom_right",
-]
-class FullPositionDict(TypedDict, total=False):
-    followType: Literal["none", "parent", "maxChildren", "maxSibling", "children", "x", "y"]
-    relativeValue: float
-    absoluteValue: float
-class FullSizeDict(TypedDict, total=False):
-    fit: bool
-    followType: Literal["none", "parent", "maxChildren", "maxSibling", "children", "x", "y"]
-    relativeValue: float
-    absoluteValue: float
-UiPropertyNamesAll = Literal[
-    "all",
-    "size",
-    "offset",
-    "alpha",
-    "clip",
-    "color",
-    "flip_book",
-    "aseprite_flip_book",
-    "uv",
-    "wait",
-]
-UiPropertyNames = Literal[
-    "size",
-    "offset",
-    "alpha",
-    "clip",
-    "color",
-    "flip_book",
-    "aseprite_flip_book",
-    "uv",
-    "wait",
-]
 NyControlTypes = Union[
     NyButton,
     NyComboBox,
@@ -135,18 +94,7 @@ NyControlTypes = Union[
     NyStackPanel,
     NyToggle,
 ]
-TextFontType = Literal[
-    "rune",
-    "unicode",
-    "smooth",
-    "default",
-]
-TextAlignmentType = Literal[
-    "left",
-    "right",
-    "center",
-]
-class FrameAnimDataType(TypedDict):
+class FrameAnimData(TypedDict):
     control: NyImage
     tex_path: str
     frame_time: float
@@ -158,18 +106,3 @@ class FrameAnimDataType(TypedDict):
     callback: Callable
     args: Tuple[Any, ...]
     kwargs: Dict[str, Any]
-ClipDirectionType = Literal[
-    "fromLeftToRight",
-    "fromRightToLeft",
-    "fromOutsideToInside",
-    "fromTopToBottom",
-    "fromBottomToTop",
-]
-ImageAdaptionType = Literal[
-    "normal",
-    "filled",
-    "oldNineSlice",
-    "originNineSlice",
-]
-class ToggleCallbackArgs(TypedDict):
-    state: bool

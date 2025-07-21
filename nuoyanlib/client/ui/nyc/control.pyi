@@ -13,10 +13,10 @@
 """
 
 
-from typing import Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Generator, Type
+from typing import TypedDict, Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Generator, Type
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ...._core._types._typing import UiPathOrControl, FTuple2, AnchorType, FullSizeDict, FullPositionDict, UiPropertyNames, UiPropertyNamesAll
+from ...._core._types._typing import UiPathOrControl, FTuple2
 from ...._core._utils import cached_property
 from ...._core._types._checker import args_type_check
 from ..screen_node import ScreenNodeExtension
@@ -24,6 +24,49 @@ from . import *
 
 
 _T = TypeVar("_T")
+__Anchor = Literal[
+    "top_left",
+    "top_middle",
+    "top_right",
+    "left_middle",
+    "center",
+    "right_middle",
+    "bottom_left",
+    "bottom_middle",
+    "bottom_right",
+]
+class __FullPositionParams(TypedDict, total=False):
+    followType: Literal["none", "parent", "maxChildren", "maxSibling", "children", "x", "y"]
+    relativeValue: float
+    absoluteValue: float
+class __FullSizeParams(TypedDict, total=False):
+    fit: bool
+    followType: Literal["none", "parent", "maxChildren", "maxSibling", "children", "x", "y"]
+    relativeValue: float
+    absoluteValue: float
+__UiPropertyNamesAll = Literal[
+    "all",
+    "size",
+    "offset",
+    "alpha",
+    "clip",
+    "color",
+    "flip_book",
+    "aseprite_flip_book",
+    "uv",
+    "wait",
+]
+__UiPropertyNames = Literal[
+    "size",
+    "offset",
+    "alpha",
+    "clip",
+    "color",
+    "flip_book",
+    "aseprite_flip_book",
+    "uv",
+    "wait",
+]
 
 
 class NyControl(object):
@@ -112,13 +155,13 @@ class NyControl(object):
     @position.setter
     def position(self, val: FTuple2) -> None: ...
     @property
-    def anchor_from(self) -> AnchorType: ...
+    def anchor_from(self) -> __Anchor: ...
     @anchor_from.setter
-    def anchor_from(self, val: AnchorType) -> None: ...
+    def anchor_from(self, val: __Anchor) -> None: ...
     @property
-    def anchor_to(self) -> AnchorType: ...
+    def anchor_to(self) -> __Anchor: ...
     @anchor_to.setter
-    def anchor_to(self, val: AnchorType) -> None: ...
+    def anchor_to(self, val: __Anchor) -> None: ...
     @property
     def clip_offset(self) -> FTuple2: ...
     @clip_offset.setter
@@ -128,21 +171,21 @@ class NyControl(object):
     @clip_children.setter
     def clip_children(self, val: bool) -> None: ...
     @property
-    def full_position_x(self) -> FullPositionDict: ...
+    def full_position_x(self) -> __FullPositionParams: ...
     @full_position_x.setter
-    def full_position_x(self, val: FullPositionDict) -> None: ...
+    def full_position_x(self, val: __FullPositionParams) -> None: ...
     @property
-    def full_position_y(self) -> FullPositionDict: ...
+    def full_position_y(self) -> __FullPositionParams: ...
     @full_position_y.setter
-    def full_position_y(self, val: FullPositionDict) -> None: ...
+    def full_position_y(self, val: __FullPositionParams) -> None: ...
     @property
-    def full_size_x(self) -> FullSizeDict: ...
+    def full_size_x(self) -> __FullSizeParams: ...
     @full_size_x.setter
-    def full_size_x(self, val: FullSizeDict) -> None: ...
+    def full_size_x(self, val: __FullSizeParams) -> None: ...
     @property
-    def full_size_y(self) -> FullSizeDict: ...
+    def full_size_y(self) -> __FullSizeParams: ...
     @full_size_y.setter
-    def full_size_y(self, val: FullSizeDict) -> None: ...
+    def full_size_y(self, val: __FullSizeParams) -> None: ...
     @property
     def global_position(self) -> FTuple2: ...
     @global_position.setter
@@ -187,7 +230,7 @@ class NyControl(object):
         :return: 无
         :rtype: None
         """
-    def SetFullSize(self, axis: Literal["x", "y"], param_dict: FullSizeDict) -> bool:
+    def SetFullSize(self, axis: Literal["x", "y"], param_dict: __FullSizeParams) -> bool:
         """
         | 设置控件的大小，支持比例形式以及绝对值。
         | ``param_dict`` 参数：
@@ -215,7 +258,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetFullSize(self, axis: Literal["x", "y"]) -> FullSizeDict:
+    def GetFullSize(self, axis: Literal["x", "y"]) -> __FullSizeParams:
         """
         获取控件的大小，支持百分比以及绝对值。
 
@@ -226,7 +269,7 @@ class NyControl(object):
         :return: 控件的大小信息，详见SetFullSize
         :rtype: dict
         """
-    def SetFullPosition(self, axis: Literal["x", "y"], param_dict: FullPositionDict) -> bool:
+    def SetFullPosition(self, axis: Literal["x", "y"], param_dict: __FullPositionParams) -> bool:
         """
         | 设置控件的锚点坐标（全局坐标），支持比例值以及绝对值。
         | ``param_dict`` 参数：
@@ -252,7 +295,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetFullPosition(self, axis: Literal["x", "y"]) -> FullPositionDict:
+    def GetFullPosition(self, axis: Literal["x", "y"]) -> __FullPositionParams:
         """
         | 获取控件的锚点坐标，支持比例值以及绝对值。
 
@@ -263,7 +306,7 @@ class NyControl(object):
         :return: 控件的位置信息，详见SetFullPosition
         :rtype: dict
         """
-    def SetAnchorFrom(self, ancho_from: AnchorType) -> bool:
+    def SetAnchorFrom(self, ancho_from: __Anchor) -> bool:
         """
         | 设置控件相对于父节点的锚点。
         | ``anchor_from`` 可选的值：
@@ -284,7 +327,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetAnchorFrom(self) -> AnchorType:
+    def GetAnchorFrom(self) -> __Anchor:
         """
         | 判断控件相对于父节点的哪个锚点来计算位置与大小。
 
@@ -293,7 +336,7 @@ class NyControl(object):
         :return: 控件计算位置大小所依赖的父节点锚点位置信息，详见SetAnchorFrom
         :rtype: str
         """
-    def SetAnchorTo(self, anchor_to: AnchorType) -> bool:
+    def SetAnchorTo(self, anchor_to: __Anchor) -> bool:
         """
         | 设置控件自身锚点位置。
 
@@ -304,7 +347,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def GetAnchorTo(self) -> AnchorType:
+    def GetAnchorTo(self) -> __Anchor:
         """
         | 获取控件自身锚点位置信息。
 
@@ -530,7 +573,7 @@ class NyControl(object):
         :return: 无
         :rtype: None
         """
-    def PauseAnimation(self, property_name: UiPropertyNamesAll = "all") -> bool:
+    def PauseAnimation(self, property_name: __UiPropertyNamesAll = "all") -> bool:
         """
         | 暂停动画，暂停后的动画会停在当前的状态。
         | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
@@ -542,7 +585,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def PlayAnimation(self, property_name: UiPropertyNamesAll = "all") -> bool:
+    def PlayAnimation(self, property_name: __UiPropertyNamesAll = "all") -> bool:
         """
         | 继续播放动画，从动画当前状态开始播放
         | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
@@ -554,7 +597,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def StopAnimation(self, property_name: UiPropertyNamesAll = "all") -> bool:
+    def StopAnimation(self, property_name: __UiPropertyNamesAll = "all") -> bool:
         """
         | 停止动画，动画将恢复到第一段动画片段的 ``from`` 状态。
         | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。
@@ -568,7 +611,7 @@ class NyControl(object):
         """
     def SetAnimation(
         self,
-        property_name: UiPropertyNames,
+        property_name: __UiPropertyNames,
         namespace: str,
         anim_name: str,
         auto_play: bool = False,
@@ -588,7 +631,7 @@ class NyControl(object):
         :return: 是否成功
         :rtype: bool
         """
-    def RemoveAnimation(self, property_name: UiPropertyNames) -> bool:
+    def RemoveAnimation(self, property_name: __UiPropertyNames) -> bool:
         """
         | 删除单一属性的动画，删除后的值与当前状态有关，建议删除后重新设置该属性值。
         | UI属性动画相关，详见 `属性动画 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/19-%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB.html>`_ 。

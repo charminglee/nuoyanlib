@@ -13,12 +13,25 @@
 """
 
 
-from typing import Optional, NoReturn
+from typing import Optional, NoReturn, Literal
 from mod.client.ui.controls.labelUIControl import LabelUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ...._core._types._checker import args_type_check
-from ...._core._types._typing import FTuple3, TextFontType, TextAlignmentType
+from ...._core._types._typing import FTuple3
+
+
+__TextFont = Literal[
+    "rune",
+    "unicode",
+    "smooth",
+    "default",
+]
+__TextAlignment = Literal[
+    "left",
+    "right",
+    "center",
+]
 
 
 class NyLabel(NyControl):
@@ -39,9 +52,9 @@ class NyLabel(NyControl):
     @text.setter
     def text(self, val: str) -> None: ...
     @property
-    def text_alignment(self) -> TextAlignmentType: ...
+    def text_alignment(self) -> __TextAlignment: ...
     @text_alignment.setter
-    def text_alignment(self, val: TextAlignmentType) -> None: ...
+    def text_alignment(self, val: __TextAlignment) -> None: ...
     @property
     def text_color(self) -> FTuple3: ...
     @text_color.setter
@@ -61,7 +74,7 @@ class NyLabel(NyControl):
     @property
     def text_font(self) -> NoReturn: ...
     @text_font.setter
-    def text_font(self, val: TextFontType) -> None: ...
+    def text_font(self, val: __TextFont) -> None: ...
 
     def DisableTextShadow(self) -> bool:
         """
@@ -143,7 +156,7 @@ class NyLabel(NyControl):
         :return: 无
         :rtype: None
         """
-    def SetTextAlignment(self, text_alignment: TextAlignmentType) -> None:
+    def SetTextAlignment(self, text_alignment: __TextAlignment) -> None:
         """
         | 设置文本控件的文本对齐方式。
         | 可选值：
@@ -158,7 +171,7 @@ class NyLabel(NyControl):
         :return: 无
         :rtype: None
         """
-    def GetTextAlignment(self) -> TextAlignmentType:
+    def GetTextAlignment(self) -> __TextAlignment:
         """
         | 获取文本控件的文本对齐方式。
 

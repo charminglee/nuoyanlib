@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-13
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -17,7 +17,7 @@ from typing import Optional, overload, Any, TypeVar, Dict, Type, Generator, Call
 from types import FunctionType
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
-from ..._core._types._typing import Args, Kwargs, UiPathOrControl, STuple, NyControlTypes, ArgsDict, FrameAnimDataType
+from ..._core._types._typing import Args, Kwargs, UiPathOrControl, STuple, NyControlTypes, ArgsDict, FrameAnimData
 from ..._core.listener import ClientEventProxy
 from .nyc import *
 
@@ -34,7 +34,7 @@ class ScreenNodeExtension(ClientEventProxy):
     _nyc_cache: Dict[str, NyControlTypes]
     _ui_pos_data_key: str
     _screen_node: ScreenNode
-    _frame_anim_data: Dict[str, FrameAnimDataType]
+    _frame_anim_data: Dict[str, FrameAnimData]
     cs: Optional[ClientSystem]
     """
     | 创建UI的客户端实例。

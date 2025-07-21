@@ -13,12 +13,27 @@
 """
 
 
-from typing import Callable, Optional, Tuple, NoReturn
+from typing import Callable, Optional, Tuple, NoReturn, Literal
 from mod.client.ui.controls.imageUIControl import ImageUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ...._core._types._checker import args_type_check
-from ...._core._types._typing import FTuple2, FTuple3, FTuple4, ClipDirectionType, ImageAdaptionType, Args, Kwargs
+from ...._core._types._typing import FTuple2, FTuple3, FTuple4, Args, Kwargs
+
+
+__ClipDirection = Literal[
+    "fromLeftToRight",
+    "fromRightToLeft",
+    "fromOutsideToInside",
+    "fromTopToBottom",
+    "fromBottomToTop",
+]
+__ImageAdaption = Literal[
+    "normal",
+    "filled",
+    "oldNineSlice",
+    "originNineSlice",
+]
 
 
 class NyImage(NyControl):
@@ -69,9 +84,9 @@ class NyImage(NyControl):
     @clip_ratio.setter
     def clip_ratio(self, val: float) -> None: ...
     @property
-    def clip_direction(self) -> ClipDirectionType: ...
+    def clip_direction(self) -> __ClipDirection: ...
     @clip_direction.setter
-    def clip_direction(self, val: ClipDirectionType) -> None: ...
+    def clip_direction(self, val: __ClipDirection) -> None: ...
     @property
     def rel_rotate_angle(self) -> float: ...
     @rel_rotate_angle.setter
@@ -184,7 +199,7 @@ class NyImage(NyControl):
         :return: 无
         :rtype: None
         """
-    def SetClipDirection(self, clip_direction: ClipDirectionType) -> bool:
+    def SetClipDirection(self, clip_direction: __ClipDirection) -> bool:
         """
         | 设置图片控件的裁剪方向。
         | 可选值：
@@ -201,7 +216,7 @@ class NyImage(NyControl):
         :return: 设置是否成功
         :rtype: bool
         """
-    def GetClipDirection(self) -> ClipDirectionType:
+    def GetClipDirection(self) -> __ClipDirection:
         """
         | 获取图片控件的裁剪方向。
 
@@ -212,7 +227,7 @@ class NyImage(NyControl):
         """
     def SetImageAdaptionType(
         self,
-        image_adaption_type: ImageAdaptionType,
+        image_adaption_type: __ImageAdaption,
         image_adaption_data: Optional[FTuple4] = None,
     ) -> bool:
         """

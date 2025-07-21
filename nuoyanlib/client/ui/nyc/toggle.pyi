@@ -13,19 +13,20 @@
 """
 
 
-from typing import Optional, Callable, Any, List
+from typing import Optional, Callable, Any, List, TypedDict
 from mod.client.ui.controls.switchToggleUIControl import SwitchToggleUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ...._core._types._checker import args_type_check
-from ...._core._types._typing import ToggleCallbackArgs
 
 
-__ToggleChangedCallbackType = Callable[[ToggleCallbackArgs], Any]
+class __ToggleCallbackArgs(TypedDict):
+    state: bool
+__ToggleChangedCallback = Callable[[__ToggleCallbackArgs], Any]
 
 
 class NyToggle(NyControl):
-    _changed_cbs: List[__ToggleChangedCallbackType]
+    _changed_cbs: List[__ToggleChangedCallback]
     base_control: SwitchToggleUIControl
     """
     | 开关 ``SwitchToggleUIControl`` 实例。
@@ -38,8 +39,8 @@ class NyToggle(NyControl):
     @args_type_check(str, is_method=True)
     def __div__(self, other: str) -> Optional[NyControl]: ...
     def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
-    def set_callback(self, func: __ToggleChangedCallbackType) -> bool: ...
-    def remove_callback(self, func: __ToggleChangedCallbackType) -> bool: ...
+    def set_callback(self, func: __ToggleChangedCallback) -> bool: ...
+    def remove_callback(self, func: __ToggleChangedCallback) -> bool: ...
     @property
     def state(self) -> bool: ...
     @state.setter

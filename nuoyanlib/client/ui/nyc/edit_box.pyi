@@ -13,7 +13,7 @@
 """
 
 
-from typing import Optional
+from typing import Optional, NoReturn
 from mod.client.ui.controls.textEditBoxUIControl import TextEditBoxUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
@@ -33,6 +33,14 @@ class NyEditBox(NyControl):
     @args_type_check(str, is_method=True)
     def __div__(self, other: str) -> Optional[NyControl]: ...
     def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
+    @property
+    def edit_text(self) -> str: ...
+    @edit_text.setter
+    def edit_text(self, val: str) -> None: ...
+    @property
+    def max_length(self) -> NoReturn: ...
+    @max_length.setter
+    def max_length(self, val: int) -> None: ...
 
     def GetEditText(self) -> str:
         """
