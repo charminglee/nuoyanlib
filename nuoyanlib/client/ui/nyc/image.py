@@ -73,6 +73,8 @@ class NyImage(NyControl):
 
         :return: 无
         :rtype: None
+
+        :raise ValueError: 参数错误
         """
         if tex_path.count("%d") != 1:
             raise ValueError("'tex_path' must contain exactly one '%d' placeholder")

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -67,7 +67,7 @@ def set_vec_length(vec, length, convert_vec=False):
     :return: 设置后的向量
     :rtype: tuple[float,float,float]|Vector3
 
-    :raise VectorError: 向量长度为0时抛出
+    :raise VectorError: 传入零向量时抛出
     """
     vec_ = _toVector3(vec)
     orig_len = vec_.Length()

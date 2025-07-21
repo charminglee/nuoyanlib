@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-09
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -35,6 +35,9 @@ class NeteaseParticle(object):
     :param tuple[float,float,float]|None pos: 粒子的世界坐标位置，默认为(0, 0, 0)，绑定实体或骨骼时可忽略该参数
     :param dict[str,str|tuple[float,float,float]|bool]|None bind_entity: 实体绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
     :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
+
+    :raise RuntimeError: 粒子创建失败/绑定粒子到实体或骨骼时出现问题
+    :raise ValueError: 同时传入bind_entity和bind_skeleton参数时抛出
     """
 
     def __init__(self, json_path, pos=(0, 0, 0), bind_entity=None, bind_skeleton=None):
@@ -599,6 +602,9 @@ class NeteaseFrameAnim(object):
     :param tuple[float,float,float] scale: 缩放系数，默认为None
     :param dict[str,str|tuple[float,float,float]]|None bind_entity: 实体绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
     :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
+
+    :raise ValueError: 同时传入json_path和tex_path，或bind_entity和bind_skeleton参数时抛出
+    :raise RuntimeError: 创建序列帧失败/将序列帧绑定到实体或骨骼时出现问题
     """
 
     def __init__(

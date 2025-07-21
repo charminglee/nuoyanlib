@@ -35,6 +35,8 @@ class NyControl(object):
 
     :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例
     :param BaseUIControl control: 通过GetBaseUIControl()获取的控件实例
+
+    :raise TypeError: 控件所在的UI类必须继承ScreenNodeExtension，否则抛出该异常
     """
 
     _CONTROL_TYPE = ControlType.base_control

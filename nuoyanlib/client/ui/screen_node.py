@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-13
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -39,6 +39,11 @@ class ScreenNodeExtension(ClientEventProxy):
     """
     | ScreenNode扩展类，提供更多UI界面功能。
     | 已继承 ``ClientEventProxy`` ，监听事件更便捷。
+
+    -----
+
+    :raise ScreenNodeNotFoundError: 无法找到当前UI的ScreenNode实例
+    :raise PathMatchError: ScreenNodeExtension.button_callback装饰器的按钮路径错误
     """
 
     _LIMIT_ATTR = [

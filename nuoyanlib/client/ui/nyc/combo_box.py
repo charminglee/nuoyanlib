@@ -110,7 +110,7 @@ class NyComboBox(NyControl):
         :raise ValueError: 回调类型无效
         """
         if callback_type not in self._callback_map:
-            raise ValueError("Invalid callback type: %s, use 'ComboBoxCallbackType'" % repr(callback_type))
+            raise ValueError("invalid callback type: %s, use 'ComboBoxCallbackType'" % repr(callback_type))
         self._callback_map[callback_type](func)
 
     # endregion
