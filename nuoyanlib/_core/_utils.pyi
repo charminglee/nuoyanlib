@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-13
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
 
 
 from types import MethodType, FunctionType, GeneratorType
-from typing import Tuple, TypeVar, Callable, Union, Any, Type, Optional, Dict, overload
+from typing import Tuple, TypeVar, Callable, Any, Type, Optional, Dict, overload
 from ._types._typing import ITuple
 
 
@@ -50,10 +50,6 @@ class CachedObject(metaclass=_CachedObjectMeta):
 
 
 def hook_method(org_method: MethodType, my_method: MethodType) -> None: ...
-def args_type_check(
-    *typ: Union[type, Tuple[type, ...]],
-    is_method: bool = False
-) -> Callable[[Callable], Callable]: ...
 def cached_method(method: Callable) -> Callable: ...
 def cached_func(func: Callable) -> Callable: ...
 @overload

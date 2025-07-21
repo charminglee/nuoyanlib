@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-11
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -18,7 +18,7 @@ from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.timer import CallLater
 from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrControl, ItemDict
-from ...._core._utils import args_type_check
+from ...._core._types._checker import args_type_check
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....utils.enum import Enum

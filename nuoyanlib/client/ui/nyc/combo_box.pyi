@@ -18,7 +18,7 @@ from types import MethodType
 from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
-from ...._core._utils import args_type_check
+from ...._core._types._checker import args_type_check
 
 
 __ComboBoxCallbackType = Callable[[Any], Any]

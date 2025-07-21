@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-14
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -15,7 +15,8 @@
 
 from types import GeneratorType
 from ...._core import _error
-from ...._core._utils import args_type_check, cached_property
+from ...._core._utils import cached_property
+from ...._core._types._checker import args_type_check
 from ....client.ui.ui_utils import get_children_path_by_level, get_parent_path
 from ....utils.enum import ControlType
 

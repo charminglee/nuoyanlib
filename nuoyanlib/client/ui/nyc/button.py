@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-11
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -19,7 +19,7 @@ from ..ui_utils import (
     get_ui_pos_data, save_ui_pos_data, get_parent_control,
 )
 from ...._core._client.comp import LvComp
-from ...._core._utils import args_type_check
+from ...._core._types._checker import args_type_check
 from ...._core.listener import listen_event, unlisten_event
 from .control import NyControl
 from ....utils.enum import Enum, ButtonCallbackType, ControlType

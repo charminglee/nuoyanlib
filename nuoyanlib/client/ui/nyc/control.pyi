@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-14
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -17,7 +17,8 @@ from typing import Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Ge
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from ...._core._types._typing import UiPathOrControl, FTuple2, AnchorType, FullSizeDict, FullPositionDict, UiPropertyNames, UiPropertyNamesAll
-from ...._core._utils import args_type_check, cached_property
+from ...._core._utils import cached_property
+from ...._core._types._checker import args_type_check
 from ..screen_node import ScreenNodeExtension
 from . import *
 

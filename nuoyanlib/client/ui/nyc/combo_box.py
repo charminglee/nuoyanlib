@@ -13,9 +13,9 @@
 """
 
 
+from ...._core._types._checker import args_type_check
 from ....utils.enum import ControlType, ComboBoxCallbackType
 from .control import NyControl
-from ...._core._utils import args_type_check
 
 
 __all__ = [

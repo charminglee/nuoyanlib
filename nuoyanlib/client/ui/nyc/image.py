@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-11
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
 
 
-from ...._core._utils import args_type_check
+from ...._core._types._checker import args_type_check
 from ...._core import _error
 from ....utils.enum import ControlType
 from .control import NyControl
