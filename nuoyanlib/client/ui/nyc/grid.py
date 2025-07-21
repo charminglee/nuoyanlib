@@ -98,6 +98,17 @@ class NyGrid(NyControl):
         self._update_cbs = []
         listen_event(self.GridComponentSizeChangedClientEvent)
 
+    def __destroy__(self):
+        unlisten_event(self.GridComponentSizeChangedClientEvent)
+        self._update_cbs = []
+        NyControl.__destroy__(self)
+
+    def GridComponentSizeChangedClientEvent(self, args):
+        for cb in self._update_cbs:
+            cb(args['path'])
+
+    # region API =======================================================================================================
+
     @args_type_check((int, slice, tuple), is_method=True)
     def __getitem__(self, item):
         """
@@ -117,17 +128,6 @@ class NyGrid(NyControl):
         :rtype: _ElemGroup|None
         """
         return _ElemGroup(self, item)
-
-    def __destroy__(self):
-        unlisten_event(self.GridComponentSizeChangedClientEvent)
-        self._update_cbs = []
-        NyControl.__destroy__(self)
-
-    def GridComponentSizeChangedClientEvent(self, args):
-        for cb in self._update_cbs:
-            cb(args['path'])
-
-    # region API =======================================================================================================
 
     def set_gird_update_callback(self, func):
         """
