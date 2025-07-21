@@ -520,10 +520,10 @@ def __test__():
         ("abc", "system", "LoadClientAddonScriptsAfter", 0),
         ("Minecraft", "Engine", "LoadClientAddonScriptsAfter", 0),
     ]
-    unlisten_event(LoadClientAddonScriptsAfter)
-    assert not getattr(lib_sys, "Minecraft:Engine:LoadClientAddonScriptsAfter")
-    assert not getattr(lib_sys, "abc:system:LoadClientAddonScriptsAfter")
-    assert not getattr(lib_sys, "mihoyo:StarRail:event")
+    unlisten_event(LoadClientAddonScriptsAfter, use_decorator=True)
+    assert not getattr(lib_sys, "Minecraft_Engine_LoadClientAddonScriptsAfter")
+    assert not getattr(lib_sys, "abc_system_LoadClientAddonScriptsAfter")
+    assert not getattr(lib_sys, "mihoyo_StarRail_event")
 
     n = [0]
     class T(object):
@@ -542,14 +542,13 @@ def __test__():
         ("Minecraft", "Engine", "LoadClientAddonScriptsAfter", 0),
     ]
     assert t.CustomEvent.__name__ == "CustomEvent"
-    call("a", "b", "CustomEvent", tl)
     n = [0]
     t.CustomEvent(tl)
     t2.CustomEvent(tl)
     unlisten_all_events(t)
-    unlisten_event(t2.CustomEvent)
-    assert not getattr(lib_sys, "a:b:CustomEvent")
-    assert not getattr(lib_sys, "Minecraft:Engine:LoadClientAddonScriptsAfter")
+    unlisten_event(t2.CustomEvent, use_decorator=True)
+    assert not getattr(lib_sys, "a_b_CustomEvent")
+    assert not getattr(lib_sys, "Minecraft_Engine_LoadClientAddonScriptsAfter")
 
 
 

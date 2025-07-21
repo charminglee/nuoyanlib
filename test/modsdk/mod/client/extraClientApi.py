@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+
+from importlib import import_module
+
+
 if 0:
     from typing import Generator
     from typing import Union
@@ -20,6 +24,10 @@ if 0:
     from mod.client.plugin.illustratedBook.bookManager import BookManager
     from typing import Any
 
+
+_system_dict = {}
+
+
 def RegisterComponent(nameSpace, name, clsPath):
     # type: (str, str, str) -> bool
     """
@@ -32,14 +40,20 @@ def RegisterSystem(nameSpace, systemName, clsPath):
     """
     用于将系统注册到引擎中，引擎会创建一个该系统的实例，并在退出游戏时回收。系统可以执行我们引擎赋予的基本逻辑，例如监听事件、执行Tick函数、与服务端进行通讯等。
     """
-    pass
+    module_path = clsPath[:clsPath.rfind(".")]
+    cls_name = clsPath.split(".")[-1]
+    module = import_module(module_path)
+    cls = getattr(module, cls_name, None)
+    if cls:
+        ins = cls(nameSpace, systemName)
+        _system_dict[(nameSpace, systemName)] = ins
 
 def GetSystem(nameSpace, systemName):
     # type: (str, str) -> ClientSystem
     """
     用于获取其他系统实例
     """
-    pass
+    return _system_dict.get((nameSpace, systemName))
 
 def CreateComponent(entityId, nameSpace, name):
     # type: (Union[str,int], str, str) -> BaseComponent
@@ -811,7 +825,6 @@ def ImportModule(path):
     """
     使用字符串路径导入模块，作用与importlib.import_module类似，但只能导入当前加载的mod中的模块
     """
-    from importlib import import_module
     return import_module(path, "nuoyanlib")
 
 def ToggleGyroSensor(isOpen=False):
