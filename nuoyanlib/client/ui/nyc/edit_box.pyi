@@ -34,3 +34,34 @@ class NyEditBox(NyControl):
     def __div__(self, other: str) -> Optional[NyControl]: ...
     def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
 
+    def GetEditText(self) -> str:
+        """
+        | 获取edit_box输入框的文本信息，获取失败会返回 ``None`` 。
+
+        -----
+
+        :return: 输入框的文本信息
+        :rtype: str|None
+        """
+    def SetEditText(self, text: str) -> None:
+        """
+        | 设置edit_box输入框的文本信息。
+
+        -----
+
+        :param str text: 输入框的文本信息
+
+        :return: 无
+        :rtype: None
+        """
+    def SetEditTextMaxLength(self, max_length: int) -> None:
+        """
+        | 设置输入框的最大输入长度。
+
+        -----
+
+        :param int max_length: 最大输入长度
+
+        :return: 无
+        :rtype: None
+        """

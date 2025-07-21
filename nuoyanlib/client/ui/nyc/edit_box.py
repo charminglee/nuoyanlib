@@ -7,12 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
 
 
+from ...._core import _error
 from ....utils.enum import ControlType
 from .control import NyControl
 
@@ -46,6 +47,50 @@ class NyEditBox(NyControl):
     # endregion
 
     # region property proxy ============================================================================================
+
+    @property
+    def edit_text(self):
+        """
+        [可读写属性]
+
+        | 输入文本。
+
+        :rtype: str
+        """
+        return self.base_control.GetEditText()
+
+    @edit_text.setter
+    def edit_text(self, val):
+        """
+        [可读写属性]
+
+        | 输入文本。
+
+        :type val: str
+        """
+        self.base_control.SetEditText(str(val))
+
+    @property
+    def max_length(self):
+        """
+        [只写属性]
+
+        | 设置编辑框的最大输入长度。
+
+        :rtype: None
+        """
+        raise _error.GetPropertyError("max_length")
+
+    @max_length.setter
+    def max_length(self, val):
+        """
+        [只写属性]
+
+        | 设置编辑框的最大输入长度。
+
+        :type val: int
+        """
+        self.base_control.SetEditTextMaxLength(val)
 
     # endregion
 
