@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-25
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -53,6 +53,12 @@ class Enum(metaclass=EnumMeta):
     def name(self) -> str: ...
     @property
     def value(self) -> Any: ...
+
+
+class ComboBoxCallbackType(Enum[str]):
+    OPEN: str
+    CLOSE: str
+    SELECT: str
 
 
 class ButtonCallbackType(Enum[str]):

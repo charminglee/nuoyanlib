@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-25
+|   Date  : 2025-07-22
 |
 | ==============================================
 """
@@ -18,6 +18,7 @@ from mod.common.minecraftEnum import EntityType
 
 __all__ = [
     "Enum",
+    "ComboBoxCallbackType",
     "ButtonCallbackType",
     "ControlType",
     "search_data",
@@ -159,6 +160,27 @@ class Enum(object):
     @property
     def value(self):
         return self.__value
+
+
+class ComboBoxCallbackType(Enum[str]):
+    """
+    下拉框回调函数类型枚举。
+    """
+
+    OPEN = Enum.auto()
+    """
+    展开下拉框。
+    """
+
+    CLOSE = Enum.auto()
+    """
+    关闭下拉框。
+    """
+
+    SELECT = Enum.auto()
+    """
+    选中下拉框内容。
+    """
 
 
 class ButtonCallbackType(Enum[str]):
