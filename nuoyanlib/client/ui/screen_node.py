@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-07-27
 |
 | ==============================================
 """
@@ -146,7 +146,7 @@ class ScreenNodeExtension(ClientEventProxy):
         -----
 
         :param str btn_path: 按钮路径，支持通配符"*"（目前仅支持最后一级控件名称使用通配符）
-        :param str callback_types: [变长参数] 按钮回调类型，支持设置多种回调，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
+        :param str callback_types: [变长位置参数] 按钮回调类型，支持设置多种回调，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
         :param dict|None touch_event_param: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
 
         :return: 返回原函数

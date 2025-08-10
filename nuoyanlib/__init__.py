@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-01
+|   Date  : 2025-08-11
 |
 | ==============================================
 """
@@ -22,7 +22,7 @@
 from ._core import _logging
 
 
-__version__ = "0.9.4-beta"
+__version__ = "1.0.0-b1"
 __author_name__ = "Nuoyan"
 __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"

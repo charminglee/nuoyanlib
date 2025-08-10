@@ -42,7 +42,7 @@
 
 ---
 
-- [v0.6.0-beta](https://gitee.com/charming-lee/nuoyanLib/releases/tag/v0.6.0-beta)
+- [1.0.0-b1](https://gitee.com/charming-lee/nuoyanLib/releases/tag/1.0.0-b1)
 
 <br></br>
 

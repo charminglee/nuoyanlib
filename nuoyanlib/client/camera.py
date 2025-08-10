@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-08-11
 |
 | ==============================================
 """
@@ -57,6 +57,8 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=pi / 5, 
         if eid == PLAYER_ID:
             continue
         ent_pos = CF(eid).Pos.GetFootPos()
+        if not ent_pos:
+            continue
         target_dir = vec_p2p(center, ent_pos)
         angle = vec_angle(camera_dir, target_dir)
         w_dist = pos_distance(center, ent_pos)
