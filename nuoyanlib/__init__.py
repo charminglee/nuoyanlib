@@ -13,10 +13,11 @@
 """
 
 
-# todo：为函数添加调用失败时输出异常信息的功能
+# todo：完善接口的异常处理
 # todo：Entity类、Player类
-# todo：UI动画
+# todo：UI动画框架
 # todo：完善Ny控件
+# todo：UI Factory
 
 
 from ._core import _logging
