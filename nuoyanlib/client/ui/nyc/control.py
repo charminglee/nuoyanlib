@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-14
 |
 | ==============================================
 """
@@ -78,9 +78,9 @@ class NyControl(object):
         self.base_control = None
         self.ui_node = None
 
-    # region API =======================================================================================================
+    # region APIs ======================================================================================================
 
-    def new_child_control(self, def_name, child_name, force_update=True):
+    def new_child(self, def_name, child_name, force_update=True):
         """
         | 为当前控件创建一个新的子控件
 
@@ -104,13 +104,14 @@ class NyControl(object):
         -----
 
         :param str|BaseUIControl|NyControl parent: 父控件路径或实例
-        :param str name: 新控件的名称，默认使用当前控件的名称；若名称已存在，则自动在名称后添加数字后缀
+        :param str name: 新控件的名称，默认使用当前控件的名称；若名称已存在，则克隆失败
         :param bool sync_refresh: 是否需要同步刷新，默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
         :param bool force_update: 是否需要强制刷新，默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
 
         :return: 新控件的Ny控件实例，类型与当前控件实例相同，克隆失败时返回None
         :rtype: NyControl|None
         """
+        # todo：处理名称重复
         parent_path = parent if isinstance(parent, str) else parent.GetPath()
         if not name:
             name = self.name
@@ -126,13 +127,14 @@ class NyControl(object):
         -----
 
         :param str|BaseUIControl|NyControl control: 控件路径或实例
-        :param str name: 新控件的名称，默认使用当前控件的名称；若名称已存在，则自动在名称后添加数字后缀
+        :param str name: 新控件的名称，默认使用当前控件的名称；若名称已存在，则克隆失败
         :param bool sync_refresh: 是否需要同步刷新，默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
         :param bool force_update: 是否需要强制刷新，默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
 
         :return: 新控件的NyControl实例，克隆失败时返回None
         :rtype: NyControl|None
         """
+        # todo：处理名称重复
         control_path = control if isinstance(control, str) else control.GetPath()
         if not name:
             name = self.name
@@ -277,7 +279,7 @@ class NyControl(object):
 
     # endregion
 
-    # region conversion ================================================================================================
+    # region Conversion ================================================================================================
 
     def to_button(self, touch_event_params=None):
         """
@@ -477,7 +479,7 @@ class NyControl(object):
 
     # endregion
 
-    # region property proxy ============================================================================================
+    # region Properties ================================================================================================
 
     @property
     def position(self):

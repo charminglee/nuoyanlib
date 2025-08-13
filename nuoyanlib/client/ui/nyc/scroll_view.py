@@ -45,7 +45,7 @@ class NyScrollView(NyControl):
 
     # endregion
 
-    # region property proxy ============================================================================================
+    # region Properties ================================================================================================
 
     @property
     def scroll_pos(self):

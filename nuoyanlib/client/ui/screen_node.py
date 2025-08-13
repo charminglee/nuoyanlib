@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-27
+|   Date  : 2025-08-14
 |
 | ==============================================
 """
@@ -178,7 +178,7 @@ class ScreenNodeExtension(ClientEventProxy):
     def create_ny_button(self, path_or_control, touch_event_params=None):
         """
         | 创建 ``NyButton`` 按钮实例，可替代 ``.asButton()`` 的返回值使用。
-        | 创建后无需调用 ``.AddTouchEventParams()`` 或 ``.AddTouchEventParams()`` 接口。
+        | 创建后无需调用 ``.AddTouchEventParams()`` 或 ``.AddHoverEventParams()`` 接口。
 
         -----
 

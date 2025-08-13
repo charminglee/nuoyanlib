@@ -46,7 +46,7 @@ class NyItemRenderer(NyControl):
 
     # endregion
 
-    # region property proxy ============================================================================================
+    # region Properties ================================================================================================
 
     @property
     def item_name(self):
