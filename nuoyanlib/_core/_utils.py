@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-14
 |
 | ==============================================
 """
@@ -22,7 +22,6 @@ __all__ = [
     "iter_obj_attrs",
     "cached_property",
     "CachedObject",
-    "hook_method",
     "cached_method",
     "cached_func",
     "singleton",
@@ -32,9 +31,10 @@ __all__ = [
 def try_exec(func, *args, **kwargs):
     try:
         return func(*args, **kwargs)
-    except:
+    except Exception as e:
         import traceback
         traceback.print_exc()
+        return e
 
 
 def iter_obj_attrs(obj):

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-11
+|   Date  : 2025-08-14
 |
 | ==============================================
 """
@@ -45,6 +45,7 @@ def run(dct):
     """
     from mod.common.mod import Mod
     from ._core import _const
+    from ._core._sys import load_extensions
 
     @Mod.Binding(_const.LIB_NAME, _const.LIB_VERSION)
     class NuoyanLibMain(object):
@@ -52,11 +53,13 @@ def run(dct):
         def server_init(self):
             from _core._server._lib_server import NuoyanLibServerSystem
             NuoyanLibServerSystem.register()
+            load_extensions()
 
         @Mod.InitClient()
         def client_init(self):
             from _core._client._lib_client import NuoyanLibClientSystem
             NuoyanLibClientSystem.register()
+            load_extensions()
 
     dct['NuoyanLibMain'] = NuoyanLibMain
 

@@ -7,13 +7,37 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-13
+|   Date  : 2025-08-14
 |
 | ==============================================
 """
 
 
-__all__ = []
+__all__ = [
+    "is_client",
+    "get_api",
+    "get_comp_factory",
+]
+
+
+def load_extensions():
+    from ._const import ROOT
+    from ._utils import try_exec
+    imp = get_api().ImportModule
+    ext_root = ROOT + ".nuoyanlib.extensions"
+    ext_list = imp(ext_root + "._list.EXTENSION_LOADING_LIST")
+    ic = is_client()
+    for name in ext_list:
+        if ic:
+            ext_name = name + ".client"
+        else:
+            ext_name = name + ".server"
+        module = imp("{}.{}".format(ext_root, ext_name))
+        if module:
+            res = try_exec(module.init)
+            if isinstance(res, Exception):
+                from ._logging import warning
+                warning("Extension '{}' loading failed.".format(ext_name))
 
 
 def check_env(target):

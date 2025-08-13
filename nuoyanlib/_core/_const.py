@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-11
+|   Date  : 2025-08-14
 |
 | ==============================================
 """
@@ -24,6 +24,11 @@ LIB_VERSION_UL = __version__.replace(".", "_").replace("-", "_")
 LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
 LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
 LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
+
+
+class __C: pass
+ROOT = __C.__module__.split(".")[0]
+del __C
 
 
 SHORTCUT = "_shortcut"
