@@ -18,7 +18,7 @@ import mod.client.extraClientApi as client_api
 from .comp import ClientSystem, CF, PLAYER_ID, LvComp
 from .. import _const, _logging
 from ..listener import ClientEventProxy
-from .._sys import NuoyanLibBaseSystem
+from .._sys import NuoyanLibBaseSystem, load_extensions
 from .._utils import singleton
 from ... import config
 from ...utils.time_ease import TimeEase
@@ -48,8 +48,8 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         if config.ENABLED_MCP_MOD_LOG_DUMPING:
             client_api.SetMcpModLogCanPostDump(True)
         _logging.info(
-            "NuoyanLibClientSystem inited (ver: %s, script: %s)"
-            % (_const.__version__, self.__class__.__module__.split(".")[0])
+            "NuoyanLibClientSystem inited, ver: %s, script: %s"
+            % (_const.__version__, _const.ROOT)
         )
 
     @classmethod
@@ -77,6 +77,9 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
 
     def UiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
+
+    def LoadClientAddonScriptsAfter(self, args):
+        load_extensions()
 
     def broadcast_to_all_client(self, event_name, event_data, ns="", sys_name=""):
         if not ns:

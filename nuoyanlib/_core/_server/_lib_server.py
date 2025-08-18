@@ -16,7 +16,7 @@
 import mod.server.extraServerApi as server_api
 from .comp import ServerSystem
 from .. import _const, _logging
-from .._sys import NuoyanLibBaseSystem
+from .._sys import NuoyanLibBaseSystem, load_extensions
 from .._utils import singleton
 from ..listener import ServerEventProxy
 from ... import config
@@ -43,8 +43,8 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         if config.ENABLED_MCP_MOD_LOG_DUMPING:
             server_api.SetMcpModLogCanPostDump(True)
         _logging.info(
-            "NuoyanLibServerSystem inited (ver: %s, script: %s)"
-            % (_const.__version__, self.__class__.__module__.split(".")[0])
+            "NuoyanLibServerSystem inited, ver: %s, script: %s"
+            % (_const.__version__, _const.ROOT)
         )
 
     @classmethod
@@ -73,6 +73,9 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
     def UiInitFinished(self, args):
         if self.query_cache:
             self.NotifyToClient(args.__id__, "_SetQueryCache", self.query_cache)
+
+    def LoadServerAddonScriptsAfter(self, args):
+        load_extensions()
 
     # endregion
 

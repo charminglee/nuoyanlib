@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-14
+|   Date  : 2025-08-18
 |
 | ==============================================
 """
@@ -21,16 +21,16 @@
 # todo：enum模块重写
 
 
-from ._core import _logging
-
-
 __version__ = "1.0.0-b1"
 __author_name__ = "Nuoyan"
 __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"
 
 
-_logging.info("Start loading, ver: %s" % __version__)
+from ._core import _logging
+from ._core._const import ROOT
+_logging.info("Start loading, ver: %s, script: %s" % (__version__, ROOT), False)
+del _logging, ROOT
 
 
 def run(dct):
@@ -54,18 +54,15 @@ def run(dct):
         def server_init(self):
             from _core._server._lib_server import NuoyanLibServerSystem
             NuoyanLibServerSystem.register()
-            load_extensions()
 
         @Mod.InitClient()
         def client_init(self):
             from _core._client._lib_client import NuoyanLibClientSystem
             NuoyanLibClientSystem.register()
-            load_extensions()
 
     dct['NuoyanLibMain'] = NuoyanLibMain
 
 
-del _logging
 
 
 

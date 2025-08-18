@@ -13,6 +13,8 @@
 """
 
 
+from traceback import print_exc
+from types import MethodType
 from functools import wraps
 from . import _const
 
@@ -46,8 +48,7 @@ def try_exec(func, *args, **kwargs):
     try:
         return func(*args, **kwargs)
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        print_exc()
         return e
 
 
@@ -61,7 +62,7 @@ def iter_obj_attrs(obj):
 
 
 def get_func(cls, module, func):
-    g = cls.__init__.__func__.__globals__
+    g = cls.__init__.__func__.__globals__ # NOQA
     m = join_chr(*module)
     f = join_chr(*func)
     try:
@@ -135,7 +136,6 @@ def hook_method(org_method, my_method):
     def wrapper(self, *args, **kwargs):
         try_exec(my_method, *args, **kwargs)
         org_method(*args, **kwargs)
-    from types import MethodType
     wrapper = MethodType(wrapper, ins)
     setattr(ins, org_name, wrapper)
 

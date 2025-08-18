@@ -7,42 +7,51 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-14
+|   Date  : 2025-08-18
 |
 | ==============================================
 """
 
 
+from threading import current_thread
+
+
 __all__ = [
+    "get_env",
     "is_client",
     "get_api",
     "get_comp_factory",
 ]
 
 
+def get_env():
+    return "client" if is_client() else "server"
+
+
 def load_extensions():
     from ._const import ROOT
     from ._utils import try_exec
+    from ._logging import warning, info
     imp = get_api().ImportModule
     ext_root = ROOT + ".nuoyanlib.extensions"
-    ext_list = imp(ext_root + "._list.EXTENSION_LOADING_LIST")
-    ic = is_client()
+    ext_list = imp(ext_root + "._list").EXTENSION_LOADING_LIST
+    env = get_env()
+    loaded = []
     for name in ext_list:
-        if ic:
-            ext_name = name + ".client"
-        else:
-            ext_name = name + ".server"
+        ext_name = name + "." + env
         module = imp("{}.{}".format(ext_root, ext_name))
         if module:
             res = try_exec(module.init)
             if isinstance(res, Exception):
-                from ._logging import warning
                 warning("Extension '{}' loading failed.".format(ext_name))
+            else:
+                loaded.append(name)
+    info("Loaded extensions: %s" % loaded)
+    return ext_list
 
 
 def check_env(target):
-    ic = is_client()
-    if (target == "client" and not ic) or (target == "server" and ic):
+    if target != get_env():
         from . import _error
         raise _error.AcrossImportError
 
@@ -68,7 +77,6 @@ def is_client():
     :return: 是则返回True，否则返回False
     :rtype: bool
     """
-    from threading import current_thread
     return current_thread().name == "MainThread"
 
 

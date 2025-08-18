@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-13
+|   Date  : 2025-08-18
 |
 | ==============================================
 """
@@ -26,6 +26,7 @@ from ._server._lib_server import NuoyanLibServerSystem
 _T = TypeVar("_T")
 
 
+def get_env() -> str: ...
 def load_extensions() -> None: ...
 def check_env(target: Literal["client", "server"]) -> None: ...
 def get_lib_system() -> Union[NuoyanLibClientSystem, NuoyanLibServerSystem, None]: ...
