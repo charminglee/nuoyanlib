@@ -21,6 +21,7 @@ __all__ = [
     "is_client",
     "get_api",
     "get_comp_factory",
+    "get_lv_comp",
 ]
 
 
@@ -90,6 +91,14 @@ def get_api():
 
 def get_comp_factory():
     return get_api().GetEngineCompFactory()
+
+
+def get_lv_comp():
+    if is_client():
+        from ._client.comp import LvComp
+    else:
+        from ._server.comp import LvComp
+    return LvComp
 
 
 LEVEL_ID = get_api().GetLevelId()

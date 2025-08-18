@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-19
 |
 | ==============================================
 """
@@ -21,6 +21,8 @@ from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 from ._client._lib_client import NuoyanLibClientSystem
 from ._server._lib_server import NuoyanLibServerSystem
+from ._client.comp import CF as ClientCF
+from ._server.comp import CF as ServerCF
 
 
 _T = TypeVar("_T")
@@ -34,6 +36,7 @@ def is_apollo() -> bool: ...
 def is_client() -> bool: ...
 def get_api() -> Union[extraClientApi, extraServerApi]: ...
 def get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...
+def get_lv_comp() -> Union[ClientCF, ServerCF]: ...
 
 
 LEVEL_ID: str
