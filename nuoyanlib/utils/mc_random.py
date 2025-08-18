@@ -7,16 +7,16 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-08-19
 |
 | ==============================================
 """
 
 
 from math import pi, sin, cos
-from random import uniform, Random, randint
+from random import uniform, Random
 from string import digits, ascii_lowercase, ascii_uppercase
-from .._core._sys import get_api, is_client, LEVEL_ID
+from .._core._sys import get_lv_comp, is_client
 from .mc_math import pos_distance
 
 
@@ -27,37 +27,33 @@ __all__ = [
 ]
 
 
-def random_pos(center_pos, grid, use_top_height=False, dimension=0):
+def random_pos(center_pos, r, dim=0, use_top_height=False):
     """
     | 在指定区域内随机获取一点坐标。
     
     -----
 
     :param tuple[float,float,float] center_pos: 区域中心坐标
-    :param float grid: 区域半径
-    :param bool use_top_height: 是否以最高的非空气方块的高度作为返回坐标的Y值（只适用于服务端），默认为否
-    :param int dimension: 维度，默认为0
+    :param float r: 区域半径
+    :param int dim: 维度ID，若在客户端调用则使用客户端的维度ID；默认为0
+    :param bool use_top_height: 是否以最高的非空气方块的高度作为返回坐标的Y值，默认为False
 
     :return: 坐标
     :rtype: tuple[float,float,float]|None
     """
     if not center_pos:
         return
-    ran_x = randint(-grid, grid)
-    ran_z = randint(-grid, grid)
-    x = center_pos[0] + ran_x
-    z = center_pos[2] + ran_z
-    if use_top_height and not is_client():
-        y = get_api().GetEngineCompFactory().CreateBlockInfo(LEVEL_ID).GetTopBlockHeight(
-            (x, z), dimension
-        )
+    x = center_pos[0] + uniform(-r, r)
+    z = center_pos[2] + uniform(-r, r)
+    if use_top_height:
+        if is_client():
+            y = get_lv_comp().BlockInfo.GetTopBlockHeight((x, z))
+        else:
+            y = get_lv_comp().BlockInfo.GetTopBlockHeight((x, z), dim)
         if y is not None:
             return x, y, z
-        else:
-            return None
     else:
-        ran_y = randint(-grid, grid)
-        y = center_pos[1] + ran_y
+        y = center_pos[1] + uniform(-r, r)
         return x, y, z
 
 
