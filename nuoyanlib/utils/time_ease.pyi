@@ -7,60 +7,59 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-08-18
 |
 | ==============================================
 """
 
 
-from typing import Callable, Iterator
-
-
-_TEType = Callable[[float], float]
+from typing import Optional
+from .._core._types._typing import TimeEaseFuncType
 
 
 class TimeEaseFunc:
-    linear: _TEType
-    spring: _TEType
-    in_quad: _TEType
-    out_quad: _TEType
-    in_out_quad: _TEType
-    in_cubic: _TEType
-    out_cubic: _TEType
-    in_out_cubic: _TEType
-    in_quart: _TEType
-    out_quart: _TEType
-    in_out_quart: _TEType
-    in_quint: _TEType
-    out_quint: _TEType
-    in_out_quint: _TEType
-    in_sine: _TEType
-    out_sine: _TEType
-    in_out_sine: _TEType
-    in_expo: _TEType
-    out_expo: _TEType
-    in_out_expo: _TEType
-    in_circ: _TEType
-    out_circ: _TEType
-    in_out_circ: _TEType
-    in_bounce: _TEType
-    out_bounce: _TEType
-    in_out_bounce: _TEType
-    in_back: _TEType
-    out_back: _TEType
-    in_out_back: _TEType
-    in_elastic: _TEType
-    out_elastic: _TEType
-    in_out_elastic: _TEType
+    linear: TimeEaseFuncType
+    spring: TimeEaseFuncType
+    in_quad: TimeEaseFuncType
+    out_quad: TimeEaseFuncType
+    in_out_quad: TimeEaseFuncType
+    in_cubic: TimeEaseFuncType
+    out_cubic: TimeEaseFuncType
+    in_out_cubic: TimeEaseFuncType
+    in_quart: TimeEaseFuncType
+    out_quart: TimeEaseFuncType
+    in_out_quart: TimeEaseFuncType
+    in_quint: TimeEaseFuncType
+    out_quint: TimeEaseFuncType
+    in_out_quint: TimeEaseFuncType
+    in_sine: TimeEaseFuncType
+    out_sine: TimeEaseFuncType
+    in_out_sine: TimeEaseFuncType
+    in_expo: TimeEaseFuncType
+    out_expo: TimeEaseFuncType
+    in_out_expo: TimeEaseFuncType
+    in_circ: TimeEaseFuncType
+    out_circ: TimeEaseFuncType
+    in_out_circ: TimeEaseFuncType
+    in_bounce: TimeEaseFuncType
+    out_bounce: TimeEaseFuncType
+    in_out_bounce: TimeEaseFuncType
+    in_back: TimeEaseFuncType
+    out_back: TimeEaseFuncType
+    in_out_back: TimeEaseFuncType
+    in_elastic: TimeEaseFuncType
+    out_elastic: TimeEaseFuncType
+    in_out_elastic: TimeEaseFuncType
 
 
-class TimeEase(Iterator):
+class TimeEase(object):
     start_val: float
     end_val: float
     total_tm: float
     hold_on_last_frame: bool
     fps: int
-    ease_func: _TEType
+    ease_func: TimeEaseFuncType
+    next_te: Optional[TimeEase]
     _init_tm: float
     _frame: int
     _total_frame: int
@@ -73,8 +72,10 @@ class TimeEase(Iterator):
         total_tm: float,
         fps: int = 0,
         hold_on_last_frame: bool = False,
-        ease_func: _TEType = TimeEaseFunc.linear,
+        ease_func: TimeEaseFuncType = TimeEaseFunc.linear,
+        next_te: Optional[TimeEase] = None,
     ) -> None: ...
     def __iter__(self) -> TimeEase: ...
+    def _on_stop(self) -> None: ...
     def next(self) -> None: ...
     def reset(self) -> None: ...

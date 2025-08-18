@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-13
+|   Date  : 2025-08-18
 |
 | ==============================================
 """
@@ -16,9 +16,9 @@
 import mod.server.extraServerApi as server_api
 from .comp import ServerSystem
 from .. import _const, _logging
-from ..listener import ServerEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
+from ..listener import ServerEventProxy
 from ... import config
 
 
@@ -33,7 +33,6 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         self.query_cache = {}
         self.callback_data = {}
         ln = _const.LIB_NAME
-        lsn = _const.LIB_SERVER_NAME
         lcn = _const.LIB_CLIENT_NAME
         self.native_listen(ln, lcn, "_ButtonCallbackTrigger", self._ButtonCallbackTrigger)
         self.native_listen(ln, lcn, "_BroadcastToAllClient", self._BroadcastToAllClient)
@@ -61,7 +60,7 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         from ... import server
         return server.__dict__
 
-    # General ==========================================================================================================
+    # region General ===================================================================================================
 
     def _ButtonCallbackTrigger(self, args):
         func_name = args['name']
@@ -75,7 +74,9 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         if self.query_cache:
             self.NotifyToClient(args.__id__, "_SetQueryCache", self.query_cache)
 
-    # BroadcastToAllClient =============================================================================================
+    # endregion
+
+    # region BroadcastToAllClient ======================================================================================
 
     def _BroadcastToAllClient(self, args):
         event_name = args['event_name']
@@ -86,7 +87,9 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
             event_data['__id__'] = args['__id__']
         ServerSystem(ns, sys_name).BroadcastToAllClient(event_name, event_data)
 
-    # NotifyToMultiClients =============================================================================================
+    # endregion
+
+    # region NotifyToMultiClients ======================================================================================
 
     def _NotifyToMultiClients(self, args):
         player_ids = args['player_ids']
@@ -98,7 +101,9 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
             event_data['__id__'] = args['__id__']
         ServerSystem(ns, sys_name).NotifyToMultiClients(player_ids, event_name, event_data)
 
-    # set_query_mod_var ================================================================================================
+    # endregion
+
+    # region set_query_mod_var =========================================================================================
 
     def _SetQueryVar(self, args):
         entity_id = args['entity_id']
@@ -107,7 +112,9 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         self.query_cache.setdefault(entity_id, {})[name] = value
         self.BroadcastToAllClient("_SetQueryVar", args)
 
-    # call =============================================================================================================
+    # endregion
+
+    # region call ======================================================================================================
 
     def _NuoyanLibCall(self, args):
         ns = args['ns']
@@ -131,6 +138,8 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         method = args['method']
         from ...utils.communicate import call_callback
         call_callback(uuid, **cb_args)
+
+    # endregion
 
 
 def instance():

@@ -1,0 +1,55 @@
+{
+    "format_version": "1.13.0",
+    "minecraft:entity": {
+        "description": {
+            "identifier": "nuoyanlib:ground_shatter_effect",
+            "is_spawnable": false,
+            "is_summonable": false
+        },
+
+
+        "component_groups": {
+            "nuoyanlib:despawn": {
+                "minecraft:instant_despawn": {}
+            }
+        },
+
+
+        "components": {
+            "minecraft:knockback_resistance": {
+                "value": 1.0
+            },
+            "minecraft:damage_sensor": {
+                "triggers": {
+                    "cause": "all",
+                    "deals_damage": false
+                }
+            },
+            "minecraft:fire_immune": {},
+            "minecraft:type_family": {
+                "family": [
+                    "ground_shatter_effect"
+                ]
+            },
+            "minecraft:collision_box": {
+                "width": 0.0,
+                "height": 0.0
+            },
+            "minecraft:pushable": {
+                "is_pushable": false,
+                "is_pushable_by_piston": false
+            }
+        },
+
+
+        "events": {
+            "nuoyanlib:times_up": {
+                "add": {
+                    "component_groups": [
+                        "nuoyanlib:despawn"
+                    ]
+                }
+            }
+        }
+    }
+}

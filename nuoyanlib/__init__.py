@@ -18,6 +18,7 @@
 # todo：UI动画框架
 # todo：完善Ny控件
 # todo：UI Factory
+# todo：enum模块重写
 
 
 from ._core import _logging

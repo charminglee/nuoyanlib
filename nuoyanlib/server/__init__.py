@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-09
+|   Date  : 2025-08-18
 |
 |   nuoyanlib服务端库。
 |
@@ -76,7 +76,9 @@ if _ins.__lib_flag__ == 0:
     from .hurt import *
     from .inv import *
     from .structure import *
+    from .block import *
     from ..utils import *
+    from .. import config
 
     _ins.__lib_flag__ = 1
 

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-14
+|   Date  : 2025-08-18
 |
 | ==============================================
 """
@@ -18,10 +18,12 @@ from typing import Tuple, TypeVar, Callable, Any, Type, Optional, Dict, overload
 from ._types._typing import ITuple
 
 
+_T = TypeVar("_T")
 _T_Type = TypeVar("_T_Type", bound=type)
 _T_CO = TypeVar("_T_CO", bound=CachedObject)
 
 
+def kwargs_setter(**kwargs: Any) -> Callable[[_T], _T]: ...
 def try_exec(func: Callable, *args: Any, **kwargs: Any) -> Union[Any, Exception]: ...
 def iter_obj_attrs(obj: Any) -> GeneratorType[Any, None, None]: ...
 def get_func(cls: type, module: ITuple, func: ITuple) -> FunctionType: ...

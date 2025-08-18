@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-18
 |
 | ==============================================
 """
@@ -106,3 +106,6 @@ class FrameAnimData(TypedDict):
     callback: Callable
     args: Tuple[Any, ...]
     kwargs: Dict[str, Any]
+
+
+TimeEaseFuncType = Callable[[float], float]

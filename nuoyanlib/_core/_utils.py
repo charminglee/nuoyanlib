@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-14
+|   Date  : 2025-08-18
 |
 | ==============================================
 """
@@ -26,6 +26,20 @@ __all__ = [
     "cached_func",
     "singleton",
 ]
+
+
+def kwargs_setter(**kwargs):
+    def decorator(func):
+        def wrapper(*args, **_kwargs):
+            for k in _kwargs:
+                if k not in kwargs:
+                    raise TypeError("%s() got an unexpected keyword argument '%s'" % (func.__name__, k))
+            for k in kwargs:
+                if k not in _kwargs:
+                    _kwargs[k] = kwargs[k]
+            return func(*args, **_kwargs)
+        return wrapper
+    return decorator
 
 
 def try_exec(func, *args, **kwargs):

@@ -1,0 +1,20 @@
+{
+    "format_version": "1.10.0",
+    "minecraft:client_entity": {
+        "description": {
+            "identifier": "nuoyanlib:ground_shatter_effect",
+            "geometry": {
+                "default": "geometry.nuoyanlib.empty"
+            },
+            "textures": {
+                "default": ""
+            },
+            "materials": {
+                "default": "entity"
+            },
+            "render_controllers": [
+                "controller.render.default"
+            ]
+        }
+    }
+}

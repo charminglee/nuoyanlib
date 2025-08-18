@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-14
+|   Date  : 2025-08-17
 |
 | ==============================================
 """
@@ -34,6 +34,14 @@ del __C
 SHORTCUT = "_shortcut"
 INV27 = "_inv27"
 INV36 = "_inv36"
+
+
+class TypeStr:
+    GROUND_SHATTER_EFFECT = "nuoyanlib:ground_shatter_effect"
+
+
+GSE_ATTR = "_nyl_ground_shatter_effect_args"
+
 
 
 
