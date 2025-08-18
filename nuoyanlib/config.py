@@ -19,25 +19,25 @@ from .utils.time_ease import TimeEaseFunc
 ENABLED_LOG = True
 """
 | [需要重载]
-| 是否输出nuoyanlib日志信息。
+| 是否输出「nuoyanlib」日志信息。
 """
 
 DISABLED_MODSDK_LOG = False
 """
-| [需要重载]
+| [需要重载] [实验性]
 | 是否关闭ModSDK日志输出。
 """
 
 ENABLED_TYPE_CHECKING = True
 """
 | [需要重载]
-| 是否启用部分函数的参数类型检查（关闭可获得少许性能提升）。
+| 是否启用「nuoyanlib」函数的参数类型检查（关闭可获得少许性能提升，但可能会增加调试难度，建议开启）。
 """
 
-ENABLED_MCP_MOD_LOG_DUMPING = True
+ENABLED_MCP_MOD_LOG_DUMPING = False
 """
 | [需要重载]
-| 是否将当前Mod的错误信息输出到McpModLog日志，等价于SetMcpModLogCanPostDump接口。
+| 是否将当前Mod的错误信息输出到McpModLog日志，等价于 ``SetMcpModLogCanPostDump()`` 接口（目前正式服已阉割该功能）。
 """
 
 
