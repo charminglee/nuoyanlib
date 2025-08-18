@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-19
 |
 | ==============================================
 """
@@ -44,10 +44,10 @@ def load_extensions():
         if module:
             res = try_exec(module.init)
             if isinstance(res, Exception):
-                warning("Extension '{}' loading failed.".format(ext_name))
+                warning("Extension '%s' loading failed", ext_name)
             else:
                 loaded.append(name)
-    info("Loaded extensions: %s" % loaded)
+    info("Loaded extensions: %s", loaded)
     return ext_list
 
 

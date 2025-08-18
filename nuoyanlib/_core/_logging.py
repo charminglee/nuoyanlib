@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-19
 |
 | ==============================================
 """
@@ -15,6 +15,8 @@
 
 from time import time, strftime, localtime
 from .._core._sys import get_env
+from .._core._utils import kwargs_setter
+from .._core import _const
 from .. import config
 
 
@@ -32,15 +34,22 @@ if config.ENABLED_LOG and logging:
         def __init__(self, level):
             self.level = level
 
-        def log(self, msg, show_env=True):
+        @kwargs_setter(show_env=True)
+        def log(self, msg, *args, **kwargs):
             ct = time()
             t = strftime("%Y-%m-%d %H:%M:%S", localtime(ct))
             msecs = (ct - long(ct)) * 1000
             s = "%s,%03d" % (t, msecs)
-            if show_env:
-                print("[%s] [%s] [nuoyanlib/%s] %s" % (s, self.level, get_env(), msg))
+            if kwargs['show_env']:
+                print(
+                    "[%s] [%s] [nuoyanlib/%s] [%s, %s] %s"
+                    % (s, self.level, get_env(), _const.__version__, _const.ROOT, msg % args)
+                )
             else:
-                print("[%s] [%s] [nuoyanlib] %s" % (s, self.level, msg))
+                print(
+                    "[%s] [%s] [nuoyanlib] [%s, %s] %s"
+                    % (s, self.level, _const.__version__, _const.ROOT, msg % args)
+                )
 
     info = _logger("INFO").log
     warning = _logger("WARNING").log

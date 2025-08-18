@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-19
 |
 | ==============================================
 """
@@ -27,10 +27,9 @@ __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"
 
 
-from ._core import _logging
-from ._core._const import ROOT
-_logging.info("Start loading, ver: %s, script: %s" % (__version__, ROOT), False)
-del _logging, ROOT
+from ._core._logging import info
+info("Start loading", show_env=False)
+del info
 
 
 def run(dct):

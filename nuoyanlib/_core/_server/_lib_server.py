@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-19
 |
 | ==============================================
 """
@@ -42,10 +42,7 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         self.native_listen(ln, lcn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
         if config.ENABLED_MCP_MOD_LOG_DUMPING:
             server_api.SetMcpModLogCanPostDump(True)
-        _logging.info(
-            "NuoyanLibServerSystem inited, ver: %s, script: %s"
-            % (_const.__version__, _const.ROOT)
-        )
+        _logging.info("NuoyanLibServerSystem inited")
 
     @classmethod
     def register(cls):

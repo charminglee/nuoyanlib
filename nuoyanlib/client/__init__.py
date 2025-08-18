@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-19
 |
 |   nuoyanlib客户端库。
 |
@@ -88,7 +88,7 @@ if _ins.__lib_flag__ == 0:
 
     if _clock:
         _consume = (_clock() - _t) * 1000
-        _info("Loaded in %.3fms (first loading)" % _consume)
+        _info("Loaded in %.3fms (first loading)", _consume)
         del _consume
 else:
     # 引用内存中已加载的对象，确保相同版本的代码只加载一次
@@ -102,7 +102,7 @@ else:
 
     if _clock:
         _consume = (_clock() - _t) * 1000
-        _info("Loaded in %.3fms (ref)" % _consume)
+        _info("Loaded in %.3fms (ref)", _consume)
         del _consume
 
 
