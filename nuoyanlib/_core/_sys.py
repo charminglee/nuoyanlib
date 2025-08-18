@@ -122,7 +122,7 @@ class NuoyanLibBaseSystem(object):
     def Update(self):
         self.__tick += 1
         for cond_id, (cond, func, freq) in self.cond_func.items():
-            if self.__tick % freq:
+            if self.__tick % freq or cond_id not in self.cond_state:
                 continue
             curr_state = cond()
             old_state = self.cond_state[cond_id]
@@ -146,6 +146,7 @@ class NuoyanLibBaseSystem(object):
         cond_id = max(self.cond_func.iterkeys()) + 1 if self.cond_func else 0
         self.cond_func[cond_id] = (cond, func, freq)
         self.cond_state[cond_id] = False
+        func(cond())
         return cond_id
 
     def rm_condition_to_func(self, cond_id):
