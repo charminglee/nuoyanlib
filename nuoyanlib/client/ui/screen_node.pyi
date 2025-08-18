@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-12
 |
 | ==============================================
 """
 
 
-from typing import Optional, overload, Any, TypeVar, Dict, Type, Generator, Callable
+from typing import Optional, overload, Any, TypeVar, Dict, Type, Generator, Callable, Union
 from types import FunctionType
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
@@ -35,7 +35,7 @@ class ScreenNodeExtension(ClientEventProxy):
     _ui_pos_data_key: str
     _screen_node: ScreenNode
     _frame_anim_data: Dict[str, FrameAnimData]
-    cs: Optional[ClientSystem]
+    cs: Union[ClientSystem, Any]
     """
     | 创建UI的客户端实例。
     """

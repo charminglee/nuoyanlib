@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-20
+|   Date  : 2025-08-16
 |
 | ==============================================
 """
 
 
-from typing import List, Optional, Callable, Dict, Tuple, Union, Generator
+from typing import List, Optional, Callable, Dict, Tuple, Union, Generator, Any
 from typing_extensions import deprecated
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
@@ -47,7 +47,7 @@ def create_ui(
     param: Optional[dict] = None,
     push: bool = False,
     client_system: Optional[ClientSystem] = None
-) -> Optional[ScreenNode]: ...
+) -> Union[ScreenNode, Any]: ...
 def to_path(control: UiPathOrControl) -> str: ...
 def to_control(
     screen_node: ScreenNode,
