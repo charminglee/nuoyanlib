@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-20
 |
 | ==============================================
 """
@@ -224,10 +224,21 @@ class TimeEase(object):
     | 时间缓动对象。
     """
 
-    def __init__(self, start_val, end_val, total_tm, fps=0, hold_on_last_frame=False, ease_func=TimeEaseFunc.linear, next_te=None):
+    def __init__(
+            self,
+            start_val,
+            end_val,
+            total_tm,
+            fps=0,
+            hold_on_last_frame=False,
+            ease_func=TimeEaseFunc.linear,
+            next_te=None,
+            on_start=None,
+            on_end=None,
+    ):
         """
         | 创建一个时间缓动对象，内置各种时间缓动函数，可用于实现UI动画、运镜等的平滑过渡效果。
-        | 时间缓动对象为一个迭代器，每次迭代或调用 ``.next()`` 方法时，会返回一个新的缓动值。
+        | 时间缓动对象为一个迭代器，每次迭代或调用 ``.next()`` 方法时，会返回最新的缓动值。
 
         -----
 
@@ -237,7 +248,11 @@ class TimeEase(object):
         :param int fps: 变化帧率，小于等于0的值将根据实际时间确定缓动值，默认为0
         :param bool hold_on_last_frame: 是否停止在最后一帧；若设为True，TimeEase可无限迭代，变化结束后将始终返回最后一帧的值；若设为False，变化结束后继续迭代将抛出StopIteration异常；默认为False
         :param function ease_func: 时间缓动函数，可使用TimeEaseFunc提供的函数，或使用自定义函数，该函数接受并返回一个float值，且取值范围均为[0, 1]，默认为TimeEaseFunc.linear
-        :param TimeEase next_te: 下一个时间缓动对象，若提供，则当前缓动迭代结束后自动切换到下一个缓动对象继续迭代；默认为None
+        :param TimeEase|None next_te: 下一个时间缓动对象，若提供，则当前缓动迭代结束后自动切换到下一个缓动对象继续迭代；默认为None
+        :param function|None on_start: 缓动开始时调用的函数，默认为None
+        :param function|None on_end: 缓动结束时调用的函数，默认为None
+
+        :raise ValueError: 传入的参数错误，请检查参数是否符合要求
         """
         self.start_val = start_val
         self.end_val = end_val
@@ -246,16 +261,25 @@ class TimeEase(object):
         self.hold_on_last_frame = hold_on_last_frame
         self.ease_func = ease_func
         self.next_te = next_te
+        self.on_start = on_start
+        self.on_end = on_end
         self._init_tm = 0
         self._frame = 0
         self._total_frame = fps * total_tm
-        self._stopped = False
         self._diff_val = self.end_val - self.start_val
+        self._val = 0
+        self._state = 0
 
     def __iter__(self):
         return self
 
-    def _on_stop(self):
+    def _on_start(self):
+        self._state += 1
+        if self.on_start:
+            self.on_start()
+
+    def _on_end(self):
+        self._state += 1
         if self.next_te:
             self.start_val = self.next_te.start_val
             self.end_val = self.next_te.end_val
@@ -265,22 +289,38 @@ class TimeEase(object):
             self.ease_func = self.next_te.ease_func
             self.next_te = self.next_te.next_te
             self.reset()
+        if self.on_end:
+            self.on_end()
 
     def next(self):
-        if self._stopped and not self.hold_on_last_frame:
-            raise StopIteration
-        if self.fps > 0:
+        """
+        | 计算并返回下一个缓动值。
+
+        -----
+
+        :return: 下一个缓动值
+        :rtype: None
+        """
+        if self._state == 0:
+            self._on_start()
+        elif self._state == 2:
+            if self.hold_on_last_frame:
+                return self._val
+            else:
+                raise StopIteration
+        if self.total_tm <= 0:
+            x = 1
+        elif self.fps > 0:
             x = min(self._frame / self._total_frame, 1)
             self._frame += 1
         else:
             if self._init_tm == 0:
                 self._init_tm = time()
             x = min((time() - self._init_tm) / self.total_tm, 1)
-        val = self.start_val + self.ease_func(x) * self._diff_val
+        self._val = self.start_val + self.ease_func(x) * self._diff_val
         if x >= 1:
-            self._stopped = True
-            self._on_stop()
-        return val
+            self._on_end()
+        return self._val
 
     def reset(self):
         """
@@ -294,8 +334,12 @@ class TimeEase(object):
         self._init_tm = 0
         self._frame = 0
         self._total_frame = self.fps * self.total_tm
-        self._stopped = False
         self._diff_val = self.end_val - self.start_val
+        self._state = 0
+
+    def pause(self):
+        pass
+        # todo
 
 
 

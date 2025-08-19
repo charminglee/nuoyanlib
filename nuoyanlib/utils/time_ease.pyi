@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-20
 |
 | ==============================================
 """
 
 
-from typing import Optional
+from typing import Optional, Callable, Any
 from .._core._types._typing import TimeEaseFuncType
 
 
@@ -60,11 +60,14 @@ class TimeEase(object):
     fps: int
     ease_func: TimeEaseFuncType
     next_te: Optional[TimeEase]
+    on_start: Optional[Callable[[], Any]]
+    on_end: Optional[Callable[[], Any]]
     _init_tm: float
     _frame: int
     _total_frame: int
-    _stopped: bool
     _diff_val: float
+    _val: float
+    _state: int
     def __init__(
         self,
         start_val: float,
@@ -74,8 +77,11 @@ class TimeEase(object):
         hold_on_last_frame: bool = False,
         ease_func: TimeEaseFuncType = TimeEaseFunc.linear,
         next_te: Optional[TimeEase] = None,
+        on_start: Optional[Callable[[], Any]] = None,
+        on_end: Optional[Callable[[], Any]] = None,
     ) -> None: ...
     def __iter__(self) -> TimeEase: ...
-    def _on_stop(self) -> None: ...
-    def next(self) -> None: ...
+    def _on_start(self) -> None: ...
+    def _on_end(self) -> None: ...
+    def next(self) -> float: ...
     def reset(self) -> None: ...
