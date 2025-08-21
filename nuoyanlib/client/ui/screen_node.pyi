@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-12
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
@@ -18,7 +18,7 @@ from types import FunctionType
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
 from ..._core._types._typing import Args, Kwargs, UiPathOrControl, STuple, NyControlTypes, ArgsDict, FrameAnimData
-from ..._core.listener import ClientEventProxy
+from ..._core.event.listener import ClientEventProxy
 from .nyc import *
 
 

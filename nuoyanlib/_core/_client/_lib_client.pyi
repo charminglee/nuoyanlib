@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
@@ -18,7 +18,7 @@ from mod.client.system.clientSystem import ClientSystem
 from mod.client.component.actorRenderCompClient import ActorRenderCompClient
 from mod.client.component.modAttrCompClient import ModAttrComponentClient
 from .._types._typing import ArgsDict, FTuple3
-from ..listener import ClientEventProxy
+from ..event.listener import ClientEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
 from ...utils.time_ease import TimeEase

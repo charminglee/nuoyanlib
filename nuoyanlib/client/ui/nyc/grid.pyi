@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
@@ -20,7 +20,7 @@ from .control import NyControl
 from ...._core._types._typing import ITuple2, ArgsDict
 from ...._core._types._checker import args_type_check
 from ..screen_node import ScreenNodeExtension
-from ...._core._types._events import ClientEventEnum as Events
+from ...._core.event._events import ClientEventEnum as Events
 
 
 _T = TypeVar("_T")

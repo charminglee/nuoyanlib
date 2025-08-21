@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-19
+|   Date  : 2025-08-21
 |
 |   nuoyanlib服务端库。
 |
@@ -46,7 +46,7 @@ if _ins.__lib_flag__ == 0:
         LEVEL_ID,
         LvComp,
     )
-    from .._core.listener import (
+    from .._core.event.listener import (
         EventArgsProxy,
         ServerEventProxy,
         event,
@@ -66,7 +66,7 @@ if _ins.__lib_flag__ == 0:
         cached_func,
         singleton,
     )
-    from .._core._types._events import (
+    from .._core.event._events import (
         ServerEventEnum as Events,
         ALL_SERVER_ENGINE_EVENTS,
         ALL_SERVER_LIB_EVENTS,

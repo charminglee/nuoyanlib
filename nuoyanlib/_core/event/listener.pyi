@@ -7,16 +7,16 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-13
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
 
 
-from typing import Callable, Optional, Tuple, Union, Generator, List, Any, DefaultDict, Set, overload
+from typing import Callable, Optional, Tuple, Generator, List, Any, DefaultDict, Set, overload
 from types import MethodType
-from ._types._events import ClientEvent, ServerEvent
-from ._types._typing import ArgsDict, PyBasicTypes, STuple
+from ._events import ClientEvent, ServerEvent
+from .._types._typing import ArgsDict, PyBasicTypes, STuple
 
 
 class _EventPool(object):

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
@@ -16,7 +16,7 @@
 from typing import Dict, Optional, Callable, Union
 from mod.server.system.serverSystem import ServerSystem
 from .._types._typing import ArgsDict
-from ..listener import ServerEventProxy
+from ..event.listener import ServerEventProxy
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
 

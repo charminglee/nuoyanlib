@@ -27,9 +27,9 @@ __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"
 
 
-from ._core._logging import info
-info("Start loading", show_env=False)
-del info
+# from ._core._logging import info
+# info("Start loading", show_env=False)
+# del info
 
 
 def run(dct):

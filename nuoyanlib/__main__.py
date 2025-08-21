@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
@@ -40,8 +40,8 @@ def test(path):
 
 
 test("._core._utils")
-test("._core.listener")
-test("._core._types._events")
+test("._core.event.listener")
+test("._core.event._events")
 test("._core._types._checker")
 test(".client.ui.screen_node")
 test(".client.ui.nyc.control")

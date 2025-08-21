@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-04
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
@@ -17,16 +17,20 @@ from ..._core import _const
 
 
 __all__ = [
-    "ClientEventEnum",
     "ALL_CLIENT_ENGINE_EVENTS",
-    "ALL_CLIENT_LIB_EVENTS",
-    "ServerEventEnum",
     "ALL_SERVER_ENGINE_EVENTS",
+    "ALL_CLIENT_LIB_EVENTS",
     "ALL_SERVER_LIB_EVENTS",
+    "ClientEventEnum",
+    "ServerEventEnum",
 ]
 
 
 ALL_CLIENT_ENGINE_EVENTS = {
+    "PlayerTryRemoveCustomContainerItemClientEvent",
+    "PlayerTryAddCustomContainerItemClientEvent",
+    "PlayerTryPutCustomContainerItemClientEvent",
+    "PlayerPermissionChangeClientEvent",
     "HudButtonChangedClientEvent",
     "BlockAnimateRandomTickEvent",
     "PlayerAttackEntityEvent",
@@ -134,6 +138,11 @@ ALL_CLIENT_ENGINE_EVENTS = {
     "TapOrHoldReleaseClientEvent",
 }
 ALL_SERVER_ENGINE_EVENTS = {
+    "ItemPullOutCustomContainerServerEvent",
+    "ItemPushInCustomContainerServerEvent",
+    "PlayerPermissionChangeServerEvent",
+    "PlayerTryRemoveCustomContainerItemServerEvent",
+    "PlayerTryAddCustomContainerItemServerEvent",
     "PlayerTryPutCustomContainerItemServerEvent",
     "MountTamingEvent",
     "OnPlayerActionServerEvent",
@@ -300,12 +309,12 @@ ALL_SERVER_ENGINE_EVENTS = {
 }
 ALL_CLIENT_LIB_EVENTS = {}
 ALL_SERVER_LIB_EVENTS = {
-    "ItemGridChangedServerEvent": _const.LIB_CLIENT_NAME,
-    "UiInitFinished": _const.LIB_CLIENT_NAME,
+    'ItemGridChangedServerEvent': _const.LIB_CLIENT_NAME,
+    'UiInitFinished': _const.LIB_CLIENT_NAME,
 }
 
 
-class _EventEnum:
+class __EventEnum:
     def __init__(self, pool, is_client):
         self.pool = pool
         self.is_client = is_client
@@ -317,8 +326,8 @@ class _EventEnum:
         return item
 
 
-ClientEventEnum = _EventEnum(ALL_CLIENT_ENGINE_EVENTS.union(ALL_CLIENT_LIB_EVENTS), True)
-ServerEventEnum = _EventEnum(ALL_SERVER_ENGINE_EVENTS.union(ALL_SERVER_LIB_EVENTS), False)
+ClientEventEnum = __EventEnum(ALL_CLIENT_ENGINE_EVENTS.union(ALL_CLIENT_LIB_EVENTS), True)
+ServerEventEnum = __EventEnum(ALL_SERVER_ENGINE_EVENTS.union(ALL_SERVER_LIB_EVENTS), False)
 
 
 def __test__():
