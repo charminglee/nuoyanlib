@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -42,7 +42,7 @@ class NyButton(NyControl):
     :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
     """
 
-    _CONTROL_TYPE = ControlType.button
+    _CONTROL_TYPE = ControlType.BUTTON
     _CALLBACK_API_MAP = {
         ButtonCallbackType.UP           : "SetButtonTouchUpCallback",
         ButtonCallbackType.DOWN         : "SetButtonTouchDownCallback",

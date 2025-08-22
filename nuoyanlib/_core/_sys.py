@@ -34,22 +34,31 @@ def load_extensions():
     from ._utils import try_exec
     from ._logging import warning, info
     imp = get_api().ImportModule
+
     if ROOT == "nuoyanlib":
-        ext_module = imp("nuoyanlib.extensions")
+        module_path = "nuoyanlib.extensions"
     else:
-        ext_module = imp(ROOT + ".nuoyanlib.extensions")
-    ext_list = ext_module.EXTENSION_LOADING_LIST
+        module_path = ROOT + ".nuoyanlib.extensions"
+    try:
+        ext_module = imp(module_path)
+        ext_list = ext_module.EXTENSION_LOADING_LIST
+    except (ImportError, AttributeError):
+        return []
+
     env = get_env()
     loaded_ext = []
     for name in ext_list:
-        ext_name = name + "." + env
-        module = imp("{}.{}".format(ext_root, ext_name))
-        if module:
+        full_name = name + "." + env
+        try:
+            module = imp("%s.%s" % (ext_module, full_name))
             res = try_exec(module.init)
-            if isinstance(res, Exception):
-                warning("Extension '%s' loading failed", ext_name)
-            else:
-                loaded_ext.append(name)
+        except (ImportError, AttributeError):
+            continue
+        if isinstance(res, Exception):
+            warning("Extension '%s' loading failed", full_name)
+        else:
+            loaded_ext.append(name)
+
     info("Loaded extensions: %s", loaded_ext)
     return loaded_ext
 

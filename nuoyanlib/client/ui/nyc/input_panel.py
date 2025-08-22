@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -33,7 +33,7 @@ class NyInputPanel(NyControl):
     :param InputPanelUIControl input_panel_control: 通过asInputPanel()获取的输入面板实例
     """
 
-    _CONTROL_TYPE = ControlType.input_panel
+    _CONTROL_TYPE = ControlType.INPUT_PANEL
 
     def __init__(self, screen_node_ex, input_panel_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, input_panel_control)

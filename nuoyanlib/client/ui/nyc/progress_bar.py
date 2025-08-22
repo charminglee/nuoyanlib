@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-27
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -34,7 +34,7 @@ class NyProgressBar(NyControl):
     :param ProgressBarUIControl progress_bar_control: 通过asProgressBar()获取的进度条实例
     """
 
-    _CONTROL_TYPE = ControlType.progress_bar
+    _CONTROL_TYPE = ControlType.PROGRESS_BAR
 
     def __init__(self, screen_node_ex, progress_bar_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, progress_bar_control)

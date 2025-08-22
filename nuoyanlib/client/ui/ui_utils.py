@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-20
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -80,7 +80,7 @@ def to_path(control):
     return control if isinstance(control, str) else control.GetPath()
 
 
-def to_control(screen_node, path, control_type=ControlType.base_control):
+def to_control(screen_node, path, control_type=ControlType.BASE_CONTROL):
     """
     | 根据路径获取控件实例，若传入的已经是实例，则返回其本身。
 
@@ -94,7 +94,7 @@ def to_control(screen_node, path, control_type=ControlType.base_control):
     :rtype: BaseUIControl|None
     """
     control = screen_node.GetBaseUIControl(path) if isinstance(path, str) else path
-    if control and control_type not in ControlType._not_special:
+    if control and control_type not in ControlType._NOT_SPECIAL:
         control = getattr(control, "as" + control_type)()
     return control
 

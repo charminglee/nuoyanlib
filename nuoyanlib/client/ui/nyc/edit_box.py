@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -34,7 +34,7 @@ class NyEditBox(NyControl):
     :param TextEditBoxUIControl edit_box_control: 通过asTextEditBox()获取的文本编辑框实例
     """
 
-    _CONTROL_TYPE = ControlType.edit_box
+    _CONTROL_TYPE = ControlType.EDIT_BOX
 
     def __init__(self, screen_node_ex, edit_box_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, edit_box_control)

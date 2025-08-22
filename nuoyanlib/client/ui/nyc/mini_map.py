@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -33,7 +33,7 @@ class NyMiniMap(NyControl):
     :param MiniMapUIControl mini_map_control: 通过asMiniMap()获取的小地图实例
     """
 
-    _CONTROL_TYPE = ControlType.mini_map
+    _CONTROL_TYPE = ControlType.MINI_MAP
 
     def __init__(self, screen_node_ex, mini_map_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, mini_map_control)

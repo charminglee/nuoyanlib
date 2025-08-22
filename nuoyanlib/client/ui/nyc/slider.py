@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -33,7 +33,7 @@ class NySlider(NyControl):
     :param SliderUIControl slider_control: 通过asSlider()获取的滑动条实例
     """
 
-    _CONTROL_TYPE = ControlType.slider
+    _CONTROL_TYPE = ControlType.SLIDER
 
     def __init__(self, screen_node_ex, slider_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, slider_control)

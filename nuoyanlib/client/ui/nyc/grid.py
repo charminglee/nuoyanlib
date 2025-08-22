@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -91,7 +91,7 @@ class NyGrid(NyControl):
         (103, 117, 105),
         (103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)
     ))
-    _CONTROL_TYPE = ControlType.grid
+    _CONTROL_TYPE = ControlType.GRID
 
     def __init__(self, screen_node_ex, grid_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, grid_control)

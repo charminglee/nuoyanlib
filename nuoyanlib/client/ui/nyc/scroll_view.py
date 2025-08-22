@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-13
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -33,7 +33,7 @@ class NyScrollView(NyControl):
     :param ScrollViewUIControl scroll_view_control: 通过asScrollView()获取的滚动视图实例
     """
 
-    _CONTROL_TYPE = ControlType.scroll_view
+    _CONTROL_TYPE = ControlType.SCROLL_VIEW
 
     def __init__(self, screen_node_ex, scroll_view_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, scroll_view_control)

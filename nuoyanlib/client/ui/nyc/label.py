@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-25
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -34,7 +34,7 @@ class NyLabel(NyControl):
     :param LabelUIControl label_control: 通过asLabel()获取的文本实例
     """
 
-    _CONTROL_TYPE = ControlType.label
+    _CONTROL_TYPE = ControlType.LABEL
 
     def __init__(self, screen_node_ex, label_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, label_control)

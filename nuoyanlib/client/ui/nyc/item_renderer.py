@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -34,7 +34,7 @@ class NyItemRenderer(NyControl):
     :param ItemRendererUIControl item_renderer_control: 通过asItemRenderer()获取的物品渲染器实例
     """
 
-    _CONTROL_TYPE = ControlType.item_renderer
+    _CONTROL_TYPE = ControlType.ITEM_RENDERER
 
     def __init__(self, screen_node_ex, item_renderer_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, item_renderer_control)

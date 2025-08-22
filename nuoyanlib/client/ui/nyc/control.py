@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-14
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -39,7 +39,7 @@ class NyControl(object):
     :raise TypeError: 控件所在的UI类必须继承ScreenNodeExtension，否则抛出该异常
     """
 
-    _CONTROL_TYPE = ControlType.base_control
+    _CONTROL_TYPE = ControlType.BASE_CONTROL
 
     def __init__(self, screen_node_ex, control, **kwargs):
         from ..screen_node import ScreenNodeExtension

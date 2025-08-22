@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-16
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -52,7 +52,7 @@ def to_path(control: UiPathOrControl) -> str: ...
 def to_control(
     screen_node: ScreenNode,
     path: UiPathOrControl,
-    control_type: str = ControlType.base_control,
+    control_type: str = ControlType.BASE_CONTROL,
 ) -> Union[
     BaseUIControl,
     LabelUIControl,

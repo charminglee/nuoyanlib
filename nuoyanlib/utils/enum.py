@@ -7,13 +7,19 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-23
 |
 | ==============================================
 """
 
 
-from mod.common.minecraftEnum import EntityType
+from mod.common.minecraftEnum import (
+    EntityType,
+    StructureFeatureType,
+    BiomeType,
+    EffectType,
+    EnchantType,
+)
 
 
 __all__ = [
@@ -21,24 +27,26 @@ __all__ = [
     "ComboBoxCallbackType",
     "ButtonCallbackType",
     "ControlType",
-    "search_data",
-    "ITEM_LIST",
-    "BLOCK_LIST",
-    "STRUCTURE_DICT",
-    "BIOME_DICT",
-    "EFFECT_DICT",
-    "ENTITY_ID_DICT",
-    "ATTACKABLE_MOB_LIST",
-    "HOSTILE_MOB_LIST",
-    "FRIENDLY_MOB_LIST",
-    "MOB_LIST",
-    "ENTITY_LIST",
+    "FriendlyMob",
+    "HostileMob",
+    "Mob",
+    "Feature",
+    "UiContainer",
+    "Container",
+    "PositiveEffect",
+    "NegativeEffect",
+    "NeutralEffect",
+    "ENTITY_NAME_MAP",
+    "BIOME_NAME_MAP",
+    "STRUCTURE_NAME_MAP",
+    "EFFECT_NAME_MAP",
+    "ENCHANT_NAME_MAP",
 ]
 
 
-class EnumMeta(type):
+class _EnumMeta(type):
     def __new__(metacls, name, bases, dct, restrict_type=None):
-        dct['__flag__'] = 0
+        dct['_enum_flag'] = 0
         cls = type.__new__(metacls, name, bases, dct) # type: type[Enum]
         members = {}
         if name != "Enum":
@@ -47,7 +55,7 @@ class EnumMeta(type):
                 if k.startswith("_"):
                     continue
                 if isinstance(v, Enum.auto):
-                    member = cls.__gen_auto_value__(k) # NOQA
+                    member = cls._gen_auto_value(k) # NOQA
                 elif cls._restrict_type:
                     if type(v) is not cls._restrict_type:
                         raise TypeError(
@@ -61,17 +69,17 @@ class EnumMeta(type):
                 setattr(cls, k, member)
             # 继承父Enum成员
             for base in bases:
-                if isinstance(base, EnumMeta):
+                if isinstance(base, _EnumMeta):
                     members.update(base.__members__)
         else:
             cls._restrict_type = restrict_type
         cls.__members__ = members
-        cls.__flag__ = 1
+        cls._enum_flag = 1
         return cls
 
     def __setattr__(cls, name, value):
         # 禁止动态设置枚举值
-        if getattr(cls, '__flag__', 0) == 1:
+        if getattr(cls, '_enum_flag', 0) == 1:
             raise AttributeError("can't set member '%s' in '%s'" % (name, cls.__name__))
         type.__setattr__(cls, name, value)
 
@@ -104,13 +112,13 @@ class EnumMeta(type):
             del dct['__dict__']
             del dct['__weakref__']
             del dct['__members__']
-            del dct['__flag__']
-            new_cls = EnumMeta.__new__(EnumMeta, "Enum", (object,), dct, item)
+            del dct['_enum_flag']
+            new_cls = _EnumMeta.__new__(_EnumMeta, "Enum", (object,), dct, item)
             return new_cls
         else:
             return cls.__members__[item]
 
-    def __gen_auto_value__(cls, name=None):
+    def _gen_auto_value(cls, name=None):
         t = getattr(cls, '_restrict_type', None)
         if t is str:
             val = name
@@ -137,7 +145,7 @@ class Enum(object):
     - 枚举名不能以下划线开头
     """
 
-    __metaclass__ = EnumMeta
+    __metaclass__ = _EnumMeta
 
     class auto(object):
         pass
@@ -160,6 +168,60 @@ class Enum(object):
     @property
     def value(self):
         return self.__value
+
+
+def __test__():
+    class E(Enum[str]):
+        a = Enum.auto()
+        b = Enum.auto()
+        c = Enum.auto()
+    class EE(Enum[str]):
+        aa = Enum.auto()
+        bb = Enum.auto()
+        cc = Enum.auto()
+    class T(E, EE):
+        d = Enum.auto()
+        e = Enum.auto()
+    assert E.a == "a"
+    assert T.a == "a"
+    assert T.aa == "aa"
+    assert T.d == "d"
+
+    class E1(Enum):
+        A = 1
+        B = 2
+        C = 3
+    class E2(E1):
+        X = 7
+        Y = 8
+        Z = 9
+    assert sorted(E2.__members__.keys()) == ["A", "B", "C", "X", "Y", "Z"]
+    assert 7 in E2
+    assert 0 not in E2
+    assert len(E2) == 6
+    assert isinstance(E2.X, E2)
+    assert E2.A.name == "A"
+    assert E2.A.value == 1
+    a = {E2.A, E2.X}
+    assert E2.A in a
+    assert E2.X in a
+
+    class E3(Enum[str]):
+        Q = "114514"
+    assert E3.Q == "114514"
+    from .._core._utils import assert_error
+    def f():
+        E3.Q = 123
+    assert_error(f, (), AttributeError)
+    def f():
+        del E3.Q
+    assert_error(f, (), AttributeError)
+
+    class E4(Enum[int]):
+        a = Enum.auto()
+        b = Enum.auto()
+        c = Enum.auto()
+    assert sorted(E4.__members__.values()) == [0, 1, 2]
 
 
 class ComboBoxCallbackType(Enum[str]):
@@ -244,2633 +306,1528 @@ class ButtonCallbackType(Enum[str]):
     """
 
 
-class UiControlType(Enum[int]):
-    all = -1
-    button = 0
-    custom = 1
-    collection_panel = 2
-    dropdown = 3
-    edit_box = 4
-    factory = 5
-    grid = 6
-    image = 7
-    input_panel = 8
-    label = 9
-    panel = 10
-    screen = 11
-    scrollbar_box = 12
-    scroll_track = 13
-    scroll_view = 14
-    selection_wheel = 15
-    slider = 16
-    slider_box = 17
-    stack_panel = 18
-    toggle = 19
-    image_cycler = 20
-    label_cycler = 21
-    grid_page_indicator = 22
-    combox = 23
-    layout = 24
-    stack_grid = 25
-    joystick = 26
-    rich_text = 27
-    sixteen_nine_layout = 28
-    mul_lines_edit = 29
-    amin_process_bar = 30
-    unknown = 31
-
-
 class ControlType(Enum[str]):
     """
     | UI控件类型枚举。
     """
 
-    base_control = "BaseControl"
+    BASE_CONTROL = "BaseControl"
     """
     | 通用控件。
     """
 
-    button = "Button"
+    BUTTON = "Button"
     """
     | 按钮。
     """
 
-    image = "Image"
+    IMAGE = "Image"
     """
     | 图片。
     """
 
-    label = "Label"
+    LABEL = "Label"
     """
     | 文本。
     """
 
-    panel = "Panel"
+    PANEL = "Panel"
     """
     | 面板。
     """
 
-    input_panel = "InputPanel"
+    INPUT_PANEL = "InputPanel"
     """
     | 输入面板。
     """
 
-    stack_panel = "StackPanel"
+    STACK_PANEL = "StackPanel"
     """
     | 栈面板。
     """
 
-    edit_box = "TextEditBox"
+    EDIT_BOX = "TextEditBox"
     """
     | 文本编辑框。
     """
 
-    paper_doll = "PaperDoll"
+    PAPER_DOLL = "PaperDoll"
     """
     | 纸娃娃。
     """
 
-    netease_paper_doll = "NeteasePaperDoll"
+    NETEASE_PAPER_DOLL = "NeteasePaperDoll"
     """
     | 网易纸娃娃。
     """
 
-    item_renderer = "ItemRenderer"
+    ITEM_RENDERER = "ItemRenderer"
     """
     | 物品渲染器。
     """
 
-    gradient_renderer = "GradientRenderer"
+    GRADIENT_RENDERER = "GradientRenderer"
     """
     | 渐变渲染器。
     """
 
-    scroll_view = "ScrollView"
+    SCROLL_VIEW = "ScrollView"
     """
     | 滚动视图。
     """
 
-    grid = "Grid"
+    GRID = "Grid"
     """
     | 网格。
     """
 
-    progress_bar = "ProgressBar"
+    PROGRESS_BAR = "ProgressBar"
     """
     | 进度条。
     """
 
-    toggle = "SwitchToggle"
+    TOGGLE = "SwitchToggle"
     """
     | 开关。
     """
 
-    slider = "Slider"
+    SLIDER = "Slider"
     """
     | 滑动条。
     """
 
-    selection_wheel = "SelectionWheel"
+    SELECTION_WHEEL = "SelectionWheel"
     """
     | 轮盘。
     """
 
-    combo_box = "NeteaseComboBox"
+    COMBO_BOX = "NeteaseComboBox"
     """
     | 下拉框。
     """
 
-    mini_map = "MiniMap"
+    MINI_MAP = "MiniMap"
     """
     | 小地图。
     """
 
-    _not_special = (base_control, panel, paper_doll, gradient_renderer)
+    _NOT_SPECIAL = (BASE_CONTROL, PANEL, PAPER_DOLL, GRADIENT_RENDERER)
 
 
-def __test__():
-    class E(Enum[str]):
-        a = Enum.auto()
-        b = Enum.auto()
-        c = Enum.auto()
-    class T(E):
-        d = Enum.auto()
-        e = Enum.auto()
-    assert E.a == "a"
-    assert T.a == "a"
-    assert T.d == "d"
-
-    class E1(Enum):
-        A = 1
-        B = 2
-        C = 3
-    class E2(E1):
-        X = 7
-        Y = 8
-        Z = 9
-    assert sorted(E2.__members__.keys()) == ["A", "B", "C", "X", "Y", "Z"]
-    assert 7 in E2
-    assert 0 not in E2
-    assert len(E2) == 6
-    assert isinstance(E2.X, E2)
-    assert E2.A.name == "A"
-    assert E2.A.value == 1
-    a = {E2.A, E2.X}
-    assert E2.A in a
-    assert E2.X in a
-
-    class E3(Enum[str]):
-        Q = "114514"
-    assert E3.Q == "114514"
-    from .._core._utils import assert_error
-    def f():
-        E3.Q = 123
-    assert_error(f, (), AttributeError)
-    def f():
-        del E3.Q
-    assert_error(f, (), AttributeError)
-
-    class E4(Enum[int]):
-        a = Enum.auto()
-        b = Enum.auto()
-        c = Enum.auto()
-    assert sorted(E4.__members__.values()) == [0, 1, 2]
-
-
-def search_data(data, lst):
+class FriendlyMob(Enum[str]):
     """
-    | 在列表中搜索数据。
+    | 友好生物identifier枚举。
 
     -----
 
-    :param Any data: 数据（实体数字id、类型id等）
-    :param list lst: 待检测列表（ENTITY_LIST、MOB_LIST等）
-
-    :return: 若数据在列表中则返回True，否则返回False
-    :rtype: bool
+    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
-    if data in lst:
-        return True
-    for i in lst:
-        if i and isinstance(i, list) and data in i:
-            return True
-    return False
+
+    ALLAY = "minecraft:allay"
+    """
+    | 悦灵。
+    """
+
+    ARMADILLO = "minecraft:armadillo"
+    """
+    | 犰狳。
+    """
+
+    BAT = "minecraft:bat"
+    """
+    | 蝙蝠。
+    """
+
+    CAMEL = "minecraft:camel"
+    """
+    | 骆驼。
+    """
+
+    CHICKEN = "minecraft:chicken"
+    """
+    | 鸡。
+    """
+
+    COD = "minecraft:cod"
+    """
+    | 鳕鱼。
+    """
+
+    COPPER_GOLEM = "minecraft:copper_golem"
+    """
+    | 铜傀儡。
+    """
+
+    COW = "minecraft:cow"
+    """
+    | 牛。
+    """
+
+    DONKEY = "minecraft:donkey"
+    """
+    | 驴。
+    """
+
+    GLOW_SQUID = "minecraft:glow_squid"
+    """
+    | 发光鱿鱼。
+    """
+
+    HAPPY_GHAST = "minecraft:happy_ghast"
+    """
+    | 快乐恶魂。
+    """
+
+    HORSE = "minecraft:horse"
+    """
+    | 马。
+    """
+
+    MOOSHROOM = "minecraft:mooshroom"
+    """
+    | 哞菇。
+    """
+
+    MULE = "minecraft:mule"
+    """
+    | 骡。
+    """
+
+    PARROT = "minecraft:parrot"
+    """
+    | 鹦鹉。
+    """
+
+    PIG = "minecraft:pig"
+    """
+    | 猪。
+    """
+
+    RABBIT = "minecraft:rabbit"
+    """
+    | 兔子。
+    """
+
+    SALMON = "minecraft:salmon"
+    """
+    | 鲑鱼。
+    """
+
+    SHEEP = "minecraft:sheep"
+    """
+    | 绵羊。
+    """
+
+    SKELETON_HORSE = "minecraft:skeleton_horse"
+    """
+    | 骷髅马。
+    """
+
+    SNIFFER = "minecraft:sniffer"
+    """
+    | 嗅探兽。
+    """
+
+    SQUID = "minecraft:squid"
+    """
+    | 鱿鱼。
+    """
+
+    STRIDER = "minecraft:strider"
+    """
+    | 炽足兽。
+    """
+
+    TADPOLE = "minecraft:tadpole"
+    """
+    | 蝌蚪。
+    """
+
+    TROPICAL_FISH = "minecraft:tropicalfish"
+    """
+    | 热带鱼。
+    """
+
+    TURTLE = "minecraft:turtle"
+    """
+    | 海龟。
+    """
+
+    WANDERING_TRADER = "minecraft:wandering_trader"
+    """
+    | 流浪商人。
+    """
+
+    PUFFERFISH = "minecraft:pufferfish"
+    """
+    | 河豚。
+    """
+
+    GOAT = "minecraft:goat"
+    """
+    | 山羊。
+    """
+
+    VILLAGER = "minecraft:villager"
+    """
+    | 旧版村民。
+    """
+
+    VILLAGER_V2 = "minecraft:villager_v2"
+    """
+    | 村民。
+    """
+
+    AXOLOTL = "minecraft:axolotl"
+    """
+    | 美西螈。
+    """
+
+    CAT = "minecraft:cat"
+    """
+    | 猫。
+    """
+
+    FROG = "minecraft:frog"
+    """
+    | 青蛙。
+    """
+
+    OCELOT = "minecraft:ocelot"
+    """
+    | 豹猫。
+    """
+
+    SNOW_GOLEM = "minecraft:snow_golem"
+    """
+    | 雪傀儡。
+    """
+
+    BEE = "minecraft:bee"
+    """
+    | 蜜蜂。
+    """
+
+    DOLPHIN = "minecraft:dolphin"
+    """
+    | 海豚。
+    """
+
+    FOX = "minecraft:fox"
+    """
+    | 狐狸。
+    """
+
+    IRON_GOLEM = "minecraft:iron_golem"
+    """
+    | 铁傀儡。
+    """
+
+    LLAMA = "minecraft:llama"
+    """
+    | 羊驼。
+    """
+
+    PANDA = "minecraft:panda"
+    """
+    | 熊猫。
+    """
+
+    POLAR_BEAR = "minecraft:polar_bear"
+    """
+    | 北极熊。
+    """
+
+    TRADER_LLAMA = "minecraft:trader_llama"
+    """
+    | 行商羊驼。
+    """
+
+    WOLF = "minecraft:wolf"
+    """
+    | 狼。
+    """
+
+    ZOMBIE_HORSE = "minecraft:zombie_horse"
+    """
+    | 僵尸马。
+    """
 
 
-# 实体列表
-# 数字ID，中文名，英文ID，网易版ID
-ENTITY_LIST = [
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    None,
-    (10, "鸡", "chicken", EntityType.Chicken),
-    (11, "牛", "cow", EntityType.Cow),
-    (12, "猪", "pig", EntityType.Pig),
-    (13, "羊", "sheep", EntityType.Sheep),
-    (14, "狼", "wolf", EntityType.Wolf),
-    (15, "村民", "villager", EntityType.Villager),
-    (16, "哞菇", "mooshroom", EntityType.MushroomCow),
-    (17, "鱿鱼", "squid", EntityType.Squid),
-    (18, "兔子", "rabbit", EntityType.Rabbit),
-    (19, "蝙蝠", "bat", EntityType.Bat),
-    (20, "铁傀儡", "iron_golem", EntityType.IronGolem),
-    (21, "雪傀儡", "snow_golem", EntityType.SnowGolem),
-    (22, "豹猫", "ocelot", EntityType.Ocelot),
-    (23, "马", "horse", EntityType.Horse),
-    (24, "驴", "donkey", EntityType.Donkey),
-    (25, "骡", "mule", EntityType.Mule),
-    (26, "骷髅马", "skeleton_horse", EntityType.SkeletonHorse),
-    (27, "僵尸马", "zombie_horse", EntityType.ZombieHorse),
-    (28, "北极熊", "polar_bear", EntityType.PolarBear),
-    (29, "羊驼", "llama", EntityType.Llama),
-    (30, "鹦鹉", "parrot", EntityType.Parrot),
-    (31, "海豚", "dolphin", EntityType.Dolphin),
-    (32, "僵尸", "zombie", EntityType.Zombie),
-    (33, "苦力怕", "creeper", EntityType.Creeper),
-    (34, "骷髅", "skeleton", EntityType.Skeleton),
-    (35, "蜘蛛", "spider", EntityType.Spider),
-    (36, "僵尸猪灵", "zombie_pigman", EntityType.PigZombie),
-    (37, "史莱姆", "slime", EntityType.Slime),
-    (38, "末影人", "enderman", EntityType.EnderMan),
-    (39, "蠹虫", "silverfish", EntityType.Silverfish),
-    (40, "洞穴蜘蛛", "cave_spider", EntityType.CaveSpider),
-    (41, "恶魂", "ghast", EntityType.Ghast),
-    (42, "岩浆怪", "magma_cube", EntityType.LavaSlime),
-    (43, "烈焰人", "blaze", EntityType.Blaze),
-    (44, "僵尸村民", "zombie_villager", EntityType.ZombieVillager),
-    (45, "女巫", "witch", EntityType.Witch),
-    (46, "流浪者", "stray", EntityType.Stray),
-    (47, "尸壳", "husk", EntityType.Husk),
-    (48, "凋灵骷髅", "wither_skeleton", EntityType.WitherSkeleton),
-    (49, "守卫者", "guardian", EntityType.Guardian),
-    (50, "远古守卫者", "elder_guardian", EntityType.ElderGuardian),
-    (51, "NPC", "npc", EntityType.Npc),
-    (52, "凋灵", "wither", EntityType.WitherBoss),
-    (53, "末影龙", "ender_dragon", EntityType.Dragon),
-    (54, "潜影贝", "shulker", EntityType.Shulker),
-    (55, "末影螨", "endermite", EntityType.Endermite),
-    (56, "吉祥物", "agent", EntityType.Agent),
-    (57, "卫道士", "vindicator", EntityType.Vindicator),
-    (58, "幻翼", "phantom", EntityType.Phantom),
-    (59, "劫掠兽", "ravager", EntityType.IllagerBeast),
-    (60, "未知实体", "unknown", 0),
-    (61, "盔甲架", "armor_stand", EntityType.ArmorStand),
-    (62, "三脚架摄像机", "camera", EntityType.TripodCamera),
-    (63, "玩家", "player", EntityType.Player),
-    (64, "掉落物", "item", EntityType.ItemEntity),
-    (65, "点燃的TNT", "tnt", EntityType.PrimedTnt),
-    (66, "掉落的方块", "falling_block", EntityType.FallingBlock),
-    (67, "移动的方块", "moving_block", EntityType.MovingBlock),
-    (68, "扔出的附魔之瓶", "xp_bottle", EntityType.ExperiencePotion),
-    (69, "经验球", "xp_orb", EntityType.Experience),
-    (70, "扔出的末影之眼", "eye_of_ender_signal", EntityType.EyeOfEnder),
-    (71, "末影水晶", "ender_crystal", EntityType.EnderCrystal),
-    (72, "烟花火箭", "fireworks_rocket", EntityType.FireworksRocket),
-    (73, "扔出的三叉戟", "thrown_trident", EntityType.Trident),
-    (74, "海龟", "turtle", EntityType.Turtle),
-    (75, "猫", "cat", EntityType.Cat),
-    (76, "潜影贝导弹", "shulker_bullet", EntityType.ShulkerBullet),
-    (77, "鱼钩浮漂", "fishing_hook", EntityType.FishingHook),
-    (78, "黑板", "chalkboard", EntityType.Chalkboard),
-    (79, "末影龙火球", "dragon_fireball", EntityType.DragonFireball),
-    (80, "射出的箭", "arrow", EntityType.Arrow),
-    (81, "扔出的雪球", "snowball", EntityType.Snowball),
-    (82, "扔出的鸡蛋", "egg", EntityType.ThrownEgg),
-    (83, "画", "painting", EntityType.Painting),
-    (84, "矿车", "minecart", EntityType.Minecart),
-    (85, "恶魂火球", "fireball", EntityType.LargeFireball),
-    (86, "扔出的喷溅药水", "splash_potion", EntityType.ThrownPotion),
-    (87, "扔出的末影珍珠", "ender_pearl", EntityType.Enderpearl),
-    (88, "栓绳结", "leash_knot", EntityType.LeashKnot),
-    (89, "黑色凋灵之首", "wither_skull", EntityType.WitherSkull),
-    (90, "船", "boat", EntityType.BoatRideable),
-    (91, "蓝色凋灵之首", "wither_skull_dangerous", EntityType.WitherSkullDangerous),
-    None,
-    (93, "闪电", "lightning_bolt", EntityType.LightningBolt),
-    (94, "烈焰人火球", "small_fireball", EntityType.SmallFireball),
-    (95, "区域效果云", "area_effect_cloud", EntityType.AreaEffectCloud),
-    (96, "漏斗矿车", "hopper_minecart", EntityType.MinecartHopper),
-    (97, "TNT矿车", "tnt_minecart", EntityType.MinecartTNT),
-    (98, "运输矿车", "chest_minecart", EntityType.MinecartChest),
-    None,
-    (100, "命令方块矿车", "command_block_minecart", EntityType.MinecartCommandBlock),
-    (101, "扔出的滞留药水", "lingering_potion", EntityType.LingeringPotion),
-    (102, "羊驼唾沫", "llama_spit", EntityType.LlamaSpit),
-    (103, "尖牙", "evocation_fang", EntityType.EvocationFang),
-    (104, "唤魔者", "evocation_illager", EntityType.EvocationIllager),
-    (105, "恼鬼", "vex", EntityType.Vex),
-    (106, "冰弹", "ice_bomb", EntityType.IceBomb),
-    (107, "气球", "balloon", EntityType.Balloon),
-    (108, "河豚", "pufferfish", EntityType.Pufferfish),
-    (109, "鲑鱼", "salmon", EntityType.Salmon),
-    (110, "溺尸", "drowned", EntityType.Drowned),
-    (111, "热带鱼", "tropicalfish", EntityType.Tropicalfish),
-    (112, "鳕鱼", "cod", EntityType.Fish),
-    (113, "熊猫", "panda", EntityType.Panda),
-    (114, "掠夺者", "pillager", EntityType.Pillager),
-    (115, "村民", "villager_v2", EntityType.VillagerV2),
-    (116, "僵尸村民", "zombie_villager_v2", EntityType.ZombieVillagerV2),
-    (117, "盾牌", "shield", EntityType.Shield),
-    (118, "流浪商人", "wandering_trader", EntityType.WanderingTrader),
-    (119, "讲台", "lectern", EntityType.Lectern),
-    (120, "远古守卫者恶魂", "elder_guardian_ghost", EntityType.ElderGuardianGhost),
-    (121, "狐狸", "fox", EntityType.Fox),
-    (122, "蜜蜂", "bee", EntityType.Bee),
-    (123, "猪灵", "piglin", EntityType.Piglin),
-    (124, "疣猪兽", "hoglin", EntityType.Hoglin),
-    (125, "炽足兽", "strider", EntityType.Strider),
-    (126, "僵尸疣猪兽", "zoglin", EntityType.Zoglin),
-    (127, "猪灵蛮兵", "piglin_brute", EntityType.PiglinBrute),
-    (128, "山羊", "goat", EntityType.Goat),
-    (129, "发光鱿鱼", "glow_squid", EntityType.GlowSquid),
-    (130, "美西螈", "axolotl", EntityType.Axolotl),
-    None,
-    (132, "青蛙", "frog", None),
-    (133, "蝌蚪", "tadpole", None),
-    (134, "Allay", "allay", None),
-    (218, "运输船", "chest_boat", None),
-]
+class HostileMob(Enum[str]):
+    """
+    | 敌对生物identifier枚举。
+
+    -----
+
+    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    """
+
+    BLAZE = "minecraft:blaze"
+    """
+    | 烈焰人。
+    """
+
+    BOGGED = "minecraft:bogged"
+    """
+    | 沼骸。
+    """
+
+    BREEZE = "minecraft:breeze"
+    """
+    | 旋风人。
+    """
+
+    CREEPER = "minecraft:creeper"
+    """
+    | 苦力怕。
+    """
+
+    ELDER_GUARDIAN = "minecraft:elder_guardian"
+    """
+    | 远古守卫者。
+    """
+
+    ENDERMITE = "minecraft:endermite"
+    """
+    | 末影螨。
+    """
+
+    EVOCATION_ILLAGER = "minecraft:evocation_illager"
+    """
+    | 唤魔者。
+    """
+
+    GHAST = "minecraft:ghast"
+    """
+    | 恶魂。
+    """
+
+    GUARDIAN = "minecraft:guardian"
+    """
+    | 守卫者。
+    """
+
+    HOGLIN = "minecraft:hoglin"
+    """
+    | 疣猪兽。
+    """
+
+    HUSK = "minecraft:husk"
+    """
+    | 尸壳。
+    """
+
+    MAGMA_CUBE = "minecraft:magma_cube"
+    """
+    | 岩浆怪。
+    """
+
+    PHANTOM = "minecraft:phantom"
+    """
+    | 幻翼。
+    """
+
+    PIGLIN_BRUTE = "minecraft:piglin_brute"
+    """
+    | 猪灵蛮兵。
+    """
+
+    PILLAGER = "minecraft:pillager"
+    """
+    | 掠夺者。
+    """
+
+    RAVAGER = "minecraft:ravager"
+    """
+    | 劫掠兽。
+    """
+
+    SHULKER = "minecraft:shulker"
+    """
+    | 潜影贝。
+    """
+
+    SILVERFISH = "minecraft:silverfish"
+    """
+    | 蠹虫。
+    """
+
+    SKELETON = "minecraft:skeleton"
+    """
+    | 骷髅。
+    """
+
+    SLIME = "minecraft:slime"
+    """
+    | 史莱姆。
+    """
+
+    STRAY = "minecraft:stray"
+    """
+    | 流浪者。
+    """
+
+    VEX = "minecraft:vex"
+    """
+    | 恼鬼。
+    """
+
+    VINDICATOR = "minecraft:vindicator"
+    """
+    | 卫道士。
+    """
+
+    WARDEN = "minecraft:warden"
+    """
+    | 监守者。
+    """
+
+    WITCH = "minecraft:witch"
+    """
+    | 女巫。
+    """
+
+    WITHER_SKELETON = "minecraft:wither_skeleton"
+    """
+    | 凋零骷髅。
+    """
+
+    ZOGLIN = "minecraft:zoglin"
+    """
+    | 僵尸疣猪兽。
+    """
+
+    ZOMBIE = "minecraft:zombie"
+    """
+    | 僵尸。
+    """
+
+    ZOMBIE_VILLAGER = "minecraft:zombie_villager"
+    """
+    | 旧版僵尸村民。
+    """
+
+    ZOMBIE_VILLAGER_V2 = "minecraft:zombie_villager_v2"
+    """
+    | 僵尸村民。
+    """
+
+    CREAKING = "minecraft:creaking"
+    """
+    | 嘎枝。
+    """
+
+    DROWNED = "minecraft:drowned"
+    """
+    | 溺尸。
+    """
+
+    ENDERMAN = "minecraft:enderman"
+    """
+    | 末影人。
+    """
+
+    PIGLIN = "minecraft:piglin"
+    """
+    | 猪灵。
+    """
+
+    SPIDER = "minecraft:spider"
+    """
+    | 蜘蛛。
+    """
+
+    CAVE_SPIDER = "minecraft:cave_spider"
+    """
+    | 洞穴蜘蛛。
+    """
+
+    ZOMBIE_PIGMAN = "minecraft:zombie_pigman"
+    """
+    | 僵尸猪灵。
+    """
+
+    ENDER_DRAGON = "minecraft:ender_dragon"
+    """
+    | 末影龙。
+    """
+
+    WITHER = "minecraft:wither"
+    """
+    | 凋灵。
+    """
 
 
-# 生物列表
-# 数字ID，中文名，英文ID，网易版ID，是否是敌对生物
-MOB_LIST = [
-    (10, "鸡", "chicken", EntityType.Chicken, False),
-    (11, "牛", "cow", EntityType.Cow, False),
-    (12, "猪", "pig", EntityType.Pig, False),
-    (13, "羊", "sheep", EntityType.Sheep, False),
-    (14, "狼", "wolf", EntityType.Wolf, False),
-    (15, "村民", "villager", EntityType.Villager, False),
-    (16, "哞菇", "mooshroom", EntityType.MushroomCow, False),
-    (17, "鱿鱼", "squid", EntityType.Squid, False),
-    (18, "兔子", "rabbit", EntityType.Rabbit, False),
-    (19, "蝙蝠", "bat", EntityType.Bat, False),
-    (20, "铁傀儡", "iron_golem", EntityType.IronGolem, False),
-    (21, "雪傀儡", "snow_golem", EntityType.SnowGolem, False),
-    (22, "豹猫", "ocelot", EntityType.Ocelot, False),
-    (23, "马", "horse", EntityType.Horse, False),
-    (24, "驴", "donkey", EntityType.Donkey, False),
-    (25, "骡", "mule", EntityType.Mule, False),
-    (26, "骷髅马", "skeleton_horse", EntityType.SkeletonHorse, False),
-    (27, "僵尸马", "zombie_horse", EntityType.ZombieHorse, False),
-    (28, "北极熊", "polar_bear", EntityType.PolarBear, False),
-    (29, "羊驼", "llama", EntityType.Llama, False),
-    (30, "鹦鹉", "parrot", EntityType.Parrot, False),
-    (31, "海豚", "dolphin", EntityType.Dolphin, False),
-    (32, "僵尸", "zombie", EntityType.Zombie, True),
-    (33, "苦力怕", "creeper", EntityType.Creeper, True),
-    (34, "骷髅", "skeleton", EntityType.Skeleton, True),
-    (35, "蜘蛛", "spider", EntityType.Spider, True),
-    (36, "僵尸猪灵", "zombie_pigman", EntityType.PigZombie, True),
-    (37, "史莱姆", "slime", EntityType.Slime, True),
-    (38, "末影人", "enderman", EntityType.EnderMan, True),
-    (39, "蠹虫", "silverfish", EntityType.Silverfish, True),
-    (40, "洞穴蜘蛛", "cave_spider", EntityType.CaveSpider, True),
-    (41, "恶魂", "ghast", EntityType.Ghast, True),
-    (42, "岩浆怪", "magma_cube", EntityType.LavaSlime, True),
-    (43, "烈焰人", "blaze", EntityType.Blaze, True),
-    (44, "僵尸村民", "zombie_villager", EntityType.ZombieVillager, True),
-    (45, "女巫", "witch", EntityType.Witch, True),
-    (46, "流浪者", "stray", EntityType.Stray, True),
-    (47, "尸壳", "husk", EntityType.Husk, True),
-    (48, "凋灵骷髅", "wither_skeleton", EntityType.WitherSkeleton, True),
-    (49, "守卫者", "guardian", EntityType.Guardian, True),
-    (50, "远古守卫者", "elder_guardian", EntityType.ElderGuardian, True),
-    (52, "凋灵", "wither", EntityType.WitherBoss, True),
-    (53, "末影龙", "ender_dragon", EntityType.Dragon, True),
-    (54, "潜影贝", "shulker", EntityType.Shulker, True),
-    (55, "末影螨", "endermite", EntityType.Endermite, True),
-    (57, "卫道士", "vindicator", EntityType.Vindicator, True),
-    (58, "幻翼", "phantom", EntityType.Phantom, True),
-    (59, "劫掠兽", "ravager", EntityType.IllagerBeast, True),
-    (63, "玩家", "player", EntityType.Player, False),
-    (74, "海龟", "turtle", EntityType.Turtle, False),
-    (75, "猫", "cat", EntityType.Cat, False),
-    (104, "唤魔者", "evocation_illager", EntityType.EvocationIllager, True),
-    (105, "恼鬼", "vex", EntityType.Vex, True),
-    (108, "河豚", "pufferfish", EntityType.Pufferfish, False),
-    (109, "鲑鱼", "salmon", EntityType.Salmon, False),
-    (110, "溺尸", "drowned", EntityType.Drowned, True),
-    (111, "热带鱼", "tropicalfish", EntityType.Tropicalfish, False),
-    (112, "鳕鱼", "cod", EntityType.Fish, False),
-    (113, "熊猫", "panda", EntityType.Panda, False),
-    (114, "掠夺者", "pillager", EntityType.Pillager, True),
-    (115, "村民", "villager_v2", EntityType.VillagerV2, False),
-    (116, "僵尸村民", "zombie_villager_v2", EntityType.ZombieVillagerV2, True),
-    (118, "流浪商人", "wandering_trader", EntityType.WanderingTrader, False),
-    (121, "狐狸", "fox", EntityType.Fox, False),
-    (122, "蜜蜂", "bee", EntityType.Bee, False),
-    (123, "猪灵", "piglin", EntityType.Piglin, True),
-    (124, "疣猪兽", "hoglin", EntityType.Hoglin, True),
-    (125, "炽足兽", "strider", EntityType.Strider, False),
-    (126, "僵尸疣猪兽", "zoglin", EntityType.Zoglin, True),
-    (127, "猪灵蛮兵", "piglin_brute", EntityType.PiglinBrute, True),
-    (128, "山羊", "goat", EntityType.Goat, False),
-    (129, "发光鱿鱼", "glow_squid", EntityType.GlowSquid, False),
-    (130, "美西螈", "axolotl", EntityType.Axolotl, False),
-    (132, "青蛙", "frog", None, False),
-    (133, "蝌蚪", "tadpole", None, False),
-    (134, "Allay", "allay", None, False),
-]
+class Mob(FriendlyMob, HostileMob):
+    """
+    | 生物identifier枚举。
+    """
 
 
-# 友好生物列表
-# 数字ID，中文名，英文ID，网易版ID
-FRIENDLY_MOB_LIST = [
-    (10, "鸡", "chicken", EntityType.Chicken),
-    (11, "牛", "cow", EntityType.Cow),
-    (12, "猪", "pig", EntityType.Pig),
-    (13, "羊", "sheep", EntityType.Sheep),
-    (14, "狼", "wolf", EntityType.Wolf),
-    (15, "村民", "villager", EntityType.Villager),
-    (16, "哞菇", "mooshroom", EntityType.MushroomCow),
-    (17, "鱿鱼", "squid", EntityType.Squid),
-    (18, "兔子", "rabbit", EntityType.Rabbit),
-    (19, "蝙蝠", "bat", EntityType.Bat),
-    (20, "铁傀儡", "iron_golem", EntityType.IronGolem),
-    (21, "雪傀儡", "snow_golem", EntityType.SnowGolem),
-    (22, "豹猫", "ocelot", EntityType.Ocelot),
-    (23, "马", "horse", EntityType.Horse),
-    (24, "驴", "donkey", EntityType.Donkey),
-    (25, "骡", "mule", EntityType.Mule),
-    (26, "骷髅马", "skeleton_horse", EntityType.SkeletonHorse),
-    (27, "僵尸马", "zombie_horse", EntityType.ZombieHorse),
-    (28, "北极熊", "polar_bear", EntityType.PolarBear),
-    (29, "羊驼", "llama", EntityType.Llama),
-    (30, "鹦鹉", "parrot", EntityType.Parrot),
-    (31, "海豚", "dolphin", EntityType.Dolphin),
-    (74, "海龟", "turtle", EntityType.Turtle),
-    (75, "猫", "cat", EntityType.Cat),
-    (108, "河豚", "pufferfish", EntityType.Pufferfish),
-    (109, "鲑鱼", "salmon", EntityType.Salmon),
-    (111, "热带鱼", "tropicalfish", EntityType.Tropicalfish),
-    (112, "鳕鱼", "cod", EntityType.Fish),
-    (113, "熊猫", "panda", EntityType.Panda),
-    (115, "村民", "villager_v2", EntityType.VillagerV2),
-    (118, "流浪商人", "wandering_trader", EntityType.WanderingTrader),
-    (121, "狐狸", "fox", EntityType.Fox),
-    (122, "蜜蜂", "bee", EntityType.Bee),
-    (125, "炽足兽", "strider", EntityType.Strider),
-    (128, "山羊", "goat", 4992),
-    (129, "发光鱿鱼", "glow_squid", EntityType.GlowSquid),
-    (130, "美西螈", "axolotl", EntityType.Axolotl),
-    (132, "青蛙", "frog", None),
-    (133, "蝌蚪", "tadpole", None),
-    (134, "Allay", "allay", None),
-]
+class Feature(Enum[str]):
+    """
+    | 原版结构特征枚举，值为结构特征ID（字符串）。
+    """
+
+    END_CITY = "end_city"
+    """
+    | 末地城。
+    """
+
+    FORTRESS = "fortress"
+    """
+    | 下界要塞。
+    """
+
+    MANSION = "mansion"
+    """
+    | 林地府邸。
+    """
+
+    MINESHAFT = "mineshaft"
+    """
+    | 废弃矿井。
+    """
+
+    MONUMENT = "monument"
+    """
+    | 海底神殿。
+    """
+
+    STRONGHOLD = "stronghold"
+    """
+    | 要塞。
+    """
+
+    TEMPLE = "temple"
+    """
+    | 神殿（包括沙漠神殿/雪屋/丛林神庙/女巫小屋）。
+    """
+
+    VILLAGE = "village"
+    """
+    | 村庄。
+    """
+
+    SHIPWRECK = "shipwreck"
+    """
+    | 沉船。
+    """
+
+    BURIED_TREASURE = "buried_treasure"
+    """
+    | 埋藏的宝藏。
+    """
+
+    RUINS = "ruins"
+    """
+    | 海底废墟。
+    """
+
+    PILLAGER_OUTPOST = "pillager_outpost"
+    """
+    | 掠夺者前哨站。
+    """
+
+    BASTION_REMNANT = "bastion_remnant"
+    """
+    | 堡垒遗迹。
+    """
+
+    RUINED_PORTAL = "ruined_portal"
+    """
+    | 废弃传送门。
+    """
+
+    ANCIENT_CITY = "ancient_city"
+    """
+    | 远古城市。
+    """
+
+    TRIAL_CHAMBERS = "trial_chambers"
+    """
+    | 试炼密室。
+    """
 
 
-# 敌对生物列表
-# 数字ID，中文名，英文ID，网易版ID
-HOSTILE_MOB_LIST = [
-    (32, "僵尸", "zombie", EntityType.Zombie),
-    (33, "苦力怕", "creeper", EntityType.Creeper),
-    (34, "骷髅", "skeleton", EntityType.Skeleton),
-    (35, "蜘蛛", "spider", EntityType.Spider),
-    (36, "僵尸猪灵", "zombie_pigman", EntityType.PigZombie),
-    (37, "史莱姆", "slime", EntityType.Slime),
-    (38, "末影人", "enderman", EntityType.EnderMan),
-    (39, "蠹虫", "silverfish", EntityType.Silverfish),
-    (40, "洞穴蜘蛛", "cave_spider", EntityType.CaveSpider),
-    (41, "恶魂", "ghast", EntityType.Ghast),
-    (42, "岩浆怪", "magma_cube", EntityType.LavaSlime),
-    (43, "烈焰人", "blaze", EntityType.Blaze),
-    (44, "僵尸村民", "zombie_villager", EntityType.ZombieVillager),
-    (45, "女巫", "witch", EntityType.Witch),
-    (46, "流浪者", "stray", EntityType.Stray),
-    (47, "尸壳", "husk", EntityType.Husk),
-    (48, "凋灵骷髅", "wither_skeleton", EntityType.WitherSkeleton),
-    (49, "守卫者", "guardian", EntityType.Guardian),
-    (50, "远古守卫者", "elder_guardian", EntityType.ElderGuardian),
-    (54, "潜影贝", "shulker", EntityType.Shulker),
-    (55, "末影螨", "endermite", EntityType.Endermite),
-    (57, "卫道士", "vindicator", EntityType.Vindicator),
-    (58, "幻翼", "phantom", EntityType.Phantom),
-    (59, "劫掠兽", "ravager", EntityType.IllagerBeast),
-    (104, "唤魔者", "evocation_illager", EntityType.EvocationIllager),
-    (105, "恼鬼", "vex", EntityType.Vex),
-    (110, "溺尸", "drowned", EntityType.Drowned),
-    (114, "掠夺者", "pillager", EntityType.Pillager),
-    (116, "僵尸村民", "zombie_villager_v2", EntityType.ZombieVillagerV2),
-    (123, "猪灵", "piglin", EntityType.Piglin),
-    (124, "疣猪兽", "hoglin", EntityType.Hoglin),
-    (126, "僵尸疣猪兽", "zoglin", EntityType.Zoglin),
-    (127, "猪灵蛮兵", "piglin_brute", EntityType.PiglinBrute),
-]
+class UiContainer(Enum[str]):
+    """
+    | 原版UI容器identifier（即仅存在容器UI，不能真正存储物品的容器）枚举（包括容器方块和容器实体）。
+
+    -----
+
+    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    """
+
+    CRAFTING_TABLE = "minecraft:crafting_table"
+    """
+    | 工作台。
+    """
+
+    ENCHANTING_TABLE = "minecraft:enchanting_table"
+    """
+    | 附魔台。
+    """
+
+    BEACON = "minecraft:beacon"
+    """
+    | 信标。
+    """
+
+    ANVIL = "minecraft:anvil"
+    """
+    | 铁砧。
+    """
+
+    CHIPPED_ANVIL = "minecraft:chipped_anvil"
+    """
+    | 开裂的铁砧。
+    """
+
+    DAMAGED_ANVIL = "minecraft:damaged_anvil"
+    """
+    | 损坏的铁砧。
+    """
+
+    DEPRECATED_ANVIL = "minecraft:deprecated_anvil"
+    """
+    | 破碎的铁砧。
+    """
+
+    GRINDSTONE = "minecraft:grindstone"
+    """
+    | 砂轮。
+    """
+
+    CARTOGRAPHY_TABLE = "minecraft:cartography_table"
+    """
+    | 制图台。
+    """
+
+    STONECUTTER_BLOCK = "minecraft:stonecutter_block"
+    """
+    | 切石机。
+    """
+
+    LOOM = "minecraft:loom"
+    """
+    | 织布机。
+    """
+
+    SMITHING_TABLE = "minecraft:smithing_table"
+    """
+    | 锻造台。
+    """
+
+    VILLAGER = "minecraft:villager"
+    """
+    | 旧版村民。
+    """
+
+    VILLAGER_V2 = "minecraft:villager_v2"
+    """
+    | 村民。
+    """
 
 
-# 具有攻击力的生物列表
-# 数字ID，中文名，英文ID，网易版ID
-ATTACKABLE_MOB_LIST = [
-    (14, "狼", "wolf", EntityType.Wolf),
-    (20, "铁傀儡", "iron_golem", EntityType.IronGolem),
-    (21, "雪傀儡", "snow_golem", EntityType.SnowGolem),
-    (22, "豹猫", "ocelot", EntityType.Ocelot),
-    (28, "北极熊", "polar_bear", EntityType.PolarBear),
-    (31, "海豚", "dolphin", EntityType.Dolphin),
-    (32, "僵尸", "zombie", EntityType.Zombie),
-    (33, "苦力怕", "creeper", EntityType.Creeper),
-    (34, "骷髅", "skeleton", EntityType.Skeleton),
-    (35, "蜘蛛", "spider", EntityType.Spider),
-    (36, "僵尸猪灵", "zombie_pigman", EntityType.PigZombie),
-    (37, "史莱姆", "slime", EntityType.Slime),
-    (38, "末影人", "enderman", EntityType.EnderMan),
-    (39, "蠹虫", "silverfish", EntityType.Silverfish),
-    (40, "洞穴蜘蛛", "cave_spider", EntityType.CaveSpider),
-    (41, "恶魂", "ghast", EntityType.Ghast),
-    (42, "岩浆怪", "magma_cube", EntityType.LavaSlime),
-    (43, "烈焰人", "blaze", EntityType.Blaze),
-    (44, "僵尸村民", "zombie_villager", EntityType.ZombieVillager),
-    (45, "女巫", "witch", EntityType.Witch),
-    (46, "流浪者", "stray", EntityType.Stray),
-    (47, "尸壳", "husk", EntityType.Husk),
-    (48, "凋灵骷髅", "wither_skeleton", EntityType.WitherSkeleton),
-    (49, "守卫者", "guardian", EntityType.Guardian),
-    (50, "远古守卫者", "elder_guardian", EntityType.ElderGuardian),
-    (54, "潜影贝", "shulker", EntityType.Shulker),
-    (55, "末影螨", "endermite", EntityType.Endermite),
-    (57, "卫道士", "vindicator", EntityType.Vindicator),
-    (58, "幻翼", "phantom", EntityType.Phantom),
-    (59, "劫掠兽", "ravager", EntityType.IllagerBeast),
-    (75, "猫", "cat", EntityType.Cat),
-    (104, "唤魔者", "evocation_illager", EntityType.EvocationIllager),
-    (105, "恼鬼", "vex", EntityType.Vex),
-    (108, "河豚", "pufferfish", EntityType.Pufferfish),
-    (110, "溺尸", "drowned", EntityType.Drowned),
-    (113, "熊猫", "panda", EntityType.Panda),
-    (114, "掠夺者", "pillager", EntityType.Pillager),
-    (116, "僵尸村民", "zombie_villager_v2", EntityType.ZombieVillagerV2),
-    (122, "蜜蜂", "bee", EntityType.Bee),
-    (123, "猪灵", "piglin", EntityType.Piglin),
-    (124, "疣猪兽", "hoglin", EntityType.Hoglin),
-    (125, "炽足兽", "strider", EntityType.Strider),
-    (126, "僵尸疣猪兽", "zoglin", EntityType.Zoglin),
-    (127, "猪灵蛮兵", "piglin_brute", EntityType.PiglinBrute),
-    (128, "山羊", "goat", EntityType.Goat),
-]
+class Container(Enum[str]):
+    """
+    | 原版容器identifier枚举（包括容器方块和容器实体）。
+
+    -----
+
+    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    """
+
+    CHEST = "minecraft:chest"
+    """
+    | 箱子。
+    """
+
+    TRAPPED_CHEST = "minecraft:trapped_chest"
+    """
+    | 陷阱箱。
+    """
+
+    CHEST = "minecraft:"
+    """
+    | 箱子。
+    """
+
+    ENDER_CHEST = "minecraft:ender_chest"
+    """
+    | 末影箱。
+    """
+
+    UNDYED_SHULKER_BOX = "minecraft:undyed_shulker_box"
+    """
+    | 潜影盒。
+    """
+
+    WHITE_SHULKER_BOX = "minecraft:white_shulker_box"
+    """
+    | 白色潜影盒。
+    """
+
+    ORANGE_SHULKER_BOX = "minecraft:orange_shulker_box"
+    """
+    | 橙色潜影盒。
+    """
+
+    MAGENTA_SHULKER_BOX = "minecraft:magenta_shulker_box"
+    """
+    | 品红色潜影盒。
+    """
+
+    LIGHT_BLUE_SHULKER_BOX = "minecraft:light_blue_shulker_box"
+    """
+    | 淡蓝色潜影盒。
+    """
+
+    YELLOW_SHULKER_BOX = "minecraft:yellow_shulker_box"
+    """
+    | 黄色潜影盒。
+    """
+
+    LIME_SHULKER_BOX = "minecraft:lime_shulker_box"
+    """
+    | 黄绿色潜影盒。
+    """
+
+    PINK_SHULKER_BOX = "minecraft:pink_shulker_box"
+    """
+    | 粉红色潜影盒。
+    """
+
+    GRAY_SHULKER_BOX = "minecraft:gray_shulker_box"
+    """
+    | 灰色潜影盒。
+    """
+
+    LIGHT_GRAY_SHULKER_BOX = "minecraft:light_gray_shulker_box"
+    """
+    | 淡灰色潜影盒。
+    """
+
+    CYAN_SHULKER_BOX = "minecraft:cyan_shulker_box"
+    """
+    | 青色潜影盒。
+    """
+
+    PURPLE_SHULKER_BOX = "minecraft:purple_shulker_box"
+    """
+    | 紫色潜影盒。
+    """
+
+    BLUE_SHULKER_BOX = "minecraft:blue_shulker_box"
+    """
+    | 蓝色潜影盒。
+    """
+
+    BROWN_SHULKER_BOX = "minecraft:brown_shulker_box"
+    """
+    | 棕色潜影盒。
+    """
+
+    GREEN_SHULKER_BOX = "minecraft:green_shulker_box"
+    """
+    | 绿色潜影盒。
+    """
+
+    RED_SHULKER_BOX = "minecraft:red_shulker_box"
+    """
+    | 红色潜影盒。
+    """
+
+    BLACK_SHULKER_BOX = "minecraft:black_shulker_box"
+    """
+    | 黑色潜影盒。
+    """
+
+    BARREL = "minecraft:barrel"
+    """
+    | 木桶。
+    """
+
+    FURNACE = "minecraft:furnace"
+    """
+    | 熔炉。
+    """
+
+    LIT_FURNACE = "minecraft:lit_furnace"
+    """
+    | 燃烧中的熔炉。
+    """
+
+    SMOKER = "minecraft:smoker"
+    """
+    | 烟熏炉。
+    """
+
+    LIT_SMOKER = "minecraft:lit_smoker"
+    """
+    | 燃烧中的烟熏炉。
+    """
+
+    BLAST_FURNACE = "minecraft:blast_furnace"
+    """
+    | 高炉。
+    """
+
+    LIT_BLAST_FURNACE = "minecraft:lit_blast_furnace"
+    """
+    | 燃烧中的高炉。
+    """
+
+    BREWING_STAND = "minecraft:brewing_stand"
+    """
+    | 酿造台。
+    """
+
+    DROPPER = "minecraft:dropper"
+    """
+    | 投掷器。
+    """
+
+    DISPENSER = "minecraft:dispenser"
+    """
+    | 发射器。
+    """
+
+    HOPPER = "minecraft:hopper"
+    """
+    | 漏斗。
+    """
+
+    CRAFTER = "minecraft:crafter"
+    """
+    | 合成器。
+    """
+
+    CHEST_MINECART = "minecraft:chest_minecart"
+    """
+    | 运输矿车。
+    """
+
+    CHEST_BOAT = "minecraft:chest_boat"
+    """
+    | 运输船。
+    """
+
+    HOPPER_MINECART = "minecraft:hopper_minecart"
+    """
+    | 漏斗矿车。
+    """
+
+    HORSE = "minecraft:horse"
+    """
+    | 马。
+    """
+
+    DONKEY = "minecraft:donkey"
+    """
+    | 驴。
+    """
+
+    MULE = "minecraft:mule"
+    """
+    | 骡。
+    """
+
+    CAMEL = "minecraft:camel"
+    """
+    | 骆驼。
+    """
+
+    TRADER_LLAMA = "minecraft:trader_llama"
+    """
+    | 行商羊驼。
+    """
+
+    LLAMA = "minecraft:llama"
+    """
+    | 羊驼。
+    """
 
 
-# 用于将实体网易版ID转换为数字ID的字典
-ENTITY_ID_DICT = {
-    EntityType.Chicken: 10,
-    EntityType.Cow: 11,
-    EntityType.Pig: 12,
-    EntityType.Sheep: 13,
-    EntityType.Wolf: 14,
-    EntityType.Villager: 15,
-    EntityType.MushroomCow: 16,
-    EntityType.Squid: 17,
-    EntityType.Rabbit: 18,
-    EntityType.Bat: 19,
-    EntityType.IronGolem: 20,
-    EntityType.SnowGolem: 21,
-    EntityType.Ocelot: 22,
-    EntityType.Horse: 23,
-    EntityType.Donkey: 24,
-    EntityType.Mule: 25,
-    EntityType.SkeletonHorse: 26,
-    EntityType.ZombieHorse: 27,
-    EntityType.PolarBear: 28,
-    EntityType.Llama: 29,
-    EntityType.Parrot: 30,
-    EntityType.Dolphin: 31,
-    EntityType.Zombie: 32,
-    EntityType.Creeper: 33,
-    EntityType.Skeleton: 34,
-    EntityType.Spider: 35,
-    EntityType.PigZombie: 36,
-    EntityType.Slime: 37,
-    EntityType.EnderMan: 38,
-    EntityType.Silverfish: 39,
-    EntityType.CaveSpider: 40,
-    EntityType.Ghast: 41,
-    EntityType.LavaSlime: 42,
-    EntityType.Blaze: 43,
-    EntityType.ZombieVillager: 44,
-    EntityType.Witch: 45,
-    EntityType.Stray: 46,
-    EntityType.Husk: 47,
-    EntityType.WitherSkeleton: 48,
-    EntityType.Guardian: 49,
-    EntityType.ElderGuardian: 50,
-    EntityType.Npc: 51,
-    EntityType.WitherBoss: 52,
-    EntityType.Dragon: 53,
-    EntityType.Shulker: 54,
-    EntityType.Endermite: 55,
-    EntityType.Agent: 56,
-    EntityType.Vindicator: 57,
-    EntityType.Phantom: 58,
-    EntityType.IllagerBeast: 59,
-    EntityType.ArmorStand: 61,
-    EntityType.TripodCamera: 62,
-    EntityType.Player: 63,
-    EntityType.ItemEntity: 64,
-    EntityType.PrimedTnt: 65,
-    EntityType.FallingBlock: 66,
-    EntityType.MovingBlock: 67,
-    EntityType.ExperiencePotion: 68,
-    EntityType.Experience: 69,
-    EntityType.EyeOfEnder: 70,
-    EntityType.EnderCrystal: 71,
-    EntityType.FireworksRocket: 72,
-    EntityType.Trident: 73,
-    EntityType.Turtle: 74,
-    EntityType.Cat: 75,
-    EntityType.ShulkerBullet: 76,
-    EntityType.FishingHook: 77,
-    EntityType.Chalkboard: 78,
-    EntityType.DragonFireball: 79,
-    EntityType.Arrow: 80,
-    EntityType.Snowball: 81,
-    EntityType.ThrownEgg: 82,
-    EntityType.Painting: 83,
-    EntityType.Minecart: 84,
-    EntityType.LargeFireball: 85,
-    EntityType.ThrownPotion: 86,
-    EntityType.Enderpearl: 87,
-    EntityType.LeashKnot: 88,
-    EntityType.WitherSkull: 89,
-    EntityType.BoatRideable: 90,
-    EntityType.WitherSkullDangerous: 91,
-    EntityType.LightningBolt: 93,
-    EntityType.SmallFireball: 94,
-    EntityType.AreaEffectCloud: 95,
-    EntityType.MinecartHopper: 96,
-    EntityType.MinecartTNT: 97,
-    EntityType.MinecartChest: 98,
-    EntityType.MinecartCommandBlock: 100,
-    EntityType.LingeringPotion: 101,
-    EntityType.LlamaSpit: 102,
-    EntityType.EvocationFang: 103,
-    EntityType.EvocationIllager: 104,
-    EntityType.Vex: 105,
-    EntityType.IceBomb: 106,
-    EntityType.Balloon: 107,
-    EntityType.Pufferfish: 108,
-    EntityType.Salmon: 109,
-    EntityType.Drowned: 110,
-    EntityType.Tropicalfish: 111,
-    EntityType.Fish: 112,
-    EntityType.Panda: 113,
-    EntityType.Pillager: 114,
-    EntityType.VillagerV2: 115,
-    EntityType.ZombieVillagerV2: 116,
-    EntityType.Shield: 117,
-    EntityType.WanderingTrader: 118,
-    EntityType.Lectern: 119,
-    EntityType.ElderGuardianGhost: 120,
-    EntityType.Fox: 121,
-    EntityType.Bee: 122,
-    EntityType.Piglin: 123,
-    EntityType.Hoglin: 124,
-    EntityType.Strider: 125,
-    EntityType.Zoglin: 126,
-    EntityType.PiglinBrute: 127,
-    EntityType.Goat: 128,
-    EntityType.GlowSquid: 129,
-    EntityType.Axolotl: 130,
+class PositiveEffect(Enum[str]):
+    """
+    | 正面状态效果枚举。
+    """
+
+    SPEED = EffectType.MOVEMENT_SPEED
+    """
+    | 迅捷。
+    """
+
+    HASTE = EffectType.DIG_SPEED
+    """
+    | 急迫。
+    """
+
+    STRENGTH = EffectType.DAMAGE_BOOST
+    """
+    | 力量。
+    """
+
+    INSTANT_HEALTH = EffectType.HEAL
+    """
+    | 瞬间治疗。
+    """
+
+    JUMP_BOOST = EffectType.JUMP
+    """
+    | 跳跃提升。
+    """
+
+    REGENERATION = EffectType.REGENERATION
+    """
+    | 生命恢复。
+    """
+
+    RESISTANCE = EffectType.DAMAGE_RESISTANCE
+    """
+    | 抗性提升。
+    """
+
+    FIRE_RESISTANCE = EffectType.FIRE_RESISTANCE
+    """
+    | 抗火。
+    """
+
+    WATER_BREATHING = EffectType.WATER_BREATHING
+    """
+    | 水下呼吸。
+    """
+
+    INVISIBILITY = EffectType.INVISIBILITY
+    """
+    | 隐身。
+    """
+
+    NIGHT_VISION = EffectType.NIGHT_VISION
+    """
+    | 夜视。
+    """
+
+    HEALTH_BOOST = EffectType.HEALTH_BOOST
+    """
+    | 生命提升。
+    """
+
+    ABSORPTION = EffectType.ABSORPTION
+    """
+    | 伤害吸收。
+    """
+
+    SATURATION = EffectType.SATURATION
+    """
+    | 饱和。
+    """
+
+    SLOW_FALLING = EffectType.SLOW_FALLING
+    """
+    | 缓降。
+    """
+
+    VILLAGE_HERO = EffectType.HERO_OF_THE_VILLAGE
+    """
+    | 村庄英雄。
+    """
+
+
+class NegativeEffect(Enum[str]):
+    """
+    | 负面状态效果枚举。
+    """
+
+    SLOWDOWN = EffectType.MOVEMENT_SLOWDOWN
+    """
+    | 缓慢。
+    """
+
+    MINING_FATIGUE = EffectType.DIG_SLOWDOWN
+    """
+    | 挖掘疲劳。
+    """
+
+    INSTANT_DAMAGE = EffectType.HARM
+    """
+    | 瞬间伤害。
+    """
+
+    NAUSEA = EffectType.CONFUSION
+    """
+    | 反胃。
+    """
+
+    BLINDNESS = EffectType.BLINDNESS
+    """
+    | 失明。
+    """
+
+    HUNGER = EffectType.HUNGER
+    """
+    | 饥饿。
+    """
+
+    WEAKNESS = EffectType.WEAKNESS
+    """
+    | 虚弱。
+    """
+
+    POISON = EffectType.POISON
+    """
+    | 中毒。
+    """
+
+    WITHER = EffectType.WITHER
+    """
+    | 凋零。
+    """
+
+    LEVITATION = EffectType.LEVITATION
+    """
+    | 飘浮。
+    """
+
+    FATAL_POISON = EffectType.FATAL_POISON
+    """
+    | 中毒（致命）。
+    """
+
+    DARKNESS = EffectType.DARKNESS
+    """
+    | 黑暗。
+    """
+
+    WIND_CHARGED = EffectType.WIND_CHARGED
+    """
+    | 蓄风。
+    """
+
+    WEAVING = EffectType.WEAVING
+    """
+    | 盘丝。
+    """
+
+    OOZING = EffectType.OOZING
+    """
+    | 渗浆。
+    """
+
+    INFESTED = EffectType.INFESTED
+    """
+    | 寄生。
+    """
+
+
+class NeutralEffect(Enum[str]):
+    """
+    | 中性状态效果枚举。
+    """
+
+    BAD_OMEN = EffectType.BAD_OMEN
+    """
+    | 不祥之兆。
+    """
+
+    TRIAL_OMEN = EffectType.TRIAL_OMEN
+    """
+    | 试炼之兆。
+    """
+
+    RAID_OMEN = EffectType.RAID_OMEN
+    """
+    | 袭击之兆。
+    """
+
+
+ENTITY_NAME_MAP = {
+    EntityType.Chicken:                     (10, "minecraft:chicken", "鸡"),
+    EntityType.Cow:                         (11, "minecraft:cow", "牛"),
+    EntityType.Pig:                         (12, "minecraft:pig", "猪"),
+    EntityType.Sheep:                       (13, "minecraft:sheep", "绵羊"),
+    EntityType.Wolf:                        (14, "minecraft:wolf", "狼"),
+    EntityType.Villager:                    (15, "minecraft:villager", "村民"),
+    EntityType.MushroomCow:                 (16, "minecraft:mooshroom", "哞菇"),
+    EntityType.Squid:                       (17, "minecraft:squid", "鱿鱼"),
+    EntityType.Rabbit:                      (18, "minecraft:rabbit", "兔子"),
+    EntityType.Bat:                         (19, "minecraft:bat", "蝙蝠"),
+    EntityType.IronGolem:                   (20, "minecraft:iron_golem", "铁傀儡"),
+    EntityType.SnowGolem:                   (21, "minecraft:snow_golem", "雪傀儡"),
+    EntityType.Ocelot:                      (22, "minecraft:ocelot", "豹猫"),
+    EntityType.Horse:                       (23, "minecraft:horse", "马"),
+    EntityType.Donkey:                      (24, "minecraft:donkey", "驴"),
+    EntityType.Mule:                        (25, "minecraft:mule", "骡"),
+    EntityType.SkeletonHorse:               (26, "minecraft:skeleton_horse", "骷髅马"),
+    EntityType.ZombieHorse:                 (27, "minecraft:zombie_horse", "僵尸马"),
+    EntityType.PolarBear:                   (28, "minecraft:polar_bear", "北极熊"),
+    EntityType.Llama:                       (29, "minecraft:llama", "羊驼"),
+    EntityType.Parrot:                      (30, "minecraft:parrot", "鹦鹉"),
+    EntityType.Dolphin:                     (31, "minecraft:dolphin", "海豚"),
+    EntityType.Zombie:                      (32, "minecraft:zombie", "僵尸"),
+    EntityType.Creeper:                     (33, "minecraft:creeper", "苦力怕"),
+    EntityType.Skeleton:                    (34, "minecraft:skeleton", "骷髅"),
+    EntityType.Spider:                      (35, "minecraft:spider", "蜘蛛"),
+    EntityType.PigZombie:                   (36, "minecraft:zombie_pigman", "僵尸猪灵"),
+    EntityType.Slime:                       (37, "minecraft:slime", "史莱姆"),
+    EntityType.EnderMan:                    (38, "minecraft:enderman", "末影人"),
+    EntityType.Silverfish:                  (39, "minecraft:silverfish", "蠹虫"),
+    EntityType.CaveSpider:                  (40, "minecraft:cave_spider", "洞穴蜘蛛"),
+    EntityType.Ghast:                       (41, "minecraft:ghast", "恶魂"),
+    EntityType.LavaSlime:                   (42, "minecraft:magma_cube", "岩浆怪"),
+    EntityType.Blaze:                       (43, "minecraft:blaze", "烈焰人"),
+    EntityType.ZombieVillager:              (44, "minecraft:zombie_villager", "僵尸村民"),
+    EntityType.Witch:                       (45, "minecraft:witch", "女巫"),
+    EntityType.Stray:                       (46, "minecraft:stray", "流浪者"),
+    EntityType.Husk:                        (47, "minecraft:husk", "尸壳"),
+    EntityType.WitherSkeleton:              (48, "minecraft:wither_skeleton", "凋灵骷髅"),
+    EntityType.Guardian:                    (49, "minecraft:guardian", "守卫者"),
+    EntityType.ElderGuardian:               (50, "minecraft:elder_guardian", "远古守卫者"),
+    EntityType.Npc:                         (51, "minecraft:npc", "NPC"),
+    EntityType.WitherBoss:                  (52, "minecraft:wither", "凋灵"),
+    EntityType.Dragon:                      (53, "minecraft:ender_dragon", "末影龙"),
+    EntityType.Shulker:                     (54, "minecraft:shulker", "潜影贝"),
+    EntityType.Endermite:                   (55, "minecraft:endermite", "末影螨"),
+    EntityType.Agent:                       (56, "minecraft:agent", "智能体"),
+    EntityType.Vindicator:                  (57, "minecraft:vindicator", "卫道士"),
+    EntityType.Phantom:                     (58, "minecraft:phantom", "幻翼"),
+    EntityType.IllagerBeast:                (59, "minecraft:ravager", "劫掠兽"),
+    EntityType.ArmorStand:                  (61, "minecraft:armor_stand", "盔甲架"),
+    EntityType.TripodCamera:                (62, "minecraft:tripod_camera", "摄像机"),
+    EntityType.Player:                      (63, "minecraft:player", "玩家"),
+    EntityType.ItemEntity:                  (64, "minecraft:item", "物品"),
+    EntityType.PrimedTnt:                   (65, "minecraft:tnt", "TNT"),
+    EntityType.FallingBlock:                (66, "minecraft:falling_block", "下落的方块"),
+    EntityType.MovingBlock:                 (67, "minecraft:moving_block", "移动的方块"),
+    EntityType.ExperiencePotion:            (68, "minecraft:xp_bottle", "掷出的附魔之瓶"),
+    EntityType.Experience:                  (69, "minecraft:xp_orb", "经验球"),
+    EntityType.EyeOfEnder:                  (70, "minecraft:eye_of_ender_signal", "末影之眼"),
+    EntityType.EnderCrystal:                (71, "minecraft:ender_crystal", "末影水晶"),
+    EntityType.FireworksRocket:             (72, "minecraft:fireworks_rocket", "烟花火箭"),
+    EntityType.Trident:                     (73, "minecraft:thrown_trident", "三叉戟"),
+    EntityType.Turtle:                      (74, "minecraft:turtle", "海龟"),
+    EntityType.Cat:                         (75, "minecraft:cat", "猫"),
+    EntityType.ShulkerBullet:               (76, "minecraft:shulker_bullet", "潜影弹"),
+    EntityType.FishingHook:                 (77, "minecraft:fishing_hook", "浮漂"),
+    EntityType.Chalkboard:                  (78, "minecraft:chalkboard", "黑板"),
+    EntityType.DragonFireball:              (79, "minecraft:dragon_fireball", "末影龙火球"),
+    EntityType.Arrow:                       (80, "minecraft:arrow", "箭"),
+    EntityType.Snowball:                    (81, "minecraft:snowball", "雪球"),
+    EntityType.ThrownEgg:                   (82, "minecraft:egg", "掷出的鸡蛋"),
+    EntityType.Painting:                    (83, "minecraft:painting", "画"),
+    EntityType.Minecart:                    (84, "minecraft:minecart", "矿车"),
+    EntityType.LargeFireball:               (85, "minecraft:fireball", "火球"),
+    EntityType.ThrownPotion:                (86, "minecraft:splash_potion", "喷溅药水"),
+    EntityType.Enderpearl:                  (87, "minecraft:ender_pearl", "掷出的末影珍珠"),
+    EntityType.LeashKnot:                   (88, "minecraft:leash_knot", "拴绳结"),
+    EntityType.WitherSkull:                 (89, "minecraft:wither_skull", "凋灵之首"),
+    EntityType.BoatRideable:                (90, "minecraft:boat", "船"),
+    EntityType.WitherSkullDangerous:        (91, "minecraft:wither_skull_dangerous", "蓝色凋灵之首"),
+    EntityType.LightningBolt:               (93, "minecraft:lightning_bolt", "闪电束"),
+    EntityType.SmallFireball:               (94, "minecraft:small_fireball", "小火球"),
+    EntityType.AreaEffectCloud:             (95, "minecraft:area_effect_cloud", "区域效果云"),
+    EntityType.MinecartHopper:              (96, "minecraft:hopper_minecart", "漏斗矿车"),
+    EntityType.MinecartTNT:                 (97, "minecraft:tnt_minecart", "TNT矿车"),
+    EntityType.MinecartChest:               (98, "minecraft:chest_minecart", "运输矿车"),
+    EntityType.MinecartCommandBlock:        (100, "minecraft:command_block_minecart", "命令方块矿车"),
+    EntityType.LingeringPotion:             (101, "minecraft:lingering_potion", "滞留药水"),
+    EntityType.LlamaSpit:                   (102, "minecraft:llama_spit", "羊驼唾沫"),
+    EntityType.EvocationFang:               (103, "minecraft:evocation_fang", "唤魔者尖牙"),
+    EntityType.EvocationIllager:            (104, "minecraft:evocation_illager", "唤魔者"),
+    EntityType.Vex:                         (105, "minecraft:vex", "恼鬼"),
+    EntityType.IceBomb:                     (106, "minecraft:ice_bomb", "冰弹"),
+    EntityType.Balloon:                     (107, "minecraft:balloon", "气球"),
+    EntityType.Pufferfish:                  (108, "minecraft:pufferfish", "河豚"),
+    EntityType.Salmon:                      (109, "minecraft:salmon", "鲑鱼"),
+    EntityType.Drowned:                     (110, "minecraft:drowned", "溺尸"),
+    EntityType.Tropicalfish:                (111, "minecraft:tropicalfish", "热带鱼"),
+    EntityType.Fish:                        (112, "minecraft:cod", "鳕鱼"),
+    EntityType.Panda:                       (113, "minecraft:panda", "熊猫"),
+    EntityType.Pillager:                    (114, "minecraft:pillager", "掠夺者"),
+    EntityType.VillagerV2:                  (115, "minecraft:villager_v2", "村民"),
+    EntityType.ZombieVillagerV2:            (116, "minecraft:zombie_villager_v2", "僵尸村民"),
+    EntityType.Shield:                      (117, "minecraft:shield", "盾牌"),
+    EntityType.WanderingTrader:             (118, "minecraft:wandering_trader", "流浪商人"),
+    EntityType.ElderGuardianGhost:          (120, "minecraft:elder_guardian_ghost", "远古守卫者幽灵"),
+    EntityType.Fox:                         (121, "minecraft:fox", "狐狸"),
+    EntityType.Bee:                         (122, "minecraft:bee", "蜜蜂"),
+    EntityType.Piglin:                      (123, "minecraft:piglin", "猪灵"),
+    EntityType.Hoglin:                      (124, "minecraft:hoglin", "疣猪兽"),
+    EntityType.Strider:                     (125, "minecraft:strider", "炽足兽"),
+    EntityType.Zoglin:                      (126, "minecraft:zoglin", "僵尸疣猪兽"),
+    EntityType.PiglinBrute:                 (127, "minecraft:piglin_brute", "猪灵蛮兵"),
+    EntityType.Goat:                        (128, "minecraft:goat", "山羊"),
+    EntityType.GlowSquid:                   (129, "minecraft:glow_squid", "发光鱿鱼"),
+    EntityType.Axolotl:                     (130, "minecraft:axolotl", "美西螈"),
+    EntityType.Warden:                      (131, "minecraft:warden", "监守者"),
+    EntityType.Frog:                        (132, "minecraft:frog", "青蛙"),
+    EntityType.Tadpole:                     (133, "minecraft:tadpole", "蝌蚪"),
+    EntityType.Allay:                       (134, "minecraft:allay", "悦灵"),
+    EntityType.ChestBoatRideable:           (136, "minecraft:chest_boat", "运输船"),
+    EntityType.TraderLlama:                 (137, "minecraft:trader_llama", "行商羊驼"),
+    EntityType.Camel:                       (138, "minecraft:camel", "骆驼"),
+    EntityType.Sniffer:                     (139, "minecraft:sniffer", "嗅探兽"),
+    EntityType.Breeze:                      (140, "minecraft:breeze", "旋风人"),
+    EntityType.BreezeWindChargeProjectile:  (141, "minecraft:breeze_wind_charge_projectile", "风弹"),
+    EntityType.Armadillo:                   (142, "minecraft:armadillo", "犰狳"),
+    EntityType.WindChargeProjectile:        (143, "minecraft:wind_charge_projectile", "风弹"),
+    EntityType.Bogged:                      (144, "minecraft:bogged", "沼骸"),
+    EntityType.OminousItemSpawner:          (145, "minecraft:ominous_item_spawner", "不祥之物生成器"),
 }
+"""
+| 用于将网易实体类型ID（详见 `EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?catalog=1>`_ ）转换为原版数字ID、identifier或中文名称的字典，结构如下：
+::
+
+    {
+        <entity_type: int>: (<num_id: int>, <identifier: str>, <entity_name: str>)
+    }
+"""
 
 
-# 用于将药水效果英文ID转换为中文名的字典
-EFFECT_DICT = {
-    'speed': "速度",
-    'slowness': "缓慢",
-    'haste': "急速",
-    'mining_fatigue': "开采疲劳",
-    'strength': "力量",
-    'instant_health': "瞬间治疗",
-    'instant_damage': "瞬间伤害",
-    'jump_boost': "跳跃增强",
-    'nausea': "反胃",
-    'regeneration': "生命恢复",
-    'resistance': "抗性",
-    'fire_resistance': "抗火",
-    'water_breathing': "水下呼吸",
-    'invisibility': "隐身",
-    'blindness': "失明",
-    'night_vision': "夜视",
-    'hunger': "饥饿",
-    'weakness': "虚弱",
-    'poison': "中毒",
-    'wither': "凋灵",
-    'health_boost': "生命提升",
-    'absorption': "伤害吸收",
-    'saturation': "饱和",
-    'levitation': "漂浮",
-    'fatal_poison': "中毒",
-    'conduit_power': "潮涌能量",
-    'slow_falling': "缓降",
-    'bad_omen': "凶兆",
-    'village_hero': "村庄英雄",
-    'darkness': "黑暗",
-    'trial_omen': "试炼之兆",
-    'weaving': "盘丝",
-    'wind_charged': "蓄风",
-    'infested': "寄生",
-    'oozing': "渗浆",
+BIOME_NAME_MAP = {
+    BiomeType.ocean:                            ("ocean", "海洋"),
+    BiomeType.plains:                           ("plains", "平原"),
+    BiomeType.desert:                           ("desert", "沙漠"),
+    BiomeType.extreme_hills:                    ("extreme_hills", "山地"),
+    BiomeType.forest:                           ("forest", "森林"),
+    BiomeType.taiga:                            ("taiga", "针叶林"),
+    BiomeType.swampland:                        ("swampland", "沼泽"),
+    BiomeType.river:                            ("river", "河流"),
+    BiomeType.hell:                             ("hell", "下界荒地"),
+    BiomeType.the_end:                          ("the_end", "末地"),
+    BiomeType.legacy_frozen_ocean:              ("legacy_frozen_ocean", "冻洋"),
+    BiomeType.frozen_river:                     ("frozen_river", "冻河"),
+    BiomeType.ice_plains:                       ("ice_plains", "积雪的冻原"),
+    BiomeType.ice_mountains:                    ("ice_mountains", "雪山"),
+    BiomeType.mushroom_island:                  ("mushroom_island", "蘑菇岛"),
+    BiomeType.mushroom_island_shore:            ("mushroom_island_shore", "蘑菇岛岸"),
+    BiomeType.beach:                            ("beach", "沙滩"),
+    BiomeType.desert_hills:                     ("desert_hills", "沙漠丘陵"),
+    BiomeType.forest_hills:                     ("forest_hills", "繁茂的丘陵"),
+    BiomeType.taiga_hills:                      ("taiga_hills", "针叶林丘陵"),
+    BiomeType.extreme_hills_edge:               ("extreme_hills_edge", "山地边缘"),
+    BiomeType.jungle:                           ("jungle", "丛林"),
+    BiomeType.jungle_hills:                     ("jungle_hills", "丛林丘陵"),
+    BiomeType.jungle_edge:                      ("jungle_edge", "丛林边缘"),
+    BiomeType.deep_ocean:                       ("deep_ocean", "深海"),
+    BiomeType.stone_beach:                      ("stone_beach", "石岸"),
+    BiomeType.cold_beach:                       ("cold_beach", "积雪的沙滩"),
+    BiomeType.birch_forest:                     ("birch_forest", "桦木森林"),
+    BiomeType.birch_forest_hills:               ("birch_forest_hills", "桦木森林丘陵"),
+    BiomeType.roofed_forest:                    ("roofed_forest", "黑森林"),
+    BiomeType.cold_taiga:                       ("cold_taiga", "积雪的针叶林"),
+    BiomeType.cold_taiga_hills:                 ("cold_taiga_hills", "积雪的针叶林丘陵"),
+    BiomeType.mega_taiga:                       ("mega_taiga", "巨型针叶林"),
+    BiomeType.mega_taiga_hills:                 ("mega_taiga_hills", "巨型针叶林丘陵"),
+    BiomeType.extreme_hills_plus_trees:         ("extreme_hills_plus_trees", "繁茂的山地"),
+    BiomeType.savanna:                          ("savanna", "热带草原"),
+    BiomeType.savanna_plateau:                  ("savanna_plateau", "热带高原"),
+    BiomeType.mesa:                             ("mesa", "恶地"),
+    BiomeType.mesa_plateau_stone:               ("mesa_plateau_stone", "繁茂的恶地高原"),
+    BiomeType.mesa_plateau:                     ("mesa_plateau", "恶地高原"),
+    BiomeType.warm_ocean:                       ("warm_ocean", "暖水海洋"),
+    BiomeType.deep_warm_ocean:                  ("deep_warm_ocean", "暖水深海"),
+    BiomeType.lukewarm_ocean:                   ("lukewarm_ocean", "温水海洋"),
+    BiomeType.deep_lukewarm_ocean:              ("deep_lukewarm_ocean", "温水深海"),
+    BiomeType.cold_ocean:                       ("cold_ocean", "冷水海洋"),
+    BiomeType.deep_cold_ocean:                  ("deep_cold_ocean", "冷水深海"),
+    BiomeType.frozen_ocean:                     ("frozen_ocean", "冻洋"),
+    BiomeType.deep_frozen_ocean:                ("deep_frozen_ocean", "封冻深海"),
+    BiomeType.bamboo_jungle:                    ("bamboo_jungle", "竹林"),
+    BiomeType.bamboo_jungle_hills:              ("bamboo_jungle_hills", "竹林丘陵"),
+    BiomeType.sunflower_plains:                 ("sunflower_plains", "向日葵平原"),
+    BiomeType.desert_mutated:                   ("desert_mutated", "沙漠湖泊"),
+    BiomeType.extreme_hills_mutated:            ("extreme_hills_mutated", "沙砾山地"),
+    BiomeType.flower_forest:                    ("flower_forest", "繁花森林"),
+    BiomeType.taiga_mutated:                    ("taiga_mutated", "针叶林山地"),
+    BiomeType.swampland_mutated:                ("swampland_mutated", "沼泽山丘"),
+    BiomeType.ice_plains_spikes:                ("ice_plains_spikes", "冰刺平原"),
+    BiomeType.jungle_mutated:                   ("jungle_mutated", "丛林变种"),
+    BiomeType.jungle_edge_mutated:              ("jungle_edge_mutated", "丛林边缘变种"),
+    BiomeType.birch_forest_mutated:             ("birch_forest_mutated", "高大桦木森林"),
+    BiomeType.birch_forest_hills_mutated:       ("birch_forest_hills_mutated", "高大桦木丘陵"),
+    BiomeType.roofed_forest_mutated:            ("roofed_forest_mutated", "黑森林丘陵"),
+    BiomeType.cold_taiga_mutated:               ("cold_taiga_mutated", "积雪的针叶林山地"),
+    BiomeType.redwood_taiga_mutated:            ("redwood_taiga_mutated", "巨型云杉针叶林"),
+    BiomeType.redwood_taiga_hills_mutated:      ("redwood_taiga_hills_mutated", "巨型云杉针叶林丘陵"),
+    BiomeType.extreme_hills_plus_trees_mutated: ("extreme_hills_plus_trees_mutated", "沙砾山地+"),
+    BiomeType.savanna_mutated:                  ("savanna_mutated", "破碎的热带草原"),
+    BiomeType.savanna_plateau_mutated:          ("savanna_plateau_mutated", "破碎的热带高原"),
+    BiomeType.mesa_bryce:                       ("mesa_bryce", "被风蚀的恶地"),
+    BiomeType.mesa_plateau_stone_mutated:       ("mesa_plateau_stone_mutated", "繁茂的恶地高原变种"),
+    BiomeType.mesa_plateau_mutated:             ("mesa_plateau_mutated", "恶地高原变种"),
+    BiomeType.soulsand_valley:                  ("soulsand_valley", "灵魂沙峡谷"),
+    BiomeType.crimson_forest:                   ("crimson_forest", "绯红森林"),
+    BiomeType.warped_forest:                    ("warped_forest", "诡异森林"),
+    BiomeType.basalt_deltas:                    ("basalt_deltas", "玄武岩三角洲"),
+    BiomeType.jagged_peaks:                     ("jagged_peaks", "尖峭山峰"),
+    BiomeType.frozen_peaks:                     ("frozen_peaks", "冰封山峰"),
+    BiomeType.snowy_slopes:                     ("snowy_slopes", "积雪的山坡"),
+    BiomeType.grove:                            ("grove", "雪林"),
+    BiomeType.meadow:                           ("meadow", "草甸"),
+    BiomeType.lush_caves:                       ("lush_caves", "繁茂洞穴"),
+    BiomeType.dripstone_caves:                  ("dripstone_caves", "溶洞"),
+    BiomeType.stony_peaks:                      ("stony_peaks", "裸岩山峰"),
+    BiomeType.deep_dark:                        ("deep_dark", "深暗之域"),
+    BiomeType.mangrove_swamp:                   ("mangrove_swamp", "红树林沼泽"),
+    BiomeType.cherry_grove:                     ("cherry_grove", "樱花树林"),
 }
+"""
+| 用于将网易生物群系ID（详见 `BiomeType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/BiomeType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
+::
+
+    {
+        <biome_type: int>: (<orig_id: str>, <biome_name: str>)
+    }
+    
+-----
+
+| 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+"""
 
 
-# 用于将生物群系英文ID转换为中文名的字典
-BIOME_DICT = {
-    'ocean': "海洋",
-    'plains': "平原",
-    'desert': "沙漠",
-    'extreme_hills': "山地",
-    'forest': "森林",
-    'taiga': "针叶林",
-    'swampland': "沼泽",
-    'river': "河流",
-    'hell': "下界荒地",
-    'the_end': "末路之地",
-    'legacy_frozen_ocean': "冻洋",
-    'frozen_river': "冻河",
-    'ice_plains': "积雪的冻原",
-    'ice_mountains': "雪山",
-    'mushroom_island': "蘑菇岛",
-    'mushroom_island_shore': "蘑菇岛岸",
-    'beach': "沙滩",
-    'desert_hills': "沙漠丘陵",
-    'forest_hills': "繁茂的丘陵",
-    'taiga_hills': "针叶林丘陵",
-    'extreme_hills_edge': "山地边缘",
-    'jungle': "丛林",
-    'jungle_hills': "丛林丘陵",
-    'jungle_edge': "丛林边缘",
-    'deep_ocean': "深海",
-    'stone_beach': "石岸",
-    'cold_beach': "积雪的沙滩",
-    'birch_forest': "桦木森林",
-    'birch_forest_hills': "桦木森林丘陵",
-    'roofed_forest': "黑森林",
-    'cold_taiga': "积雪的针叶林",
-    'cold_taiga_hills': "积雪的针叶林丘陵",
-    'mega_taiga': "巨型针叶林",
-    'mega_taiga_hills': "巨型针叶林丘陵",
-    'extreme_hills_plus_trees': "繁茂的山地",
-    'savanna': "热带草原",
-    'savanna_plateau': "热带高原",
-    'mesa': "恶地",
-    'mesa_plateau_stone': "繁茂的恶地高原",
-    'mesa_plateau': "恶地高原",
-    'warm_ocean': "暖水海洋",
-    'deep_warm_ocean': "暖水深海",
-    'lukewarm_ocean': "温水海洋",
-    'deep_lukewarm_ocean': "温水深海",
-    'cold_ocean': "冷水海洋",
-    'deep_cold_ocean': "冷水深海",
-    'frozen_ocean': "封冻海洋",
-    'deep_frozen_ocean': "封冻深海",
-    'bamboo_jungle': "竹林",
-    'bamboo_jungle_hills': "竹林丘陵",
-    'sunflower_plains': "向日葵平原",
-    'desert_mutated': "沙漠湖泊",
-    'extreme_hills_mutated': "沙砾山地",
-    'flower_forest': "繁花森林",
-    'taiga_mutated': "针叶林山地",
-    'swampland_mutated': "沼泽丘陵",
-    'ice_plains_spikes': "冰刺平原",
-    'jungle_mutated': "丛林变种",
-    'jungle_edge_mutated': "丛林边缘变种",
-    'birch_forest_mutated': "高大桦木森林",
-    'birch_forest_hills_mutated': "高大桦木丘陵",
-    'roofed_forest_mutated': "黑森林丘陵",
-    'cold_taiga_mutated': "积雪的针叶林山地",
-    'redwood_taiga_mutated': "巨型云杉针叶林",
-    'redwood_taiga_hills_mutated': "巨型云杉针叶林丘陵",
-    'extreme_hills_plus_trees_mutated': "沙砾山地+",
-    'savanna_mutated': "破碎的热带草原",
-    'savanna_plateau_mutated': "破碎的热带高原",
-    'mesa_bryce': "被风蚀的恶地",
-    'mesa_plateau_stone_mutated': "繁茂的恶地高原变种",
-    'mesa_plateau_mutated': "恶地高原变种",
+STRUCTURE_NAME_MAP = {
+    StructureFeatureType.EndCity:           ("end_city", "末地城"),
+    StructureFeatureType.Fortress:          ("fortress", "要塞"),
+    StructureFeatureType.Mineshaft:         ("mineshaft", "废弃矿井"),
+    StructureFeatureType.Monument:          ("monument", "海底神殿"),
+    StructureFeatureType.Stronghold:        ("stronghold", "要塞"),
+    StructureFeatureType.Temple:            ("temple", "神殿"),
+    StructureFeatureType.Village:           ("village", "村庄"),
+    StructureFeatureType.WoodlandMansion:   ("mansion", "林地府邸"),
+    StructureFeatureType.Shipwreck:         ("shipwreck", "沉船"),
+    StructureFeatureType.BuriedTreasure:    ("buried_treasure", "埋藏的宝藏"),
+    StructureFeatureType.Ruins:             ("ruins", "海底废墟"),
+    StructureFeatureType.PillagerOutpost:   ("pillager_outpost", "掠夺者前哨站"),
+    StructureFeatureType.RuinedPortal:      ("ruined_portal", "废弃传送门"),
+    StructureFeatureType.Bastion:           ("bastion_remnant", "堡垒遗迹"),
+    StructureFeatureType.AncientCity:       ("ancient_city", "远古城市"),
+    StructureFeatureType.TrailRuins:        ("trail_ruins", "试炼密室"),
 }
+"""
+| 用于将网易结构特征ID（详见 `StructureFeatureType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/StructureFeatureType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
+::
+
+    {
+        <structure_type: int>: (<orig_id: str>, <structure_name: str>)
+    }
+
+-----
+
+| 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+"""
 
 
-# 用于将结构数字ID转换为中文名或英文ID的字典
-STRUCTURE_DICT = {
-    1: ("末地城", "endcity"),
-    2: ("下界要塞", "fortress"),
-    3: ("废弃矿井", "mineshaft"),
-    4: ("海底神殿", "monument"),
-    5: ("地牢", "stronghold"),
-    6: ("沙漠神殿/雪屋/丛林/神庙/女巫小屋", "temple"),
-    7: ("村庄", "village"),
-    8: ("林地府邸", "mansion"),
-    9: ("沉船", "shipwreck"),
-    10: ("埋藏的宝藏", "buriedtreasure"),
-    11: ("水下遗迹", "ruins"),
-    12: ("掠夺者前哨站", "pillageroutpost"),
-    13: ("废弃传送门", "ruinedportal"),
-    14: ("堡垒遗迹", "bastionremnant"),
+EFFECT_NAME_MAP = {
+    EffectType.MOVEMENT_SPEED:      "迅捷",
+    EffectType.MOVEMENT_SLOWDOWN:   "缓慢",
+    EffectType.DIG_SPEED:           "急迫",
+    EffectType.DIG_SLOWDOWN:        "挖掘疲劳",
+    EffectType.DAMAGE_BOOST:        "力量",
+    EffectType.HEAL:                "瞬间治疗",
+    EffectType.HARM:                "瞬间伤害",
+    EffectType.JUMP:                "跳跃提升",
+    EffectType.CONFUSION:           "反胃",
+    EffectType.REGENERATION:        "生命恢复",
+    EffectType.DAMAGE_RESISTANCE:   "抗性提升",
+    EffectType.FIRE_RESISTANCE:     "抗火",
+    EffectType.WATER_BREATHING:     "水下呼吸",
+    EffectType.INVISIBILITY:        "隐身",
+    EffectType.BLINDNESS:           "失明",
+    EffectType.NIGHT_VISION:        "夜视",
+    EffectType.HUNGER:              "饥饿",
+    EffectType.WEAKNESS:            "虚弱",
+    EffectType.POISON:              "中毒",
+    EffectType.WITHER:              "凋零",
+    EffectType.HEALTH_BOOST:        "生命提升",
+    EffectType.ABSORPTION:          "伤害吸收",
+    EffectType.SATURATION:          "饱和",
+    EffectType.LEVITATION:          "漂浮",
+    EffectType.FATAL_POISON:        "中毒（致命）",
+    EffectType.SLOW_FALLING:        "缓降",
+    EffectType.CONDUIT_POWER:       "潮涌能量",
+    EffectType.BAD_OMEN:            "不祥之兆",
+    EffectType.HERO_OF_THE_VILLAGE: "村庄英雄",
+    EffectType.DARKNESS:            "黑暗",
+    EffectType.TRIAL_OMEN:          "试炼之兆",
+    EffectType.RAID_OMEN:           "袭击之兆",
+    EffectType.WIND_CHARGED:        "蓄风",
+    EffectType.WEAVING:             "盘丝",
+    EffectType.OOZING:              "渗浆",
+    EffectType.INFESTED:            "寄生",
 }
+"""
+| 用于将状态效果ID（详见 `EffectType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EffectType.html?catalog=1>`_ ）转换为中文名称的字典，结构如下：
+::
+
+    {
+        <effect_id: str>: <effect_name: str>
+    }
+
+-----
+
+| 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+"""
 
 
-# 方块列表
-BLOCK_LIST = [
-    "acacia_button",
-    "acacia_door",
-    "acacia_fence_gate",
-    "acacia_pressure_plate",
-    "acacia_stairs",
-    "acacia_standing_sign",
-    "acacia_trapdoor",
-    "acacia_wall_sign",
-    "activator_rail",
-    "air",
-    "allow",
-    "amethyst_block",
-    "amethyst_cluster",
-    "ancient_debris",
-    "andesite_stairs",
-    "anvil",
-    "azalea",
-    "azalea_leaves",
-    "azalea_leaves_flowered",
-    "bamboo",
-    "bamboo_sapling",
-    "barrel",
-    "barrier",
-    "basalt",
-    "beacon",
-    "bed",
-    "bedrock",
-    "bee_nest",
-    "beehive",
-    "beetroot",
-    "bell",
-    "big_dripleaf",
-    "birch_button",
-    "birch_door",
-    "birch_fence_gate",
-    "birch_pressure_plate",
-    "birch_stairs",
-    "birch_standing_sign",
-    "birch_trapdoor",
-    "birch_wall_sign",
-    "black_candle",
-    "black_candle_cake",
-    "black_glazed_terracotta",
-    "blackstone",
-    "blackstone_double_slab",
-    "blackstone_slab",
-    "blackstone_stairs",
-    "blackstone_wall",
-    "blast_furnace",
-    "blue_candle",
-    "blue_candle_cake",
-    "blue_glazed_terracotta",
-    "blue_ice",
-    "bone_block",
-    "bookshelf",
-    "border_block",
-    "brewing_stand",
-    "brick_block",
-    "brick_stairs",
-    "brown_candle",
-    "brown_candle_cake",
-    "brown_glazed_terracotta",
-    "brown_mushroom",
-    "brown_mushroom_block",
-    "bubble_column",
-    "budding_amethyst",
-    "cactus",
-    "cake",
-    "calcite",
-    "camera",
-    "campfire",
-    "candle",
-    "candle_cake",
-    "carpet",
-    "carrots",
-    "cartography_table",
-    "carved_pumpkin",
-    "cauldron",
-    "cave_vines",
-    "cave_vines_body_with_berries",
-    "cave_vines_head_with_berries",
-    "chain",
-    "chain_command_block",
-    "chemical_heat",
-    "chemistry_table",
-    "chest",
-    "chiseled_deepslate",
-    "chiseled_nether_bricks",
-    "chiseled_polished_blackstone",
-    "chorus_flower",
-    "chorus_plant",
-    "clay",
-    "client_request_placeholder_block",
-    "coal_block",
-    "coal_ore",
-    "cobbled_deepslate",
-    "cobbled_deepslate_double_slab",
-    "cobbled_deepslate_slab",
-    "cobbled_deepslate_stairs",
-    "cobbled_deepslate_wall",
-    "cobblestone",
-    "cobblestone_wall",
-    "cocoa",
-    "colored_torch_bp",
-    "colored_torch_rg",
-    "command_block",
-    "composter",
-    "concrete",
-    "concretePowder",
-    "conduit",
-    "copper_block",
-    "copper_ore",
-    "coral",
-    "coral_block",
-    "coral_fan",
-    "coral_fan_dead",
-    "coral_fan_hang",
-    "coral_fan_hang2",
-    "coral_fan_hang3",
-    "cracked_deepslate_bricks",
-    "cracked_deepslate_tiles",
-    "cracked_nether_bricks",
-    "cracked_polished_blackstone_bricks",
-    "crafting_table",
-    "crimson_button",
-    "crimson_door",
-    "crimson_double_slab",
-    "crimson_fence",
-    "crimson_fence_gate",
-    "crimson_fungus",
-    "crimson_hyphae",
-    "crimson_nylium",
-    "crimson_planks",
-    "crimson_pressure_plate",
-    "crimson_roots",
-    "crimson_slab",
-    "crimson_stairs",
-    "crimson_standing_sign",
-    "crimson_stem",
-    "crimson_trapdoor",
-    "crimson_wall_sign",
-    "crying_obsidian",
-    "cut_copper",
-    "cut_copper_slab",
-    "cut_copper_stairs",
-    "cyan_candle",
-    "cyan_candle_cake",
-    "cyan_glazed_terracotta",
-    "dark_oak_button",
-    "dark_oak_door",
-    "dark_oak_fence_gate",
-    "dark_oak_pressure_plate",
-    "dark_oak_stairs",
-    "dark_oak_trapdoor",
-    "dark_prismarine_stairs",
-    "darkoak_standing_sign",
-    "darkoak_wall_sign",
-    "daylight_detector",
-    "daylight_detector_inverted",
-    "deadbush",
-    "deepslate",
-    "deepslate_brick_double_slab",
-    "deepslate_brick_slab",
-    "deepslate_brick_stairs",
-    "deepslate_brick_wall",
-    "deepslate_bricks",
-    "deepslate_coal_ore",
-    "deepslate_copper_ore",
-    "deepslate_diamond_ore",
-    "deepslate_emerald_ore",
-    "deepslate_gold_ore",
-    "deepslate_iron_ore",
-    "deepslate_lapis_ore",
-    "deepslate_redstone_ore",
-    "deepslate_tile_double_slab",
-    "deepslate_tile_slab",
-    "deepslate_tile_stairs",
-    "deepslate_tile_wall",
-    "deepslate_tiles",
-    "deny",
-    "detector_rail",
-    "diamond_block",
-    "diamond_ore",
-    "diorite_stairs",
-    "dirt",
-    "dirt_with_roots",
-    "dispenser",
-    "double_cut_copper_slab",
-    "double_plant",
-    "double_stone_slab",
-    "double_stone_slab2",
-    "double_stone_slab3",
-    "double_stone_slab4",
-    "double_wooden_slab",
-    "dragon_egg",
-    "dried_kelp_block",
-    "dripstone_block",
-    "dropper",
-    "element_0",
-    "element_1",
-    "element_10",
-    "element_100",
-    "element_101",
-    "element_102",
-    "element_103",
-    "element_104",
-    "element_105",
-    "element_106",
-    "element_107",
-    "element_108",
-    "element_109",
-    "element_11",
-    "element_110",
-    "element_111",
-    "element_112",
-    "element_113",
-    "element_114",
-    "element_115",
-    "element_116",
-    "element_117",
-    "element_118",
-    "element_12",
-    "element_13",
-    "element_14",
-    "element_15",
-    "element_16",
-    "element_17",
-    "element_18",
-    "element_19",
-    "element_2",
-    "element_20",
-    "element_21",
-    "element_22",
-    "element_23",
-    "element_24",
-    "element_25",
-    "element_26",
-    "element_27",
-    "element_28",
-    "element_29",
-    "element_3",
-    "element_30",
-    "element_31",
-    "element_32",
-    "element_33",
-    "element_34",
-    "element_35",
-    "element_36",
-    "element_37",
-    "element_38",
-    "element_39",
-    "element_4",
-    "element_40",
-    "element_41",
-    "element_42",
-    "element_43",
-    "element_44",
-    "element_45",
-    "element_46",
-    "element_47",
-    "element_48",
-    "element_49",
-    "element_5",
-    "element_50",
-    "element_51",
-    "element_52",
-    "element_53",
-    "element_54",
-    "element_55",
-    "element_56",
-    "element_57",
-    "element_58",
-    "element_59",
-    "element_6",
-    "element_60",
-    "element_61",
-    "element_62",
-    "element_63",
-    "element_64",
-    "element_65",
-    "element_66",
-    "element_67",
-    "element_68",
-    "element_69",
-    "element_7",
-    "element_70",
-    "element_71",
-    "element_72",
-    "element_73",
-    "element_74",
-    "element_75",
-    "element_76",
-    "element_77",
-    "element_78",
-    "element_79",
-    "element_8",
-    "element_80",
-    "element_81",
-    "element_82",
-    "element_83",
-    "element_84",
-    "element_85",
-    "element_86",
-    "element_87",
-    "element_88",
-    "element_89",
-    "element_9",
-    "element_90",
-    "element_91",
-    "element_92",
-    "element_93",
-    "element_94",
-    "element_95",
-    "element_96",
-    "element_97",
-    "element_98",
-    "element_99",
-    "emerald_block",
-    "emerald_ore",
-    "enchanting_table",
-    "end_brick_stairs",
-    "end_bricks",
-    "end_gateway",
-    "end_portal",
-    "end_portal_frame",
-    "end_rod",
-    "end_stone",
-    "ender_chest",
-    "exposed_copper",
-    "exposed_cut_copper",
-    "exposed_cut_copper_slab",
-    "exposed_cut_copper_stairs",
-    "exposed_double_cut_copper_slab",
-    "farmland",
-    "fence",
-    "fence_gate",
-    "fire",
-    "fletching_table",
-    "flower_pot",
-    "flowering_azalea",
-    "flowing_lava",
-    "flowing_water",
-    "frame",
-    "frosted_ice",
-    "furnace",
-    "gilded_blackstone",
-    "glass",
-    "glass_pane",
-    "glow_frame",
-    "glow_lichen",
-    "glowingobsidian",
-    "glowstone",
-    "gold_block",
-    "gold_ore",
-    "golden_rail",
-    "granite_stairs",
-    "grass",
-    "grass_path",
-    "gravel",
-    "gray_candle",
-    "gray_candle_cake",
-    "gray_glazed_terracotta",
-    "green_candle",
-    "green_candle_cake",
-    "green_glazed_terracotta",
-    "grindstone",
-    "hanging_roots",
-    "hard_glass",
-    "hard_glass_pane",
-    "hard_stained_glass",
-    "hard_stained_glass_pane",
-    "hardened_clay",
-    "hay_block",
-    "heavy_weighted_pressure_plate",
-    "honey_block",
-    "honeycomb_block",
-    "hopper",
-    "ice",
-    "infested_deepslate",
-    "info_update",
-    "info_update2",
-    "invisibleBedrock",
-    "iron_bars",
-    "iron_block",
-    "iron_door",
-    "iron_ore",
-    "iron_trapdoor",
-    "jigsaw",
-    "jukebox",
-    "jungle_button",
-    "jungle_door",
-    "jungle_fence_gate",
-    "jungle_pressure_plate",
-    "jungle_stairs",
-    "jungle_standing_sign",
-    "jungle_trapdoor",
-    "jungle_wall_sign",
-    "kelp",
-    "ladder",
-    "lantern",
-    "lapis_block",
-    "lapis_ore",
-    "large_amethyst_bud",
-    "lava",
-    "lava_cauldron",
-    "leaves",
-    "leaves2",
-    "lectern",
-    "lever",
-    "light_block",
-    "light_blue_candle",
-    "light_blue_candle_cake",
-    "light_blue_glazed_terracotta",
-    "light_gray_candle",
-    "light_gray_candle_cake",
-    "light_weighted_pressure_plate",
-    "lightning_rod",
-    "lime_candle",
-    "lime_candle_cake",
-    "lime_glazed_terracotta",
-    "lit_blast_furnace",
-    "lit_deepslate_redstone_ore",
-    "lit_furnace",
-    "lit_pumpkin",
-    "lit_redstone_lamp",
-    "lit_redstone_ore",
-    "lit_smoker",
-    "lodestone",
-    "log",
-    "log2",
-    "loom",
-    "magenta_candle",
-    "magenta_candle_cake",
-    "magenta_glazed_terracotta",
-    "magma",
-    "medium_amethyst_bud",
-    "melon_block",
-    "melon_stem",
-    "mob_spawner",
-    "monster_egg",
-    "moss_block",
-    "moss_carpet",
-    "mossy_cobblestone",
-    "mossy_cobblestone_stairs",
-    "mossy_stone_brick_stairs",
-    "movingBlock",
-    "mycelium",
-    "mysterious_frame",
-    "mysterious_frame_slot",
-    "nether_brick",
-    "nether_brick_fence",
-    "nether_brick_stairs",
-    "nether_gold_ore",
-    "nether_sprouts",
-    "nether_wart",
-    "nether_wart_block",
-    "netherite_block",
-    "netherrack",
-    "netherreactor",
-    "normal_stone_stairs",
-    "noteblock",
-    "oak_stairs",
-    "observer",
-    "obsidian",
-    "orange_candle",
-    "orange_candle_cake",
-    "orange_glazed_terracotta",
-    "oxidized_copper",
-    "oxidized_cut_copper",
-    "oxidized_cut_copper_slab",
-    "oxidized_cut_copper_stairs",
-    "oxidized_double_cut_copper_slab",
-    "packed_ice",
-    "pink_candle",
-    "pink_candle_cake",
-    "pink_glazed_terracotta",
-    "piston",
-    "pistonArmCollision",
-    "planks",
-    "podzol",
-    "pointed_dripstone",
-    "polished_andesite_stairs",
-    "polished_basalt",
-    "polished_blackstone",
-    "polished_blackstone_brick_double_slab",
-    "polished_blackstone_brick_slab",
-    "polished_blackstone_brick_stairs",
-    "polished_blackstone_brick_wall",
-    "polished_blackstone_bricks",
-    "polished_blackstone_button",
-    "polished_blackstone_double_slab",
-    "polished_blackstone_pressure_plate",
-    "polished_blackstone_slab",
-    "polished_blackstone_stairs",
-    "polished_blackstone_wall",
-    "polished_deepslate",
-    "polished_deepslate_double_slab",
-    "polished_deepslate_slab",
-    "polished_deepslate_stairs",
-    "polished_deepslate_wall",
-    "polished_diorite_stairs",
-    "polished_granite_stairs",
-    "portal",
-    "potatoes",
-    "powder_snow",
-    "powered_comparator",
-    "powered_repeater",
-    "prismarine",
-    "prismarine_bricks_stairs",
-    "prismarine_stairs",
-    "pumpkin",
-    "pumpkin_stem",
-    "purple_candle",
-    "purple_candle_cake",
-    "purple_glazed_terracotta",
-    "purpur_block",
-    "purpur_stairs",
-    "quartz_block",
-    "quartz_bricks",
-    "quartz_ore",
-    "quartz_stairs",
-    "rail",
-    "raw_copper_block",
-    "raw_gold_block",
-    "raw_iron_block",
-    "red_candle",
-    "red_candle_cake",
-    "red_flower",
-    "red_glazed_terracotta",
-    "red_mushroom",
-    "red_mushroom_block",
-    "red_nether_brick",
-    "red_nether_brick_stairs",
-    "red_sandstone",
-    "red_sandstone_stairs",
-    "redstone_block",
-    "redstone_lamp",
-    "redstone_ore",
-    "redstone_torch",
-    "redstone_wire",
-    "reeds",
-    "repeating_command_block",
-    "reserved6",
-    "respawn_anchor",
-    "sand",
-    "sandstone",
-    "sandstone_stairs",
-    "sapling",
-    "scaffolding",
-    "sculk",
-    "sculk_catalyst",
-    "sculk_sensor",
-    "sculk_shrieker",
-    "sculk_vein",
-    "sea_pickle",
-    "seagrass",
-    "seaLantern",
-    "shroomlight",
-    "shulker_box",
-    "silver_glazed_terracotta",
-    "skull",
-    "slime",
-    "small_amethyst_bud",
-    "small_dripleaf_block",
-    "smithing_table",
-    "smoker",
-    "smooth_basalt",
-    "smooth_quartz_stairs",
-    "smooth_red_sandstone_stairs",
-    "smooth_sandstone_stairs",
-    "smooth_stone",
-    "snow",
-    "snow_layer",
-    "soul_campfire",
-    "soul_fire",
-    "soul_lantern",
-    "soul_sand",
-    "soul_soil",
-    "soul_torch",
-    "sponge",
-    "spore_blossom",
-    "spruce_button",
-    "spruce_door",
-    "spruce_fence_gate",
-    "spruce_pressure_plate",
-    "spruce_stairs",
-    "spruce_standing_sign",
-    "spruce_trapdoor",
-    "spruce_wall_sign",
-    "stained_glass",
-    "stained_glass_pane",
-    "stained_hardened_clay",
-    "standing_banner",
-    "standing_sign",
-    "sticky_piston",
-    "stickyPistonArmCollision",
-    "stone",
-    "stone_brick_stairs",
-    "stone_button",
-    "stone_pressure_plate",
-    "stone_slab",
-    "stone_slab2",
-    "stone_slab3",
-    "stone_slab4",
-    "stone_stairs",
-    "stonebrick",
-    "stonecutter",
-    "stonecutter_block",
-    "stripped_acacia_log",
-    "stripped_birch_log",
-    "stripped_crimson_hyphae",
-    "stripped_crimson_stem",
-    "stripped_dark_oak_log",
-    "stripped_jungle_log",
-    "stripped_oak_log",
-    "stripped_spruce_log",
-    "stripped_warped_hyphae",
-    "stripped_warped_stem",
-    "structure_block",
-    "structure_void",
-    "sweet_berry_bush",
-    "tallgrass",
-    "target",
-    "tinted_glass",
-    "tnt",
-    "torch",
-    "trapdoor",
-    "trapped_chest",
-    "tripWire",
-    "tripwire_hook",
-    "tuff",
-    "turtle_egg",
-    "twisting_vines",
-    "underwater_torch",
-    "undyed_shulker_box",
-    "unknown",
-    "unlit_redstone_torch",
-    "unpowered_comparator",
-    "unpowered_repeater",
-    "vine",
-    "wall_banner",
-    "wall_sign",
-    "warped_button",
-    "warped_door",
-    "warped_double_slab",
-    "warped_fence",
-    "warped_fence_gate",
-    "warped_fungus",
-    "warped_hyphae",
-    "warped_nylium",
-    "warped_planks",
-    "warped_pressure_plate",
-    "warped_roots",
-    "warped_slab",
-    "warped_stairs",
-    "warped_standing_sign",
-    "warped_stem",
-    "warped_trapdoor",
-    "warped_wall_sign",
-    "warped_wart_block",
-    "water",
-    "waterlily",
-    "waxed_copper",
-    "waxed_cut_copper",
-    "waxed_cut_copper_slab",
-    "waxed_cut_copper_stairs",
-    "waxed_double_cut_copper_slab",
-    "waxed_exposed_copper",
-    "waxed_exposed_cut_copper",
-    "waxed_exposed_cut_copper_slab",
-    "waxed_exposed_cut_copper_stairs",
-    "waxed_exposed_double_cut_copper_slab",
-    "waxed_oxidized_copper",
-    "waxed_oxidized_cut_copper",
-    "waxed_oxidized_cut_copper_slab",
-    "waxed_oxidized_cut_copper_stairs",
-    "waxed_oxidized_double_cut_copper_slab",
-    "waxed_weathered_copper",
-    "waxed_weathered_cut_copper",
-    "waxed_weathered_cut_copper_slab",
-    "waxed_weathered_cut_copper_stairs",
-    "waxed_weathered_double_cut_copper_slab",
-    "weathered_copper",
-    "weathered_cut_copper",
-    "weathered_cut_copper_slab",
-    "weathered_cut_copper_stairs",
-    "weathered_double_cut_copper_slab",
-    "web",
-    "weeping_vines",
-    "wheat",
-    "white_candle",
-    "white_candle_cake",
-    "white_glazed_terracotta",
-    "wither_rose",
-    "wood",
-    "wooden_button",
-    "wooden_door",
-    "wooden_pressure_plate",
-    "wooden_slab",
-    "wool",
-    "yellow_candle",
-    "yellow_candle_cakez",
-    "yellow_flower",
-    "yellow_glazed_terracotta",
-]
+ENCHANT_NAME_MAP = {
+    EnchantType.ArmorAll:               ("protection", "保护"),
+    EnchantType.ArmorFire:              ("fire_protection", "火焰保护"),
+    EnchantType.ArmorFall:              ("feather_falling", "摔落缓冲"),
+    EnchantType.ArmorExplosive:         ("blast_protection", "爆炸保护"),
+    EnchantType.ArmorProjectile:        ("projectile_protection", "弹射物保护"),
+    EnchantType.ArmorThorns:            ("thorns", "荆棘"),
+    EnchantType.WaterBreath:            ("respiration", "水下呼吸"),
+    EnchantType.WaterSpeed:             ("depth_strider", "深海探索者"),
+    EnchantType.WaterAffinity:          ("aqua_affinity", "水下速掘"),
+    EnchantType.WeaponDamage:           ("sharpness", "锋利"),
+    EnchantType.WeaponUndead:           ("smite", "亡灵杀手"),
+    EnchantType.WeaponArthropod:        ("bane_of_arthropods", "节肢杀手"),
+    EnchantType.WeaponKnockback:        ("knockback", "击退"),
+    EnchantType.WeaponFire:             ("fire_aspect", "火焰附加"),
+    EnchantType.WeaponLoot:             ("looting", "抢夺"),
+    EnchantType.MiningEfficiency:       ("efficiency", "效率"),
+    EnchantType.MiningSilkTouch:        ("silk_touch", "精准采集"),
+    EnchantType.MiningDurability:       ("unbreaking", "耐久"),
+    EnchantType.MiningLoot:             ("fortune", "时运"),
+    EnchantType.BowDamage:              ("power", "力量"),
+    EnchantType.BowKnockback:           ("punch", "冲击"),
+    EnchantType.BowFire:                ("flame", "火矢"),
+    EnchantType.BowInfinity:            ("infinity", "无限"),
+    EnchantType.FishingLoot:            ("luck_of_the_sea", "海之眷顾"),
+    EnchantType.FishingLure:            ("lure", "饵钓"),
+    EnchantType.FrostWalker:            ("frost_walker", "冰霜行者"),
+    EnchantType.Mending:                ("mending", "经验修补"),
+    EnchantType.CurseBinding:           ("binding", "绑定诅咒"),
+    EnchantType.CurseVanishing:         ("vanishing", "消失诅咒"),
+    EnchantType.TridentImpaling:        ("impaling", "穿刺"),
+    EnchantType.TridentRiptide:         ("riptide", "激流"),
+    EnchantType.TridentLoyalty:         ("loyalty", "忠诚"),
+    EnchantType.TridentChanneling:      ("channeling", "引雷"),
+    EnchantType.CrossbowMultishot:      ("multishot", "多重射击"),
+    EnchantType.CrossbowPiercing:       ("piercing", "穿透"),
+    EnchantType.CrossbowQuickCharge:    ("quick_charge", "快速装填"),
+    EnchantType.SoulSpeed:              ("soul_speed", "灵魂疾行"),
+    EnchantType.SwiftSneak:             ("swift_sneak", "迅捷潜行"),
+    EnchantType.WindBurst:              ("wind_burst", "风爆"),
+    EnchantType.Density:                ("density", "致密"),
+    EnchantType.Breach:                 ("breach", "破甲"),
+}
+"""
+| 用于将网易附魔ID（详见 `EnchantType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EnchantType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
+::
 
+    {
+        <enchant_type: int>: (<orig_id: str>, <enchant_name: str>)
+    }
 
-# 物品列表
-ITEM_LIST = [
-    "acacia_boat",
-    "acacia_button",
-    "acacia_door",
-    "acacia_fence_gate",
-    "acacia_pressure_plate",
-    "acacia_sign",
-    "acacia_stairs",
-    "acacia_standing_sign",
-    "acacia_trapdoor",
-    "acacia_wall_sign",
-    "activator_rail",
-    "agent_spawn_egg",
-    "air",
-    "allow",
-    "amethyst_block",
-    "amethyst_cluster",
-    "amethyst_shard",
-    "ancient_debris",
-    "andesite_stairs",
-    "anvil",
-    "apple",
-    "armor_stand",
-    "arrow",
-    "axolotl_bucket",
-    "axolotl_spawn_egg",
-    "azalea",
-    "azalea_leaves",
-    "azalea_leaves_flowered",
-    "baked_potato",
-    "balloon",
-    "bamboo",
-    "bamboo_sapling",
-    "banner",
-    "banner_pattern",
-    "barrel",
-    "barrier",
-    "basalt",
-    "bat_spawn_egg",
-    "beacon",
-    "bed",
-    "bedrock",
-    "bee_nest",
-    "bee_spawn_egg",
-    "beef",
-    "beehive",
-    "beetroot",
-    "beetroot_seeds",
-    "beetroot_soup",
-    "bell",
-    "big_dripleaf",
-    "birch_boat",
-    "birch_button",
-    "birch_door",
-    "birch_fence_gate",
-    "birch_pressure_plate",
-    "birch_sign",
-    "birch_stairs",
-    "birch_standing_sign",
-    "birch_trapdoor",
-    "birch_wall_sign",
-    "black_candle",
-    "black_candle_cake",
-    "black_dye",
-    "black_glazed_terracotta",
-    "blackstone",
-    "blackstone_double_slab",
-    "blackstone_slab",
-    "blackstone_stairs",
-    "blackstone_wall",
-    "blast_furnace",
-    "blaze_powder",
-    "blaze_rod",
-    "blaze_spawn_egg",
-    "bleach",
-    "blue_candle",
-    "blue_candle_cake",
-    "blue_dye",
-    "blue_glazed_terracotta",
-    "blue_ice",
-    "boat",
-    "bone",
-    "bone_block",
-    "bone_meal",
-    "book",
-    "bookshelf",
-    "border_block",
-    "bordure_indented_banner_pattern",
-    "bow",
-    "bowl",
-    "bread",
-    "brewing_stand",
-    "brewingstandblock",
-    "brick",
-    "brick_block",
-    "brick_stairs",
-    "brown_candle",
-    "brown_candle_cake",
-    "brown_dye",
-    "brown_glazed_terracotta",
-    "brown_mushroom",
-    "brown_mushroom_block",
-    "bubble_column",
-    "bucket",
-    "budding_amethyst",
-    "cactus",
-    "cake",
-    "calcite",
-    "camera",
-    "campfire",
-    "candle",
-    "candle_cake",
-    "carpet",
-    "carrot",
-    "carrot_on_a_stick",
-    "carrots",
-    "cartography_table",
-    "carved_pumpkin",
-    "cat_spawn_egg",
-    "cauldron",
-    "cave_spider_spawn_egg",
-    "cave_vines",
-    "cave_vines_body_with_berries",
-    "cave_vines_head_with_berries",
-    "chain",
-    "chain_command_block",
-    "chainmail_boots",
-    "chainmail_chestplate",
-    "chainmail_helmet",
-    "chainmail_leggings",
-    "charcoal",
-    "chemical_heat",
-    "chemistry_table",
-    "chest",
-    "chest_minecart",
-    "chicken",
-    "chicken_spawn_egg",
-    "chiseled_deepslate",
-    "chiseled_nether_bricks",
-    "chiseled_polished_blackstone",
-    "chorus_flower",
-    "chorus_fruit",
-    "chorus_plant",
-    "clay",
-    "clay_ball",
-    "client_request_placeholder_block",
-    "clock",
-    "coal",
-    "coal_block",
-    "coal_ore",
-    "cobbled_deepslate",
-    "cobbled_deepslate_double_slab",
-    "cobbled_deepslate_slab",
-    "cobbled_deepslate_stairs",
-    "cobbled_deepslate_wall",
-    "cobblestone",
-    "cobblestone_wall",
-    "cocoa",
-    "cocoa_beans",
-    "cod",
-    "cod_bucket",
-    "cod_spawn_egg",
-    "colored_torch_bp",
-    "colored_torch_rg",
-    "command_block",
-    "command_block_minecart",
-    "comparator",
-    "compass",
-    "composter",
-    "compound",
-    "concrete",
-    "concrete_powder",
-    "conduit",
-    "cooked_beef",
-    "cooked_chicken",
-    "cooked_cod",
-    "cooked_mutton",
-    "cooked_porkchop",
-    "cooked_rabbit",
-    "cooked_salmon",
-    "cookie",
-    "copper_block",
-    "copper_ingot",
-    "copper_ore",
-    "coral",
-    "coral_block",
-    "coral_fan",
-    "coral_fan_dead",
-    "coral_fan_hang",
-    "coral_fan_hang2",
-    "coral_fan_hang3",
-    "cow_spawn_egg",
-    "cracked_deepslate_bricks",
-    "cracked_deepslate_tiles",
-    "cracked_nether_bricks",
-    "cracked_polished_blackstone_bricks",
-    "crafting_table",
-    "creeper_banner_pattern",
-    "creeper_spawn_egg",
-    "crimson_button",
-    "crimson_door",
-    "crimson_double_slab",
-    "crimson_fence",
-    "crimson_fence_gate",
-    "crimson_fungus",
-    "crimson_hyphae",
-    "crimson_nylium",
-    "crimson_planks",
-    "crimson_pressure_plate",
-    "crimson_roots",
-    "crimson_sign",
-    "crimson_slab",
-    "crimson_stairs",
-    "crimson_standing_sign",
-    "crimson_stem",
-    "crimson_trapdoor",
-    "crimson_wall_sign",
-    "crossbow",
-    "crying_obsidian",
-    "cut_copper",
-    "cut_copper_slab",
-    "cut_copper_stairs",
-    "cyan_candle",
-    "cyan_candle_cake",
-    "cyan_dye",
-    "cyan_glazed_terracotta",
-    "dark_oak_boat",
-    "dark_oak_button",
-    "dark_oak_door",
-    "dark_oak_fence_gate",
-    "dark_oak_pressure_plate",
-    "dark_oak_sign",
-    "dark_oak_stairs",
-    "dark_oak_trapdoor",
-    "dark_prismarine_stairs",
-    "darkoak_standing_sign",
-    "darkoak_wall_sign",
-    "daylight_detector",
-    "daylight_detector_inverted",
-    "deadbush",
-    "debug_stick",
-    "deepslate",
-    "deepslate_brick_double_slab",
-    "deepslate_brick_slab",
-    "deepslate_brick_stairs",
-    "deepslate_brick_wall",
-    "deepslate_bricks",
-    "deepslate_coal_ore",
-    "deepslate_copper_ore",
-    "deepslate_diamond_ore",
-    "deepslate_emerald_ore",
-    "deepslate_gold_ore",
-    "deepslate_iron_ore",
-    "deepslate_lapis_ore",
-    "deepslate_redstone_ore",
-    "deepslate_tile_double_slab",
-    "deepslate_tile_slab",
-    "deepslate_tile_stairs",
-    "deepslate_tile_wall",
-    "deepslate_tiles",
-    "deny",
-    "detector_rail",
-    "diamond",
-    "diamond_axe",
-    "diamond_block",
-    "diamond_boots",
-    "diamond_chestplate",
-    "diamond_helmet",
-    "diamond_hoe",
-    "diamond_horse_armor",
-    "diamond_leggings",
-    "diamond_ore",
-    "diamond_pickaxe",
-    "diamond_shovel",
-    "diamond_sword",
-    "diorite_stairs",
-    "dirt",
-    "dirt_with_roots",
-    "dispenser",
-    "dolphin_spawn_egg",
-    "donkey_spawn_egg",
-    "double_cut_copper_slab",
-    "double_plant",
-    "double_stone_slab",
-    "double_stone_slab2",
-    "double_stone_slab3",
-    "double_stone_slab4",
-    "double_wooden_slab",
-    "dragon_breath",
-    "dragon_egg",
-    "dried_kelp",
-    "dried_kelp_block",
-    "dripstone_block",
-    "dropper",
-    "drowned_spawn_egg",
-    "dye",
-    "egg",
-    "elder_guardian_spawn_egg",
-    "element_0",
-    "element_1",
-    "element_10",
-    "element_100",
-    "element_101",
-    "element_102",
-    "element_103",
-    "element_104",
-    "element_105",
-    "element_106",
-    "element_107",
-    "element_108",
-    "element_109",
-    "element_11",
-    "element_110",
-    "element_111",
-    "element_112",
-    "element_113",
-    "element_114",
-    "element_115",
-    "element_116",
-    "element_117",
-    "element_118",
-    "element_12",
-    "element_13",
-    "element_14",
-    "element_15",
-    "element_16",
-    "element_17",
-    "element_18",
-    "element_19",
-    "element_2",
-    "element_20",
-    "element_21",
-    "element_22",
-    "element_23",
-    "element_24",
-    "element_25",
-    "element_26",
-    "element_27",
-    "element_28",
-    "element_29",
-    "element_3",
-    "element_30",
-    "element_31",
-    "element_32",
-    "element_33",
-    "element_34",
-    "element_35",
-    "element_36",
-    "element_37",
-    "element_38",
-    "element_39",
-    "element_4",
-    "element_40",
-    "element_41",
-    "element_42",
-    "element_43",
-    "element_44",
-    "element_45",
-    "element_46",
-    "element_47",
-    "element_48",
-    "element_49",
-    "element_5",
-    "element_50",
-    "element_51",
-    "element_52",
-    "element_53",
-    "element_54",
-    "element_55",
-    "element_56",
-    "element_57",
-    "element_58",
-    "element_59",
-    "element_6",
-    "element_60",
-    "element_61",
-    "element_62",
-    "element_63",
-    "element_64",
-    "element_65",
-    "element_66",
-    "element_67",
-    "element_68",
-    "element_69",
-    "element_7",
-    "element_70",
-    "element_71",
-    "element_72",
-    "element_73",
-    "element_74",
-    "element_75",
-    "element_76",
-    "element_77",
-    "element_78",
-    "element_79",
-    "element_8",
-    "element_80",
-    "element_81",
-    "element_82",
-    "element_83",
-    "element_84",
-    "element_85",
-    "element_86",
-    "element_87",
-    "element_88",
-    "element_89",
-    "element_9",
-    "element_90",
-    "element_91",
-    "element_92",
-    "element_93",
-    "element_94",
-    "element_95",
-    "element_96",
-    "element_97",
-    "element_98",
-    "element_99",
-    "elytra",
-    "emerald",
-    "emerald_block",
-    "emerald_ore",
-    "empty_map",
-    "enchanted_book",
-    "enchanted_golden_apple",
-    "enchanting_table",
-    "end_brick_stairs",
-    "end_bricks",
-    "end_crystal",
-    "end_gateway",
-    "end_portal",
-    "end_portal_frame",
-    "end_rod",
-    "end_stone",
-    "ender_chest",
-    "ender_eye",
-    "ender_pearl",
-    "enderman_spawn_egg",
-    "endermite_spawn_egg",
-    "evoker_spawn_egg",
-    "experience_bottle",
-    "exposed_copper",
-    "exposed_cut_copper",
-    "exposed_cut_copper_slab",
-    "exposed_cut_copper_stairs",
-    "exposed_double_cut_copper_slab",
-    "farmland",
-    "feather",
-    "fence",
-    "fence_gate",
-    "fermented_spider_eye",
-    "field_masoned_banner_pattern",
-    "filled_map",
-    "fire",
-    "fire_charge",
-    "firework_rocket",
-    "firework_star",
-    "fishing_rod",
-    "fletching_table",
-    "flint",
-    "flint_and_steel",
-    "flower_banner_pattern",
-    "flower_pot",
-    "flowering_azalea",
-    "flowing_lava",
-    "flowing_water",
-    "fox_spawn_egg",
-    "frame",
-    "frosted_ice",
-    "furnace",
-    "ghast_spawn_egg",
-    "ghast_tear",
-    "gilded_blackstone",
-    "glass",
-    "glass_bottle",
-    "glass_pane",
-    "glistering_melon_slice",
-    "glow_frame",
-    "glow_ink_sac",
-    "glow_lichen",
-    "glow_squid_spawn_egg",
-    "glow_stick",
-    "glowingobsidian",
-    "glowstone",
-    "glowstone_dust",
-    "goat_horn",
-    "goat_spawn_egg",
-    "gold_block",
-    "gold_ingot",
-    "gold_nugget",
-    "gold_ore",
-    "golden_apple",
-    "golden_axe",
-    "golden_boots",
-    "golden_carrot",
-    "golden_chestplate",
-    "golden_helmet",
-    "golden_hoe",
-    "golden_horse_armor",
-    "golden_leggings",
-    "golden_pickaxe",
-    "golden_rail",
-    "golden_shovel",
-    "golden_sword",
-    "granite_stairs",
-    "grass",
-    "grass_path",
-    "gravel",
-    "gray_candle",
-    "gray_candle_cake",
-    "gray_dye",
-    "gray_glazed_terracotta",
-    "green_candle",
-    "green_candle_cake",
-    "green_dye",
-    "green_glazed_terracotta",
-    "grindstone",
-    "guardian_spawn_egg",
-    "gunpowder",
-    "hanging_roots",
-    "hard_glass",
-    "hard_glass_pane",
-    "hard_stained_glass",
-    "hard_stained_glass_pane",
-    "hardened_clay",
-    "hay_block",
-    "heart_of_the_sea",
-    "heavy_weighted_pressure_plate",
-    "hoglin_spawn_egg",
-    "honey_block",
-    "honey_bottle",
-    "honeycomb",
-    "honeycomb_block",
-    "hopper",
-    "hopper_minecart",
-    "horse_spawn_egg",
-    "husk_spawn_egg",
-    "ice",
-    "ice_bomb",
-    "infested_deepslate",
-    "info_update",
-    "info_update2",
-    "ink_sac",
-    "invisiblebedrock",
-    "iron_axe",
-    "iron_bars",
-    "iron_block",
-    "iron_boots",
-    "iron_chestplate",
-    "iron_door",
-    "iron_helmet",
-    "iron_hoe",
-    "iron_horse_armor",
-    "iron_ingot",
-    "iron_leggings",
-    "iron_nugget",
-    "iron_ore",
-    "iron_pickaxe",
-    "iron_shovel",
-    "iron_sword",
-    "iron_trapdoor",
-    "item.acacia_door",
-    "item.bed",
-    "item.beetroot",
-    "item.birch_door",
-    "item.cake",
-    "item.camera",
-    "item.campfire",
-    "item.cauldron",
-    "item.chain",
-    "item.crimson_door",
-    "item.dark_oak_door",
-    "item.flower_pot",
-    "item.frame",
-    "item.glow_frame",
-    "item.hopper",
-    "item.iron_door",
-    "item.jungle_door",
-    "item.kelp",
-    "item.nether_sprouts",
-    "item.nether_wart",
-    "item.reeds",
-    "item.skull",
-    "item.soul_campfire",
-    "item.spruce_door",
-    "item.warped_door",
-    "item.wheat",
-    "item.wooden_door",
-    "jigsaw",
-    "jukebox",
-    "jungle_boat",
-    "jungle_button",
-    "jungle_door",
-    "jungle_fence_gate",
-    "jungle_pressure_plate",
-    "jungle_sign",
-    "jungle_stairs",
-    "jungle_standing_sign",
-    "jungle_trapdoor",
-    "jungle_wall_sign",
-    "kelp",
-    "ladder",
-    "lantern",
-    "lapis_block",
-    "lapis_lazuli",
-    "lapis_ore",
-    "large_amethyst_bud",
-    "lava",
-    "lava_bucket",
-    "lava_cauldron",
-    "lead",
-    "leather",
-    "leather_boots",
-    "leather_chestplate",
-    "leather_helmet",
-    "leather_horse_armor",
-    "leather_leggings",
-    "leaves",
-    "leaves2",
-    "lectern",
-    "lever",
-    "light_block",
-    "light_blue_candle",
-    "light_blue_candle_cake",
-    "light_blue_dye",
-    "light_blue_glazed_terracotta",
-    "light_gray_candle",
-    "light_gray_candle_cake",
-    "light_gray_dye",
-    "light_weighted_pressure_plate",
-    "lightning_rod",
-    "lime_candle",
-    "lime_candle_cake",
-    "lime_dye",
-    "lime_glazed_terracotta",
-    "lingering_potion",
-    "lit_blast_furnace",
-    "lit_deepslate_redstone_ore",
-    "lit_furnace",
-    "lit_pumpkin",
-    "lit_redstone_lamp",
-    "lit_redstone_ore",
-    "lit_smoker",
-    "llama_spawn_egg",
-    "lodestone",
-    "lodestone_compass",
-    "log",
-    "log2",
-    "loom",
-    "magenta_candle",
-    "magenta_candle_cake",
-    "magenta_dye",
-    "magenta_glazed_terracotta",
-    "magma",
-    "magma_cream",
-    "magma_cube_spawn_egg",
-    "medicine",
-    "medium_amethyst_bud",
-    "melon_block",
-    "melon_seeds",
-    "melon_slice",
-    "melon_stem",
-    "milk_bucket",
-    "minecart",
-    "mob_spawner",
-    "mojang_banner_pattern",
-    "monster_egg",
-    "mooshroom_spawn_egg",
-    "moss_block",
-    "moss_carpet",
-    "mossy_cobblestone",
-    "mossy_cobblestone_stairs",
-    "mossy_stone_brick_stairs",
-    "movingblock",
-    "mule_spawn_egg",
-    "mushroom_stew",
-    "music_disc_11",
-    "music_disc_13",
-    "music_disc_blocks",
-    "music_disc_cat",
-    "music_disc_chirp",
-    "music_disc_far",
-    "music_disc_mall",
-    "music_disc_mellohi",
-    "music_disc_pigstep",
-    "music_disc_stal",
-    "music_disc_strad",
-    "music_disc_wait",
-    "music_disc_ward",
-    "mutton",
-    "mycelium",
-    "mysterious_frame",
-    "mysterious_frame_slot",
-    "name_tag",
-    "nautilus_shell",
-    "nether_brick",
-    "nether_brick_fence",
-    "nether_brick_stairs",
-    "nether_gold_ore",
-    "nether_sprouts",
-    "nether_star",
-    "nether_wart",
-    "nether_wart_block",
-    "netherbrick",
-    "netherite_axe",
-    "netherite_block",
-    "netherite_boots",
-    "netherite_chestplate",
-    "netherite_helmet",
-    "netherite_hoe",
-    "netherite_ingot",
-    "netherite_leggings",
-    "netherite_pickaxe",
-    "netherite_scrap",
-    "netherite_shovel",
-    "netherite_sword",
-    "netherrack",
-    "netherreactor",
-    "normal_stone_stairs",
-    "noteblock",
-    "npc_spawn_egg",
-    "oak_boat",
-    "oak_sign",
-    "oak_stairs",
-    "observer",
-    "obsidian",
-    "ocelot_spawn_egg",
-    "orange_candle",
-    "orange_candle_cake",
-    "orange_dye",
-    "orange_glazed_terracotta",
-    "oxidized_copper",
-    "oxidized_cut_copper",
-    "oxidized_cut_copper_slab",
-    "oxidized_cut_copper_stairs",
-    "oxidized_double_cut_copper_slab",
-    "packed_ice",
-    "painting",
-    "panda_spawn_egg",
-    "paper",
-    "parrot_spawn_egg",
-    "phantom_membrane",
-    "phantom_spawn_egg",
-    "pig_spawn_egg",
-    "piglin_banner_pattern",
-    "piglin_brute_spawn_egg",
-    "piglin_spawn_egg",
-    "pillager_spawn_egg",
-    "pink_candle",
-    "pink_candle_cake",
-    "pink_dye",
-    "pink_glazed_terracotta",
-    "piston",
-    "pistonarmcollision",
-    "planks",
-    "podzol",
-    "pointed_dripstone",
-    "poisonous_potato",
-    "polar_bear_spawn_egg",
-    "polished_andesite_stairs",
-    "polished_basalt",
-    "polished_blackstone",
-    "polished_blackstone_brick_double_slab",
-    "polished_blackstone_brick_slab",
-    "polished_blackstone_brick_stairs",
-    "polished_blackstone_brick_wall",
-    "polished_blackstone_bricks",
-    "polished_blackstone_button",
-    "polished_blackstone_double_slab",
-    "polished_blackstone_pressure_plate",
-    "polished_blackstone_slab",
-    "polished_blackstone_stairs",
-    "polished_blackstone_wall",
-    "polished_deepslate",
-    "polished_deepslate_double_slab",
-    "polished_deepslate_slab",
-    "polished_deepslate_stairs",
-    "polished_deepslate_wall",
-    "polished_diorite_stairs",
-    "polished_granite_stairs",
-    "popped_chorus_fruit",
-    "porkchop",
-    "portal",
-    "potato",
-    "potatoes",
-    "potion",
-    "powder_snow",
-    "powder_snow_bucket",
-    "powered_comparator",
-    "powered_repeater",
-    "prismarine",
-    "prismarine_bricks_stairs",
-    "prismarine_crystals",
-    "prismarine_shard",
-    "prismarine_stairs",
-    "pufferfish",
-    "pufferfish_bucket",
-    "pufferfish_spawn_egg",
-    "pumpkin",
-    "pumpkin_pie",
-    "pumpkin_seeds",
-    "pumpkin_stem",
-    "purple_candle",
-    "purple_candle_cake",
-    "purple_dye",
-    "purple_glazed_terracotta",
-    "purpur_block",
-    "purpur_stairs",
-    "quartz",
-    "quartz_block",
-    "quartz_bricks",
-    "quartz_ore",
-    "quartz_stairs",
-    "rabbit",
-    "rabbit_foot",
-    "rabbit_hide",
-    "rabbit_spawn_egg",
-    "rabbit_stew",
-    "rail",
-    "rapid_fertilizer",
-    "ravager_spawn_egg",
-    "raw_copper",
-    "raw_copper_block",
-    "raw_gold",
-    "raw_gold_block",
-    "raw_iron",
-    "raw_iron_block",
-    "real_double_stone_slab",
-    "real_double_stone_slab2",
-    "real_double_stone_slab3",
-    "real_double_stone_slab4",
-    "red_candle",
-    "red_candle_cake",
-    "red_dye",
-    "red_flower",
-    "red_glazed_terracotta",
-    "red_mushroom",
-    "red_mushroom_block",
-    "red_nether_brick",
-    "red_nether_brick_stairs",
-    "red_sandstone",
-    "red_sandstone_stairs",
-    "redstone",
-    "redstone_block",
-    "redstone_lamp",
-    "redstone_ore",
-    "redstone_torch",
-    "redstone_wire",
-    "repeater",
-    "repeating_command_block",
-    "reserved6",
-    "respawn_anchor",
-    "rotten_flesh",
-    "saddle",
-    "salmon",
-    "salmon_bucket",
-    "salmon_spawn_egg",
-    "sand",
-    "sandstone",
-    "sandstone_stairs",
-    "sapling",
-    "scaffolding",
-    "sculk",
-    "sculk_catalyst",
-    "sculk_sensor",
-    "sculk_shrieker",
-    "sculk_vein",
-    "scute",
-    "sea_pickle",
-    "seagrass",
-    "sealantern",
-    "shears",
-    "sheep_spawn_egg",
-    "shield",
-    "shroomlight",
-    "shulker_box",
-    "shulker_shell",
-    "shulker_spawn_egg",
-    "silver_glazed_terracotta",
-    "silverfish_spawn_egg",
-    "skeleton_horse_spawn_egg",
-    "skeleton_spawn_egg",
-    "skull",
-    "skull_banner_pattern",
-    "slime",
-    "slime_ball",
-    "slime_spawn_egg",
-    "small_amethyst_bud",
-    "small_dripleaf_block",
-    "smithing_table",
-    "smoker",
-    "smooth_basalt",
-    "smooth_quartz_stairs",
-    "smooth_red_sandstone_stairs",
-    "smooth_sandstone_stairs",
-    "smooth_stone",
-    "snow",
-    "snow_layer",
-    "snowball",
-    "soul_campfire",
-    "soul_fire",
-    "soul_lantern",
-    "soul_sand",
-    "soul_soil",
-    "soul_torch",
-    "sparkler",
-    "spawn_egg",
-    "spider_eye",
-    "spider_spawn_egg",
-    "splash_potion",
-    "sponge",
-    "spore_blossom",
-    "spruce_boat",
-    "spruce_button",
-    "spruce_door",
-    "spruce_fence_gate",
-    "spruce_pressure_plate",
-    "spruce_sign",
-    "spruce_stairs",
-    "spruce_standing_sign",
-    "spruce_trapdoor",
-    "spruce_wall_sign",
-    "spyglass",
-    "squid_spawn_egg",
-    "stained_glass",
-    "stained_glass_pane",
-    "stained_hardened_clay",
-    "standing_banner",
-    "standing_sign",
-    "stick",
-    "sticky_piston",
-    "stickypistonarmcollision",
-    "stone",
-    "stone_axe",
-    "stone_brick_stairs",
-    "stone_button",
-    "stone_hoe",
-    "stone_pickaxe",
-    "stone_pressure_plate",
-    "stone_shovel",
-    "stone_stairs",
-    "stone_sword",
-    "stonebrick",
-    "stonecutter",
-    "stonecutter_block",
-    "stray_spawn_egg",
-    "strider_spawn_egg",
-    "string",
-    "stripped_acacia_log",
-    "stripped_birch_log",
-    "stripped_crimson_hyphae",
-    "stripped_crimson_stem",
-    "stripped_dark_oak_log",
-    "stripped_jungle_log",
-    "stripped_oak_log",
-    "stripped_spruce_log",
-    "stripped_warped_hyphae",
-    "stripped_warped_stem",
-    "structure_block",
-    "structure_void",
-    "sugar",
-    "sugar_cane",
-    "suspicious_stew",
-    "sweet_berries",
-    "sweet_berry_bush",
-    "tallgrass",
-    "target",
-    "tinted_glass",
-    "tnt",
-    "tnt_minecart",
-    "torch",
-    "totem_of_undying",
-    "trapdoor",
-    "trapped_chest",
-    "trident",
-    "tripwire",
-    "tripwire_hook",
-    "tropical_fish",
-    "tropical_fish_bucket",
-    "tropical_fish_spawn_egg",
-    "tuff",
-    "turtle_egg",
-    "turtle_helmet",
-    "turtle_spawn_egg",
-    "twisting_vines",
-    "underwater_torch",
-    "undyed_shulker_box",
-    "unknown",
-    "unlit_redstone_torch",
-    "unpowered_comparator",
-    "unpowered_repeater",
-    "vex_spawn_egg",
-    "villager_spawn_egg",
-    "vindicator_spawn_egg",
-    "vine",
-    "wall_banner",
-    "wall_sign",
-    "wandering_trader_spawn_egg",
-    "warped_button",
-    "warped_door",
-    "warped_double_slab",
-    "warped_fence",
-    "warped_fence_gate",
-    "warped_fungus",
-    "warped_fungus_on_a_stick",
-    "warped_hyphae",
-    "warped_nylium",
-    "warped_planks",
-    "warped_pressure_plate",
-    "warped_roots",
-    "warped_sign",
-    "warped_slab",
-    "warped_stairs",
-    "warped_standing_sign",
-    "warped_stem",
-    "warped_trapdoor",
-    "warped_wall_sign",
-    "warped_wart_block",
-    "water",
-    "water_bucket",
-    "waterlily",
-    "waxed_copper",
-    "waxed_cut_copper",
-    "waxed_cut_copper_slab",
-    "waxed_cut_copper_stairs",
-    "waxed_double_cut_copper_slab",
-    "waxed_exposed_copper",
-    "waxed_exposed_cut_copper",
-    "waxed_exposed_cut_copper_slab",
-    "waxed_exposed_cut_copper_stairs",
-    "waxed_exposed_double_cut_copper_slab",
-    "waxed_oxidized_copper",
-    "waxed_oxidized_cut_copper",
-    "waxed_oxidized_cut_copper_slab",
-    "waxed_oxidized_cut_copper_stairs",
-    "waxed_oxidized_double_cut_copper_slab",
-    "waxed_weathered_copper",
-    "waxed_weathered_cut_copper",
-    "waxed_weathered_cut_copper_slab",
-    "waxed_weathered_cut_copper_stairs",
-    "waxed_weathered_double_cut_copper_slab",
-    "weathered_copper",
-    "weathered_cut_copper",
-    "weathered_cut_copper_slab",
-    "weathered_cut_copper_stairs",
-    "weathered_double_cut_copper_slab",
-    "web",
-    "weeping_vines",
-    "wheat",
-    "wheat_seeds",
-    "white_candle",
-    "white_candle_cake",
-    "white_dye",
-    "white_glazed_terracotta",
-    "witch_spawn_egg",
-    "wither_rose",
-    "wither_skeleton_spawn_egg",
-    "wolf_spawn_egg",
-    "wood",
-    "wooden_axe",
-    "wooden_button",
-    "wooden_door",
-    "wooden_hoe",
-    "wooden_pickaxe",
-    "wooden_pressure_plate",
-    "wooden_shovel",
-    "wooden_slab",
-    "wooden_sword",
-    "wool",
-    "writable_book",
-    "written_book",
-    "yellow_candle",
-    "yellow_candle_cake",
-    "yellow_dye",
-    "yellow_flower",
-    "yellow_glazed_terracotta",
-    "zoglin_spawn_egg",
-    "zombie_horse_spawn_egg",
-    "zombie_pigman_spawn_egg",
-    "zombie_spawn_egg",
-    "zombie_villager_spawn_egg",
-]
+-----
 
-
-
-
-
+| 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+"""
 
 
 

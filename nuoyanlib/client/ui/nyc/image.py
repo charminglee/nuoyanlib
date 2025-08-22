@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -35,8 +35,7 @@ class NyImage(NyControl):
     :param ImageUIControl image_control: 通过asImage()获取的图片实例
     """
 
-    _CONTROL_TYPE = ControlType.image
-
+    _CONTROL_TYPE = ControlType.IMAGE
     def __init__(self, screen_node_ex, image_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, image_control)
 

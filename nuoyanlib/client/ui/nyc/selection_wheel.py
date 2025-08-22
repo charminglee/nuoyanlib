@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -33,7 +33,7 @@ class NySelectionWheel(NyControl):
     :param SelectionWheelUIControl selection_wheel_control: 通过asSelectionWheel()获取的轮盘实例
     """
 
-    _CONTROL_TYPE = ControlType.selection_wheel
+    _CONTROL_TYPE = ControlType.SELECTION_WHEEL
 
     def __init__(self, screen_node_ex, selection_wheel_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, selection_wheel_control)

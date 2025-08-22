@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-14
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -45,7 +45,7 @@ class NyToggle(NyControl):
         (103, 117, 105),
         (117, 110, 114, 101, 103, 105, 115, 116, 101, 114, 95, 116, 111, 103, 103, 108, 101, 95, 99, 104, 97, 110, 103, 101, 100, 95, 104, 97, 110, 100, 108, 101, 114)
     ))
-    _CONTROL_TYPE = ControlType.toggle
+    _CONTROL_TYPE = ControlType.TOGGLE
 
     def __init__(self, screen_node_ex, toggle_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, toggle_control)

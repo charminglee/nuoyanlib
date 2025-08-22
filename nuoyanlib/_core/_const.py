@@ -16,9 +16,6 @@
 from .. import __version__
 
 
-__all__ = []
-
-
 LIB_VERSION = __version__.split("-")[0]
 LIB_VERSION_UL = __version__.replace(".", "_").replace("-", "_")
 LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL

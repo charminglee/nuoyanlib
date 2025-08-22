@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-11
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -33,7 +33,7 @@ class NyStackPanel(NyControl):
     :param StackPanelUIControl stack_panel_control: 通过asStackPanel()获取的栈面板实例
     """
 
-    _CONTROL_TYPE = ControlType.stack_panel
+    _CONTROL_TYPE = ControlType.STACK_PANEL
 
     def __init__(self, screen_node_ex, stack_panel_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, stack_panel_control)

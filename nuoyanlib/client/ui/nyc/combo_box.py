@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -34,7 +34,7 @@ class NyComboBox(NyControl):
     :param NeteaseComboBoxUIControl combo_box_control: 通过asNeteaseComboBox()获取的下拉框实例
     """
 
-    _CONTROL_TYPE = ControlType.combo_box
+    _CONTROL_TYPE = ControlType.COMBO_BOX
 
     def __init__(self, screen_node_ex, combo_box_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, combo_box_control)
