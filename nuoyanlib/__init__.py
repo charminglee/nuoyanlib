@@ -27,9 +27,9 @@ __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"
 
 
-# from ._core._logging import info
-# info("Start loading", show_env=False)
-# del info
+from ._core._logging import info
+info("Start loading", show_env=False)
+del info
 
 
 def run(dct):
@@ -45,7 +45,6 @@ def run(dct):
     """
     from mod.common.mod import Mod
     from ._core import _const
-    from ._core._sys import load_extensions
 
     @Mod.Binding(_const.LIB_NAME, _const.LIB_VERSION)
     class NuoyanLibMain(object):

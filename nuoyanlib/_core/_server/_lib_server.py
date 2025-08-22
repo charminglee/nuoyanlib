@@ -71,8 +71,8 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
         if self.query_cache:
             self.NotifyToClient(args.__id__, "_SetQueryCache", self.query_cache)
 
-    def LoadServerAddonScriptsAfter(self, args):
-        load_extensions()
+    # def LoadServerAddonScriptsAfter(self, args):
+    #     load_extensions()
 
     # endregion
 

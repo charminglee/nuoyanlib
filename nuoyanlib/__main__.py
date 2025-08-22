@@ -20,8 +20,11 @@ import mod.client.extraClientApi as api
 
 # 导入测试
 from . import client
+from ._core._sys import load_extensions
+load_extensions()
 def import_server():
     from . import server
+    load_extensions()
 threading.Thread(target=import_server).start()
 
 

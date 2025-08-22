@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-22
 |
 | ==============================================
 """
@@ -65,7 +65,6 @@ class ItemHeapData(TypedDict):
     animating: bool
     bar_ctrl: ProgressBarUIControl
 UserData = Dict[str, Any]
-
 
 
 ArgsDict = Dict[str, PyBasicTypes]

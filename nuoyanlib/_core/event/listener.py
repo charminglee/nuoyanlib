@@ -481,7 +481,7 @@ def __test__():
         assert event.playerId == a['playerId'] == "1919810"
     CustomEvent(EventArgsProxy(a, "CustomEvent"))
 
-    from ._utils import assert_error
+    from .._utils import assert_error
     def f():
         @event("xxx", is_method=False)
         def cb(args):

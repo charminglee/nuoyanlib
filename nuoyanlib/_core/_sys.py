@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-19
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
@@ -34,10 +34,13 @@ def load_extensions():
     from ._utils import try_exec
     from ._logging import warning, info
     imp = get_api().ImportModule
-    ext_root = ROOT + ".nuoyanlib.extensions"
-    ext_list = imp(ext_root + "._list").EXTENSION_LOADING_LIST
+    if ROOT == "nuoyanlib":
+        ext_module = imp("nuoyanlib.extensions")
+    else:
+        ext_module = imp(ROOT + ".nuoyanlib.extensions")
+    ext_list = ext_module.EXTENSION_LOADING_LIST
     env = get_env()
-    loaded = []
+    loaded_ext = []
     for name in ext_list:
         ext_name = name + "." + env
         module = imp("{}.{}".format(ext_root, ext_name))
@@ -46,9 +49,9 @@ def load_extensions():
             if isinstance(res, Exception):
                 warning("Extension '%s' loading failed", ext_name)
             else:
-                loaded.append(name)
-    info("Loaded extensions: %s", loaded)
-    return ext_list
+                loaded_ext.append(name)
+    info("Loaded extensions: %s", loaded_ext)
+    return loaded_ext
 
 
 def check_env(target):

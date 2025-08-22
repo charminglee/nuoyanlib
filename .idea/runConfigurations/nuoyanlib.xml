@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="nuoyanlib 3.12" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="nuoyanlib" type="PythonConfigurationType" factoryName="Python">
     <module name="nuoyanlib" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
@@ -8,7 +8,7 @@
       <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
     <option name="SDK_HOME" value="" />
-    <option name="SDK_NAME" value="Python 3.12" />
+    <option name="SDK_NAME" value="Python 2.7" />
     <option name="WORKING_DIRECTORY" value="$ContentRoot$" />
     <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />

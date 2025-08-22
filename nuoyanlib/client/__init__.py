@@ -63,7 +63,6 @@ if _ins.__lib_flag__ == 0:
         iter_obj_attrs,
         cached_property,
         CachedObject,
-        hook_method,
         cached_method,
         cached_func,
         singleton,

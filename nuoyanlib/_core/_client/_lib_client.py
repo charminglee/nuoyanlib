@@ -75,8 +75,8 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     def UiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
 
-    def LoadClientAddonScriptsAfter(self, args):
-        load_extensions()
+    # def LoadClientAddonScriptsAfter(self, args):
+    #     load_extensions()
 
     def broadcast_to_all_client(self, event_name, event_data, ns="", sys_name=""):
         if not ns:

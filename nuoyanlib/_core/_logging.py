@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-19
+|   Date  : 2025-08-21
 |
 | ==============================================
 """
@@ -42,13 +42,13 @@ if config.ENABLED_LOG and logging:
             s = "%s,%03d" % (t, msecs)
             if kwargs['show_env']:
                 print(
-                    "[%s] [%s] [nuoyanlib/%s] [%s, %s] %s"
-                    % (s, self.level, get_env(), _const.__version__, _const.ROOT, msg % args)
+                    "[%s] [%s] [nuoyanlib/%s] [%s] %s"
+                    % (s, self.level, get_env(), _const.ROOT, msg % args)
                 )
             else:
                 print(
-                    "[%s] [%s] [nuoyanlib] [%s, %s] %s"
-                    % (s, self.level, _const.__version__, _const.ROOT, msg % args)
+                    "[%s] [%s] [nuoyanlib] [%s] %s"
+                    % (s, self.level, _const.ROOT, msg % args)
                 )
 
     info = _logger("INFO").log
