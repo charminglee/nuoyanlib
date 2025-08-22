@@ -15,8 +15,7 @@
 
 「nuoyanlib」是基于我的世界中国版[ModSDK](https://mc.163.com/dev/index.html)开发的开源工具库，封装了许多开发中常用的功能算法，致力于为广大开发者提高代码编写效率，更轻松地实现复杂效果。  
 「nuoyanlib」可供大家学习参考，也可应用于任何个人/团队的商业/非商业项目中。您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
-
-#### **兼容ModSDK版本：3.4**
+**兼容ModSDK版本：3.4**
 
 
 ## ✨ 亮点
@@ -94,8 +93,8 @@
     ```python
     import <scripts_root>.nuoyanlib.server as nyl
     ```
-    > [!WARNING]  
-    > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。
+> [!WARNING]  
+> 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。
 4. 更多信息请参见[入门指南](/docs/入门指南.md)。
 
 
@@ -115,13 +114,13 @@
 2. 增加更多实用功能；
 3. 编写demo；
 4. 优化代码；
-5. 完善Apollo版本；
+5. ~~完善Apollo版本；~~
 6. ...
 
 
 ## 👑 贡献
 
-本项目欢迎各位开发者共同参与开发，如果您有更好的算法或修改建议，可通过Issue或Pull Request的方式提交，成为本项目的贡献者。
+本项目欢迎各位开发者共同参与开发，如果您有更好的算法或修改建议，欢迎通过Issue或Pull Request的方式提交！
 
 [什么是Issue？](https://help.gitee.com/base/issue/intro)  
 [什么是Pull Request？](https://help.gitee.com/base/pullrequest/intro)
