@@ -54,27 +54,49 @@ for cls in ClientEvent, ServerEvent:
 print("events:", len(ClientEvent._data) + len(ServerEvent._data))
 
 
+shutil.copyfile(f"{event_dir}\\_events.py", f"{script_dir}\\_events.py")
 shutil.copyfile(f"{event_dir}\\_events.pyi", f"{script_dir}\\_events.pyi")
 shutil.copyfile(f"{event_dir}\\_event_typing.pyi", f"{script_dir}\\_event_typing.pyi")
 
 
+_events_py = open(f"{script_dir}\\_events.py", "r", encoding="utf-8").read()
+all_client_events = "ALL_CLIENT_ENGINE_EVENTS = {\n"
+for k in ClientEvent._data.keys():
+    all_client_events += f'    "{k}",\n'
+all_client_events += "}\nALL_SERVER_ENGINE_EVENTS"
+_events_py = re.sub(
+    r"ALL_CLIENT_ENGINE_EVENTS = \{.*}\nALL_SERVER_ENGINE_EVENTS",
+    all_client_events, _events_py, 1, re.S
+)
+all_server_events = "ALL_SERVER_ENGINE_EVENTS = {\n"
+for k in ServerEvent._data.keys():
+    all_server_events += f'    "{k}",\n'
+all_server_events += "}\nALL_CLIENT_LIB_EVENTS"
+_events_py = re.sub(
+    r"ALL_SERVER_ENGINE_EVENTS = \{.*}\nALL_CLIENT_LIB_EVENTS",
+    all_server_events, _events_py, 1, re.S
+)
+open(f"{script_dir}\\_events.py", "w", encoding="utf-8").write(_events_py)
+
+
 # 生成事件枚举
-_events = open(f"{script_dir}\\_events.pyi", "r", encoding="utf-8").read()
-_events = re.sub(r"# clear.*", "# clear\n\n\n", _events, 1, re.S)
-_events += "class ClientEventEnum:\n"
+_events_pyi = open(f"{script_dir}\\_events.pyi", "r", encoding="utf-8").read()
+_events_pyi = re.sub(r"# clear.*", "# clear\n\n\n", _events_pyi, 1, re.S)
+_events_pyi += "class ClientEventEnum:\n"
 for data in ClientEvent._data, ServerEvent._data:
     for event_name, (args, doc) in data.items():
-        _events += f"    {event_name}: str\n"
+        _events_pyi += f"    {event_name}: str\n"
         doc = doc.replace("\n        ", "\n    ")
-        _events += f'    """{doc}"""\n'
-    if "ServerEventEnum" not in _events:
-        _events += "\n\nclass ServerEventEnum:\n"
-open(f"{script_dir}\\_events.pyi", "w", encoding="utf-8").write(_events)
+        _events_pyi += f'    """{doc}"""\n'
+    if "ServerEventEnum" not in _events_pyi:
+        _events_pyi += "\n\nclass ServerEventEnum:\n"
+open(f"{script_dir}\\_events.pyi", "w", encoding="utf-8").write(_events_pyi)
 
 
 _event_typing = open(f"{script_dir}\\_event_typing.pyi", "r", encoding="utf-8").read()
 _event_typing = re.sub(r"# clear.*", "# clear\n\n\n", _event_typing, 1, re.S)
 _event_typing += "class ClientEvent:\n"
+
 
 # 生成ClientEvent、ServerEvent类
 n = 0
@@ -86,6 +108,7 @@ for data in ClientEvent._data, ServerEvent._data:
     if "class ServerEvent" not in _event_typing:
         _event_typing += "\n\nclass ServerEvent:\n"
 _event_typing += "\n"
+
 
 # 生成EventArgs类
 n = 0
