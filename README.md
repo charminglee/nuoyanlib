@@ -4,11 +4,14 @@
 
   <h3 align="center">基于网易我的世界ModSDK的Mod开发工具库</h3>
 
-  ![Static Badge](https://img.shields.io/badge/license-BSD--3-blue) ![Static Badge](https://img.shields.io/badge/ModSDK-3.5-green)
+  [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.5-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/charminglee/nuoyanlib) ![GitHub repo size](https://img.shields.io/github/repo-size/charminglee/nuoyanlib)  
+  [![python](https://camo.githubusercontent.com/61a81b1dbe844fb6b43df995ae0b9b118c641df75220b27281aad6ea97e46622/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f507974686f6e2d3337373641423f7374796c653d666c6174266c6f676f3d507974686f6e266c6f676f436f6c6f723d666666666666)](https://www.python.org/) [![pycharm](https://img.shields.io/badge/-JetBrains%20PyCharm-black?style=flat&logo=pycharm)](https://www.jetbrains.com/pycharm/) [![github](https://img.shields.io/badge/-GitHub-black?style=flat&logo=github)](https://github.com/charminglee/nuoyanlib) [![gitee](https://img.shields.io/badge/-gitee-red?style=flat&logo=gitee)](https://gitee.com/charming-lee/nuoyanLib) [![qq](https://img.shields.io/badge/QQ-1279735247-green)](https://qm.qq.com/q/BknsDqOdsk)
 
 </div>
 
-<br></br>
+---
+
+<br>
 
 ## 💼 介绍
 
@@ -18,7 +21,7 @@
 「nuoyanlib」是基于我的世界中国版[ModSDK](https://mc.163.com/dev/index.html)开发的开源工具库，封装了许多开发中常用的功能算法，致力于为广大开发者提高代码编写效率，更轻松地实现复杂效果。  
 「nuoyanlib」可供大家学习参考，也可应用于任何个人/团队的商业/非商业项目中。您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
 
-**兼容ModSDK版本：3.4**
+**兼容ModSDK版本：3.5**
 
 
 ## ✨ 亮点
