@@ -13,19 +13,22 @@
 
 <br>
 <br>
-
-## 💼 介绍
+<br>
 
 > [!NOTE]  
-> 目前该项目仍处于测试阶段，部分功能仍未开发完成或存在未知bug，且其中的函数命名、具体实现等随时可能发生变化，请谨慎使用。
+> 目前该项目仍处于开发和测试阶段，一些功能仍未开发完善或存在未知bug，且其中的函数命名、具体实现等随时可能发生变化，请谨慎使用。
 
-「nuoyanlib」是基于我的世界中国版[ModSDK](https://mc.163.com/dev/index.html)开发的开源工具库，封装了许多开发中常用的功能算法，致力于为广大开发者提高代码编写效率，更轻松地实现复杂效果。  
-「nuoyanlib」可供大家学习参考，也可应用于任何个人/团队的商业/非商业项目中。您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
+## 📖 简介 | Introduction
 
-**兼容ModSDK版本：3.5**
+「nuoyanlib」是基于网易我的世界[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端、服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
+您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
 
+> ✅ 已支持 **ModSDK 3.5**  
+> 📌 适合**个人**或**团队**项目，可自由用于**商业**和**非商业**用途
 
-## ✨ 亮点
+<br>
+
+## ✨ 亮点 | Features
 
 - [**client（客户端库）**](/nuoyanlib/client)  
   提供了客户端扩展、特效管理器等客户端专用工具以及ScreenNode扩展、物品网格管理器等UI专用工具。  
@@ -38,13 +41,15 @@
 - [**utils（通用工具库）**](/nuoyanlib/utils)  
   提供了多种数学计算函数、更多的枚举值等双端通用的工具。
 
+<br>
 
-## ⬇️ 下载
+## ⬇️ 下载 | Download
 
-- [1.0.0-b1](https://gitee.com/charming-lee/nuoyanLib/releases/tag/1.0.0-b1)
+- [1.0.0-beta.1](https://gitee.com/charming-lee/nuoyanLib/releases/tag/1.0.0-beta.1)
 
+<br>
 
-## ⚙️ 配置
+## ⚙️ 配置 | Configuration
 
 1. 解压下载的压缩包，将`nuoyanlib`文件夹放至行为包Python脚本根目录下（即`modMain.py`文件所在位置）。  
     安装好后，你的行为包结构应为： 
@@ -104,38 +109,42 @@
 > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。
 4. 更多信息参见[入门指南](/docs/入门指南.md)。
 
+<br>
 
-## 🎉 更新信息
-
-作者正在熬夜编写中......
-
-
-## 🔍 参考文档
+## 🎉 更新信息 | Changelog
 
 作者正在熬夜编写中......
 
+<br>
 
-## 🌞 未来计划TODO
+## 🔍 参考文档 | Documentation
 
-1. 重新整理函数文档注释，完成参考文档的编写；
-2. 增加更多实用功能；
-3. 编写demo；
-4. 优化代码；
-5. ~~完善Apollo版本；~~
-6. ...
+作者正在熬夜编写中......
 
+<br>
 
-## 👑 贡献
+## 🌞 未来计划 | TODO
+
+1. 重新整理函数文档注释，完成参考文档的编写。
+2. 完善测试包。
+3. 编写demo。
+4. ~~完善Apollo版本。~~
+5. ...
+
+<br>
+
+## 👑 贡献 | Contributing
 
 本项目欢迎各位开发者共同参与开发，如果您有更好的算法或修改建议，欢迎通过Issue或Pull Request的方式提交！
 
 [什么是Issue？](https://help.gitee.com/base/issue/intro)  
 [什么是Pull Request？](https://help.gitee.com/base/pullrequest/intro)
 
+<br>
 
-## 👴 联系作者
+## 👴 联系作者 | Contact
 
 如果在使用过程中遇到问题，可通过以下方式联系作者：
 
-- QQ：1279735247
+- QQ：[1279735247](https://qm.qq.com/q/BknsDqOdsk)
 - 邮箱：1279735247@qq.com
