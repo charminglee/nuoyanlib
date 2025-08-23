@@ -3,6 +3,7 @@ scripts/event_typehint/_event_typing.pyi
 scripts/event_typehint/_events.pyi
 *.zip
 studio.json
+/img/logo/logo.psd
 
 
 ### Python template

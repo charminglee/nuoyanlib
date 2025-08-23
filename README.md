@@ -1,10 +1,12 @@
-<h1 align="center">
-🐱
-<br>
-「nuoyanlib」
-</h1>
+<div align="center">
 
-<h3 align="center">基于网易我的世界ModSDK的Mod开发工具库</h3>
+  <img src="/img/logo/logo.png" alt="logo">
+
+  <h3 align="center">基于网易我的世界ModSDK的Mod开发工具库</h3>
+
+  ![Static Badge](https://img.shields.io/badge/license-BSD--3-blue) ![Static Badge](https://img.shields.io/badge/ModSDK-3.5-green)
+
+</div>
 
 <br></br>
 
