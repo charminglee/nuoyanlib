@@ -1,6 +1,8 @@
 <div align="center">
 
   <img src="/img/logo/logo.png" alt="logo">
+  
+  ---
 
   <h3 align="center">基于网易我的世界ModSDK的Mod开发工具库</h3>
 
@@ -9,8 +11,7 @@
 
 </div>
 
----
-
+<br>
 <br>
 
 ## 💼 介绍
