@@ -77,6 +77,8 @@ dmypy.json
 
 
 ### JetBrains IDEs
+.idea/GitCommitMessageStorage.xml
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
