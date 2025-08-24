@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
 
 
-from ...._core._utils import get_func
+from ...._core._utils import get_func, kwargs_setter
 from ...._core._types._checker import args_type_check
 from ...._core._client.comp import ScreenNode
 from ...._core.event.listener import listen_event, unlisten_event
@@ -93,9 +93,10 @@ class NyGrid(NyControl):
     ))
     _CONTROL_TYPE = ControlType.GRID
 
+    @kwargs_setter(is_stack_grid=False)
     def __init__(self, screen_node_ex, grid_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, grid_control)
-        self.is_stack_grid = kwargs.get('is_stack_grid', False)
+        self.is_stack_grid = kwargs['is_stack_grid']
         self._update_cbs = []
         listen_event(self.GridComponentSizeChangedClientEvent)
 

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -23,6 +23,7 @@ def spawn_ground_shatter_effect(
     r: float,
     num: int,
     block_dist: float = 1.0,
+    /,
     *,
     time: float = 3.0,
     tilt_angle: float = 22.0,

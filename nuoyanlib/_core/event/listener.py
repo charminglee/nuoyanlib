@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-24
 |
 | ==============================================
 """
@@ -207,7 +207,7 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
 
     -----
 
-    :param str event_name: 事件名称，默认为被装饰函数名
+    :param str|function event_name: 事件名称，默认为被装饰函数名
     :param str ns: 事件来源命名空间
     :param str sys_name: 事件来源系统名称
     :param int priority: 优先级，值越大优先级越高，默认为0

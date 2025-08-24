@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -32,6 +32,7 @@ __all__ = [
 
 def kwargs_setter(**kwargs):
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **_kwargs):
             for k in _kwargs:
                 if k not in kwargs:
@@ -212,6 +213,14 @@ def is_not_inv_key(k):
 
 
 def __test__():
+    @kwargs_setter(c=3, d=4)
+    def func(a, b=2, **kwargs):
+        return a, b, kwargs['c'], kwargs['d']
+    assert func(1, 2) == (1, 2, 3, 4)
+    assert func(1, 2, c=6) == (1, 2, 6, 4)
+    # assert func(1, b=5, c=6) == (1, 5, 6, 4)
+    assert func(1, c=6) == (1, 2, 6, 4)
+
     a = [0]
     class T(object):
         @cached_property

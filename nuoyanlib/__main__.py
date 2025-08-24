@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -51,6 +51,9 @@ test(".client.ui.nyc.control")
 test(".utils.enum")
 test(".utils.item")
 test(".utils.utils")
+
+
+print("\n\033[33mAll tests passed.")
 
 
 

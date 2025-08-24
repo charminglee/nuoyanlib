@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -19,8 +19,8 @@ from mod.client.ui.controls.baseUIControl import BaseUIControl
 from .control import NyControl
 from ...._core._types._typing import ITuple2, ArgsDict
 from ...._core._types._checker import args_type_check
-from ..screen_node import ScreenNodeExtension
 from ...._core.event._events import ClientEventEnum as Events
+from ..screen_node import ScreenNodeExtension
 
 
 _T = TypeVar("_T")
@@ -53,6 +53,7 @@ class NyGrid(NyControl):
         self: ...,
         screen_node_ex: ScreenNodeExtension,
         grid_control: GridUIControl,
+        /,
         *,
         is_stack_grid: bool = False,
     ) -> None: ...

@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
 
 
-from typing import Callable, Optional, Tuple, Generator, List, Any, DefaultDict, Set, overload
+from typing import Callable, Optional, Tuple, Generator, List, Any, DefaultDict, Set, Union
 from types import MethodType
 from ._events import ClientEvent, ServerEvent
 from .._types._typing import ArgsDict, PyBasicTypes, STuple
@@ -95,16 +95,13 @@ class ClientEventProxy(ClientEvent, _BaseEventProxy): ...
 class ServerEventProxy(ServerEvent, _BaseEventProxy): ...
 
 
-@overload
 def event(
-    event_name: str = "",
+    event_name: Union[str, Callable] = "",
     ns: str = "",
     sys_name: str = "",
     priority: int = 0,
     is_method: bool = True,
 ) -> Callable: ...
-@overload
-def event(func: Callable) -> Callable: ...
 def _get_event_args(func: Callable) -> List[Tuple[str, str, str, int]]: ...
 def listen_event(
     func: Callable,
