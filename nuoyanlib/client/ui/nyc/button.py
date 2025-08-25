@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -16,7 +16,7 @@
 from time import time
 from ..ui_utils import (
     to_control, is_ui_out_of_screen,
-    get_ui_pos_data, save_ui_pos_data, get_parent_control,
+    get_ui_pos_data, save_ui_pos_data, get_parent,
 )
 from ...._core._client.comp import LvComp
 from ...._core._types._checker import args_type_check
@@ -365,7 +365,7 @@ class NyButton(NyControl):
         if movable:
             movable_controls = []
             if move_parent:
-                movable_controls.append(get_parent_control(self.base_control, self._screen_node))
+                movable_controls.append(get_parent(self.base_control, self._screen_node))
             else:
                 movable_controls.append(self.base_control)
             if associated_uis:

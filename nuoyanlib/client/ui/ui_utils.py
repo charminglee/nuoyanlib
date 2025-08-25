@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -27,10 +27,10 @@ __all__ = [
     "create_ui",
     "to_path",
     "to_control",
-    "get_parent_path",
     "get_children_path_by_level",
-    "get_children_control_by_level",
-    "get_parent_control",
+    "get_children_by_level",
+    "get_parent_path",
+    "get_parent",
     "notify_server",
 ]
 
@@ -169,7 +169,7 @@ def get_children_path_by_level(control, screen_node, level=1):
                 yield p
 
 
-def get_children_control_by_level(control, screen_node, level=1):
+def get_children_by_level(control, screen_node, level=1):
     """
     [迭代器]
 
@@ -204,7 +204,7 @@ def get_parent_path(control):
     return path[:path.rindex("/")] if path else None
 
 
-def get_parent_control(control, screen_node):
+def get_parent(control, screen_node):
     """
     | 获取控件的父控件 ``BaseUIControl`` 实例。
 
