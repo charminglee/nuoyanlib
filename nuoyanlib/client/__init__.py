@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-25
 |
 |   nuoyanlib客户端库。
 |
@@ -35,7 +35,7 @@ if not _ins:
     raise _error.NuoyanLibClientSystemRegisterError
 
 
-if _ins.__lib_flag__ == 0:
+if 1 or _ins.__lib_flag__ == 0:
     # 首次加载
     from .._core._client.comp import (
         ENGINE_NAMESPACE,
