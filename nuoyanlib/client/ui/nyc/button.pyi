@@ -65,7 +65,9 @@ class NyButton(NyControl):
         self: ...,
         screen_node_ex: ScreenNodeExtension,
         btn_control: ButtonUIControl,
-        **kwargs: Any,
+        /,
+        *,
+        touch_event_params: Optional[Dict[str, Any]] = None,
     ) -> None: ...
     @args_type_check(str, is_method=True)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...

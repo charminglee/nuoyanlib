@@ -283,21 +283,21 @@ class NyControl(object):
 
     # region Conversion ================================================================================================
 
-    def to_button(self, touch_event_params=None):
+    def to_button(self, **kwargs):
         """
         | 转换为 ``NyButton`` 实例。
 
         -----
 
-        :param dict[str,Any]|None touch_event_params: 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+        :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
 
         :return: NyButton实例
         :rtype: NyButton
         """
         from . import NyButton
-        return NyButton.from_path(self.ui_node, self.path, touch_event_params=touch_event_params)
+        return NyButton.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_image(self):
+    def to_image(self, **kwargs):
         """
         | 转换为 ``NyImage`` 实例。
 
@@ -307,9 +307,9 @@ class NyControl(object):
         :rtype: NyImage
         """
         from . import NyImage
-        return NyImage.from_path(self.ui_node, self.path)
+        return NyImage.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_label(self):
+    def to_label(self, **kwargs):
         """
         | 转换为 ``NyLabel`` 实例。
 
@@ -319,9 +319,9 @@ class NyControl(object):
         :rtype: NyLabel
         """
         from . import NyLabel
-        return NyLabel.from_path(self.ui_node, self.path)
+        return NyLabel.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_input_panel(self):
+    def to_input_panel(self, **kwargs):
         """
         | 转换为 ``NyInputPanel`` 实例。
 
@@ -331,9 +331,9 @@ class NyControl(object):
         :rtype: NyInputPanel
         """
         from . import NyInputPanel
-        return NyInputPanel.from_path(self.ui_node, self.path)
+        return NyInputPanel.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_stack_panel(self):
+    def to_stack_panel(self, **kwargs):
         """
         | 转换为 ``NyStackPanel`` 实例。
 
@@ -343,9 +343,9 @@ class NyControl(object):
         :rtype: NyStackPanel
         """
         from . import NyStackPanel
-        return NyStackPanel.from_path(self.ui_node, self.path)
+        return NyStackPanel.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_edit_box(self):
+    def to_edit_box(self, **kwargs):
         """
         | 转换为 ``NyEditBox`` 实例。
 
@@ -355,9 +355,9 @@ class NyControl(object):
         :rtype: NyEditBox
         """
         from . import NyEditBox
-        return NyEditBox.from_path(self.ui_node, self.path)
+        return NyEditBox.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_netease_paper_doll(self):
+    def to_netease_paper_doll(self, **kwargs):
         """
         | 转换为 ``NyPaperDoll`` 实例。
 
@@ -367,9 +367,9 @@ class NyControl(object):
         :rtype: NyPaperDoll
         """
         from . import NyPaperDoll
-        return NyPaperDoll.from_path(self.ui_node, self.path)
+        return NyPaperDoll.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_item_renderer(self):
+    def to_item_renderer(self, **kwargs):
         """
         | 转换为 ``NyItemRenderer`` 实例。
 
@@ -379,9 +379,9 @@ class NyControl(object):
         :rtype: NyItemRenderer
         """
         from . import NyItemRenderer
-        return NyItemRenderer.from_path(self.ui_node, self.path)
+        return NyItemRenderer.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_scroll_view(self):
+    def to_scroll_view(self, **kwargs):
         """
         | 转换为 ``NyScrollView`` 实例。
 
@@ -391,23 +391,23 @@ class NyControl(object):
         :rtype: NyScrollView
         """
         from . import NyScrollView
-        return NyScrollView.from_path(self.ui_node, self.path)
+        return NyScrollView.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_grid(self, is_stack_grid=False):
+    def to_grid(self, **kwargs):
         """
         | 转换为 ``NyGrid`` 实例。
 
         -----
 
-        :param bool is_stack_grid: 是否是StackGrid，默认为False
+        :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
 
         :return: NyGrid实例
         :rtype: NyGrid
         """
         from . import NyGrid
-        return NyGrid.from_path(self.ui_node, self.path, is_stack_grid=is_stack_grid)
+        return NyGrid.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_progress_bar(self):
+    def to_progress_bar(self, **kwargs):
         """
         | 转换为 ``NyProgressBar`` 实例。
 
@@ -417,9 +417,9 @@ class NyControl(object):
         :rtype: NyProgressBar
         """
         from . import NyProgressBar
-        return NyProgressBar.from_path(self.ui_node, self.path)
+        return NyProgressBar.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_toggle(self):
+    def to_toggle(self, **kwargs):
         """
         | 转换为 ``NyToggle`` 实例。
 
@@ -429,9 +429,9 @@ class NyControl(object):
         :rtype: NyToggle
         """
         from . import NyToggle
-        return NyToggle.from_path(self.ui_node, self.path)
+        return NyToggle.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_slider(self):
+    def to_slider(self, **kwargs):
         """
         | 转换为 ``NySlider`` 实例。
 
@@ -441,9 +441,9 @@ class NyControl(object):
         :rtype: NySlider
         """
         from . import NySlider
-        return NySlider.from_path(self.ui_node, self.path)
+        return NySlider.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_selection_wheel(self):
+    def to_selection_wheel(self, **kwargs):
         """
         | 转换为 ``NySelectionWheel`` 实例。
 
@@ -453,9 +453,9 @@ class NyControl(object):
         :rtype: NySelectionWheel
         """
         from . import NySelectionWheel
-        return NySelectionWheel.from_path(self.ui_node, self.path)
+        return NySelectionWheel.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_combo_box(self):
+    def to_combo_box(self, **kwargs):
         """
         | 转换为 ``NyComboBox`` 实例。
 
@@ -465,9 +465,9 @@ class NyControl(object):
         :rtype: NyComboBox
         """
         from . import NyComboBox
-        return NyComboBox.from_path(self.ui_node, self.path)
+        return NyComboBox.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_mini_map(self):
+    def to_mini_map(self, **kwargs):
         """
         | 转换为 ``NyMiniMap`` 实例。
 
@@ -477,7 +477,7 @@ class NyControl(object):
         :rtype: NyMiniMap
         """
         from . import NyMiniMap
-        return NyMiniMap.from_path(self.ui_node, self.path)
+        return NyMiniMap.from_path(self.ui_node, self.path, **kwargs)
 
     # endregion
 

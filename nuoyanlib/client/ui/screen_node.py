@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -16,16 +16,12 @@
 from time import time
 from itertools import product, cycle
 from fnmatch import fnmatchcase
-from types import GeneratorType
 from ..._core._client.comp import CustomUIScreenProxy, ScreenNode
 from ..._core import _error
 from ..._core.event.listener import ClientEventProxy, listen_event, unlisten_event, has_listened, unlisten_all_events
 from ..._core.event._events import ClientEventEnum as Events
 from ..._core._utils import hook_method, iter_obj_attrs
-from .ui_utils import (
-    to_control, get_ui_pos_data, save_ui_pos_data,
-    get_children_path_by_level, get_parent_path, to_path,
-)
+from .ui_utils import to_control, get_ui_pos_data, save_ui_pos_data, to_path
 from ...utils.enum import ButtonCallbackType
 from .nyc import *
 
@@ -147,22 +143,22 @@ class ScreenNodeExtension(ClientEventProxy):
 
         :param str btn_path: 按钮路径，支持通配符"*"（目前仅支持最后一级控件名称使用通配符）
         :param str callback_types: [变长位置参数] 按钮回调类型，支持设置多种回调，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
-        :param dict|None touch_event_param: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
 
         :return: 返回原函数
         :rtype: function
         """
         if not callback_types:
             callback_types = (ButtonCallbackType.UP,)
-        touch_event_param = kwargs.get('touch_event_params', None)
+        touch_event_params = kwargs.get('touch_event_params', None)
         def decorator(func):
             func._nyl_callback_types = callback_types
             func._nyl_btn_path = btn_path
-            func._nyl_touch_event_param = touch_event_param
+            func._nyl_touch_event_params = touch_event_params
             return func
         return decorator
 
-    def create_ny_control(self, path_or_control):
+    def create_ny_control(self, path_or_control, **kwargs):
         """
         | 创建 ``NyControl`` 通用控件实例，可替代 ``.GetBaseUIControl()`` 的返回值使用。
 
@@ -173,9 +169,9 @@ class ScreenNodeExtension(ClientEventProxy):
         :return: NyControl控件实例，创建失败返回None
         :rtype: NyControl|None
         """
-        return self._create_nyc(path_or_control, NyControl)
+        return self._create_nyc(path_or_control, NyControl, **kwargs)
 
-    def create_ny_button(self, path_or_control, touch_event_params=None):
+    def create_ny_button(self, path_or_control, **kwargs):
         """
         | 创建 ``NyButton`` 按钮实例，可替代 ``.asButton()`` 的返回值使用。
         | 创建后无需调用 ``.AddTouchEventParams()`` 或 ``.AddHoverEventParams()`` 接口。
@@ -183,14 +179,14 @@ class ScreenNodeExtension(ClientEventProxy):
         -----
 
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-        :param dict|None touch_event_params: 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
 
         :return: NyButton按钮实例，创建失败返回None
         :rtype: NyButton|None
         """
-        return self._create_nyc(path_or_control, NyButton, touch_event_params=touch_event_params)
+        return self._create_nyc(path_or_control, NyButton, **kwargs)
 
-    def create_ny_grid(self, path_or_control, is_stack_grid=False):
+    def create_ny_grid(self, path_or_control, **kwargs):
         """
         | 创建 ``NyGrid`` 网格实例，可替代 ``.asGrid()`` 的返回值使用。
         | 对网格进行操作需要注意一些细节，详见开发指南-界面与交互- `UI说明文档 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/30-UI%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.html?key=grid&docindex=4&type=0>`_ 中对Grid控件的描述。
@@ -198,14 +194,14 @@ class ScreenNodeExtension(ClientEventProxy):
         -----
 
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-        :param bool is_stack_grid: 是否是StackGrid，默认为False
+        :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
 
         :return: NyGrid网格实例，创建失败返回None
         :rtype: NyGrid|None
         """
-        return self._create_nyc(path_or_control, NyGrid, is_stack_grid=is_stack_grid)
+        return self._create_nyc(path_or_control, NyGrid, **kwargs)
 
-    def create_ny_label(self, path_or_control):
+    def create_ny_label(self, path_or_control, **kwargs):
         """
         | 创建 ``NyLabel`` 文本实例，可替代 ``.asLabel()`` 的返回值使用。
 
@@ -216,9 +212,9 @@ class ScreenNodeExtension(ClientEventProxy):
         :return: NyLabel文本实例，创建失败返回None
         :rtype: NyLabel|None
         """
-        return self._create_nyc(path_or_control, NyLabel)
+        return self._create_nyc(path_or_control, NyLabel, **kwargs)
 
-    def create_ny_progress_bar(self, path_or_control):
+    def create_ny_progress_bar(self, path_or_control, **kwargs):
         """
         | 创建 ``NyProgressBar`` 进度条实例，可替代 ``.asProgressBar()`` 的返回值使用。
 
@@ -229,71 +225,7 @@ class ScreenNodeExtension(ClientEventProxy):
         :return: NyProgressBar进度条实例，创建失败返回None
         :rtype: NyProgressBar|None
         """
-        return self._create_nyc(path_or_control, NyProgressBar)
-
-    def get_children_path_by_level(self, path_or_control, level=1):
-        """
-        [迭代器]
-
-        | 获取控件的指定层级的所有子控件的路径，返回迭代器。
-        | 例如，某面板包含两个按钮，而每个按钮又包含三张图片，则按钮为面板的一级子控件，按钮下的图片为面板的二级子控件，以此类推。
-
-        -----
-
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-        :param int level: 子控件层级，默认为1
-
-        :return: 控件指定层级所有子控件路径的迭代器，获取不到时返回空迭代器
-        :rtype: GeneratorType
-        """
-        return get_children_path_by_level(path_or_control, self._screen_node, level)
-
-    def get_children_control_by_level(self, path_or_control, level=1):
-        """
-        [迭代器]
-
-        | 获取控件的指定层级的所有子控件的 ``NyControl`` 实例，返回迭代器。
-        | 例如，某面板包含两个按钮，而每个按钮又包含三张图片，则按钮为面板的一级子控件，按钮下的图片为面板的二级子控件，以此类推。
-
-        -----
-
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-        :param int level: 子控件层级，默认为1
-
-        :return: 控件指定层级所有子控件的NyControl实例的迭代器，获取不到时返回空迭代器
-        :rtype: GeneratorType
-        """
-        all_path = get_children_path_by_level(path_or_control, self._screen_node, level)
-        for p in all_path:
-            yield self._create_nyc(p, NyControl)
-
-    def get_parent_path(self, path_or_control):
-        """
-        | 获取控件的父控件路径。
-
-        -----
-
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-
-        :return: 父控件路径，获取不到返回None
-        :rtype: str|None
-        """
-        return get_parent_path(path_or_control)
-
-    def get_parent_control(self, path_or_control):
-        """
-        | 获取控件的父控件 ``NyControl`` 实例。
-
-        -----
-
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-
-        :return: 父控件的NyControl实例，获取不到返回None
-        :rtype: NyControl|None
-        """
-        parent_path = get_parent_path(path_or_control)
-        if parent_path:
-            return self._create_nyc(parent_path, NyControl)
+        return self._create_nyc(path_or_control, NyProgressBar, **kwargs)
 
     def clear_all_pos_data(self):
         """
@@ -330,10 +262,6 @@ class ScreenNodeExtension(ClientEventProxy):
     CreateNyGrid                = create_ny_grid
     CreateNyLabel               = create_ny_label
     CreateNyProgressBar         = create_ny_progress_bar
-    GetChildrenPathByLevel      = get_children_path_by_level
-    GetChildrenNyControlByLevel = get_children_control_by_level
-    GetParentPath               = get_parent_path
-    GetParentNyControl          = get_parent_control
     ClearAllPosData             = clear_all_pos_data
     SaveAllPosData              = save_all_pos_data
 
@@ -395,7 +323,7 @@ class ScreenNodeExtension(ClientEventProxy):
             path = attr._nyl_btn_path
             path_lst = self._expend_path(path)
             for p in path_lst:
-                nyb = self._create_nyc(p, NyButton, touch_event_param=attr._nyl_touch_event_param)
+                nyb = self._create_nyc(p, NyButton, touch_event_params=attr._nyl_touch_event_params)
                 for t in attr._nyl_callback_types:
                     nyb.set_callback(t, attr)
 

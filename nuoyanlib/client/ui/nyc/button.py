@@ -21,6 +21,7 @@ from ..ui_utils import (
 from ...._core._client.comp import LvComp
 from ...._core._types._checker import args_type_check
 from ...._core.event.listener import listen_event, unlisten_event
+from ...._core._utils import kwargs_setter
 from .control import NyControl
 from ....utils.enum import Enum, ButtonCallbackType, ControlType
 
@@ -80,6 +81,7 @@ class NyButton(NyControl):
         | 文本控件。
         """
 
+    @kwargs_setter(touch_event_params=None)
     def __init__(self, screen_node_ex, btn_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, btn_control)
         self.__vibrate_time = 100
@@ -94,7 +96,7 @@ class NyButton(NyControl):
         self.is_movable = False
         self.auto_save_pos = False
         self.has_long_clicked = False
-        self.touch_event_params = kwargs.get('touch_event_params')
+        self.touch_event_params = kwargs['touch_event_params']
         self.base_control.AddTouchEventParams(self.touch_event_params)
         self.base_control.AddHoverEventParams()
         listen_event(self.GetEntityByCoordReleaseClientEvent)
