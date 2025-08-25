@@ -7,14 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-19
+|   Date  : 2025-08-26
 |
 | ==============================================
 """
 
 
-from .utils.time_ease import TimeEaseFunc
-
+# region 基本配置 =======================================================================================================
 
 ENABLED_LOG = True
 """
@@ -40,6 +39,12 @@ ENABLED_MCP_MOD_LOG_DUMPING = False
 | 是否将当前Mod的错误信息输出到McpModLog日志，等价于 ``SetMcpModLogCanPostDump()`` 接口（目前正式服已阉割该功能）。
 """
 
+# endregion
+
+
+# region spawn_ground_shatter_effect()函数配置 ==========================================================================
+
+from .utils.time_ease import TimeEaseFunc
 
 GSE_IN_FUNC = TimeEaseFunc.out_expo
 """
@@ -56,3 +61,5 @@ GSE_USE_RENDER_TICK = False
 | [需要重载] 
 | ``spawn_ground_shatter_effect()`` 裂地效果是否使用渲染帧进行刷新。
 """
+
+# endregion

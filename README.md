@@ -4,7 +4,7 @@
   
   ---
 
-  <h3 align="center">基于网易我的世界ModSDK的Mod开发工具库</h3>
+  <h3>基于网易我的世界ModSDK的Mod开发工具库</h3>
 
   [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.5-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/charminglee/nuoyanlib) ![GitHub repo size](https://img.shields.io/github/repo-size/charminglee/nuoyanlib)  
   [![python](https://camo.githubusercontent.com/61a81b1dbe844fb6b43df995ae0b9b118c641df75220b27281aad6ea97e46622/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f507974686f6e2d3337373641423f7374796c653d666c6174266c6f676f3d507974686f6e266c6f676f436f6c6f723d666666666666)](https://www.python.org/) [![pycharm](https://img.shields.io/badge/-JetBrains%20PyCharm-black?style=flat&logo=pycharm)](https://www.jetbrains.com/pycharm/) [![github](https://img.shields.io/badge/-GitHub-black?style=flat&logo=github)](https://github.com/charminglee/nuoyanlib) [![gitee](https://img.shields.io/badge/-gitee-red?style=flat&logo=gitee)](https://gitee.com/charming-lee/nuoyanLib) [![qq](https://img.shields.io/badge/QQ-1279735247-green)](https://qm.qq.com/q/BknsDqOdsk)
@@ -49,10 +49,11 @@
 
 <br>
 
-## ⚙️ 配置 | Configuration
+## ▶️ 开始 | Getting Started
 
 1. 解压下载的压缩包，将`nuoyanlib`文件夹放至行为包Python脚本根目录下（即`modMain.py`文件所在位置）。  
     安装好后，你的行为包结构应为： 
+
     ```
     行为包/  
     ├── entities/  
@@ -70,12 +71,16 @@
     │   ...  
     ...
     ```
+
 2. 在`modMain.py`中添加以下代码以启动「nuoyanlib」：
+
     ```python
     import nuoyanlib
     nuoyanlib.run(globals())
     ```
+
     例如：
+
     ```python
     from mod.common.mod import Mod
     import mod.client.extraClientApi as client_api
@@ -96,24 +101,24 @@
         def init_client(self):
             client_api.RegisterSystem("MyMod", "MyClientSystem", "myScripts.myClientSystem.MyClientSystem")
     ```
+
 3. 之后，在你的业务代码中导入「nuoyanlib」即可使用，推荐使用以下方式进行导入，其中`<scripts_root>`是你的Python脚本根目录名称：
     #### 导入客户端库
+
     ```python
     import <scripts_root>.nuoyanlib.client as nyl
     ```
+
     #### 导入服务端库
+
     ```python
     import <scripts_root>.nuoyanlib.server as nyl
     ```
+
 > [!WARNING]  
 > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。
+
 4. 更多信息参见[入门指南](/docs/入门指南.md)。
-
-<br>
-
-## 🎉 更新信息 | Changelog
-
-作者正在熬夜编写中......
 
 <br>
 
@@ -123,22 +128,26 @@
 
 <br>
 
+## 🎉 更新信息 | Changelog
+
+作者正在熬夜编写中......
+
+<br>
+
 ## 🌞 未来计划 | TODO
 
-1. 重新整理函数文档注释，完成参考文档的编写。
-2. 完善测试包。
-3. 编写demo。
-4. ~~完善Apollo版本。~~
-5. ...
+- [ ] 重新整理文档注释，完成参考文档的编写
+- [ ] 编写测试包
+- [ ] 编写demo
+- [ ] 发布1.0第一个测试版
+- [ ] 搭建项目网站
+- [ ] ...
 
 <br>
 
 ## 👑 贡献 | Contributing
 
-本项目欢迎各位开发者共同参与开发，如果您有更好的算法或修改建议，欢迎通过Issue或Pull Request的方式提交！
-
-[什么是Issue？](https://help.gitee.com/base/issue/intro)  
-[什么是Pull Request？](https://help.gitee.com/base/pullrequest/intro)
+如果您有更好的算法或修改建议，欢迎通过Issue或PR的方式提交，为MC Mod社区的健康发展助一份力！
 
 <br>
 

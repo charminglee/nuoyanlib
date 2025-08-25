@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-24
+|   Date  : 2025-08-26
 |
 | ==============================================
 """
@@ -18,6 +18,7 @@
 # todo：UI动画框架
 # todo：完善Ny控件
 # todo：UI Factory
+# todo：event热更新
 
 
 __version__ = "1.0.0-beta.1"
