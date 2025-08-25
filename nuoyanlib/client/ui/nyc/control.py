@@ -145,7 +145,7 @@ class NyControl(object):
             new_path = self.path + "/" + name
             return NyControl.from_path(self.ui_node, new_path)
 
-    def iter_children_control(self, level=1):
+    def iter_children(self, level=1):
         """
         [迭代器]
 
@@ -188,7 +188,7 @@ class NyControl(object):
         :param str path: 控件路径
 
         :return: Ny控件实例
-        :rtype: NyControl
+        :rtype: NyControl|None
         """
         return screen_node_ex._create_nyc(path, cls, **kwargs)
 
@@ -203,9 +203,10 @@ class NyControl(object):
         :param BaseUIControl control: BaseUIControl实例
 
         :return: Ny控件实例
-        :rtype: NyControl
+        :rtype: NyControl|None
         """
-        return screen_node_ex._create_nyc(control.GetPath(), cls, **kwargs)
+        if control:
+            return screen_node_ex._create_nyc(control.GetPath(), cls, **kwargs)
 
     def destroy(self):
         """
