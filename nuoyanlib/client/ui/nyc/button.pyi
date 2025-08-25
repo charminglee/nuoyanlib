@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -68,8 +68,8 @@ class NyButton(NyControl):
         **kwargs: Any,
     ) -> None: ...
     @args_type_check(str, is_method=True)
-    def __div__(self, other: str) -> Optional[NyControl]: ...
-    def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
+    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    __div__ = __truediv__
     def GetEntityByCoordReleaseClientEvent(self, args: ArgsDict) -> None: ...
     def set_default_texture(self, tex_path: str) -> None: ...
     def set_hover_texture(self, tex_path: str) -> None: ...

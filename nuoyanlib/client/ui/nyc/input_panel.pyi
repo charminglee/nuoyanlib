@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-26
 |
 | ==============================================
 """
@@ -32,8 +32,8 @@ class NyInputPanel(NyControl):
         input_panel_control: InputPanelUIControl,
     ) -> None: ...
     @args_type_check(str, is_method=True)
-    def __div__(self, other: str) -> Optional[NyControl]: ...
-    def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
+    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    __div__ = __truediv__
     @property
     def is_modal(self) -> bool: ...
     @is_modal.setter

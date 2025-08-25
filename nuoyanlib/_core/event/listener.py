@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-24
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -43,7 +43,7 @@ __all__ = [
 
 
 class _EventPool(object):
-    __slots__ = ("__name__", "pool", "priorities", "lock", "remove_lst", "add_lst")
+    __slots__ = ('__name__', 'pool', 'priorities', 'lock', 'remove_lst', 'add_lst')
 
     def __init__(self):
         self.pool = defaultdict(set)
@@ -355,7 +355,7 @@ def has_listened(func, event_name="", ns="", sys_name="", priority=0):
 
 
 class EventArgsProxy(object):
-    __slots__ = ("_arg_dict", "_event_name")
+    __slots__ = ('_arg_dict', '_event_name')
 
     def __init__(self, arg_dict, event_name):
         self._arg_dict = arg_dict

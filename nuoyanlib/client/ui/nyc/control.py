@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -58,7 +58,7 @@ class NyControl(object):
         return getattr(self.base_control, name)
 
     @args_type_check(str, is_method=True)
-    def __div__(self, other):
+    def __truediv__(self, other):
         """
         | 根据相对路径返回子控件的 ``NyControl`` 实例。
 
@@ -72,6 +72,8 @@ class NyControl(object):
         if not other.startswith("/"):
             other = "/" + other
         return NyControl.from_path(self.ui_node, self.path + other)
+
+    __div__ = __truediv__
 
     def __destroy__(self):
         self._screen_node = None

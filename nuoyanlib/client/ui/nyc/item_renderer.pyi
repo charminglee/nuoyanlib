@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-08-26
 |
 | ==============================================
 """
@@ -38,8 +38,8 @@ class NyItemRenderer(NyControl):
         item_renderer_control: ItemRendererUIControl,
     ) -> None: ...
     @args_type_check(str, is_method=True)
-    def __div__(self, other: str) -> Optional[NyControl]: ...
-    def __truediv__(self, other: str) -> Optional[NyControl]: ... # for python3
+    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    __div__ = __truediv__
     @property
     def item_name(self) -> str: ...
     @item_name.setter
