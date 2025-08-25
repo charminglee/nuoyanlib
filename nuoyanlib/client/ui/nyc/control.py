@@ -858,6 +858,28 @@ class NyControl(object):
         """
         self.base_control.SetTouchEnable(bool(val))
 
+    @property
+    def property_bag(self):
+        """
+        [可读写属性]
+
+        | 获取PropertyBag。
+
+        :rtype: dict|None
+        """
+        return self.base_control.GetPropertyBag()
+
+    @property_bag.setter
+    def property_bag(self, val):
+        """
+        [可读写属性]
+
+        | 设置PropertyBag，将使用字典中的每个值来覆盖原本PropertyBag中的值。
+
+        :type val: dict
+        """
+        self.base_control.SetPropertyBag(val)
+
     # endregion
 
 
