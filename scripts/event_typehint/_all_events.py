@@ -7,13 +7,31 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-08-26
 |
 | ==============================================
 """
 
 
 class ClientEvent:
+    def UpdatePlayerSkinClientEvent(self, args):
+        """
+        [事件]
+
+        | 玩家加入游戏或通过更衣室局内换肤后，同步皮肤信息至客户端后触发。
+
+        -----
+
+        【注意】
+
+        | 此事件配合 ``IsOfficialSkin`` ``IsHighLevelOfficialSkin`` ``IsHighLevelMultiJointOfficialSkin`` 接口，用于获取玩家的皮肤信息。
+
+        -----
+
+        【事件参数】
+
+        - ``playerId`` -- str，更换皮肤的玩家实体ID
+        """
     def PlayerTryRemoveCustomContainerItemClientEvent(self, args):
         """
         [事件]

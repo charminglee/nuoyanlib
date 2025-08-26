@@ -27,6 +27,7 @@ __all__ = [
 
 
 ALL_CLIENT_ENGINE_EVENTS = {
+    "UpdatePlayerSkinClientEvent",
     "PlayerTryRemoveCustomContainerItemClientEvent",
     "PlayerTryAddCustomContainerItemClientEvent",
     "PlayerTryPutCustomContainerItemClientEvent",
@@ -306,6 +307,8 @@ ALL_SERVER_ENGINE_EVENTS = {
     "OnCarriedNewItemChangedServerEvent",
     "EntityRemoveEvent",
     "OnScriptTickServer",
+    "ItemGridChangedServerEvent",
+    "UiInitFinished",
 }
 ALL_CLIENT_LIB_EVENTS = {}
 ALL_SERVER_LIB_EVENTS = {
