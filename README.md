@@ -1,5 +1,6 @@
 <div align="center">
 
+  <img src="/img/diamond_sword.png" alt="logo" width=64 height=64>
   <img src="/img/logo/logo.png" alt="logo">
   
   ---
