@@ -5,6 +5,7 @@
 *.zip
 studio.json
 /img/logo/logo.psd
+*.log
 
 
 ### Python template
