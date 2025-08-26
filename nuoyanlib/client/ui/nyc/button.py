@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -38,8 +38,8 @@ class NyButton(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 按钮所在UI类的实例
-    :param ButtonUIControl btn_control: 通过asButton()获取的按钮实例
+    :param ScreenNodeExtension screen_node_ex: 按钮所在UI类的实例（需继承ScreenNodeExtension）
+    :param ButtonUIControl btn_control: 通过asButton()等方式获取的ButtonUIControl实例
     :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
     """
 

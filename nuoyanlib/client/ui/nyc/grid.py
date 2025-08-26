@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -81,8 +81,8 @@ class NyGrid(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 网格所在UI类的实例
-    :param GridUIControl grid_control: 通过asGrid()获取的网格实例
+    :param ScreenNodeExtension screen_node_ex: 网格所在UI类的实例（需继承ScreenNodeExtension）
+    :param GridUIControl grid_control: 通过asGrid()等方式获取的GridUIControl实例
     :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
     """
 

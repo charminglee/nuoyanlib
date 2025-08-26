@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -29,8 +29,8 @@ class NySlider(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 滑动条所在UI类的实例
-    :param SliderUIControl slider_control: 通过asSlider()获取的滑动条实例
+    :param ScreenNodeExtension screen_node_ex: 滑动条所在UI类的实例（需继承ScreenNodeExtension）
+    :param SliderUIControl slider_control: 通过asSlider()等方式获取的SliderUIControl实例
     """
 
     _CONTROL_TYPE = ControlType.SLIDER

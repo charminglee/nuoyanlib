@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -29,8 +29,8 @@ class NyStackPanel(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 栈面板所在UI类的实例
-    :param StackPanelUIControl stack_panel_control: 通过asStackPanel()获取的栈面板实例
+    :param ScreenNodeExtension screen_node_ex: 栈面板所在UI类的实例（需继承ScreenNodeExtension）
+    :param StackPanelUIControl stack_panel_control: 通过asStackPanel()等方式获取的StackPanelUIControl实例
     """
 
     _CONTROL_TYPE = ControlType.STACK_PANEL

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -33,8 +33,8 @@ class NyControl(object):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例
-    :param BaseUIControl control: 通过GetBaseUIControl()获取的控件实例
+    :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例（需继承ScreenNodeExtension）
+    :param BaseUIControl control: 通过GetBaseUIControl()等方式获取的BaseUIControl实例
 
     :raise TypeError: 控件所在的UI类必须继承ScreenNodeExtension，否则抛出该异常
     """

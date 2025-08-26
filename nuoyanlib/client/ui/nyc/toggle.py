@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -31,8 +31,8 @@ class NyToggle(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 开关所在UI类的实例
-    :param SwitchToggleUIControl toggle_control: 通过asSwitchToggle()获取的开关实例
+    :param ScreenNodeExtension screen_node_ex: 开关所在UI类的实例（需继承ScreenNodeExtension）
+    :param SwitchToggleUIControl toggle_control: 通过asSwitchToggle()等方式获取的SwitchToggleUIControl实例
     """
 
     __set_callback = staticmethod(get_func(

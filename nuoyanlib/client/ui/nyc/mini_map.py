@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -29,8 +29,8 @@ class NyMiniMap(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 小地图所在UI类的实例
-    :param MiniMapUIControl mini_map_control: 通过asMiniMap()获取的小地图实例
+    :param ScreenNodeExtension screen_node_ex: 小地图所在UI类的实例（需继承ScreenNodeExtension）
+    :param MiniMapUIControl mini_map_control: 通过asMiniMap()等方式获取的MiniMapUIControl实例
     """
 
     _CONTROL_TYPE = ControlType.MINI_MAP

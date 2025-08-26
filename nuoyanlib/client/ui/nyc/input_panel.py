@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -29,8 +29,8 @@ class NyInputPanel(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 输入面板所在UI类的实例
-    :param InputPanelUIControl input_panel_control: 通过asInputPanel()获取的输入面板实例
+    :param ScreenNodeExtension screen_node_ex: 输入面板所在UI类的实例（需继承ScreenNodeExtension）
+    :param InputPanelUIControl input_panel_control: 通过asInputPanel()等方式获取的InputPanelUIControl实例
     """
 
     _CONTROL_TYPE = ControlType.INPUT_PANEL
