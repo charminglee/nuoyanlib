@@ -7,39 +7,54 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
 
 
-from typing import Union, Tuple, Callable, TypeVar, Optional, Iterator, Generator, Any, List
+from typing import Union, Tuple, Callable, TypeVar, Optional, Any, List, Iterator, overload, Iterable, Sized, Generator, DefaultDict
 from mod.client.ui.controls.gridUIControl import GridUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from .control import NyControl
-from ...._core._types._typing import ITuple2, ArgsDict
+from ...._core._types._typing import ITuple2, STuple
 from ...._core._types._checker import args_type_check
 from ...._core.event._events import ClientEventEnum as Events
 from ..screen_node import ScreenNodeExtension
 
 
 _T = TypeVar("_T")
-__Item = Union[int, slice, Tuple[Union[int, slice], Union[int, slice]]]
-__GridUpdateCallback = Callable[[ArgsDict], Any]
+_T_co = TypeVar("_T_co", covariant=True, bound=NyControl)
+__GridUpdateCallback = Callable[[], Any]
 
 
-class _ElemGroup(Iterator[Optional[NyGrid]]):
-    _grid: NyGrid
-    _coord_gen: Generator[ITuple2, None, None]
+def _process_grid_index(index: Union[int, slice], l: int) -> List[int]: ...
+def _index_to_coord(i: int, dx: int) -> ITuple2: ...
+def _coord_to_index(x: int, y: int, dx: int) -> int: ...
+
+
+class ElemGroup(Iterable[_T_co], Sized):
+    __slots__: STuple
+    _ALLOWED_SET_ATTRS: STuple
+    _ALLOWED_GET_ATTRS: STuple
+    _ALLOWED_METHODS: STuple
+    grid: NyGrid
+    elem_list: List[_T_co]
     _len: int
-    def __init__(self, grid: NyGrid, item: __Item) -> None: ...
-    def __iter__(self: _T) -> _T: ...
-    def next(self) -> Optional[NyGrid]: ...
+    def __init__(self, grid: NyGrid, elem_list: List[_T_co]) -> None: ...
+    def __iter__(self) -> Iterator[_T_co]: ...
     def __len__(self) -> int: ...
-    def _index_to_coord(self, index: int, xl: int) -> ITuple2: ...
+    @overload
+    def __getitem__(self, item: int) -> _T_co: ...
+    @overload
+    def __getitem__(self, item: slice) -> List[_T_co]: ...
+    def __setattr__(self, key: str, value: Any) -> None: ...
+    def __getattr__(self, key: str) -> Union[List[Any], Callable[[...], List[Any]]]: ...
 
 
 class NyGrid(NyControl):
+    __elem_count: int
+    __template_name: str
     _update_cbs: List[__GridUpdateCallback]
     base_control: GridUIControl
     """
@@ -49,6 +64,14 @@ class NyGrid(NyControl):
     """
     | 是否是StackGrid。
     """
+    elem_visible_binding: str
+    """
+    | 用于控制网格元素visible的绑定名称。
+    """
+    collection_name_: str
+    """
+    | 网格集合名称。
+    """
     def __init__(
         self: ...,
         screen_node_ex: ScreenNodeExtension,
@@ -56,21 +79,40 @@ class NyGrid(NyControl):
         /,
         *,
         is_stack_grid: bool = False,
+        template_name: str = "",
+        elem_visible_binding: str = "",
+        collection_name: str = "",
     ) -> None: ...
     @args_type_check(str, is_method=True)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
+    def __grid_update__(self) -> None: ...
+    @property
+    def template_name(self) -> str: ...
+    @property
+    def row(self) -> List[NyControl]: ...
+    @property
+    def column(self) -> List[NyControl]: ...
+    def iter_elems(self) -> Generator[NyControl]: ...
     @args_type_check((int, slice, tuple), is_method=True)
-    def __getitem__(self, item: __Item) -> _ElemGroup: ...
-    def GridComponentSizeChangedClientEvent(self, args: ArgsDict) -> None: ...
+    def __getitem__(
+        self,
+        item: Union[int, slice, Tuple[Union[int, slice], Union[int, slice]]]
+    ) -> Union[NyControl, ElemGroup, None]: ...
     def set_gird_update_callback(self, func: __GridUpdateCallback) -> bool: ...
     def remove_gird_update_callback(self, func: __GridUpdateCallback) -> bool: ...
     @property
     def grid_size(self) -> int: ...
     @property
+    def elem_count(self) -> int: ...
+    @elem_count.setter
+    def elem_count(self, val: int) -> None: ...
+    @property
     def dimension(self) -> ITuple2: ...
     @dimension.setter
     def dimension(self, val: ITuple2) -> None: ...
+    def _return_elem_visible(self, index: int) -> bool: ...
+    def _get_elem(self, index: int) -> Optional[NyControl]: ...
 
     def SetGridDimension(self, dimension: ITuple2) -> None:
         """

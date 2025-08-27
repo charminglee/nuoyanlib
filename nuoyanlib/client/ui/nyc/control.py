@@ -116,8 +116,7 @@ class NyControl(object):
         parent_path = parent if isinstance(parent, str) else parent.GetPath()
         if not name:
             name = self.name
-        ret = self._screen_node.Clone(self.path, parent_path, name, sync_refresh, force_update)
-        if ret:
+        if self._screen_node.Clone(self.path, parent_path, name, sync_refresh, force_update):
             new_path = parent_path + "/" + name
             return self.__class__.from_path(self.ui_node, new_path, **self._kwargs)
 
@@ -139,8 +138,7 @@ class NyControl(object):
         control_path = control if isinstance(control, str) else control.GetPath()
         if not name:
             name = self.name
-        ret = self._screen_node.Clone(control_path, self.path, name, sync_refresh, force_update)
-        if ret:
+        if self._screen_node.Clone(control_path, self.path, name, sync_refresh, force_update):
             new_path = self.path + "/" + name
             return NyControl.from_path(self.ui_node, new_path)
 
@@ -213,10 +211,10 @@ class NyControl(object):
 
         -----
 
-        :return: 无
-        :rtype: None
+        :return: 是否成功
+        :rtype: bool
         """
-        self.ui_node._destroy_nyc(self)
+        return self.ui_node._destroy_nyc(self)
 
     @property
     def real_visible(self):
@@ -399,7 +397,28 @@ class NyControl(object):
 
         -----
 
+        | 关于 ``elem_visible_binding`` 与 ``collection_name`` 参数的说明：
+        - 该参数用于 ``.elem_count`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
+        - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``elem_visible_binding`` 参数 。
+        ::
+
+            "bindings": [
+                {
+                    "binding_type": "collection",
+                    "binding_collection_name": "grid_collection_name", //此处需要与网格的"collection_name"字段相同
+                    "binding_name": "#namespace.binding_name", //可自定义
+                    "binding_name_override": "#visible",
+                    "binding_condition": "always"
+                }
+            ]
+        - 最后，将 **网格** json中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
+
+        -----
+
         :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
+        :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
+        :param str elem_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
+        :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
 
         :return: NyGrid实例
         :rtype: NyGrid

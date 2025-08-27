@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-12
+|   Date  : 2025-08-25
 |
 | ==============================================
 """
@@ -17,7 +17,7 @@ from .control import NyControl
 from .button import NyButton
 from .combo_box import NyComboBox
 from .edit_box import NyEditBox
-from .grid import NyGrid
+from .grid import ElemGroup, NyGrid
 from .image import NyImage
 from .input_panel import NyInputPanel
 from .item_renderer import NyItemRenderer
