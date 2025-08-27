@@ -7,20 +7,21 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
 
 
+from types import MethodType
 from time import time
 from itertools import product, cycle
 from fnmatch import fnmatchcase
-from ..._core._client.comp import CustomUIScreenProxy, ScreenNode
+from ..._core._client.comp import CustomUIScreenProxy, ScreenNode, ViewBinder
 from ..._core import _error
 from ..._core.event.listener import ClientEventProxy, listen_event, unlisten_event, has_listened, unlisten_all_events
 from ..._core.event._events import ClientEventEnum as Events
-from ..._core._utils import hook_method, iter_obj_attrs
+from ..._core._utils import hook_method, iter_obj_attrs, try_exec
 from .ui_utils import to_control, get_ui_pos_data, save_ui_pos_data, to_path
 from ...utils.enum import ButtonCallbackType
 from .nyc import *
@@ -42,25 +43,6 @@ class ScreenNodeExtension(ClientEventProxy):
     :raise PathMatchError: ScreenNodeExtension.button_callback装饰器的按钮路径错误
     """
 
-    _LIMIT_ATTR = [
-        "namespace",
-        "name",
-        "full_name",
-        "screen_name",
-        "component_path",
-        "parent",
-        "children",
-        "visible",
-        "enable",
-        "removed",
-        "def_key",
-        "org_key",
-        "input_mode",
-        "is_push_screen",
-        "touch_with_mouse",
-        "dirty",
-        "fresh_async",
-    ]
     ROOT_PANEL_PATH = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel"
 
     def __init__(self, *args):
@@ -71,6 +53,7 @@ class ScreenNodeExtension(ClientEventProxy):
         self._frame_anim_data = {}
         self.cs = None
         self.root_panel = None
+
         if isinstance(self, CustomUIScreenProxy):
             # 兼容UI代理
             self._screen_node = args[1]
@@ -85,11 +68,7 @@ class ScreenNodeExtension(ClientEventProxy):
         else:
             raise _error.ScreenNodeNotFoundError
 
-    # def __setattr__(self, key, value):
-    #     # 网易ScreenNode中某些属性被覆盖会导致功能异常且难以排查（如name），因此添加一个限制
-    #     if key in ScreenNodeExtension._LIMIT_ATTR and hasattr(self, key):
-    #         raise AttributeError("can't set attribute '%s' to '%s'" % (key, self.__class__.__name__))
-    #     super(ScreenNodeExtension, self).__setattr__(key, value)
+        listen_event(self._GridComponentSizeChangedClientEvent, Events.GridComponentSizeChangedClientEvent)
 
     def __create__(self):
         self._ui_pos_data_key = "nyl_ui_pos_data_%s_%s" % (self._screen_node.namespace, self._screen_node.name) # NOQA
@@ -105,6 +84,7 @@ class ScreenNodeExtension(ClientEventProxy):
     def __destroy__(self):
         unlisten_all_events(self)
         unlisten_event(self._GameRenderTickEvent, Events.GameRenderTickEvent)
+        unlisten_event(self._GridComponentSizeChangedClientEvent, Events.GridComponentSizeChangedClientEvent)
         for nyc in self._nyc_cache.values():
             nyc.__destroy__()
         self._nyc_cache.clear()
@@ -128,6 +108,15 @@ class ScreenNodeExtension(ClientEventProxy):
                 else:
                     data['control'].texture = data['tex_path'] % index
                     data['last_time'] = now
+
+    def _GridComponentSizeChangedClientEvent(self, args):
+        path = args['path']
+        path = path[path.index("/", 1):]
+        grid = self._nyc_cache.get(path, None)
+        if isinstance(grid, NyGrid):
+            try_exec(grid.__grid_update__)
+            for cb in grid._update_cbs:
+                try_exec(cb)
 
     # region Public APIs ===============================================================================================
 
@@ -160,7 +149,8 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def create_ny_control(self, path_or_control, **kwargs):
         """
-        | 创建 ``NyControl`` 通用控件实例，可替代 ``.GetBaseUIControl()`` 的返回值使用。
+        | 创建 ``NyControl`` 通用控件实例。
+        | 兼容ModSDK ``BaseUIControl`` 的相关接口。
 
         -----
 
@@ -173,8 +163,9 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def create_ny_button(self, path_or_control, **kwargs):
         """
-        | 创建 ``NyButton`` 按钮实例，可替代 ``.asButton()`` 的返回值使用。
-        | 创建后无需调用 ``.AddTouchEventParams()`` 或 ``.AddHoverEventParams()`` 接口。
+        | 创建 ``NyButton`` 按钮实例。
+        | 兼容ModSDK ``ButtonUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        | 创建后无需再调用 ``.AddTouchEventParams()`` 或 ``.AddHoverEventParams()`` 接口。
 
         -----
 
@@ -188,13 +179,34 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def create_ny_grid(self, path_or_control, **kwargs):
         """
-        | 创建 ``NyGrid`` 网格实例，可替代 ``.asGrid()`` 的返回值使用。
-        | 对网格进行操作需要注意一些细节，详见开发指南-界面与交互- `UI说明文档 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/18-%E7%95%8C%E9%9D%A2%E4%B8%8E%E4%BA%A4%E4%BA%92/30-UI%E8%AF%B4%E6%98%8E%E6%96%87%E6%A1%A3.html?key=grid&docindex=4&type=0>`_ 中对Grid控件的描述。
+        | 创建 ``NyGrid`` 网格实例。
+        | 兼容ModSDK ``GridUIControl`` 和 ``BaseUIControl`` 的相关接口。
+
+        -----
+
+        | 关于 ``elem_visible_binding`` 与 ``collection_name`` 参数的说明：
+        - 该参数用于 ``.elem_count`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
+        - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``elem_visible_binding`` 参数 。
+        ::
+
+            "bindings": [
+                {
+                    "binding_type": "collection",
+                    "binding_collection_name": "grid_collection_name", //此处需要与网格的"collection_name"字段相同
+                    "binding_name": "#namespace.binding_name", //可自定义
+                    "binding_name_override": "#visible",
+                    "binding_condition": "always"
+                }
+            ]
+        - 最后，将 **网格** json中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
 
         -----
 
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
         :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
+        :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
+        :param str elem_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
+        :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
 
         :return: NyGrid网格实例，创建失败返回None
         :rtype: NyGrid|None
@@ -203,7 +215,8 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def create_ny_label(self, path_or_control, **kwargs):
         """
-        | 创建 ``NyLabel`` 文本实例，可替代 ``.asLabel()`` 的返回值使用。
+        | 创建 ``NyLabel`` 文本实例。
+        | 兼容ModSDK ``LabelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
@@ -216,7 +229,8 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def create_ny_progress_bar(self, path_or_control, **kwargs):
         """
-        | 创建 ``NyProgressBar`` 进度条实例，可替代 ``.asProgressBar()`` 的返回值使用。
+        | 创建 ``NyProgressBar`` 进度条实例。
+        | 兼容ModSDK ``ProgressBarUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
@@ -226,6 +240,20 @@ class ScreenNodeExtension(ClientEventProxy):
         :rtype: NyProgressBar|None
         """
         return self._create_nyc(path_or_control, NyProgressBar, **kwargs)
+
+    def create_ny_toggle(self, path_or_control, **kwargs):
+        """
+        | 创建 ``NyToggle`` 开关实例。
+        | 兼容ModSDK ``SwitchToggleUIControl`` 和 ``BaseUIControl`` 的相关接口。
+
+        -----
+
+        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+
+        :return: NyToggle开关实例，创建失败返回None
+        :rtype: NyToggle|None
+        """
+        return self._create_nyc(path_or_control, NyToggle, **kwargs)
 
     def clear_all_pos_data(self):
         """
@@ -257,13 +285,13 @@ class ScreenNodeExtension(ClientEventProxy):
                 nyc.save_pos_data()
         return True
 
-    CreateNyControl             = create_ny_control
-    CreateNyButton              = create_ny_button
-    CreateNyGrid                = create_ny_grid
-    CreateNyLabel               = create_ny_label
-    CreateNyProgressBar         = create_ny_progress_bar
-    ClearAllPosData             = clear_all_pos_data
-    SaveAllPosData              = save_all_pos_data
+    CreateNyControl     = create_ny_control
+    CreateNyButton      = create_ny_button
+    CreateNyGrid        = create_ny_grid
+    CreateNyLabel       = create_ny_label
+    CreateNyProgressBar = create_ny_progress_bar
+    ClearAllPosData     = clear_all_pos_data
+    SaveAllPosData      = save_all_pos_data
 
     # endregion
 
@@ -357,6 +385,42 @@ class ScreenNodeExtension(ClientEventProxy):
 
     # region Internal ==================================================================================================
 
+    def _create_binding_proxy(self, func):
+        def proxy(*args):
+            return func(*args)
+        name = "%s_%s" % (func.__name__, id(func))
+        proxy.__name__ = name
+        proxy.binding_flags = func.binding_flags # NOQA
+        proxy.binding_name = func.binding_name # NOQA
+        if hasattr(func, 'collection_name'):
+            proxy.collection_name = func.collection_name
+        setattr(self._screen_node, name, proxy)
+        return proxy
+
+    def _build_binding(self, func, flag, binding_name="", collection_name=""):
+        if not binding_name:
+            binding_name = "#%s.%s" % (self._screen_node.namespace, func.__name__)  # NOQA
+
+        if collection_name:
+            binder = ViewBinder.binding_collection(flag, collection_name, binding_name)
+            process_binding = self._screen_node._process_collection # NOQA
+        else:
+            binder = ViewBinder.binding(flag, binding_name)
+            process_binding = self._screen_node._process_default # NOQA
+
+        if isinstance(func, MethodType):
+            bound_func = func.__func__
+            binder(bound_func)
+            func = MethodType(bound_func, func.__self__)
+        else:
+            binder(func)
+
+        proxy = self._create_binding_proxy(func)
+        process_binding(proxy, self._screen_node.screen_name) # NOQA
+
+    def _unbuild_binding(self, func):
+        self._screen_node._process_default_unregister(func, self._screen_node.screen_name) # NOQA
+
     def _create_nyc(self, path_or_control, typ, **kwargs):
         path = to_path(path_or_control)
         if path in self._nyc_cache:
@@ -370,9 +434,13 @@ class ScreenNodeExtension(ClientEventProxy):
             return nyc
 
     def _destroy_nyc(self, nyc):
-        nyc.__destroy__()
-        self._nyc_cache.pop(nyc.path, None)
-        self._screen_node.RemoveChildControl(nyc.base_control)
+        res = self._screen_node.RemoveChildControl(nyc.base_control)
+        if res:
+            path = nyc.path
+            if path in self._nyc_cache:
+                del self._nyc_cache[path]
+            nyc.__destroy__()
+        return res
 
     def _recover_ui_pos(self):
         data = get_ui_pos_data(self._ui_pos_data_key)

@@ -13,8 +13,7 @@
 """
 
 
-from ...._core._utils import get_func
-from ...._core._client.comp import ScreenNode
+from ...._core._client.comp import ViewBinder
 from ....utils.enum import ControlType
 from .control import NyControl
 
@@ -27,7 +26,6 @@ __all__ = [
 class NyToggle(NyControl):
     """
     | 创建 ``NyToggle`` 开关实例。
-    | 兼容ModSDK ``SwitchToggleUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 
@@ -35,16 +33,6 @@ class NyToggle(NyControl):
     :param SwitchToggleUIControl toggle_control: 通过asSwitchToggle()等方式获取的SwitchToggleUIControl实例
     """
 
-    __set_callback = staticmethod(get_func(
-        ScreenNode,
-        (103, 117, 105),
-        (114, 101, 103, 105, 115, 116, 101, 114, 95, 116, 111, 103, 103, 108, 101, 95, 99, 104, 97, 110, 103, 101, 100, 95, 104, 97, 110, 100, 108, 101, 114)
-    ))
-    __remove_callback = staticmethod(get_func(
-        ScreenNode,
-        (103, 117, 105),
-        (117, 110, 114, 101, 103, 105, 115, 116, 101, 114, 95, 116, 111, 103, 103, 108, 101, 95, 99, 104, 97, 110, 103, 101, 100, 95, 104, 97, 110, 100, 108, 101, 114)
-    ))
     _CONTROL_TYPE = ControlType.TOGGLE
 
     def __init__(self, screen_node_ex, toggle_control, **kwargs):
@@ -73,9 +61,7 @@ class NyToggle(NyControl):
         """
         if func in self._changed_cbs:
             return False
-        screen_name = self._screen_node.screen_name # NOQA
-        binding_name = "#%s.%s" % (self._screen_node.namespace, func.__name__) # NOQA
-        NyToggle.__set_callback(screen_name, binding_name, self._screen_node, func)
+        self.ui_node._build_binding(func, ViewBinder.BF_ToggleChanged)
         self._changed_cbs.append(func)
         return True
 
@@ -92,9 +78,7 @@ class NyToggle(NyControl):
         """
         if func not in self._changed_cbs:
             return False
-        screen_name = self._screen_node.screen_name # NOQA
-        binding_name = "#%s.%s" % (self._screen_node.namespace, func.__name__) # NOQA
-        NyToggle.__remove_callback(screen_name, binding_name)
+        self.ui_node._unbuild_binding(func)
         self._changed_cbs.remove(func)
         return True
 
@@ -128,6 +112,9 @@ class NyToggle(NyControl):
 
     # endregion
 
+    # region Internal ==================================================================================================
+
+    # endregion
 
 
 
