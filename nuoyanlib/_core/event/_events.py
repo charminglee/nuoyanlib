@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-24
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -307,8 +307,6 @@ ALL_SERVER_ENGINE_EVENTS = {
     "OnCarriedNewItemChangedServerEvent",
     "EntityRemoveEvent",
     "OnScriptTickServer",
-    "ItemGridChangedServerEvent",
-    "UiInitFinished",
 }
 ALL_CLIENT_LIB_EVENTS = {}
 ALL_SERVER_LIB_EVENTS = {

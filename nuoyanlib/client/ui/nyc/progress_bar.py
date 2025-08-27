@@ -26,7 +26,6 @@ __all__ = [
 class NyProgressBar(NyControl):
     """
     | 创建 ``NyProgressBar`` 进度条实例。
-    | 兼容ModSDK ``ProgressBarUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

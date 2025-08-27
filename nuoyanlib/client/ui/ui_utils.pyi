@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -34,7 +34,7 @@ from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUICon
 from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
 from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
-from ..._core._types._typing import UiPathOrControl, FTuple2
+from ..._core._types._typing import UiPathOrNyControl, FTuple2
 from ...utils.enum import ControlType
 
 
@@ -48,10 +48,10 @@ def create_ui(
     push: bool = False,
     client_system: Optional[ClientSystem] = None
 ) -> Union[ScreenNode, Any]: ...
-def to_path(control: UiPathOrControl) -> str: ...
+def to_path(control: UiPathOrNyControl) -> str: ...
 def to_control(
     screen_node: ScreenNode,
-    path: UiPathOrControl,
+    path: UiPathOrNyControl,
     control_type: str = ControlType.BASE_CONTROL,
 ) -> Union[
     BaseUIControl,
@@ -76,17 +76,17 @@ def to_control(
 def save_ui_pos_data(key: str, data: Dict[str, List[Tuple[str, FTuple2]]]) -> bool: ...
 def get_ui_pos_data(key: str) -> Dict[str, List[Tuple[str, FTuple2]]]: ...
 def get_children_path_by_level(
-    control: UiPathOrControl,
+    control: UiPathOrNyControl,
     screen_node: ScreenNode,
     level: int = 1,
 ) -> Generator[str]: ...
 def get_children_by_level(
-    control: UiPathOrControl,
+    control: UiPathOrNyControl,
     screen_node: ScreenNode,
     level: int = 1,
 ) -> Generator[BaseUIControl]: ...
-def get_parent_path(control: UiPathOrControl) -> Optional[str]: ...
-def get_parent(control: UiPathOrControl, screen_node: ScreenNode) -> Optional[BaseUIControl]: ...
-def is_ui_out_of_screen(control: UiPathOrControl, screen_node: Optional[ScreenNode] = None) -> bool: ...
+def get_parent_path(control: UiPathOrNyControl) -> Optional[str]: ...
+def get_parent(control: UiPathOrNyControl, screen_node: ScreenNode) -> Optional[BaseUIControl]: ...
+def is_ui_out_of_screen(control: UiPathOrNyControl, screen_node: Optional[ScreenNode] = None) -> bool: ...
 @deprecated("已废弃，将在未来版本中移除。")
 def notify_server(func: Callable) -> Callable: ...

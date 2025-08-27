@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-22
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -73,7 +73,8 @@ EventCallbackFunc = Callable[[ArgsDict], Any]
 EventCallbackMethod = Callable[[InstanceType, ArgsDict], Any]
 
 
-UiPathOrControl = Union[str, BaseUIControl, NyControl]
+UiPathOrControl = Union[str, BaseUIControl]
+UiPathOrNyControl = Union[str, BaseUIControl, NyControl]
 NyControlTypes = Union[
     NyButton,
     NyComboBox,

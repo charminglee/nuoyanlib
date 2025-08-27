@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -17,7 +17,7 @@ from typing import Callable, Optional, Dict, Union, List, Any
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.timer import CallLater
-from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrControl, ItemDict
+from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl, ItemDict
 from ...._core._types._checker import args_type_check
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
@@ -89,14 +89,14 @@ class NyButton(NyControl):
     def set_movable(
         self,
         move_parent: bool = False,
-        associated_uis: Union[UiPathOrControl, List[UiPathOrControl], None] = None,
+        associated_uis: Union[UiPathOrNyControl, List[UiPathOrNyControl], None] = None,
         auto_save: bool = False,
     ) -> None: ...
     SetMovable = set_movable
     def set_movable_by_long_click(
         self,
         move_parent: bool = False,
-        associated_uis: Union[UiPathOrControl, List[UiPathOrControl], None] = None,
+        associated_uis: Union[UiPathOrNyControl, List[UiPathOrNyControl], None] = None,
         auto_save: bool = False,
     ) -> None: ...
     SetMovableByLongClick = set_movable_by_long_click
@@ -110,7 +110,7 @@ class NyButton(NyControl):
         self,
         movable: bool,
         move_parent: bool = False,
-        associated_uis: Union[UiPathOrControl, List[UiPathOrControl], None] = None,
+        associated_uis: Union[UiPathOrNyControl, List[UiPathOrNyControl], None] = None,
         auto_save: bool = False,
     ) -> None: ...
     def _exec_callbacks(self, callback_type: int, args: Dict[str, Any]) -> None: ...
@@ -121,7 +121,7 @@ class NyButton(NyControl):
     def _on_long_click_mov(self, args: ArgsDict) -> None: ...
     def _on_touch_down_mov(self, args: ArgsDict) -> None: ...
     def _vibrate(self) -> None: ...
-    def _set_offset(self, control: UiPathOrControl, offset: FTuple2) -> None: ...
+    def _set_offset(self, control: UiPathOrNyControl, offset: FTuple2) -> None: ...
 
     def AddTouchEventParams(self, args: Optional[dict] = None) -> None:
         """

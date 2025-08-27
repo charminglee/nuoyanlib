@@ -29,7 +29,6 @@ __all__ = [
 class NyControl(object):
     """
     | 创建 ``NyControl`` 通用UI控件实例。
-    | 兼容ModSDK ``BaseUIControl`` 的相关接口。
 
     -----
 

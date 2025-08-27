@@ -25,7 +25,6 @@ __all__ = [
 class NyPaperDoll(NyControl):
     """
     | 创建 ``NyPaperDoll`` 纸娃娃实例。
-    | 兼容ModSDK ``NeteasePaperDollUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

@@ -1,6 +1,6 @@
 <div align="center">
 
-  <br>
+[//]: # (  <br>)
 
 [//]: # (  <img src="/img/diamond_sword.png" alt="diamond_sword" width=64 height=64>)
 

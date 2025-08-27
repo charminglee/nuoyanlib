@@ -25,7 +25,6 @@ __all__ = [
 class NySlider(NyControl):
     """
     | 创建 ``NySlider`` 滑动条实例。
-    | 兼容ModSDK ``SliderUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

@@ -25,7 +25,6 @@ __all__ = [
 class NySelectionWheel(NyControl):
     """
     | 创建 ``NySelectionWheel`` 轮盘实例。
-    | 兼容ModSDK ``SelectionWheelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

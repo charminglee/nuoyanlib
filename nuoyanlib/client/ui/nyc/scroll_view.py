@@ -25,7 +25,6 @@ __all__ = [
 class NyScrollView(NyControl):
     """
     | 创建 ``NyScrollView`` 滚动视图实例。
-    | 兼容ModSDK ``ScrollViewUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

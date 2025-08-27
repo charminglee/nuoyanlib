@@ -16,7 +16,7 @@
 from typing import TypedDict, Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Generator, Type
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ...._core._types._typing import UiPathOrControl, FTuple2
+from ...._core._types._typing import UiPathOrNyControl, FTuple2
 from ...._core._utils import cached_property
 from ...._core._types._checker import args_type_check
 from ..screen_node import ScreenNodeExtension
@@ -97,14 +97,14 @@ class NyControl(object):
     def new_child(self, def_name: str, child_name: str, force_update: bool = True) -> Optional[NyControl]: ...
     def clone_to(
         self: _T,
-        parent: UiPathOrControl,
+        parent: UiPathOrNyControl,
         name: str = "",
         sync_refresh: bool = True,
         force_update: bool = True,
     ) -> Optional[_T]: ...
     def clone_from(
         self,
-        control: UiPathOrControl,
+        control: UiPathOrNyControl,
         name: str = "",
         sync_refresh: bool = True,
         force_update: bool = True,

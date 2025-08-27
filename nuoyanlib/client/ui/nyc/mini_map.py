@@ -25,7 +25,6 @@ __all__ = [
 class NyMiniMap(NyControl):
     """
     | 创建 ``NyMiniMap`` 小地图实例。
-    | 兼容ModSDK ``MiniMapUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

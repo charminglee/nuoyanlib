@@ -26,7 +26,6 @@ __all__ = [
 class NyItemRenderer(NyControl):
     """
     | 创建 ``NyItemRenderer`` 物品渲染器实例。
-    | 兼容ModSDK ``ItemRendererUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

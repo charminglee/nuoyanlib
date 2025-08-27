@@ -25,7 +25,6 @@ __all__ = [
 class NyInputPanel(NyControl):
     """
     | 创建 ``NyInputPanel`` 输入面板实例。
-    | 兼容ModSDK ``InputPanelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

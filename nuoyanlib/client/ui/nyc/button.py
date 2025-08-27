@@ -34,7 +34,6 @@ __all__ = [
 class NyButton(NyControl):
     """
     | 创建 ``NyButton`` 按钮实例。
-    | 兼容ModSDK ``ButtonUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

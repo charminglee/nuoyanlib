@@ -26,7 +26,6 @@ __all__ = [
 class NyLabel(NyControl):
     """
     | 创建 ``NyLabel`` 文本实例。
-    | 兼容ModSDK ``LabelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

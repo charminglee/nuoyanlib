@@ -27,7 +27,6 @@ __all__ = [
 class NyImage(NyControl):
     """
     | 创建 ``NyImage`` 图片实例。
-    | 兼容ModSDK ``ImageUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

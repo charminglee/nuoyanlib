@@ -26,7 +26,6 @@ __all__ = [
 class NyEditBox(NyControl):
     """
     | 创建 ``NyEditBox`` 文本编辑框实例。
-    | 兼容ModSDK ``TextEditBoxUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

@@ -25,7 +25,6 @@ __all__ = [
 class NyStackPanel(NyControl):
     """
     | 创建 ``NyStackPanel`` 栈面板实例。
-    | 兼容ModSDK ``StackPanelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 

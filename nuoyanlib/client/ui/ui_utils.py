@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-27
 |
 | ==============================================
 """
@@ -118,7 +118,7 @@ def is_ui_out_of_screen(control, screen_node=None):
 
     -----
 
-    :param str|BaseUIControl control: 控件路径或实例
+    :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode|None screen_node: 当control参数传入控件路径时，需要指定控件所在UI类的实例；默认为None
 
     :return: 是否超出屏幕范围
@@ -146,7 +146,7 @@ def get_children_path_by_level(control, screen_node, level=1):
 
     -----
 
-    :param str|BaseUIControl control: 控件路径或实例
+    :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
     :param int level: 子控件层级，默认为1，传入0或负值时，获取所有层级
 
@@ -178,7 +178,7 @@ def get_children_by_level(control, screen_node, level=1):
 
     -----
 
-    :param str|BaseUIControl control: 控件路径或实例
+    :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
     :param int level: 子控件层级，默认为1，传入0或负值时，获取所有层级
 
@@ -195,7 +195,7 @@ def get_parent_path(control):
 
     -----
 
-    :param str|BaseUIControl control: 控件路径或实例
+    :param str|BaseUIControl|NyControl control: 控件路径或实例
 
     :return: 父控件路径，获取不到返回None
     :rtype: str|None
@@ -210,7 +210,7 @@ def get_parent(control, screen_node):
 
     -----
 
-    :param str|BaseUIControl control: 控件路径或实例
+    :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
 
     :return: 父控件实例，获取不到返回None

@@ -26,7 +26,6 @@ __all__ = [
 class NyComboBox(NyControl):
     """
     | 创建 ``NyComboBox`` 下拉框实例。
-    | 兼容ModSDK ``NeteaseComboBoxUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
     -----
 
