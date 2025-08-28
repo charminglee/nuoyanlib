@@ -13,7 +13,13 @@
 """
 
 
-EXTENSION_LOADING_LIST = [
-    # "item_grid",
-    # "mod_debugger",
-]
+from typing import Callable, Optional, Any
+
+
+def bind_key(
+    key: int,
+    on_up: Optional[Callable[[], Any]] = None,
+    on_down: Optional[Callable[[], Any]] = None,
+    cond: Optional[Callable[[], bool]] = None,
+    multi_binding: bool = False,
+) -> bool: ...

@@ -53,7 +53,7 @@
 
 <br>
 
-## ▶️ 开始 | Getting Started
+## 🚀 开始 | Getting Started
 
 1. 解压下载的压缩包，将`nuoyanlib`文件夹放至行为包Python脚本根目录下（即`modMain.py`文件所在位置）。  
     安装好后，你的行为包结构应为： 
