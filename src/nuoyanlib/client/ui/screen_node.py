@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-08-30
 |
 | ==============================================
 """
@@ -434,13 +434,11 @@ class ScreenNodeExtension(ClientEventProxy):
             return nyc
 
     def _destroy_nyc(self, nyc):
-        res = self._screen_node.RemoveChildControl(nyc.base_control)
-        if res:
-            path = nyc.path
-            if path in self._nyc_cache:
-                del self._nyc_cache[path]
-            nyc.__destroy__()
-        return res
+        path = nyc.path
+        self._screen_node.RemoveComponent(path, nyc.parent_path)
+        if path in self._nyc_cache:
+            del self._nyc_cache[path]
+        nyc.__destroy__()
 
     def _recover_ui_pos(self):
         data = get_ui_pos_data(self._ui_pos_data_key)

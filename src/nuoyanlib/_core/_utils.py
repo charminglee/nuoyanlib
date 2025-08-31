@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-28
 |
 | ==============================================
 """
@@ -88,7 +88,8 @@ class cached_property(object):
 
     def __get__(self, ins, cls):
         value = self.getter(ins)
-        setattr(ins, self.getter.__name__, value)
+        if value is not None:
+            setattr(ins, self.getter.__name__, value)
         return value
 
 
