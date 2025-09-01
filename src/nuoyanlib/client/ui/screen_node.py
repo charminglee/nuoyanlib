@@ -7,13 +7,12 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-30
+|   Date  : 2025-09-01
 |
 | ==============================================
 """
 
 
-from types import MethodType
 from time import time
 from itertools import product, cycle
 from fnmatch import fnmatchcase
@@ -385,38 +384,27 @@ class ScreenNodeExtension(ClientEventProxy):
 
     # region Internal ==================================================================================================
 
-    def _create_binding_proxy(self, func):
+    def _create_binding_proxy(self, func, flag, binding_name="", collection_name=""):
+        if collection_name:
+            binding = ViewBinder.binding_collection(flag, collection_name, binding_name)
+        else:
+            binding = ViewBinder.binding(flag, binding_name)
+        @binding
         def proxy(*args):
             return func(*args)
-        name = "%s_%s" % (func.__name__, id(func))
+        name = "_nyl_binding_%s_%s" % (func.__name__, id(func))
         proxy.__name__ = name
-        proxy.binding_flags = func.binding_flags # NOQA
-        proxy.binding_name = func.binding_name # NOQA
-        if hasattr(func, 'collection_name'):
-            proxy.collection_name = func.collection_name
         setattr(self._screen_node, name, proxy)
         return proxy
 
     def _build_binding(self, func, flag, binding_name="", collection_name=""):
         if not binding_name:
             binding_name = "#%s.%s" % (self._screen_node.namespace, func.__name__)  # NOQA
-
+        proxy = self._create_binding_proxy(func, flag, binding_name, collection_name)
         if collection_name:
-            binder = ViewBinder.binding_collection(flag, collection_name, binding_name)
-            process_binding = self._screen_node._process_collection # NOQA
+            self._screen_node._process_collection(proxy, self._screen_node.screen_name) # NOQA
         else:
-            binder = ViewBinder.binding(flag, binding_name)
-            process_binding = self._screen_node._process_default # NOQA
-
-        if isinstance(func, MethodType):
-            bound_func = func.__func__
-            binder(bound_func)
-            func = MethodType(bound_func, func.__self__)
-        else:
-            binder(func)
-
-        proxy = self._create_binding_proxy(func)
-        process_binding(proxy, self._screen_node.screen_name) # NOQA
+            self._screen_node._process_default(proxy, self._screen_node.screen_name) # NOQA
 
     def _unbuild_binding(self, func):
         self._screen_node._process_default_unregister(func, self._screen_node.screen_name) # NOQA
