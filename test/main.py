@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-08-31
 |
 | ==============================================
 """
@@ -19,11 +19,11 @@ import mod.client.extraClientApi as api
 
 
 # 导入测试
-from . import client
-from ._core._sys import load_extensions
+import nuoyanlib.client
+from nuoyanlib._core._sys import load_extensions
 load_extensions()
 def import_server():
-    from . import server
+    import nuoyanlib.server
     load_extensions()
 threading.Thread(target=import_server).start()
 
