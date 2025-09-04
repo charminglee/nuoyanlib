@@ -111,18 +111,40 @@
 
     ```python
     import <scripts_root>.nuoyanlib.client as nyl
+   
+    # 导入常用工具
+    from <scripts_root>.nuoyanlib.client import (
+        PLAYER_ID,   
+        CF,          
+        PlrComp,     
+        LvComp,      
+        event,       
+    )
     ```
 
     #### 导入服务端库
 
     ```python
     import <scripts_root>.nuoyanlib.server as nyl
+   
+    # 导入常用工具
+    from <scripts_root>.nuoyanlib.client import (
+        CF,          
+        LvComp,      
+        event,       
+    )
+    ```
+   
+    #### 调用「nuoyanlib」函数
+
+    ```python
+    nyl.pos_distance(pos1, pos2)
     ```
 
 > [!WARNING]  
 > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。
 
-4. 更多信息参见[入门指南](/docs/入门指南.md)。
+4. 更多信息详见[入门指南](/docs/入门指南.md)。
 
 <br>
 

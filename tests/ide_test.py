@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-31
+|   Date  : 2025-09-05
 |
 | ==============================================
 """
@@ -42,15 +42,15 @@ def test(path):
     )
 
 
-test("._core._utils")
-test("._core.event.listener")
-test("._core.event._events")
-test("._core._types._checker")
-test(".client.ui.screen_node")
-test(".client.ui.nyc.control")
-test(".utils.enum")
-test(".utils.item")
-test(".utils.utils")
+test("nuoyanlib._core._utils")
+test("nuoyanlib._core.event.listener")
+test("nuoyanlib._core.event._events")
+test("nuoyanlib._core._types._checker")
+test("nuoyanlib.client.ui.screen_node")
+test("nuoyanlib.client.ui.nyc.control")
+test("nuoyanlib.utils.enum")
+test("nuoyanlib.utils.item")
+test("nuoyanlib.utils.utils")
 
 
 print("\n\033[33mAll tests passed.")
