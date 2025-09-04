@@ -4,7 +4,7 @@
 /scripts/event_typehint/_events.py
 *.zip
 studio.json
-/img/logo/logo.psd
+*.psd
 *.log
 
 
