@@ -7,17 +7,17 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-01
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
 
 
-from typing import Optional, overload, Any, TypeVar, Dict, Type, Generator, Callable, Union
+from typing import ClassVar, Optional, overload, Any, TypeVar, Dict, Type, Generator, Callable, Union
 from types import FunctionType
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
-from ..._core._types._typing import Args, Kwargs, UiPathOrControl, STuple, NyControlTypes, ArgsDict, FrameAnimData
+from ..._core._types._typing import Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, FrameAnimData
 from ..._core.event.listener import ClientEventProxy
 from .nyc import *
 
@@ -26,11 +26,11 @@ _T = TypeVar("_T")
 
 
 class ScreenNodeExtension(ClientEventProxy):
-    ROOT_PANEL_PATH: str
+    ROOT_PANEL_PATH: ClassVar[str]
     """
     | 使用基类画布时的根节点路径，所有自定义控件均挂接在该路径下。
     """
-    _nyc_cache: Dict[str, NyControlTypes]
+    _nyc_cache_map: Dict[str, NyControlTypes]
     _ui_pos_data_key: str
     _screen_node: ScreenNode
     _frame_anim_data: Dict[str, FrameAnimData]
@@ -69,7 +69,7 @@ class ScreenNodeExtension(ClientEventProxy):
         *,
         is_stack_grid: bool = False,
         template_name: str = "",
-        elem_visible_binding: str = "",
+        cell_visible_binding: str = "",
         collection_name: str = "",
     ) -> Optional[NyGrid]: ...
     def create_ny_label(self, path_or_control: UiPathOrControl) -> Optional[NyLabel]: ...

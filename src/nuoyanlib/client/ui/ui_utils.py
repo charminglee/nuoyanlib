@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-09-02
 |
 | ==============================================
 """
@@ -27,8 +27,8 @@ __all__ = [
     "create_ui",
     "to_path",
     "to_control",
-    "get_children_path_by_level",
-    "get_children_by_level",
+    "iter_children_path_by_level",
+    "iter_children_by_level",
     "get_parent_path",
     "get_parent",
     "notify_server",
@@ -137,20 +137,19 @@ def is_ui_out_of_screen(control, screen_node=None):
     )
 
 
-def get_children_path_by_level(control, screen_node, level=1):
+def iter_children_path_by_level(control, screen_node, level=1):
     """
     [迭代器]
 
-    | 获取控件的指定层级的所有子控件的路径，返回迭代器。
-    | 例如，某面板包含两个按钮，而每个按钮又包含三张图片，则按钮为面板的一级子控件，按钮下的图片为面板的二级子控件，以此类推。
+    | 获取控件指定层次的所有子控件的路径，返回迭代器。
 
     -----
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层级，默认为1，传入0或负值时，获取所有层级
+    :param int level: 子控件层次，默认为1，传入0或负值时，获取所有层次
 
-    :return: 控件指定层级的所有子控件路径的迭代器，获取不到时返回空迭代器
+    :return: 指定层次的所有子控件路径的迭代器，获取不到时返回空迭代器
     :rtype: GeneratorType
     """
     path = to_path(control)
@@ -169,23 +168,22 @@ def get_children_path_by_level(control, screen_node, level=1):
                 yield p
 
 
-def get_children_by_level(control, screen_node, level=1):
+def iter_children_by_level(control, screen_node, level=1):
     """
     [迭代器]
 
-    | 获取控件的指定层级的所有子控件的 ``BaseUIControl`` 实例，返回迭代器。
-    | 例如，某面板包含两个按钮，而每个按钮又包含三张图片，则按钮为面板的一级子控件，按钮下的图片为面板的二级子控件，以此类推。
+    | 获取控件指定层次的所有子控件的 ``BaseUIControl`` 实例，返回迭代器。
 
     -----
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层级，默认为1，传入0或负值时，获取所有层级
+    :param int level: 子控件层次，默认为1，传入0或负值时，获取所有层次
 
-    :return: 控件指定层级的所有子控件实例的迭代器，获取不到时返回空迭代器
+    :return: 指定层次的所有子控件实例的迭代器，获取不到时返回空迭代器
     :rtype: GeneratorType
     """
-    for p in get_children_path_by_level(control, screen_node, level):
+    for p in iter_children_path_by_level(control, screen_node, level):
         yield to_control(screen_node, p)
 
 

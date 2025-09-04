@@ -7,17 +7,16 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
 
 
-from types import GeneratorType
 from ...._core import _error
 from ...._core._utils import cached_property
 from ...._core._types._checker import args_type_check
-from ....client.ui.ui_utils import get_children_path_by_level, get_parent_path
+from ....client.ui.ui_utils import iter_children_path_by_level, get_parent_path
 from ....utils.enum import ControlType
 
 
@@ -39,6 +38,26 @@ class NyControl(object):
     """
 
     _CONTROL_TYPE = ControlType.BASE_CONTROL
+    _ALLOWED_APPLY_ATTRS = (
+        'position',
+        'anchor_from',
+        'anchor_to',
+        'clip_offset',
+        'clip_children',
+        'full_position_x',
+        'full_position_y',
+        'full_size_x',
+        'full_size_y',
+        'global_position',
+        'max_size',
+        'min_size',
+        'size',
+        'visible',
+        'alpha',
+        'layer',
+        'touch_enable',
+        'property_bag',
+    )
 
     def __init__(self, screen_node_ex, control, **kwargs):
         from ..screen_node import ScreenNodeExtension
@@ -48,31 +67,13 @@ class NyControl(object):
                 % self.__class__.__name__
             )
         self._screen_node = screen_node_ex._screen_node
-        self._kwargs = kwargs
         self.ui_node = screen_node_ex
         self.base_control = control
+        self.kwargs = kwargs
 
     def __getattr__(self, name):
         # 尝试调用ModSDK方法
         return getattr(self.base_control, name)
-
-    @args_type_check(str, is_method=True)
-    def __truediv__(self, other):
-        """
-        | 根据相对路径返回子控件的 ``NyControl`` 实例。
-
-        -----
-
-        :param str other: 相对路径
-
-        :return: 子控件的NyControl实例
-        :rtype: NyControl
-        """
-        if not other.startswith("/"):
-            other = "/" + other
-        return NyControl.from_path(self.ui_node, self.path + other)
-
-    __div__ = __truediv__
 
     def __destroy__(self):
         self._screen_node = None
@@ -80,6 +81,39 @@ class NyControl(object):
         self.ui_node = None
 
     # region APIs ======================================================================================================
+
+    def apply(self, func, level=1):
+        """
+        | 对指定层次的所有子控件批量调用函数。
+
+        -----
+
+        :param function func: 需要调用的函数，该函数需要接受一个参数，值为子控件的NyControl实例
+        :param int level: 子控件层次，默认为1，传入0或负值表示所有层次
+
+        :return: 无
+        :rtype: None
+        """
+        for c in self.get_children(level):
+            func(c)
+
+    def apply_attr(self, attr, value, level=1):
+        """
+        | 批量设置指定层次的所有子控件的属性。
+
+        -----
+
+        :param str attr: 需要设置的属性名
+        :param Any value: 需要设置的值
+        :param int level: 子控件层次，默认为1，传入0或负值表示所有层次
+
+        :return: 无
+        :rtype: None
+        """
+        if attr not in NyControl._ALLOWED_APPLY_ATTRS:
+            raise AttributeError("can't apply to attribute '%s'" % attr)
+        for c in self.get_children(level):
+            setattr(c, attr, value)
 
     def new_child(self, def_name, child_name, force_update=True):
         """
@@ -118,7 +152,7 @@ class NyControl(object):
             name = self.name
         if self._screen_node.Clone(self.path, parent_path, name, sync_refresh, force_update):
             new_path = parent_path + "/" + name
-            return self.__class__.from_path(self.ui_node, new_path, **self._kwargs)
+            return self.__class__.from_path(self.ui_node, new_path, **self.kwargs)
 
     def clone_from(self, control, name="", sync_refresh=True, force_update=True):
         """
@@ -142,37 +176,32 @@ class NyControl(object):
             new_path = self.path + "/" + name
             return NyControl.from_path(self.ui_node, new_path)
 
-    def iter_children(self, level=1):
+    def get_children(self, level=1):
         """
-        [迭代器]
-
-        | 返回当前控件指定层级子控件的 ``NyControl`` 实例的迭代器。
+        | 获取指定层次的所有子控件。
 
         -----
 
-        :param int level: 子控件层级，默认为1，传入0或负值时获取所有层级
+        :param int level: 子控件层次，默认为1，传入0或负值表示所有层次
 
-        :return: 迭代器
-        :rtype: GeneratorType
+        :return: 指定层次所有子控件的NyControl列表
+        :rtype: list[NyControl]
         """
-        all_path = get_children_path_by_level(self.base_control, self._screen_node, level)
-        for p in all_path:
-            yield NyControl.from_path(self.ui_node, p)
+        all_path = iter_children_path_by_level(self.base_control, self._screen_node, level)
+        return [NyControl.from_path(self.ui_node, p) for p in all_path]
 
-    def iter_children_path(self, level=1):
+    def get_children_path(self, level=1):
         """
-        [迭代器]
-
-        | 返回当前控件指定层级子控件的路径的迭代器。
+        | 获取指定层次的所有子控件的路径。
 
         -----
 
-        :param int level: 子控件层级，默认为1，传入0或负值时获取所有层级
+        :param int level: 子控件层次，默认为1，传入0或负值表示所有层次
 
-        :return: 迭代器
-        :rtype: GeneratorType
+        :return: 指定层次所有子控件的路径列表
+        :rtype: list[str]
         """
-        return get_children_path_by_level(self.base_control, self._screen_node, level)
+        return list(iter_children_path_by_level(self.base_control, self._screen_node, level))
 
     @classmethod
     def from_path(cls, screen_node_ex, path, **kwargs):
@@ -226,11 +255,11 @@ class NyControl(object):
 
         :rtype: bool
         """
-        parent = self.parent_control
+        parent = self.parent
         while parent:
             if not parent.visible:
                 return False
-            parent = parent.parent_control
+            parent = parent.parent
         return self.visible
 
     @cached_property
@@ -267,7 +296,7 @@ class NyControl(object):
         return get_parent_path(self.path)
 
     @cached_property
-    def parent_control(self):
+    def parent(self):
         """
         [只读属性]
 
@@ -276,6 +305,24 @@ class NyControl(object):
         :rtype: NyControl
         """
         return NyControl.from_path(self.ui_node, self.parent_path)
+
+    @args_type_check(str, is_method=True)
+    def __truediv__(self, other):
+        """
+        | 根据相对路径返回子控件的 ``NyControl`` 实例。
+
+        -----
+
+        :param str other: 相对路径
+
+        :return: 子控件的NyControl实例
+        :rtype: NyControl
+        """
+        if not other.startswith("/"):
+            other = "/" + other
+        return NyControl.from_path(self.ui_node, self.path + other)
+
+    __div__ = __truediv__
 
     # endregion
 
@@ -397,9 +444,9 @@ class NyControl(object):
 
         -----
 
-        | 关于 ``elem_visible_binding`` 与 ``collection_name`` 参数的说明：
-        - 该参数用于 ``.elem_count`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
-        - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``elem_visible_binding`` 参数 。
+        | 关于 ``cell_visible_binding`` 与 ``collection_name`` 参数的说明：
+        - 该参数用于 ``.grid_size`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
+        - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``cell_visible_binding`` 参数 。
         ::
 
             "bindings": [
@@ -417,7 +464,7 @@ class NyControl(object):
 
         :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
         :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
-        :param str elem_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
+        :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
         :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
 
         :return: NyGrid实例
@@ -837,7 +884,7 @@ class NyControl(object):
         """
         [可读写属性]
 
-        | 控件层级。
+        | 控件渲染层级。
 
         :rtype: int
         """
@@ -848,7 +895,7 @@ class NyControl(object):
         """
         [可读写属性]
 
-        | 控件层级。
+        | 控件渲染层级。
 
         :type val: int
         """
@@ -910,11 +957,11 @@ def __test__():
     c = s.create_ny_control("/control")
     c2 = s.create_ny_control("/control2")
     abc = NyControl.from_path(s, "/abc")
-    assert "/abc" in s._nyc_cache
+    assert "/abc" in s._nyc_cache_map
     c = abc / "child"
     assert c.GetPath() == c.path == "/abc/child"
     abc.destroy()
-    assert "/abc" not in s._nyc_cache
+    assert "/abc" not in s._nyc_cache_map
 
 
 

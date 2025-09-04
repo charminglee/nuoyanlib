@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -190,73 +190,79 @@ class NyButton(NyControl):
         """
         self.__vibrate_time = val
 
-    def set_callback(self, callback_type, func):
+    def set_callback(self, func, cb_type=ButtonCallbackType.UP):
         """
         | 添加按钮回调函数，支持对同一个按钮添加多个同类型的回调，按添加顺序依次触发。
         | 注意：调用本方法后请勿再调用ModSDK的设置按钮回调的接口（如 ``.SetButtonTouchUpCallback()``），否则所有通过本方法添加的回调函数将无效。
 
         -----
 
-        :param int callback_type: 回调类型，请使用ButtonCallbackType枚举值
         :param function func: 回调函数
+        :param str cb_type: 回调类型，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
 
         :return: 是否成功
         :rtype: bool
+
+        :raise ValueError: 回调类型无效
         """
-        if callback_type not in ButtonCallbackType:
-            return False
-        callback_lst = self._btn_callbacks.setdefault(callback_type, [])
+        if cb_type not in ButtonCallbackType:
+            raise ValueError("invalid callback type: %s, use 'ButtonCallbackType' instead" % repr(cb_type))
+        callback_lst = self._btn_callbacks.setdefault(cb_type, [])
         if func not in callback_lst:
             callback_lst.append(func)
         else:
             return False
-        if callback_type == ButtonCallbackType.DOUBLE_CLICK:
+        if cb_type == ButtonCallbackType.DOUBLE_CLICK:
             if not self._enabled_double_click:
                 self._enabled_double_click = True
-                self.set_callback(ButtonCallbackType.UP, self._on_touch_up_dc)
-        elif callback_type == ButtonCallbackType.LONG_CLICK:
+                self.set_callback(self._on_touch_up_dc)
+        elif cb_type == ButtonCallbackType.LONG_CLICK:
             if not self._enabled_long_click:
                 self._enabled_long_click = True
-                self.set_callback(ButtonCallbackType.DOWN, self._on_touch_down_lc)
-                self.set_callback(ButtonCallbackType.MOVE, self._cancel_long_click)
-                self.set_callback(ButtonCallbackType.UP, self._cancel_long_click)
+                self.set_callback(self._on_touch_down_lc, ButtonCallbackType.DOWN)
+                self.set_callback(self._cancel_long_click, ButtonCallbackType.MOVE)
+                self.set_callback(self._cancel_long_click, ButtonCallbackType.UP)
         else:
             def proxy(args):
-                self._exec_callbacks(callback_type, args)
-            set_callback_api = getattr(self.base_control, NyButton._CALLBACK_API_MAP[callback_type])
+                self._exec_callbacks(cb_type, args)
+            set_callback_api = getattr(self.base_control, NyButton._CALLBACK_API_MAP[cb_type])
             set_callback_api(proxy)
         return True
     
     SetCallback = set_callback
 
-    def remove_callback(self, callback_type, func):
+    def remove_callback(self, func, cb_type=ButtonCallbackType.UP):
         """
         | 移除通过 ``.set_callback()`` 添加的按钮回调函数。
 
         -----
 
-        :param int callback_type: 回调类型，请使用ButtonCallbackType枚举值
         :param function func: 要移除的回调函数
+        :param int cb_type: 回调类型，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
 
         :return: 是否成功
         :rtype: bool
+
+        :raise ValueError: 回调类型无效
         """
-        if callback_type in self._btn_callbacks and func in self._btn_callbacks[callback_type]:
-            callback_lst = self._btn_callbacks[callback_type]
+        if cb_type not in ButtonCallbackType:
+            raise ValueError("invalid callback type: %s, use 'ButtonCallbackType' instead" % repr(cb_type))
+        if cb_type in self._btn_callbacks and func in self._btn_callbacks[cb_type]:
+            callback_lst = self._btn_callbacks[cb_type]
             callback_lst.remove(func)
         else:
             return False
         if not callback_lst:
-            if callback_type == ButtonCallbackType.DOUBLE_CLICK:
+            if cb_type == ButtonCallbackType.DOUBLE_CLICK:
                 if self._enabled_double_click:
                     self._enabled_double_click = False
-                    self.remove_callback(ButtonCallbackType.UP, self._on_touch_up_dc)
-            elif callback_type == ButtonCallbackType.LONG_CLICK:
+                    self.remove_callback(self._on_touch_up_dc, ButtonCallbackType.UP)
+            elif cb_type == ButtonCallbackType.LONG_CLICK:
                 if self._enabled_long_click:
                     self._enabled_long_click = False
-                    self.remove_callback(ButtonCallbackType.DOWN, self._on_touch_down_lc)
-                    self.remove_callback(ButtonCallbackType.MOVE, self._cancel_long_click)
-                    self.remove_callback(ButtonCallbackType.UP, self._cancel_long_click)
+                    self.remove_callback(self._on_touch_down_lc, ButtonCallbackType.DOWN)
+                    self.remove_callback(self._cancel_long_click, ButtonCallbackType.MOVE)
+                    self.remove_callback(self._cancel_long_click, ButtonCallbackType.UP)
         return True
 
     RemoveCallback = remove_callback
@@ -277,7 +283,7 @@ class NyButton(NyControl):
         :rtype: None
         """
         self._set_movable_data(True, move_parent, associated_uis, auto_save)
-        self.set_callback(ButtonCallbackType.MOVE, self._on_move)
+        self.set_callback(self._on_move, ButtonCallbackType.MOVE)
 
     SetMovable = set_movable
 
@@ -297,8 +303,8 @@ class NyButton(NyControl):
         :rtype: None
         """
         self._set_movable_data(True, move_parent, associated_uis, auto_save)
-        self.set_callback(ButtonCallbackType.LONG_CLICK, self._on_long_click_mov)
-        self.set_callback(ButtonCallbackType.DOWN, self._on_touch_down_mov)
+        self.set_callback(self._on_long_click_mov, ButtonCallbackType.LONG_CLICK)
+        self.set_callback(self._on_touch_down_mov, ButtonCallbackType.DOWN)
 
     SetMovableByLongClick = set_movable_by_long_click
 
@@ -312,9 +318,9 @@ class NyButton(NyControl):
         :rtype: None
         """
         self._set_movable_data(False)
-        self.remove_callback(ButtonCallbackType.MOVE, self._on_move)
-        self.remove_callback(ButtonCallbackType.LONG_CLICK, self._on_long_click_mov)
-        self.remove_callback(ButtonCallbackType.DOWN, self._on_touch_down_mov)
+        self.remove_callback(self._on_move, ButtonCallbackType.MOVE)
+        self.remove_callback(self._on_long_click_mov, ButtonCallbackType.LONG_CLICK)
+        self.remove_callback(self._on_touch_down_mov, ButtonCallbackType.DOWN)
 
     CancelMovable = cancel_movable
 
@@ -382,8 +388,8 @@ class NyButton(NyControl):
             self.auto_save_pos = False
             self.is_movable = False
 
-    def _exec_callbacks(self, callback_type, args):
-        for cb in self._btn_callbacks[callback_type]:
+    def _exec_callbacks(self, cb_type, args):
+        for cb in self._btn_callbacks[cb_type]:
             cb(args)
 
     def _on_touch_up_dc(self, args):
@@ -419,10 +425,10 @@ class NyButton(NyControl):
             self._set_offset(c, offset)
 
     def _on_long_click_mov(self, args):
-        self.set_callback(ButtonCallbackType.MOVE, self._on_move)
+        self.set_callback(self._on_move, ButtonCallbackType.MOVE)
 
     def _on_touch_down_mov(self, args):
-        self.remove_callback(ButtonCallbackType.MOVE, self._on_move)
+        self.remove_callback(self._on_move, ButtonCallbackType.MOVE)
 
     def _vibrate(self):
         LvComp.Device.SetDeviceVibrate(self.__vibrate_time)

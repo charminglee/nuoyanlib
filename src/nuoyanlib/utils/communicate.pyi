@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -25,7 +25,7 @@ class Caller(object):
     ns: str
     sys_name: str
     method: str
-    def __init__(self, ns: str, sys_name: str, method: str = "") -> None: ...
+    def __init__(self: ..., ns: str, sys_name: str, method: str = "") -> None: ...
     def __call__(
         self,
         args: Optional[Tuple[Any, ...]] = None,

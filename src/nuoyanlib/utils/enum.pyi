@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-23
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -47,13 +47,18 @@ class Enum(metaclass=_EnumMeta):
     __hash: int
     class auto(object):
         pass
-    def __init__(self, name: str, value: Any) -> None: ...
+    def __init__(self: ..., name: str, value: Any) -> None: ...
     def __repr__(self) -> str: ...
     def __hash__(self) -> int: ...
     @property
     def name(self) -> str: ...
     @property
     def value(self) -> Any: ...
+
+
+class GridCallbackType(Enum[str]):
+    UPDATE: str
+    LOADED: str
 
 
 class ComboBoxCallbackType(Enum[str]):

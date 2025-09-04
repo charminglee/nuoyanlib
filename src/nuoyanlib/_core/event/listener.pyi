@@ -7,20 +7,20 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
 
 
-from typing import Callable, Optional, Tuple, Generator, List, Any, DefaultDict, Set, Union
+from typing import ClassVar, Callable, Optional, Tuple, Generator, List, Any, DefaultDict, Set, Union
 from types import MethodType
 from ._events import ClientEvent, ServerEvent
 from .._types._typing import ArgsDict, PyBasicTypes, STuple
 
 
 class _EventPool(object):
-    __slots__: STuple
+    __slots__: ClassVar[STuple]
     pool: DefaultDict[int, Set[Callable]]
     priorities: List[int]
     lock: bool
@@ -28,7 +28,8 @@ class _EventPool(object):
     add_lst: List[Tuple[Callable, int]]
     __name__: str
     def __init__(self: ...) -> None: ...
-    def __nonzero__(self) -> bool: ...
+    def __bool__(self) -> bool: ...
+    __nonzero__ = __bool__
     def __call__(self, args: Optional[dict] = None) -> None: ...
     def add(self, func: Callable, priority: int = 0) -> None: ...
     def remove(self, func: Callable, priority: int = 0) -> None: ...
@@ -43,7 +44,7 @@ class _EventPool(object):
 
 
 class EventArgsProxy(object):
-    __slots__: STuple
+    __slots__: ClassVar[STuple]
     _arg_dict: ArgsDict
     _event_name: str
     def __init__(self: ..., arg_dict: ArgsDict, event_name: str) -> None: ...
@@ -54,14 +55,14 @@ class EventArgsProxy(object):
     keys = dict.keys
     values = dict.values
     items = dict.items
-    has_key = dict.has_key # NOQA
+    # has_key = dict.has_key # NOQA
     copy = dict.copy
-    iterkeys = dict.iterkeys
-    itervalues = dict.itervalues
-    iteritems = dict.iteritems
-    viewkeys = dict.viewkeys
-    viewvalues = dict.viewvalues
-    viewitems = dict.viewitems
+    # iterkeys = dict.iterkeys
+    # itervalues = dict.itervalues
+    # iteritems = dict.iteritems
+    # viewkeys = dict.viewkeys
+    # viewvalues = dict.viewvalues
+    # viewitems = dict.viewitems
     __len__ = dict.__len__
     __contains__ = dict.__contains__
     __getitem__ = dict.__getitem__
@@ -81,7 +82,7 @@ def _parse_event_args(func: Callable, event_name: str, ns: str, sys_name: str) -
 
 
 class _BaseEventProxy(object):
-    _is_client: bool
+    _is_client: ClassVar[bool]
     def __init__(self: ..., *args, **kwargs) -> None: ...
     def _process_engine_events(self) -> None: ...
     def _create_proxy(

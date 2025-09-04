@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-26
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -19,6 +19,7 @@ from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUICon
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ...._core._types._checker import args_type_check
+from ....utils.enum import ComboBoxCallbackType
 
 
 __ComboBoxCallbackType = Callable[[Any], Any]
@@ -43,7 +44,7 @@ class NyComboBox(NyControl):
     def __getitem__(self, item: Union[int, str]) -> NyControl: ...
     @args_type_check((int, str), is_method=True)
     def __delitem__(self, item: Union[int, str]) -> None: ...
-    def set_callback(self, callback_type: str, func: __ComboBoxCallbackType) -> None: ...
+    def set_callback(self, func: __ComboBoxCallbackType, cb_type: str = ComboBoxCallbackType.SELECT) -> None: ...
     @property
     def opt_count(self) -> int: ...
     @property

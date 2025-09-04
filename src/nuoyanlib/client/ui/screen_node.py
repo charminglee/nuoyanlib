@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-01
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -46,7 +46,7 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def __init__(self, *args):
         super(ScreenNodeExtension, self).__init__(*args)
-        self._nyc_cache = {}
+        self._nyc_cache_map = {}
         self._ui_pos_data_key = ""
         self._screen_node = None
         self._frame_anim_data = {}
@@ -84,9 +84,9 @@ class ScreenNodeExtension(ClientEventProxy):
         unlisten_all_events(self)
         unlisten_event(self._GameRenderTickEvent, Events.GameRenderTickEvent)
         unlisten_event(self._GridComponentSizeChangedClientEvent, Events.GridComponentSizeChangedClientEvent)
-        for nyc in self._nyc_cache.values():
+        for nyc in self._nyc_cache_map.values():
             nyc.__destroy__()
-        self._nyc_cache.clear()
+        self._nyc_cache_map.clear()
         self._screen_node = None
         self.cs = None
         self.root_panel = None
@@ -111,11 +111,9 @@ class ScreenNodeExtension(ClientEventProxy):
     def _GridComponentSizeChangedClientEvent(self, args):
         path = args['path']
         path = path[path.index("/", 1):]
-        grid = self._nyc_cache.get(path, None)
+        grid = self._nyc_cache_map.get(path, None)
         if isinstance(grid, NyGrid):
-            try_exec(grid.__grid_update__)
-            for cb in grid._update_cbs:
-                try_exec(cb)
+            grid.__grid_update__()
 
     # region Public APIs ===============================================================================================
 
@@ -183,9 +181,9 @@ class ScreenNodeExtension(ClientEventProxy):
 
         -----
 
-        | 关于 ``elem_visible_binding`` 与 ``collection_name`` 参数的说明：
-        - 该参数用于 ``.elem_count`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
-        - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``elem_visible_binding`` 参数 。
+        | 关于 ``cell_visible_binding`` 与 ``collection_name`` 参数的说明：
+        - 该参数用于 ``.grid_size`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
+        - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``cell_visible_binding`` 参数 。
         ::
 
             "bindings": [
@@ -204,7 +202,7 @@ class ScreenNodeExtension(ClientEventProxy):
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
         :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
         :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
-        :param str elem_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
+        :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
         :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
 
         :return: NyGrid网格实例，创建失败返回None
@@ -279,7 +277,7 @@ class ScreenNodeExtension(ClientEventProxy):
         """
         if not self._ui_pos_data_key:
             return False
-        for nyc in self._nyc_cache.values():
+        for nyc in self._nyc_cache_map.values():
             if isinstance(nyc, NyButton) and nyc.is_movable:
                 nyc.save_pos_data()
         return True
@@ -297,11 +295,7 @@ class ScreenNodeExtension(ClientEventProxy):
     # region Image APIs ================================================================================================
 
     def _play_frame_anim(
-            self,
-            ny_image,
-            tex_path,
-            frame_count,
-            frame_rate,
+            self, ny_image, tex_path, frame_count, frame_rate,
             stop_frame=-1,
             loop=False,
             callback=None,
@@ -352,7 +346,7 @@ class ScreenNodeExtension(ClientEventProxy):
             for p in path_lst:
                 nyb = self._create_nyc(p, NyButton, touch_event_params=attr._nyl_touch_event_params)
                 for t in attr._nyl_callback_types:
-                    nyb.set_callback(t, attr)
+                    nyb.set_callback(attr, t)
 
     def _expend_path(self, path):
         if "*" not in path:
@@ -411,21 +405,22 @@ class ScreenNodeExtension(ClientEventProxy):
 
     def _create_nyc(self, path_or_control, typ, **kwargs):
         path = to_path(path_or_control)
-        if path in self._nyc_cache:
-            nyc = self._nyc_cache[path]
-            if type(nyc) is typ or type(nyc) is not NyControl:
-                return nyc
+        cached_nyc = self._nyc_cache_map.get(path)
+        if cached_nyc:
+            nyc_t = type(cached_nyc)
+            if nyc_t is typ or nyc_t is not NyControl:
+                return cached_nyc
         control = to_control(self._screen_node, path_or_control, typ._CONTROL_TYPE)
         if control:
             nyc = typ(self, control, **kwargs)
-            self._nyc_cache[path] = nyc
+            self._nyc_cache_map[path] = nyc
             return nyc
 
     def _destroy_nyc(self, nyc):
         path = nyc.path
         self._screen_node.RemoveComponent(path, nyc.parent_path)
-        if path in self._nyc_cache:
-            del self._nyc_cache[path]
+        if path in self._nyc_cache_map:
+            del self._nyc_cache_map[path]
         nyc.__destroy__()
 
     def _recover_ui_pos(self):

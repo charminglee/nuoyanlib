@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
 
 
-from typing import Dict, Optional, Callable, Union
+from typing import ClassVar, Dict, Optional, Callable, Union
 from mod.server.system.serverSystem import ServerSystem
 from .._types._typing import ArgsDict
 from ..event.listener import ServerEventProxy
@@ -26,8 +26,8 @@ def instance() -> Optional[NuoyanLibServerSystem]: ...
 
 @singleton
 class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem):
-    __instance__: NuoyanLibServerSystem
-    __inited__: bool
+    __instance__: ClassVar[NuoyanLibServerSystem]
+    __inited__: ClassVar[bool]
     __lib_flag__: int
     query_cache: Dict[str, Dict[str, float]]
     callback_data: Dict[str, Dict[str, Union[Callable, int]]]

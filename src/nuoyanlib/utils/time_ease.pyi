@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-20
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -69,7 +69,7 @@ class TimeEase(object):
     _val: float
     _state: int
     def __init__(
-        self,
+        self: ...,
         start_val: float,
         end_val: float,
         total_tm: float,

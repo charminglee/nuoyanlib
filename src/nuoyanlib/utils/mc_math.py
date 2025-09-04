@@ -342,14 +342,14 @@ def camera_rot_p2p(pos1, pos2):
     return rot
 
 
-def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
+def pos_entity_facing(entity_id, dist, use_0yaw=False, height_offset=0.0):
     """
     | 计算实体视角方向上、给定距离上的位置的坐标。
 
     -----
 
     :param str entity_id: 实体ID
-    :param float dis: 距离
+    :param float dist: 距离
     :param bool use_0yaw: 是否使用0作为实体竖直方向上的视角
     :param float height_offset: 高度偏移量（如实体为玩家建议使用1.6，其他实体建议使用其头部到脚底的距离）
 
@@ -362,33 +362,31 @@ def pos_entity_facing(entity_id, dis, use_0yaw=False, height_offset=0.0):
         return
     if use_0yaw:
         rot = (0, rot[1])
-    dir_rot = get_api().GetDirFromRot(rot)
+    direction = get_api().GetDirFromRot(rot)
     ep = comp_factory.CreatePos(entity_id).GetFootPos()
     if not ep:
         return
     ep = (ep[0], ep[1] + height_offset, ep[2])
-    result = tuple(ep[i] + dir_rot[i] * dis for i in range(3))
-    return result
+    return tuple(p + d * dist for p, d in zip(ep, direction))
 
 
-def pos_forward_rot(pos, rot, dis):
+def pos_forward_rot(pos, rot, dist):
     """
-    | 计算从 ``pos`` 射出，以 ``rot`` 为方向的射线上，与 ``pos`` 的距离为 ``dis`` 的位置的坐标。
+    | 计算从 ``pos`` 射出，以 ``rot`` 为方向的射线上，与 ``pos`` 的距离为 ``dist`` 的位置的坐标。
 
     -----
 
     :param tuple[float,float,float] pos: 坐标
     :param tuple[float,float] rot: (竖直角度, 水平角度)
-    :param float dis: 距离
+    :param float dist: 距离
 
     :return: 坐标
     :rtype: tuple[float,float,float]|None
     """
     if not rot or not pos:
         return
-    dir_rot = get_api().GetDirFromRot(rot)
-    result_pos = tuple(pos[i] + dir_rot[i] * dis for i in range(3))
-    return result_pos
+    direction = get_api().GetDirFromRot(rot)
+    return tuple(p + d * dist for p, d in zip(pos, direction))
 
 
 def n_quantiles_index_list(n, data):
@@ -468,8 +466,8 @@ def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_ang
     :return: 在扇形区域内则返回True，否则返回False
     :rtype: bool
     """
-    dis = pos_distance(vertex_pos, test_pos)
-    if dis <= radius:
+    dist = pos_distance(vertex_pos, test_pos)
+    if dist <= radius:
         if sector_angle > 180:
             sector_angle = 180
         elif sector_angle < 0:

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-25
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -52,8 +52,10 @@ class _EventPool(object):
         self.remove_lst = []
         self.add_lst = []
 
-    def __nonzero__(self): # __bool__
+    def __bool__(self):
         return any(s for s in self.pool.values())
+
+    __nonzero__ = __bool__
 
     def __call__(self, args=None):
         # 事件触发（modsdk调用入口）

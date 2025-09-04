@@ -7,16 +7,16 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-30
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
 
 
-from typing import TypedDict, Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Generator, Type
+from typing import ClassVar, TypedDict, Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Generator, Type, List
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ...._core._types._typing import UiPathOrNyControl, FTuple2
+from ...._core._types._typing import UiPathOrNyControl, FTuple2, STuple
 from ...._core._utils import cached_property
 from ...._core._types._checker import args_type_check
 from ..screen_node import ScreenNodeExtension
@@ -70,9 +70,9 @@ __UiPropertyNames = Literal[
 
 
 class NyControl(object):
-    _CONTROL_TYPE: str
+    _CONTROL_TYPE: ClassVar[str]
+    _ALLOWED_APPLY_ATTRS: ClassVar[STuple]
     _screen_node: ScreenNode
-    _kwargs: Dict[str, Any]
     ui_node: ScreenNodeExtension
     """
     | 控件所在UI类的实例。
@@ -80,6 +80,10 @@ class NyControl(object):
     base_control: BaseUIControl
     """
     | 控件 ``BaseUIControl`` 实例。
+    """
+    kwargs: Dict[str, Any]
+    """
+    | 创建 ``NyControl`` 实例时传入的参数字典。
     """
     def __init__(
         self: ...,
@@ -94,6 +98,8 @@ class NyControl(object):
     def __destroy__(self) -> None: ...
     @property
     def real_visible(self) -> bool: ...
+    def apply(self, func: Callable[[NyControl], Any], level: int = 1) -> None: ...
+    def apply_attr(self, attr: str, value: Any, level: int = 1) -> None: ...
     def new_child(self, def_name: str, child_name: str, force_update: bool = True) -> Optional[NyControl]: ...
     def clone_to(
         self: _T,
@@ -109,8 +115,8 @@ class NyControl(object):
         sync_refresh: bool = True,
         force_update: bool = True,
     ) -> Optional[NyControl]: ...
-    def iter_children(self, level: int = 1) -> Generator[NyControl]: ...
-    def iter_children_path(self, level: int = 1) -> Generator[str]: ...
+    def get_children(self, level: int = 1) -> List[NyControl]: ...
+    def get_children_path(self, level: int = 1) -> List[str]: ...
     @classmethod
     def from_path(
         cls: Type[_T],
@@ -132,7 +138,7 @@ class NyControl(object):
     @cached_property
     def parent_path(self) -> str: ...
     @cached_property
-    def parent_control(self) -> Optional[NyControl]: ...
+    def parent(self) -> Optional[NyControl]: ...
     def destroy(self) -> None: ...
     def to_button(self, *, touch_event_params: Optional[Dict[str, Any]] = None) -> NyButton: ...
     def to_image(self) -> NyImage: ...
@@ -148,7 +154,7 @@ class NyControl(object):
         *,
         is_stack_grid: bool = False,
         template_name: str = "",
-        elem_visible_binding: str = "",
+        cell_visible_binding: str = "",
         collection_name: str = "",
     ) -> NyGrid: ...
     def to_progress_bar(self) -> NyProgressBar: ...
@@ -494,7 +500,7 @@ class NyControl(object):
         -----
 
         :param bool visible: False为隐藏该控件，True为显示该控件
-        :param bool force_update: 是否需要强制刷新，默认值为True。置True则按照马上进行刷新，新的visible状态生效。置False，则需要再次调用UpdateScreen使新状态生效。如有大量SetVisible操作且非在同一帧执行，建议设置为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新，默认值为True。置True则马上进行刷新，新的visible状态生效。置False，则需要再次调用UpdateScreen使新状态生效。如有大量SetVisible操作且非在同一帧执行，建议设置为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
 
         :return: 无
         :rtype: None

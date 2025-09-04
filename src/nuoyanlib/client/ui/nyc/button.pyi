@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
 
 
-from typing import Callable, Optional, Dict, Union, List, Any
+from typing import Callable, Optional, Dict, Union, List, Any, ClassVar
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.timer import CallLater
@@ -21,12 +21,12 @@ from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl, ItemD
 from ...._core._types._checker import args_type_check
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
-from ....utils.enum import Enum
+from ....utils.enum import Enum, ButtonCallbackType
 from ...._core.event._events import ClientEventEnum as Events
 
 
 class NyButton(NyControl):
-    _CALLBACK_API_MAP: Dict[int, str]
+    _CALLBACK_API_MAP: ClassVar[Dict[int, str]]
     class CommonChildPath(Enum[str]):
         default: str
         hover: str
@@ -82,9 +82,9 @@ class NyButton(NyControl):
     @vibrate_time.setter
     @args_type_check(int, is_method=True)
     def vibrate_time(self, val: int) -> None: ...
-    def set_callback(self, callback_type: int, func: Callable) -> bool: ...
+    def set_callback(self, func: Callable, cb_type: str = ButtonCallbackType.UP) -> bool: ...
     SetCallback = set_callback
-    def remove_callback(self, callback_type: int, func: Callable) -> bool: ...
+    def remove_callback(self, func: Callable, cb_type: str = ButtonCallbackType.UP) -> bool: ...
     RemoveCallback = remove_callback
     def set_movable(
         self,
@@ -113,7 +113,7 @@ class NyButton(NyControl):
         associated_uis: Union[UiPathOrNyControl, List[UiPathOrNyControl], None] = None,
         auto_save: bool = False,
     ) -> None: ...
-    def _exec_callbacks(self, callback_type: int, args: Dict[str, Any]) -> None: ...
+    def _exec_callbacks(self, cb_type: int, args: Dict[str, Any]) -> None: ...
     def _on_touch_up_dc(self, args: ArgsDict) -> None: ...
     def _on_touch_down_lc(self, args: ArgsDict) -> None: ...
     def _cancel_long_click(self, args: ArgsDict) -> None: ...

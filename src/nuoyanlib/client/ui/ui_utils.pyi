@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-09-02
 |
 | ==============================================
 """
@@ -75,12 +75,12 @@ def to_control(
 ]: ...
 def save_ui_pos_data(key: str, data: Dict[str, List[Tuple[str, FTuple2]]]) -> bool: ...
 def get_ui_pos_data(key: str) -> Dict[str, List[Tuple[str, FTuple2]]]: ...
-def get_children_path_by_level(
+def iter_children_path_by_level(
     control: UiPathOrNyControl,
     screen_node: ScreenNode,
     level: int = 1,
 ) -> Generator[str]: ...
-def get_children_by_level(
+def iter_children_by_level(
     control: UiPathOrNyControl,
     screen_node: ScreenNode,
     level: int = 1,

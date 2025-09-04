@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-23
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -24,6 +24,7 @@ from mod.common.minecraftEnum import (
 
 __all__ = [
     "Enum",
+    "GridCallbackType",
     "ComboBoxCallbackType",
     "ButtonCallbackType",
     "ControlType",
@@ -222,6 +223,22 @@ def __test__():
         b = Enum.auto()
         c = Enum.auto()
     assert sorted(E4.__members__.values()) == [0, 1, 2]
+
+
+class GridCallbackType(Enum[str]):
+    """
+    网格回调函数类型枚举。
+    """
+
+    UPDATE = Enum.auto()
+    """
+    网格元素刷新时触发。
+    """
+
+    LOADED = Enum.auto()
+    """
+    网格初次加载完成时触发。
+    """
 
 
 class ComboBoxCallbackType(Enum[str]):

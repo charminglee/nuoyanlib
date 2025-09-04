@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -94,23 +94,23 @@ class NyComboBox(NyControl):
         index = self._item_to_index(item)
         self.RemoveOptionByIndex(index)
 
-    def set_callback(self, callback_type, func):
+    def set_callback(self, func, cb_type=ComboBoxCallbackType.SELECT):
         """
         | 设置下拉框回调函数。
 
         -----
 
-        :param callback_type: 回调类型，请使用ComboBoxCallbackType枚举值
-        :param func: 回调函数
+        :param function func: 回调函数
+        :param str cb_type: 回调类型，请使用ComboBoxCallbackType枚举值，默认为ComboBoxCallbackType.SELECT
 
         :return: 无
         :rtype: None
 
         :raise ValueError: 回调类型无效
         """
-        if callback_type not in self._callback_map:
-            raise ValueError("invalid callback type: %s, use 'ComboBoxCallbackType'" % repr(callback_type))
-        self._callback_map[callback_type](func)
+        if cb_type not in self._callback_map:
+            raise ValueError("invalid callback type: %s, use 'ComboBoxCallbackType' instead" % repr(cb_type))
+        self._callback_map[cb_type](func)
 
     # endregion
 

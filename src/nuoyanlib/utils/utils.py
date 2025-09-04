@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-23
+|   Date  : 2025-09-01
 |
 | ==============================================
 """
@@ -16,10 +16,11 @@
 from functools import wraps
 from time import time
 from re import match
-from .._core._sys import get_lib_system
+from .._core._sys import get_lib_system, get_lv_comp, is_client
 
 
 __all__ = [
+    "notify_error",
     "call_interval",
     "add_condition_to_func",
     "rm_condition_to_func",
@@ -31,6 +32,27 @@ __all__ = [
     "is_method_overridden",
     "translate_time",
 ]
+
+
+def notify_error(player_id=None):
+    """
+    | 将报错信息打印到聊天栏。
+
+    -----
+
+    :param str|None player_id: 打印到的玩家实体ID，客户端可省略该参数
+
+    :return: 无
+    :rtype: None
+    """
+    from traceback import format_exc
+    lv_comp = get_lv_comp()
+    ic = is_client()
+    for line in format_exc().splitlines():
+        if ic:
+            lv_comp.TextNotifyClient.SetLeftCornerNotify(line)
+        else:
+            lv_comp.Msg.NotifyOneMessage(player_id, line)
 
 
 def call_interval(interval):

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-04
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
@@ -39,4 +39,4 @@ class EventSourceError(TypeError):
 class EventNotFoundError(AttributeError):
     name: str
     is_client: bool
-    def __init__(self, name: str, is_client: bool) -> None: ...
+    def __init__(self: ..., name: str, is_client: bool) -> None: ...

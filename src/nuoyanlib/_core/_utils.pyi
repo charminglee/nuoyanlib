@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-09-04
 |
 | ==============================================
 """
 
 
 from types import MethodType, FunctionType, GeneratorType
-from typing import Tuple, TypeVar, Callable, Any, Type, Optional, Dict, overload, Union
+from typing import Tuple, TypeVar, Callable, Any, Type, Optional, Dict, overload, Union, ClassVar
 from ._types._typing import ITuple
 
 
@@ -33,7 +33,7 @@ def assert_error(func: Callable, args: tuple, *error: Exception) -> None: ...
 class cached_property(object):
     __doc__: Optional[str]
     getter: Callable[[Any], Any]
-    def __init__(self, getter: Callable[[Any], Any]) -> None: ...
+    def __init__(self: ..., getter: Callable[[Any], Any]) -> None: ...
     def __get__(self, ins: Any, cls: type) -> Any: ...
 
 
@@ -45,7 +45,7 @@ class _CachedObjectMeta(type):
 
 
 class CachedObject(metaclass=_CachedObjectMeta):
-    __cache__: Dict[tuple, CachedObject]
+    __cache__: ClassVar[Dict[tuple, CachedObject]]
     def __new__(cls: Type[_T_CO], *args: Any, **kwargs: Any) -> _T_CO: ...
     @classmethod
     def __cache_key__(cls, *args: Any, **kwargs: Any) -> tuple: ...

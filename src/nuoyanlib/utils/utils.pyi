@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-16
+|   Date  : 2025-09-01
 |
 | ==============================================
 """
@@ -16,6 +16,7 @@
 from typing import Sequence, Any, List, Callable, Tuple, Optional
 
 
+def notify_error(player_id: Optional[str] = None) -> None: ...
 def call_interval(interval: float) -> Callable: ...
 def add_condition_to_func(cond: Callable[[], bool], func: Callable[[bool], Any], freq: int = 1) -> int: ...
 def rm_condition_to_func(cond_id: int) -> bool: ...
