@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-09-05
 |
 | ==============================================
 """
@@ -55,6 +55,8 @@ MiniMapScreenNode = client_api.GetMiniMapScreenNodeCls()
 
 
 class CF(CachedObject):
+    __cache__ = {}
+
     def __init__(self, target):
         self._target = target
 

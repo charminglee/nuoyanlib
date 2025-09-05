@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-05
 |
 | ==============================================
 """
@@ -19,7 +19,7 @@ from .._core._types._typing import STuple
 
 
 class _EnumMeta(type):
-    _enum_flag: int
+    __enum_flag__: int
     __members__: Dict[str, Any]
     _restrict_type: Optional[type]
     def __new__(
@@ -38,6 +38,8 @@ class _EnumMeta(type):
     def __getitem__(cls, item: type) -> Type[Enum]: ...
     @overload
     def __getitem__(cls, item: str) -> Any: ...
+    @staticmethod
+    def _gen_cls(restrict_type: type) -> Type[Enum]: ...
     def _gen_auto_value(cls, name: Optional[str] = None) -> Union[str, int]: ...
 
 
@@ -54,6 +56,8 @@ class Enum(metaclass=_EnumMeta):
     def name(self) -> str: ...
     @property
     def value(self) -> Any: ...
+    @classmethod
+    def __class_getitem__(cls, item: type) -> Type[Enum]: ...
 
 
 class GridCallbackType(Enum[str]):

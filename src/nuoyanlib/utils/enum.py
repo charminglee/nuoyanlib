@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-05
 |
 | ==============================================
 """
@@ -20,6 +20,7 @@ from mod.common.minecraftEnum import (
     EffectType,
     EnchantType,
 )
+from .._core._utils import with_metaclass
 
 
 __all__ = [
@@ -47,7 +48,7 @@ __all__ = [
 
 class _EnumMeta(type):
     def __new__(metacls, name, bases, dct, restrict_type=None):
-        dct['_enum_flag'] = 0
+        dct['__enum_flag__'] = 0
         cls = type.__new__(metacls, name, bases, dct) # type: type[Enum]
         members = {}
         if name != "Enum":
@@ -60,7 +61,7 @@ class _EnumMeta(type):
                 elif cls._restrict_type:
                     if type(v) is not cls._restrict_type:
                         raise TypeError(
-                            "member of '%s' must be '%s', not '%s'"
+                            "member of '%s' must be '%s', got '%s'"
                             % (name, cls._restrict_type.__name__, type(v).__name__)
                         )
                     member = v
@@ -75,12 +76,12 @@ class _EnumMeta(type):
         else:
             cls._restrict_type = restrict_type
         cls.__members__ = members
-        cls._enum_flag = 1
+        cls.__enum_flag__ = 1
         return cls
 
     def __setattr__(cls, name, value):
         # 禁止动态设置枚举值
-        if getattr(cls, '_enum_flag', 0) == 1:
+        if getattr(cls, '__enum_flag__', 0) == 1:
             raise AttributeError("can't set member '%s' in '%s'" % (name, cls.__name__))
         type.__setattr__(cls, name, value)
 
@@ -109,15 +110,19 @@ class _EnumMeta(type):
     def __getitem__(cls, item):
         # 支持Enum[type]/Enum['xxx']
         if cls is Enum:
-            dct = dict(Enum.__dict__)
-            del dct['__dict__']
-            del dct['__weakref__']
-            del dct['__members__']
-            del dct['_enum_flag']
-            new_cls = _EnumMeta.__new__(_EnumMeta, "Enum", (object,), dct, item)
-            return new_cls
+            return _EnumMeta._gen_cls(item)
         else:
             return cls.__members__[item]
+
+    @staticmethod
+    def _gen_cls(restrict_type):
+        dct = dict(Enum.__dict__)
+        del dct['__dict__']
+        del dct['__weakref__']
+        del dct['__members__']
+        del dct['__enum_flag__']
+        new_cls = _EnumMeta.__new__(_EnumMeta, "Enum", (object,), dct, restrict_type)
+        return new_cls
 
     def _gen_auto_value(cls, name=None):
         t = getattr(cls, '_restrict_type', None)
@@ -131,7 +136,7 @@ class _EnumMeta(type):
         return val
 
 
-class Enum(object):
+class Enum(with_metaclass(_EnumMeta, object)):
     """
     | 枚举类型，用于实现自定义枚举值。
     | 支持以下功能：
@@ -145,8 +150,6 @@ class Enum(object):
     - 不支持动态插入或删除枚举值
     - 枚举名不能以下划线开头
     """
-
-    __metaclass__ = _EnumMeta
 
     class auto(object):
         pass
@@ -169,6 +172,10 @@ class Enum(object):
     @property
     def value(self):
         return self.__value
+
+    @classmethod
+    def __class_getitem__(cls, item):
+        return _EnumMeta._gen_cls(item)
 
 
 def __test__():

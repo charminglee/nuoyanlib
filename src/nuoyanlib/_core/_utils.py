@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-28
+|   Date  : 2025-09-06
 |
 | ==============================================
 """
@@ -28,6 +28,13 @@ __all__ = [
     "cached_func",
     "singleton",
 ]
+
+
+def with_metaclass(metacls, *bases):
+    class MetaClass(metacls):
+        def __new__(cls, name, this_bases, dct):
+            return metacls(name, bases, dct)
+    return type.__new__(MetaClass, "C", (), {})
 
 
 def kwargs_setter(**kwargs):
@@ -63,7 +70,10 @@ def iter_obj_attrs(obj):
 
 
 def get_func(cls, module, func):
-    g = cls.__init__.__func__.__globals__ # NOQA
+    try:
+        g = cls.__init__.__func__.__globals__ # NOQA
+    except AttributeError:
+        return
     m = join_chr(*module)
     f = join_chr(*func)
     try:
@@ -97,14 +107,6 @@ def join_chr(*seq):
     return "".join(chr(i) for i in seq)
 
 
-class _CachedObjectMeta(type):
-    def __new__(metacls, name, bases, dct):
-        cls = type.__new__(metacls, name, bases, dct)
-        if name != "CachedObject":
-            cls.__cache__ = {}
-        return cls
-
-
 class CachedObject(object):
     """
     ::
@@ -117,8 +119,6 @@ class CachedObject(object):
             def __init__(self, a, b, c):
                 ...
     """
-
-    __metaclass__ = _CachedObjectMeta
 
     def __new__(cls, *args, **kwargs):
         key = cls.__cache_key__(*args, **kwargs)
@@ -175,7 +175,7 @@ def singleton(init_once=True):
         org_new = cls.__new__
         org_init = cls.__init__
         def new_new(*args, **kwargs):
-            return cls.__instance__ or org_new(*args, **kwargs)
+            return cls.__instance__ or org_new(cls)
         def new_init(self, *args, **kwargs):
             if cls.__instance__ is None:
                 cls.__instance__ = self

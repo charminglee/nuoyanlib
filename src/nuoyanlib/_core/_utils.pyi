@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-06
 |
 | ==============================================
 """
 
 
 from types import MethodType, FunctionType, GeneratorType
-from typing import Tuple, TypeVar, Callable, Any, Type, Optional, Dict, overload, Union, ClassVar
+from typing import TypeVar, Callable, Any, Type, Optional, Dict, overload, Union, ClassVar
 from ._types._typing import ITuple
 
 
@@ -23,6 +23,7 @@ _T_Type = TypeVar("_T_Type", bound=type)
 _T_CO = TypeVar("_T_CO", bound=CachedObject)
 
 
+def with_metaclass(metacls: Type[_T], *bases: type) -> _T: ...
 def kwargs_setter(**kwargs: Any) -> Callable[[_T], _T]: ...
 def try_exec(func: Callable, *args: Any, **kwargs: Any) -> Union[Any, Exception]: ...
 def iter_obj_attrs(obj: Any) -> GeneratorType[Any, None, None]: ...
@@ -40,11 +41,7 @@ class cached_property(object):
 def join_chr(*seq: int) -> str: ...
 
 
-class _CachedObjectMeta(type):
-    def __new__(metacls, name: str, bases: Tuple[type, ...], dct: Dict[str, Any]) -> _CachedObjectMeta: ...
-
-
-class CachedObject(metaclass=_CachedObjectMeta):
+class CachedObject(object):
     __cache__: ClassVar[Dict[tuple, CachedObject]]
     def __new__(cls: Type[_T_CO], *args: Any, **kwargs: Any) -> _T_CO: ...
     @classmethod
