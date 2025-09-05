@@ -15,7 +15,6 @@
    
       ~NyItemRenderer.__div__
       ~NyItemRenderer.__init__
-      ~NyItemRenderer.__truediv__
       ~NyItemRenderer.apply
       ~NyItemRenderer.apply_attr
       ~NyItemRenderer.clone_from

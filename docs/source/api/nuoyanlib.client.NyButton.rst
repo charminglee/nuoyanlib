@@ -23,7 +23,6 @@
       ~NyButton.SetMovableByLongClick
       ~NyButton.__div__
       ~NyButton.__init__
-      ~NyButton.__truediv__
       ~NyButton.apply
       ~NyButton.apply_attr
       ~NyButton.cancel_movable

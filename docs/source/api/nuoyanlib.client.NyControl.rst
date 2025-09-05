@@ -15,7 +15,6 @@
    
       ~NyControl.__div__
       ~NyControl.__init__
-      ~NyControl.__truediv__
       ~NyControl.apply
       ~NyControl.apply_attr
       ~NyControl.clone_from

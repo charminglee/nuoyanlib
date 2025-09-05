@@ -15,7 +15,6 @@
    
       ~NyScrollView.__div__
       ~NyScrollView.__init__
-      ~NyScrollView.__truediv__
       ~NyScrollView.apply
       ~NyScrollView.apply_attr
       ~NyScrollView.clone_from

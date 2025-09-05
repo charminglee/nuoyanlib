@@ -16,7 +16,6 @@
       ~NyGrid.__div__
       ~NyGrid.__getitem__
       ~NyGrid.__init__
-      ~NyGrid.__truediv__
       ~NyGrid.apply
       ~NyGrid.apply_attr
       ~NyGrid.bind_data

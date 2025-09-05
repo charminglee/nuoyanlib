@@ -15,7 +15,6 @@
    
       ~NyEditBox.__div__
       ~NyEditBox.__init__
-      ~NyEditBox.__truediv__
       ~NyEditBox.apply
       ~NyEditBox.apply_attr
       ~NyEditBox.clone_from

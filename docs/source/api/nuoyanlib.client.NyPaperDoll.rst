@@ -15,7 +15,6 @@
    
       ~NyPaperDoll.__div__
       ~NyPaperDoll.__init__
-      ~NyPaperDoll.__truediv__
       ~NyPaperDoll.apply
       ~NyPaperDoll.apply_attr
       ~NyPaperDoll.clone_from

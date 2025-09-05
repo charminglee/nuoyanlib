@@ -15,7 +15,6 @@
    
       ~NySlider.__div__
       ~NySlider.__init__
-      ~NySlider.__truediv__
       ~NySlider.apply
       ~NySlider.apply_attr
       ~NySlider.clone_from

@@ -15,7 +15,6 @@
    
       ~NyStackPanel.__div__
       ~NyStackPanel.__init__
-      ~NyStackPanel.__truediv__
       ~NyStackPanel.apply
       ~NyStackPanel.apply_attr
       ~NyStackPanel.clone_from

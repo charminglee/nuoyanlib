@@ -15,7 +15,6 @@
    
       ~NyToggle.__div__
       ~NyToggle.__init__
-      ~NyToggle.__truediv__
       ~NyToggle.apply
       ~NyToggle.apply_attr
       ~NyToggle.clone_from

@@ -15,7 +15,6 @@
    
       ~NyProgressBar.__div__
       ~NyProgressBar.__init__
-      ~NyProgressBar.__truediv__
       ~NyProgressBar.apply
       ~NyProgressBar.apply_attr
       ~NyProgressBar.clone_from

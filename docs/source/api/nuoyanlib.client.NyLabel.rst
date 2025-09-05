@@ -15,7 +15,6 @@
    
       ~NyLabel.__div__
       ~NyLabel.__init__
-      ~NyLabel.__truediv__
       ~NyLabel.apply
       ~NyLabel.apply_attr
       ~NyLabel.clone_from

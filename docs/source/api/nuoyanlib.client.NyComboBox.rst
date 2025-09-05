@@ -17,7 +17,6 @@
       ~NyComboBox.__div__
       ~NyComboBox.__getitem__
       ~NyComboBox.__init__
-      ~NyComboBox.__truediv__
       ~NyComboBox.apply
       ~NyComboBox.apply_attr
       ~NyComboBox.clone_from

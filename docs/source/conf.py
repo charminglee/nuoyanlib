@@ -11,6 +11,8 @@
 |
 | ==============================================
 """
+
+
 import re
 
 
@@ -74,9 +76,7 @@ autodoc_mock_imports = [
     # "mod.server",
     # "mod.common",
 ]
-autodoc_default_options = {
-    'exclude-members': "__truediv__,__bool__",
-}
+autodoc_default_options = {}
 autodoc_docstring_signature = True
 
 
@@ -84,7 +84,7 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
     for i, line in enumerate(lines[:]):
         if line.startswith("| "):
             lines[i] = line[2:]
-        if re.match(r"\[.+\]", line):
+        if re.match(r"\[.+]", line):
             lines.pop(i)
             lines.pop(i + 1)
 
@@ -97,6 +97,8 @@ def autodoc_process_signature(app, what, name, obj, options, signature, return_a
 
 
 def autodoc_skip_member(app, what, name, obj, skip, options):
+    if name in ("__truediv__", "__bool__"):
+        return True
     if what == "class" and name not in obj.__dict__:
         return True
     if name.startswith("_") and name != "__init__" and (not getattr(obj, '__doc__', "") or "-----" not in obj.__doc__):

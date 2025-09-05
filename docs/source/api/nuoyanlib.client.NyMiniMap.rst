@@ -15,7 +15,6 @@
    
       ~NyMiniMap.__div__
       ~NyMiniMap.__init__
-      ~NyMiniMap.__truediv__
       ~NyMiniMap.apply
       ~NyMiniMap.apply_attr
       ~NyMiniMap.clone_from

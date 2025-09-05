@@ -15,7 +15,6 @@
    
       ~NyImage.__div__
       ~NyImage.__init__
-      ~NyImage.__truediv__
       ~NyImage.apply
       ~NyImage.apply_attr
       ~NyImage.clone_from

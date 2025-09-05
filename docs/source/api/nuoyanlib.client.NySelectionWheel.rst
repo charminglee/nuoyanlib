@@ -15,7 +15,6 @@
    
       ~NySelectionWheel.__div__
       ~NySelectionWheel.__init__
-      ~NySelectionWheel.__truediv__
       ~NySelectionWheel.apply
       ~NySelectionWheel.apply_attr
       ~NySelectionWheel.clone_from

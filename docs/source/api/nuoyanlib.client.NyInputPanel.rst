@@ -15,7 +15,6 @@
    
       ~NyInputPanel.__div__
       ~NyInputPanel.__init__
-      ~NyInputPanel.__truediv__
       ~NyInputPanel.apply
       ~NyInputPanel.apply_attr
       ~NyInputPanel.clone_from
