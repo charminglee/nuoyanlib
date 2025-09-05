@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-09-05
 |
 | ==============================================
 """
@@ -38,7 +38,7 @@ if config.ENABLED_LOG and logging:
         def log(self, msg, *args, **kwargs):
             ct = time()
             t = strftime("%Y-%m-%d %H:%M:%S", localtime(ct))
-            msecs = (ct - long(ct)) * 1000
+            msecs = (ct - int(ct)) * 1000
             s = "%s,%03d" % (t, msecs)
             if kwargs['show_env']:
                 print(

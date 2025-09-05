@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-18
+|   Date  : 2025-09-06
 |
 | ==============================================
 """
@@ -16,6 +16,7 @@
 from .._core._sys import get_lib_system
 from .._core._server.comp import LvComp, CF
 from .._core._utils import kwargs_setter
+from .._core._doc import signature
 from .._core import _const
 from ..utils.mc_random import random_even_poses
 from ..utils.mc_math import pos_floor
@@ -26,6 +27,7 @@ __all__ = [
 ]
 
 
+@signature("pos, dim, r, num, block_dist=1.0, *, time=3.0, tilt_angle=22.0, min_height=0.0, max_height=0.3, in_time=0.2, out_time=0.5, in_dist=0.5, out_dist=0.5")
 @kwargs_setter(
     time=3.0,
     tilt_angle=22.0,

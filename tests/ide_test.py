@@ -25,20 +25,22 @@ load_extensions()
 def import_server():
     import nuoyanlib.server
     load_extensions()
-threading.Thread(target=import_server).start()
+t = threading.Thread(target=import_server)
+t.start()
+t.join()
 
 
 def test(path):
     turns = 50
-    t = time.clock()
+    t = time.time()
     m = api.ImportModule(path)
     for _ in range(turns):
         m.__test__()
-    c = (time.clock() - t) * 1000
+    c = (time.time() - t) * 1000
     print(
-        "Test passed: {:<25}".format(path + ",")
-        + " in {:<8.3f}ms,".format(c)
-        + " avg {:<6.3f}ms".format(c / turns)
+        "Test passed: {:<35}".format(path + ",")
+        + " in {:<6.2f}ms,".format(c)
+        + " avg {:<5.2f}ms".format(c / turns)
     )
 
 

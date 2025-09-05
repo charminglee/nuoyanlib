@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-09-06
 |
 | ==============================================
 """
@@ -23,6 +23,9 @@ __all__ = [
     "get_comp_factory",
     "get_lv_comp",
 ]
+
+
+DEV_MOVE = True
 
 
 def get_env():
@@ -64,6 +67,8 @@ def load_extensions():
 
 
 def check_env(target):
+    if DEV_MOVE:
+        return
     if target != get_env():
         from . import _error
         raise _error.AcrossImportError

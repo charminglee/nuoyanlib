@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-19
+|   Date  : 2025-09-05
 |
 | ==============================================
 """
@@ -26,6 +26,9 @@ from ._server.comp import CF as ServerCF
 
 
 _T = TypeVar("_T")
+
+
+DEV_MOVE: bool
 
 
 def get_env() -> str: ...
