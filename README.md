@@ -20,7 +20,7 @@
 
 ## 📖 简介 | Intro
 
-「nuoyanlib」是基于网易我的世界[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
+「nuoyanlib」是基于网易我的世界（我的世界中国版）[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
 您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
 
 > ✅ 已支持 **ModSDK 3.5**  
@@ -37,6 +37,9 @@
 
 
 - [`nuoyanlib.utils`](/docs/source/api/utils.rst)：通用工具包，提供了事件监听框架、多种与MC密切相关的数学计算函数、向量工具、双端通信工具、随机数工具等实用工具。
+
+
+- [`nuoyanlib.extensions`](/docs/source/api/extensions.rst)：「nuoyanlib」扩展功能，供开发者按需选择。
 
 <br>
 
@@ -169,9 +172,15 @@
 
 <br>
 
+## 🔗 作者的其他项目 | Other Projects
+
+- [网易我的世界ModSDK补全库修正版](https://github.com/charminglee/mc-netease-sdk-nyrev)
+
+<br>
+
 ## 👴 联系作者 | Contact
 
-如果在使用过程中遇到问题，可通过以下方式联系作者：
+如果在使用过程中遇到问题，可通过以下方式联系作者，作者将尽全力为你解答。
 
 - QQ：[1279735247](https://qm.qq.com/q/BknsDqOdsk)
 - 邮箱：1279735247@qq.com
