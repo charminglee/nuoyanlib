@@ -6,6 +6,7 @@
 studio.json
 *.psd
 *.log
+/docs/source/api/apis/
 
 
 ### Python template
