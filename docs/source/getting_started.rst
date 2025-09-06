@@ -1,0 +1,272 @@
+.. _getting_started:
+
+========
+入门指南
+========
+
+开始
+====
+
+安装
+~~~~
+
+
+下载并解压压缩包，将 ``nuoyanlib`` 文件夹放至行为包Python脚本根目录下（即 ``modMain.py`` 文件所在位置）。
+安装好后，您的行为包结构应为：
+
+::
+
+    行为包/
+    ├── entities/
+    ├── 脚本根目录/
+    │   ├── nuoyanlib/
+    │   │   ├── _core/
+    │   │   ├── client/
+    │   │   ├── server/
+    │   │   ├── utils/
+    │   │   ├── __init__.py
+    │   │   ├── config.py
+    │   │   └── LICENSE
+    │   ├── __init__.py
+    │   ├── modMain.py
+    │   ...
+    ...
+
+启动
+~~~~
+
+在 ``modMain.py`` 中添加以下代码以启动「nuoyanlib」：
+
+.. code-block:: python
+
+    import nuoyanlib
+    nuoyanlib.run(globals())
+
+例如：
+
+.. code-block:: python
+
+    from mod.common.mod import Mod
+    import mod.client.extraClientApi as client_api
+    import mod.server.extraServerApi as server_api
+
+
+    import nuoyanlib
+    nuoyanlib.run(globals())
+
+
+    @Mod.Binding(name="MyMod", version="1.0.0")
+    class ModMain(object):
+        @Mod.InitServer()
+        def init_server(self):
+            server_api.RegisterSystem("MyMod", "MyServerSystem", "myScripts.myServerSystem.MyServerSystem")
+
+        @Mod.InitClient()
+        def init_client(self):
+            client_api.RegisterSystem("MyMod", "MyClientSystem", "myScripts.myClientSystem.MyClientSystem")
+
+导入
+~~~~
+
+推荐使用以下方式进行导入，其中 ``<scripts_root>`` 是你的Python脚本根目录名称， ``<client/server>`` 表示根据所处环境填写 ``client`` 或 ``server`` ：
+
+.. code-block:: python
+
+    import <scripts_root>.nuoyanlib.<client/server> as nyl
+
+    # 调用nuoyanlib接口
+    nyl.pos_distance(pos1, pos2)
+
+.. warning::
+
+    为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且 **禁止** 跨端导入（如在客户端导入服务端库，在服务端导入客户端库）。
+    如果你强制这么做，「nuoyanlib」将抛出 ``AcrossImportError`` 。
+
+对于一些较为常用的功能，你可以直接 ``import`` 它们的名称，省去每次都附加 ``nyl.`` 前缀的麻烦。
+
+.. code-block:: python
+
+    from <scripts_root>.nuoyanlib.client import (
+        PLAYER_ID,   # 本地玩家实体ID
+        CF,          # 组件工厂（CompFactory）
+        PlrComp,     # 本地玩家组件工厂
+        LvComp,      # 使用Level ID创建的组件工厂
+        event,       # 事件监听装饰器
+    )
+
+全局配置
+~~~~~~~~
+
+你可以在 `nuoyanlib/config.py <https://github.com/charminglee/nuoyanlib/blob/master/src/nuoyanlib/config.py>`_ 中找到并修改「nuoyanlib」的全局配置，详情请参考 :ref:`config` 。
+
+到这里，你已经学会「nuoyanlib」最基本的食用方法了。以下是一些增强使用体验的可选项。
+
+完整类型提示（可选）
+~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    如果你正在使用PyCharm开发模组，可跳过该小节。
+
+依靠 ``.pyi`` 文件，「nuoyanlib」的每个接口都提供了详细精确的类型提示，你可以选择安装以下依赖库以正确显示：
+
+::
+
+    pip install typing
+    pip install typing-extensions
+
+.. image:: _static/type_hint.png
+    :align: center
+
+更改PyCharm文档注释格式（可选）
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+如果你的PyCharm渲染的文档注释出现格式问题，可以通过以下步骤在PyCharm设置中将文档注释渲染格式更改为reStructuredText。
+
+.. image:: _static/docstring_format.png
+    :align: center
+
+组件工厂
+========
+
+调用ModSDK接口前需要先创建组件工厂，然后再用实体ID或Level ID创建组件。若需要对同一个实体创建多个组件，则每次创建都要重复传入实体ID，比较冗余。
+「nuoyanlib」的 ``CF`` 类将这一过程提前，仅需传入一次实体ID即可。
+
+.. code-block:: python
+
+    import <scripts_root>.nuoyanlib.client as nyl
+    cf = nyl.CF(entity_id)              # 等价于cf = client_api.GetEngineCompFactory()
+    cf.Pos.GetFootPos()                 # cf.CreatePos(entity_id).GetFootPos()
+    cf.ActorMotion.SeMotion((0.1, 0.1)) # cf.CreateActorMotion(entity_id).SeMotion((0.1, 0.1))
+    cf.EngineType.GetEngineType()       # cf.CreateEngineType(entity_id).GetEngineType()
+
+此外，「nuoyanlib」已经预设了客户端本地玩家和双端Level ID的组件工厂，无需再手动创建。
+
+.. code-block:: python
+
+    # 客户端
+    from <scripts_root>.nuoyanlib.client import PlrComp, LvComp, PLAYER_ID, LEVEL_ID, CF
+    PlrComp  # 客户端本地玩家组件工厂，等价于CF(PLAYER_ID)
+    LvComp   # 客户端Level ID组件工厂，等价于CF(LEVEL_ID)
+
+    # 调用接口
+    PlrComp.Attr.GetAttrValue(AttrType.HEALTH)
+    LvComp.Game.AddTimer(0, func)
+
+.. code-block:: python
+
+    # 服务端
+    from <scripts_root>.nuoyanlib.server import LvComp
+    LvComp # 服务端Level ID组件工厂
+
+    # 调用接口
+    LvComp.Game.AddTimer(0, func)
+
+事件监听
+========
+
+ModSDK事件
+~~~~~~~~~~
+
+ModSDK事件系统的最大痛点——事件参数不支持IDE补全，经常需要手动查阅文档，非常麻烦，「nuoyanlib」很好地解决了这个问题。  
+
+.. image:: _static/event_proxy_pre.gif
+    :align: center
+
+在上方的演示中，你可以看见：
+
+- 键入任意一个ModSDK事件的名称，IDE会弹出事件列表，选中你需要的事件并按下回车键即可补全。  
+- 将鼠标停留在事件名上会显示该事件的完整文档。
+- 事件参数同样支持补全，输入 ``event.`` 后IDE会弹出该事件的参数列表。
+- 将鼠标停留在参数名上会显示该参数的说明。
+
+此外：
+
+- 事件参数支持修改，如 ``event.cancel=True`` 。
+- 完全兼容旧版参数字典的写法，如 ``event['entityId']`` 。
+
+要使用这一功能，只需将你的客户端类继承 ``ClientEventProxy`` 即可。服务端对应的事件代理类为 ``ServerEventProxy`` ，用法相同，不再赘述。
+
+.. code-block:: python
+
+    import <scripts_root>.nuoyanlib.client as nyl
+
+    class MyClientSystem(nyl.ClientEventProxy, nyl.ClientSystem) # 继承事件代理类ClientEventProxy与原版ClientSystem类
+        def __init__(self, namespace, system_name):
+            super(MyClientSystem, self).__init__(namespace, system_name) # 此处建议使用super
+
+.. tip::
+
+    实际上，你可以在任何类中继承 ``ClientEventProxy`` ，并非强制绑定 ``ClientSystem`` 。
+
+自定义事件
+~~~~~~~~~~
+
+对于自定义事件，「nuoyanlib」还提供了 ``@event`` 装饰器来优化事件监听过程。
+「nuoyanlib」的事件监听系统基于事件池机制，在高频监听/反监听的场景下，与ModSDK ``ListenForEvent()`` 接口相比有显著的性能提升。
+
+.. code-block:: python
+
+    import mod.client.extraClientApi as client_api
+    import <scripts_root>.nuoyanlib.client as nyl
+
+    class MyClientSystem(client_api.GetClientSystemCls()):
+        def __init__(self, namespace, system_name):
+            # 对当前类中所有被@event装饰的方法执行事件监听
+            nyl.listen_all_events(self)
+            # 调用以下函数可监听特定事件
+            nyl.listen_event(self.MyCustomEvent)
+
+        # 监听MyCustomEvent事件，事件来源为MyMod:MyServerSystem
+        @nyl.event("MyCustomEvent", "MyMod", "MyServerSystem")
+        def EventCallback(self, args):
+            ...
+
+        # 事件名与函数名相同时，可省略event_name参数
+        @nyl.event(ns="MyMod", sys_name="MyServerSystem")
+        def MyCustomEvent(self, args):
+            ...
+
+        # 监听ModSDK事件且事件名与函数名相同时，可省略所有参数
+        @nyl.event
+        def UiInitFinished(self, args):
+            ...
+
+        def Destroy(self):
+            # 必要时，调用以下函数可取消当前类中所有被@event装饰的方法的事件监听
+            nyl.unlisten_all_events(self)
+            # 调用以下函数可取消监听特定事件
+            nyl.unlisten_event(self.MyCustomEvent)
+
+对静态函数使用时，写法基本相同，但需要将 ``is_method`` 参数设为 ``False`` 。此时事件将被立即监听，无需手动调用 ``listen_all_events()`` 。
+
+.. code-block:: python
+
+    @nyl.event(ns="MyMod", sys_name="MyServerSystem", is_method=False)
+    def MyCustomEvent(args):
+        ...
+
+.. tip::
+
+    使用 ``@event`` 装饰器监听的事件支持MCS热更新。
+
+双端通信
+========
+
+跨端调用
+~~~~~~~~
+
+双端广播
+~~~~~~~~
+
+NyUI框架
+========
+
+ScreenNode扩展
+~~~~~~~~~~~~~~
+
+Ny控件
+~~~~~~
+
+自定义容器UI框架
+~~~~~~~~~~~~~~~~

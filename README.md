@@ -24,7 +24,7 @@
 
 ## 📖 简介 | Introduction
 
-「nuoyanlib」是基于网易我的世界[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端、服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
+「nuoyanlib」是基于网易我的世界[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
 您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
 
 > ✅ 已支持 **ModSDK 3.5**  
@@ -144,7 +144,7 @@
 > [!WARNING]  
 > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。
 
-4. 更多信息详见[入门指南](/docs/入门指南.md)。
+4. 更多信息详见[入门指南](/docs/source/getting_started.rst)。
 
 <br>
 
