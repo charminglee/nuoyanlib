@@ -33,11 +33,11 @@ extensions = [
 ]
 
 
-templates_path = ["_templates"]
 exclude_patterns = []
 
 
 html_theme = "pydata_sphinx_theme"
+templates_path = ["_templates"]
 html_static_path = ["_static"]
 html_logo = "_static/logo.png"
 html_theme_options = {

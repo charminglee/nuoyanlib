@@ -1,18 +1,14 @@
 <div align="center">
+   <img src="/img/logo/logo2.png" alt="logo">
 
-[//]: # (  <br>)
+   ---
 
-[//]: # (  <img src="/img/diamond_sword.png" alt="diamond_sword" width=64 height=64>)
+   <h3>基于网易我的世界ModSDK的Mod开发工具库</h3>
 
-  <img src="/img/logo/logo2.png" alt="logo">
-  
-  ---
+   [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.5-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/charminglee/nuoyanlib) ![GitHub repo size](https://img.shields.io/github/repo-size/charminglee/nuoyanlib)  
+   [![python](https://camo.githubusercontent.com/61a81b1dbe844fb6b43df995ae0b9b118c641df75220b27281aad6ea97e46622/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f507974686f6e2d3337373641423f7374796c653d666c6174266c6f676f3d507974686f6e266c6f676f436f6c6f723d666666666666)](https://www.python.org/) [![pycharm](https://img.shields.io/badge/-JetBrains%20PyCharm-black?style=flat&logo=pycharm)](https://www.jetbrains.com/pycharm/) [![github](https://img.shields.io/badge/-GitHub-black?style=flat&logo=github)](https://github.com/charminglee/nuoyanlib) [![gitee](https://img.shields.io/badge/-gitee-red?style=flat&logo=gitee)](https://gitee.com/charming-lee/nuoyanLib)
 
-  <h3>基于网易我的世界ModSDK的Mod开发工具库</h3>
-
-  [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.5-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/charminglee/nuoyanlib) ![GitHub repo size](https://img.shields.io/github/repo-size/charminglee/nuoyanlib)  
-  [![python](https://camo.githubusercontent.com/61a81b1dbe844fb6b43df995ae0b9b118c641df75220b27281aad6ea97e46622/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f507974686f6e2d3337373641423f7374796c653d666c6174266c6f676f3d507974686f6e266c6f676f436f6c6f723d666666666666)](https://www.python.org/) [![pycharm](https://img.shields.io/badge/-JetBrains%20PyCharm-black?style=flat&logo=pycharm)](https://www.jetbrains.com/pycharm/) [![github](https://img.shields.io/badge/-GitHub-black?style=flat&logo=github)](https://github.com/charminglee/nuoyanlib) [![gitee](https://img.shields.io/badge/-gitee-red?style=flat&logo=gitee)](https://gitee.com/charming-lee/nuoyanLib) [![qq](https://img.shields.io/badge/QQ-1279735247-green)](https://qm.qq.com/q/BknsDqOdsk)
-
+   [入门指南]() ● [API文档]() ● [QQ群]()
 </div>
 
 <br>
@@ -22,7 +18,7 @@
 > [!NOTE]  
 > 目前该项目仍处于开发和测试阶段，一些功能仍未开发完善或存在未知bug，且其中的函数命名、具体实现等随时可能发生变化，请谨慎使用。
 
-## 📖 简介 | Introduction
+## 📖 简介 | Intro
 
 「nuoyanlib」是基于网易我的世界[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
 您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
@@ -34,16 +30,13 @@
 
 ## ✨ 亮点 | Features
 
-- [**client（客户端库）**](/nuoyanlib/client)  
-  提供了客户端扩展、特效管理器等客户端专用工具以及ScreenNode扩展、物品网格管理器等UI专用工具。  
+- [`nuoyanlib.client`](/docs/source/api/client.rst)：客户端工具包，提供了NyUI框架、容器UI框架、特效管理、渲染、运镜工具等实用工具。  
 
 
-- [**server（服务端库）**](/nuoyanlib/server)  
-  提供了服务端扩展、实体获取、实体操作、范围伤害、背包管理等服务端专用工具。
+- [`nuoyanlib.server`](/docs/source/api/server.rst)：服务端工具包，提供了实体工具、伤害工具等实用工具。
 
 
-- [**utils（通用工具库）**](/nuoyanlib/utils)  
-  提供了多种数学计算函数、更多的枚举值等双端通用的工具。
+- [`nuoyanlib.utils`](/docs/source/api/utils.rst)：通用工具包，提供了事件监听框架、多种与MC密切相关的数学计算函数、向量工具、双端通信工具、随机数工具等实用工具。
 
 <br>
 
@@ -53,10 +46,9 @@
 
 <br>
 
-## 🚀 开始 | Getting Started
+## 🚀 快速上手 | Quick Start
 
-1. 解压下载的压缩包，将`nuoyanlib`文件夹放至行为包Python脚本根目录下（即`modMain.py`文件所在位置）。  
-    安装好后，你的行为包结构应为： 
+1. 解压下载的压缩包，将`nuoyanlib`文件夹放至行为包Python脚本根目录下（即`modMain.py`文件所在位置）。安装好后，你的行为包结构应为： 
 
     ```
     行为包/  
