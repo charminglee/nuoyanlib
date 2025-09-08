@@ -1,0 +1,7 @@
+typing==3.7.4.3
+typing_extensions
+mc-netease-sdk-nyrev
+Sphinx==8.3.0
+sphinx-autobuild==2025.8.25
+sphinx-copybutton==0.5.2
+pydata-sphinx-theme==0.16.1

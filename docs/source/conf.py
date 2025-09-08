@@ -7,13 +7,28 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-06
+|   Date  : 2025-09-08
 |
 | ==============================================
 """
 
 
+import sys
 import re
+import threading
+from sphinx.application import Sphinx
+from docutils.nodes import document
+from bs4 import BeautifulSoup
+
+
+import nuoyanlib.client as nyl_c
+sys.modules['nuoyanlib.client'] = nyl_c
+def import_server():
+    import nuoyanlib.server as nyl_s
+    sys.modules['nuoyanlib.server'] = nyl_s
+t = threading.Thread(target=import_server)
+t.start()
+t.join()
 
 
 project = "「nuoyanlib」"
@@ -23,7 +38,6 @@ language = "zh_CN"
 
 
 extensions = [
-    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
@@ -31,8 +45,6 @@ extensions = [
     "sphinx_copybutton",
     "sphinx.ext.duration",
 ]
-
-
 exclude_patterns = []
 
 
@@ -76,7 +88,12 @@ html_theme_options = {
     ],
     'show_nav_level': 2
 }
-html_context = {}
+html_sidebars = {
+    '**': ["sidebar-nav-bs", "sidebar-ethical-ads"]
+}
+html_context = {
+    'theme_collapse_navigation': True,
+}
 
 
 autosummary_generate = True
@@ -90,11 +107,27 @@ autodoc_mock_imports = [
     # "mod.server",
     # "mod.common",
 ]
-autodoc_default_options = {}
+autodoc_default_options = {
+    'special-members': ""
+}
 autodoc_docstring_signature = True
 
 
-def autodoc_process_docstring(app, what, name, obj, options, lines):
+a = 0
+def builder_inited(app: Sphinx):
+    def shorten_name(s):
+        if isinstance(s, BeautifulSoup):
+            for tag in s.find_all("a", class_="reference internal"):
+                tag.string = re.sub(r"nuoyanlib\.(client|server|utils)\.", "", tag.string)
+            # global a
+            # if a == 0:
+            #     print(s)
+            #     a += 1
+        return s
+    app.builder.templates.environment.filters['shorten_name'] = shorten_name
+
+
+def autodoc_process_docstring(app: Sphinx, what: str, name: str, obj, options, lines: list[str]):
     for i, line in enumerate(lines[:]):
         if line.startswith("| "):
             lines[i] = line[2:]
@@ -103,7 +136,7 @@ def autodoc_process_docstring(app, what, name, obj, options, lines):
             lines.pop(i + 1)
 
 
-def autodoc_skip_member(app, what, name, obj, skip, options):
+def autodoc_skip_member(app: Sphinx, what: str, name: str, obj: object, skip: bool, options):
     if name in ("__init__", "__truediv__", "__bool__"):
         return True
     if what == "class" and name not in obj.__dict__:
@@ -113,9 +146,29 @@ def autodoc_skip_member(app, what, name, obj, skip, options):
     return skip
 
 
-def setup(app):
+b = 0
+def html_page_context(app: Sphinx, page_name: str, template_name: str, context: dict[str, ...], doctree: document):
+    if 'body' in context:
+        context['body'] = re.sub(
+            r'<span class=\"sig-prename descclassname\">'
+            r'<span class=\"pre\">'
+            r'nuoyanlib\.(client|server|utils)\.'
+            r'</span></span>',
+            "",
+            context['body'],
+        )
+    # global b
+    # b += 1
+    # if b == 10:
+    #     for i in context.items():
+    #         print(i)
+
+
+def setup(app: Sphinx):
+    app.connect("builder-inited", builder_inited)
     app.connect("autodoc-process-docstring", autodoc_process_docstring)
     app.connect("autodoc-skip-member", autodoc_skip_member)
+    app.connect("html-page-context", html_page_context)
 
 
 

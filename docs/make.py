@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-05
+|   Date  : 2025-09-07
 |
 | ==============================================
 """
@@ -34,6 +34,7 @@ app = Sphinx(
     outdir=BUILD_DIR,
     doctreedir=DOCTREES_DIR,
     buildername=BUILDER,
+    parallel=4,
 )
 app.build()
 

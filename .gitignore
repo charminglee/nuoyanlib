@@ -163,3 +163,5 @@ http-client.private.env.json
 
 .idea/GitCommitMessageStorage.xml
 /.idea/git_toolbox_prj.xml
+/.idea/copilot.data.migration.edit.xml
+/.idea/copilot.data.migration.agent.xml

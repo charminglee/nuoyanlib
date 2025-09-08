@@ -7,6 +7,9 @@
 ==========
 
 
+所有在 ``nuoyanlib.utils`` 中公开的接口都可以在 ``nuoyanlib.<client/server>`` 中获得，因此你不必单独 ``import nuoyanlib.utils`` 。
+
+
 事件监听
 ~~~~~~~~
 

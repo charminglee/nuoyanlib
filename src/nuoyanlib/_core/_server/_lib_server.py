@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-09-08
 |
 | ==============================================
 """
@@ -16,7 +16,7 @@
 import mod.server.extraServerApi as server_api
 from .comp import ServerSystem
 from .. import _const, _logging
-from .._sys import NuoyanLibBaseSystem, load_extensions
+from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton
 from ..event.listener import ServerEventProxy
 from ... import config

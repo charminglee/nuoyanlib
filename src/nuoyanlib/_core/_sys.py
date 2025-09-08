@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-06
+|   Date  : 2025-09-08
 |
 | ==============================================
 """
@@ -25,7 +25,7 @@ __all__ = [
 ]
 
 
-DEV_MOVE = True
+DEV_MOVE = False
 
 
 def get_env():
