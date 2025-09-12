@@ -7,18 +7,76 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-27
+|   Date  : 2025-09-12
 |
 | ==============================================
 """
 
 
 from threading import Timer
+from .._core._sys import get_lv_comp
 
 
 __all__ = [
+    "delay",
+    "repeat",
     "McTimer",
 ]
+
+
+def _get_timer(repeated=False):
+    if repeated:
+        return get_lv_comp().Game.AddRepeatedTimer
+    else:
+        return get_lv_comp().Game.AddTimer
+
+
+def delay(t=0):
+    """
+    [装饰器]
+
+    | 延迟执行函数（仅支持无参数的函数）。
+
+    -----
+
+    :param float t: 延迟时间，单位秒；默认为0，表示下一帧执行
+
+    :return: 返回原函数
+    :rtype: function
+    """
+    def decorator(func):
+        _get_timer()(_t, func)
+        return func
+    if callable(t):
+        _t = 0
+        return decorator(t)
+    else:
+        _t = t
+        return decorator
+
+
+def repeat(t=0):
+    """
+    [装饰器]
+
+    | 重复执行函数（仅支持无参数的函数）。
+
+    -----
+
+    :param float t: 执行间隔时间，单位秒；默认为0，表示每帧执行
+
+    :return: 返回原函数
+    :rtype: function
+    """
+    def decorator(func):
+        _get_timer(True)(_t, func)
+        return func
+    if callable(t):
+        _t = 0
+        return decorator(t)
+    else:
+        _t = t
+        return decorator
 
 
 class McTimer(object):

@@ -7,14 +7,27 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-09-12
 |
 | ==============================================
 """
 
 
-from typing import Callable, Any, Optional
+from typing import Callable, Any, Optional, overload
 from threading import Timer
+from mod.common.utils.timer import CallLater
+from .._core._types._typing import _F
+
+
+def _get_timer(repeated: bool = False) -> Callable[..., CallLater]: ...
+@overload
+def delay(t: float = 0) -> Callable[[_F], _F]: ...
+@overload
+def delay(t: _F) -> _F: ...
+@overload
+def repeat(t: float = 0) -> Callable[[_F], _F]: ...
+@overload
+def repeat(t: _F) -> _F: ...
 
 
 class McTimer(object):

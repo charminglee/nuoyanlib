@@ -7,18 +7,22 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-12
 |
 | ==============================================
 """
 
 
-from typing import Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, Iterator
+from typing import TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, Iterator
 from types import InstanceType
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.mcmath import Vector3
 from ...client.ui.nyc import *
+
+
+_T = TypeVar("_T")
+_F = TypeVar("_F", bound=Callable[..., Any])
 
 
 PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
