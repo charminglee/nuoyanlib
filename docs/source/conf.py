@@ -133,7 +133,7 @@ def autodoc_process_docstring(app: Sphinx, what: str, name: str, obj, options, l
             lines[i] = line[2:]
         if re.match(r"\[.+]", line):
             lines.pop(i)
-            lines.pop(i + 1)
+            lines.pop(i)
 
 
 def autodoc_skip_member(app: Sphinx, what: str, name: str, obj: object, skip: bool, options):

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-06
+|   Date  : 2025-09-14
 |
 | ==============================================
 """
@@ -39,10 +39,12 @@ def with_metaclass(metacls, *bases):
 
 def kwargs_setter(**kwargs):
     def decorator(func):
+        co = func.func_code
+        sgn = co.co_varnames[:co.co_argcount]
         @wraps(func)
         def wrapper(*args, **_kwargs):
             for k in _kwargs:
-                if k not in kwargs:
+                if k not in kwargs and k not in sgn:
                     raise TypeError("%s() got an unexpected keyword argument '%s'" % (func.__name__, k))
             for k in kwargs:
                 if k not in _kwargs:
@@ -219,7 +221,7 @@ def __test__():
         return a, b, kwargs['c'], kwargs['d']
     assert func(1, 2) == (1, 2, 3, 4)
     assert func(1, 2, c=6) == (1, 2, 6, 4)
-    # assert func(1, b=5, c=6) == (1, 5, 6, 4)
+    assert func(1, b=5, c=6) == (1, 5, 6, 4)
     assert func(1, c=6) == (1, 2, 6, 4)
 
     a = [0]
