@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-03
+|   Date  : 2025-09-14
 |
 | ==============================================
 """
@@ -21,6 +21,7 @@ from .._core._sys import get_comp_factory, get_api, LEVEL_ID
 
 
 __all__ = [
+    "to_aabb",
     "pos_distance_square",
     "clamp",
     "pos_block_facing",
@@ -46,6 +47,25 @@ __all__ = [
     "rot_diff",
     "ray_aabb_intersection",
 ]
+
+
+def to_aabb(pos1, pos2):
+    """
+    | 将任意两点坐标转换为以这两点为顶点的长方体区域的最小点和最大点（AABB）。
+
+    -----
+
+    :param tuple[float,float,float] pos1: 坐标1
+    :param tuple[float,float,float] pos2: 坐标2
+
+    :return: 最小点和最大点坐标
+    :rtype: tuple[tuple[float,float,float],tuple[float,float,float]]|None
+    """
+    if not pos1 or not pos2:
+        return
+    min_pos = (min(pos1[0], pos2[0]), min(pos1[1], pos2[1]), min(pos1[2], pos2[2]))
+    max_pos = (max(pos1[0], pos2[0]), max(pos1[1], pos2[1]), max(pos1[2], pos2[2]))
+    return min_pos, max_pos
 
 
 def pos_distance_square(pos1, pos2):
