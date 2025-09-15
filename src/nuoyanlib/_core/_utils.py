@@ -39,7 +39,7 @@ def with_metaclass(metacls, *bases):
 
 def kwargs_setter(**kwargs):
     def decorator(func):
-        co = func.func_code
+        co = func.__code__
         sgn = co.co_varnames[:co.co_argcount]
         @wraps(func)
         def wrapper(*args, **_kwargs):
