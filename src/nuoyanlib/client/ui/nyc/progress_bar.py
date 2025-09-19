@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-09-20
 |
 | ==============================================
 """
@@ -48,7 +48,7 @@ class NyProgressBar(NyControl):
     # region Properties ================================================================================================
 
     @property
-    def value(self):
+    def progress(self):
         """
         [只写属性]
 
@@ -58,8 +58,8 @@ class NyProgressBar(NyControl):
         """
         raise _error.GetPropertyError("value")
 
-    @value.setter
-    def value(self, val):
+    @progress.setter
+    def progress(self, val):
         """
         [只写属性]
 

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-26
+|   Date  : 2025-09-20
 |
 | ==============================================
 """
@@ -34,9 +34,9 @@ class NyProgressBar(NyControl):
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
     @property
-    def value(self) -> NoReturn: ...
-    @value.setter
-    def value(self, val: float) -> None: ...
+    def progress(self) -> NoReturn: ...
+    @progress.setter
+    def progress(self, val: float) -> None: ...
 
     def SetValue(self, progress: float) -> None:
         """
