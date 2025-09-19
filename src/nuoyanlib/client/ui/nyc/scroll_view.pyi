@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-26
+|   Date  : 2025-09-18
 |
 | ==============================================
 """
@@ -43,9 +43,9 @@ class NyScrollView(NyControl):
     @scroll_pct.setter
     def scroll_pct(self, val: int) -> None: ...
     @property
-    def content_path(self) -> str: ...
+    def scroll_content_path(self) -> str: ...
     @property
-    def content_control(self) -> NyControl: ...
+    def scroll_content(self) -> NyControl: ...
 
     def SetScrollViewPos(self, pos: float) -> None:
         """

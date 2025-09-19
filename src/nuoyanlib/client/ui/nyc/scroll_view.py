@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-09-18
 |
 | ==============================================
 """
@@ -91,7 +91,7 @@ class NyScrollView(NyControl):
         self.base_control.SetScrollViewPercentValue(int(val))
 
     @property
-    def content_path(self):
+    def scroll_content_path(self):
         """
         [只读属性]
 
@@ -102,7 +102,7 @@ class NyScrollView(NyControl):
         return self.base_control.GetScrollViewContentPath()
 
     @property
-    def content_control(self):
+    def scroll_content(self):
         """
         [只读属性]
 
@@ -110,7 +110,7 @@ class NyScrollView(NyControl):
 
         :rtype: NyControl
         """
-        return NyControl.from_path(self.ui_node, self.content_path)
+        return NyControl.from_path(self.ui_node, self.scroll_content_path)
 
     # endregion
 
