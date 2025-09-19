@@ -111,6 +111,21 @@ class FrameAnimData(TypedDict):
     callback: Callable
     args: Tuple[Any, ...]
     kwargs: Dict[str, Any]
+class BtnTouchCallbackDict(TypedDict):
+    #collection_name
+    #collection_index
+    ButtonState: int
+    TouchEvent: int
+    PrevButtonDownID: int
+    TouchPosX: float
+    TouchPosY: float
+    ButtonPath: str
+    AddTouchEventParams: dict
+class BtnHoverCallbackDict(TypedDict):
+    isHoverIn: int
+    PrevButtonDownID: int
+    ButtonPath: str
+    AddHoverEventParams: dict
 
 
 TimeEaseFuncType = Callable[[float], float]

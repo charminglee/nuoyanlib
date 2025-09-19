@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-19
 |
 | ==============================================
 """
@@ -17,12 +17,15 @@ from typing import Callable, Optional, Dict, Union, List, Any, ClassVar
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.timer import CallLater
-from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl, ItemDict
+from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl, ItemDict, BtnTouchCallbackDict, BtnHoverCallbackDict
 from ...._core._types._checker import args_type_check
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....utils.enum import Enum, ButtonCallbackType
 from ...._core.event._events import ClientEventEnum as Events
+
+
+__BtnCallback = Callable[[Union[BtnTouchCallbackDict, BtnHoverCallbackDict]], Any]
 
 
 class NyButton(NyControl):
@@ -33,7 +36,7 @@ class NyButton(NyControl):
         pressed: str
         button_label: str
     __vibrate_time: int
-    _btn_callbacks: Dict[int, List[Callable]]
+    _btn_callbacks: Dict[int, List[__BtnCallback]]
     _enabled_double_click: bool
     _double_click_time: float
     _enabled_long_click: bool
@@ -57,7 +60,7 @@ class NyButton(NyControl):
     """
     | 按钮最近一次的按下中是否触发了长按。
     """
-    touch_event_params: Optional[Dict[str, Any]]
+    touch_event_params: Optional[dict]
     """
     | 按钮TouchEvent参数。
     """
@@ -67,7 +70,7 @@ class NyButton(NyControl):
         btn_control: ButtonUIControl,
         /,
         *,
-        touch_event_params: Optional[Dict[str, Any]] = None,
+        touch_event_params: Optional[dict] = None,
     ) -> None: ...
     @args_type_check(str, is_method=True)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
@@ -82,9 +85,9 @@ class NyButton(NyControl):
     @vibrate_time.setter
     @args_type_check(int, is_method=True)
     def vibrate_time(self, val: int) -> None: ...
-    def set_callback(self, func: Callable, cb_type: str = ButtonCallbackType.UP) -> bool: ...
+    def set_callback(self, func: __BtnCallback, cb_type: str = ButtonCallbackType.UP) -> bool: ...
     SetCallback = set_callback
-    def remove_callback(self, func: Callable, cb_type: str = ButtonCallbackType.UP) -> bool: ...
+    def remove_callback(self, func: __BtnCallback, cb_type: str = ButtonCallbackType.UP) -> bool: ...
     RemoveCallback = remove_callback
     def set_movable(
         self,
@@ -113,7 +116,7 @@ class NyButton(NyControl):
         associated_uis: Union[UiPathOrNyControl, List[UiPathOrNyControl], None] = None,
         auto_save: bool = False,
     ) -> None: ...
-    def _exec_callbacks(self, cb_type: int, args: Dict[str, Any]) -> None: ...
+    def _exec_callbacks(self, cb_type: int, args: dict) -> None: ...
     def _on_touch_up_dc(self, args: ArgsDict) -> None: ...
     def _on_touch_down_lc(self, args: ArgsDict) -> None: ...
     def _cancel_long_click(self, args: ArgsDict) -> None: ...

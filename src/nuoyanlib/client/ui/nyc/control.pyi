@@ -7,23 +7,22 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-20
 |
 | ==============================================
 """
 
 
-from typing import ClassVar, TypedDict, Any, Literal, Callable, NoReturn, Dict, Optional, TypeVar, Generator, Type, List
+from typing import ClassVar, TypedDict, Any, Literal, Callable, NoReturn, Dict, Optional, Type, List
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ...._core._types._typing import UiPathOrNyControl, FTuple2, STuple
+from ...._core._types._typing import UiPathOrNyControl, FTuple2, STuple, _T
 from ...._core._utils import cached_property
 from ...._core._types._checker import args_type_check
 from ..screen_node import ScreenNodeExtension
 from . import *
 
 
-_T = TypeVar("_T")
 __Anchor = Literal[
     "top_left",
     "top_middle",
@@ -140,7 +139,7 @@ class NyControl(object):
     @cached_property
     def parent(self) -> Optional[NyControl]: ...
     def destroy(self) -> None: ...
-    def to_button(self, *, touch_event_params: Optional[Dict[str, Any]] = None) -> NyButton: ...
+    def to_button(self, *, touch_event_params: Optional[dict] = None) -> NyButton: ...
     def to_image(self) -> NyImage: ...
     def to_label(self) -> NyLabel: ...
     def to_input_panel(self) -> NyInputPanel: ...

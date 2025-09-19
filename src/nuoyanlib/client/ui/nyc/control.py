@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-18
 |
 | ==============================================
 """
@@ -143,7 +143,7 @@ class NyControl(object):
         :param bool sync_refresh: 是否需要同步刷新，默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
         :param bool force_update: 是否需要强制刷新，默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
 
-        :return: 新控件的Ny控件实例，类型与当前控件实例相同，克隆失败时返回None
+        :return: 新控件的Ny控件实例，类型与被克隆控件相同，克隆失败时返回None
         :rtype: NyControl|None
         """
         # todo：处理名称重复
