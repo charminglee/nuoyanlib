@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-18
 |
 | ==============================================
 """
@@ -251,6 +251,20 @@ class ScreenNodeExtension(ClientEventProxy):
         :rtype: NyToggle|None
         """
         return self._create_nyc(path_or_control, NyToggle, **kwargs)
+
+    def create_ny_scroll_view(self, path_or_control, **kwargs):
+        """
+        | 创建 ``NyScrollView`` 滚动视图实例。
+        | 兼容ModSDK ``ScrollViewUIControl`` 和 ``BaseUIControl`` 的相关接口。
+
+        -----
+
+        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+
+        :return: NyScrollView滚动视图实例，创建失败返回None
+        :rtype: NyScrollView|None
+        """
+        return self._create_nyc(path_or_control, NyScrollView, **kwargs)
 
     def clear_all_pos_data(self):
         """
