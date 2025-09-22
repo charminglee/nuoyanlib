@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-19
+|   Date  : 2025-09-20
 |
 | ==============================================
 """
@@ -35,7 +35,13 @@ def change_item_count(
     pos: int = 0,
     change: int = -1,
 ) -> None: ...
-def deduct_inv_item(player_id: str, name: str, aux: int = -1, count: int = 1) -> bool: ...
+def deduct_inv_item(
+    player_id: str,
+    name: str,
+    aux: int = -1,
+    count: int = 1,
+    include_creative: bool = False,
+) -> bool: ...
 
 
 

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-19
+|   Date  : 2025-09-20
 |
 | ==============================================
 """
@@ -168,7 +168,7 @@ def change_item_count(player_id, pos_type=ItemPosType.CARRIED, pos=0, change=-1)
     item_comp.SetPlayerAllItems({(pos_type, pos): item})
 
 
-def deduct_inv_item(player_id, name, aux=-1, count=1):
+def deduct_inv_item(player_id, name, aux=-1, count=1, include_creative=False):
     """
     | 从玩家背包中扣除指定数量的物品。
     | 该函数无需传入物品所在位置，而是自动从背包中寻找指定物品，找到了则扣除指定数量。
@@ -179,10 +179,13 @@ def deduct_inv_item(player_id, name, aux=-1, count=1):
     :param str name: 物品名称
     :param int aux: 物品特殊值，默认为-1，表示任意特殊值
     :param int count: 扣除数量，默认为1
+    :param bool include_creative: 创造模式下是否扣除，默认为False
 
     :return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
     :rtype: bool
     """
+    if not include_creative and LvComp.Game.GetPlayerGameType(player_id) == GameType.Creative:
+        return
     comp = CF(player_id).Item
     items = comp.GetPlayerAllItems(ItemPosType.INVENTORY, True)
     items_dict_map = {}

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-12
+|   Date  : 2025-09-21
 |
 | ==============================================
 """
@@ -16,6 +16,7 @@
 from uuid import uuid4
 from traceback import format_exc
 from .._core._sys import get_api, is_client, get_comp_factory, LEVEL_ID, get_lib_system
+from .._core._error import SystemNotFoundError
 
 
 __all__ = [
@@ -55,17 +56,18 @@ def broadcast_to_all_systems(event_name, event_args, from_system):
 
     :return: 无
     :rtype: None
+
+    :raise SystemNotFoundError: from_system不存在时抛出
     """
     api = get_api()
     if is_client():
         from .._core._client._lib_client import instance
         lib_sys = instance()
         if isinstance(from_system, tuple):
-            lib_sys.broadcast_to_all_client(event_name, event_args, *from_system)
             from_system = api.GetSystem(*from_system)
             if not from_system:
-                from mod.client.system.clientSystem import ClientSystem
-                from_system = ClientSystem(*from_system)
+                raise SystemNotFoundError(*from_system)
+            lib_sys.broadcast_to_all_client(event_name, event_args, *from_system)
         else:
             lib_sys.broadcast_to_all_client(
                 event_name, event_args, from_system.namespace, from_system.systemName # NOQA
@@ -75,8 +77,7 @@ def broadcast_to_all_systems(event_name, event_args, from_system):
         if isinstance(from_system, tuple):
             from_system = api.GetSystem(*from_system)
             if not from_system:
-                from mod.server.system.serverSystem import ServerSystem
-                from_system = ServerSystem(*from_system)
+                raise SystemNotFoundError(*from_system)
         from_system.BroadcastToAllClient(event_name, event_args)
         from_system.BroadcastEvent(event_name, event_args)
 

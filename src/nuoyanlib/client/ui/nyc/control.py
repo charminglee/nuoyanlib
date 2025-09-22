@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-18
+|   Date  : 2025-09-21
 |
 | ==============================================
 """
@@ -340,6 +340,8 @@ class NyControl(object):
         :rtype: NyButton
         """
         from . import NyButton
+        if isinstance(self, NyButton):
+            return self
         return NyButton.from_path(self.ui_node, self.path, **kwargs)
 
     def to_image(self, **kwargs):
@@ -352,6 +354,8 @@ class NyControl(object):
         :rtype: NyImage
         """
         from . import NyImage
+        if isinstance(self, NyImage):
+            return self
         return NyImage.from_path(self.ui_node, self.path, **kwargs)
 
     def to_label(self, **kwargs):
@@ -364,6 +368,8 @@ class NyControl(object):
         :rtype: NyLabel
         """
         from . import NyLabel
+        if isinstance(self, NyLabel):
+            return self
         return NyLabel.from_path(self.ui_node, self.path, **kwargs)
 
     def to_input_panel(self, **kwargs):
@@ -376,6 +382,8 @@ class NyControl(object):
         :rtype: NyInputPanel
         """
         from . import NyInputPanel
+        if isinstance(self, NyInputPanel):
+            return self
         return NyInputPanel.from_path(self.ui_node, self.path, **kwargs)
 
     def to_stack_panel(self, **kwargs):
@@ -388,6 +396,8 @@ class NyControl(object):
         :rtype: NyStackPanel
         """
         from . import NyStackPanel
+        if isinstance(self, NyStackPanel):
+            return self
         return NyStackPanel.from_path(self.ui_node, self.path, **kwargs)
 
     def to_edit_box(self, **kwargs):
@@ -400,9 +410,11 @@ class NyControl(object):
         :rtype: NyEditBox
         """
         from . import NyEditBox
+        if isinstance(self, NyEditBox):
+            return self
         return NyEditBox.from_path(self.ui_node, self.path, **kwargs)
 
-    def to_netease_paper_doll(self, **kwargs):
+    def to_paper_doll(self, **kwargs):
         """
         | 转换为 ``NyPaperDoll`` 实例。
 
@@ -412,6 +424,8 @@ class NyControl(object):
         :rtype: NyPaperDoll
         """
         from . import NyPaperDoll
+        if isinstance(self, NyPaperDoll):
+            return self
         return NyPaperDoll.from_path(self.ui_node, self.path, **kwargs)
 
     def to_item_renderer(self, **kwargs):
@@ -424,6 +438,8 @@ class NyControl(object):
         :rtype: NyItemRenderer
         """
         from . import NyItemRenderer
+        if isinstance(self, NyItemRenderer):
+            return self
         return NyItemRenderer.from_path(self.ui_node, self.path, **kwargs)
 
     def to_scroll_view(self, **kwargs):
@@ -436,6 +452,8 @@ class NyControl(object):
         :rtype: NyScrollView
         """
         from . import NyScrollView
+        if isinstance(self, NyScrollView):
+            return self
         return NyScrollView.from_path(self.ui_node, self.path, **kwargs)
 
     def to_grid(self, **kwargs):
@@ -471,6 +489,8 @@ class NyControl(object):
         :rtype: NyGrid
         """
         from . import NyGrid
+        if isinstance(self, NyGrid):
+            return self
         return NyGrid.from_path(self.ui_node, self.path, **kwargs)
 
     def to_progress_bar(self, **kwargs):
@@ -483,6 +503,8 @@ class NyControl(object):
         :rtype: NyProgressBar
         """
         from . import NyProgressBar
+        if isinstance(self, NyProgressBar):
+            return self
         return NyProgressBar.from_path(self.ui_node, self.path, **kwargs)
 
     def to_toggle(self, **kwargs):
@@ -495,6 +517,8 @@ class NyControl(object):
         :rtype: NyToggle
         """
         from . import NyToggle
+        if isinstance(self, NyToggle):
+            return self
         return NyToggle.from_path(self.ui_node, self.path, **kwargs)
 
     def to_slider(self, **kwargs):
@@ -507,6 +531,8 @@ class NyControl(object):
         :rtype: NySlider
         """
         from . import NySlider
+        if isinstance(self, NySlider):
+            return self
         return NySlider.from_path(self.ui_node, self.path, **kwargs)
 
     def to_selection_wheel(self, **kwargs):
@@ -519,6 +545,8 @@ class NyControl(object):
         :rtype: NySelectionWheel
         """
         from . import NySelectionWheel
+        if isinstance(self, NySelectionWheel):
+            return self
         return NySelectionWheel.from_path(self.ui_node, self.path, **kwargs)
 
     def to_combo_box(self, **kwargs):
@@ -531,6 +559,8 @@ class NyControl(object):
         :rtype: NyComboBox
         """
         from . import NyComboBox
+        if isinstance(self, NyComboBox):
+            return self
         return NyComboBox.from_path(self.ui_node, self.path, **kwargs)
 
     def to_mini_map(self, **kwargs):
@@ -543,6 +573,8 @@ class NyControl(object):
         :rtype: NyMiniMap
         """
         from . import NyMiniMap
+        if isinstance(self, NyMiniMap):
+            return self
         return NyMiniMap.from_path(self.ui_node, self.path, **kwargs)
 
     # endregion

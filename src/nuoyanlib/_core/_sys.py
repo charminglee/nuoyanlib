@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-08
+|   Date  : 2025-09-20
 |
 | ==============================================
 """
@@ -22,6 +22,7 @@ __all__ = [
     "get_api",
     "get_comp_factory",
     "get_lv_comp",
+    "get_cf",
 ]
 
 
@@ -116,6 +117,14 @@ def get_lv_comp():
     else:
         from ._server.comp import LvComp
     return LvComp
+
+
+def get_cf(player_id):
+    if is_client():
+        from ._client.comp import CF
+    else:
+        from ._server.comp import CF
+    return CF(player_id)
 
 
 LEVEL_ID = get_api().GetLevelId()

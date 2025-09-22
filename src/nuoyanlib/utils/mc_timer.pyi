@@ -7,25 +7,33 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-12
+|   Date  : 2025-09-22
 |
 | ==============================================
 """
 
 
-from typing import Callable, Any, Optional, overload
+from typing import Callable, Any, Optional, overload, Hashable, Dict, TypeVar
 from threading import Timer
 from mod.common.utils.timer import CallLater
-from .._core._types._typing import _F
 
 
-def _get_timer(repeated: bool = False) -> Callable[..., CallLater]: ...
+_F = TypeVar("_F", bound=Callable[[], Any])
+
+
+_c_delay_timers: Dict[Hashable, CallLater]
+_s_delay_timers: Dict[Hashable, CallLater]
+_c_repeat_timers: Dict[Hashable, CallLater]
+_s_repeat_timers: Dict[Hashable, CallLater]
+
+
+def _set_timer(t: float, func: Callable[[], Any], is_repeat: bool, key: Optional[Hashable]) -> None: ...
 @overload
-def delay(t: float = 0) -> Callable[[_F], _F]: ...
+def delay(t: float = 0, key: Optional[Hashable] = None) -> Callable[[_F], _F]: ...
 @overload
 def delay(t: _F) -> _F: ...
 @overload
-def repeat(t: float = 0) -> Callable[[_F], _F]: ...
+def repeat(t: float = 0, key: Optional[Hashable] = None) -> Callable[[_F], _F]: ...
 @overload
 def repeat(t: _F) -> _F: ...
 

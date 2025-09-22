@@ -123,7 +123,7 @@
     import <scripts_root>.nuoyanlib.server as nyl
    
     # 导入常用工具
-    from <scripts_root>.nuoyanlib.client import (
+    from <scripts_root>.nuoyanlib.server import (
         CF,          
         LvComp,      
         event,       

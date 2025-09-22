@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-09-21
 |
 | ==============================================
 """
@@ -16,6 +16,10 @@
 from typing import Tuple
 
 
+class SystemNotFoundError(RuntimeError):
+    ns: str
+    sys_name: str
+    def __init__(self: ..., ns: str, sys_name: str) -> None: ...
 class NuoyanLibServerSystemRegisterError(RuntimeError):
     pass
 class NuoyanLibClientSystemRegisterError(RuntimeError):

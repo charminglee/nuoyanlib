@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-09-20
 |
 | ==============================================
 """
@@ -16,7 +16,7 @@
 from math import atan, acos, pi, sin, cos, radians
 from mod.common.utils.mcmath import Vector3, Matrix
 from .mc_math import pos_distance
-from .._core._sys import get_comp_factory, get_api
+from .._core._sys import get_cf, get_api
 from .._core import _error
 
 
@@ -69,7 +69,7 @@ def set_vec_length(vec, length, convert_vec=False):
 
     :raise VectorError: 传入零向量时抛出
     """
-    vec_ = _toVector3(vec)
+    vec_ = _to_vector3(vec)
     orig_len = vec_.Length()
     if orig_len <= 0:
         raise _error.VectorError("can't set the length of zero vector")
@@ -91,9 +91,9 @@ def vec_orthogonal_decomposition(vec, basis1, basis2, convert_vec=False):
     :return: 分解后的两个向量，第一个向量沿basis1方向，第二个向量沿basis2方向
     :rtype: tuple[tuple[float,float,float]|Vector3, tuple[float,float,float]|Vector3]
     """
-    vec_ = _toVector3(vec)
-    basis1 = _toVector3(basis1)
-    basis2 = _toVector3(basis2)
+    vec_ = _to_vector3(vec)
+    basis1 = _to_vector3(basis1)
+    basis2 = _to_vector3(basis2)
     vec1 = (Vector3.Dot(vec_, basis1) / Vector3.Dot(basis1, basis1)) * basis1
     vec2 = (Vector3.Dot(vec_, basis2) / Vector3.Dot(basis2, basis2)) * basis2
     return _convert_return_vec(vec, vec1, convert_vec), _convert_return_vec(vec, vec2, convert_vec)
@@ -108,16 +108,18 @@ def vec_entity_left(entity_id, retVector3=False):
     :param str entity_id: 实体ID
     :param bool retVector3: 是否以Vector3类型返回，默认为False，返回tuple
 
-    :return: 实体朝向左侧90°的单位向量
-    :rtype: tuple[float,float,float]|Vector3
+    :return: 实体朝向左侧90°的单位向量，获取失败返回None
+    :rtype: tuple[float,float,float]|Vector3|None
     """
-    front = vec_entity_front(entity_id, retVector3=True)
-    up = Vector3.Up()
-    left = Vector3.Cross(up, front)
-    left.Normalize()
+    f = vec_entity_front(entity_id, retVector3=True)
+    if not f:
+        return
+    u = Vector3.Up()
+    l = Vector3.Cross(u, f)
+    l.Normalize()
     if not retVector3:
-        left = left.ToTuple()
-    return left
+        l = l.ToTuple()
+    return l
 
 
 def vec_entity_right(entity_id, retVector3=False):
@@ -129,11 +131,14 @@ def vec_entity_right(entity_id, retVector3=False):
     :param str entity_id: 实体ID
     :param bool retVector3: 是否以Vector3类型返回，默认为False，返回tuple
 
-    :return: 实体朝向右侧90°的单位向量
-    :rtype: tuple[float,float,float]|Vector3
+    :return: 实体朝向右侧90°的单位向量，获取失败返回None
+    :rtype: tuple[float,float,float]|Vector3|None
     """
-    right = -Vector3(vec_entity_left(entity_id)) # 手动转Vector3而不是使用retVector3参数，以规避机审报错（机审会判定为tuple无法使用-运算符）
-    return right if retVector3 else right.ToTuple()
+    l = vec_entity_left(entity_id)
+    if not l:
+        return
+    r = -Vector3(l) # 手动转Vector3而不是使用retVector3参数，以规避机审报错（机审会判定为tuple无法使用-运算符）
+    return r if retVector3 else r.ToTuple()
 
 
 def vec_entity_front(entity_id, ignore_y=False, retVector3=False):
@@ -146,17 +151,17 @@ def vec_entity_front(entity_id, ignore_y=False, retVector3=False):
     :param bool ignore_y: 是否忽略y轴朝向，设为True时y轴朝向恒定为0，默认为False
     :param bool retVector3: 是否以Vector3类型返回，默认为False，返回tuple
 
-    :return: 实体朝向的单位向量
-    :rtype: tuple[float,float,float]|Vector3
+    :return: 实体朝向的单位向量，获取失败返回None
+    :rtype: tuple[float,float,float]|Vector3|None
     """
-    api = get_api()
-    cf = get_comp_factory()
-    front = api.GetDirFromRot(cf.CreateRot(entity_id).GetRot())
+    f = get_api().GetDirFromRot(get_cf(entity_id).Rot.GetRot())
+    if not f:
+        return
     if ignore_y:
-        front = vec_normalize((front[0], 0, front[2]))
+        f = vec_normalize((f[0], 0, f[2]))
     if retVector3:
-        front = Vector3(front)
-    return front
+        f = Vector3(f)
+    return f
 
 
 def vec_entity_back(entity_id, ignore_y=False, retVector3=False):
@@ -169,14 +174,17 @@ def vec_entity_back(entity_id, ignore_y=False, retVector3=False):
     :param bool ignore_y: 是否忽略y轴朝向，设为True时y轴朝向恒定为0，默认为False
     :param bool retVector3: 是否以Vector3类型返回，默认为False，返回tuple
 
-    :return: 与实体朝向相反的单位向量
-    :rtype: tuple[float,float,float]|Vector3
+    :return: 与实体朝向相反的单位向量，获取失败返回None
+    :rtype: tuple[float,float,float]|Vector3|None
     """
-    back = -Vector3(vec_entity_front(entity_id, ignore_y))
-    return back if retVector3 else back.ToTuple()
+    f = vec_entity_front(entity_id, ignore_y)
+    if not f:
+        return
+    b = -Vector3(f)
+    return b if retVector3 else b.ToTuple()
 
 
-def _toVector3(vec):
+def _to_vector3(vec):
     if isinstance(vec, Vector3):
         return vec
     else:
@@ -191,7 +199,7 @@ def _convert_return_vec(input_vec, output_vec, convert):
             else:
                 return tuple(output_vec)
         else:
-            return _toVector3(output_vec)
+            return _to_vector3(output_vec)
     else:
         input_type = type(input_vec)
         return (
@@ -212,7 +220,7 @@ def vec_normalize(vec, convert_vec=False):
     :return: 单位向量，长度为1
     :rtype: tuple[float,float,float]|list[float]|Vector3
     """
-    res = _toVector3(vec).Normalized()
+    res = _to_vector3(vec).Normalized()
     return _convert_return_vec(vec, res, convert_vec)
 
 
@@ -254,7 +262,7 @@ def vec_p2p(pos1, pos2, retVector3=False):
     :return: 从pos1指向pos2的单位向量
     :rtype: tuple[float,float,float]|Vector3
     """
-    vec = _toVector3(pos2) - _toVector3(pos1)
+    vec = _to_vector3(pos2) - _to_vector3(pos1)
     vec.Normalize()
     return vec if retVector3 else vec.ToTuple()
 
@@ -270,7 +278,7 @@ def vec_length(vec):
     :return: 向量长度
     :rtype: float
     """
-    return _toVector3(vec).Length()
+    return _to_vector3(vec).Length()
 
 
 def vec_angle(vec1, vec2):
@@ -285,8 +293,8 @@ def vec_angle(vec1, vec2):
     :return: 夹角弧度值
     :rtype: float
     """
-    vec1 = _toVector3(vec1)
-    vec2 = _toVector3(vec2)
+    vec1 = _to_vector3(vec1)
+    vec2 = _to_vector3(vec2)
     vec1_len = vec1.Length()
     vec2_len = vec2.Length()
     v1_v2 = Vector3.Dot(vec1, vec2)
@@ -364,10 +372,10 @@ def vec_rotate_around(v, u, angle, convert_vec=False):
     :return: 旋转后的向量
     :rtype: tuple[float,float,float]|list[float]|Vector3
     """
-    v = _toVector3(v)
+    v = _to_vector3(v)
     v_len = v.Length()
     v.Normalize()
-    u = _toVector3(u).Normalized()
+    u = _to_vector3(u).Normalized()
     theta = radians(angle)
     cos_ = cos(theta)
     sin_ = sin(theta)
@@ -391,8 +399,8 @@ def outgoing_vec(vec, normal, convert_vec=False):
     :return: 出射向量
     :rtype: tuple[float,float,float]|list[float]|Vector3
     """
-    v = _toVector3(vec)
-    n = _toVector3(normal)
+    v = _to_vector3(vec)
+    n = _to_vector3(normal)
     reflex_vec = v - 2 * Vector3.Dot(v, n) * n
     return _convert_return_vec(vec, reflex_vec, convert_vec)
 
@@ -410,9 +418,9 @@ def vec_composite(convert_vec, vec, *more_vec):
     :return: 合向量
     :rtype: tuple[float,float,float]|list[float]|Vector3
     """
-    res = _toVector3(vec)
+    res = _to_vector3(vec)
     for v in more_vec:
-        res += _toVector3(v)
+        res += _to_vector3(v)
     return _convert_return_vec(vec, res, convert_vec)
 
 
@@ -429,7 +437,7 @@ def vec_scale(vec, scale, convert_vec=False):
     :return: 缩放后的向量
     :rtype: tuple[float,float,float]|list[float]|Vector3
     """
-    res = _toVector3(vec) * scale
+    res = _to_vector3(vec) * scale
     return _convert_return_vec(vec, res, convert_vec)
 
 

@@ -7,45 +7,65 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-12
+|   Date  : 2025-09-22
 |
 | ==============================================
 """
 
 
 from threading import Timer
-from .._core._sys import get_lv_comp
+from .._core._sys import get_lv_comp, is_client
 
 
 __all__ = [
     "delay",
     "repeat",
-    "McTimer",
+    # "McTimer",
 ]
 
 
-def _get_timer(repeated=False):
-    if repeated:
-        return get_lv_comp().Game.AddRepeatedTimer
+_c_delay_timers = {}
+_s_delay_timers = {}
+_c_repeat_timers = {}
+_s_repeat_timers = {}
+
+
+def _set_timer(t, func, is_repeat, key):
+    if is_client():
+        if is_repeat:
+            dct = _c_repeat_timers
+        else:
+            dct = _c_delay_timers
     else:
-        return get_lv_comp().Game.AddTimer
+        if is_repeat:
+            dct = _s_repeat_timers
+        else:
+            dct = _s_delay_timers
+    comp = get_lv_comp().Game
+    if key is not None and key in dct:
+        comp.CancelTimer(dct[key])
+    if is_repeat:
+        dct[key] = comp.AddRepeatedTimer(t, func)
+    else:
+        dct[key] = comp.AddTimer(t, func)
 
 
-def delay(t=0):
+def delay(t=0, key=None):
     """
     [装饰器]
 
-    | 延迟执行函数（仅支持无参数的函数）。
+    | 定时器，延迟指定时间执行函数（仅支持无参数的函数）。
 
     -----
 
     :param float t: 延迟时间，单位秒；默认为0，表示下一帧执行
+    :param Any key: 定时器键名，用于标识定时器，可传入str、int、tuple等可哈希对象；传入该参数时，若存在相同键名且尚未触发的定时器，则旧的定时器会被取消；默认为None
 
     :return: 返回原函数
     :rtype: function
     """
     def decorator(func):
-        _get_timer()(_t, func)
+        _set_timer(_t, func, False, key)
         return func
     if callable(t):
         _t = 0
@@ -55,21 +75,22 @@ def delay(t=0):
         return decorator
 
 
-def repeat(t=0):
+def repeat(t=0, key=None):
     """
     [装饰器]
 
-    | 重复执行函数（仅支持无参数的函数）。
+    | 定时器，以指定时间间隔重复执行函数（仅支持无参数的函数）。
 
     -----
 
     :param float t: 执行间隔时间，单位秒；默认为0，表示每帧执行
+    :param Any key: 定时器键名，用于标识定时器，可传入str、int、tuple等可哈希对象；传入该参数时，若存在相同键名的定时器，则旧的定时器会被取消；默认为None
 
     :return: 返回原函数
     :rtype: function
     """
     def decorator(func):
-        _get_timer(True)(_t, func)
+        _set_timer(_t, func, True, key)
         return func
     if callable(t):
         _t = 0

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-18
+|   Date  : 2025-09-21
 |
 | ==============================================
 """
@@ -265,6 +265,34 @@ class ScreenNodeExtension(ClientEventProxy):
         :rtype: NyScrollView|None
         """
         return self._create_nyc(path_or_control, NyScrollView, **kwargs)
+
+    def create_ny_image(self, path_or_control, **kwargs):
+        """
+        | 创建 ``NyImage`` 图片实例。
+        | 兼容ModSDK ``ImageUIControl`` 和 ``BaseUIControl`` 的相关接口。
+
+        -----
+
+        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+
+        :return: NyImage图片实例，创建失败返回None
+        :rtype: NyImage|None
+        """
+        return self._create_nyc(path_or_control, NyImage, **kwargs)
+
+    def create_ny_paper_doll(self, path_or_control, **kwargs):
+        """
+        | 创建 ``NyPaperDoll`` 纸娃娃实例。
+        | 兼容ModSDK ``NeteasePaperDollUIControl`` 和 ``BaseUIControl`` 的相关接口。
+
+        -----
+
+        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+
+        :return: NyPaperDoll纸娃娃实例，创建失败返回None
+        :rtype: NyPaperDoll|None
+        """
+        return self._create_nyc(path_or_control, NyPaperDoll, **kwargs)
 
     def clear_all_pos_data(self):
         """

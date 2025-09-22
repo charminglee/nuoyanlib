@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-05
+|   Date  : 2025-09-20
 |
 | ==============================================
 """
@@ -40,6 +40,7 @@ def is_client() -> bool: ...
 def get_api() -> Union[extraClientApi, extraServerApi]: ...
 def get_comp_factory() -> Union[EngineCompFactoryClient, EngineCompFactoryServer]: ...
 def get_lv_comp() -> Union[ClientCF, ServerCF]: ...
+def get_cf(player_id: str) -> Union[ClientCF, ServerCF]: ...
 
 
 LEVEL_ID: str

@@ -7,13 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-05
+|   Date  : 2025-09-21
 |
 | ==============================================
 """
 
 
 __all__ = [
+    "SystemNotFoundError",
     "NuoyanLibServerSystemRegisterError",
     "NuoyanLibClientSystemRegisterError",
     "PathMatchError",
@@ -25,6 +26,15 @@ __all__ = [
     "EventSourceError",
     "EventNotFoundError",
 ]
+
+
+class SystemNotFoundError(RuntimeError):
+    def __init__(self, ns, sys_name):
+        self.ns = ns
+        self.sys_name = sys_name
+
+    def __str__(self):
+        return "namespace=%s, system_name=%s" % (self.ns, self.sys_name)
 
 
 class NuoyanLibServerSystemRegisterError(RuntimeError):
