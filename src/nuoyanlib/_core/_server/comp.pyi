@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-31
+|   Date  : 2025-09-22
 |
 | ==============================================
 """
 
 
-from typing import Type, Any
+from typing import Type, ClassVar, Dict
 from mod.server.system.serverSystem import ServerSystem
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 from mod.server.component.effectCompServer import EffectComponentServer
@@ -84,7 +84,8 @@ from mod.server.component.modAttrCompServer import ModAttrComponentServer
 from mod.server.component.shareableCompServer import ShareableComponentServer
 from mod.server.component.blockUseEventWhiteListCompServer import BlockUseEventWhiteListComponentServer
 from mod.server.component.actorLootCompServer import ActorLootComponentServer
-from .._utils import CachedObject
+from mod.common.component.baseComponent import BaseComponent
+from .._types._typing import STuple, _T
 
 
 ENGINE_NAMESPACE: str
@@ -94,10 +95,14 @@ ServerSystem: Type[ServerSystem]
 CompFactory: EngineCompFactoryServer
 
 
-class CF(CachedObject):
+class CF(object):
+    __slots__: STuple
+    __cache__: ClassVar[Dict[str, CF]]
     _target: str
+    _comp_cache: Dict[str, BaseComponent]
+    def __new__(cls: Type[_T], target: str) -> _T: ...
     def __init__(self: ..., target: str) -> None: ...
-    def __getattr__(self, name: str) -> Any: ...
+    def __getattr__(self, name: str) -> BaseComponent: ...
     Achievement: AchievementCompServer
     Action: ActionCompServer
     ActorCollidable: ActorCollidableCompServer

@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-09-23
 |
 | ==============================================
 """
@@ -43,6 +43,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         self.native_listen(ln, lsn, "_NuoyanLibCall", self._NuoyanLibCall)
         self.native_listen(ln, lcn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
         self.native_listen(ln, lsn, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
+        self.native_listen(ln, lsn, "_NuoyanLibVisualizeArea", self._NuoyanLibVisualizeArea)
         if config.DISABLED_MODSDK_LOG:
             _logging.disable_modsdk_loggers()
         if config.ENABLED_MCP_MOD_LOG_DUMPING:
@@ -233,6 +234,25 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
             if data['inited']:
                 n = next(data['te'])
                 data['render_comp'].SetActorBlockGeometryOffset(data['geo_name'], (0, -1.01 + n, 0))
+
+    # endregion
+
+    # region _visualize_area ===========================================================================================
+
+    def _NuoyanLibVisualizeArea(self, args):
+        area_type = args['area_type']
+        args = args['args']
+        dim = args[0]
+        if dim != LvComp.Game.GetCurrentDimension():
+            return
+        shape = None
+        if area_type == "sphere":
+            r, pos = args[1:]
+            shape = LvComp.Drawing.AddSphereShape(pos, r)
+        elif area_type == "cylinder":
+            r, pos1, pos2 = args[1:]
+        if shape:
+            LvComp.Game.AddTimer(5, shape.Remove)
 
     # endregion
 

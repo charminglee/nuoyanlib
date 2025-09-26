@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-07
+|   Date  : 2025-09-24
 |
 | ==============================================
 """
@@ -43,14 +43,14 @@ ENABLED_MCP_MOD_LOG_DUMPING = False
 
 # region spawn_ground_shatter_effect()函数配置 ==========================================================================
 
-from .utils.time_ease import TimeEaseFunc
+from math import cos, pi
 
-GSE_IN_FUNC = TimeEaseFunc.out_expo
+GSE_IN_FUNC = lambda x: 1 if x == 1 else 1 - 2**(-10 * x)
 """
 | 裂地效果上浮阶段使用的缓动函数，如线性函数 ``lambda⠀x:⠀x`` ，参数 ``x`` 表示经过的时间比例，取值范围为 [0,⠀1] ，即只取缓动函数定义域中 [0,⠀1] 部分的值。
 """
 
-GSE_OUT_FUNC = TimeEaseFunc.in_sine
+GSE_OUT_FUNC = lambda x: 1 - cos(x * pi / 2)
 """
 | 裂地效果下沉阶段使用的缓动函数，如线性函数 ``lambda⠀x:⠀x`` ，参数 ``x`` 表示经过的时间比例，取值范围为 [0,⠀1] ，即只取缓动函数定义域中 [0,⠀1] 部分的值。
 """

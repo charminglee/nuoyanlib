@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-14
+|   Date  : 2025-09-27
 |
 | ==============================================
 """
@@ -18,6 +18,7 @@ from random import randint, uniform
 from mod.common.utils.mcmath import Vector3
 from mod.common.minecraftEnum import Facing
 from .._core._sys import get_comp_factory, get_api, LEVEL_ID
+from .vector import Vector
 
 
 __all__ = [
@@ -42,6 +43,7 @@ __all__ = [
     "n_quantiles_index_list",
     "cube_center",
     "cube_longest_side_len",
+    "is_in_cylinder",
     "is_in_sector",
     "is_in_cube",
     "rot_diff",
@@ -471,49 +473,63 @@ def cube_longest_side_len(start_pos, end_pos):
     return max(xl, yl, zl)
 
 
-def is_in_sector(test_pos, vertex_pos, radius, sector_angle, sector_bisector_angle):
+def is_in_cylinder(pos, r, center1, center2):
+    """
+    | 判断给定坐标是否在圆柱体区域内。
+
+    -----
+
+    :param tuple[float,float,float] pos: 坐标
+    :param float r: 圆柱体半径
+    :param tuple[float,float,float] center1: 圆柱体底面中心坐标
+    :param tuple[float,float,float] center2: 圆柱体另一底面中心坐标
+
+    :return: 在圆柱体区域内则返回True，否则返回False
+    :rtype: bool
+    """
+    pos = Vector(pos)
+    center1 = Vector(center1)
+    center2 = Vector(center2)
+    axis_vec = center2 - center1
+    axis_len2 = axis_vec.length2
+    pos_vec = pos - center1
+    pos_len2 = pos_vec.length2
+    r2 = r**2
+    t = axis_vec.dot(pos_vec) / axis_len2
+    if t < 0 or t > 1:
+        return False
+    dist2 = pos_len2 - t * t * axis_len2
+    return dist2 <= r2
+
+def is_in_sector(pos, r, angle, center, direction):
     """
     | 判断给定坐标是否在扇形区域内。
 
     -----
-    
-    :param tuple[float,float,float] test_pos: 待测试的坐标
-    :param tuple[float,float,float] vertex_pos: 扇形顶点坐标
-    :param float radius: 扇形半径
-    :param float sector_angle: 扇形张开的角度(<=180)
-    :param float sector_bisector_angle: 扇形角平分线所在直线的水平角度
-        
+
+    :param tuple[float,float,float] pos: 待测试的坐标
+    :param float r: 扇形半径
+    :param float angle: 扇形张开的角度
+    :param tuple[float,float,float] center: 扇形圆心坐标
+    :param tuple[float,float,float] direction: 扇形方向向量
+
     :return: 在扇形区域内则返回True，否则返回False
     :rtype: bool
     """
-    dist = pos_distance(vertex_pos, test_pos)
-    if dist <= radius:
-        if sector_angle > 180:
-            sector_angle = 180
-        elif sector_angle < 0:
-            sector_angle = 0
-        dx = test_pos[0] - vertex_pos[0]
-        dz = test_pos[2] - vertex_pos[2]
-        test_pos_angle = -degrees(atan2(dx, dz))
-        min_angle = sector_bisector_angle - sector_angle / 2
-        max_angle = sector_bisector_angle + sector_angle / 2
-        range_list = []
-        if sector_bisector_angle < 0:
-            if min_angle < -180:
-                range_list.append((-180, max_angle))
-                range_list.append((360 - abs(min_angle), 180))
-            else:
-                range_list.append((min_angle, max_angle))
-        else:
-            if max_angle > 180:
-                range_list.append((min_angle, 180))
-                range_list.append((-180, -360 + max_angle))
-            else:
-                range_list.append((min_angle, max_angle))
-        for r in range_list:
-            if r[0] <= test_pos_angle <= r[1]:
-                return True
-    return False
+    pos = Vector(pos)
+    center = Vector(center)
+    direction = Vector(direction).normalize()
+    v = pos - center
+    dist2 = v.length2
+    if dist2 > r**2:
+        return False
+    v_len = sqrt(dist2)
+    if v_len <= 0:
+        return True
+    cos_alpha = v.dot(direction) / v_len
+    theta = radians(angle)
+    cos_theta_half = cos(theta / 2.0)
+    return cos_alpha >= cos_theta_half
 
 
 def _num_in_range(num, r1, r2):

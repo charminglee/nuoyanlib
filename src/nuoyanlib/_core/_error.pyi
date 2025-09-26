@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-21
+|   Date  : 2025-09-24
 |
 | ==============================================
 """
@@ -37,6 +37,8 @@ class EventParameterError(AttributeError):
     param: str
     def __init__(self: ..., event_name: str, param: str) -> None: ...
 class VectorError(Exception): ...
+class ZeroVectorError(Exception): ...
+class VectorDimError(Exception): ...
 class EventSourceError(TypeError):
     args = Tuple[str, str, str]
     def __init__(self: ..., name: str, ns: str, sys_name: str) -> None: ...

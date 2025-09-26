@@ -7,14 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-05
+|   Date  : 2025-09-22
 |
 | ==============================================
 """
 
 
 import mod.client.extraClientApi as client_api
-from .._utils import CachedObject
 
 
 __all__ = [
@@ -54,14 +53,23 @@ NativeScreenManager = client_api.GetNativeScreenManagerCls().instance() # NOQA
 MiniMapScreenNode = client_api.GetMiniMapScreenNodeCls()
 
 
-class CF(CachedObject):
+class CF(object):
+    __slots__ = ('_target', '_comp_cache')
     __cache__ = {}
+
+    def __new__(cls, target):
+        if target not in cls.__cache__:
+            cls.__cache__[target] = object.__new__(cls)
+        return cls.__cache__[target]
 
     def __init__(self, target):
         self._target = target
+        self._comp_cache = {}
 
     def __getattr__(self, name):
-        return getattr(CompFactory, "Create" + name)(self._target)
+        if name not in self._comp_cache:
+            self._comp_cache[name] = getattr(CompFactory, "Create" + name)(self._target)
+        return self._comp_cache[name]
 
 
 PlrComp = CF(PLAYER_ID)

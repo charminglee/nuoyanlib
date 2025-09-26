@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-02
+|   Date  : 2025-09-26
 |
 | ==============================================
 """
 
 
 from contextlib import contextmanager
-from typing import List, Optional, Callable, ContextManager, Literal
+from typing import List, Optional, Callable, ContextManager, Literal, Any
 from mod.common.minecraftEnum import ActorDamageCause
 from .._core._types._typing import FTuple3
 
@@ -69,7 +69,7 @@ def explode_damage(
     mob_loot: bool = True,
     hurt_source: bool = False,
 ) -> None: ...
-def _visualize_range(*pos: FTuple3) -> None: ...
+def _visualize_area(area_type: str, *args: Any) -> None: ...
 def _get_basic_pos(entity_id: str, base: __BasicPos) -> FTuple3: ...
 def cylinder_damage(
     damage: float,
@@ -88,10 +88,10 @@ def cylinder_damage(
     ent_filter: Optional[Callable[[str], bool]] = None,
     on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
     on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
-    visualize_range: bool = False,
+    visualize: bool = False,
     basic_pos: __BasicPos = "foot_pos",
 ) -> List[str]: ...
-def ball_damage(
+def sphere_damage(
     damage: float,
     r: float,
     pos: FTuple3,
@@ -107,28 +107,15 @@ def ball_damage(
     ent_filter: Optional[Callable[[str], bool]] = None,
     on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
     on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
+    visualize: bool = False,
+    basic_pos: __BasicPos = "foot_pos",
 ) -> List[str]: ...
 def sector_damage(
     damage: float,
     r: float,
     angle: float,
-    attacker_id: str,
-    *,
-    cause: str = ActorDamageCause.EntityAttack,
-    child_id: Optional[str] = None,
-    knocked: bool = True,
-    force: bool = False,
-    hurt_attacker: bool = False,
-    hurt_child: bool = False,
-    ent_filter: Optional[Callable[[str], bool]] = None,
-    on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
-    on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
-    basic_pos: __BasicPos = "foot_pos",
-) -> List[str]: ...
-def rectangle_damage(
-    damage: float,
-    min_vertex: FTuple3,
-    max_vertex: FTuple3,
+    center: FTuple3,
+    direction: FTuple3,
     dim: int,
     *,
     cause: str = ActorDamageCause.EntityAttack,
@@ -141,7 +128,27 @@ def rectangle_damage(
     ent_filter: Optional[Callable[[str], bool]] = None,
     on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
     on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
-    visualize_range: bool = False,
+    visualize: bool = False,
+    basic_pos: __BasicPos = "foot_pos",
+) -> List[str]: ...
+def rectangle_damage(
+    damage: float,
+    pos1: FTuple3,
+    pos2: FTuple3,
+    dim: int,
+    *,
+    cause: str = ActorDamageCause.EntityAttack,
+    attacker_id: Optional[str] = None,
+    child_id: Optional[str] = None,
+    knocked: bool = True,
+    force: bool = False,
+    hurt_attacker: bool = False,
+    hurt_child: bool = False,
+    ent_filter: Optional[Callable[[str], bool]] = None,
+    on_hurt_before: Optional[Callable[[str], Optional[str]]] = None,
+    on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
+    visualize: bool = False,
+    basic_pos: __BasicPos = "foot_pos",
 ) -> List[str]: ...
 def percent_damage(
     entity_id: str,

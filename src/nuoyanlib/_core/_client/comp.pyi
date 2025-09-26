@@ -7,13 +7,13 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-31
+|   Date  : 2025-09-22
 |
 | ==============================================
 """
 
 
-from typing import Type, Any
+from typing import Type, ClassVar, Dict
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.viewBinder import ViewBinder
@@ -79,7 +79,8 @@ from mod.client.component.modAttrCompClient import ModAttrComponentClient
 from mod.client.component.playerAnimCompClient import PlayerAnimCompClient
 from mod.client.component.achievementCompClient import AchievementCompClient
 from mod.client.component.dimensionCompClient import DimensionCompClient
-from .._types._typing import FTuple2
+from mod.common.component.baseComponent import BaseComponent
+from .._types._typing import FTuple2, STuple, _T
 from .._utils import CachedObject
 
 
@@ -255,9 +256,13 @@ CompFactory: EngineCompFactoryClient
 
 
 class CF(CachedObject):
+    __slots__: STuple
+    __cache__: ClassVar[Dict[str, CF]]
     _target: str
+    _comp_cache: Dict[str, BaseComponent]
+    def __new__(cls: Type[_T], target: str) -> _T: ...
     def __init__(self: ..., target: str) -> None: ...
-    def __getattr__(self, name: str) -> Any: ...
+    def __getattr__(self, name: str) -> BaseComponent: ...
     Drawing: DrawingCompClient
     Achievement: AchievementCompClient
     Action: ActionCompClient

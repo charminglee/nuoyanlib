@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-05
+|   Date  : 2025-09-24
 |
 | ==============================================
 """
@@ -31,7 +31,7 @@ t.join()
 
 
 def test(path):
-    turns = 50
+    turns = 500
     t = time.time()
     m = api.ImportModule(path)
     for _ in range(turns):
@@ -53,6 +53,7 @@ test("nuoyanlib.client.ui.nyc.control")
 test("nuoyanlib.utils.enum")
 test("nuoyanlib.utils.item")
 test("nuoyanlib.utils.utils")
+test("nuoyanlib.utils.vector")
 
 
 print("\n\033[33mAll tests passed.")

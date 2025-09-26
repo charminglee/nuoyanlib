@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-09-23
 |
 | ==============================================
 """
@@ -74,3 +74,4 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     def _NuoyanLibCallReturn(self, args: ArgsDict) -> None: ...
     def _init_ground_shatter_effect(self, data: __GROUND_SHATTER_DATA) -> None: ...
     def _update_ground_shatter_effect(self) -> None: ...
+    def _NuoyanLibVisualizeArea(self, args: ArgsDict) -> None: ...

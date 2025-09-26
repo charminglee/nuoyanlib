@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-09-26
 |
 | ==============================================
 """
@@ -160,7 +160,7 @@ def attract_entities(
         orig_motion = motion.GetMotion()
         vec = vec_p2p(epos, pos)
         vec = tuple(i * power for i in vec)
-        res_motion = vec_composite(orig_motion, vec)
+        res_motion = vec_composite(False, orig_motion, vec)
         etype = cf.EngineType.GetEngineType()
         if etype == EntityType.Player:
             if motion.SetPlayerMotion(res_motion):
@@ -472,7 +472,7 @@ def get_all_entities(ent_filter=None):
 
     -----
 
-    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否获取该实体，可以使用nuoyanlib预设的过滤器EntityFilter，默认为None
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否获取该实体，可以使用「nuoyanlib」预设的过滤器EntityFilter，默认为None
 
     :return: 实体ID列表
     :rtype: list[str]

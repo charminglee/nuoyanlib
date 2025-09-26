@@ -7,9 +7,9 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-06
+|   Date  : 2025-09-23
 |
-|   nuoyanlib客户端库。
+|   「nuoyanlib」客户端库。
 |
 | ==============================================
 """

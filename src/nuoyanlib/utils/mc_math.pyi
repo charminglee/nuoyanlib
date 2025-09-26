@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-29
+|   Date  : 2025-09-26
 |
 | ==============================================
 """
@@ -50,13 +50,8 @@ def pos_forward_rot(pos: FTuple3, rot: FTuple2, dist: float) -> Optional[FTuple3
 def n_quantiles_index_list(n: int, data: Union[tuple, list, set]) -> List[int]: ...
 def cube_center(start_pos: FTuple3, end_pos: FTuple3) -> Optional[FTuple3]: ...
 def cube_longest_side_len(start_pos: FTuple3, end_pos: FTuple3) -> float: ...
-def is_in_sector(
-    test_pos: FTuple3,
-    vertex_pos: FTuple3,
-    radius: float,
-    sector_angle: float,
-    sector_bisector_angle: float,
-) -> bool: ...
+def is_in_cylinder(pos: FTuple3, r: float, center1: FTuple3, center2: FTuple3) -> bool:
+def is_in_sector(pos: FTuple3, r: float, angle: float, center: FTuple3, direction: FTuple3) -> bool: ...
 def is_in_cube(obj: Union[str, FTuple3], pos1: FTuple3, pos2: FTuple3, ignore_y: bool = False) -> bool: ...
 def rot_diff(r1: float, r2: float) -> float: ...
 def ray_aabb_intersection(

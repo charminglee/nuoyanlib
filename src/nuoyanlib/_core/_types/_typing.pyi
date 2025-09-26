@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-12
+|   Date  : 2025-09-25
 |
 | ==============================================
 """
@@ -17,8 +17,8 @@ from typing import TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Calla
 from types import InstanceType
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from mod.common.utils.mcmath import Vector3
 from ...client.ui.nyc import *
+from ...utils.vector import Vector
 
 
 _T = TypeVar("_T")
@@ -26,6 +26,7 @@ _F = TypeVar("_F", bound=Callable[..., Any])
 
 
 PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
+SupportNeteaseApi = Union[str, int, float, list, tuple, dict, None, long, set, frozenset]
 FTuple = Tuple[float, ...]
 FTuple2 = Tuple[float, float]
 FTuple3 = Tuple[float, float, float]
@@ -34,8 +35,6 @@ ITuple = Tuple[int, ...]
 ITuple2 = Tuple[int, int]
 ITuple3 = Tuple[int, int, int]
 STuple = Tuple[str, ...]
-Vector = Union[FTuple3, List[float], Vector3]
-VectorNoList = Union[FTuple3, Vector3]
 Matrix = List[List[float]]
 Args = Tuple[Any, ...]
 Kwargs = Dict[str, Any]
@@ -99,33 +98,6 @@ NyControlTypes = Union[
     NyStackPanel,
     NyToggle,
 ]
-class FrameAnimData(TypedDict):
-    control: NyImage
-    tex_path: str
-    frame_time: float
-    stop_frame: int
-    loop: bool
-    last_time: float
-    indexes: Iterator[int]
-    is_pausing: bool
-    callback: Callable
-    args: Tuple[Any, ...]
-    kwargs: Dict[str, Any]
-class BtnTouchCallbackDict(TypedDict):
-    #collection_name
-    #collection_index
-    ButtonState: int
-    TouchEvent: int
-    PrevButtonDownID: int
-    TouchPosX: float
-    TouchPosY: float
-    ButtonPath: str
-    AddTouchEventParams: dict
-class BtnHoverCallbackDict(TypedDict):
-    isHoverIn: int
-    PrevButtonDownID: int
-    ButtonPath: str
-    AddHoverEventParams: dict
 
 
 TimeEaseFuncType = Callable[[float], float]

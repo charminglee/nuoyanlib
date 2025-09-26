@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-21
+|   Date  : 2025-09-24
 |
 | ==============================================
 """
@@ -23,6 +23,8 @@ __all__ = [
     "ScreenNodeNotFoundError",
     "EventParameterError",
     "VectorError",
+    "ZeroVectorError",
+    "VectorDimError",
     "EventSourceError",
     "EventNotFoundError",
 ]
@@ -85,6 +87,14 @@ class EventParameterError(AttributeError):
 
 
 class VectorError(Exception):
+    pass
+
+
+class ZeroVectorError(Exception):
+    pass
+
+
+class VectorDimError(Exception):
     pass
 
 

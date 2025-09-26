@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-02
+|   Date  : 2025-09-27
 |
 | ==============================================
 """
@@ -16,10 +16,11 @@
 from contextlib import contextmanager
 import mod.server.extraServerApi as server_api
 from mod.common.minecraftEnum import AttrType, ActorDamageCause, EntityComponentType
-from mod.common.utils.mcmath import Vector3
+from .._core._sys import get_lib_system
 from .._core._server.comp import CF, LvComp
-from ..utils.mc_math import is_in_sector
-from .entity import get_all_entities, get_entities_in_area
+from .._core._utils import kwargs_setter
+from ..utils.mc_math import is_in_sector, pos_distance_square, is_in_cube, is_in_cylinder
+from .entity import get_all_entities
 
 
 __all__ = [
@@ -29,7 +30,7 @@ __all__ = [
     "hurt_mobs",
     "explode_damage",
     "cylinder_damage",
-    "ball_damage",
+    "sphere_damage",
     "sector_damage",
     "rectangle_damage",
     "percent_damage",
@@ -193,7 +194,7 @@ def hurt_mobs(
     :param bool force: 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害，默认为False
     :param bool hurt_attacker: 是否对攻击者造成伤害，默认为False
     :param bool hurt_child: 是否对子实体造成伤害，默认为False
-    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用nuoyanlib预设的过滤器EntityFilter，默认为None
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器EntityFilter，默认为None
     :param function|None on_hurt_before: 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为即将受伤的实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；若无返回值，则不转移伤害；若返回字符串"-1"，则本次伤害跳过该实体；默认为None
     :param function|None on_hurt_after: 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为None
 
@@ -280,10 +281,14 @@ def explode_damage(
             hurt_comp.ImmuneDamage(False)
 
 
-def _visualize_range(*pos):
-    for p in pos:
-        for i in range(30):
-            LvComp.Command.SetCommand("/particle minecraft:lava_particle %f %f %f" % p)
+def _visualize_area(area_type, *args):
+    try:
+        get_lib_system().BroadcastToAllClient(
+            "_NuoyanLibVisualizeArea",
+            {'area_type': area_type, 'args': args}
+        )
+    finally:
+        print(args)
 
 
 def _get_basic_pos(entity_id, base):
@@ -295,6 +300,23 @@ def _get_basic_pos(entity_id, base):
     return pos
 
 
+__damage_kwargs_setter = kwargs_setter(
+    cause=ActorDamageCause.EntityAttack,
+    attacker_id=None,
+    child_id=None,
+    knocked=True,
+    force=False,
+    hurt_attacker=False,
+    hurt_child=False,
+    ent_filter=None,
+    on_hurt_before=None,
+    on_hurt_after=None,
+    visualize=False,
+    basic_pos="foot_pos",
+)
+
+
+@__damage_kwargs_setter
 def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     """
     | 对圆柱体区域内所有实体造成伤害。
@@ -313,11 +335,11 @@ def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害，默认为False
     :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害，默认为False
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害，默认为False
-    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用nuoyanlib预设的过滤器EntityFilter，默认为None
+    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器EntityFilter，默认为None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为None
     :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为None
-    :param bool visualize_range: [仅关键字参数] 是否在边界坐标上生成粒子，以可视化攻击范围；默认为False
-    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos"表示使用实体脚底坐标，"center"表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用"center"效果更佳，但更消耗性能；默认为"foot_pos"
+    :param bool visualize: [仅关键字参数] 是否可视化伤害区域，默认为False
+    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos"表示使用实体脚底坐标，"center"表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用"center"效果更佳，但也更消耗性能；默认为"foot_pos"
 
     :return: 最终成功受到伤害的实体ID列表
     :rtype: list[str]
@@ -325,40 +347,29 @@ def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     if not pos1 or not pos2 or r <= 0 or damage <= 0:
         return []
 
-    ent_filter = kwargs.get('ent_filter', None)
-    visualize_range = kwargs.pop('visualize_range', False)
-    basic_pos = kwargs.pop('basic_pos', "foot_pos")
-
-    pos1 = Vector3(pos1)
-    pos2 = Vector3(pos2)
-    axis_vec = pos2 - pos1
-    axis_len2 = axis_vec.LengthSquared()
+    ent_filter = kwargs['ent_filter']
+    visualize = kwargs.pop('visualize')
+    basic_pos = kwargs.pop('basic_pos')
 
     def _filter(eid):
-        if ent_filter and not ent_filter(eid): # NOQA
+        if ent_filter and not ent_filter(eid):
             return False
         if CF(eid).Dimension.GetEntityDimensionId() != dim:
             return False
         ep = _get_basic_pos(eid, basic_pos)
         if not ep:
             return False
-        ep = Vector3(ep)
-        ent_vec = ep - pos1
-        ent_len2 = ent_vec.LengthSquared()
-        t = Vector3.Dot(axis_vec, ent_vec) / axis_len2
-        if t < 0 or t > 1:
-            return False
-        dist2 = ent_len2 - t * t * axis_len2
-        return dist2 <= r**2
-
-    if visualize_range:
-        _visualize_range(pos1.ToTuple(), pos2.ToTuple())
-
+        return is_in_cylinder(ep, r, pos1, pos2)
     kwargs['ent_filter'] = _filter
+
+    if visualize:
+        _visualize_area("cylinder", dim, r, pos1, pos2)
+
     return hurt_mobs(get_all_entities(), damage, **kwargs)
 
 
-def ball_damage(damage, r, pos, dim, **kwargs):
+@__damage_kwargs_setter
+def sphere_damage(damage, r, pos, dim, **kwargs):
     """
     | 对球体区域内所有实体造成伤害。
     
@@ -375,20 +386,43 @@ def ball_damage(damage, r, pos, dim, **kwargs):
     :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害，默认为False
     :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害，默认为False
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害，默认为False
-    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用nuoyanlib预设的过滤器EntityFilter，默认为None
+    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器EntityFilter，默认为None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为None
     :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为None
+    :param bool visualize: [仅关键字参数] 是否可视化伤害区域，默认为False
+    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos"表示使用实体脚底坐标，"center"表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用"center"效果更佳，但也更消耗性能；默认为"foot_pos"
 
     :return: 最终成功受到伤害的实体ID列表
     :rtype: list[str]
     """
     if not pos or r <= 0 or damage <= 0:
         return []
-    entities = get_entities_in_area(pos, r, dim)
-    return hurt_mobs(entities, damage, **kwargs)
+
+    ent_filter = kwargs['ent_filter']
+    visualize = kwargs.pop('visualize')
+    basic_pos = kwargs.pop('basic_pos')
+
+    r2 = r**2
+
+    def _filter(eid):
+        if ent_filter and not ent_filter(eid):
+            return False
+        if CF(eid).Dimension.GetEntityDimensionId() != dim:
+            return False
+        ep = _get_basic_pos(eid, basic_pos)
+        if not ep:
+            return False
+        return pos_distance_square(ep, pos) <= r2
+    kwargs['ent_filter'] = _filter
+
+    if visualize:
+        _visualize_area("sphere", dim, r, pos)
+
+    return hurt_mobs(get_all_entities(), damage, **kwargs)
 
 
-def sector_damage(damage, r, angle, attacker_id, **kwargs):
+@__damage_kwargs_setter
+def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
     """
     | 朝攻击者视线前方造成扇形范围伤害。
     
@@ -397,52 +431,9 @@ def sector_damage(damage, r, angle, attacker_id, **kwargs):
     :param float damage: 伤害
     :param float r: 扇形半径
     :param float angle: 扇形张开的角度
-    :param str attacker_id: 攻击者实体ID
-    :param str cause: [仅关键字参数] 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
-    :param str|None child_id: [仅关键字参数] 攻击者的子实体ID，默认无子实体
-    :param bool knocked: [仅关键字参数] 是否产生击退，默认为True
-    :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害，默认为False
-    :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害，默认为False
-    :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害，默认为False
-    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用nuoyanlib预设的过滤器EntityFilter，默认为None
-    :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为None
-    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为None
-    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos"表示使用实体脚底坐标，"center"表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用"center"效果更佳，但更消耗性能；默认为"foot_pos"
-
-    :return: 最终成功受到伤害的实体ID列表
-    :rtype: list[str]
-    """
-    ent_filter = kwargs.get('ent_filter', None)
-    basic_pos = kwargs.pop('basic_pos', "foot_pos")
-
-    cf = CF(attacker_id)
-    attacker_pos = cf.Pos.GetFootPos()
-    attacker_rot = cf.Rot.GetRot()[1]
-    dim = cf.Dimension.GetEntityDimensionId()
-    entities = get_entities_in_area(attacker_pos, r, dim)
-
-    def _filter(eid):
-        if ent_filter and not ent_filter(eid): # NOQA
-            return False
-        pos = _get_basic_pos(eid, basic_pos)
-        return is_in_sector(
-            (pos[0], attacker_pos[1], pos[2]), attacker_pos, r, angle, attacker_rot
-        )
-
-    kwargs['attacker_id'] = attacker_id
-    kwargs['ent_filter'] = _filter
-    return hurt_mobs(entities, damage, **kwargs)
-
-
-def rectangle_damage(damage, min_vertex, max_vertex, dim, **kwargs):
-    """
-    | 对指定矩形区域内所有实体造成伤害。
-    
-    -----
-
-    :param float damage: 伤害
-    :param tuple[float,float,float] min_vertex: 矩形最小顶点坐标
-    :param tuple[float,float,float] max_vertex: 矩形最大顶点坐标，最大顶点坐标必须大于最小顶点坐标，否则不会对任何实体造成伤害
+    :param tuple[float,float,float] center: 扇形圆心坐标
+    :param tuple[float,float,float] direction: 扇形方向向量
+    :param int dim: 维度
     :param int dim: 维度
     :param str cause: [仅关键字参数] 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
     :param str|None attacker_id: [仅关键字参数] 攻击者实体ID，默认无攻击者
@@ -451,19 +442,88 @@ def rectangle_damage(damage, min_vertex, max_vertex, dim, **kwargs):
     :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害，默认为False
     :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害，默认为False
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害，默认为False
-    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用nuoyanlib预设的过滤器EntityFilter，默认为None
+    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器EntityFilter，默认为None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为None
     :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为None
-    :param bool visualize_range: [仅关键字参数] 是否在边界坐标上生成粒子，以可视化攻击范围；默认为False
+    :param bool visualize: [仅关键字参数] 是否可视化伤害区域，默认为False
+    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos"表示使用实体脚底坐标，"center"表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用"center"效果更佳，但更消耗性能；默认为"foot_pos"
 
     :return: 最终成功受到伤害的实体ID列表
     :rtype: list[str]
     """
-    entities = LvComp.Game.GetEntitiesInSquareArea(None, min_vertex, max_vertex, dim)
-    visualize_range = kwargs.pop('visualize_range', False)
-    if visualize_range:
-        _visualize_range(min_vertex, max_vertex)
-    return hurt_mobs(entities, damage, **kwargs)
+    if r <= 0 or damage <= 0 or angle <= 0:
+        return []
+
+    ent_filter = kwargs['ent_filter']
+    visualize = kwargs.pop('visualize')
+    basic_pos = kwargs.pop('basic_pos')
+
+    def _filter(eid):
+        if ent_filter and not ent_filter(eid):
+            return False
+        if CF(eid).Dimension.GetEntityDimensionId() != dim:
+            return False
+        ep = _get_basic_pos(eid, basic_pos)
+        if not ep:
+            return False
+        return is_in_sector(ep, r, angle, center, direction)
+    kwargs['ent_filter'] = _filter
+
+    if visualize:
+        _visualize_area("sector", dim, r, angle, center, direction)
+
+    return hurt_mobs(get_all_entities(), damage, **kwargs)
+
+
+@__damage_kwargs_setter
+def rectangle_damage(damage, pos1, pos2, dim, **kwargs):
+    """
+    | 对指定矩形区域内所有实体造成伤害。
+    
+    -----
+
+    :param float damage: 伤害
+    :param tuple[float,float,float] pos1: 矩形最小顶点坐标
+    :param tuple[float,float,float] pos2: 矩形最大顶点坐标，最大顶点坐标必须大于最小顶点坐标，否则不会对任何实体造成伤害
+    :param int dim: 维度
+    :param str cause: [仅关键字参数] 伤害来源，`ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义，默认为ActorDamageCause.EntityAttack
+    :param str|None attacker_id: [仅关键字参数] 攻击者实体ID，默认无攻击者
+    :param str|None child_id: [仅关键字参数] 攻击者的子实体ID，默认无子实体
+    :param bool knocked: [仅关键字参数] 是否产生击退，默认为True
+    :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害，默认为False
+    :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害，默认为False
+    :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害，默认为False
+    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否对该实体造成伤害，返回False时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器EntityFilter，默认为None
+    :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为None
+    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为None
+    :param bool visualize: [仅关键字参数] 是否可视化伤害区域，默认为False
+    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos"表示使用实体脚底坐标，"center"表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用"center"效果更佳，但也更消耗性能；默认为"foot_pos"
+
+    :return: 最终成功受到伤害的实体ID列表
+    :rtype: list[str]
+    """
+    if not pos1 or not pos2 or damage <= 0:
+        return []
+
+    ent_filter = kwargs['ent_filter']
+    visualize = kwargs.pop('visualize')
+    basic_pos = kwargs.pop('basic_pos')
+
+    def _filter(eid):
+        if ent_filter and not ent_filter(eid):
+            return False
+        if CF(eid).Dimension.GetEntityDimensionId() != dim:
+            return False
+        ep = _get_basic_pos(eid, basic_pos)
+        if not ep:
+            return False
+        return is_in_cube(ep, pos1, pos2)
+    kwargs['ent_filter'] = _filter
+
+    if visualize:
+        _visualize_area("rectangle", dim, pos1, pos2)
+
+    return hurt_mobs(get_all_entities(), damage, **kwargs)
 
 
 def percent_damage(

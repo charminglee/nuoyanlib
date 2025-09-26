@@ -7,16 +7,17 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-09-24
 |
 | ==============================================
 """
 
 
 from typing import Tuple, Callable, Union
+from ._typing import _F
 
 
 def args_type_check(
-    *typ: Union[type, Tuple[type, ...]],
+    *types: Union[type, Tuple[type, ...]],
     is_method: bool = False,
-) -> Callable[[Callable], Callable]: ...
+) -> Callable[[_F], _F]: ...

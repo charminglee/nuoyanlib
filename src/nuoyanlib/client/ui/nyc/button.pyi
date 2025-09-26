@@ -13,11 +13,11 @@
 """
 
 
-from typing import Callable, Optional, Dict, Union, List, Any, ClassVar
+from typing import Callable, Optional, Dict, Union, List, Any, ClassVar, TypedDict
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from mod.common.utils.timer import CallLater
-from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl, ItemDict, BtnTouchCallbackDict, BtnHoverCallbackDict
+from ...._core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl, ItemDict
 from ...._core._types._checker import args_type_check
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
@@ -25,7 +25,26 @@ from ....utils.enum import Enum, ButtonCallbackType
 from ...._core.event._events import ClientEventEnum as Events
 
 
-__BtnCallback = Callable[[Union[BtnTouchCallbackDict, BtnHoverCallbackDict]], Any]
+class __BtnTouchCallbackDict(TypedDict):
+    #collection_name
+    #collection_index
+    ButtonState: int
+    TouchEvent: int
+    PrevButtonDownID: int
+    TouchPosX: float
+    TouchPosY: float
+    ButtonPath: str
+    AddTouchEventParams: dict
+
+
+class __BtnHoverCallbackDict(TypedDict):
+    isHoverIn: int
+    PrevButtonDownID: int
+    ButtonPath: str
+    AddHoverEventParams: dict
+
+
+__BtnCallback = Callable[[Union[__BtnTouchCallbackDict, __BtnHoverCallbackDict]], Any]
 
 
 class NyButton(NyControl):

@@ -20,7 +20,7 @@ from ..._core._client.comp import CustomUIScreenProxy, ScreenNode, ViewBinder
 from ..._core import _error
 from ..._core.event.listener import ClientEventProxy, listen_event, unlisten_event, has_listened, unlisten_all_events
 from ..._core.event._events import ClientEventEnum as Events
-from ..._core._utils import hook_method, iter_obj_attrs, try_exec
+from ..._core._utils import hook_method, iter_obj_attrs
 from .ui_utils import to_control, get_ui_pos_data, save_ui_pos_data, to_path
 from ...utils.enum import ButtonCallbackType
 from .nyc import *

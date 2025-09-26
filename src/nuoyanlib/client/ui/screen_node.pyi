@@ -7,22 +7,36 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-21
+|   Date  : 2025-09-25
 |
 | ==============================================
 """
 
 
-from typing import ClassVar, Optional, overload, Any, TypeVar, Dict, Type, Generator, Callable, Union
+from typing import Tuple, Iterator, TypedDict, ClassVar, Optional, overload, Any, TypeVar, Dict, Type, Generator, Callable, Union
 from types import FunctionType
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
-from ..._core._types._typing import Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, FrameAnimData
+from ..._core._types._typing import Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict
 from ..._core.event.listener import ClientEventProxy
 from .nyc import *
 
 
 _T = TypeVar("_T")
+
+
+class __FrameAnimData(TypedDict):
+    control: NyImage
+    tex_path: str
+    frame_time: float
+    stop_frame: int
+    loop: bool
+    last_time: float
+    indexes: Iterator[int]
+    is_pausing: bool
+    callback: Callable
+    args: Tuple[Any, ...]
+    kwargs: Dict[str, Any]
 
 
 class ScreenNodeExtension(ClientEventProxy):
@@ -33,7 +47,7 @@ class ScreenNodeExtension(ClientEventProxy):
     _nyc_cache_map: Dict[str, NyControlTypes]
     _ui_pos_data_key: str
     _screen_node: ScreenNode
-    _frame_anim_data: Dict[str, FrameAnimData]
+    _frame_anim_data: Dict[str, __FrameAnimData]
     cs: Union[ClientSystem, Any]
     """
     | 创建UI的客户端实例。

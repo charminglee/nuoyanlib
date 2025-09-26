@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-22
+|   Date  : 2025-09-25
 |
 | ==============================================
 """
@@ -47,7 +47,10 @@ def _set_timer(t, func, is_repeat, key):
     if is_repeat:
         dct[key] = comp.AddRepeatedTimer(t, func)
     else:
-        dct[key] = comp.AddTimer(t, func)
+        def timeout():
+            dct.pop(key, None)
+            func()
+        dct[key] = comp.AddTimer(t, timeout)
 
 
 def delay(t=0, key=None):
