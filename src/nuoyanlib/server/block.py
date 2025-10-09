@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-06
+|   Date  : 2025-10-10
 |
 | ==============================================
 """
@@ -27,7 +27,7 @@ __all__ = [
 ]
 
 
-@signature("pos, dim, r, num, block_dist=1.0, *, time=3.0, tilt_angle=22.0, min_height=0.0, max_height=0.3, in_time=0.2, out_time=0.5, in_dist=0.5, out_dist=0.5")
+@signature("pos, dim, r, num, *, time=3.0, tilt_angle=22.0, min_height=0.0, max_height=0.3, in_time=0.2, out_time=0.5, in_dist=0.5, out_dist=0.5")
 @kwargs_setter(
     time=3.0,
     tilt_angle=22.0,
@@ -38,7 +38,7 @@ __all__ = [
     in_dist=0.5,
     out_dist=0.5,
 )
-def spawn_ground_shatter_effect(pos, dim, r, num, block_dist=1.0, **kwargs):
+def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
     """
     | 在指定位置生成裂地效果。
 
@@ -48,7 +48,6 @@ def spawn_ground_shatter_effect(pos, dim, r, num, block_dist=1.0, **kwargs):
     :param int dim: 维度ID
     :param float r: 生成半径
     :param int num: 裂地方块数量
-    :param float block_dist: 裂地方块之间的最小距离，默认为1.0
     :param float time: [仅关键字参数] 裂地效果持续时间，包括上浮和下沉阶段，单位为秒，默认为3.0
     :param float tilt_angle: [仅关键字参数] 裂地方块最大倾斜角度，默认为22.0
     :param float min_height: [仅关键字参数] 裂地方块最小高度，默认为0.0
@@ -63,7 +62,7 @@ def spawn_ground_shatter_effect(pos, dim, r, num, block_dist=1.0, **kwargs):
     """
     lib_sys = get_lib_system()
     eid_list = []
-    for p in random_even_poses(pos, r, num, fixed_y=True, min_distance=block_dist):
+    for p in random_even_poses(pos, r, num, fixed_y=True):
         block = LvComp.BlockInfo.GetBlockNew(pos_floor(p), dim)
         if not block or block['name'] == "minecraft:air":
             continue

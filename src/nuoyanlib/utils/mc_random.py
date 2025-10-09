@@ -7,14 +7,14 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-19
+|   Date  : 2025-10-10
 |
 | ==============================================
 """
 
 
-from math import pi, sin, cos
-from random import uniform, Random
+import math
+import random
 from string import digits, ascii_lowercase, ascii_uppercase
 from .._core._sys import get_lv_comp, is_client
 from .mc_math import pos_distance
@@ -43,8 +43,8 @@ def random_pos(center_pos, r, dim=0, use_top_height=False):
     """
     if not center_pos:
         return
-    x = center_pos[0] + uniform(-r, r)
-    z = center_pos[2] + uniform(-r, r)
+    x = center_pos[0] + random.uniform(-r, r)
+    z = center_pos[2] + random.uniform(-r, r)
     if use_top_height:
         if is_client():
             y = get_lv_comp().BlockInfo.GetTopBlockHeight((x, z))
@@ -53,7 +53,7 @@ def random_pos(center_pos, r, dim=0, use_top_height=False):
         if y is not None:
             return x, y, z
     else:
-        y = center_pos[1] + uniform(-r, r)
+        y = center_pos[1] + random.uniform(-r, r)
         return x, y, z
 
 
@@ -81,21 +81,14 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
     :rtype: str|list[str]
     """
     s = (ascii_lowercase if lower else "") + (ascii_uppercase if upper else "") + (digits if num else "")
-    random = _random_ins.setdefault(seed, Random(seed))
+    rand = _random_ins.setdefault(seed, random.Random(seed))
     if generate_num == 1:
-        return _gen_str(random.choice, s, length)
+        return _gen_str(rand.choice, s, length)
     else:
-        return [_gen_str(random.choice, s, length) for _ in range(generate_num)]
+        return [_gen_str(rand.choice, s, length) for _ in range(generate_num)]
 
 
-def _is_pos_far_enough(poses, x, y, z, min_distance):
-    for pos in poses:
-        if pos_distance(pos, (x, y, z)) < min_distance:
-            return False
-    return True
-
-
-def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False, fixed_z=False, min_distance=1.0):
+def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False, fixed_z=False):
     """
     | 在指定坐标周围，生成随机的均匀分布的多个坐标。
     
@@ -107,21 +100,22 @@ def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False,
     :param bool fixed_x: 是否固定x轴，固定后x轴取值将总是与center_pos一致，默认为不固定
     :param bool fixed_y: 是否固定y轴，固定后y轴取值将总是与center_pos一致，默认为不固定
     :param bool fixed_z: 是否固定z轴，固定后z轴取值将总是与center_pos一致，默认为不固定
-    :param float min_distance: 生成的坐标之间的最小距离，越小生成的坐标越不均匀，默认为1.0
 
     :return: 坐标列表
     :rtype: list[tuple[float,float,float]]
     """
+    cx, cy, cz = center_pos
     poses = []
-    while len(poses) < pos_num:
-        theta = uniform(0, 2 * pi)
-        phi = uniform(0, pi)
-        r = uniform(0, radius)
-        x = center_pos[0] if fixed_x else center_pos[0] + r * sin(phi) * cos(theta)
-        y = center_pos[1] if fixed_y else center_pos[1] + r * sin(phi) * sin(theta)
-        z = center_pos[2] if fixed_z else center_pos[2] + r * cos(phi)
-        if not poses or _is_pos_far_enough(poses, x, y, z, min_distance):
-            poses.append((x, y, z))
+    for _ in range(pos_num):
+        theta = random.uniform(0, 2 * math.pi)
+        phi = random.uniform(0, math.pi)
+        r = radius * (random.random() ** (1/3.))
+        pos = (
+            cx if fixed_x else cx + r * math.sin(phi) * math.cos(theta),
+            cy if fixed_y else cy + r * math.sin(phi) * math.sin(theta),
+            cz if fixed_z else cz + r * math.cos(phi),
+        )
+        poses.append(pos)
     return poses
 
 

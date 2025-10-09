@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-19
+|   Date  : 2025-10-10
 |
 | ==============================================
 """
@@ -33,5 +33,4 @@ def random_even_poses(
     fixed_x: bool = False,
     fixed_y: bool = False,
     fixed_z: bool = False,
-    min_distance: float = 1.0,
 ) -> List[FTuple3]: ...

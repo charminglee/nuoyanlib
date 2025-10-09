@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-27
+|   Date  : 2025-10-10
 |
 | ==============================================
 """
@@ -79,9 +79,11 @@ def pos_distance_square(pos1, pos2):
     :param tuple[float] pos1: 坐标1
     :param tuple[float] pos2: 坐标2
 
-    :return: 距离的平方
+    :return: 坐标距离的平方，若任一坐标为None，返回-1.0
     :rtype: float
     """
+    if not pos1 or not pos2:
+        return -1.0
     return sum((a - b) ** 2 for a, b in zip(pos1, pos2))
 
 
@@ -242,22 +244,22 @@ def pos_floor(pos):
     return tuple(int(floor(i)) for i in pos)
 
 
-def pos_distance(first_point, second_point):
+def pos_distance(pos1, pos2):
     """
     | 计算两个坐标间的距离。
     | 支持n维坐标。
 
     -----
 
-    :param tuple[float] first_point: 坐标1
-    :param tuple[float] second_point: 坐标2
+    :param tuple[float] pos1: 坐标1
+    :param tuple[float] pos2: 坐标2
         
-    :return: 距离
+    :return: 坐标距离，若任一坐标为None，返回-1.0
     :rtype: float
     """
-    if not first_point or not second_point:
+    if not pos1 or not pos2:
         return -1.0
-    return sqrt(sum((a - b) ** 2 for a, b in zip(first_point, second_point)))
+    return sqrt(sum((a - b)**2 for a, b in zip(pos1, pos2)))
 
 
 def to_relative_pos(entity_pos1, entity_pos2):
