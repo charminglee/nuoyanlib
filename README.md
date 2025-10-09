@@ -172,6 +172,13 @@
 
 <br>
 
+## 🌹 特别鸣谢 | Thanks
+
+1. [创新工坊-小坊]()：发现了[`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41)的一个bug；「nuoyanlib」内测用户。
+2. [xiaoweii](https://github.com/645359132)：「nuoyanlib」内测用户。
+
+<br>
+
 ## 🔗 作者的其他项目 | Other Projects
 
 - [网易我的世界ModSDK补全库修正版](https://github.com/charminglee/mc-netease-sdk-nyrev)
