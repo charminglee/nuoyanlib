@@ -45,7 +45,8 @@
 
 ## ⬇️ 下载 | Download
 
-- [1.0.0-beta.1](https://gitee.com/charming-lee/nuoyanLib/releases/tag/1.0.0-beta.1)
+- ~~[1.0.0-beta.1](https://gitee.com/charming-lee/nuoyanLib/releases/tag/1.0.0-beta.1)~~
+- [开发版](https://codeload.github.com/charminglee/nuoyanlib/zip/refs/heads/master)
 
 <br>
 
