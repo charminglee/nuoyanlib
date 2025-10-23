@@ -27,6 +27,7 @@ __all__ = [
 
 
 ALL_CLIENT_ENGINE_EVENTS = {
+    "UIDefReloadSceneStackAfter",
     "UpdatePlayerSkinClientEvent",
     "PlayerTryRemoveCustomContainerItemClientEvent",
     "PlayerTryAddCustomContainerItemClientEvent",

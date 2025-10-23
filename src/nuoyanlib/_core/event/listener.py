@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-10-23
 |
 | ==============================================
 """
@@ -391,7 +391,7 @@ class EventArgsProxy(object):
     keys         = lambda self, *a: self._arg_dict.keys(*a)
     values       = lambda self, *a: self._arg_dict.values(*a)
     items        = lambda self, *a: self._arg_dict.items(*a)
-    has_key      = lambda self, *a: self._arg_dict.has_key(a*a)
+    has_key      = lambda self, *a: self._arg_dict.has_key(*a)
     copy         = lambda self, *a: self._arg_dict.copy(*a)
     iterkeys     = lambda self, *a: self._arg_dict.iterkeys(*a)
     itervalues   = lambda self, *a: self._arg_dict.itervalues(*a)

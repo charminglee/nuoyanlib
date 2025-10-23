@@ -7,13 +7,25 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-26
+|   Date  : 2025-10-10
 |
 | ==============================================
 """
 
 
 class ClientEvent:
+    def UIDefReloadSceneStackAfter(self, args):
+        """
+        [事件]
+
+        | UI热重载（Ctrl+R）完成后触发。
+
+        -----
+
+        【事件参数】
+
+        | 无
+        """
     def UpdatePlayerSkinClientEvent(self, args):
         """
         [事件]

@@ -27,6 +27,18 @@ ALL_SERVER_LIB_EVENTS: Dict[str, str]
 
 
 class ClientEventEnum:
+    UIDefReloadSceneStackAfter: str
+    """
+    [事件]
+
+    | UI热重载（Ctrl+R）完成后触发。
+
+    -----
+
+    【事件参数】
+
+    | 无
+    """
     UpdatePlayerSkinClientEvent: str
     """
     [事件]

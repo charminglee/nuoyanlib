@@ -175,7 +175,7 @@
 
 ## 🌹 特别鸣谢 | Thanks
 
-1. [创新工坊-小坊]()：发现了[`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41)的一个bug；「nuoyanlib」内测用户。
+1. [创新工坊-小坊](https://github.com/cxgf666)：发现了[`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41)的一个bug；「nuoyanlib」内测用户。
 2. [xiaoweii](https://github.com/645359132)：「nuoyanlib」内测用户。
 
 <br>

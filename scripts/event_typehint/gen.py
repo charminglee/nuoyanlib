@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-21
+|   Date  : 2025-10-10
 |
 | ==============================================
 """
@@ -20,7 +20,7 @@ from _all_events import ClientEvent, ServerEvent
 
 
 root = os.getcwd()
-event_dir = f"{root}\\nuoyanlib\\_core\\event"
+event_dir = f"{root}\\src\\nuoyanlib\\_core\\event"
 script_dir = f"{root}\\scripts\\event_typehint"
 
 
