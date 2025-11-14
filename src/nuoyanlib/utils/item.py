@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-11-14
 |
 | ==============================================
 """
@@ -24,7 +24,6 @@ __all__ = [
     "set_namespace",
     "is_same_item",
     "is_empty_item",
-    "are_same_item",
     "get_max_stack",
 ]
 
@@ -147,58 +146,43 @@ def set_namespace(name, namespace="minecraft"):
     return ":".join(name_lst)
 
 
-def _same(what1, what2):
-    return (not what1 and not what2) or what1 == what2
+def _same(dct1, dct2, key):
+    v1 = dct1.get(key)
+    v2 = dct2.get(key)
+    return (not v1 and not v2) or v1 == v2
 
 
-def is_same_item(item_dict1, item_dict2):
-    """
-    | 判断两个物品是否是同种物品。
-
-    -----
-
-    :param dict item_dict1: 物品信息字典1
-    :param dict item_dict2: 物品信息字典2
-
-    :return: 相同则返回True，否则返回False
-    :rtype: bool
-    """
+def _is_same_item(item_dict1, item_dict2):
     is_emp1 = is_empty_item(item_dict1)
     is_emp2 = is_empty_item(item_dict2)
     if is_emp1 != is_emp2:
         return False
     if is_emp1 and is_emp2:
         return True
-    if 'newItemName' in item_dict1:
-        item_data1 = [item_dict1['newItemName'], item_dict1.get('newAuxValue', 0)]
-    else:
-        item_data1 = [item_dict1['itemName'], item_dict1.get('auxValue', 0)]
-    if 'newItemName' in item_dict2:
-        item_data2 = [item_dict2['newItemName'], item_dict2.get('newAuxValue', 0)]
-    else:
-        item_data2 = [item_dict2['itemName'], item_dict2.get('auxValue', 0)]
-    item_data1[0] = set_namespace(item_data1[0])
-    item_data2[0] = set_namespace(item_data2[0])
-    extra_id1, extra_id2 = item_dict1.get('extraId'), item_dict2.get('extraId')
-    user_data1, user_data2 = item_dict1.get('userData'), item_dict2.get('userData')
-    if not _same(extra_id1, extra_id2) or not _same(user_data1, user_data2):
+    if item_dict1['newItemName'] != item_dict2['newItemName']:
         return False
-    return item_data1 == item_data2
+    if item_dict1.get('newAuxValue', 0) != item_dict2.get('newAuxValue', 0):
+        return False
+    if not _same(item_dict1, item_dict2, 'extraId'):
+        return False
+    if not _same(item_dict1, item_dict2, 'userData'):
+        return False
+    return True
 
 
-def are_same_item(item, *other_item):
+def is_same_item(item_dict, *more):
     """
-    | 判断多个物品是否是同种物品。
+    | 判断两个或多个物品是否是同种物品。
 
     -----
 
-    :param dict item: 物品信息字典
-    :param dict other_item: 物品信息字典
+    :param dict item_dict: 物品信息字典
+    :param dict more: [变长位置参数] 可传入1个或多个需要对比的物品信息字典
 
     :return: 相同则返回True，否则返回False
     :rtype: bool
     """
-    return all(is_same_item(item, i) for i in other_item)
+    return all(_is_same_item(item_dict, i) for i in more)
 
 
 _AIR = ("minecraft:air", "air")
@@ -211,7 +195,7 @@ def is_empty_item(item, zero_is_emp=True):
     -----
 
     :param dict item: 物品信息字典
-    :param bool zero_is_emp: 是否把数量为0的物品视为空物品，默认为是
+    :param bool zero_is_emp: 是否把数量为0的物品视为空物品，默认为True
 
     :return: 空物品则返回True，否则返回False
     :rtype: bool
@@ -259,8 +243,6 @@ def __test__():
     assert not is_same_item(item1, item3)
     assert not is_same_item(item2, item4)
     assert not is_same_item(item1, item4)
-    assert not are_same_item(item1, item2, item3, item4)
-    assert are_same_item(item1, item2, item5, item6)
 
     emp1 = {'newItemName': "minecraft:air"}
     emp2 = {'newItemName': "minecraft:apple", 'count': 0}

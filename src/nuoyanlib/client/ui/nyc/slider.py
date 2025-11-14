@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-11-04
 |
 | ==============================================
 """
@@ -45,6 +45,28 @@ class NySlider(NyControl):
     # endregion
 
     # region Properties ================================================================================================
+
+    @property
+    def value(self):
+        """
+        [可读写属性]
+
+        | 滑动条的值。
+
+        :rtype: float
+        """
+        return self.base_control.GetSliderValue()
+
+    @value.setter
+    def value(self, val):
+        """
+        [可读写属性]
+
+        | 滑动条的值。
+
+        :type val: float
+        """
+        self.base_control.SetSliderValue(val)
 
     # endregion
 

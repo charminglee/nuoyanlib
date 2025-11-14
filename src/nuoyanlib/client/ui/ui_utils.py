@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-02
+|   Date  : 2025-11-05
 |
 | ==============================================
 """
@@ -35,25 +35,28 @@ __all__ = [
 ]
 
 
-def create_ui(namespace, ui_key, cls_path, screen_def, register=True, param=None, push=False, client_system=None):
+def create_ui(namespace, ui_key, cls_path, screen_def="", register=True, param=None, push=False, client_system=None):
     """
-    | 创建UI界面，无需注册。
+    | 创建UI界面。
 
     -----
 
     :param str namespace: 命名空间，建议为mod名字
-    :param str ui_key: UI唯一标识
+    :param str ui_key: UI唯一标识，建议为UI json中的"namespace"的值
     :param str cls_path: UI类路径
-    :param str screen_def: UI画布路径，格式为"namespace.screen_name"；namespace对应UI json文件中"namespace"对应的值；screen_name对应想打开的画布的名称
-    :param bool register: 是否自动注册UI，默认为True
+    :param str screen_def: UI画布路径，格式为"<namespace>.<screen_name>"，<namespace>为UI json中"namespace"的值，<screen_name>为想要创建的画布名称；默认为"<ui_key>.main"
+    :param bool register: 创建前是否注册UI，默认为True
     :param dict|None param: UI参数字典；不通过堆栈管理的方式创建UI时，该参数默认为{'isHud': 1}
-    :param bool push: 是否通过堆栈管理（Push）的方式创建UI，默认为False
+    :param bool push: 是否通过堆栈管理（PushScreen）的方式创建UI，默认为False
     :param ClientSystem|None client_system: 客户端类实例，默认为None；若指定，可在UI类中通过param字典的 '__cs__' 键获取到该实例
 
     :return: UI类实例，创建失败时返回None
     :rtype: ScreenNode|None
     """
-    param = param or {}
+    if not screen_def:
+        screen_def = ui_key + ".main"
+    if param is None:
+        param = {}
     if not push and 'isHud' not in param:
         param['isHud'] = 1
     param['__cs__'] = client_system

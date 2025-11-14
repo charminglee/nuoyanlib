@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-10-10
+|   Date  : 2025-10-31
 |
 | ==============================================
 """
@@ -15,9 +15,10 @@
 
 from typing import Union, Optional, List, Dict
 from mod.common.minecraftEnum import Facing
-from .._core._types._typing import FTuple2, FTuple3, FTuple, ITuple
+from .._core._types._typing import FTuple2, FTuple3, FTuple, ITuple, ITuple2
 
 
+def to_chunk_pos(pos: FTuple3) -> Optional[ITuple2]: ...
 def pos_distance_square(pos1: FTuple, pos2: FTuple) -> float: ...
 def clamp(x: float, min_value: float, max_value: float) -> float: ...
 def pos_block_facing(pos: FTuple3, face: int = Facing.North, dist: float = 1.0) -> Optional[FTuple3]: ...

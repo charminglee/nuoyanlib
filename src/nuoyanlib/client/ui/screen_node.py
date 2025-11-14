@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-21
+|   Date  : 2025-11-04
 |
 | ==============================================
 """
@@ -293,6 +293,20 @@ class ScreenNodeExtension(ClientEventProxy):
         :rtype: NyPaperDoll|None
         """
         return self._create_nyc(path_or_control, NyPaperDoll, **kwargs)
+
+    def create_ny_slider(self, path_or_control, **kwargs):
+        """
+        | 创建 ``NySlider`` 滑动条实例。
+        | 兼容ModSDK ``SliderUIControl`` 和 ``BaseUIControl`` 的相关接口。
+
+        -----
+
+        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+
+        :return: NySlider滑动条实例，创建失败返回None
+        :rtype: NySlider|None
+        """
+        return self._create_nyc(path_or_control, NySlider, **kwargs)
 
     def clear_all_pos_data(self):
         """

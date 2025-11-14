@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-10-10
+|   Date  : 2025-10-31
 |
 | ==============================================
 """
@@ -22,6 +22,7 @@ from .vector import Vector
 
 
 __all__ = [
+    "to_chunk_pos",
     "to_aabb",
     "pos_distance_square",
     "clamp",
@@ -49,6 +50,23 @@ __all__ = [
     "rot_diff",
     "ray_aabb_intersection",
 ]
+
+
+def to_chunk_pos(pos):
+    """
+    | 将世界坐标转换为所在区块坐标。
+
+    -----
+
+    :param tuple[float,float,float] pos: 世界坐标
+
+    :return: 区块坐标
+    :rtype: tuple[int,int]|None
+    """
+    if not pos:
+        return
+    pos = pos_floor(pos)
+    return int(pos[0] // 16), int(pos[2] // 16)
 
 
 def to_aabb(pos1, pos2):

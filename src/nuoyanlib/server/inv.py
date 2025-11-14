@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-20
+|   Date  : 2025-11-14
 |
 | ==============================================
 """
@@ -185,7 +185,7 @@ def deduct_inv_item(player_id, name, aux=-1, count=1, include_creative=False):
     :rtype: bool
     """
     if not include_creative and LvComp.Game.GetPlayerGameType(player_id) == GameType.Creative:
-        return
+        return False
     comp = CF(player_id).Item
     items = comp.GetPlayerAllItems(ItemPosType.INVENTORY, True)
     items_dict_map = {}
@@ -208,7 +208,9 @@ def deduct_inv_item(player_id, name, aux=-1, count=1, include_creative=False):
         return False
     if items_dict_map:
         comp.SetPlayerAllItems(items_dict_map)
-    return True
+        return True
+    return False
+
 
 
 

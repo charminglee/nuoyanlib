@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-02
+|   Date  : 2025-11-05
 |
 | ==============================================
 """
@@ -42,7 +42,7 @@ def create_ui(
     namespace: str,
     ui_key: str,
     cls_path: str,
-    screen_def: str,
+    screen_def: str = "",
     register: bool = True,
     param: Optional[dict] = None,
     push: bool = False,
