@@ -1,22 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-26
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
 from contextlib import contextmanager
 from typing import List, Optional, Callable, ContextManager, Literal, Any
 from mod.common.minecraftEnum import ActorDamageCause
-from .._core._types._typing import FTuple3
+from ..core._types._typing import FTuple3
+
+
+__BasicPos = Literal["foot_pos", "center"]
 
 
 @contextmanager
@@ -30,9 +32,6 @@ class EntityFilter:
     def mob(eid: str) -> bool: ...
     @staticmethod
     def has_health(eid: str) -> bool: ...
-
-
-__BasicPos = Literal["foot_pos", "center"]
 
 
 def hurt(

@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-05
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
 from typing import Dict, List, Tuple, Optional, Union, Set, Callable
-from .._core._types._typing import FTuple3, FTuple2
+from ..core._types._typing import FTuple3, FTuple2
 
 
-def set_query_mod_var(entity_id: str, name: str, value: float) -> bool: ...
+def set_query_mod_var(entity_id: str, name: str, value: float) -> None: ...
 def clear_effects(entity_id: str) -> None: ...
 def bounce_entities(
     pos: FTuple3,

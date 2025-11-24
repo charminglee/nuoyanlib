@@ -1,27 +1,27 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-10-31
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 from math import degrees, atan2, sqrt, pi, sin, cos, floor, radians
-from random import randint, uniform
+from random import uniform
 from mod.common.utils.mcmath import Vector3
 from mod.common.minecraftEnum import Facing
-from .._core._sys import get_comp_factory, get_api, LEVEL_ID
+from ..core._sys import get_comp_factory, get_api, LEVEL_ID
 from .vector import Vector
 
 
 __all__ = [
+    "range_map",
     "to_chunk_pos",
     "to_aabb",
     "pos_distance_square",
@@ -29,8 +29,7 @@ __all__ = [
     "pos_block_facing",
     "to_polar_coordinate",
     "to_cartesian_coordinate",
-    "probability_true_i",
-    "probability_true_f",
+    "probability",
     "pos_distance_to_line",
     "pos_floor",
     "pos_distance",
@@ -52,9 +51,30 @@ __all__ = [
 ]
 
 
+def range_map(x, output_range, input_range=(0, 1), func=lambda t: t):
+    """
+    将某个范围内的数值映射到另一个范围。
+
+    -----
+
+    :param float x: 输入值
+    :param tuple[float,float] output_range: 输出范围，如 (0, 1)，表示范围0~1
+    :param tuple[float,float] input_range: 输入范围，默认为 (0, 1)
+    :param function func: 插值函数，接受一个参数 t ∈ [0, 1]，返回 [0, 1] 的值；默认为 lambda t: t，即线性映射
+
+    :return: 映射值
+    :rtype: float
+    """
+    j, k = output_range
+    m, n = input_range
+    t = float(x - m) / (n - m)
+    t = func(t)
+    return j + (k - j) * t
+
+
 def to_chunk_pos(pos):
     """
-    | 将世界坐标转换为所在区块坐标。
+    将世界坐标转换为所在区块坐标。
 
     -----
 
@@ -71,7 +91,7 @@ def to_chunk_pos(pos):
 
 def to_aabb(pos1, pos2):
     """
-    | 将任意两点坐标转换为以这两点为顶点的长方体区域的最小点和最大点（AABB）。
+    将任意两点坐标转换为以这两点为顶点的长方体区域的最小点和最大点（AABB）。
 
     -----
 
@@ -90,7 +110,7 @@ def to_aabb(pos1, pos2):
 
 def pos_distance_square(pos1, pos2):
     """
-    | 计算两个坐标间距离的平方，相比于直接计算距离速度更快。
+    计算两个坐标间距离的平方，相比于直接计算距离速度更快。
 
     -----
 
@@ -107,8 +127,9 @@ def pos_distance_square(pos1, pos2):
 
 def clamp(x, min_value, max_value):
     """
-    | 将数值限制在指定范围内。
-    | 小于 ``min_value`` 的值将被限制为 ``min_value`` ，大于 ``max_value`` 的值将被限制为 ``max_value`` 。
+    将数值限制在指定范围内。
+
+    小于 ``min_value`` 的值将被限制为 ``min_value`` ，大于 ``max_value`` 的值将被限制为 ``max_value`` 。
 
     -----
 
@@ -124,7 +145,7 @@ def clamp(x, min_value, max_value):
 
 def pos_block_facing(pos, face=Facing.North, dist=1.0):
     """
-    | 计算方块某个面朝向的坐标。
+    计算方块某个面朝向的坐标。
 
     -----
 
@@ -154,7 +175,7 @@ def pos_block_facing(pos, face=Facing.North, dist=1.0):
 
 def to_polar_coordinate(coordinate, rad=False, origin=(0, 0)):
     """
-    | 将平面直角坐标转换为极坐标。
+    将平面直角坐标转换为极坐标。
 
     -----
 
@@ -177,7 +198,7 @@ def to_polar_coordinate(coordinate, rad=False, origin=(0, 0)):
 
 def to_cartesian_coordinate(coordinate, rad=False, origin=(0, 0)):
     """
-    | 将极坐标转换为平面直角坐标。
+    将极坐标转换为平面直角坐标。
 
     -----
 
@@ -196,30 +217,15 @@ def to_cartesian_coordinate(coordinate, rad=False, origin=(0, 0)):
     return x, y
 
 
-def probability_true_i(n, d):
+def probability(f):
     """
-    | 以指定概率返回 ``True`` 。（分数版本）
-
-    -----
-
-    :param int n: 概率分子
-    :param int d: 概率分母
-
-    :return: 以a/b的概率返回True
-    :rtype: bool
-    """
-    return n * d > 0 and randint(1, d) <= n
-
-
-def probability_true_f(f):
-    """
-    | 以指定概率返回 ``True`` 。（浮点数版本）
+    以指定概率返回 ``True`` 。
 
     -----
 
     :param float f: 概率，范围为[0, 1]
 
-    :return: 以f的概率返回True
+    :return: 以f的概率返回True，否则返回False
     :rtype: bool
     """
     return f > 0 and uniform(0, 1) <= f
@@ -227,7 +233,7 @@ def probability_true_f(f):
 
 def pos_distance_to_line(pos, line_pos1, line_pos2):
     """
-    | 计算指定坐标 ``pos`` 与指定直线的距离。
+    计算指定坐标 ``pos`` 与指定直线的距离。
 
     -----
 
@@ -249,8 +255,9 @@ def pos_distance_to_line(pos, line_pos1, line_pos2):
 
 def pos_floor(pos):
     """
-    | 对坐标进行向下取整。
-    | 支持n维坐标。
+    对坐标进行向下取整。
+
+    支持n维坐标。
 
     -----
 
@@ -264,8 +271,9 @@ def pos_floor(pos):
 
 def pos_distance(pos1, pos2):
     """
-    | 计算两个坐标间的距离。
-    | 支持n维坐标。
+    计算两个坐标间的距离。
+
+    支持n维坐标。
 
     -----
 
@@ -282,7 +290,7 @@ def pos_distance(pos1, pos2):
 
 def to_relative_pos(entity_pos1, entity_pos2):
     """
-    | 将实体1的绝对坐标转换为相对实体2的坐标。
+    将实体1的绝对坐标转换为相对实体2的坐标。
         
     -----
     
@@ -299,7 +307,9 @@ def to_relative_pos(entity_pos1, entity_pos2):
 
 def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, player_rot):
     """
-    | 将实体的世界坐标转换为屏幕上的平面坐标，并根据玩家水平视角做对应旋转。可用于在小地图上显示实体图标。
+    将实体的世界坐标转换为屏幕上的平面坐标，并根据玩家水平视角做对应旋转。
+
+    可用于在小地图上显示实体图标。
         
     -----
     
@@ -330,7 +340,7 @@ def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, pl
 
 def pos_rotate(angle, pos):
     """
-    | 计算给定坐标绕坐标原点旋转后的新坐标。
+    计算给定坐标绕坐标原点旋转后的新坐标。
         
     -----
     
@@ -350,7 +360,7 @@ def pos_rotate(angle, pos):
 
 def midpoint(first_point, second_point):
     """
-    | 计算给定两点间的中点坐标。
+    计算给定两点间的中点坐标。
         
     -----
     
@@ -367,7 +377,9 @@ def midpoint(first_point, second_point):
 
 def camera_rot_p2p(pos1, pos2):
     """
-    | 计算从 ``pos1`` 指向 ``pos2`` 的相机角度。（可用于将玩家相机视角锁定到某一坐标）
+    计算从 ``pos1`` 指向 ``pos2`` 的相机角度。
+
+    可用于将玩家相机视角锁定到某一坐标。
 
     -----
 
@@ -386,7 +398,7 @@ def camera_rot_p2p(pos1, pos2):
 
 def pos_entity_facing(entity_id, dist, use_0yaw=False, height_offset=0.0):
     """
-    | 计算实体视角方向上、给定距离上的位置的坐标。
+    计算实体视角方向上、给定距离上的位置的坐标。
 
     -----
 
@@ -414,7 +426,7 @@ def pos_entity_facing(entity_id, dist, use_0yaw=False, height_offset=0.0):
 
 def pos_forward_rot(pos, rot, dist):
     """
-    | 计算从 ``pos`` 射出，以 ``rot`` 为方向的射线上，与 ``pos`` 的距离为 ``dist`` 的位置的坐标。
+    计算从 ``pos`` 射出，以 ``rot`` 为方向的射线上，与 ``pos`` 的距离为 ``dist`` 的位置的坐标。
 
     -----
 
@@ -433,7 +445,7 @@ def pos_forward_rot(pos, rot, dist):
 
 def n_quantiles_index_list(n, data):
     """
-    | 计算一串数据的n分位数的位置。
+    计算一串数据的n分位数的位置。
 
     -----
 
@@ -455,7 +467,7 @@ def n_quantiles_index_list(n, data):
 
 def cube_center(start_pos, end_pos):
     """
-    | 计算立方体中心坐标。
+    计算立方体中心坐标。
 
     -----
 
@@ -475,7 +487,7 @@ def cube_center(start_pos, end_pos):
 
 def cube_longest_side_len(start_pos, end_pos):
     """
-    | 计算立方体最大棱长。
+    计算立方体最大棱长。
         
     -----
     
@@ -495,7 +507,7 @@ def cube_longest_side_len(start_pos, end_pos):
 
 def is_in_cylinder(pos, r, center1, center2):
     """
-    | 判断给定坐标是否在圆柱体区域内。
+    判断给定坐标是否在圆柱体区域内。
 
     -----
 
@@ -523,7 +535,7 @@ def is_in_cylinder(pos, r, center1, center2):
 
 def is_in_sector(pos, r, angle, center, direction):
     """
-    | 判断给定坐标是否在扇形区域内。
+    判断给定坐标是否在扇形区域内。
 
     -----
 
@@ -558,7 +570,7 @@ def _num_in_range(num, r1, r2):
 
 def is_in_cube(obj, pos1, pos2, ignore_y=False):
     """
-    | 判断对象是否在立方体区域内。
+    判断对象是否在立方体区域内。
         
     -----
     
@@ -586,7 +598,7 @@ def is_in_cube(obj, pos1, pos2, ignore_y=False):
 
 def rot_diff(r1, r2):
     """
-    | 计算两个角度之间的实际差值。
+    计算两个角度之间的实际差值。
         
     -----
     
@@ -606,7 +618,7 @@ def rot_diff(r1, r2):
 
 def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_size):
     """
-    | 从指定位置射出一条射线，计算该射线与指定立方体（AABB）的第一个交点坐标，不相交时返回 ``None`` 。
+    从指定位置射出一条射线，计算该射线与指定立方体（AABB）的第一个交点坐标，不相交时返回 ``None`` 。
 
     -----
 
@@ -638,8 +650,10 @@ def ray_aabb_intersection(ray_start_pos, ray_dir, length, cube_center_pos, cube_
 
 def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter_blocks=None):
     """
-    | 从指定位置射出一条射线，获取该射线经过的方块。
-    | 返回一个列表，方块按照由近到远的顺序排列，列表每个元素为一个字典，结构如下：
+    从指定位置射出一条射线，获取该射线经过的方块。
+
+    返回一个列表，方块按照由近到远的顺序排列，列表每个元素为一个字典，结构如下：
+
     ::
 
         {
@@ -652,7 +666,7 @@ def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter
     -----
 
     | 算法作者：头脑风暴
-    | 修改：`Nuoyan <https://gitee.com/charming-lee>`_
+    | 修改：`Nuoyan <https://github.com/charminglee>`_
 
     -----
 

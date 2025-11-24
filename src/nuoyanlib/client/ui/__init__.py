@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
 |   Date  : 2025-09-23
 |
 |   「nuoyanlib」UI库。
 |
-| ==============================================
+| ====================================================
 """
 
 
-from ..._core._client.comp import (
+from ...core.client.comp import (
     ScreenNode,
     ViewBinder,
     ViewRequest,

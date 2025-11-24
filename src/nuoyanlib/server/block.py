@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-10-10
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-from .._core._sys import get_lib_system
-from .._core._server.comp import LvComp, CF
-from .._core._utils import kwargs_setter
-from .._core._doc import signature
-from .._core import _const
+from ..core._sys import get_lib_system
+from ..core.server.comp import LvComp, CF
+from ..core._utils import kwargs_setter
+from ..core import _const
 from ..utils.mc_random import random_even_poses
 from ..utils.mc_math import pos_floor
 
@@ -27,7 +25,6 @@ __all__ = [
 ]
 
 
-@signature("pos, dim, r, num, *, time=3.0, tilt_angle=22.0, min_height=0.0, max_height=0.3, in_time=0.2, out_time=0.5, in_dist=0.5, out_dist=0.5")
 @kwargs_setter(
     time=3.0,
     tilt_angle=22.0,
@@ -40,7 +37,7 @@ __all__ = [
 )
 def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
     """
-    | 在指定位置生成裂地效果。
+    在指定位置生成裂地效果。
 
     -----
 
@@ -57,10 +54,10 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
     :param float in_dist: [仅关键字参数] 上浮距离，默认为0.5
     :param float out_dist: [仅关键字参数] 下沉距离，默认为0.5
 
-    :return: list[str]
-    :rtype: 生成的裂地方块的实体ID列表
+    :return: 生成的裂地方块的实体ID列表
+    :rtype: list[str]
     """
-    lib_sys = get_lib_system()
+    lib_sys = get_lib_system(False)
     eid_list = []
     for p in random_even_poses(pos, r, num, fixed_y=True):
         block = LvComp.BlockInfo.GetBlockNew(pos_floor(p), dim)

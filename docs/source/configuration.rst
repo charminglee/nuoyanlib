@@ -27,7 +27,7 @@
           名称                  类型      初始值         解释
 ===========================  ========  ==========  ===========
 ENABLED_LOG                  bool      True        [需要重载] 是否输出「nuoyanlib」日志信息。
-DISABLED_MODSDK_LOG          bool      False       [需要重载] 是否关闭ModSDK日志输出。
+ENABLED_MODSDK_LOG           bool      True        [需要重载] 是否开启ModSDK日志输出。
 ENABLED_TYPE_CHECKING        bool      True        [需要重载] 是否启用「nuoyanlib」对某些函数的参数类型的运行时检查（关闭可获得少许性能提升）。
 ENABLED_MCP_MOD_LOG_DUMPING  bool      False       [需要重载] 是否将当前Mod的错误信息输出到McpModLog日志（目前正式服已阉割该功能）。
 ===========================  ========  ==========  ===========

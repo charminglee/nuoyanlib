@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-26
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
 from typing import Callable, ClassVar, Literal, Tuple, overload, Union, Iterator, Dict
-from .._core._types._typing import STuple, FTuple3, FTuple2
+from ..core._types._typing import STuple, FTuple3, FTuple2
 
 
 __Vector = Union[FTuple3, FTuple2, Vector]

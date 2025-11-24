@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-27
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-from .._core._client.comp import CF
-from .._core._client import _lib_client
+from ..core.client.comp import CF
+from ..core.client import _lib_client
 
 
 __all__ = [
@@ -26,9 +25,11 @@ __all__ = [
 
 def set_query_mod_var(entity_id, name, value, sync=True):
     """
-    | 设置指定实体 ``query.mod`` 变量的值，支持全局同步（即所有客户端同步设置该变量的值）。
-    | 若不进行全局同步，则本次设置只对当前客户端有效。
-    | 若设置的变量未注册，会自动进行注册。
+    设置指定实体 ``query.mod`` 变量的值。
+
+    支持全局同步（即所有客户端同步设置该变量的值）。
+    若不进行全局同步，则本次设置只对当前客户端有效。
+    若设置的变量未注册，会自动进行注册。
 
     -----
 
@@ -37,31 +38,32 @@ def set_query_mod_var(entity_id, name, value, sync=True):
     :param float value: 设置的值
     :param bool sync: 是否进行全局同步，默认为True
 
-    :return: 是否成功
-    :rtype: bool
+    :return: 无
+    :rtype: None
     """
     lib_sys = _lib_client.instance()
-    if not lib_sys:
-        return False
     data = {'entity_id': entity_id, 'name': name, 'value': value}
     lib_sys._SetQueryVar(data)
     if sync:
         lib_sys.NotifyToServer("_SetQueryVar", data)
-    return True
 
 
 def add_player_render_resources(player_id, rebuild, *res_tuple):
     """
-    | 一次性添加多个玩家渲染资源，支持添加模型、贴图、材质、渲染控制器、动画、动画控制器、音效和微软粒子特效。
-    | 注意：使用本接口添加的资源的identifier，需要遵循以下命名规范：
-    * 模型：以 ``geometry.`` 开头；
-    * 贴图：无特别要求；
-    * 材质：无特别要求；
-    * 渲染控制器：以 ``controller.render.`` 开头；
-    * 动画：以 ``animation.`` 开头；
-    * 动画控制器：以 ``controller.animation.`` 开头；
-    * 音效：音效名称至少包含一个“.”，如 ``sound.abc``；
-    * 微软粒子特效：需要包含命名空间。
+    一次性添加多个玩家渲染资源。
+
+    支持添加模型、贴图、材质、渲染控制器、动画、动画控制器、音效和微软粒子特效。
+
+    注意：使用本接口添加的资源的identifier，需要遵循以下命名规范：
+
+    - 模型：以 ``geometry.`` 开头；
+    - 贴图：无特别要求；
+    - 材质：无特别要求；
+    - 渲染控制器：以 ``controller.render.`` 开头；
+    - 动画：以 ``animation.`` 开头；
+    - 动画控制器：以 ``controller.animation.`` 开头；
+    - 音效：音效名称至少包含一个“.”，如 ``sound.abc``；
+    - 微软粒子特效：需要包含命名空间。
 
     -----
 
@@ -98,16 +100,20 @@ def add_player_render_resources(player_id, rebuild, *res_tuple):
 
 def add_entity_render_resources(entity_id, rebuild, *res_tuple):
     """
-    | 一次性添加多个实体渲染资源，支持添加模型、贴图、材质、渲染控制器、动画、动画控制器、音效和微软粒子特效。
-    | 注意：使用本接口添加的资源的identifier，需要遵循以下命名规范：
-    * 模型：以 ``geometry.`` 开头；
-    * 贴图：无特别要求；
-    * 材质：无特别要求；
-    * 渲染控制器：以 ``controller.render.`` 开头；
-    * 动画：以 ``animation.`` 开头；
-    * 动画控制器：以 ``controller.animation.`` 开头；
-    * 音效：音效名称至少包含一个“.”，如 ``sound.abc``；
-    * 微软粒子特效：需要包含命名空间。
+    一次性添加多个实体渲染资源。
+
+    支持添加模型、贴图、材质、渲染控制器、动画、动画控制器、音效和微软粒子特效。
+
+    注意：使用本接口添加的资源的identifier，需要遵循以下命名规范：
+
+    - 模型：以 ``geometry.`` 开头；
+    - 贴图：无特别要求；
+    - 材质：无特别要求；
+    - 渲染控制器：以 ``controller.render.`` 开头；
+    - 动画：以 ``animation.`` 开头；
+    - 动画控制器：以 ``controller.animation.`` 开头；
+    - 音效：音效名称至少包含一个“.”，如 ``sound.abc``；
+    - 微软粒子特效：需要包含命名空间。
 
     -----
 

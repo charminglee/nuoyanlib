@@ -1,28 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-21
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
+from traceback import print_exc
 from uuid import uuid4
-from traceback import format_exc
-from .._core._sys import get_api, is_client, get_comp_factory, LEVEL_ID, get_lib_system
-from .._core._error import SystemNotFoundError
+import mod.client.extraClientApi as c_api
+from ..core._sys import get_api, is_client, get_lv_comp, get_lib_system
+from ..core.error import SystemNotFoundError
 
 
 __all__ = [
     "Caller",
+    "broadcast_to_all_systems",
     "call",
-    "broadcast_to_all_systems"
 ]
 
 
@@ -45,44 +45,32 @@ def call_func(func_path, args=None, kwargs=None, callback=None, delay_ret=-1):
 
 def broadcast_to_all_systems(event_name, event_args, from_system):
     """
-    | 广播事件到所有系统，包括服务端和所有玩家的客户端。
-    | 监听该事件时使用 ``from_system`` 的命名空间和系统名称即可。
+    广播事件到所有系统，包括服务端和所有玩家的客户端。
+
+    注：监听该事件时使用 ``from_system`` 的命名空间和系统名称即可。
 
     -----
 
     :param str event_name: 事件名
     :param Any event_args: 事件参数
-    :param ClientSystem|ServerSystem|tuple[str,str] from_system: 事件来源系统，可传入系统实例或元组：(命名空间, 系统名称)
+    :param ClientSystem|ServerSystem from_system: 事件来源系统的实例
 
     :return: 无
     :rtype: None
 
     :raise SystemNotFoundError: from_system不存在时抛出
     """
-    api = get_api()
     if is_client():
-        from .._core._client._lib_client import instance
-        lib_sys = instance()
-        if isinstance(from_system, tuple):
-            from_system = api.GetSystem(*from_system)
-            if not from_system:
-                raise SystemNotFoundError(*from_system)
-            lib_sys.broadcast_to_all_client(event_name, event_args, *from_system)
-        else:
-            lib_sys.broadcast_to_all_client(
-                event_name, event_args, from_system.namespace, from_system.systemName # NOQA
-            )
+        get_lib_system(True).broadcast_to_all_client(
+            event_name, event_args, from_system.namespace, from_system.systemName
+        )
         from_system.NotifyToServer(event_name, event_args)
     else:
-        if isinstance(from_system, tuple):
-            from_system = api.GetSystem(*from_system)
-            if not from_system:
-                raise SystemNotFoundError(*from_system)
         from_system.BroadcastToAllClient(event_name, event_args)
         from_system.BroadcastEvent(event_name, event_args)
 
 
-def call_callback(cb_or_uuid, delay_ret=-1, success=True, ret=None, error="", player_id=""):
+def _call_callback(cb_or_uuid, delay_ret, cb_args):
     lib_sys = get_lib_system()
     if isinstance(cb_or_uuid, str):
         data = lib_sys.callback_data[cb_or_uuid]
@@ -92,34 +80,44 @@ def call_callback(cb_or_uuid, delay_ret=-1, success=True, ret=None, error="", pl
             del lib_sys.callback_data[cb_or_uuid]
     else:
         callback = cb_or_uuid
-    if not callback:
-        return
-    cb_args = {'success': success, 'ret': ret, 'error': error, 'player_id': player_id}
     if delay_ret >= 0:
-        get_comp_factory().CreateGame(LEVEL_ID).AddTimer(delay_ret, callback, cb_args)
+        get_lv_comp().Game.AddTimer(delay_ret, callback, *cb_args)
     else:
-        callback(cb_args)
+        callback(*cb_args)
 
 
-def call_local(target_sys, method, cb_or_uuid, delay_ret, args, kwargs):
-    player_id = get_api().GetLocalPlayerId() if is_client() else ""
+def _call_local(ns, sys_name, method, cb_or_uuid, delay_ret, args, kwargs):
+    target_sys = get_api().GetSystem(ns, sys_name)
     if not target_sys:
-        call_callback(cb_or_uuid, delay_ret, False, player_id=player_id)
-    else:
-        try:
-            if args is None:
-                args = ()
-            if kwargs is None:
-                kwargs = {}
-            ret = getattr(target_sys, method)(*args, **kwargs)
-        except:
-            call_callback(cb_or_uuid, delay_ret, False, error=format_exc(), player_id=player_id)
+        raise SystemNotFoundError(ns, sys_name)
+
+    try:
+        if args is None:
+            args = ()
+        if kwargs is None:
+            kwargs = {}
+        ret = getattr(target_sys, method)(*args, **kwargs)
+        success = True
+    except:
+        ret = None
+        success = False
+        print_exc()
+
+    if cb_or_uuid:
+        if is_client():
+            cb_args = (success, ret, c_api.GetLocalPlayerId())
         else:
-            call_callback(cb_or_uuid, delay_ret, True, ret, player_id=player_id)
+            cb_args = (success, ret)
+        _call_callback(cb_or_uuid, delay_ret, cb_args)
 
 
-def call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs):
-    uuid = str(uuid4())
+def _call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs):
+    lib_sys = get_lib_system()
+    if callback:
+        uuid = uuid4().hex
+        lib_sys.callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
+    else:
+        uuid = None
     notify_args = {
         'ns': ns,
         'sys_name': sys_name,
@@ -129,79 +127,69 @@ def call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwar
         'args': args,
         'kwargs': kwargs,
     }
-    lib_sys = get_lib_system()
-    lib_sys.callback_data[uuid] = {'callback': callback, 'count': len(player_id) if player_id else 1}
     if is_client():
-        if player_id is None:
-            lib_sys.NotifyToServer("_NuoyanLibCall", notify_args)
-        else:
+        if player_id:
             lib_sys.notify_to_multi_clients(player_id, "_NuoyanLibCall", notify_args)
+        else:
+            lib_sys.NotifyToServer("_NuoyanLibCall", notify_args)
     else:
-        lib_sys.NotifyToMultiClients(player_id, "_NuoyanLibCall", notify_args)
+        if len(player_id) == 1:
+            lib_sys.NotifyToClient(player_id[0], "_NuoyanLibCall", notify_args)
+        else:
+            lib_sys.NotifyToMultiClients(player_id, "_NuoyanLibCall", notify_args)
 
 
-def call(
-        ns,
-        sys_name,
-        method,
-        args=None,
-        kwargs=None,
-        player_id=None,
-        callback=None,
-        delay_ret=-1,
-):
+def call(ns, sys_name, method, args=None, kwargs=None, player_id=None, callback=None, delay_ret=-1):
     """
-    | 调用指定客户端或服务端系统的函数，可以通过回调函数获取被调用函数的返回值。
-    | 回调函数的参数字典说明如下：
+    调用指定客户端或服务端系统的函数，可以通过回调函数获取调用结果。
+
+    回调函数的三个参数说明如下：
+
     - ``success`` -- bool，表示调用是否成功
     - ``ret`` -- 被调用函数的返回值
-    - ``error`` -- str，若调用时出现异常，异常信息将通过该参数给出
-    - ``player_id`` -- str，调用客户端时，该参数表示该客户端的玩家实体ID
-    | 由于ModSDK接口限制，跨端调用时，被调用函数返回的数据类型和传入被调用函数的参数的类型仅支持python基本数据类型（str，int，float，list，tuple，dict）。
+    - ``player_id`` -- str，仅当调用客户端时存在该参数，表示触发回调函数的玩家实体ID
 
     -----
 
     :param str ns: 被调用函数所在系统的命名空间
     :param str sys_name: 被调用函数所在系统的名称
     :param str method: 被调用函数名
-    :param tuple args: 位置参数元组，展开后传入被调用函数中
-    :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数中
-    :param str|list[str]|None player_id: 当被调用方为客户端时，可以指定玩家实体ID，传入玩家实体ID列表即可指定多个玩家，或用单字符"*"表示所有玩家；默认为None，表示被调用方为服务端
-    :param function|None callback: 回调函数，默认为None；接受一个带有四个参数的字典，参数说明见上方
-    :param float delay_ret: 延迟返回时间，单位为秒，若设置了该值，则callback触发前会延迟给定时间；但由于跨端调用本身存在不可避免的网络延迟，实际的延迟时间会大于此处给定的值；默认为-1，即无延迟
+    :param tuple args: 位置参数元组，展开后传入被调用函数，默认为None
+    :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数，默认为None
+    :param str|list[str]|None player_id: 调用客户端时，需指定玩家实体ID；传入玩家实体ID/玩家实体ID列表表示单个/多个玩家，传入"*"（星号）表示所有玩家；调用服务端时忽略该参数即可
+    :param function|None callback: 回调函数，参数说明见上方，默认为None
+    :param float delay_ret: 延迟返回时间，单位为秒；若设置了该值，则callback触发前会延迟给定时间；由于跨端调用本身存在不可避免的网络延迟，因此实际的延迟时间会大于此处给定的值；默认为-1，即无延迟
 
     :return: 无
     :rtype: None
     """
     api = get_api()
-    target_sys = api.GetSystem(ns, sys_name)
     if player_id == "*":
         player_id = api.GetPlayerList()
     elif isinstance(player_id, str):
         player_id = [player_id]
-    elif isinstance(player_id, list):
-        player_id = player_id[:]
+    elif isinstance(player_id, (list, tuple)):
+        player_id = list(player_id)
+
     if is_client():
-        # c to s
-        if not target_sys and not player_id:
-            call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
-        # c to c
-        else:
+        # c2c
+        if player_id:
             local_plr = api.GetLocalPlayerId()
             if local_plr in player_id:
-                call_local(target_sys, method, callback, delay_ret, args, kwargs)
+                _call_local(ns, sys_name, method, callback, delay_ret, args, kwargs)
                 player_id.remove(local_plr)
             if player_id:
-                call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
-    else:
-        # s to s
-        if target_sys:
-            call_local(target_sys, method, callback, delay_ret, args, kwargs)
-        elif not player_id:
-            call_callback(callback, delay_ret, False)
-        # s to c
+                _call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
+        # c2s
         else:
-            call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
+            _call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
+    else:
+        # s2c
+        if player_id:
+            _call_remote(ns, sys_name, method, player_id, callback, delay_ret, args, kwargs)
+        # s2s
+        else:
+            _call_local(ns, sys_name, method, callback, delay_ret, args, kwargs)
 
 
 

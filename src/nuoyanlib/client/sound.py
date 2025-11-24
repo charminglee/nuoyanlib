@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-from .._core._client.comp import LvComp
+from ..core.client.comp import LvComp
 
 
 __all__ = [
@@ -24,7 +23,7 @@ __all__ = [
 
 def play_custom_sound(sound_name, pos=(0, 0, 0), volume=1.0, speed=1.0, is_loop=False, entity_id=None):
     """
-    | 播放场景音效。
+    播放场景音效。
 
     -----
 
@@ -43,7 +42,7 @@ def play_custom_sound(sound_name, pos=(0, 0, 0), volume=1.0, speed=1.0, is_loop=
 
 def stop_custom_sound(sound_id, fade_out_time=0.0):
     """
-    | 停止音效。
+    停止音效。
 
     -----
 

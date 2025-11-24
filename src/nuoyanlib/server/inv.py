@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-11-14
+|   Date  : 2025-12-03
 |
-| ==============================================
+| ====================================================
 """
 
 
 from mod.common.minecraftEnum import ItemPosType, GameType
-from .._core._server.comp import CF, LvComp
-from .._core._server import _lib_server
+from ..core.server.comp import CF, LvComp
 from ..utils.item import is_empty_item
 
 
 __all__ = [
-    "set_items_to_item_grid",
-    "get_items_from_item_grid",
-    "update_item_grids",
+    # "set_items_to_item_grid",
+    # "get_items_from_item_grid",
+    # "update_item_grids",
     "deduct_inv_item",
     "clear_items",
     "get_item_pos",
@@ -30,67 +28,68 @@ __all__ = [
 ]
 
 
-def set_items_to_item_grid(player_id, key, item_dict_list):
-    """
-    | 设置物品网格的所有物品。
+# def set_items_to_item_grid(player_id, key, item_dict_list):
+#     """
+#     设置物品网格的所有物品。
+#
+#     -----
+#
+#     :param str player_id: 玩家实体ID
+#     :param str key: 网格的key
+#     :param list[dict|None] item_dict_list: 物品信息字典列表
+#
+#     :return: 返回一个列表，列表元素为布尔值，对应item_dict_list中各物品是否设置成功
+#     :rtype: list[bool]
+#     """
+#     lib_sys = _lib_server.instance()
+#     if not lib_sys:
+#         return False
+#     return lib_sys.set_all_items(player_id, key, item_dict_list, True)
+#
+#
+# def get_items_from_item_grid(player_id, key):
+#     """
+#     获取物品网格的所有物品。
+#
+#     -----
+#
+#     :param str player_id: 玩家实体ID
+#     :param str key: 网格的key
+#
+#     :return: 物品信息字典列表，获取不到返回空列表
+#     :rtype: list[dict|None]
+#     """
+#     lib_sys = _lib_server.instance()
+#     if not lib_sys:
+#         return []
+#     return lib_sys.get_all_items(player_id, key)
 
-    -----
 
-    :param str player_id: 玩家实体ID
-    :param str key: 网格的key
-    :param list[dict|None] item_dict_list: 物品信息字典列表
-
-    :return: 返回一个列表，列表元素为布尔值，对应item_dict_list中各物品是否设置成功
-    :rtype: list[bool]
-    """
-    lib_sys = _lib_server.instance()
-    if not lib_sys:
-        return False
-    return lib_sys.set_all_items(player_id, key, item_dict_list, True)
-
-
-def get_items_from_item_grid(player_id, key):
-    """
-    | 获取物品网格的所有物品。
-
-    -----
-
-    :param str player_id: 玩家实体ID
-    :param str key: 网格的key
-
-    :return: 物品信息字典列表，获取不到返回空列表
-    :rtype: list[dict|None]
-    """
-    lib_sys = _lib_server.instance()
-    if not lib_sys:
-        return []
-    return lib_sys.get_all_items(player_id, key)
-
-
-def update_item_grids(player_id, keys):
-    """
-    | 立即同步一次玩家的物品数据给客户端的物品网格。
-    | 以“_shortcut”、“_inv27”或“_inv36”结尾的网格无需使用此接口进行同步。
-
-    -----
-
-    :param str player_id: 玩家的实体ID
-    :param str|tuple[str] keys: 网格的key，多个网格请使用元组
-
-    :return: 是否成功
-    :rtype: bool
-    """
-    lib_sys = _lib_server.instance()
-    if not lib_sys:
-        return False
-    if isinstance(keys, str):
-        keys = (keys,)
-    return lib_sys.on_update_item_grids({'__id__': player_id, 'keys': keys})
+# def update_item_grids(player_id, keys):
+#     """
+#     立即同步一次玩家的物品数据给客户端的物品网格。
+#
+#     以“_shortcut”、“_inv27”或“_inv36”结尾的网格无需使用此接口进行同步。
+#
+#     -----
+#
+#     :param str player_id: 玩家的实体ID
+#     :param str|tuple[str] keys: 网格的key，多个网格请使用元组
+#
+#     :return: 是否成功
+#     :rtype: bool
+#     """
+#     lib_sys = _lib_server.instance()
+#     if not lib_sys:
+#         return False
+#     if isinstance(keys, str):
+#         keys = (keys,)
+#     return lib_sys.on_update_item_grids({'__id__': player_id, 'keys': keys})
 
 
 def clear_items(player_id, item_pos_type, pos=0):
     """
-    | 清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
+    清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
 
     -----
 
@@ -112,7 +111,7 @@ _ITEM_POS_SIZE = (36, 1, 1, 4)
 
 def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     """
-    | 获取物品所在槽位。
+    获取物品所在槽位。
 
     -----
 
@@ -146,7 +145,7 @@ def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
 
 def change_item_count(player_id, pos_type=ItemPosType.CARRIED, pos=0, change=-1):
     """
-    | 改变玩家指定槽位物品的数量。（创造模式下不生效）
+    改变玩家指定槽位物品的数量。（创造模式下不生效）
 
     -----
 
@@ -170,8 +169,9 @@ def change_item_count(player_id, pos_type=ItemPosType.CARRIED, pos=0, change=-1)
 
 def deduct_inv_item(player_id, name, aux=-1, count=1, include_creative=False):
     """
-    | 从玩家背包中扣除指定数量的物品。
-    | 该函数无需传入物品所在位置，而是自动从背包中寻找指定物品，找到了则扣除指定数量。
+    从玩家背包中扣除指定数量的物品。
+
+    该函数无需传入物品所在位置，而是自动从背包中寻找指定物品，找到了则扣除指定数量。
 
     -----
 

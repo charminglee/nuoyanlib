@@ -1,55 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-11-25
 |
-| ==============================================
+| ====================================================
 """
 
 
 from typing import Optional, Callable, Any
-from .._core._types._typing import TimeEaseFuncType
-
-
-class TimeEaseFunc:
-    linear: TimeEaseFuncType
-    spring: TimeEaseFuncType
-    in_quad: TimeEaseFuncType
-    out_quad: TimeEaseFuncType
-    in_out_quad: TimeEaseFuncType
-    in_cubic: TimeEaseFuncType
-    out_cubic: TimeEaseFuncType
-    in_out_cubic: TimeEaseFuncType
-    in_quart: TimeEaseFuncType
-    out_quart: TimeEaseFuncType
-    in_out_quart: TimeEaseFuncType
-    in_quint: TimeEaseFuncType
-    out_quint: TimeEaseFuncType
-    in_out_quint: TimeEaseFuncType
-    in_sine: TimeEaseFuncType
-    out_sine: TimeEaseFuncType
-    in_out_sine: TimeEaseFuncType
-    in_expo: TimeEaseFuncType
-    out_expo: TimeEaseFuncType
-    in_out_expo: TimeEaseFuncType
-    in_circ: TimeEaseFuncType
-    out_circ: TimeEaseFuncType
-    in_out_circ: TimeEaseFuncType
-    in_bounce: TimeEaseFuncType
-    out_bounce: TimeEaseFuncType
-    in_out_bounce: TimeEaseFuncType
-    in_back: TimeEaseFuncType
-    out_back: TimeEaseFuncType
-    in_out_back: TimeEaseFuncType
-    in_elastic: TimeEaseFuncType
-    out_elastic: TimeEaseFuncType
-    in_out_elastic: TimeEaseFuncType
+from ..core._types._typing import TimeEaseFuncType
+from .enum import TimeEaseFunc
 
 
 class TimeEase(object):
@@ -75,7 +40,7 @@ class TimeEase(object):
         total_tm: float,
         fps: int = 0,
         hold_on_last_frame: bool = False,
-        ease_func: TimeEaseFuncType = TimeEaseFunc.linear,
+        ease_func: TimeEaseFuncType = TimeEaseFunc.LINEAR,
         next_te: Optional[TimeEase] = None,
         on_start: Optional[Callable[[], Any]] = None,
         on_end: Optional[Callable[[], Any]] = None,

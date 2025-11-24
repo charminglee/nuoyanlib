@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -24,7 +23,7 @@ __all__ = [
 
 class NyInputPanel(NyControl):
     """
-    | 创建 ``NyInputPanel`` 输入面板实例。
+    输入面板控件类。
 
     -----
 
@@ -32,17 +31,13 @@ class NyInputPanel(NyControl):
     :param InputPanelUIControl input_panel_control: 通过asInputPanel()等方式获取的InputPanelUIControl实例
     """
 
-    _CONTROL_TYPE = ControlType.INPUT_PANEL
+    CONTROL_TYPE = ControlType.INPUT_PANEL
 
     def __init__(self, screen_node_ex, input_panel_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, input_panel_control)
 
     def __destroy__(self):
         NyControl.__destroy__(self)
-
-    # region API =======================================================================================================
-
-    # endregion
 
     # region Properties ================================================================================================
 
@@ -51,70 +46,74 @@ class NyInputPanel(NyControl):
         """
         [可读写属性]
 
-        | 当前面板是否为模态框。
+        当前面板是否为模态框。
 
         :rtype: bool
         """
-        return self.base_control.GetIsModal()
+        return self._base_control.GetIsModal()
 
     @is_modal.setter
     def is_modal(self, val):
         """
         [可读写属性]
 
-        | 当前面板是否为模态框。
+        当前面板是否为模态框。
 
         :type val: bool
         """
         if isinstance(val, int):
             val = bool(val)
-        self.base_control.SetIsModal(val)
+        self._base_control.SetIsModal(val)
 
     @property
     def is_swallow(self):
         """
         [可读写属性]
 
-        | 当前面板输入是否会吞噬事件，为 ``True`` 时，点击事件不会穿透到世界，如破坏方块、镜头转向不会被响应。
+        当前面板输入是否会吞噬事件。
+
+        为 ``True`` 时，点击事件不会穿透到世界，如破坏方块、镜头转向不会被响应。
 
         :rtype: bool
         """
-        return self.base_control.GetIsSwallow()
+        return self._base_control.GetIsSwallow()
 
     @is_swallow.setter
     def is_swallow(self, val):
         """
         [可读写属性]
 
-        | 当前面板输入是否会吞噬事件，为 ``True`` 时，点击事件不会穿透到世界，如破坏方块、镜头转向不会被响应。
+        当前面板输入是否会吞噬事件。
+
+        为 ``True`` 时，点击事件不会穿透到世界，如破坏方块、镜头转向不会被响应。
 
         :type val: bool
         """
         if isinstance(val, int):
             val = bool(val)
-        self.base_control.SetIsSwallow(val)
+        self._base_control.SetIsSwallow(val)
 
     @property
     def offset_delta(self):
         """
         [可读写属性]
 
-        | 拖拽偏移量。
+        拖拽偏移量。
 
         :rtype: tuple[float,float]
         """
-        return self.base_control.GetOffsetDelta()
+        return self._base_control.GetOffsetDelta()
 
     @offset_delta.setter
     def offset_delta(self, val):
         """
         [可读写属性]
 
-        | 拖拽偏移量。
+        拖拽偏移量。
 
         :type val: tuple[float,float]
         """
-        self.base_control.SetOffsetDelta(tuple(val))
+        self._base_control.SetOffsetDelta(tuple(val))
 
     # endregion
 

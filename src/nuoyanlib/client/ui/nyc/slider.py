@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-11-04
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -24,7 +23,7 @@ __all__ = [
 
 class NySlider(NyControl):
     """
-    | 创建 ``NySlider`` 滑动条实例。
+    滑动条控件类。
 
     -----
 
@@ -32,17 +31,13 @@ class NySlider(NyControl):
     :param SliderUIControl slider_control: 通过asSlider()等方式获取的SliderUIControl实例
     """
 
-    _CONTROL_TYPE = ControlType.SLIDER
+    CONTROL_TYPE = ControlType.SLIDER
 
     def __init__(self, screen_node_ex, slider_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, slider_control)
 
     def __destroy__(self):
         NyControl.__destroy__(self)
-
-    # region API =======================================================================================================
-
-    # endregion
 
     # region Properties ================================================================================================
 
@@ -51,22 +46,22 @@ class NySlider(NyControl):
         """
         [可读写属性]
 
-        | 滑动条的值。
+        滑动条的值。
 
         :rtype: float
         """
-        return self.base_control.GetSliderValue()
+        return self._base_control.GetSliderValue()
 
     @value.setter
     def value(self, val):
         """
         [可读写属性]
 
-        | 滑动条的值。
+        滑动条的值。
 
         :type val: float
         """
-        self.base_control.SetSliderValue(val)
+        self._base_control.SetSliderValue(val)
 
     # endregion
 

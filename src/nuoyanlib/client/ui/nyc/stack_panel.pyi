@@ -1,30 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-26
+|   Date  : 2025-11-30
 |
-| ==============================================
+| ====================================================
 """
 
 
-from typing import Optional
+from typing import Optional, Literal
 from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
-from ...._core._types._checker import args_type_check
+from ....core._types._checker import args_type_check
 
 
 class NyStackPanel(NyControl):
-    base_control: StackPanelUIControl
-    """
-    | 栈面板 ``StackPanelUIControl`` 实例。
-    """
+    _base_control: StackPanelUIControl
     def __init__(
         self: ...,
         screen_node_ex: ScreenNodeExtension,
@@ -33,4 +29,9 @@ class NyStackPanel(NyControl):
     @args_type_check(str, is_method=True)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
-
+    @property
+    def orientation(self) -> Literal["horizontal", "vertical"]: ...
+    @orientation.setter
+    def orientation(self, val: Literal["horizontal", "vertical"]) -> None: ...
+    SetOrientation = StackPanelUIControl.SetOrientation
+    GetOrientation = StackPanelUIControl.GetOrientation

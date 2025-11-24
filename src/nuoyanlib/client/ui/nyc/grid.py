@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 from math import ceil
-from ...._core._utils import get_func, kwargs_setter, cached_property, try_exec
-from ...._core._types._checker import args_type_check
-from ...._core._client.comp import ScreenNode, ViewBinder
+from ....core._utils import get_func, kwargs_setter, try_exec, cached_property
+from ....core._types._checker import args_type_check
+from ....core.client.comp import ScreenNode, ViewBinder
 from ....utils.enum import ControlType, GridCallbackType
 from .control import NyControl
 
@@ -30,9 +29,10 @@ __all__ = [
 
 class GridData(list):
     """
-    | 网格数据对象，用于实现网格元素与数据的自动管理。
-    | 借助网格数据对象，开发者只需关注数据本身，而无需关心网格的刷新等繁琐细节。
-    | 网格数据对象继承于列表，因此，你可以像操作列表一样操作网格数据对象。
+    网格数据对象，用于实现网格元素与数据的自动管理。
+
+    借助网格数据对象，开发者只需关注数据本身，而无需关心网格的刷新等繁琐细节。
+    网格数据对象继承于列表，因此，你可以像操作列表一样操作网格数据对象。
 
     -----
 
@@ -50,7 +50,7 @@ class GridData(list):
 
     def bind_grid(self, grid):
         """
-        | 绑定当前网格数据对象到网格。
+        绑定当前网格数据对象到网格。
 
         -----
 
@@ -67,7 +67,7 @@ class GridData(list):
 
     def bind(self):
         """
-        | 立即将数据绑定给各个元素，并刷新显示。
+        立即将数据绑定给各个元素，并刷新显示。
 
         -----
 
@@ -123,7 +123,6 @@ class ElemGroup(object):
         'property_bag',
     )
     _ALLOWED_GET_ATTRS = (
-        'real_visible',
         'name',
         'path',
         'parent_path',
@@ -162,7 +161,7 @@ class ElemGroup(object):
         # 'to_selection_wheel',
         # 'to_combo_box',
         # 'to_mini_map',
-        'new_child',
+        'add_child',
         'clone_from',
         'SetPosition',
         'SetFullSize',
@@ -250,11 +249,12 @@ class ElemGroup(object):
 
 class NyGrid(NyControl):
     """
-    | 创建 ``NyGrid`` 网格实例。
+    网格控件类。
 
     -----
 
-    | 关于 ``cell_visible_binding`` 与 ``collection_name`` 参数的说明：
+    关于 ``cell_visible_binding`` 与 ``collection_name`` 参数的说明：
+
     - 该参数用于 ``.grid_size`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
     - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``cell_visible_binding`` 参数 。
     ::
@@ -280,12 +280,9 @@ class NyGrid(NyControl):
     :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
     """
 
-    __get_dim = staticmethod(get_func(
-        ScreenNode,
-        (103, 117, 105),
-        (103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)
-    ))
-    _CONTROL_TYPE = ControlType.GRID
+    CONTROL_TYPE = ControlType.GRID
+
+    __get_dim = staticmethod(get_func(ScreenNode, (103, 117, 105), (103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)))
 
     @kwargs_setter(
         is_stack_grid=False,
@@ -309,14 +306,14 @@ class NyGrid(NyControl):
         self.cell_visible_binding = kwargs['cell_visible_binding']
         self.collection_name_ = kwargs['collection_name']
         if self.cell_visible_binding and self.collection_name_:
-            self.ui_node._build_binding(
+            self.ui_node.build_binding(
                 self._return_cell_visible, ViewBinder.BF_BindBool, self.cell_visible_binding, self.collection_name_
             )
         self.gd_obj = None
 
     def __destroy__(self):
         self._callback_map.clear()
-        self.ui_node._unbuild_binding(self._return_cell_visible)
+        self.ui_node.unbuild_binding(self._return_cell_visible)
         NyControl.__destroy__(self)
 
     def __grid_update__(self):
@@ -329,46 +326,16 @@ class NyGrid(NyControl):
         for func in self._callback_map[GridCallbackType.UPDATE]:
             try_exec(func)
 
-    # region API =======================================================================================================
-
-    def get_cell_index(self, cell):
-        """
-        | 获取指定元素在网格中的索引。
-
-        -----
-
-        :param cell: 网格元素的路径或实例
-
-        :return: 元素索引
-        :rtype: int
-        """
-        return int(cell.GetPath().split(self.template_name)[-1]) - 1
-
-    def update_grid_data(self):
-        if not self.gd_obj:
-            return
-
-    @args_type_check(GridData, is_method=True)
-    def bind_data(self, gd):
-        """
-        | 绑定网格数据。
-
-        -----
-
-        :param GridData gd: 网格数据对象
-
-        :return: 无
-        :rtype: None
-        """
-        self.gd_obj = gd
-        gd.grid = self
+    # region Properties ================================================================================================
 
     @cached_property
     def template_name(self):
         """
         [只读属性]
 
-        | 网格模板控件名称，即 ``"grid_item_template"`` 字段或UI编辑器中的网格“内容”所使用的控件。
+        网格模板控件名称。
+
+        即 ``"grid_item_template"`` 字段或UI编辑器中的网格“内容”所使用的控件。
 
         :rtype: str
         """
@@ -376,8 +343,8 @@ class NyGrid(NyControl):
             children_names = self._screen_node.GetChildrenName(self.path)
             if children_names:
                 name = children_names[0]
-                for i in range(len(name) - 1, -1, -1):
-                    if not name[i].isdigit():
+                for i in name[::-1]:
+                    if not i.isdigit():
                         return name[:i + 1]
         else:
             return self.__template_name
@@ -390,78 +357,106 @@ class NyGrid(NyControl):
     def columns(self):
         return
 
-    def get_cell(self, index):
+    @property
+    def grid_size(self):
         """
-        获取索引为 ``index`` 的元素。
+        [可读写属性]
 
-        -----
+        网格的容量，即元素数量。
 
-        :param int index: 索引
+        对于非StackGrid网格，设置 ``grid_size`` 不会改变网格的列数。
+        例如一个3x3（3行3列）网格，设置 ``grid_size=5`` 后将变成2x3，且最末尾元素会被隐藏。
+        同理，若设置 ``grid_size=13``，则网格变成5x3，末尾2个元素会被隐藏。
 
-        :return: 元素的NyControl实例，获取不到时返回None
-        :rtype: NyControl|None
+        :rtype: int
         """
-        return self / (self.template_name + str(index + 1))
+        if self.__grid_size < 0:
+            bag = self.property_bag
+            return bag.get('#grid_number_size', 0) if bag else 0
+        else:
+            return self.__grid_size
 
-    def get_all_cells(self):
+    @grid_size.setter
+    def grid_size(self, val):
         """
-        | 获取网格所有元素的 ``NyControl`` 实例。
+        [可读写属性]
 
-        -----
+        网格的容量，即元素数量。
 
-        :return: 网格所有元素的NyControl实例列表
-        :rtype: list[NyControl]
+        对于非StackGrid网格，设置 ``grid_size`` 不会改变网格的列数。
+        例如一个3x3（3行3列）网格，设置 ``grid_size=5`` 后将变成2x3，且最末尾元素会被隐藏。
+        同理，若设置 ``grid_size=13``，则网格变成5x3，末尾2个元素会被隐藏。
+
+        :type val: int
         """
-        return [self.get_cell(i) for i in range(self.grid_size)]
+        if val == self.grid_size:
+            return
+        if val < 0:
+            raise ValueError("'grid_size' must be >= 0")
+        if self.is_stack_grid:
+            self._screen_node.SetStackGridCount(self.path, val)
+        else:
+            dx, dy = self.dimension
+            new_dy = int(ceil(float(val) / dx))
+            if new_dy != dy:
+                self._base_control.SetGridDimension((dx, new_dy))
+        self.__grid_size = val
 
-    def set_callback(self, func, cb_type=GridCallbackType.UPDATE):
+    @property
+    def dimension(self):
         """
-        | 设置网格回调函数。
+        [可读写属性]
 
-        -----
+        获取网格的xy大小。
 
-        :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
+        当网格为StackGrid时，y值固定为0。
 
-        :return: 是否成功
-        :rtype: bool
+        :rtype: tuple[int,int]
         """
-        if cb_type not in GridCallbackType:
-            raise ValueError("invalid callback type: %s, use 'GridCallbackType' instead" % repr(cb_type))
-        lst = self._callback_map[cb_type]
-        if func in lst:
-            return False
-        lst.append(func)
-        return True
+        return NyGrid.__get_dim(self._base_control.mScreenName, self._base_control.FullPath())
 
-    def remove_callback(self, func, cb_type=GridCallbackType.UPDATE):
+    @dimension.setter
+    def dimension(self, val):
         """
-        | 移除网格回调函数。
+        [可读写属性]
 
-        -----
+        设置网格的xy大小。
 
-        :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
+        当网格为StackGrid时，忽略传入的y值。
 
-        :return: 是否成功
-        :rtype: bool
+        :type val: tuple[int,int]
         """
-        if cb_type not in GridCallbackType:
-            raise ValueError("invalid callback type: %s, use 'GridCallbackType' instead" % repr(cb_type))
-        lst = self._callback_map[cb_type]
-        if func not in lst:
-            return False
-        lst.remove(func)
-        return True
+        if val == self.dimension:
+            return
+        if self.is_stack_grid:
+            if val[0] < 0:
+                raise ValueError("'dimension' value must be >= 0")
+            self._screen_node.SetStackGridCount(self.path, val[0])
+            self.__grid_size = val[0]
+        else:
+            if val[0] < 0 or val[1] < 0:
+                raise ValueError("'dimension' value must be >= 0")
+            self._base_control.SetGridDimension(val)
+            size = val[0] * val[1]
+            if self.__grid_size <= 0 or size < self.__grid_size:
+                self.__grid_size = size
+
+    # endregion
+
+    # region Common ====================================================================================================
 
     @args_type_check((int, slice, tuple), is_method=True)
     def __getitem__(self, item):
         """
-        | 根据特定规则获取网格单个或多个元素。
-        | 获取指定位置的元素：
+        根据特定规则获取网格单个或多个元素。
+
+        获取指定位置的元素：
+
         - ``grid[i]`` -- 按从左到右从上到下的顺序（下同）获取索引为i的元素，支持负数索引。
         - ``grid[x,⠀y]`` -- 获取坐标为 (x, y) 的元素，坐标从0开始，向右为X轴正方向，向下为Y轴正方向（下同）。
-        | 利用切片获取多个元素：
+
+        利用切片获取多个元素：
+
         - ``grid[start:stop]`` -- 与列表切片类似，获取索引为start到stop的元素（不包括stop，下同）。
         - ``grid[x,⠀start:stop]`` -- 获取指定x坐标上，y坐标为start到stop的元素。
         - ``grid[start:stop,⠀y]`` -- 获取指定y坐标上，x坐标为start到stop的元素。
@@ -493,83 +488,109 @@ class NyGrid(NyControl):
             cell_list = [self.get_cell(i) for i in index_list]
             return ElemGroup(self, cell_list)
 
-    # endregion
-
-    # region Properties ================================================================================================
-
-    @property
-    def grid_size(self):
+    def get_cell_index(self, cell):
         """
-        [可读写属性]
+        获取指定元素在网格中的索引。
 
-        | 网格的容量，即元素数量。
-        | 对于非StackGrid网格，设置 ``grid_size`` 不会改变网格的列数。例如一个3x3（3行3列）网格，设置 ``grid_size=5`` 后将变成2x3，且最末尾元素会被隐藏。同理，若设置 ``grid_size=13``，则网格变成5x3，末尾2个元素会被隐藏。
+        -----
 
+        :param cell: 网格元素的路径或实例
+
+        :return: 元素索引
         :rtype: int
         """
-        if self.__grid_size < 0:
-            bag = self.property_bag
-            return bag.get('#grid_number_size', 0) if bag else 0
-        else:
-            return self.__grid_size
+        return int(cell.GetPath().split(self.template_name)[-1]) - 1
 
-    @grid_size.setter
-    def grid_size(self, val):
-        """
-        [可读写属性]
-
-        | 网格的容量，即元素数量。
-        | 对于非StackGrid网格，设置 ``grid_size`` 不会改变网格的列数。例如一个3x3（3行3列）网格，设置 ``grid_size=5`` 后将变成2x3，且最末尾元素会被隐藏。同理，若设置 ``grid_size=13``，则网格变成5x3，末尾2个元素会被隐藏。
-
-        :type val: int
-        """
-        if val == self.grid_size:
+    def update_grid_data(self):
+        if not self.gd_obj:
             return
-        if val < 0:
-            raise ValueError("'grid_size' must be >= 0")
-        if self.is_stack_grid:
-            self._screen_node.SetStackGridCount(self.path, val)
-        else:
-            dx, dy = self.dimension
-            new_dy = int(ceil(float(val) / dx))
-            if new_dy != dy:
-                self.base_control.SetGridDimension((dx, new_dy))
-        self.__grid_size = val
 
-    @property
-    def dimension(self):
+    @args_type_check(GridData, is_method=True)
+    def bind_data(self, gd):
         """
-        [可读写属性]
+        绑定网格数据。
 
-        | 获取网格的xy大小。当网格为StackGrid时，y值固定为0。
+        -----
 
-        :rtype: tuple[int,int]
+        :param GridData gd: 网格数据对象
+
+        :return: 无
+        :rtype: None
         """
-        return NyGrid.__get_dim(self.base_control.mScreenName, self.base_control.FullPath()) # NOQA
+        self.gd_obj = gd
+        gd.grid = self
 
-    @dimension.setter
-    def dimension(self, val):
+    def get_cell(self, index):
         """
-        [可读写属性]
+        获取索引为 ``index`` 的元素。
 
-        | 设置网格的xy大小。当网格为StackGrid时，忽略传入的y值。
+        -----
 
-        :type val: tuple[int,int]
+        :param int index: 索引
+
+        :return: 元素的NyControl实例，获取不到时返回None
+        :rtype: NyControl|None
         """
-        if val == self.dimension:
-            return
-        if self.is_stack_grid:
-            if val[0] < 0:
-                raise ValueError("'dimension' value must be >= 0")
-            self._screen_node.SetStackGridCount(self.path, val[0])
-            self.__grid_size = val[0]
-        else:
-            if val[0] < 0 or val[1] < 0:
-                raise ValueError("'dimension' value must be >= 0")
-            self.base_control.SetGridDimension(val)
-            size = val[0] * val[1]
-            if self.__grid_size <= 0 or size < self.__grid_size:
-                self.__grid_size = size
+        return self / (self.template_name + str(index + 1))
+
+    def get_all_cells(self):
+        """
+        获取网格所有元素的 ``NyControl`` 实例。
+
+        -----
+
+        :return: 网格所有元素的NyControl实例列表
+        :rtype: list[NyControl]
+        """
+        return [self.get_cell(i) for i in range(self.grid_size)]
+
+    def set_callback(self, func, cb_type=GridCallbackType.UPDATE):
+        """
+        设置网格回调函数。
+
+        -----
+
+        :param function func: 回调函数
+        :param str cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
+
+        :return: 是否成功
+        :rtype: bool
+        """
+        if cb_type not in GridCallbackType:
+            raise ValueError("invalid callback type: %s, use 'GridCallbackType' instead" % repr(cb_type))
+        lst = self._callback_map[cb_type]
+        if func in lst:
+            return False
+        lst.append(func)
+        return True
+
+    def remove_callback(self, func, cb_type=GridCallbackType.UPDATE):
+        """
+        移除网格回调函数。
+
+        -----
+
+        :param function func: 回调函数
+        :param str cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
+
+        :return: 是否成功
+        :rtype: bool
+        """
+        if cb_type not in GridCallbackType:
+            raise ValueError("invalid callback type: %s, use 'GridCallbackType' instead" % repr(cb_type))
+        lst = self._callback_map[cb_type]
+        if func not in lst:
+            return False
+        lst.remove(func)
+        return True
+
+    GetCellIndex = get_cell_index
+    UpdateGridData = update_grid_data
+    BindData = bind_data
+    GetCell = get_cell
+    GetAllCells = get_all_cells
+    SetCallback = set_callback
+    RemoveCallback = remove_callback
 
     # endregion
 

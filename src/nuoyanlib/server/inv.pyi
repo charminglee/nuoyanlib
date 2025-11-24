@@ -1,26 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-20
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
 from typing import List, Union, Optional
 from mod.common.minecraftEnum import ItemPosType
-from .._core._types._typing import ItemDict, STuple
+from ..core._types._typing import ItemDict, STuple
 
 
-def set_items_to_item_grid(player_id: str, key: str, item_dict_list: List[Optional[ItemDict]]) -> List[bool]: ...
-def get_items_from_item_grid(player_id: str, key: str) -> List[Optional[ItemDict]]: ...
-def update_item_grids(player_id: str, keys: Union[str, STuple]) -> bool: ...
+# def set_items_to_item_grid(player_id: str, key: str, item_dict_list: List[Optional[ItemDict]]) -> List[bool]: ...
+# def get_items_from_item_grid(player_id: str, key: str) -> List[Optional[ItemDict]]: ...
+# def update_item_grids(player_id: str, keys: Union[str, STuple]) -> bool: ...
 def clear_items(player_id: str, item_pos_type: int, pos: int = 0) -> dict: ...
 def get_item_pos(
     entity_id: str,

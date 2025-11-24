@@ -1,18 +1,30 @@
 {
-    "format_version": 1,
-    "modules": [
-        {
-            "description": "Test By @Nuoyan",
-            "type": "data",
-            "uuid": "a3b26108-74ec-4d02-90a9-7d98c2aa4a93",
-            "version": [ 0, 0, 1 ]
-        }
-    ],
-    "header": {
-        "description": "Test By @Nuoyan",
-        "name": "Test",
-        "uuid": "394d2579-2f90-40ed-bdbc-c3b18b2d638c",
-        "version": [ 0, 0, 1 ],
-        "min_engine_version": [ 1, 18, 0 ]
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "74a7b541-1e05-4dcd-8d12-7f7be9cf54f7",
+      "version": [
+        0,
+        0,
+        1
+      ],
+      "description": "Test By @诺言Nuoyan"
     }
+  ],
+  "header": {
+    "uuid": "96d45c51-157a-4889-ac90-a1f5333d9ddb",
+    "version": [
+      0,
+      0,
+      1
+    ],
+    "description": "Test By @诺言Nuoyan",
+    "name": "Test",
+    "min_engine_version": [
+      1,
+      18,
+      0
+    ]
+  },
+  "format_version": 1
 }

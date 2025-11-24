@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-10-10
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 import math
 import random
 from string import digits, ascii_lowercase, ascii_uppercase
-from .._core._sys import get_lv_comp, is_client
-from .mc_math import pos_distance
+from ..core._sys import get_lv_comp, is_client
 
 
 __all__ = [
@@ -29,7 +27,7 @@ __all__ = [
 
 def random_pos(center_pos, r, dim=0, use_top_height=False):
     """
-    | 在指定区域内随机获取一点坐标。
+    在指定区域内随机获取一点坐标。
     
     -----
 
@@ -47,9 +45,9 @@ def random_pos(center_pos, r, dim=0, use_top_height=False):
     z = center_pos[2] + random.uniform(-r, r)
     if use_top_height:
         if is_client():
-            y = get_lv_comp().BlockInfo.GetTopBlockHeight((x, z))
+            y = get_lv_comp(True).BlockInfo.GetTopBlockHeight((x, z))
         else:
-            y = get_lv_comp().BlockInfo.GetTopBlockHeight((x, z), dim)
+            y = get_lv_comp(False).BlockInfo.GetTopBlockHeight((x, z), dim)
         if y is not None:
             return x, y, z
     else:
@@ -66,7 +64,7 @@ _random_ins = {}
 
 def random_string(length, lower=True, upper=True, num=True, seed=None, generate_num=1):
     """
-    | 生成随机字符串。
+    生成随机字符串。
     
     -----
 
@@ -90,7 +88,7 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
 
 def random_even_poses(center_pos, radius, pos_num, fixed_x=False, fixed_y=False, fixed_z=False):
     """
-    | 在指定坐标周围，生成随机的均匀分布的多个坐标。
+    在指定坐标周围，生成随机的均匀分布的多个坐标。
     
     -----
 

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -24,7 +23,7 @@ __all__ = [
 
 class NyPaperDoll(NyControl):
     """
-    | 创建 ``NyPaperDoll`` 纸娃娃实例。
+    纸娃娃控件类。
 
     -----
 
@@ -32,7 +31,7 @@ class NyPaperDoll(NyControl):
     :param NeteasePaperDollUIControl paper_doll_control: 通过asNeteasePaperDoll()等方式获取的NeteasePaperDollUIControl实例
     """
 
-    _CONTROL_TYPE = ControlType.NETEASE_PAPER_DOLL
+    CONTROL_TYPE = ControlType.NETEASE_PAPER_DOLL
 
     def __init__(self, screen_node_ex, paper_doll_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, paper_doll_control)
@@ -40,11 +39,18 @@ class NyPaperDoll(NyControl):
     def __destroy__(self):
         NyControl.__destroy__(self)
 
-    # region API =======================================================================================================
-
-    # endregion
-
     # region Properties ================================================================================================
+
+    @property
+    def model_id(self):
+        """
+        [只读属性]
+
+        渲染的骨骼模型ID。
+
+        :rtype: int
+        """
+        return self._base_control.GetModelId()
 
     # endregion
 

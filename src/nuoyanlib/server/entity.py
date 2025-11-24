@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-26
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-import mod.server.extraServerApi as server_api
+import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import EntityType
-from .._core._server.comp import CF, LvComp
-from .._core._server import _lib_server
+from ..core.server.comp import CF, LvComp
+from ..core.server import _lib_server
 from ..utils.mc_math import pos_distance, ray_aabb_intersection
 from ..utils.vector import vec_p2p, vec_composite
 
@@ -51,28 +50,26 @@ __all__ = [
 
 def set_query_mod_var(entity_id, name, value):
     """
-    | 设置指定实体 ``query.mod`` 变量的值，全局同步。
-    | 若设置的变量未注册，则自动进行注册。
+    设置指定实体 ``query.mod`` 变量的值，全局同步。
+
+    若设置的变量未注册，则自动进行注册。
 
     -----
 
     :param str entity_id: 实体ID
-    :param str name: 变量名
+    :param str name: 变量名，仅支持query.mod开头的变量
     :param float value: 设置的值
 
-    :return: 是否成功
-    :rtype: bool
+    :return: 无
+    :rtype: None
     """
     lib_sys = _lib_server.instance()
-    if not lib_sys:
-        return False
     lib_sys._SetQueryVar({'entity_id': entity_id, 'name': name, 'value': value})
-    return True
 
 
 def clear_effects(entity_id):
     """
-    | 清除指定实体的全部药水效果。
+    清除指定实体的全部药水效果。
 
     -----
 
@@ -99,7 +96,7 @@ def bounce_entities(
         filter_abiotic=False,
 ):
     """
-    | 从中心弹开指定范围内的实体。
+    从中心弹开指定范围内的实体。
 
     -----
 
@@ -131,7 +128,7 @@ def attract_entities(
         filter_abiotic=False,
 ):
     """
-    | 吸引指定范围内的实体到中心。
+    吸引指定范围内的实体到中心。
 
     -----
 
@@ -173,7 +170,7 @@ def attract_entities(
 
 def is_mob(entity_id):
     """
-    | 判断实体是否为生物。
+    判断实体是否为生物。
 
     -----
 
@@ -188,7 +185,7 @@ def is_mob(entity_id):
 
 def all_mob(entity_id_list):
     """
-    | 判断一个实体ID列表内的实体是否均为生物。
+    判断一个实体ID列表内的实体是否均为生物。
 
     -----
 
@@ -202,7 +199,7 @@ def all_mob(entity_id_list):
 
 def any_mob(entity_id_list):
     """
-    | 判断一个实体ID列表内的实体是否含有生物。
+    判断一个实体ID列表内的实体是否含有生物。
 
     -----
 
@@ -216,20 +213,23 @@ def any_mob(entity_id_list):
 
 def entity_filter(entity_list, *args):
     """
-    | 实体ID过滤器。
-    | 执行过滤时将会从左到右按顺序处理过滤参数，且会自动丢弃无法获取坐标的实体。
+    实体ID过滤器。
+
+    执行过滤时将会从左到右按顺序处理过滤参数，且会自动丢弃无法获取坐标的实体。
 
     -----
 
     【过滤参数说明及示例】
 
-    * **传入一个tuple，tuple的第一个元素为坐标，第二个元素为半径，表示保留该坐标半径范围内的所有实体：**
+    - 传入一个tuple，tuple的第一个元素为坐标，第二个元素为半径，表示保留该坐标半径范围内的所有实体。
+
     ::
 
         # 保留以pos为中心60格半径内的实体
         entity_filter(entity_list, (pos, 60))
 
-    * **将EntityType枚举放入集合传入，表示保留这些类型的所有实体：**
+    - 将EntityType枚举放入集合传入，表示保留这些类型的所有实体。
+
     ::
 
         # 保留所有生物
@@ -237,19 +237,22 @@ def entity_filter(entity_list, *args):
         # 保留所有猪和狼
         entity_filter(entity_list, {EntityType.Pig, EntityType.Wolf})
 
-    * **将字符串形式的维度ID放入集合传入，表示保留这些维度的所有实体：**
+    - 将字符串形式的维度ID放入集合传入，表示保留这些维度的所有实体。
+
     ::
 
         # 保留所有主世界和地狱的实体
         entity_filter(entity_list, {"0", "1"})
 
-    * **将实体ID放入列表传入，表示抛弃这些实体ID：**
+    - *将实体ID放入列表传入，表示抛弃这些实体ID。
+
     ::
 
         entity_list = ["-123", "-456", "-789"]
         entity_filter(entity_list, ["-123", "-456"]) # ["-789"]
 
-    * **将EntityType枚举放入列表传入，表示抛弃这些类型的所有实体：**
+    - 将EntityType枚举放入列表传入，表示抛弃这些类型的所有实体。
+
     ::
 
         # 抛弃所有生物
@@ -257,7 +260,8 @@ def entity_filter(entity_list, *args):
         # 抛弃所有猪和狼
         entity_filter(entity_list, [EntityType.Pig, EntityType.Wolf])
 
-    * **以上5种过滤参数均可混合使用：**
+    - 以上5种过滤参数均可混合使用。
+
     ::
 
         # 保留主世界中以pos为中心60格半径内的所有生物
@@ -310,7 +314,7 @@ def entity_filter(entity_list, *args):
 
 def is_entity_type(entity_id, etype):
     """
-    | 判断实体是否是某一类型。
+    判断实体是否是某一类型。
 
     -----
 
@@ -328,7 +332,9 @@ def is_entity_type(entity_id, etype):
 
 def sort_entity_list_by_dist(entity_list, pos):
     """
-    | 根据距离从小到大对实体列表进行排序。该函数直接修改原列表，无法获取坐标的实体将会从列表中删除。
+    根据距离从小到大对实体列表进行排序。
+
+    该函数直接修改原列表，无法获取坐标的实体将会从列表中删除。
 
     -----
 
@@ -363,7 +369,7 @@ def launch_projectile(
         damage_owner=False,
 ):
     """
-    | 发射抛射物。
+    发射抛射物。
 
     -----
 
@@ -390,7 +396,7 @@ def launch_projectile(
         rot = cf.Rot.GetRot()
         if not rot:
             return "-1"
-        direction = server_api.GetDirFromRot(rot)
+        direction = s_api.GetDirFromRot(rot)
     param = {
         'position': position,
         'direction': direction,
@@ -409,7 +415,7 @@ def launch_projectile(
 
 def entity_plunge(entity_id1, entity_id2, speed):
     """
-    | 使实体1向实体2的准星方向突进。
+    使实体1向实体2的准星方向突进。
 
     -----
 
@@ -428,7 +434,7 @@ def entity_plunge(entity_id1, entity_id2, speed):
 
 def entity_plunge_by_dir(entity_id, direction, speed):
     """
-    | 使实体以指定方向和速度突进。
+    使实体以指定方向和速度突进。
 
     -----
 
@@ -451,7 +457,7 @@ def entity_plunge_by_dir(entity_id, direction, speed):
 
 def entity_plunge_by_rot(entity_id, rot, speed):
     """
-    | 使实体向指定视角方向突进。
+    使实体向指定视角方向突进。
 
     -----
 
@@ -462,13 +468,13 @@ def entity_plunge_by_rot(entity_id, rot, speed):
     :return: 无
     :rtype: None
     """
-    direction = server_api.GetDirFromRot(rot)
+    direction = s_api.GetDirFromRot(rot)
     entity_plunge_by_dir(entity_id, direction, speed)
 
 
 def get_all_entities(ent_filter=None):
     """
-    | 获取所有实体，包括玩家。
+    获取所有实体，包括玩家。
 
     -----
 
@@ -477,7 +483,7 @@ def get_all_entities(ent_filter=None):
     :return: 实体ID列表
     :rtype: list[str]
     """
-    return filter(ent_filter, server_api.GetEngineActor().keys() + server_api.GetPlayerList())
+    return filter(ent_filter, s_api.GetEngineActor().keys() + s_api.GetPlayerList())
 
 
 def get_entities_in_area(
@@ -490,7 +496,7 @@ def get_entities_in_area(
         filter_abiotic=False,
 ):
     """
-    | 获取给定区域内的所有实体。
+    获取给定区域内的所有实体。
 
     -----
 
@@ -519,7 +525,7 @@ def get_entities_in_area(
 
 def get_entities_by_type(type_id, pos=None, dimension=0, radius=0.0):
     """
-    | 获取指定类型的所有实体。
+    获取指定类型的所有实体。
 
     -----
 
@@ -544,7 +550,7 @@ def get_entities_by_type(type_id, pos=None, dimension=0, radius=0.0):
 
 def get_entities_by_name(name):
     """
-    | 获取自定义名称为 ``name`` 的所有实体。
+    获取自定义名称为 ``name`` 的所有实体。
 
     -----
 
@@ -563,7 +569,7 @@ def get_entities_by_name(name):
 
 def get_entities_by_locking(entity_id, dist=-1.0, filter_ids=None, filter_types=None):
     """
-    | 获取攻击目标为指定生物的所有生物。
+    获取攻击目标为指定生物的所有生物。
 
     -----
 
@@ -602,7 +608,7 @@ def get_nearest_entity(
         filter_abiotic=False,
 ):
     """
-    | 获取距离指定实体或坐标位置最近的实体。
+    获取距离指定实体或坐标位置最近的实体。
 
     -----
 
@@ -643,7 +649,7 @@ def get_nearest_entity(
 
 def attack_nearest_mob(entity_id, r=15.0, filter_ids=None, filter_types=None):
     """
-    | 令指定实体攻击距离其最近的实体。
+    令指定实体攻击距离其最近的实体。
 
     -----
 
@@ -665,7 +671,7 @@ def attack_nearest_mob(entity_id, r=15.0, filter_ids=None, filter_types=None):
 
 def has_effect(entity_id, effect_id):
     """
-    | 检测生物是否存在指定药水效果。
+    检测生物是否存在指定药水效果。
 
     -----
 
@@ -694,8 +700,10 @@ def get_entities_by_ray(
         filter_abiotic=False,
 ):
     """
-    | 从指定位置射出一条射线，获取该射线接触到的所有实体。
-    | 返回一个列表，实体按照由近到远的顺序排列，列表每个元素为一个字典，结构如下：
+    从指定位置射出一条射线，获取该射线接触到的所有实体。
+
+    返回一个列表，实体按照由近到远的顺序排列，列表每个元素为一个字典，结构如下：
+
     ::
 
         {
@@ -754,7 +762,7 @@ def get_entities_by_ray(
 
 def entity_distance(ent1, ent2):
     """
-    | 计算两个实体的距离。
+    计算两个实体的距离。
 
     -----
 

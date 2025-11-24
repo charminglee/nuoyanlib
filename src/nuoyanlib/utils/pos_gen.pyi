@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-04
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
 from abc import abstractmethod, ABCMeta
-from typing import TypeVar, NoReturn, Iterator
-from .._core._types._typing import FTuple3, ITuple3
-
-
-_T = TypeVar("_T")
+from typing import NoReturn, Iterator
+from ..core._types._typing import FTuple3, ITuple3, _T
 
 
 class _PosGenerator(Iterator[FTuple3], metaclass=ABCMeta):

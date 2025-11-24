@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-27
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -24,7 +23,7 @@ __all__ = [
 
 class NyStackPanel(NyControl):
     """
-    | 创建 ``NyStackPanel`` 栈面板实例。
+    栈面板控件类。
 
     -----
 
@@ -32,7 +31,7 @@ class NyStackPanel(NyControl):
     :param StackPanelUIControl stack_panel_control: 通过asStackPanel()等方式获取的StackPanelUIControl实例
     """
 
-    _CONTROL_TYPE = ControlType.STACK_PANEL
+    CONTROL_TYPE = ControlType.STACK_PANEL
 
     def __init__(self, screen_node_ex, stack_panel_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, stack_panel_control)
@@ -40,11 +39,29 @@ class NyStackPanel(NyControl):
     def __destroy__(self):
         NyControl.__destroy__(self)
 
-    # region API =======================================================================================================
-
-    # endregion
-
     # region Properties ================================================================================================
+
+    @property
+    def orientation(self):
+        """
+        [可读写属性]
+
+        栈面板排列方向。
+
+        :rtype: str
+        """
+        return self._base_control.GetOrientation()
+
+    @orientation.setter
+    def orientation(self, val):
+        """
+        [可读写属性]
+
+        栈面板排列方向。
+
+        :type val: str
+        """
+        self._base_control.SetOrientation(val)
 
     # endregion
 

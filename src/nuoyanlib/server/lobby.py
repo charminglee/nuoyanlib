@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-15
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-import mod.server.extraServerApi as server_api
-from .._core._sys import get_lib_system
-from .._core._server.comp import LvComp
-from .._core._utils import kwargs_setter
-from .._core.event.listener import event, ServerEventProxy
+import mod.server.extraServerApi as s_api
+from ..core.server.comp import LvComp
+from ..core._utils import kwargs_setter
+from ..core.listener import event, ServerEventProxy
 
 
 __all__ = [
@@ -25,15 +23,17 @@ __all__ = [
 ]
 
 
-_IS_LOBBY = (server_api.GetPlatform() == -1)
+_IS_LOBBY = (s_api.GetPlatform() == -1)
 _UID_DATA_KEY = "_nyl_lobby_uid_data"
 _GLOBAL_DATA_KEY = "_nyl_lobby_global_data"
 
 
 class LobbyDataMgr(ServerEventProxy):
     """
-    | 联机大厅管理器。
-    | 支持以下功能：
+    联机大厅管理器。
+
+    支持以下功能：
+
     - 便捷管理联机大厅云端数据，自动完成数据更新上传/数据获取/数据冲突等情况的处理。
     - 设置订单发货。
     - 在单机环境中模拟联机大厅环境。
@@ -64,7 +64,7 @@ class LobbyDataMgr(ServerEventProxy):
 
     def register(self, key, default=None, is_global=False):
         """
-        | 注册云端数据。
+        注册云端数据。
 
         -----
 
@@ -89,7 +89,7 @@ class LobbyDataMgr(ServerEventProxy):
         else:
             self.uid_data[key] = {
                 self._to_uid(pid): default()
-                for pid in server_api.GetPlayerList()
+                for pid in s_api.GetPlayerList()
             }
         self._default[key] = default
 
@@ -121,8 +121,9 @@ class LobbyDataMgr(ServerEventProxy):
     @kwargs_setter(callback=None, simulate=None)
     def fetch(self, player=0, *keys, **kwargs):
         """
-        | 从云端获取数据并缓存。
-        | 请先用 ``.register()`` 注册数据再调用本调接口。
+        从云端获取数据并缓存。
+
+        请先用 ``.register()`` 注册数据再调用本调接口。
 
         -----
 
@@ -187,7 +188,7 @@ class LobbyDataMgr(ServerEventProxy):
     @kwargs_setter(order_id=None, callback=None)
     def update(self, key, exp, player=0, **kwargs):
         """
-        | 更新云端数据。
+        更新云端数据。
 
         -----
 
@@ -220,8 +221,9 @@ class LobbyDataMgr(ServerEventProxy):
     @kwargs_setter(order_id=None, callback=None)
     def set(self, key, value, player=0, **kwargs):
         """
-        | 强制设置云端某个数据的值。
-        | 注意：若出现数据冲突，本接口将 **强制** 覆盖数据的值，请谨慎使用。
+        强制设置云端某个数据的值。
+
+        注意：若出现数据冲突，本接口将 **强制** 覆盖数据的值，请谨慎使用。
 
         -----
 
@@ -252,8 +254,9 @@ class LobbyDataMgr(ServerEventProxy):
 
     def get(self, key, player=0):
         """
-        | 从服务端本地缓存中获取数据。
-        | 请先用 ``.register()`` 注册数据再调用本调接口。
+        从服务端本地缓存中获取数据。
+
+        请先用 ``.register()`` 注册数据再调用本调接口。
 
         -----
 
@@ -270,8 +273,9 @@ class LobbyDataMgr(ServerEventProxy):
     @kwargs_setter(callback=None)
     def ship(self, order_id, player, **kwargs):
         """
-        | 设置订单发货。
-        | 如需同时设置数据和发货，建议使用 ``.update()`` 或 ``.set()`` 接口。
+        设置订单发货。
+
+        如需同时设置数据和发货，建议使用 ``.update()`` 或 ``.set()`` 接口。
 
         -----
 
@@ -300,7 +304,7 @@ class LobbyDataMgr(ServerEventProxy):
     @kwargs_setter(callback=None, simulate=None)
     def query(self, player, **kwargs):
         """
-        | 查询还未发货的订单。
+        查询还未发货的订单。
 
         -----
 

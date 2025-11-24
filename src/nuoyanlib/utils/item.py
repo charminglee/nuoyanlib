@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-11-14
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 from mod.common.minecraftEnum import ItemPosType
-from .._core._sys import get_comp_factory, LEVEL_ID
+from ..core._sys import get_comp_factory, LEVEL_ID
 
 
 __all__ = [
@@ -30,8 +29,11 @@ __all__ = [
 
 def deepcopy_item_dict(item_dict):
     """
-    | 对物品信息字典进行深拷贝。比标准库的 ``deepcopy`` 效率更高。
-    | 注：该函数进行的深拷贝为伪深拷贝，只会对字典中的字典、列表进行递归深拷贝，其他不可变对象（如元组、字符串等）仍保留原引用。
+    对物品信息字典进行深拷贝。
+
+    比标准库的 ``deepcopy`` 效率更高。
+
+    注：该函数进行的深拷贝为伪深拷贝，只会对字典中的字典、列表进行递归深拷贝，其他不可变对象（如元组、字符串等）仍保留原引用。
 
     -----
 
@@ -70,8 +72,9 @@ def gen_item_dict(
         auxValue=0,
 ):
     """
-    | 构造物品信息字典。
-    | 利用IDE的参数提示编写物品信息字典，省去了翻阅文档的麻烦。该函数返回的物品信息字典可直接传入接口使用。
+    构造物品信息字典。
+
+    该函数返回的物品信息字典可直接传入接口使用。
 
     -----
 
@@ -104,7 +107,7 @@ def gen_item_dict(
 
 def get_item_count(player_id, name, aux=-1):
     """
-    | 获取玩家背包中指定物品的总数量。
+    获取玩家背包中指定物品的总数量。
 
     -----
 
@@ -127,7 +130,7 @@ def get_item_count(player_id, name, aux=-1):
 
 def set_namespace(name, namespace="minecraft"):
     """
-    | 设置物品的命名空间。
+    设置物品的命名空间。
 
     -----
 
@@ -172,7 +175,7 @@ def _is_same_item(item_dict1, item_dict2):
 
 def is_same_item(item_dict, *more):
     """
-    | 判断两个或多个物品是否是同种物品。
+    判断两个或多个物品是否是同种物品。
 
     -----
 
@@ -190,7 +193,7 @@ _AIR = ("minecraft:air", "air")
 
 def is_empty_item(item, zero_is_emp=True):
     """
-    | 判断物品是否是空物品。
+    判断物品是否是空物品。
 
     -----
 
@@ -211,7 +214,7 @@ def is_empty_item(item, zero_is_emp=True):
 
 def get_max_stack(item):
     """
-    | 获取物品最大堆叠数量。
+    获取物品最大堆叠数量。
 
     -----
 
@@ -233,29 +236,24 @@ def get_max_stack(item):
 
 def __test__():
     item1 = {'newItemName': "minecraft:apple"}
-    item2 = {'itemName': "minecraft:apple"}
-    item3 = {'newItemName': "minecraft:apple", 'newAuxValue': 1}
-    item4 = {'itemName': "minecraft:apple", 'auxValue': 1}
-    item5 = {'newItemName': "minecraft:apple"}
-    item6 = {'itemName': "minecraft:apple"}
-    assert is_same_item(item1, item2)
-    assert is_same_item(item3, item4)
-    assert not is_same_item(item1, item3)
-    assert not is_same_item(item2, item4)
-    assert not is_same_item(item1, item4)
+    item2 = {'newItemName': "minecraft:apple", 'newAuxValue': 1}
+    item3 = {'newItemName': "minecraft:apple", 'newAuxValue': 2}
+    item4 = {'newItemName': "minecraft:apple", 'newAuxValue': 0, 'userData': None, 'extraId': None}
+    item5 = {'newItemName': "minecraft:apple", 'userData': {'a': 1}}
+    item6 = {'newItemName': "minecraft:apple", 'extraId': "a"}
+    assert not is_same_item(item1, item2, item3)
+    assert is_same_item(item1, item4)
+    assert not is_same_item(item1, item5)
+    assert not is_same_item(item1, item6)
 
     emp1 = {'newItemName': "minecraft:air"}
     emp2 = {'newItemName': "minecraft:apple", 'count': 0}
     emp3 = {}
-    emp4 = {'itemName': "air"}
     assert is_empty_item(emp1)
     assert is_empty_item(emp2)
     assert is_empty_item(emp3)
-    assert is_empty_item(emp4)
     assert not is_empty_item(item1)
-    assert not is_empty_item(item2)
     assert not is_empty_item(item3)
-    assert not is_empty_item(item4)
 
     assert set_namespace("apple") == "minecraft:apple"
     assert set_namespace("minecraft:apple", "nuoyan") == "nuoyan:apple"

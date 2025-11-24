@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-07-22
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-from .._core._client.comp import CF
-from .._core._client import _lib_client
+from ..core.client.comp import CF
+from ..core.client import _lib_client
 
 
 __all__ = [
@@ -25,9 +24,11 @@ __all__ = [
 
 class NeteaseParticle(object):
     """
-    | 网易粒子特效管理器。
-    | 切换维度后会自动隐藏非本维度创建的而且没有绑定实体的粒子，回到该维度后会自动重新显示。
-    | 粒子创建之后需要调用 ``.Play()`` 方法才会播放，如果播放非本维度创建的粒子，会同时修改该粒子的创建维度为当前维度。
+    网易粒子特效管理器。
+
+    切换维度后会自动隐藏非本维度创建的而且没有绑定实体的粒子，回到该维度后会自动重新显示。
+
+    粒子创建之后需要调用 ``.Play()`` 方法才会播放，如果播放非本维度创建的粒子，会同时修改该粒子的创建维度为当前维度。
 
     -----
 
@@ -74,7 +75,7 @@ class NeteaseParticle(object):
         """
         [只读属性]
 
-        | 粒子特效ID。
+        粒子特效ID。
 
         :rtype: int
         """
@@ -85,7 +86,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定的实体ID。
+        粒子绑定的实体ID。
 
         :rtype: str
         """
@@ -96,7 +97,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定的实体ID。
+        粒子绑定的实体ID。
 
         :type value: str
         """
@@ -107,7 +108,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定实体时的偏移量。
+        粒子绑定实体时的偏移量。
 
         :rtype: tuple[float,float,float]
         """
@@ -118,7 +119,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定实体时的偏移量。
+        粒子绑定实体时的偏移量。
 
         :type value: tuple[float,float,float]
         """
@@ -129,7 +130,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定实体时的旋转角度。
+        粒子绑定实体时的旋转角度。
 
         :rtype: tuple[float,float,float]
         """
@@ -140,7 +141,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定实体时的旋转角度。
+        粒子绑定实体时的旋转角度。
 
         :type value: tuple[float,float,float]
         """
@@ -151,7 +152,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定实体时是否开启特效旋转角度修正。
+        粒子绑定实体时是否开启特效旋转角度修正。
 
         :rtype: bool
         """
@@ -162,7 +163,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定实体时是否开启特效旋转角度修正。
+        粒子绑定实体时是否开启特效旋转角度修正。
 
         :type value: bool
         """
@@ -173,7 +174,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定的骨骼模型的ID。
+        粒子绑定的骨骼模型的ID。
 
         :rtype: int
         """
@@ -184,7 +185,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定的骨骼模型的ID。
+        粒子绑定的骨骼模型的ID。
 
         :type value: int
         """
@@ -195,7 +196,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定的具体骨骼的名称。
+        粒子绑定的具体骨骼的名称。
 
         :rtype: str
         """
@@ -206,7 +207,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定的具体骨骼的名称。
+        粒子绑定的具体骨骼的名称。
 
         :type value: str
         """
@@ -217,7 +218,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定骨骼时的偏移量。
+        粒子绑定骨骼时的偏移量。
 
         :rtype: tuple[float,float,float]
         """
@@ -228,7 +229,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定骨骼时的偏移量。
+        粒子绑定骨骼时的偏移量。
 
         :type value: tuple[float,float,float]
         """
@@ -239,7 +240,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定骨骼时的旋转角度。
+        粒子绑定骨骼时的旋转角度。
 
         :rtype: tuple[float,float,float]
         """
@@ -250,7 +251,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子绑定骨骼时的旋转角度。
+        粒子绑定骨骼时的旋转角度。
 
         :type value: tuple[float,float,float]
         """
@@ -261,8 +262,10 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子发射器每帧发射粒子的频率，数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
-        | 对应粒子特效json文件中 ``"emissionrate"`` 的值。
+        粒子发射器每帧发射粒子的频率。
+
+        对应粒子特效json文件中 ``"emissionrate"`` 的值。
+        数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
 
         :rtype: tuple[float,float]
         """
@@ -273,10 +276,13 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 设置粒子发射器每帧发射粒子的频率，数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
-        | 频率越大则每帧发射的粒子数量越多，但粒子数量不会超过粒子发射器的粒子容量，同时由于性能考虑，每帧发射的粒子数量也不会超过100个。
-        | 每帧发射粒子的频率将在频率最小值和频率最大值之间取随机数进行插值。当值设置为负值时设置将会失败。
-        | 对应粒子特效json文件中 ``"emissionrate"`` 的值。
+        设置粒子发射器每帧发射粒子的频率。
+
+        对应粒子特效json文件中 ``"emissionrate"`` 的值。
+        数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
+
+        频率越大则每帧发射的粒子数量越多，但粒子数量不会超过粒子发射器的粒子容量，同时由于性能考虑，每帧发射的粒子数量也不会超过100个。
+        每帧发射粒子的频率将在频率最小值和频率最大值之间取随机数进行插值。当值设置为负值时设置将会失败。
 
         :type value: tuple[float,float]
         """
@@ -287,8 +293,9 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子发射器包含的最大粒子数量，数据类型为整数。
-        | 对应粒子特效json文件中 ``"numparticles"`` 的值。
+        粒子发射器包含的最大粒子数量。
+
+        对应粒子特效json文件中 ``"numparticles"`` 的值。
 
         :rtype: int
         """
@@ -299,9 +306,12 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 设置粒子发射器的粒子容量，即粒子发射器所包含的最大粒子数量，数据类型为整数，不能为负值，粒子的数量最大值不超过100000。
-        | 该数量并不代表目前粒子发射器所发射的粒子数量，如需要增加发射的粒子数量，需同时改变粒子的发射频率。
-        | 对应粒子特效json文件中 ``"numparticles"`` 的值。
+        设置粒子发射器的粒子容量。
+
+        即粒子发射器所包含的最大粒子数量，不能为负值，粒子的数量最大值不超过100000。
+        该数量并不代表目前粒子发射器所发射的粒子数量，如需要增加发射的粒子数量，需同时改变粒子的发射频率。
+
+        对应粒子特效json文件中 ``"numparticles"`` 的值。
 
         :type value: int
         """
@@ -312,8 +322,12 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子大小的最小值和最大值，数据类型为元组：((minx, miny), (maxx, maxy))，其中minx为粒子x轴大小的最小值，miny为粒子y轴大小的最小值，maxx为粒子x轴大小的最大值，maxy为粒子y轴大小的最大值。
-        | 对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
+        粒子大小的最小值和最大值。
+
+        数据类型为元组：((min_x, min_y), (max_x, max_y))，其中min_x为粒子x轴大小的最小值，min_y为粒子y轴大小的最小值，
+        max_x为粒子x轴大小的最大值，max_y为粒子y轴大小的最大值。
+
+        对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
 
         :rtype: tuple[tuple[float,float],tuple[float,float]]
         """
@@ -324,9 +338,13 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 设置粒子大小的最小值及最大值，数据类型为元组：((minx, miny), (maxx, maxy))，其中minx为粒子x轴大小的最小值，miny为粒子y轴大小的最小值，maxx为粒子x轴大小的最大值，maxy为粒子y轴大小的最大值。
-        | 粒子大小会在最小值和最大值当中取随机值进行决定，当该值设置为负值时设置将会失败。
-        | 对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
+        设置粒子大小的最小值及最大值。
+
+        数据类型为元组：((min_x, min_y), (max_x, max_y))，其中min_x为粒子x轴大小的最小值，min_y为粒子y轴大小的最小值，
+        max_x为粒子x轴大小的最大值，max_y为粒子y轴大小的最大值。
+        粒子大小会在最小值和最大值当中取随机值进行决定，当该值设置为负值时设置将会失败。
+
+        对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
 
         :type value: tuple[tuple[float,float],tuple[float,float]]
         """
@@ -337,7 +355,9 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子发射器的体积大小缩放值，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
+        粒子发射器的体积大小缩放值。
+
+        数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
 
         :rtype: tuple[float,float,float]
         """
@@ -348,9 +368,12 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 设置粒子发射器的体积大小缩放，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
-        | 不影响单个粒子的尺寸，粒子发射器的体积越大，则粒子的发射范围越大。
-        | 当粒子绑定实体时该设置无效。
+        设置粒子发射器的体积大小缩放。
+
+        数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
+        不影响单个粒子的尺寸，粒子发射器的体积越大，则粒子的发射范围越大。
+
+        当粒子绑定实体时该设置无效。
 
         :type value: tuple[float,float,float]
         """
@@ -361,7 +384,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子发射器的世界坐标位置，数据类型为元组：(x, y, z)。
+        粒子发射器的世界坐标位置。
 
         :rtype: tuple[float,float,float]
         """
@@ -372,7 +395,7 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子发射器的世界坐标位置，数据类型为元组：(x, y, z)。
+        粒子发射器的世界坐标位置。
 
         :type value: tuple[float,float,float]
         """
@@ -383,7 +406,9 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子发射器的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
+        粒子发射器的旋转角度。
+
+        旋转顺序：zxy。
 
         :rtype: tuple[float,float,float]
         """
@@ -394,8 +419,9 @@ class NeteaseParticle(object):
         """
         [可读写属性]
 
-        | 粒子发射器的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
-        | 旋转顺序按照绕z、x、y轴旋转。
+        粒子发射器的旋转角度。
+
+        旋转顺序：zxy。
 
         :type value: tuple[float,float,float]
         """
@@ -406,7 +432,7 @@ class NeteaseParticle(object):
         """
         [只读属性]
 
-        | 粒子是否正在播放。
+        粒子是否正在播放。
 
         :rtype: bool
         """
@@ -417,7 +443,7 @@ class NeteaseParticle(object):
         """
         [只读属性]
 
-        | 粒子是否已销毁。
+        粒子是否已销毁。
 
         :rtype: bool
         """
@@ -425,7 +451,7 @@ class NeteaseParticle(object):
 
     def BindEntity(self, ent_id, offset=(0, 0, 0), rot=(0, 0, 0), correction=False):
         """
-        | 绑定粒子到实体上。
+        绑定粒子到实体上。
 
         -----
 
@@ -451,7 +477,7 @@ class NeteaseParticle(object):
 
     def BindSkeleton(self, model_id, bone_name, offset=(0, 0, 0), rot=(0, 0, 0)):
         """
-        | 绑定粒子到骨骼模型上。
+        绑定粒子到骨骼模型上。
 
         -----
 
@@ -477,7 +503,7 @@ class NeteaseParticle(object):
 
     def Play(self):
         """
-        | 播放粒子特效。
+        播放粒子特效。
 
         -----
 
@@ -491,7 +517,7 @@ class NeteaseParticle(object):
 
     def Pause(self):
         """
-        | 暂停粒子特效。
+        暂停粒子特效。
 
         -----
 
@@ -505,7 +531,7 @@ class NeteaseParticle(object):
 
     def Destroy(self):
         """
-        | 销毁粒子特效。
+        销毁粒子特效。
 
         -----
 
@@ -533,8 +559,9 @@ class NeteaseParticle(object):
 
     def SetFadeDistance(self, dist):
         """
-        | 设置粒子开始自动调整透明度的距离。
-        | 粒子与摄像机之间的距离小于该值时会自动调整粒子的透明度，距离摄像机越近，粒子越透明。
+        设置粒子开始自动调整透明度的距离。
+
+        粒子与摄像机之间的距离小于该值时会自动调整粒子的透明度，距离摄像机越近，粒子越透明。
 
         -----
 
@@ -547,8 +574,10 @@ class NeteaseParticle(object):
 
     def SetLayer(self, layer):
         """
-        | 设置粒子渲染层级。粒子默认层级为1，当层级不为1时表示该特效开启特效分层渲染功能。
-        | 分层渲染时，层级越高渲染越靠后，层级大的会遮挡层级低的，且同一层级的特效会根据特效的相对位置产生正确的相互遮挡关系。
+        设置粒子渲染层级。
+
+        粒子默认层级为1，当层级不为1时表示该特效开启特效分层渲染功能。
+        分层渲染时，层级越高渲染越靠后，层级大的会遮挡层级低的，且同一层级的特效会根据特效的相对位置产生正确的相互遮挡关系。
 
         -----
 
@@ -561,8 +590,9 @@ class NeteaseParticle(object):
 
     def SetRelative(self, relative):
         """
-        | 设置当粒子绑定了实体或骨骼模型时，发射出的粒子使用相对坐标系还是世界坐标系。
-        | 与mcstudio特效编辑器中粒子的“相对挂点运动”选项功能相同。
+        设置当粒子绑定了实体或骨骼模型时，发射出的粒子使用相对坐标系还是世界坐标系。
+
+        与mcstudio特效编辑器中粒子的“相对挂点运动”选项功能相同。
 
         -----
 
@@ -575,7 +605,7 @@ class NeteaseParticle(object):
 
     def SetUsePointFiltering(self, use):
         """
-        | 设置粒子材质的纹理滤波是否使用点滤波方法。
+        设置粒子材质的纹理滤波是否使用点滤波方法。
 
         -----
 
@@ -589,9 +619,11 @@ class NeteaseParticle(object):
 
 class NeteaseFrameAnim(object):
     """
-    | 网易序列帧特效管理器。
-    | 切换维度后会自动隐藏非本维度创建的而且没有绑定实体的序列帧，回到该维度后会自动重新显示。
-    | 需要注意，序列帧创建之后需要调用 ``.Play()`` 方法才会播放，如果播放非本维度创建的序列帧，会同时修改该序列帧的创建维度为当前维度。
+    网易序列帧特效管理器。
+
+    切换维度后会自动隐藏非本维度创建的而且没有绑定实体的序列帧，回到该维度后会自动重新显示。
+
+    需要注意，序列帧创建之后需要调用 ``.Play()`` 方法才会播放，如果播放非本维度创建的序列帧，会同时修改该序列帧的创建维度为当前维度。
 
     -----
 
@@ -654,7 +686,7 @@ class NeteaseFrameAnim(object):
         """
         [只读属性]
 
-        | 序列帧特效ID。
+        序列帧特效ID。
 
         :rtype: int
         """
@@ -665,7 +697,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定的实体ID。
+        序列帧绑定的实体ID。
 
         :rtype: str
         """
@@ -676,7 +708,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定的实体ID。
+        序列帧绑定的实体ID。
 
         :type value: str
         """
@@ -687,7 +719,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定实体时的偏移量。
+        序列帧绑定实体时的偏移量。
 
         :rtype: tuple[float,float,float]
         """
@@ -698,7 +730,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定实体时的偏移量。
+        序列帧绑定实体时的偏移量。
 
         :type value: tuple[float,float,float]
         """
@@ -709,7 +741,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定实体时的旋转角度。
+        序列帧绑定实体时的旋转角度。
 
         :rtype: tuple[float,float,float]
         """
@@ -720,7 +752,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定实体时的旋转角度。
+        序列帧绑定实体时的旋转角度。
 
         :type value: tuple[float,float,float]
         """
@@ -731,7 +763,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定的骨骼模型的ID。
+        序列帧绑定的骨骼模型的ID。
 
         :rtype: int
         """
@@ -742,7 +774,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定的骨骼模型的ID。
+        序列帧绑定的骨骼模型的ID。
 
         :type value: int
         """
@@ -753,7 +785,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定的具体骨骼的名称。
+        序列帧绑定的具体骨骼的名称。
 
         :rtype: str
         """
@@ -764,7 +796,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定的具体骨骼的名称。
+        序列帧绑定的具体骨骼的名称。
 
         :type value: str
         """
@@ -775,7 +807,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定骨骼时的偏移量。
+        序列帧绑定骨骼时的偏移量。
 
         :rtype: tuple[float,float,float]
         """
@@ -786,7 +818,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定骨骼时的偏移量。
+        序列帧绑定骨骼时的偏移量。
 
         :type value: tuple[float,float,float]
         """
@@ -797,7 +829,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定骨骼时的旋转角度。
+        序列帧绑定骨骼时的旋转角度。
 
         :rtype: tuple[float,float,float]
         """
@@ -808,7 +840,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧绑定骨骼时的旋转角度。
+        序列帧绑定骨骼时的旋转角度。
 
         :type value: tuple[float,float,float]
         """
@@ -819,7 +851,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧的世界坐标位置，数据类型为元组：(x, y, z)。
+        序列帧的世界坐标位置。
 
         :rtype: tuple[float,float,float]
         """
@@ -830,7 +862,7 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧的世界坐标位置，数据类型为元组：(x, y, z)。
+        序列帧的世界坐标位置。
 
         :type value: tuple[float,float,float]
         """
@@ -841,7 +873,9 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
+        序列帧的旋转角度。
+
+        旋转顺序：zxy。
 
         :rtype: tuple[float,float,float]
         """
@@ -852,8 +886,9 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧的旋转角度，数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴的旋转角度。
-        | 旋转顺序按照绕z、x、y轴旋转。
+        序列帧的旋转角度。
+
+        旋转顺序：zxy。
 
         :type value: tuple[float,float,float]
         """
@@ -864,9 +899,11 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧的缩放值，数据类型为元组：(x, y, z)。
-        | 对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
-        | 对于环状序列帧，三个参数分别为三个坐标轴上的缩放。
+        序列帧的缩放值。
+
+        数据类型为元组：(x, y, z)。
+        对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
+        对于环状序列帧，三个参数分别为三个坐标轴上的缩放。
 
         :rtype: tuple[float,float,float]
         """
@@ -877,9 +914,11 @@ class NeteaseFrameAnim(object):
         """
         [可读写属性]
 
-        | 序列帧的缩放值，数据类型为元组：(x, y, z)。
-        | 对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
-        | 对于环状序列帧，三个参数分别为三个坐标轴上的缩放。
+        序列帧的缩放值。
+
+        数据类型为元组：(x, y, z)。
+        对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
+        对于环状序列帧，三个参数分别为三个坐标轴上的缩放。
 
         :type value: tuple[float,float,float]
         """
@@ -890,7 +929,7 @@ class NeteaseFrameAnim(object):
         """
         [只读属性]
 
-        | 序列帧是否正在播放。
+        序列帧是否正在播放。
 
         :rtype: bool
         """
@@ -901,7 +940,7 @@ class NeteaseFrameAnim(object):
         """
         [只读属性]
 
-        | 序列帧是否已销毁。
+        序列帧是否已销毁。
 
         :rtype: bool
         """
@@ -909,7 +948,7 @@ class NeteaseFrameAnim(object):
 
     def BindEntity(self, bind_entity_id, offset=(0, 0, 0), rot=(0, 0, 0)):
         """
-        | 绑定序列帧到实体上。
+        绑定序列帧到实体上。
 
         -----
 
@@ -933,7 +972,7 @@ class NeteaseFrameAnim(object):
 
     def BindSkeleton(self, model_id, bone_name, offset=(0, 0, 0), rot=(0, 0, 0)):
         """
-        | 绑定序列帧到骨骼模型上。
+        绑定序列帧到骨骼模型上。
 
         -----
 
@@ -958,7 +997,7 @@ class NeteaseFrameAnim(object):
 
     def Play(self):
         """
-        | 播放序列帧特效。
+        播放序列帧特效。
 
         -----
 
@@ -972,7 +1011,7 @@ class NeteaseFrameAnim(object):
 
     def Pause(self):
         """
-        | 暂停序列帧特效。
+        暂停序列帧特效。
 
         -----
 
@@ -986,7 +1025,7 @@ class NeteaseFrameAnim(object):
 
     def Destroy(self):
         """
-        | 销毁序列帧特效。
+        销毁序列帧特效。
 
         -----
 
@@ -1013,7 +1052,7 @@ class NeteaseFrameAnim(object):
 
     def SetDeepTest(self, enabled):
         """
-        | 设置序列帧是否开启深度测试。
+        设置序列帧是否开启深度测试。
 
         -----
 
@@ -1026,7 +1065,7 @@ class NeteaseFrameAnim(object):
 
     def SetFaceCamera(self, face):
         """
-        | 设置序列帧是否始终朝向摄像机。
+        设置序列帧是否始终朝向摄像机。
 
         -----
 
@@ -1039,8 +1078,9 @@ class NeteaseFrameAnim(object):
 
     def SetFadeDistance(self, dist):
         """
-        | 设置序列帧开始自动调整透明度的距离。
-        | 序列帧与摄像机之间的距离小于该值时会自动调整序列帧的透明度，距离摄像机越近，序列帧越透明。
+        设置序列帧开始自动调整透明度的距离。
+
+        序列帧与摄像机之间的距离小于该值时会自动调整序列帧的透明度，距离摄像机越近，序列帧越透明。
 
         -----
 
@@ -1053,8 +1093,10 @@ class NeteaseFrameAnim(object):
 
     def SetLayer(self, layer):
         """
-        | 设置序列帧渲染层级。序列帧默认层级为1，当层级不为1时表示该特效开启特效分层渲染功能。
-        | 分层渲染时，层级越高渲染越靠后，层级大的会遮挡层级低的，且同一层级的特效会根据特效的相对位置产生正确的相互遮挡关系。
+        设置序列帧渲染层级。
+
+        序列帧默认层级为1，当层级不为1时表示该特效开启特效分层渲染功能。
+        分层渲染时，层级越高渲染越靠后，层级大的会遮挡层级低的，且同一层级的特效会根据特效的相对位置产生正确的相互遮挡关系。
 
         -----
 
@@ -1067,7 +1109,7 @@ class NeteaseFrameAnim(object):
 
     def SetLoop(self, loop):
         """
-        | 设置序列帧是否循环播放。
+        设置序列帧是否循环播放。
 
         -----
 
@@ -1080,7 +1122,7 @@ class NeteaseFrameAnim(object):
 
     def SetUsePointFiltering(self, use):
         """
-        | 设置序列帧材质的纹理滤波是否使用点滤波方法。
+        设置序列帧材质的纹理滤波是否使用点滤波方法。
 
         -----
 
@@ -1093,8 +1135,9 @@ class NeteaseFrameAnim(object):
 
     def SetGlobal(self, isGlobal):
         """
-        | 设置序列帧是否是全局的。
-        | 全局时，不会因摄像机的视野范围而被裁剪。
+        设置序列帧是否是全局的。
+
+        全局时，不会因摄像机的视野范围而被裁剪。
 
         -----
 

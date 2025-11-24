@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-from .._core._client.comp import LvComp
+from ..core.client.comp import LvComp
 
 
 __all__ = [
@@ -25,7 +24,7 @@ __all__ = [
 
 def save_setting(name, data_dict, is_global=True):
     """
-    | 保存设置数据。
+    保存设置数据。
     
     -----
     
@@ -41,7 +40,7 @@ def save_setting(name, data_dict, is_global=True):
 
 def read_setting(name, is_global=True):
     """
-    | 读取设置数据。
+    读取设置数据。
     
     -----
 
@@ -56,9 +55,10 @@ def read_setting(name, is_global=True):
         data = {(str(k) if isinstance(k, unicode) else k): v for k, v in data.items()}
     return data
 
+
 def check_setting(name, item_list, is_global=True):
     """
-    | 检测本地存储的设置数据是否完整。
+    检测本地存储的设置数据是否完整。
     
     -----
 

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-11-04
+|   Date  : 2025-11-30
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -17,14 +16,11 @@ from typing import Optional
 from mod.client.ui.controls.sliderUIControl import SliderUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
-from ...._core._types._checker import args_type_check
+from ....core._types._checker import args_type_check
 
 
 class NySlider(NyControl):
-    base_control: SliderUIControl
-    """
-    | 滑动条 ``SliderUIControl`` 实例。
-    """
+    _base_control: SliderUIControl
     def __init__(
         self: ...,
         screen_node_ex: ScreenNodeExtension,
@@ -37,4 +33,5 @@ class NySlider(NyControl):
     def value(self) -> float: ...
     @value.setter
     def value(self, val: float) -> None: ...
-
+    GetSliderValue = SliderUIControl.GetSliderValue
+    SetSliderValue = SliderUIControl.SetSliderValue

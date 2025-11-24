@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-20
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 from ....utils.enum import ControlType
 from .control import NyControl
-from ...._core import _error
+from ....core import error
 
 
 __all__ = [
@@ -25,7 +24,7 @@ __all__ = [
 
 class NyProgressBar(NyControl):
     """
-    | 创建 ``NyProgressBar`` 进度条实例。
+    进度条控件类。
 
     -----
 
@@ -33,17 +32,13 @@ class NyProgressBar(NyControl):
     :param ProgressBarUIControl progress_bar_control: 通过asProgressBar()等方式获取的ProgressBarUIControl实例
     """
 
-    _CONTROL_TYPE = ControlType.PROGRESS_BAR
+    CONTROL_TYPE = ControlType.PROGRESS_BAR
 
     def __init__(self, screen_node_ex, progress_bar_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, progress_bar_control)
 
     def __destroy__(self):
         NyControl.__destroy__(self)
-
-    # region API =======================================================================================================
-
-    # endregion
 
     # region Properties ================================================================================================
 
@@ -52,22 +47,22 @@ class NyProgressBar(NyControl):
         """
         [只写属性]
 
-        | 进度条进度，范围为[0, 1]。
+        进度条进度，范围为[0, 1]。
 
         :rtype: None
         """
-        raise _error.GetPropertyError("value")
+        raise error.GetPropertyError("value")
 
     @progress.setter
     def progress(self, val):
         """
         [只写属性]
 
-        | 进度条进度，范围为[0, 1]。
+        进度条进度，范围为[0, 1]。
 
         :type val: float
         """
-        self.base_control.SetValue(val)
+        self._base_control.SetValue(val)
 
     # endregion
 

@@ -1,36 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-09
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-# todo：完善接口的异常处理
-# todo：Entity类、Player类
-# todo：UI动画框架
+# todo：Entity类、Player类，对事件返回的entityId、playerId进行封装
 # todo：完善Ny控件
+# todo：UI动画框架
 # todo：event热更新
+# todo：完善接口的异常处理
 # todo：@async
 # todo：容器UI
+# todo：NBT类
 
 
 __version__ = "1.0.0-beta.1"
 __author__ = "Nuoyan"
 __author_qq__ = "1279735247"
 __author_email__ = "1279735247@qq.com"
-
-
-from ._core._logging import info
-info("Start loading", show_env=False)
-del info
 
 
 def run(dct):
@@ -45,21 +40,25 @@ def run(dct):
     :rtype: None
     """
     from mod.common.mod import Mod
-    from ._core import _const
+    from .core import _const, _logging
+
+    _logging.info("Start loading, version: %s, script: %s" % (__version__, _const.ROOT), show_env=False)
 
     @Mod.Binding(_const.LIB_NAME, _const.LIB_VERSION)
     class NuoyanLibMain(object):
         @Mod.InitServer()
         def server_init(self):
-            from _core._server._lib_server import NuoyanLibServerSystem
+            from core.server._lib_server import NuoyanLibServerSystem
             NuoyanLibServerSystem.register()
 
         @Mod.InitClient()
         def client_init(self):
-            from _core._client._lib_client import NuoyanLibClientSystem
+            from core.client._lib_client import NuoyanLibClientSystem
             NuoyanLibClientSystem.register()
 
     dct['NuoyanLibMain'] = NuoyanLibMain
+
+
 
 
 

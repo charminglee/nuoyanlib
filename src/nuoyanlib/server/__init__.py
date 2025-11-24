@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-23
+|   Date  : 2025-12-01
 |
 |   「nuoyanlib」服务端库。
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -21,68 +20,37 @@ try:
 except ImportError:
     _clock = None
     _t = 0
-from .._core._sys import check_env as _check_env
-from .._core import _error
-from .._core._server._lib_server import NuoyanLibServerSystem as _lib_sys_cls
-from .._core._logging import info as _info
+from ..core import _logging, _sys
+from ..core.server._lib_server import NuoyanLibServerSystem as _NuoyanLibServerSystem
 
 
-_check_env("server")
-_ins = _lib_sys_cls.register()
-if not _ins:
-    raise _error.NuoyanLibServerSystemRegisterError
+_sys.check_env("server")
+if not _NuoyanLibServerSystem.register():
+    _logging.error("NuoyanLibServerSystem register failed!")
 
 
-if 1 or _ins.__lib_flag__ == 0:
-    # 首次加载
-    from .._core._server.comp import (
-        ENGINE_NAMESPACE,
-        ENGINE_SYSTEM_NAME,
-        ServerSystem,
-        CompFactory,
-        CF,
-        LEVEL_ID,
-        LvComp,
-    )
-    from .._core.event.listener import (
-        ServerEventProxy,
-    )
-    from .._core.event._events import (
-        ServerEventEnum as Events,
-        ALL_SERVER_ENGINE_EVENTS,
-        ALL_SERVER_LIB_EVENTS,
-    )
-
-    from .entity import *
-    from .hurt import *
-    from .inv import *
-    from .structure import *
-    from .block import *
-    from .lobby import *
-    from ..utils import *
-    from .. import config
-
-    _ins.__lib_flag__ = 1
-
-    if _clock:
-        _consume = (_clock() - _t) * 1000
-        _info("Loaded in %.3fms (first loading)", _consume)
-        del _consume
-else:
-    # 引用内存中已加载的对象，确保相同版本的代码只加载一次
-    _dct = {
-        k: v
-        for k, v in _ins.get_lib_dict().items()
-        if not k.startswith("_")
-    }
-    globals().update(_dct)
-    del _dct
-
-    if _clock:
-        _consume = (_clock() - _t) * 1000
-        _info("Loaded in %.3fms (ref)", _consume)
-        del _consume
+from ..core.server.comp import *
+from ..core.listener import *
+from ..core import error
 
 
-del _check_env, _lib_sys_cls, _ins, _error, _info
+from .entity import *
+from .hurt import *
+from .inv import *
+from .structure import *
+from .block import *
+from .lobby import *
+
+
+from ..utils import *
+from .. import config
+
+
+if _clock:
+    _consume = (_clock() - _t) * 1000
+    _logging.info("Loaded in %.3fms", _consume)
+    del _consume
+
+
+del _logging, _sys, _NuoyanLibServerSystem
 del _clock, _t

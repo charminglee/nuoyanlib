@@ -1,31 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-10-31
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
-from typing import Union, Optional, List, Dict
+from typing import Union, Optional, List, Dict, Callable
 from mod.common.minecraftEnum import Facing
-from .._core._types._typing import FTuple2, FTuple3, FTuple, ITuple, ITuple2
+from ..core._types._typing import FTuple2, FTuple3, FTuple, ITuple, ITuple2
 
 
+def range_map(
+    x: float,
+    output_range: FTuple2,
+    input_range: FTuple2 = (0, 1),
+    func: Callable[[float], float] = lambda t: t,
+) -> float: ...
 def to_chunk_pos(pos: FTuple3) -> Optional[ITuple2]: ...
 def pos_distance_square(pos1: FTuple, pos2: FTuple) -> float: ...
 def clamp(x: float, min_value: float, max_value: float) -> float: ...
 def pos_block_facing(pos: FTuple3, face: int = Facing.North, dist: float = 1.0) -> Optional[FTuple3]: ...
 def to_polar_coordinate(coordinate: FTuple2, rad: bool = False, origin: FTuple2 = (0, 0)) -> FTuple2: ...
 def to_cartesian_coordinate(coordinate: FTuple2, rad: bool = False, origin: FTuple2 = (0, 0)) -> FTuple2: ...
-def probability_true_i(n: int, d: int) -> bool: ...
-def probability_true_f(f: float) -> bool: ...
+def probability(f: float) -> bool: ...
 def pos_distance_to_line(pos: FTuple3, line_pos1: FTuple3, line_pos2: FTuple3) -> float: ...
 def pos_floor(pos: FTuple) -> ITuple: ...
 def pos_distance(pos1: FTuple, pos2: FTuple) -> float: ...

@@ -5,10 +5,10 @@
 
    <h3>基于网易我的世界ModSDK的Mod开发工具库</h3>
 
-   [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.5-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/charminglee/nuoyanlib) ![GitHub repo size](https://img.shields.io/github/repo-size/charminglee/nuoyanlib)  
-   [![python](https://camo.githubusercontent.com/61a81b1dbe844fb6b43df995ae0b9b118c641df75220b27281aad6ea97e46622/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f507974686f6e2d3337373641423f7374796c653d666c6174266c6f676f3d507974686f6e266c6f676f436f6c6f723d666666666666)](https://www.python.org/) [![pycharm](https://img.shields.io/badge/-JetBrains%20PyCharm-black?style=flat&logo=pycharm)](https://www.jetbrains.com/pycharm/) [![github](https://img.shields.io/badge/-GitHub-black?style=flat&logo=github)](https://github.com/charminglee/nuoyanlib) [![gitee](https://img.shields.io/badge/-gitee-red?style=flat&logo=gitee)](https://gitee.com/charming-lee/nuoyanLib)
+   [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.6-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/charminglee/nuoyanlib) ![GitHub repo size](https://img.shields.io/github/repo-size/charminglee/nuoyanlib)  
+   [![github](https://img.shields.io/badge/-GitHub-black?style=flat&logo=github)](https://github.com/charminglee/nuoyanlib) [![gitee](https://img.shields.io/badge/-gitee-red?style=flat&logo=gitee)](https://gitee.com/charming-lee/nuoyanLib)
 
-   [入门指南]() ● [API文档]() ● [QQ群]()
+   [入门指南](/docs/source/getting_started.rst) ● [API文档]() ● [QQ群]()
 </div>
 
 <br>
@@ -18,7 +18,7 @@
 > [!NOTE]  
 > 目前该项目仍处于开发和测试阶段，一些功能仍未开发完善或存在未知bug，且其中的函数命名、具体实现等随时可能发生变化，请谨慎使用。
 
-## 📖 简介 | Intro
+## 📖 简介
 
 「nuoyanlib」是基于网易我的世界（我的世界中国版）[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
 您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
@@ -28,7 +28,7 @@
 
 <br>
 
-## ✨ 亮点 | Features
+## ✨ 亮点
 
 - [`nuoyanlib.client`](/docs/source/api/client.rst)：客户端工具包，提供了NyUI框架、容器UI框架、特效管理、渲染、运镜工具等实用工具。  
 
@@ -43,14 +43,14 @@
 
 <br>
 
-## ⬇️ 下载 | Download
+## ⬇️ 下载
 
-- ~~[1.0.0-beta.1](https://gitee.com/charming-lee/nuoyanLib/releases/tag/1.0.0-beta.1)~~
+- ~~[1.0.0-beta.1]()~~
 - [开发版](https://codeload.github.com/charminglee/nuoyanlib/zip/refs/heads/master)
 
 <br>
 
-## 🚀 快速上手 | Quick Start
+## 🚀 快速上手
 
 1. 解压下载的压缩包，将`nuoyanlib`文件夹放至行为包Python脚本根目录下（即`modMain.py`文件所在位置）。安装好后，你的行为包结构应为： 
 
@@ -144,19 +144,19 @@
 
 <br>
 
-## 🔍 参考文档 | Documentation
+## 🔍 参考文档
 
 作者正在熬夜编写中......
 
 <br>
 
-## 🎉 更新信息 | Changelog
+## 🎉 更新信息
 
 作者正在熬夜编写中......
 
 <br>
 
-## 🌞 未来计划 | TODO
+## 🌞 未来计划
 
 - [ ] 重新整理文档注释，完成参考文档的编写
 - [ ] 编写测试包
@@ -167,26 +167,27 @@
 
 <br>
 
-## 👑 贡献 | Contributing
+## 👑 贡献
 
 如果您有更好的算法或修改建议，欢迎通过Issue或PR的方式提交，为MC Mod社区的健康发展助一份力！
 
 <br>
 
-## 🌹 特别鸣谢 | Thanks
+## 🌹 特别鸣谢
 
 1. [创新工坊-小坊](https://github.com/cxgf666)：发现了[`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41)的一个bug；「nuoyanlib」内测用户。
 2. [xiaoweii](https://github.com/645359132)：「nuoyanlib」内测用户。
+3. [幻尘](https://github.com/HuanChen19)：「nuoyanlib」内测用户。
 
 <br>
 
-## 🔗 作者的其他项目 | Other Projects
+## 🔗 作者的其他项目
 
 - [网易我的世界ModSDK补全库修正版](https://github.com/charminglee/mc-netease-sdk-nyrev)
 
 <br>
 
-## 👴 联系作者 | Contact
+## 👴 联系作者
 
 如果在使用过程中遇到问题，可通过以下方式联系作者，作者将尽全力为你解答。
 

@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-09
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -22,8 +21,8 @@ from mod.client.component.frameAniControlComp import FrameAniControlComp
 from mod.client.component.frameAniTransComp import FrameAniTransComp
 from mod.client.component.frameAniEntityBindComp import FrameAniEntityBindComp
 from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindComp
-from .._core._client._lib_client import NuoyanLibClientSystem
-from .._core._types._typing import FTuple3, FTuple2
+from ..core.client._lib_client import NuoyanLibClientSystem
+from ..core._types._typing import FTuple3, FTuple2
 
 
 class NeteaseParticle(object):

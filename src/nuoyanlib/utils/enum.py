@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-05
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
+from math import pi, sin, cos, sqrt
 from mod.common.minecraftEnum import (
     EntityType,
     StructureFeatureType,
@@ -20,11 +20,15 @@ from mod.common.minecraftEnum import (
     EffectType,
     EnchantType,
 )
-from .._core._utils import with_metaclass
 
 
 __all__ = [
     "Enum",
+    "auto",
+    "ClientEvent",
+    "ServerEvent",
+    "TimeEaseFunc",
+    "WheelCallbackType",
     "GridCallbackType",
     "ComboBoxCallbackType",
     "ButtonCallbackType",
@@ -56,7 +60,7 @@ class _EnumMeta(type):
             for k, v in dct.items():
                 if k.startswith("_"):
                     continue
-                if isinstance(v, Enum.auto):
+                if isinstance(v, auto):
                     member = cls._gen_auto_value(k) # NOQA
                 elif cls._restrict_type:
                     if type(v) is not cls._restrict_type:
@@ -136,23 +140,26 @@ class _EnumMeta(type):
         return val
 
 
-class Enum(with_metaclass(_EnumMeta, object)):
+class Enum(object):
     """
-    | 枚举类型，用于实现自定义枚举值。
-    | 支持以下功能：
+    枚举类，用于实现自定义枚举值。
+
+    支持以下功能：
+
     - ``len()``: 获取枚举值数量
     - 通过for循环等方式进行遍历
     - 通过 ``in`` 关键字判断某个值是否在枚举范围内
     - 可通过 ``Enum[type]`` 的方式定义特定类型的枚举值，如 ``Enum[int]`` 定义int类型枚举值
     - 可通过 ``MyEnum.xxx`` 或 ``MyEnum['xxx']`` 的方式获取指定枚举值
-    | 注意事项：
+
+    注意事项：
+
     - 枚举值是无序的（类似于字典），因此遍历顺序与编写顺序无关
     - 不支持动态插入或删除枚举值
     - 枚举名不能以下划线开头
     """
 
-    class auto(object):
-        pass
+    __metaclass__ = _EnumMeta
 
     def __init__(self, name, value):
         self.__name = name
@@ -173,63 +180,518 @@ class Enum(with_metaclass(_EnumMeta, object)):
     def value(self):
         return self.__value
 
-    @classmethod
-    def __class_getitem__(cls, item):
-        return _EnumMeta._gen_cls(item)
+
+class auto(object):
+    pass
 
 
-def __test__():
-    class E(Enum[str]):
-        a = Enum.auto()
-        b = Enum.auto()
-        c = Enum.auto()
-    class EE(Enum[str]):
-        aa = Enum.auto()
-        bb = Enum.auto()
-        cc = Enum.auto()
-    class T(E, EE):
-        d = Enum.auto()
-        e = Enum.auto()
-    assert E.a == "a"
-    assert T.a == "a"
-    assert T.aa == "aa"
-    assert T.d == "d"
+class ClientEvent(Enum[str]):
+    UIDefReloadSceneStackAfter = auto()
+    UpdatePlayerSkinClientEvent = auto()
+    PlayerTryRemoveCustomContainerItemClientEvent = auto()
+    PlayerTryAddCustomContainerItemClientEvent = auto()
+    PlayerTryPutCustomContainerItemClientEvent = auto()
+    PlayerPermissionChangeClientEvent = auto()
+    HudButtonChangedClientEvent = auto()
+    BlockAnimateRandomTickEvent = auto()
+    PlayerAttackEntityEvent = auto()
+    OnLocalPlayerActionClientEvent = auto()
+    OnLocalPlayerStartJumpClientEvent = auto()
+    GameRenderTickEvent = auto()
+    GyroSensorChangedClientEvent = auto()
+    ModBlockEntityTickClientEvent = auto()
+    ModBlockEntityRemoveClientEvent = auto()
+    AchievementButtonMovedClientEvent = auto()
+    OnKeyboardControllerLayoutChangeClientEvent = auto()
+    OnGamepadControllerLayoutChangeClientEvent = auto()
+    OnGamepadTriggerClientEvent = auto()
+    OnGamepadStickClientEvent = auto()
+    OnGamepadKeyPressClientEvent = auto()
+    ModBlockEntityLoadedClientEvent = auto()
+    CloseNeteaseShopEvent = auto()
+    PopScreenAfterClientEvent = auto()
+    TapOrHoldReleaseClientEvent = auto()
+    TapBeforeClientEvent = auto()
+    RightClickReleaseClientEvent = auto()
+    RightClickBeforeClientEvent = auto()
+    OnMouseMiddleDownClientEvent = auto()
+    OnKeyPressInGame = auto()
+    OnClientPlayerStopMove = auto()
+    OnClientPlayerStartMove = auto()
+    OnBackButtonReleaseClientEvent = auto()
+    MouseWheelClientEvent = auto()
+    LeftClickReleaseClientEvent = auto()
+    LeftClickBeforeClientEvent = auto()
+    HoldBeforeClientEvent = auto()
+    GetEntityByCoordReleaseClientEvent = auto()
+    GetEntityByCoordEvent = auto()
+    ClientJumpButtonReleaseEvent = auto()
+    ClientJumpButtonPressDownEvent = auto()
+    PlaySoundClientEvent = auto()
+    PlayMusicClientEvent = auto()
+    OnMusicStopClientEvent = auto()
+    ScreenSizeChangedClientEvent = auto()
+    PushScreenEvent = auto()
+    PopScreenEvent = auto()
+    PlayerChatButtonClickClientEvent = auto()
+    OnItemSlotButtonClickedEvent = auto()
+    GridComponentSizeChangedClientEvent = auto()
+    ClientPlayerInventoryOpenEvent = auto()
+    ClientPlayerInventoryCloseEvent = auto()
+    ClientChestOpenEvent = auto()
+    ClientChestCloseEvent = auto()
+    WalkAnimEndClientEvent = auto()
+    WalkAnimBeginClientEvent = auto()
+    AttackAnimEndClientEvent = auto()
+    AttackAnimBeginClientEvent = auto()
+    StopUsingItemClientEvent = auto()
+    StartUsingItemClientEvent = auto()
+    PlayerTryDropItemClientEvent = auto()
+    OnCarriedNewItemChangedClientEvent = auto()
+    ItemReleaseUsingClientEvent = auto()
+    InventoryItemChangedClientEvent = auto()
+    GrindStoneRemovedEnchantClientEvent = auto()
+    ClientShapedRecipeTriggeredEvent = auto()
+    ClientItemUseOnEvent = auto()
+    ClientItemTryUseEvent = auto()
+    AnvilCreateResultItemAfterClientEvent = auto()
+    ActorUseItemClientEvent = auto()
+    ActorAcquiredItemClientEvent = auto()
+    StepOnBlockClientEvent = auto()
+    StartDestroyBlockClientEvent = auto()
+    StepOffBlockClientEvent = auto()
+    ShearsDestoryBlockBeforeClientEvent = auto()
+    PlayerTryDestroyBlockClientEvent = auto()
+    OnStandOnBlockClientEvent = auto()
+    OnModBlockNeteaseEffectCreatedClientEvent = auto()
+    OnEntityInsideBlockClientEvent = auto()
+    OnAfterFallOnBlockClientEvent = auto()
+    FallingBlockCauseDamageBeforeClientEvent = auto()
+    ClientBlockUseEvent = auto()
+    PerspChangeClientEvent = auto()
+    OnPlayerHitBlockClientEvent = auto()
+    GameTypeChangedClientEvent = auto()
+    ExtinguishFireClientEvent = auto()
+    DimensionChangeFinishClientEvent = auto()
+    DimensionChangeClientEvent = auto()
+    CameraMotionStopClientEvent = auto()
+    CameraMotionStartClientEvent = auto()
+    LeaveEntityClientEvent = auto()
+    StartRidingClientEvent = auto()
+    OnMobHitMobClientEvent = auto()
+    OnGroundClientEvent = auto()
+    HealthChangeClientEvent = auto()
+    EntityStopRidingEvent = auto()
+    EntityModelChangedClientEvent = auto()
+    ApproachEntityClientEvent = auto()
+    UnLoadClientAddonScriptsBefore = auto()
+    RemovePlayerAOIClientEvent = auto()
+    RemoveEntityClientEvent = auto()
+    OnLocalPlayerStopLoading = auto()
+    OnCommandOutputClientEvent = auto()
+    LoadClientAddonScriptsAfter = auto()
+    ChunkLoadedClientEvent = auto()
+    ChunkAcquireDiscardedClientEvent = auto()
+    AddPlayerCreatedClientEvent = auto()
+    AddPlayerAOIClientEvent = auto()
+    AddEntityClientEvent = auto()
+    OnScriptTickClient = auto()
+    UiInitFinished = auto()
 
-    class E1(Enum):
-        A = 1
-        B = 2
-        C = 3
-    class E2(E1):
-        X = 7
-        Y = 8
-        Z = 9
-    assert sorted(E2.__members__.keys()) == ["A", "B", "C", "X", "Y", "Z"]
-    assert 7 in E2
-    assert 0 not in E2
-    assert len(E2) == 6
-    assert isinstance(E2.X, E2)
-    assert E2.A.name == "A"
-    assert E2.A.value == 1
-    a = {E2.A, E2.X}
-    assert E2.A in a
-    assert E2.X in a
 
-    class E3(Enum[str]):
-        Q = "114514"
-    assert E3.Q == "114514"
-    from .._core._utils import assert_error
-    def f():
-        E3.Q = 123
-    assert_error(f, (), AttributeError)
-    def f():
-        del E3.Q
-    assert_error(f, (), AttributeError)
+class ServerEvent(Enum[str]):
+    ItemPullOutCustomContainerServerEvent = auto()
+    ItemPushInCustomContainerServerEvent = auto()
+    PlayerPermissionChangeServerEvent = auto()
+    PlayerTryRemoveCustomContainerItemServerEvent = auto()
+    PlayerTryAddCustomContainerItemServerEvent = auto()
+    PlayerTryPutCustomContainerItemServerEvent = auto()
+    MountTamingEvent = auto()
+    OnPlayerActionServerEvent = auto()
+    CustomCommandTriggerServerEvent = auto()
+    GlobalCommandServerEvent = auto()
+    PlayerPickupArrowServerEvent = auto()
+    EntityDieLoottableAfterServerEvent = auto()
+    PlayerHungerChangeServerEvent = auto()
+    ItemDurabilityChangedServerEvent = auto()
+    PlaceNeteaseLargeFeatureServerEvent = auto()
+    PlayerNamedEntityServerEvent = auto()
+    PlayerFeedEntityServerEvent = auto()
+    lobbyGoodBuySucServerEvent = auto()
+    UrgeShipEvent = auto()
+    PlayerInventoryOpenScriptServerEvent = auto()
+    WalkAnimEndServerEvent = auto()
+    WalkAnimBeginServerEvent = auto()
+    JumpAnimBeginServerEvent = auto()
+    AttackAnimEndServerEvent = auto()
+    AttackAnimBeginServerEvent = auto()
+    UIContainerItemChangedServerEvent = auto()
+    ShearsUseToBlockBeforeServerEvent = auto()
+    ServerPlayerTryTouchEvent = auto()
+    ServerItemTryUseEvent = auto()
+    PlayerDropItemServerEvent = auto()
+    OnPlayerBlockedByShieldBeforeServerEvent = auto()
+    OnPlayerBlockedByShieldAfterServerEvent = auto()
+    OnPlayerActiveShieldServerEvent = auto()
+    OnOffhandItemChangedServerEvent = auto()
+    OnNewArmorExchangeServerEvent = auto()
+    OnItemPutInEnchantingModelServerEvent = auto()
+    ItemUseOnAfterServerEvent = auto()
+    ItemUseAfterServerEvent = auto()
+    ItemReleaseUsingServerEvent = auto()
+    InventoryItemChangedServerEvent = auto()
+    FurnaceBurnFinishedServerEvent = auto()
+    CraftItemOutputChangeServerEvent = auto()
+    ContainerItemChangedServerEvent = auto()
+    StepOnBlockServerEvent = auto()
+    StepOffBlockServerEvent = auto()
+    StartDestroyBlockServerEvent = auto()
+    ShearsDestoryBlockBeforeServerEvent = auto()
+    ServerPlayerTryDestroyBlockEvent = auto()
+    ServerPlaceBlockEntityEvent = auto()
+    ServerEntityTryPlaceBlockEvent = auto()
+    ServerBlockEntityTickEvent = auto()
+    PistonActionServerEvent = auto()
+    OnStandOnBlockServerEvent = auto()
+    OnBeforeFallOnBlockServerEvent = auto()
+    OnAfterFallOnBlockServerEvent = auto()
+    HopperTryPullOutServerEvent = auto()
+    HopperTryPullInServerEvent = auto()
+    HeavyBlockStartFallingServerEvent = auto()
+    GrassBlockToDirtBlockServerEvent = auto()
+    FarmBlockToDirtBlockServerEvent = auto()
+    FallingBlockReturnHeavyBlockServerEvent = auto()
+    FallingBlockCauseDamageBeforeServerEvent = auto()
+    FallingBlockBreakServerEvent = auto()
+    EntityPlaceBlockAfterServerEvent = auto()
+    DirtBlockToGrassBlockServerEvent = auto()
+    CommandBlockUpdateEvent = auto()
+    CommandBlockContainerOpenEvent = auto()
+    ChestBlockTryPairWithServerEvent = auto()
+    BlockStrengthChangedServerEvent = auto()
+    BlockSnowStateChangeServerEvent = auto()
+    BlockSnowStateChangeAfterServerEvent = auto()
+    BlockRemoveServerEvent = auto()
+    BlockRandomTickServerEvent = auto()
+    BlockNeighborChangedServerEvent = auto()
+    BlockLiquidStateChangeServerEvent = auto()
+    BlockLiquidStateChangeAfterServerEvent = auto()
+    BlockDestroyByLiquidServerEvent = auto()
+    StoreBuySuccServerEvent = auto()
+    ServerPlayerGetExperienceOrbEvent = auto()
+    PlayerTrySleepServerEvent = auto()
+    PlayerTeleportEvent = auto()
+    PlayerStopSleepServerEvent = auto()
+    PlayerSleepServerEvent = auto()
+    PlayerRespawnFinishServerEvent = auto()
+    PlayerRespawnEvent = auto()
+    PlayerHurtEvent = auto()
+    PlayerEatFoodServerEvent = auto()
+    PlayerDieEvent = auto()
+    OnPlayerHitBlockServerEvent = auto()
+    GameTypeChangedServerEvent = auto()
+    ExtinguishFireServerEvent = auto()
+    DimensionChangeServerEvent = auto()
+    ChangeLevelUpCostServerEvent = auto()
+    AddLevelEvent = auto()
+    AddExpEvent = auto()
+    WillTeleportToServerEvent = auto()
+    WillAddEffectServerEvent = auto()
+    StartRidingServerEvent = auto()
+    RemoveEffectServerEvent = auto()
+    RefreshEffectServerEvent = auto()
+    ProjectileCritHitEvent = auto()
+    OnMobHitMobServerEvent = auto()
+    OnKnockBackServerEvent = auto()
+    OnFireHurtEvent = auto()
+    MobGriefingBlockServerEvent = auto()
+    HealthChangeServerEvent = auto()
+    EntityTickServerEvent = auto()
+    EntityPickupItemServerEvent = auto()
+    EntityMotionStopServerEvent = auto()
+    EntityMotionStartServerEvent = auto()
+    EntityLoadScriptEvent = auto()
+    EntityEffectDamageServerEvent = auto()
+    EntityDroppedItemServerEvent = auto()
+    EntityChangeDimensionServerEvent = auto()
+    ChangeSwimStateServerEvent = auto()
+    AddEffectServerEvent = auto()
+    ActorHurtServerEvent = auto()
+    ServerSpawnMobEvent = auto()
+    ServerPreBlockPatternEvent = auto()
+    ServerPostBlockPatternEvent = auto()
+    ServerChatEvent = auto()
+    PlayerLeftMessageServerEvent = auto()
+    PlayerJoinMessageEvent = auto()
+    PlayerIntendLeaveServerEvent = auto()
+    PlaceNeteaseStructureFeatureEvent = auto()
+    OnRainLevelChangeServerEvent = auto()
+    OnLocalRainLevelChangeServerEvent = auto()
+    OnLocalLightningLevelChangeServerEvent = auto()
+    OnLightningLevelChangeServerEvent = auto()
+    OnContainerFillLoottableServerEvent = auto()
+    OnCommandOutputServerEvent = auto()
+    NewOnEntityAreaEvent = auto()
+    LoadServerAddonScriptsAfter = auto()
+    DelServerPlayerEvent = auto()
+    CommandEvent = auto()
+    ClientLoadAddonsFinishServerEvent = auto()
+    ChunkLoadedServerEvent = auto()
+    ChunkGeneratedServerEvent = auto()
+    ChunkAcquireDiscardedServerEvent = auto()
+    AddServerPlayerEvent = auto()
+    AchievementCompleteEvent = auto()
+    PlayerAttackEntityEvent = auto()
+    ServerBlockUseEvent = auto()
+    OnGroundServerEvent = auto()
+    SpawnProjectileServerEvent = auto()
+    EntityDieLoottableServerEvent = auto()
+    ActuallyHurtServerEvent = auto()
+    HealthChangeBeforeServerEvent = auto()
+    DimensionChangeFinishServerEvent = auto()
+    EntityDefinitionsEventServerEvent = auto()
+    PlayerDoInteractServerEvent = auto()
+    PlayerInteractServerEvent = auto()
+    MobDieEvent = auto()
+    AddEntityServerEvent = auto()
+    OnMobHitBlockServerEvent = auto()
+    OnEntityInsideBlockServerEvent = auto()
+    EntityStartRidingEvent = auto()
+    EntityStopRidingEvent = auto()
+    ServerItemUseOnEvent = auto()
+    ActorUseItemServerEvent = auto()
+    ActorAcquiredItemServerEvent = auto()
+    DestroyBlockEvent = auto()
+    DamageEvent = auto()
+    ExplosionServerEvent = auto()
+    ProjectileDoHitEffectEvent = auto()
+    OnCarriedNewItemChangedServerEvent = auto()
+    EntityRemoveEvent = auto()
+    OnScriptTickServer = auto()
+    UiInitFinished = auto()
 
-    class E4(Enum[int]):
-        a = Enum.auto()
-        b = Enum.auto()
-        c = Enum.auto()
-    assert sorted(E4.__members__.values()) == [0, 1, 2]
+
+class TimeEaseFunc:
+    """
+    时间缓动函数枚举。
+    """
+
+    LINEAR = staticmethod(lambda x: x)
+    """
+    线性缓动，变化速度均匀。
+    """
+
+    SPRING = staticmethod(lambda x: 1 - cos(x * pi * (0.2 + 2.5 * x**2)))
+    """
+    弹簧缓动，效果通常表现为一个有些反复的波动，随着时间逐渐衰减。
+    """
+
+    IN_QUAD = staticmethod(lambda x: x**2)
+    """
+    二次加速，在开始时慢，随着时间推进加速，二次方增长。
+    """
+
+    OUT_QUAD = staticmethod(lambda x: 1 - (1 - x)**2)
+    """
+    二次减速，在开始时快速，随着时间推移减速，二次方衰减。
+    """
+
+    IN_OUT_QUAD = staticmethod(lambda x: 2 * x**2 if x < 0.5 else 1 - (-2 * x + 2)**2 / 2.)
+    """
+    二次加减速，先加速然后减速，二次方的组合。
+    """
+
+    IN_CUBIC = staticmethod(lambda x: x**3)
+    """
+    三次加速，在开始时非常慢，然后迅速加速，三次方增长。
+    """
+
+    OUT_CUBIC = staticmethod(lambda x: 1 - (1 - x)**3)
+    """
+    三次减速，在开始时快速，然后减速，三次方衰减。
+    """
+
+    IN_OUT_CUBIC = staticmethod(lambda x: 4 * x**3 if x < 0.5 else 1 - (-2 * x + 2)**3 / 2.)
+    """
+    三次加减速，先加速然后减速，三次方的组合。
+    """
+
+    IN_QUART = staticmethod(lambda x: x**4)
+    """
+    四次加速，在开始时非常慢，然后迅速加速，四次方增长。
+    """
+
+    OUT_QUART = staticmethod(lambda x: 1 - (1 - x)**4)
+    """
+    四次减速，在开始时非常快，然后逐渐减速，四次方衰减。
+    """
+
+    IN_OUT_QUART = staticmethod(lambda x: 8 * x**4 if x < 0.5 else 1 - (-2 * x + 2)**4 / 2.)
+    """
+    四次加减速，先加速然后减速，四次方的组合。
+    """
+
+    IN_QUINT = staticmethod(lambda x: x**5)
+    """
+    五次加速，在开始时非常慢，然后急剧加速，五次方增长。
+    """
+
+    OUT_QUINT = staticmethod(lambda x: 1 - (1 - x)**5)
+    """
+    五次减速，在开始时非常快，随后减速，五次方衰减。
+    """
+
+    IN_OUT_QUINT = staticmethod(lambda x: 16 * x**5 if x < 0.5 else 1 - (-2 * x + 2)**5 / 2.)
+    """
+    五次加减速，先加速然后减速，五次方的组合。
+    """
+
+    IN_SINE = staticmethod(lambda x: 1 - cos(x * pi / 2))
+    """
+    正弦加速，在开始时慢，随着时间加速，遵循正弦函数的形式。
+    """
+
+    OUT_SINE = staticmethod(lambda x:  sin(x * pi / 2))
+    """
+    正弦减速，在开始时快，随后减速，遵循正弦函数的形式。
+    """
+
+    IN_OUT_SINE = staticmethod(lambda x: -0.5 * (cos(pi * x) - 1))
+    """
+    正弦加减速，先加速然后减速，遵循正弦函数的形式。
+    """
+
+    IN_EXPO = staticmethod(lambda x: 0 if x == 0 else 2**(10 * (x - 1)))
+    """
+    指数加速，在开始时非常慢，随后迅速加速，遵循指数函数增长。
+    """
+
+    OUT_EXPO = staticmethod(lambda x: 1 if x == 1 else 1 - 2**(-10 * x))
+    """
+    指数减速，在开始时非常快，随后减速，遵循指数衰减。
+    """
+
+    @staticmethod
+    def IN_OUT_EXPO(x):
+        """
+        指数加减速，先加速然后减速，遵循指数函数。
+        """
+        if x == 0:
+            return 0.
+        if x == 1:
+            return 1.
+        return 2**(10 * (x * 2 - 1)) / 2. if x < 0.5 else (2 - 2**(-10 * (x * 2 - 1))) / 2.
+
+    IN_CIRC = staticmethod(lambda x: 1 - sqrt(1 - x**2))
+    """
+    圆形加速，在开始时较慢，然后加速，遵循圆形函数的效果。
+    """
+
+    OUT_CIRC = staticmethod(lambda x:  sqrt(1 - (x - 1)**2))
+    """
+    圆形减速，在开始时较快，然后减速，遵循圆形函数的效果。
+    """
+
+    IN_OUT_CIRC = staticmethod(lambda x: 1 - sqrt(1 - (2 * x)**2) if x < 0.5 else sqrt(1 - (-2 * x + 2)**2) / 2.)
+    """
+    圆形加减速，先加速然后减速，遵循圆形函数的效果。
+    """
+
+    @staticmethod
+    def IN_BOUNCE(x):
+        """
+        弹跳加速，表现为一种反复弹跳的加速效果。
+        """
+        return 1 - TimeEaseFunc.OUT_BOUNCE(1 - x)
+
+    @staticmethod
+    def OUT_BOUNCE(x):
+        """
+        弹跳减速，表现为一种弹跳的减速效果。
+        """
+        if x < 1 / 2.75:
+            return 7.5625 * x**2
+        elif x < 2 / 2.75:
+            x -= 1.5 / 2.75
+            return 7.5625 * x**2 + 0.75
+        elif x < 2.5 / 2.75:
+            x -= 2.25 / 2.75
+            return 7.5625 * x**2 + 0.9375
+        else:
+            x -= 2.625 / 2.75
+            return 7.5625 * x**2 + 0.984375
+
+    @staticmethod
+    def IN_OUT_BOUNCE(x):
+        """
+        弹跳加减速，先加速然后减速，表现为弹跳效果。
+        """
+        return 0.5 * TimeEaseFunc.IN_BOUNCE(x * 2) if x < 0.5 else 0.5 * TimeEaseFunc.OUT_BOUNCE(x * 2 - 1) + 0.5
+
+    IN_BACK = staticmethod(lambda x: x**3 - x * sin(x * pi) * 1.70158)
+    """
+    回退加速，动画先稍微向后回退，然后加速。
+    """
+
+    OUT_BACK = staticmethod(lambda x: 1 - ((1 - x)**3 - (1 - x) * sin((1 - x) * pi) * 1.70158))
+    """
+    回退减速，动画开始时很快，之后回退并逐渐减速。
+    """
+
+    IN_OUT_BACK = staticmethod(
+        lambda x:
+            (2 * x**3 - x * sin(x * pi) * 1.70158) if x < 0.5
+            else (1 - ((2 - 2 * x)**3 - (2 - 2 * x) * sin((2 - 2 * x) * pi) * 1.70158))
+    )
+    """
+    回退加减速，先回退后加速，之后回弹并减速。
+    """
+
+    IN_ELASTIC = staticmethod(lambda x: 1 - sin(6 * pi * x) * x**2)
+    """
+    弹性加速，具有弹性拉伸的效果，初期比较慢，然后加速。
+    """
+
+    OUT_ELASTIC = staticmethod(lambda x:  sin(6 * pi * x) * (1 - x)**2)
+    """
+    弹性减速，弹性效果，快速运动然后逐渐回弹。
+    """
+
+    IN_OUT_ELASTIC = staticmethod(
+        lambda x:
+            (0.5 * (1 - sin(6 * pi * x) * x**2)) if x < 0.5
+            else (0.5 * (sin(6 * pi * (x - 0.5)) * (1 - x)**2 + 1))
+    )
+    """
+    弹性加减速，先加速后减速，表现为弹性效果。
+    """
+
+
+class ToggleCallbackType(Enum[str]):
+    """
+    开关回调函数类型枚举。
+    """
+
+    CHANGED = auto()
+    """
+    开关状态变化时触发。
+    """
+
+
+class WheelCallbackType(Enum[str]):
+    """
+    轮盘回调函数类型枚举。
+    """
+
+    CLICK = auto()
+    """
+    点击轮盘切片时触发。
+    """
+
+    HOVER = auto()
+    """
+    选择轮盘切片时触发。
+    """
 
 
 class GridCallbackType(Enum[str]):
@@ -237,12 +699,12 @@ class GridCallbackType(Enum[str]):
     网格回调函数类型枚举。
     """
 
-    UPDATE = Enum.auto()
+    UPDATE = auto()
     """
     网格元素刷新时触发。
     """
 
-    LOADED = Enum.auto()
+    LOADED = auto()
     """
     网格初次加载完成时触发。
     """
@@ -253,17 +715,17 @@ class ComboBoxCallbackType(Enum[str]):
     下拉框回调函数类型枚举。
     """
 
-    OPEN = Enum.auto()
+    OPEN = auto()
     """
     展开下拉框。
     """
 
-    CLOSE = Enum.auto()
+    CLOSE = auto()
     """
     关闭下拉框。
     """
 
-    SELECT = Enum.auto()
+    SELECT = auto()
     """
     选中下拉框内容。
     """
@@ -274,57 +736,57 @@ class ButtonCallbackType(Enum[str]):
     按钮回调函数类型枚举。
     """
 
-    UP = Enum.auto()
+    UP = auto()
     """
     触控在按钮范围内抬起。
     """
 
-    DOWN = Enum.auto()
+    DOWN = auto()
     """
     按钮按下。
     """
 
-    CANCEL = Enum.auto()
+    CANCEL = auto()
     """
     触控在按钮范围外抬起。
     """
 
-    MOVE = Enum.auto()
+    MOVE = auto()
     """
     按下后触控移动。
     """
 
-    MOVE_IN = Enum.auto()
+    MOVE_IN = auto()
     """
     按下按钮后触控进入按钮。
     """
 
-    MOVE_OUT = Enum.auto()
+    MOVE_OUT = auto()
     """
     按下按钮后触控退出按钮。
     """
 
-    DOUBLE_CLICK = Enum.auto()
+    DOUBLE_CLICK = auto()
     """
     双击按钮。
     """
 
-    LONG_CLICK = Enum.auto()
+    LONG_CLICK = auto()
     """
     长按按钮。
     """
 
-    HOVER_IN = Enum.auto()
+    HOVER_IN = auto()
     """
     鼠标进入按钮。
     """
 
-    HOVER_OUT = Enum.auto()
+    HOVER_OUT = auto()
     """
     鼠标退出按钮。
     """
 
-    SCREEN_EXIT = Enum.auto()
+    SCREEN_EXIT = auto()
     """
     按钮所在画布退出，且鼠标仍未抬起时触发。
     """
@@ -332,107 +794,107 @@ class ButtonCallbackType(Enum[str]):
 
 class ControlType(Enum[str]):
     """
-    | UI控件类型枚举。
+    UI控件类型枚举。
     """
 
     BASE_CONTROL = "BaseControl"
     """
-    | 通用控件。
+    通用控件。
     """
 
     BUTTON = "Button"
     """
-    | 按钮。
+    按钮控件。
     """
 
     IMAGE = "Image"
     """
-    | 图片。
+    图片控件。
     """
 
     LABEL = "Label"
     """
-    | 文本。
+    文本控件。
     """
 
     PANEL = "Panel"
     """
-    | 面板。
+    面板控件。
     """
 
     INPUT_PANEL = "InputPanel"
     """
-    | 输入面板。
+    输入面板控件。
     """
 
     STACK_PANEL = "StackPanel"
     """
-    | 栈面板。
+    栈面板控件。
     """
 
     EDIT_BOX = "TextEditBox"
     """
-    | 文本编辑框。
+    文本编辑框控件。
     """
 
     PAPER_DOLL = "PaperDoll"
     """
-    | 纸娃娃。
+    纸娃娃控件。
     """
 
     NETEASE_PAPER_DOLL = "NeteasePaperDoll"
     """
-    | 网易纸娃娃。
+    网易纸娃娃控件。
     """
 
     ITEM_RENDERER = "ItemRenderer"
     """
-    | 物品渲染器。
+    物品渲染器控件。
     """
 
     GRADIENT_RENDERER = "GradientRenderer"
     """
-    | 渐变渲染器。
+    渐变渲染器控件。
     """
 
     SCROLL_VIEW = "ScrollView"
     """
-    | 滚动视图。
+    滚动视图控件。
     """
 
     GRID = "Grid"
     """
-    | 网格。
+    网格控件。
     """
 
     PROGRESS_BAR = "ProgressBar"
     """
-    | 进度条。
+    进度条控件。
     """
 
     TOGGLE = "SwitchToggle"
     """
-    | 开关。
+    开关控件。
     """
 
     SLIDER = "Slider"
     """
-    | 滑动条。
+    滑动条控件。
     """
 
     SELECTION_WHEEL = "SelectionWheel"
     """
-    | 轮盘。
+    轮盘控件。
     """
 
     COMBO_BOX = "NeteaseComboBox"
     """
-    | 下拉框。
+    下拉框控件。
     """
 
     MINI_MAP = "MiniMap"
     """
-    | 小地图。
+    小地图控件。
     """
 
     _NOT_SPECIAL = (BASE_CONTROL, PANEL, PAPER_DOLL, GRADIENT_RENDERER)
@@ -440,1031 +902,1026 @@ class ControlType(Enum[str]):
 
 class FriendlyMob(Enum[str]):
     """
-    | 友好生物identifier枚举。
+    友好生物identifier枚举。
 
     -----
 
-    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
     ALLAY = "minecraft:allay"
     """
-    | 悦灵。
+    悦灵。
     """
 
     ARMADILLO = "minecraft:armadillo"
     """
-    | 犰狳。
+    犰狳。
     """
 
     BAT = "minecraft:bat"
     """
-    | 蝙蝠。
+    蝙蝠。
     """
 
     CAMEL = "minecraft:camel"
     """
-    | 骆驼。
+    骆驼。
     """
 
     CHICKEN = "minecraft:chicken"
     """
-    | 鸡。
+    鸡。
     """
 
     COD = "minecraft:cod"
     """
-    | 鳕鱼。
+    鳕鱼。
     """
 
     COPPER_GOLEM = "minecraft:copper_golem"
     """
-    | 铜傀儡。
+    铜傀儡。
     """
 
     COW = "minecraft:cow"
     """
-    | 牛。
+    牛。
     """
 
     DONKEY = "minecraft:donkey"
     """
-    | 驴。
+    驴。
     """
 
     GLOW_SQUID = "minecraft:glow_squid"
     """
-    | 发光鱿鱼。
+    发光鱿鱼。
     """
 
     HAPPY_GHAST = "minecraft:happy_ghast"
     """
-    | 快乐恶魂。
+    快乐恶魂。
     """
 
     HORSE = "minecraft:horse"
     """
-    | 马。
+    马。
     """
 
     MOOSHROOM = "minecraft:mooshroom"
     """
-    | 哞菇。
+    哞菇。
     """
 
     MULE = "minecraft:mule"
     """
-    | 骡。
+    骡。
     """
 
     PARROT = "minecraft:parrot"
     """
-    | 鹦鹉。
+    鹦鹉。
     """
 
     PIG = "minecraft:pig"
     """
-    | 猪。
+    猪。
     """
 
     RABBIT = "minecraft:rabbit"
     """
-    | 兔子。
+    兔子。
     """
 
     SALMON = "minecraft:salmon"
     """
-    | 鲑鱼。
+    鲑鱼。
     """
 
     SHEEP = "minecraft:sheep"
     """
-    | 绵羊。
+    绵羊。
     """
 
     SKELETON_HORSE = "minecraft:skeleton_horse"
     """
-    | 骷髅马。
+    骷髅马。
     """
 
     SNIFFER = "minecraft:sniffer"
     """
-    | 嗅探兽。
+    嗅探兽。
     """
 
     SQUID = "minecraft:squid"
     """
-    | 鱿鱼。
+    鱿鱼。
     """
 
     STRIDER = "minecraft:strider"
     """
-    | 炽足兽。
+    炽足兽。
     """
 
     TADPOLE = "minecraft:tadpole"
     """
-    | 蝌蚪。
+    蝌蚪。
     """
 
     TROPICAL_FISH = "minecraft:tropicalfish"
     """
-    | 热带鱼。
+    热带鱼。
     """
 
     TURTLE = "minecraft:turtle"
     """
-    | 海龟。
+    海龟。
     """
 
     WANDERING_TRADER = "minecraft:wandering_trader"
     """
-    | 流浪商人。
+    流浪商人。
     """
 
     PUFFERFISH = "minecraft:pufferfish"
     """
-    | 河豚。
+    河豚。
     """
 
     GOAT = "minecraft:goat"
     """
-    | 山羊。
+    山羊。
     """
 
     VILLAGER = "minecraft:villager"
     """
-    | 旧版村民。
+    旧版村民。
     """
 
     VILLAGER_V2 = "minecraft:villager_v2"
     """
-    | 村民。
+    村民。
     """
 
     AXOLOTL = "minecraft:axolotl"
     """
-    | 美西螈。
+    美西螈。
     """
 
     CAT = "minecraft:cat"
     """
-    | 猫。
+    猫。
     """
 
     FROG = "minecraft:frog"
     """
-    | 青蛙。
+    青蛙。
     """
 
     OCELOT = "minecraft:ocelot"
     """
-    | 豹猫。
+    豹猫。
     """
 
     SNOW_GOLEM = "minecraft:snow_golem"
     """
-    | 雪傀儡。
+    雪傀儡。
     """
 
     BEE = "minecraft:bee"
     """
-    | 蜜蜂。
+    蜜蜂。
     """
 
     DOLPHIN = "minecraft:dolphin"
     """
-    | 海豚。
+    海豚。
     """
 
     FOX = "minecraft:fox"
     """
-    | 狐狸。
+    狐狸。
     """
 
     IRON_GOLEM = "minecraft:iron_golem"
     """
-    | 铁傀儡。
+    铁傀儡。
     """
 
     LLAMA = "minecraft:llama"
     """
-    | 羊驼。
+    羊驼。
     """
 
     PANDA = "minecraft:panda"
     """
-    | 熊猫。
+    熊猫。
     """
 
     POLAR_BEAR = "minecraft:polar_bear"
     """
-    | 北极熊。
+    北极熊。
     """
 
     TRADER_LLAMA = "minecraft:trader_llama"
     """
-    | 行商羊驼。
+    行商羊驼。
     """
 
     WOLF = "minecraft:wolf"
     """
-    | 狼。
+    狼。
     """
 
     ZOMBIE_HORSE = "minecraft:zombie_horse"
     """
-    | 僵尸马。
+    僵尸马。
     """
 
 
 class HostileMob(Enum[str]):
     """
-    | 敌对生物identifier枚举。
+    敌对生物identifier枚举。
 
     -----
 
-    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
     BLAZE = "minecraft:blaze"
     """
-    | 烈焰人。
+    烈焰人。
     """
 
     BOGGED = "minecraft:bogged"
     """
-    | 沼骸。
+    沼骸。
     """
 
     BREEZE = "minecraft:breeze"
     """
-    | 旋风人。
+    旋风人。
     """
 
     CREEPER = "minecraft:creeper"
     """
-    | 苦力怕。
+    苦力怕。
     """
 
     ELDER_GUARDIAN = "minecraft:elder_guardian"
     """
-    | 远古守卫者。
+    远古守卫者。
     """
 
     ENDERMITE = "minecraft:endermite"
     """
-    | 末影螨。
+    末影螨。
     """
 
     EVOCATION_ILLAGER = "minecraft:evocation_illager"
     """
-    | 唤魔者。
+    唤魔者。
     """
 
     GHAST = "minecraft:ghast"
     """
-    | 恶魂。
+    恶魂。
     """
 
     GUARDIAN = "minecraft:guardian"
     """
-    | 守卫者。
+    守卫者。
     """
 
     HOGLIN = "minecraft:hoglin"
     """
-    | 疣猪兽。
+    疣猪兽。
     """
 
     HUSK = "minecraft:husk"
     """
-    | 尸壳。
+    尸壳。
     """
 
     MAGMA_CUBE = "minecraft:magma_cube"
     """
-    | 岩浆怪。
+    岩浆怪。
     """
 
     PHANTOM = "minecraft:phantom"
     """
-    | 幻翼。
+    幻翼。
     """
 
     PIGLIN_BRUTE = "minecraft:piglin_brute"
     """
-    | 猪灵蛮兵。
+    猪灵蛮兵。
     """
 
     PILLAGER = "minecraft:pillager"
     """
-    | 掠夺者。
+    掠夺者。
     """
 
     RAVAGER = "minecraft:ravager"
     """
-    | 劫掠兽。
+    劫掠兽。
     """
 
     SHULKER = "minecraft:shulker"
     """
-    | 潜影贝。
+    潜影贝。
     """
 
     SILVERFISH = "minecraft:silverfish"
     """
-    | 蠹虫。
+    蠹虫。
     """
 
     SKELETON = "minecraft:skeleton"
     """
-    | 骷髅。
+    骷髅。
     """
 
     SLIME = "minecraft:slime"
     """
-    | 史莱姆。
+    史莱姆。
     """
 
     STRAY = "minecraft:stray"
     """
-    | 流浪者。
+    流浪者。
     """
 
     VEX = "minecraft:vex"
     """
-    | 恼鬼。
+    恼鬼。
     """
 
     VINDICATOR = "minecraft:vindicator"
     """
-    | 卫道士。
+    卫道士。
     """
 
     WARDEN = "minecraft:warden"
     """
-    | 监守者。
+    监守者。
     """
 
     WITCH = "minecraft:witch"
     """
-    | 女巫。
+    女巫。
     """
 
     WITHER_SKELETON = "minecraft:wither_skeleton"
     """
-    | 凋零骷髅。
+    凋零骷髅。
     """
 
     ZOGLIN = "minecraft:zoglin"
     """
-    | 僵尸疣猪兽。
+    僵尸疣猪兽。
     """
 
     ZOMBIE = "minecraft:zombie"
     """
-    | 僵尸。
+    僵尸。
     """
 
     ZOMBIE_VILLAGER = "minecraft:zombie_villager"
     """
-    | 旧版僵尸村民。
+    旧版僵尸村民。
     """
 
     ZOMBIE_VILLAGER_V2 = "minecraft:zombie_villager_v2"
     """
-    | 僵尸村民。
+    僵尸村民。
     """
 
     CREAKING = "minecraft:creaking"
     """
-    | 嘎枝。
+    嘎枝。
     """
 
     DROWNED = "minecraft:drowned"
     """
-    | 溺尸。
+    溺尸。
     """
 
     ENDERMAN = "minecraft:enderman"
     """
-    | 末影人。
+    末影人。
     """
 
     PIGLIN = "minecraft:piglin"
     """
-    | 猪灵。
+    猪灵。
     """
 
     SPIDER = "minecraft:spider"
     """
-    | 蜘蛛。
+    蜘蛛。
     """
 
     CAVE_SPIDER = "minecraft:cave_spider"
     """
-    | 洞穴蜘蛛。
+    洞穴蜘蛛。
     """
 
     ZOMBIE_PIGMAN = "minecraft:zombie_pigman"
     """
-    | 僵尸猪灵。
+    僵尸猪灵。
     """
 
     ENDER_DRAGON = "minecraft:ender_dragon"
     """
-    | 末影龙。
+    末影龙。
     """
 
     WITHER = "minecraft:wither"
     """
-    | 凋灵。
+    凋灵。
     """
 
 
 class Mob(FriendlyMob, HostileMob):
     """
-    | 生物identifier枚举。
+    生物identifier枚举。
     """
 
 
 class Feature(Enum[str]):
     """
-    | 原版结构特征枚举，值为结构特征ID（字符串）。
+    原版结构特征枚举，值为结构特征ID（字符串）。
     """
 
     END_CITY = "end_city"
     """
-    | 末地城。
+    末地城。
     """
 
     FORTRESS = "fortress"
     """
-    | 下界要塞。
+    下界要塞。
     """
 
     MANSION = "mansion"
     """
-    | 林地府邸。
+    林地府邸。
     """
 
     MINESHAFT = "mineshaft"
     """
-    | 废弃矿井。
+    废弃矿井。
     """
 
     MONUMENT = "monument"
     """
-    | 海底神殿。
+    海底神殿。
     """
 
     STRONGHOLD = "stronghold"
     """
-    | 要塞。
+    要塞。
     """
 
     TEMPLE = "temple"
     """
-    | 神殿（包括沙漠神殿/雪屋/丛林神庙/女巫小屋）。
+    神殿（包括沙漠神殿/雪屋/丛林神庙/女巫小屋）。
     """
 
     VILLAGE = "village"
     """
-    | 村庄。
+    村庄。
     """
 
     SHIPWRECK = "shipwreck"
     """
-    | 沉船。
+    沉船。
     """
 
     BURIED_TREASURE = "buried_treasure"
     """
-    | 埋藏的宝藏。
+    埋藏的宝藏。
     """
 
     RUINS = "ruins"
     """
-    | 海底废墟。
+    海底废墟。
     """
 
     PILLAGER_OUTPOST = "pillager_outpost"
     """
-    | 掠夺者前哨站。
+    掠夺者前哨站。
     """
 
     BASTION_REMNANT = "bastion_remnant"
     """
-    | 堡垒遗迹。
+    堡垒遗迹。
     """
 
     RUINED_PORTAL = "ruined_portal"
     """
-    | 废弃传送门。
+    废弃传送门。
     """
 
     ANCIENT_CITY = "ancient_city"
     """
-    | 远古城市。
+    远古城市。
     """
 
     TRIAL_CHAMBERS = "trial_chambers"
     """
-    | 试炼密室。
+    试炼密室。
     """
 
 
 class UiContainer(Enum[str]):
     """
-    | 原版UI容器identifier（即仅存在容器UI，不能真正存储物品的容器）枚举（包括容器方块和容器实体）。
+    原版UI容器identifier（即仅存在容器UI，不能真正存储物品的容器）枚举（包括容器方块和容器实体）。
 
     -----
 
-    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
     CRAFTING_TABLE = "minecraft:crafting_table"
     """
-    | 工作台。
+    工作台。
     """
 
     ENCHANTING_TABLE = "minecraft:enchanting_table"
     """
-    | 附魔台。
+    附魔台。
     """
 
     BEACON = "minecraft:beacon"
     """
-    | 信标。
+    信标。
     """
 
     ANVIL = "minecraft:anvil"
     """
-    | 铁砧。
+    铁砧。
     """
 
     CHIPPED_ANVIL = "minecraft:chipped_anvil"
     """
-    | 开裂的铁砧。
+    开裂的铁砧。
     """
 
     DAMAGED_ANVIL = "minecraft:damaged_anvil"
     """
-    | 损坏的铁砧。
+    损坏的铁砧。
     """
 
     DEPRECATED_ANVIL = "minecraft:deprecated_anvil"
     """
-    | 破碎的铁砧。
+    破碎的铁砧。
     """
 
     GRINDSTONE = "minecraft:grindstone"
     """
-    | 砂轮。
+    砂轮。
     """
 
     CARTOGRAPHY_TABLE = "minecraft:cartography_table"
     """
-    | 制图台。
+    制图台。
     """
 
     STONECUTTER_BLOCK = "minecraft:stonecutter_block"
     """
-    | 切石机。
+    切石机。
     """
 
     LOOM = "minecraft:loom"
     """
-    | 织布机。
+    织布机。
     """
 
     SMITHING_TABLE = "minecraft:smithing_table"
     """
-    | 锻造台。
+    锻造台。
     """
 
     VILLAGER = "minecraft:villager"
     """
-    | 旧版村民。
+    旧版村民。
     """
 
     VILLAGER_V2 = "minecraft:villager_v2"
     """
-    | 村民。
+    村民。
     """
 
 
 class Container(Enum[str]):
     """
-    | 原版容器identifier枚举（包括容器方块和容器实体）。
+    原版容器identifier枚举（包括容器方块和容器实体）。
 
     -----
 
-    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
     CHEST = "minecraft:chest"
     """
-    | 箱子。
+    箱子。
     """
 
     TRAPPED_CHEST = "minecraft:trapped_chest"
     """
-    | 陷阱箱。
-    """
-
-    CHEST = "minecraft:"
-    """
-    | 箱子。
+    陷阱箱。
     """
 
     ENDER_CHEST = "minecraft:ender_chest"
     """
-    | 末影箱。
+    末影箱。
     """
 
     UNDYED_SHULKER_BOX = "minecraft:undyed_shulker_box"
     """
-    | 潜影盒。
+    潜影盒。
     """
 
     WHITE_SHULKER_BOX = "minecraft:white_shulker_box"
     """
-    | 白色潜影盒。
+    白色潜影盒。
     """
 
     ORANGE_SHULKER_BOX = "minecraft:orange_shulker_box"
     """
-    | 橙色潜影盒。
+    橙色潜影盒。
     """
 
     MAGENTA_SHULKER_BOX = "minecraft:magenta_shulker_box"
     """
-    | 品红色潜影盒。
+    品红色潜影盒。
     """
 
     LIGHT_BLUE_SHULKER_BOX = "minecraft:light_blue_shulker_box"
     """
-    | 淡蓝色潜影盒。
+    淡蓝色潜影盒。
     """
 
     YELLOW_SHULKER_BOX = "minecraft:yellow_shulker_box"
     """
-    | 黄色潜影盒。
+    黄色潜影盒。
     """
 
     LIME_SHULKER_BOX = "minecraft:lime_shulker_box"
     """
-    | 黄绿色潜影盒。
+    黄绿色潜影盒。
     """
 
     PINK_SHULKER_BOX = "minecraft:pink_shulker_box"
     """
-    | 粉红色潜影盒。
+    粉红色潜影盒。
     """
 
     GRAY_SHULKER_BOX = "minecraft:gray_shulker_box"
     """
-    | 灰色潜影盒。
+    灰色潜影盒。
     """
 
     LIGHT_GRAY_SHULKER_BOX = "minecraft:light_gray_shulker_box"
     """
-    | 淡灰色潜影盒。
+    淡灰色潜影盒。
     """
 
     CYAN_SHULKER_BOX = "minecraft:cyan_shulker_box"
     """
-    | 青色潜影盒。
+    青色潜影盒。
     """
 
     PURPLE_SHULKER_BOX = "minecraft:purple_shulker_box"
     """
-    | 紫色潜影盒。
+    紫色潜影盒。
     """
 
     BLUE_SHULKER_BOX = "minecraft:blue_shulker_box"
     """
-    | 蓝色潜影盒。
+    蓝色潜影盒。
     """
 
     BROWN_SHULKER_BOX = "minecraft:brown_shulker_box"
     """
-    | 棕色潜影盒。
+    棕色潜影盒。
     """
 
     GREEN_SHULKER_BOX = "minecraft:green_shulker_box"
     """
-    | 绿色潜影盒。
+    绿色潜影盒。
     """
 
     RED_SHULKER_BOX = "minecraft:red_shulker_box"
     """
-    | 红色潜影盒。
+    红色潜影盒。
     """
 
     BLACK_SHULKER_BOX = "minecraft:black_shulker_box"
     """
-    | 黑色潜影盒。
+    黑色潜影盒。
     """
 
     BARREL = "minecraft:barrel"
     """
-    | 木桶。
+    木桶。
     """
 
     FURNACE = "minecraft:furnace"
     """
-    | 熔炉。
+    熔炉。
     """
 
     LIT_FURNACE = "minecraft:lit_furnace"
     """
-    | 燃烧中的熔炉。
+    燃烧中的熔炉。
     """
 
     SMOKER = "minecraft:smoker"
     """
-    | 烟熏炉。
+    烟熏炉。
     """
 
     LIT_SMOKER = "minecraft:lit_smoker"
     """
-    | 燃烧中的烟熏炉。
+    燃烧中的烟熏炉。
     """
 
     BLAST_FURNACE = "minecraft:blast_furnace"
     """
-    | 高炉。
+    高炉。
     """
 
     LIT_BLAST_FURNACE = "minecraft:lit_blast_furnace"
     """
-    | 燃烧中的高炉。
+    燃烧中的高炉。
     """
 
     BREWING_STAND = "minecraft:brewing_stand"
     """
-    | 酿造台。
+    酿造台。
     """
 
     DROPPER = "minecraft:dropper"
     """
-    | 投掷器。
+    投掷器。
     """
 
     DISPENSER = "minecraft:dispenser"
     """
-    | 发射器。
+    发射器。
     """
 
     HOPPER = "minecraft:hopper"
     """
-    | 漏斗。
+    漏斗。
     """
 
     CRAFTER = "minecraft:crafter"
     """
-    | 合成器。
+    合成器。
     """
 
     CHEST_MINECART = "minecraft:chest_minecart"
     """
-    | 运输矿车。
+    运输矿车。
     """
 
     CHEST_BOAT = "minecraft:chest_boat"
     """
-    | 运输船。
+    运输船。
     """
 
     HOPPER_MINECART = "minecraft:hopper_minecart"
     """
-    | 漏斗矿车。
+    漏斗矿车。
     """
 
     HORSE = "minecraft:horse"
     """
-    | 马。
+    马。
     """
 
     DONKEY = "minecraft:donkey"
     """
-    | 驴。
+    驴。
     """
 
     MULE = "minecraft:mule"
     """
-    | 骡。
+    骡。
     """
 
     CAMEL = "minecraft:camel"
     """
-    | 骆驼。
+    骆驼。
     """
 
     TRADER_LLAMA = "minecraft:trader_llama"
     """
-    | 行商羊驼。
+    行商羊驼。
     """
 
     LLAMA = "minecraft:llama"
     """
-    | 羊驼。
+    羊驼。
     """
 
 
 class PositiveEffect(Enum[str]):
     """
-    | 正面状态效果枚举。
+    正面状态效果枚举。
     """
 
     SPEED = EffectType.MOVEMENT_SPEED
     """
-    | 迅捷。
+    迅捷。
     """
 
     HASTE = EffectType.DIG_SPEED
     """
-    | 急迫。
+    急迫。
     """
 
     STRENGTH = EffectType.DAMAGE_BOOST
     """
-    | 力量。
+    力量。
     """
 
     INSTANT_HEALTH = EffectType.HEAL
     """
-    | 瞬间治疗。
+    瞬间治疗。
     """
 
     JUMP_BOOST = EffectType.JUMP
     """
-    | 跳跃提升。
+    跳跃提升。
     """
 
     REGENERATION = EffectType.REGENERATION
     """
-    | 生命恢复。
+    生命恢复。
     """
 
     RESISTANCE = EffectType.DAMAGE_RESISTANCE
     """
-    | 抗性提升。
+    抗性提升。
     """
 
     FIRE_RESISTANCE = EffectType.FIRE_RESISTANCE
     """
-    | 抗火。
+    抗火。
     """
 
     WATER_BREATHING = EffectType.WATER_BREATHING
     """
-    | 水下呼吸。
+    水下呼吸。
     """
 
     INVISIBILITY = EffectType.INVISIBILITY
     """
-    | 隐身。
+    隐身。
     """
 
     NIGHT_VISION = EffectType.NIGHT_VISION
     """
-    | 夜视。
+    夜视。
     """
 
     HEALTH_BOOST = EffectType.HEALTH_BOOST
     """
-    | 生命提升。
+    生命提升。
     """
 
     ABSORPTION = EffectType.ABSORPTION
     """
-    | 伤害吸收。
+    伤害吸收。
     """
 
     SATURATION = EffectType.SATURATION
     """
-    | 饱和。
+    饱和。
     """
 
     SLOW_FALLING = EffectType.SLOW_FALLING
     """
-    | 缓降。
+    缓降。
     """
 
     VILLAGE_HERO = EffectType.HERO_OF_THE_VILLAGE
     """
-    | 村庄英雄。
+    村庄英雄。
     """
 
 
 class NegativeEffect(Enum[str]):
     """
-    | 负面状态效果枚举。
+    负面状态效果枚举。
     """
 
     SLOWDOWN = EffectType.MOVEMENT_SLOWDOWN
     """
-    | 缓慢。
+    缓慢。
     """
 
     MINING_FATIGUE = EffectType.DIG_SLOWDOWN
     """
-    | 挖掘疲劳。
+    挖掘疲劳。
     """
 
     INSTANT_DAMAGE = EffectType.HARM
     """
-    | 瞬间伤害。
+    瞬间伤害。
     """
 
     NAUSEA = EffectType.CONFUSION
     """
-    | 反胃。
+    反胃。
     """
 
     BLINDNESS = EffectType.BLINDNESS
     """
-    | 失明。
+    失明。
     """
 
     HUNGER = EffectType.HUNGER
     """
-    | 饥饿。
+    饥饿。
     """
 
     WEAKNESS = EffectType.WEAKNESS
     """
-    | 虚弱。
+    虚弱。
     """
 
     POISON = EffectType.POISON
     """
-    | 中毒。
+    中毒。
     """
 
     WITHER = EffectType.WITHER
     """
-    | 凋零。
+    凋零。
     """
 
     LEVITATION = EffectType.LEVITATION
     """
-    | 飘浮。
+    飘浮。
     """
 
     FATAL_POISON = EffectType.FATAL_POISON
     """
-    | 中毒（致命）。
+    中毒（致命）。
     """
 
     DARKNESS = EffectType.DARKNESS
     """
-    | 黑暗。
+    黑暗。
     """
 
     WIND_CHARGED = EffectType.WIND_CHARGED
     """
-    | 蓄风。
+    蓄风。
     """
 
     WEAVING = EffectType.WEAVING
     """
-    | 盘丝。
+    盘丝。
     """
 
     OOZING = EffectType.OOZING
     """
-    | 渗浆。
+    渗浆。
     """
 
     INFESTED = EffectType.INFESTED
     """
-    | 寄生。
+    寄生。
     """
 
 
 class NeutralEffect(Enum[str]):
     """
-    | 中性状态效果枚举。
+    中性状态效果枚举。
     """
 
     BAD_OMEN = EffectType.BAD_OMEN
     """
-    | 不祥之兆。
+    不祥之兆。
     """
 
     TRIAL_OMEN = EffectType.TRIAL_OMEN
     """
-    | 试炼之兆。
+    试炼之兆。
     """
 
     RAID_OMEN = EffectType.RAID_OMEN
     """
-    | 袭击之兆。
+    袭击之兆。
     """
 
 
@@ -1602,7 +2059,7 @@ ENTITY_NAME_MAP = {
     EntityType.OminousItemSpawner:          (145, "minecraft:ominous_item_spawner", "不祥之物生成器"),
 }
 """
-| 用于将网易实体类型ID（详见 `EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?catalog=1>`_ ）转换为原版数字ID、identifier或中文名称的字典，结构如下：
+用于将网易实体类型ID（详见 `EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?catalog=1>`_ ）转换为原版数字ID、identifier或中文名称的字典，结构如下：
 ::
 
     {
@@ -1700,7 +2157,7 @@ BIOME_NAME_MAP = {
     BiomeType.cherry_grove:                     ("cherry_grove", "樱花树林"),
 }
 """
-| 用于将网易生物群系ID（详见 `BiomeType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/BiomeType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
+用于将网易生物群系ID（详见 `BiomeType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/BiomeType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
 ::
 
     {
@@ -1709,7 +2166,7 @@ BIOME_NAME_MAP = {
     
 -----
 
-| 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
 """
 
 
@@ -1732,7 +2189,7 @@ STRUCTURE_NAME_MAP = {
     StructureFeatureType.TrailRuins:        ("trail_ruins", "试炼密室"),
 }
 """
-| 用于将网易结构特征ID（详见 `StructureFeatureType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/StructureFeatureType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
+用于将网易结构特征ID（详见 `StructureFeatureType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/StructureFeatureType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
 ::
 
     {
@@ -1741,7 +2198,7 @@ STRUCTURE_NAME_MAP = {
 
 -----
 
-| 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
 """
 
 
@@ -1784,7 +2241,7 @@ EFFECT_NAME_MAP = {
     EffectType.INFESTED:            "寄生",
 }
 """
-| 用于将状态效果ID（详见 `EffectType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EffectType.html?catalog=1>`_ ）转换为中文名称的字典，结构如下：
+用于将状态效果ID（详见 `EffectType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EffectType.html?catalog=1>`_ ）转换为中文名称的字典，结构如下：
 ::
 
     {
@@ -1793,7 +2250,7 @@ EFFECT_NAME_MAP = {
 
 -----
 
-| 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
 """
 
 
@@ -1841,7 +2298,7 @@ ENCHANT_NAME_MAP = {
     EnchantType.Breach:                 ("breach", "破甲"),
 }
 """
-| 用于将网易附魔ID（详见 `EnchantType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EnchantType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
+用于将网易附魔ID（详见 `EnchantType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EnchantType.html?catalog=1>`_ ）转换为原版ID或中文名称的字典，结构如下：
 ::
 
     {
@@ -1850,8 +2307,62 @@ ENCHANT_NAME_MAP = {
 
 -----
 
-| 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
 """
+
+
+def __test__():
+    class E(Enum[str]):
+        a = auto()
+        b = auto()
+        c = auto()
+    class EE(Enum[str]):
+        aa = auto()
+        bb = auto()
+        cc = auto()
+    class T(E, EE):
+        d = auto()
+        e = auto()
+    assert E.a == "a"
+    assert T.a == "a"
+    assert T.aa == "aa"
+    assert T.d == "d"
+
+    class E1(Enum):
+        A = 1
+        B = 2
+        C = 3
+    class E2(E1):
+        X = 7
+        Y = 8
+        Z = 9
+    assert sorted(E2.__members__.keys()) == ["A", "B", "C", "X", "Y", "Z"]
+    assert 7 in E2
+    assert 0 not in E2
+    assert len(E2) == 6
+    assert isinstance(E2.X, E2)
+    assert E2.A.name == "A"
+    assert E2.A.value == 1
+    a = {E2.A, E2.X}
+    assert E2.A in a
+    assert E2.X in a
+
+    class E3(Enum[str]):
+        Q = "114514"
+    assert E3.Q == "114514"
+    from ..core._utils import assert_error
+    def f():
+        E3.Q = 123
+    assert_error(f, exc=AttributeError)
+    def f():
+        del E3.Q
+    assert_error(f, exc=AttributeError)
+
+    class E4(Enum[int]):
+        a = auto()
+        b = auto()
+        c = auto()
+    assert sorted(E4.__members__.values()) == [0, 1, 2]
 
 
 

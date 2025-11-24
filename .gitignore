@@ -1,12 +1,19 @@
 ### Project
-/scripts/event_typehint/_event_typing.pyi
-/scripts/event_typehint/_events.pyi
-/scripts/event_typehint/_events.py
 *.zip
 studio.json
 *.psd
 *.log
+/scripts/event_typehint/*
+!/scripts/event_typehint/all_events.py
+!/scripts/event_typehint/main.py
 /docs/source/api/apis/
+/tests/ingame_test/.idea/
+/tests/ingame_test/bp/test_scripts/nuoyanlib/
+/tests/ingame_test/bp/test_scripts/nuoyanlib
+/tests/ingame_test/mcdk.exe
+/tests/ingame_test/.mcdev.json
+/src/nuoyanlib/extensions/*
+!/src/nuoyanlib/extensions/__init__.py
 
 
 ### Python template
@@ -164,3 +171,4 @@ http-client.private.env.json
 .idea/GitCommitMessageStorage.xml
 /.idea/git_toolbox_prj.xml
 /.idea/copilot.*.xml
+/.idea/copilot*.xml

@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-11-05
+|   Date  : 2025-11-29
 |
-| ==============================================
+| ====================================================
 """
 
 
-from typing import List, Optional, Callable, Dict, Tuple, Union, Generator, Any
-from typing_extensions import deprecated
+from typing import Optional, Union, List, Any, overload, Literal
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
@@ -34,7 +32,7 @@ from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUICon
 from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
 from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
-from ..._core._types._typing import UiPathOrNyControl, FTuple2
+from ...core._types._typing import UiPathOrNyControl
 from ...utils.enum import ControlType
 
 
@@ -49,44 +47,52 @@ def create_ui(
     client_system: Optional[ClientSystem] = None
 ) -> Union[ScreenNode, Any]: ...
 def to_path(control: UiPathOrNyControl) -> str: ...
-def to_control(
-    screen_node: ScreenNode,
-    path: UiPathOrNyControl,
-    control_type: str = ControlType.BASE_CONTROL,
-) -> Union[
-    BaseUIControl,
-    LabelUIControl,
-    ButtonUIControl,
-    ImageUIControl,
-    GridUIControl,
-    ScrollViewUIControl,
-    SwitchToggleUIControl,
-    TextEditBoxUIControl,
-    ProgressBarUIControl,
-    NeteasePaperDollUIControl,
-    MiniMapUIControl,
-    SliderUIControl,
-    ItemRendererUIControl,
-    NeteaseComboBoxUIControl,
-    InputPanelUIControl,
-    StackPanelUIControl,
-    SelectionWheelUIControl,
-    None,
-]: ...
-def save_ui_pos_data(key: str, data: Dict[str, List[Tuple[str, FTuple2]]]) -> bool: ...
-def get_ui_pos_data(key: str) -> Dict[str, List[Tuple[str, FTuple2]]]: ...
-def iter_children_path_by_level(
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["BaseControl", "Panel", "PaperDoll", "GradientRenderer"]) -> BaseUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["Label"]) -> LabelUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["Button"]) -> ButtonUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["Image"]) -> ImageUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["Grid"]) -> GridUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["ScrollView"]) -> ScrollViewUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["SwitchToggle"]) -> SwitchToggleUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["TextEditBox"]) -> TextEditBoxUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["ProgressBar"]) -> ProgressBarUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["NeteasePaperDoll"]) -> NeteasePaperDollUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["MiniMap"]) -> MiniMapUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["Slider"]) -> SliderUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["ItemRenderer"]) -> ItemRendererUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["NeteaseComboBox"]) -> NeteaseComboBoxUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["InputPanel"]) -> InputPanelUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["StackPanel"]) -> StackPanelUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal["SelectionWheel"]) -> SelectionWheelUIControl: ...
+@overload
+def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: str = ControlType.BASE_CONTROL) -> BaseUIControl: ...
+def get_children_path_by_level(
     control: UiPathOrNyControl,
     screen_node: ScreenNode,
     level: int = 1,
-) -> Generator[str]: ...
-def iter_children_by_level(
+) -> List[str]: ...
+def get_children_by_level(
     control: UiPathOrNyControl,
     screen_node: ScreenNode,
     level: int = 1,
-) -> Generator[BaseUIControl]: ...
+) -> List[BaseUIControl]: ...
 def get_parent_path(control: UiPathOrNyControl) -> Optional[str]: ...
 def get_parent(control: UiPathOrNyControl, screen_node: ScreenNode) -> Optional[BaseUIControl]: ...
-def is_ui_out_of_screen(control: UiPathOrNyControl, screen_node: Optional[ScreenNode] = None) -> bool: ...
-@deprecated("已废弃，将在未来版本中移除。")
-def notify_server(func: Callable) -> Callable: ...
+def is_out_of_screen(control: UiPathOrNyControl, screen_node: Optional[ScreenNode] = None) -> bool: ...

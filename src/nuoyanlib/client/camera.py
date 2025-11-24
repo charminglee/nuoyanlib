@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-23
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 from math import pi
-import mod.client.extraClientApi as client_api
+import mod.client.extraClientApi as c_api
 from mod.common.minecraftEnum import RayFilterType
-from .._core._client.comp import LvComp, PLAYER_ID, CF
+from ..core.client.comp import LvComp, PLAYER_ID, CF
 from ..utils.vector import vec_p2p, vec_angle
 from ..utils.mc_math import pos_distance
 
@@ -38,7 +37,9 @@ def __get_viewport_args():
 
 def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=pi / 5, ent_filter=None):
     """
-    获取当前屏幕内的实体，返回实体ID列表，按与准星的屏幕距离（screen_dist）从小到大排序。
+    获取当前屏幕内的实体。
+
+    返回实体ID列表，按与准星的屏幕距离（screen_dist）从小到大排序。
 
     -----
 
@@ -50,7 +51,7 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=pi / 5, 
     :rtype: list[str]
     """
     res = []
-    all_ents = client_api.GetEngineActor().keys() + client_api.GetPlayerList()
+    all_ents = c_api.GetEngineActor().keys() + c_api.GetPlayerList()
     center = LvComp.Camera.GetPosition()
     camera_dir = LvComp.Camera.GetForward()
     for eid in all_ents:
@@ -69,7 +70,7 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=pi / 5, 
                 and s_dist <= screen_dist
                 and (ent_filter is None or ent_filter(eid))
         ):
-            ray_result = client_api.getEntitiesOrBlockFromRay(
+            ray_result = c_api.getEntitiesOrBlockFromRay(
                 center, target_dir, int(w_dist) + 1, False, RayFilterType.BothEntitiesAndBlock
             )
             for r in ray_result:

@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-27
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 from contextlib import contextmanager
-import mod.server.extraServerApi as server_api
+import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import AttrType, ActorDamageCause, EntityComponentType
-from .._core._sys import get_lib_system
-from .._core._server.comp import CF, LvComp
-from .._core._utils import kwargs_setter
+from ..core._sys import get_lib_system
+from ..core.server.comp import CF, LvComp
+from ..core._utils import kwargs_setter
 from ..utils.mc_math import is_in_sector, pos_distance_square, is_in_cube, is_in_cylinder
 from .entity import get_all_entities
 
@@ -42,7 +41,7 @@ def ignore_dmg_cd(restore_cd=10):
     """
     [上下文管理器]
 
-    | 用于忽略生物受击后的 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 。
+    用于忽略生物受击后的 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 。
 
     -----
 
@@ -73,14 +72,17 @@ def ignore_dmg_cd(restore_cd=10):
 
 class EntityFilter:
     """
-    | 实体过滤器，预设了一些常用的过滤条件。
-    | 过滤器接受一个实体ID作为参数，且返回一个 ``bool`` 值，返回 ``True`` 时表示该实体符合条件。
+    实体过滤器，预设了一些常用的过滤条件。
+
+    过滤器接受一个实体ID作为参数，且返回一个 ``bool`` 值，返回 ``True`` 时表示该实体符合条件。
     """
 
     @staticmethod
     def mob(eid):
         """
-        | 过滤生物实体。（判定标准为是否具有 ``minecraft:health`` 组件）
+        过滤生物实体。
+
+        判定标准为是否具有 ``minecraft:health`` 组件。
 
         -----
 
@@ -94,7 +96,9 @@ class EntityFilter:
     @staticmethod
     def non_mob(eid):
         """
-        | 过滤非生物实体。（判定标准为是否具有 ``minecraft:health`` 组件）
+        过滤非生物实体。
+
+        判定标准为是否具有 ``minecraft:health`` 组件。
 
         -----
 
@@ -108,7 +112,7 @@ class EntityFilter:
     @staticmethod
     def has_health(eid):
         """
-        | 过滤当前生命值大于0的实体。
+        过滤当前生命值大于0的实体。
 
         -----
 
@@ -137,7 +141,7 @@ def hurt(
         force=False,
 ):
     """
-    | 对指定生物造成伤害。
+    对指定生物造成伤害。
 
     -----
 
@@ -181,7 +185,7 @@ def hurt_mobs(
         on_hurt_after=None,
 ):
     """
-    | 对多个实体造成伤害。
+    对多个实体造成伤害。
 
     -----
 
@@ -244,7 +248,7 @@ def explode_damage(
         hurt_source=False,
 ):
     """
-    | 造成爆炸伤害。
+    造成爆炸伤害。
     
     -----
 
@@ -261,7 +265,7 @@ def explode_damage(
     :return: 无
     :rtype: None
     """
-    for plr in server_api.GetPlayerList():
+    for plr in s_api.GetPlayerList():
         if CF(plr).Dimension.GetEntityDimensionId() == dim:
             player_id = plr
             break
@@ -283,7 +287,7 @@ def explode_damage(
 
 def _visualize_area(area_type, *args):
     try:
-        get_lib_system().BroadcastToAllClient(
+        get_lib_system(False).BroadcastToAllClient(
             "_NuoyanLibVisualizeArea",
             {'area_type': area_type, 'args': args}
         )
@@ -319,7 +323,7 @@ __damage_kwargs_setter = kwargs_setter(
 @__damage_kwargs_setter
 def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     """
-    | 对圆柱体区域内所有实体造成伤害。
+    对圆柱体区域内所有实体造成伤害。
     
     -----
 
@@ -371,7 +375,7 @@ def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
 @__damage_kwargs_setter
 def sphere_damage(damage, r, pos, dim, **kwargs):
     """
-    | 对球体区域内所有实体造成伤害。
+    对球体区域内所有实体造成伤害。
     
     -----
 
@@ -424,7 +428,7 @@ def sphere_damage(damage, r, pos, dim, **kwargs):
 @__damage_kwargs_setter
 def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
     """
-    | 朝攻击者视线前方造成扇形范围伤害。
+    朝攻击者视线前方造成扇形范围伤害。
     
     -----
 
@@ -478,7 +482,7 @@ def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
 @__damage_kwargs_setter
 def rectangle_damage(damage, pos1, pos2, dim, **kwargs):
     """
-    | 对指定矩形区域内所有实体造成伤害。
+    对指定矩形区域内所有实体造成伤害。
     
     -----
 
@@ -537,7 +541,7 @@ def percent_damage(
         force=False,
 ):
     """
-    | 对生物造成百分比伤害。
+    对生物造成百分比伤害。
     
     -----
 

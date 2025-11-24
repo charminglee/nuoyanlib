@@ -1,30 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-08-26
+|   Date  : 2025-12-01
 |
-| ==============================================
+| ====================================================
 """
 
 
-from typing import Optional
+from typing import Optional, Callable, Any
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
-from .control import NyControl
+from .control import NyControl, InteractableControl
 from ..screen_node import ScreenNodeExtension
-from ...._core._types._checker import args_type_check
+from ....core._types._checker import args_type_check
+from ....utils.enum import WheelCallbackType
 
 
-class NySelectionWheel(NyControl):
-    base_control: SelectionWheelUIControl
-    """
-    | 轮盘 ``SelectionWheelUIControl`` 实例。
-    """
+__WheelCallbackType = Callable[[], Any]
+
+
+class NySelectionWheel(InteractableControl, NyControl):
+    _base_control: SelectionWheelUIControl
     def __init__(
         self: ...,
         screen_node_ex: ScreenNodeExtension,
@@ -33,4 +33,14 @@ class NySelectionWheel(NyControl):
     @args_type_check(str, is_method=True)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
-
+    def set_callback(self, func: __WheelCallbackType, cb_type: str = WheelCallbackType.CLICK) -> bool: ...
+    def remove_callback(self, func: __WheelCallbackType, cb_type: str = WheelCallbackType.CLICK) -> bool: ...
+    def _on_click(self) -> None: ...
+    def _on_hover(self) -> None: ...
+    SetCallback = set_callback
+    RemoveCallback = remove_callback
+    GetSliceCount = SelectionWheelUIControl.GetSliceCount
+    GetCurrentSliceIndex = SelectionWheelUIControl.GetCurrentSliceIndex
+    SetCurrentSliceIndex = SelectionWheelUIControl.SetCurrentSliceIndex
+    SetTouchUpCallback = SelectionWheelUIControl.SetTouchUpCallback
+    SetHoverCallback = SelectionWheelUIControl.SetHoverCallback

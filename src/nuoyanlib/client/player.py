@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-import mod.client.extraClientApi as client_api
-from .._core._client.comp import PlrComp
+import mod.client.extraClientApi as c_api
+from ..core.client.comp import PlrComp
 
 
 __all__ = [
@@ -24,7 +23,7 @@ __all__ = [
 
 def player_plunge(speed):
     """
-    | 使玩家向准星方向以指定初始速度突进。
+    使玩家向准星方向以指定初始速度突进。
 
     -----
 
@@ -34,7 +33,7 @@ def player_plunge(speed):
     :rtype: None
     """
     rot = PlrComp.Rot.GetRot()
-    dir_rot = client_api.GetDirFromRot(rot)
+    dir_rot = c_api.GetDirFromRot(rot)
     motion = tuple(map(lambda x: x * speed, dir_rot))
     PlrComp.ActorMotion.SetMotion(motion)
 

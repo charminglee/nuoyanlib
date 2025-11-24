@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-26
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 import operator
 import math
 from mod.common.utils.mcmath import Matrix
-from .._core._sys import get_cf, get_api
-from .._core._error import VectorError, ZeroVectorError, VectorDimError
+from ..core._sys import get_cf, get_api
+from ..core.error import VectorError, ZeroVectorError, VectorDimError
 
 
 __all__ = [
@@ -60,8 +59,9 @@ _OP_MAP = {
 
 class Vector(object):
     """
-    | 向量类，支持三维向量与二维向量。
-    | 可传入2个或3个 ``float`` / ``int`` ，也可传入一个包含2个或3个 ``float`` / ``int`` 的 ``tuple`` ，若不传入任何参数，则创建一个三维零向量。
+    向量类，支持三维向量与二维向量。
+
+    可传入2个或3个 ``float`` / ``int`` ，也可传入一个包含2个或3个 ``float`` / ``int`` 的 ``tuple`` ，若不传入任何参数，则创建一个三维零向量。
 
     -----
 
@@ -103,7 +103,7 @@ class Vector(object):
         """
         [只读属性]
 
-        | 向量维度。
+        向量维度。
 
         :rtype: int
         """
@@ -112,7 +112,7 @@ class Vector(object):
     @staticmethod
     def zero(is_3d=True):
         """
-        | 创建一个零向量。
+        创建一个零向量。
 
         -----
 
@@ -126,7 +126,7 @@ class Vector(object):
     @staticmethod
     def one(is_3d=True):
         """
-        | 创建一个所有分量均为 ``1.0`` 的向量。
+        创建一个所有分量均为 ``1.0`` 的向量。
 
         -----
 
@@ -140,7 +140,7 @@ class Vector(object):
     @staticmethod
     def left(is_3d=True):
         """
-        | 创建一个x分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
+        创建一个x分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
 
@@ -154,7 +154,7 @@ class Vector(object):
     @staticmethod
     def right(is_3d=True):
         """
-        | 创建一个x分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
+        创建一个x分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
 
@@ -168,7 +168,7 @@ class Vector(object):
     @staticmethod
     def up(is_3d=True):
         """
-        | 创建一个y分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
+        创建一个y分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
 
@@ -182,7 +182,7 @@ class Vector(object):
     @staticmethod
     def down(is_3d=True):
         """
-        | 创建一个y分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
+        创建一个y分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
 
@@ -196,7 +196,7 @@ class Vector(object):
     @staticmethod
     def forward():
         """
-        | 创建一个z分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
+        创建一个z分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
 
@@ -208,7 +208,7 @@ class Vector(object):
     @staticmethod
     def backward():
         """
-        | 创建一个z分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
+        创建一个z分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
 
@@ -222,7 +222,7 @@ class Vector(object):
         """
         [可读写属性]
 
-        | 向量长度。
+        向量长度。
 
         :rtype: float
         """
@@ -233,7 +233,7 @@ class Vector(object):
         """
         [可读写属性]
 
-        | 设置向量长度。
+        设置向量长度。
 
         :type val: float
         :raise ZeroVectorError: 对零向量调用时抛出
@@ -251,8 +251,9 @@ class Vector(object):
         """
         [只读属性]
 
-        | 向量长度的平方。
-        | 相比于直接计算长度，速度更快。
+        向量长度的平方。
+
+        相比于直接计算长度，速度更快。
 
         :rtype: float
         """
@@ -260,7 +261,7 @@ class Vector(object):
 
     def is_zero(self):
         """
-        | 判断向量是否是零向量。
+        判断向量是否是零向量。
 
         -----
 
@@ -271,7 +272,7 @@ class Vector(object):
 
     def normalize(self, inplace=True):
         """
-        | 向量标准化。
+        向量标准化。
 
         -----
 
@@ -297,7 +298,7 @@ class Vector(object):
 
     def __neg__(self):
         """
-        | 向量取反（返回新向量）。
+        向量取反（返回新向量）。
 
         -----
 
@@ -308,7 +309,7 @@ class Vector(object):
 
     def neg(self, inplace=True):
         """
-        | 向量取反。
+        向量取反。
 
         -----
 
@@ -335,7 +336,7 @@ class Vector(object):
 
     def copy(self):
         """
-        | 复制向量。
+        复制向量。
 
         -----
 
@@ -356,7 +357,7 @@ class Vector(object):
 
     def __getitem__(self, i):
         """
-        | 获取向量分量。
+        获取向量分量。
 
         -----
 
@@ -377,7 +378,7 @@ class Vector(object):
 
     def __setitem__(self, i, value):
         """
-        | 设置向量某个分量的值。
+        设置向量某个分量的值。
 
         -----
 
@@ -443,8 +444,9 @@ class Vector(object):
 
     def __add__(self, other):
         """
-        | 向量加法（返回新向量）。
-        | 与另一向量相加时，结果为对应分量相加，两个向量的维度需一致；与标量相加时，结果为每个分量同时加上该标量。
+        向量加法（返回新向量）。
+
+        与另一向量相加时，结果为对应分量相加，两个向量的维度需一致；与标量相加时，结果为每个分量同时加上该标量。
 
         -----
 
@@ -459,8 +461,9 @@ class Vector(object):
 
     def __radd__(self, other):
         """
-        | 向量加法（返回新向量）。
-        | 与另一向量相加时，结果为对应分量相加，两个向量的维度需一致；与标量相加时，结果为每个分量同时加上该标量。
+        向量加法（返回新向量）。
+
+        与另一向量相加时，结果为对应分量相加，两个向量的维度需一致；与标量相加时，结果为每个分量同时加上该标量。
 
         -----
 
@@ -475,8 +478,9 @@ class Vector(object):
 
     def __iadd__(self, other):
         """
-        | 向量加法（就地修改）。
-        | 与另一向量相加时，结果为对应分量相加，两个向量的维度需一致；与标量相加时，结果为每个分量同时加上该标量。
+        向量加法（就地修改）。
+
+        与另一向量相加时，结果为对应分量相加，两个向量的维度需一致；与标量相加时，结果为每个分量同时加上该标量。
 
         -----
 
@@ -491,8 +495,9 @@ class Vector(object):
 
     def __sub__(self, other):
         """
-        | 向量减法（返回新向量）。
-        | 与另一向量相减时，结果为对应分量相减，两个向量的维度需一致；与标量相减时，结果为每个分量同时减去该标量。
+        向量减法（返回新向量）。
+
+        与另一向量相减时，结果为对应分量相减，两个向量的维度需一致；与标量相减时，结果为每个分量同时减去该标量。
 
         -----
 
@@ -507,8 +512,9 @@ class Vector(object):
 
     def __rsub__(self, other):
         """
-        | 向量减法（返回新向量）。
-        | 与另一向量相减时，结果为对应分量相减，两个向量的维度需一致；与标量相减时，结果为每个分量同时减去该标量。
+        向量减法（返回新向量）。
+
+        与另一向量相减时，结果为对应分量相减，两个向量的维度需一致；与标量相减时，结果为每个分量同时减去该标量。
 
         -----
 
@@ -523,8 +529,9 @@ class Vector(object):
 
     def __isub__(self, other):
         """
-        | 向量减法（就地修改）。
-        | 与另一向量相减时，结果为对应分量相减，两个向量的维度需一致；与标量相减时，结果为每个分量同时减去该标量。
+        向量减法（就地修改）。
+
+        与另一向量相减时，结果为对应分量相减，两个向量的维度需一致；与标量相减时，结果为每个分量同时减去该标量。
 
         -----
 
@@ -539,8 +546,9 @@ class Vector(object):
 
     def __mul__(self, other):
         """
-        | 向量乘法（返回新向量）。
-        | 只允许与标量相乘，结果为每个分量同时乘以该标量。
+        向量乘法（返回新向量）。
+
+        只允许与标量相乘，结果为每个分量同时乘以该标量。
 
         -----
 
@@ -553,8 +561,9 @@ class Vector(object):
 
     def __rmul__(self, other):
         """
-        | 向量乘法（返回新向量）。
-        | 只允许与标量相乘，结果为每个分量同时乘以该标量。
+        向量乘法（返回新向量）。
+
+        只允许与标量相乘，结果为每个分量同时乘以该标量。
 
         -----
 
@@ -567,8 +576,9 @@ class Vector(object):
 
     def __imul__(self, other):
         """
-        | 向量乘法（就地修改）。
-        | 只允许与标量相乘，结果为每个分量同时乘以该标量。
+        向量乘法（就地修改）。
+
+        只允许与标量相乘，结果为每个分量同时乘以该标量。
 
         -----
 
@@ -581,8 +591,9 @@ class Vector(object):
 
     def __truediv__(self, other):
         """
-        | 向量除法（返回新向量）。
-        | 只允许与标量相除，结果为每个分量同时除以该标量。
+        向量除法（返回新向量）。
+
+        只允许与标量相除，结果为每个分量同时除以该标量。
 
         -----
 
@@ -595,8 +606,9 @@ class Vector(object):
 
     def __itruediv__(self, other):
         """
-        | 向量除法（就地修改）。
-        | 只允许与标量相除，结果为每个分量同时除以该标量。
+        向量除法（就地修改）。
+
+        只允许与标量相除，结果为每个分量同时除以该标量。
 
         -----
 
@@ -612,8 +624,9 @@ class Vector(object):
 
     def __floordiv__(self, other):
         """
-        | 向量除法（向下整除）（返回新向量）。
-        | 只允许与标量相除，结果为每个分量同时除以该标量。
+        向量除法（向下整除）（返回新向量）。
+
+        只允许与标量相除，结果为每个分量同时除以该标量。
 
         -----
 
@@ -626,8 +639,9 @@ class Vector(object):
 
     def __ifloordiv__(self, other):
         """
-        | 向量除法（向下整除）（就地修改）。
-        | 只允许与标量相除，结果为每个分量同时除以该标量。
+        向量除法（向下整除）（就地修改）。
+
+        只允许与标量相除，结果为每个分量同时除以该标量。
 
         -----
 
@@ -640,7 +654,7 @@ class Vector(object):
 
     def dot(self, vec):
         """
-        | 向量点积。
+        向量点积。
 
         -----
 
@@ -657,7 +671,7 @@ class Vector(object):
 
     def cross(self, vec, inplace=True):
         """
-        | 向量叉积，仅支持三维向量。
+        向量叉积，仅支持三维向量。
 
         -----
 
@@ -690,7 +704,7 @@ def _to_vector(vec):
 
 def is_zero_vec(vec):
     """
-    | 判断向量是否是零向量。
+    判断向量是否是零向量。
 
     -----
 
@@ -704,7 +718,7 @@ def is_zero_vec(vec):
 
 def set_vec_length(vec, length, ret_vector=False):
     """
-    | 设置向量长度。
+    设置向量长度。
 
     -----
 
@@ -724,7 +738,7 @@ def set_vec_length(vec, length, ret_vector=False):
 
 def vec_orthogonal_decomposition(vec, basis1, basis2, ret_vector=False):
     """
-    | 对向量进行正交分解。
+    对向量进行正交分解。
 
     -----
 
@@ -746,7 +760,7 @@ def vec_orthogonal_decomposition(vec, basis1, basis2, ret_vector=False):
 
 def vec_entity_left(entity_id, ret_vector=False):
     """
-    | 获取实体局部坐标系中朝左的单位向量。
+    获取实体局部坐标系中朝左的单位向量。
 
     -----
 
@@ -765,7 +779,7 @@ def vec_entity_left(entity_id, ret_vector=False):
 
 def vec_entity_right(entity_id, ret_vector=False):
     """
-    | 获取实体局部坐标系中朝右的单位向量。
+    获取实体局部坐标系中朝右的单位向量。
 
     -----
 
@@ -784,7 +798,7 @@ def vec_entity_right(entity_id, ret_vector=False):
 
 def vec_entity_forward(entity_id, ignore_rot_x=False, ret_vector=False):
     """
-    | 获取实体局部坐标系中朝前的单位向量。
+    获取实体局部坐标系中朝前的单位向量。
 
     -----
 
@@ -806,7 +820,7 @@ def vec_entity_forward(entity_id, ignore_rot_x=False, ret_vector=False):
 
 def vec_entity_backward(entity_id, ignore_rot_x=False, ret_vector=False):
     """
-    | 获取实体局部坐标系中朝后的单位向量。
+    获取实体局部坐标系中朝后的单位向量。
 
     -----
 
@@ -826,7 +840,7 @@ def vec_entity_backward(entity_id, ignore_rot_x=False, ret_vector=False):
 
 def vec_entity_up(entity_id, ignore_rot_x=False, ret_vector=False):
     """
-    | 获取实体局部坐标系中朝上的单位向量。
+    获取实体局部坐标系中朝上的单位向量。
 
     -----
 
@@ -850,7 +864,7 @@ def vec_entity_up(entity_id, ignore_rot_x=False, ret_vector=False):
 
 def vec_entity_down(entity_id, ignore_rot_x=False, ret_vector=False):
     """
-    | 获取实体局部坐标系中朝下的单位向量。
+    获取实体局部坐标系中朝下的单位向量。
 
     -----
 
@@ -873,7 +887,7 @@ def vec_entity_down(entity_id, ignore_rot_x=False, ret_vector=False):
 
 def vec_normalize(vec, ret_vector=False):
     """
-    | 向量标准化。
+    向量标准化。
 
     -----
 
@@ -890,7 +904,7 @@ def vec_normalize(vec, ret_vector=False):
 
 def vec_rot_p2p(pos1, pos2):
     """
-    | 计算从 ``pos1`` 指向 ``pos2`` 的向量角度。
+    计算从 ``pos1`` 指向 ``pos2`` 的向量角度。
 
     -----
 
@@ -916,7 +930,7 @@ def vec_rot_p2p(pos1, pos2):
 
 def vec_p2p(pos1, pos2, ret_vector=False):
     """
-    | 计算从 ``pos1`` 指向 ``pos2`` 的单位向量。
+    计算从 ``pos1`` 指向 ``pos2`` 的单位向量。
 
     -----
 
@@ -934,7 +948,7 @@ def vec_p2p(pos1, pos2, ret_vector=False):
 
 def vec_length(vec):
     """
-    | 计算向量长度。
+    计算向量长度。
 
     -----
 
@@ -948,7 +962,7 @@ def vec_length(vec):
 
 def vec_angle(vec1, vec2):
     """
-    | 计算两个向量之间的夹角。
+    计算两个向量之间的夹角。
 
     -----
 
@@ -968,7 +982,7 @@ def vec_angle(vec1, vec2):
 
 def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", ret_vector=False):
     """
-    | 对指定向量应用欧拉旋转。
+    对指定向量应用欧拉旋转。
 
     -----
 
@@ -1024,7 +1038,7 @@ def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", re
 
 def vec_rotate_around(v, u, angle, ret_vector=False):
     """
-    | 将向量v绕着向量u旋转。
+    将向量v绕着向量u旋转。
 
     :param Vector|tuple[float] v: 要旋转的向量
     :param Vector|tuple[float] u: 旋转轴向量
@@ -1050,7 +1064,7 @@ def vec_rotate_around(v, u, angle, ret_vector=False):
 
 def outgoing_vec(vec, normal, ret_vector=False):
     """
-    | 已知入射向量和法线求出射向量。
+    已知入射向量和法线求出射向量。
 
     -----
 
@@ -1069,7 +1083,7 @@ def outgoing_vec(vec, normal, ret_vector=False):
 
 def vec_composite(ret_vector, vec, *more_vec):
     """
-    | 向量的合成。
+    向量的合成。
 
     -----
 
@@ -1088,7 +1102,7 @@ def vec_composite(ret_vector, vec, *more_vec):
 
 def vec_scale(vec, scale, ret_vector=False):
     """
-    | 向量缩放。
+    向量缩放。
 
     -----
 
@@ -1104,7 +1118,7 @@ def vec_scale(vec, scale, ret_vector=False):
 
 
 def __test__():
-    from .._core._utils import assert_error
+    from ..core._utils import assert_error
     v1 = Vector(1, 2, 3)
     v2 = Vector(4, 5, 6)
 
@@ -1113,7 +1127,7 @@ def __test__():
     assert v1[0] == 1
     assert tuple(v1) == (1, 2, 3)
 
-    assert_error(v1.dot, ((1, 2),), VectorDimError)
+    assert_error(v1.dot, ((1, 2),), exc=VectorDimError)
     assert v1.dot(v2) == v1.dot((4, 5, 6)) == 32
     assert v1.cross(v2, False) == v1.cross((4, 5, 6), False) == (-3, 6, -3)
 

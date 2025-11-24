@@ -1,26 +1,25 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-24
+|   Date  : 2025-12-01
 |
-| ==============================================
+| ====================================================
 """
 
 
+from importlib import import_module
 import threading
 import time
-import mod.client.extraClientApi as api
 
 
 # 导入测试
 import nuoyanlib.client
-from nuoyanlib._core._sys import load_extensions
+from nuoyanlib.core._sys import load_extensions
 load_extensions()
 def import_server():
     import nuoyanlib.server
@@ -30,30 +29,34 @@ t.start()
 t.join()
 
 
+try:
+    timer = time.clock
+except AttributeError:
+    timer = time.perf_counter
+
+
 def test(path):
-    turns = 500
-    t = time.time()
-    m = api.ImportModule(path)
-    for _ in range(turns):
-        m.__test__()
-    c = (time.time() - t) * 1000
+    path = "nuoyanlib." + path
+    module = import_module(path)
+    t = timer()
+    module.__test__()
+    cost = (timer() - t) * 1000
     print(
-        "Test passed: {:<35}".format(path + ",")
-        + " in {:<6.2f}ms,".format(c)
-        + " avg {:<5.2f}ms".format(c / turns)
+        "Test passed: {:<40}".format(path + ",")
+        + " in {:<6.3f}ms,".format(cost)
     )
 
 
-test("nuoyanlib._core._utils")
-test("nuoyanlib._core.event.listener")
-test("nuoyanlib._core.event._events")
-test("nuoyanlib._core._types._checker")
-test("nuoyanlib.client.ui.screen_node")
-test("nuoyanlib.client.ui.nyc.control")
-test("nuoyanlib.utils.enum")
-test("nuoyanlib.utils.item")
-test("nuoyanlib.utils.utils")
-test("nuoyanlib.utils.vector")
+test("core._utils")
+test("core.listener")
+test("core._types._checker")
+test("core.server.comp")
+test("client.ui.screen_node")
+test("client.ui.nyc.control")
+test("utils.enum")
+test("utils.item")
+test("utils.utils")
+test("utils.vector")
 
 
 print("\n\033[33mAll tests passed.")

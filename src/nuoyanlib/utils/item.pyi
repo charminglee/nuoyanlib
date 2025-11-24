@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-11-14
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
 from typing import Tuple, List, Optional
 from mod.common.minecraftEnum import ItemPosType as _ItemPosType
-from .._core._types._typing import ITuple2
+from ..core._types._typing import ITuple2
 
 
 def deepcopy_item_dict(item_dict: Optional[dict]) -> Optional[dict]: ...

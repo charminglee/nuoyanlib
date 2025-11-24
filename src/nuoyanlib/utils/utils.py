@@ -1,25 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-01
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 from functools import wraps
-from time import time
+import time
 from re import match
-from .._core._sys import get_lib_system, get_lv_comp, is_client
+from ..core._sys import get_lib_system, get_lv_comp, is_client
 
 
 __all__ = [
+    "get_time",
+    "timeit",
     "notify_error",
     "call_interval",
     "add_condition_to_func",
@@ -34,9 +35,62 @@ __all__ = [
 ]
 
 
+def get_time():
+    """
+    获取当前时间。
+
+    注：仅用于计时，pc端返回 ``time.clock()`` （精度更高），手机端返回 ``time.time()`` 。
+
+    -----
+
+    :return: 当前时间
+    :rtype: float
+    """
+try:
+    get_time = time.clock
+except AttributeError:
+    try:
+        get_time = time.perf_counter
+    except AttributeError:
+        get_time = time.time
+
+
+def timeit(func, n=100000, print_res=False, args=None, kwargs=None):
+    """
+    计算函数执行耗时。
+
+    -----
+
+    :param function func: 函数
+    :param int n: 执行次数，默认为100000
+    :param bool print_res: 是否打印计算结果，默认为False
+    :param Any args: 函数位置参数元组，默认为None
+    :param Any kwargs: 函数关键字参数字典，默认为None
+
+    :return: 返回一个元组，元素分别为总耗时和平均耗时，单位为ms
+    :rtype: tuple[float,float]
+    """
+    try:
+        timer = time.clock
+    except AttributeError:
+        timer = time.time
+    t = timer()
+    for _ in xrange(n):
+        func(*args, **kwargs)
+    total = timer() - t
+    total *= 1000
+    avg = total / n
+    if print_res:
+        print(
+            "[timeit] func: {}(), total: {:.3f}ms, average: {:.3f}ms, n: {}"
+            .format(func.__name__, total, avg, n)
+        )
+    return total, avg
+
+
 def notify_error(player_id=None):
     """
-    | 将报错信息打印到聊天栏。
+    将报错信息打印到聊天栏。
 
     -----
 
@@ -59,20 +113,17 @@ def call_interval(interval):
     """
     [装饰器]
 
-    | 用于限制函数调用的最小时间间隔。
+    用于限制函数调用的最小时间间隔。
 
     -----
 
     :param float interval: 最小时间间隔，单位为秒
-
-    :return: 返回wrapper函数
-    :rtype: function
     """
     def decorator(func):
         func._last_call_time = 0
         @wraps(func)
         def wrapper(*args, **kwargs):
-            now = time()
+            now = time.time()
             if now - func._last_call_time >= interval:
                 func._last_call_time = now
                 return func(*args, **kwargs)
@@ -82,7 +133,9 @@ def call_interval(interval):
 
 def add_condition_to_func(cond, func, freq=1):
     """
-    | 为指定函数添加一个条件，当条件发生变化时，自动执行一次函数。例如，当条件由 ``True`` 变化到 ``False``，或由 ``False`` 变化到 ``True`` 时，都会执行一次指定函数。
+    为指定函数添加一个条件，当条件发生变化时，自动执行一次函数。
+
+    例如，当条件由 ``True`` 变化到 ``False``，或由 ``False`` 变化到 ``True`` 时，都会执行一次指定函数。
 
     -----
 
@@ -102,7 +155,7 @@ def add_condition_to_func(cond, func, freq=1):
 
 def rm_condition_to_func(cond_id):
     """
-    | 移除由 ``add_condition_to_func()`` 添加的条件和函数。
+    移除由 ``add_condition_to_func()`` 添加的条件和函数。
 
     -----
 
@@ -119,7 +172,7 @@ def rm_condition_to_func(cond_id):
 
 def all_indexes(seq, *elements):
     """
-    | 获取元素在序列中所有出现位置的下标。
+    获取元素在序列中所有出现位置的下标。
     
     -----
 
@@ -134,7 +187,7 @@ def all_indexes(seq, *elements):
 
 def check_string(string, *check):
     """
-    | 检测字符串是否只含有指定字符。
+    检测字符串是否只含有指定字符。
     
     -----
 
@@ -159,7 +212,7 @@ def check_string(string, *check):
 
 def check_string2(string, *check):
     """
-    | 返回字符串中指定字符之外的字符的列表。
+    返回字符串中指定字符之外的字符的列表。
     
     -----
 
@@ -185,7 +238,7 @@ def check_string2(string, *check):
 
 def turn_dict_value_to_tuple(orig_dict):
     """
-    | 将字典值中的列表全部转换为元组。（改变原字典）
+    将字典值中的列表全部转换为元组。（改变原字典）
     
     -----
 
@@ -201,7 +254,7 @@ def turn_dict_value_to_tuple(orig_dict):
 
 def turn_list_to_tuple(lst):
     """
-    | 将一个列表及其元素中的列表转换成元组。
+    将一个列表及其元素中的列表转换成元组。
     
     -----
 
@@ -221,7 +274,7 @@ def turn_list_to_tuple(lst):
 
 def is_method_overridden(subclass, father, method):
     """
-    | 判断子类是否重写了父类的方法。
+    判断子类是否重写了父类的方法。
     
     -----
 
@@ -239,7 +292,7 @@ def is_method_overridden(subclass, father, method):
 
 def translate_time(sec, separator="", unit=("h", "m", "s"), zfill=False):
     """
-    | 将秒数转换成h/m/s的格式字符串。
+    将秒数转换成h/m/s的格式字符串。
 
     -----
 
@@ -323,10 +376,6 @@ def __test__():
     assert translate_time(60) == "1m"
     assert translate_time(1) == "1s"
     assert translate_time(0) == "0s"
-
-
-if __name__ == "__main__":
-    __test__()
 
 
 

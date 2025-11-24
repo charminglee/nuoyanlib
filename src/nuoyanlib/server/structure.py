@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-06-06
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
-from .._core._server.comp import LvComp
+from ..core.server.comp import LvComp
 
 
 __all__ = [
@@ -23,7 +22,9 @@ __all__ = [
 
 def place_large_structure(pos, dimension_id, json_list, namespace):
     """
-    | 放置由编辑器导出的经过切分的大型结构。放置结构时以第一个小结构为起点开始放置。
+    放置由编辑器导出的经过切分的大型结构。
+
+    放置结构时以第一个小结构为起点开始放置。
 
     -----
 

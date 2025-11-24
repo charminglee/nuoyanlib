@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-15
+|   Date  : 2025-12-02
 |
-| ==============================================
+| ====================================================
 """
 
 
 from typing import Dict, Any, Optional, Callable, Union, TypedDict, List
-from .._core._types._typing import ArgsDict, STuple
-from .._core.event.listener import event, ServerEventProxy
+from ..core._types._typing import ArgsDict, STuple
+from ..core.listener import event, ServerEventProxy
 
 
 __DataType = Union[str, int, float, bool, list, dict, None]
@@ -61,11 +60,11 @@ class LobbyDataMgr(ServerEventProxy):
     _uid: Dict[str, int]
     global_data: __SimpleDataDict
     """
-    | 全局数据字典。
+    全局数据字典。
     """
     uid_data: Dict[str, Dict[int, __DataType]]
     """
-    | 玩家数据字典。
+    玩家数据字典。
     """
     def __init__(self: ...) -> None: ...
     @event("UiInitFinished")

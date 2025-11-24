@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-26
+|   Date  : 2025-11-24
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -66,16 +65,11 @@ with open(py_path, encoding="utf-8") as f:
     while line := f.readline():
         if line.startswith("def __test__():"):
             continue
-        if (
-                line.startswith("class")
-                or line.startswith("@")
-                or line.startswith("    @")
-        ):
+        if line.startswith("def __benchmark__():"):
+            continue
+        if line.startswith("class") or line.startswith("@") or line.startswith("    @"):
             pyi_content += line
-        elif (
-                line.startswith("def")
-                or line.startswith("    def")
-        ):
+        elif line.startswith("def") or line.startswith("    def"):
             pyi_content += line[:-1] + " ...\n"
 
 

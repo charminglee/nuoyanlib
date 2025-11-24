@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-| ==============================================
+| ====================================================
 |
 |   Copyright (c) 2025 Nuoyan
 |
-|   Author: Nuoyan
+|   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-09-20
+|   Date  : 2025-11-30
 |
-| ==============================================
+| ====================================================
 """
 
 
@@ -17,14 +16,11 @@ from typing import Optional, NoReturn
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
-from ...._core._types._checker import args_type_check
+from ....core._types._checker import args_type_check
 
 
 class NyProgressBar(NyControl):
-    base_control: ProgressBarUIControl
-    """
-    | 进度条 ``ProgressBarUIControl`` 实例。
-    """
+    _base_control: ProgressBarUIControl
     def __init__(
         self: ...,
         screen_node_ex: ScreenNodeExtension,
@@ -37,15 +33,4 @@ class NyProgressBar(NyControl):
     def progress(self) -> NoReturn: ...
     @progress.setter
     def progress(self, val: float) -> None: ...
-
-    def SetValue(self, progress: float) -> None:
-        """
-        | 设置进度条的进度。
-
-        -----
-
-        :param float progress: 进度，范围为[0, 1]
-
-        :return: 无
-        :rtype: None
-        """
+    SetValue = ProgressBarUIControl.SetValue
