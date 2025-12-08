@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-03
 |
 | ====================================================
 """
@@ -15,9 +15,9 @@
 import mod.server.extraServerApi as s_api
 from .. import _const, _logging
 from .._utils import singleton
-from .._sys import NuoyanLibBaseSystem
+from .._sys import NuoyanLibBaseSystem, load_extensions
 from ..listener import ServerEventProxy, _lib_sys_event
-from .comp import ServerSystem
+from .comp import ServerSystem, CF
 from ... import config
 
 
@@ -34,16 +34,12 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
             s_api.SetMcpModLogCanPostDump(True)
         _logging.info("NuoyanLibServerSystem inited")
 
-    # region General ===================================================================================================
+    # region Events ====================================================================================================
 
-    @_lib_sys_event
-    def _ButtonCallbackTrigger(self, args):
-        func_name = args['name']
-        func_args = args['args']
-        func_args['__id__'] = args['__id__']
-        func = getattr(self, func_name, None)
-        if func:
-            func(func_args)
+    def EntityRemoveEvent(self, args):
+        entity_id = args.id
+        if entity_id in CF.__cache__:
+            del CF.__cache__[entity_id]
 
     def UiInitFinished(self, args):
         if self.query_cache:

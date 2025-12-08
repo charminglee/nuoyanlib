@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-30
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Optional, NoReturn, Literal
 from mod.client.ui.controls.labelUIControl import LabelUIControl
 from .control import NyControl
@@ -36,7 +37,7 @@ __TextAlignment = Literal[
 class NyLabel(NyControl):
     _base_control: LabelUIControl
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         label_control: LabelUIControl,
     ) -> None: ...

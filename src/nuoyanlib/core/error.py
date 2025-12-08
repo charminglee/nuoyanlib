@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
@@ -35,7 +35,7 @@ class SystemNotFoundError(RuntimeError):
         self.sys_name = sys_name
 
     def __str__(self):
-        return "namespace=%s, system_name=%s" % (self.ns, self.sys_name)
+        return "namespace=%r, system_name=%r" % (self.ns, self.sys_name)
 
 
 class NuoyanLibServerSystemRegisterError(RuntimeError):
@@ -51,7 +51,7 @@ class PathMatchError(RuntimeError):
         self.pattern = pattern
 
     def __str__(self):
-        return "control path '%s' not matched" % self.pattern
+        return "control path %r not matched" % self.pattern
 
 
 class AcrossImportError(ImportError):
@@ -68,7 +68,7 @@ class GetPropertyError(AttributeError):
         self.name = name
 
     def __str__(self):
-        return "can't get property '%s', it is write-only" % self.name
+        return "can't get property %r, it is write-only" % self.name
 
 
 class ScreenNodeNotFoundError(RuntimeError):
@@ -82,7 +82,7 @@ class EventParameterError(AttributeError):
         self.param = param
 
     def __str__(self):
-        return "'%s' has no parameter '%s'" % (self.event_name, self.param)
+        return "%s has no parameter %r" % (self.event_name, self.param)
 
 
 class VectorError(Exception):
@@ -102,7 +102,7 @@ class EventSourceError(TypeError):
         self.args = (name, ns, sys_name)
 
     def __str__(self):
-        return "unknown event source (event_name='%s', ns='%s', sys_name='%s')" % self.args
+        return "unknown event source (event_name=%r, ns=%r, sys_name=%r)" % self.args
 
 
 class EventNotFoundError(AttributeError):
@@ -112,9 +112,9 @@ class EventNotFoundError(AttributeError):
 
     def __str__(self):
         if self.is_client:
-            return "client event '%s' doesn't exist" % self.name
+            return "client event %r doesn't exist" % self.name
         else:
-            return "server event '%s' doesn't exist" % self.name
+            return "server event %r doesn't exist" % self.name
 
 
 if __name__ == "__main__":

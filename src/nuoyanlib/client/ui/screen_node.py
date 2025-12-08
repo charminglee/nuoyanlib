@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
@@ -18,9 +18,9 @@ from itertools import product, cycle
 from fnmatch import fnmatchcase
 from ...core.client.comp import CustomUIScreenProxy, ScreenNode, ViewBinder
 from ...core import error
-from ...core.listener import is_listened, listen_event, unlisten_event
-from ...core._utils import hook_method, iter_obj_attrs, kwargs_setter, try_exec
-from .ui_utils import to_control, to_path
+from ...core.listener import listen_event, unlisten_event
+from ...core._utils import hook_method, iter_obj_attrs, kwargs_setter, try_exec, get_func
+from .ui_utils import to_control, to_path, _UIControlType
 from ...utils.enum import ButtonCallbackType, ClientEvent
 from .nyc import *
 from ..setting import read_setting, save_setting
@@ -64,28 +64,34 @@ class ScreenNodeExtension(object):
         self._binging_data = {}
         self.cs = None
         self.root_panel = None
+        self.has_created = False
+        self.is_base_screen = False
+
+        def set_has_created():
+            self.has_created = True
 
         if isinstance(self, CustomUIScreenProxy):
             # 兼容UI代理
             self._screen_node = args[1]
-            hook_method(self.OnCreate, self.__create__) # NOQA
-            hook_method(self.OnDestroy, self.__destroy__) # NOQA
+            hook_method(self.OnCreate, self.__create__, set_has_created) # NOQA
+            hook_method(self.OnDestroy, after_hook=self.__destroy__) # NOQA
         elif isinstance(self, ScreenNode):
             self._screen_node = self
             if len(args) == 3 and isinstance(args[2], dict):
                 self.cs = args[2].get('__cs__')
-            hook_method(self.Create, self.__create__) # NOQA
-            hook_method(self.Destroy, self.__destroy__) # NOQA
+            hook_method(self.Create, self.__create__, set_has_created) # NOQA
+            hook_method(self.Destroy, after_hook=self.__destroy__) # NOQA
         else:
             raise error.ScreenNodeNotFoundError
 
     def __create__(self):
         self._ui_pos_data_key = "nyl_ui_pos_data_%s_%s" % (self._screen_node.namespace, self._screen_node.name)
         self._recover_ui_pos()
-        root_panel = (
-            self._screen_node.GetBaseUIControl("")
-            or self._screen_node.GetBaseUIControl(ScreenNodeExtension.ROOT_PANEL_PATH)
-        )
+        if self._is_control_exist(ScreenNodeExtension.ROOT_PANEL_PATH):
+            root_panel = self._screen_node.GetBaseUIControl(ScreenNodeExtension.ROOT_PANEL_PATH)
+            self.is_base_screen = True
+        else:
+            root_panel = self._screen_node.GetBaseUIControl("")
         if root_panel:
             self.root_panel = self.create_ny_control(root_panel)
         self._process_button_callback()
@@ -276,8 +282,6 @@ class ScreenNodeExtension(object):
         :return: NyGrid网格实例，创建失败返回None
         :rtype: NyGrid|None
         """
-        if not is_listened(self._OnGridSizeChanged, ClientEvent.GridComponentSizeChangedClientEvent):
-            listen_event(self._OnGridSizeChanged, ClientEvent.GridComponentSizeChangedClientEvent)
         return self._create_nyc(path_or_control, NyGrid, **kwargs)
 
     def create_ny_image(self, path_or_control, **kwargs):
@@ -491,6 +495,8 @@ class ScreenNodeExtension(object):
         if control:
             nyc = typ(self, control, **kwargs)
             self._nyc_cache_map[path] = nyc
+            if typ is NyGrid:
+                listen_event(self._OnGridSizeChanged, ClientEvent.GridComponentSizeChangedClientEvent)
             return nyc
 
     def _destroy_nyc(self, nyc):
@@ -508,7 +514,7 @@ class ScreenNodeExtension(object):
     @kwargs_setter(touch_event_params=None)
     def button_callback(btn_path, *callback_types, **kwargs): # todo
         """
-        [装饰器]
+        [静态方法] [装饰器]
 
         将函数设置为按钮回调函数。
 
@@ -674,8 +680,7 @@ class ScreenNodeExtension(object):
             'args': args or (),
             'kwargs': kwargs or {},
         }
-        if not is_listened(self._OnRenderTick, ClientEvent.GameRenderTickEvent):
-            listen_event(self._OnRenderTick, ClientEvent.GameRenderTickEvent)
+        listen_event(self._OnRenderTick, ClientEvent.GameRenderTickEvent)
 
     def _pause_frame_anim(self, ny_image):
         path = ny_image.path
@@ -693,10 +698,25 @@ class ScreenNodeExtension(object):
 
     def _OnGridSizeChanged(self, args):
         path = args['path']
-        path = path[path.index("/", 1):]
+        idx = path.index("/", 1)
+        root_name = path[1: idx]
+        if root_name != self._screen_node.name:
+            return
+        path = path[idx:]
         grid = self._nyc_cache_map.get(path)
         if isinstance(grid, NyGrid):
             grid.__grid_update__()
+
+    # endregion
+
+    # region Internal ==================================================================================================
+
+    __get_control_type = staticmethod(get_func(ScreenNode, (103, 117, 105), (103, 101, 116, 95, 99, 111, 110, 116, 114, 111, 108, 95, 100, 101, 102, 95, 116, 121, 112, 101)))
+
+    def _is_control_exist(self, path):
+        screen_name = self._screen_node.screen_name
+        full_path = self._screen_node.component_path + path
+        return ScreenNodeExtension.__get_control_type(screen_name, full_path) != _UIControlType.UNKNOWN # NOQA
 
     # endregion
 

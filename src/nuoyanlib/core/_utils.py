@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-03
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
@@ -20,6 +20,41 @@ from ._types._checker import args_type_check
 
 
 __all__ = []
+
+
+class MappingProxy(object):
+    def __init__(self, mapping):
+        self.__mapping = mapping
+
+    def __repr__(self):
+        return "MappingProxy(%r)" % self.__mapping
+
+    get             = lambda self, *args: self.__mapping.get(*args)
+    has_key         = lambda self, *args: self.__mapping.has_key(*args)
+    keys            = lambda self, *args: self.__mapping.keys()
+    values          = lambda self, *args: self.__mapping.values()
+    items           = lambda self, *args: self.__mapping.items()
+    viewkeys        = lambda self, *args: self.__mapping.viewkeys()
+    viewvalues      = lambda self, *args: self.__mapping.viewvalues()
+    viewitems       = lambda self, *args: self.__mapping.viewitems()
+    iterkeys        = lambda self, *args: self.__mapping.iterkeys()
+    itervalues      = lambda self, *args: self.__mapping.itervalues()
+    iteritems       = lambda self, *args: self.__mapping.iteritems()
+    __getitem__     = lambda self, *args: self.__mapping.__getitem__(*args)
+    __iter__        = lambda self, *args: self.__mapping.__iter__()
+    __len__         = lambda self, *args: self.__mapping.__len__()
+    __contains__    = lambda self, *args: self.__mapping.__contains__(*args)
+
+    def __raise(self, *args, **kwargs):
+        raise TypeError("MappingProxy is read-only")
+
+    clear       = __raise
+    pop         = __raise
+    popitem     = __raise
+    setdefault  = __raise
+    update      = __raise
+    __setitem__ = __raise
+    __delitem__ = __raise
 
 
 _KWARGS_MARK = (object(),)
@@ -46,8 +81,15 @@ class lru_cache(object):
         root = []
         root[:] = [root, root, None, None]
         self.root = root
+        self.hits = 0
+        self.misses = 0
 
-    def __call__(self, func):
+    def __call__(self, func_or_cls):
+        is_cls = isinstance(func_or_cls, type)
+        if is_cls:
+            func = func_or_cls.__new__
+        else:
+            func = func_or_cls
         size = self.size
         cache = {}
         cache_get = cache.get
@@ -69,10 +111,12 @@ class lru_cache(object):
                 hit_next[PREV] = hit_prev
                 tail = root[PREV]
                 tail[NEXT] = root[PREV] = hit_node
-                hit_prev[PREV] = tail
-                hit_prev[NEXT] = root
+                hit_node[PREV] = tail
+                hit_node[NEXT] = root
+                self.hits += 1
                 return res
 
+            self.misses += 1
             res = func(*args, **kwargs)
             # 某些情况下接口会异常返回None，因此不对None值进行缓存
             if res is None:
@@ -100,14 +144,23 @@ class lru_cache(object):
 
             return res
 
-        return wrapper
+        def lru_info():
+            return cache_len(), size, self.hits, self.misses
+
+        if is_cls:
+            func_or_cls.lru_info = staticmethod(lru_info)
+            func_or_cls.__new__ = staticmethod(wrapper)
+            return func_or_cls
+        else:
+            wrapper.lru_info = lru_info
+            return wrapper
 
 
-def client_api(func):
+def client_api(func): # todo
     return func
 
 
-def server_api(func):
+def server_api(func): # todo
     return func
 
 
@@ -229,17 +282,30 @@ def join_chr(*seq):
     return "".join(chr(i) for i in seq)
 
 
-def hook_method(org_method, my_method):
-    ins = org_method.__self__
-    org_name = org_method.__name__
+def hook_method(org_method, before_hook=None, after_hook=None):
     @wraps(org_method.__func__)
     def wrapper(self, *args, **kwargs):
-        # 如果my_method或try_exec对象被异常回收，直接执行会报错，导致原方法无法执行，因此增加判断
-        if my_method and try_exec:
-            try_exec(my_method, *args, **kwargs)
-        org_method(*args, **kwargs)
-    wrapper = MethodType(wrapper, ins)
-    setattr(ins, org_name, wrapper)
+        if before_hook:
+            try:
+                before_hook(*args, **kwargs)
+            except:
+                try:
+                    print_exc()
+                except:
+                    pass
+        try:
+            org_method(*args, **kwargs)
+        except:
+            try:
+                print_exc()
+            except:
+                pass
+        if after_hook:
+            after_hook(*args, **kwargs)
+
+    ins = org_method.__self__
+    wrapper = MethodType(wrapper, ins, ins.__class__) # NOQA
+    setattr(ins, org_method.__name__, wrapper)
 
 
 # def is_inv36_key(k):
@@ -263,6 +329,24 @@ def hook_method(org_method, my_method):
 
 
 def __test__():
+    class A(object):
+        def __init__(self):
+            self.lst = []
+        def test(self, a):
+            return a
+        def hook(self, a):
+            self.lst.append(a)
+    ins = A()
+    hook_method(ins.test, ins.hook)
+    ins.test(1)
+    ins.test(2)
+    assert ins.lst == [1, 2]
+    def hook(a):
+        ins.lst.append(a)
+    hook_method(ins.test, hook)
+    ins.test(3)
+    assert ins.lst == [1, 2, 3, 3]
+
     n = [0]
     @singleton(False)
     class A(object):

@@ -6,60 +6,124 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-07
 |
 | ====================================================
 """
 
 
-from typing import Dict, Tuple, Any, Optional, Iterator, Union, overload, Type
-from _typeshed import Self
-from ..core._types._typing import STuple, TimeEaseFuncType
-
-
-class _EnumMeta(type):
-    __enum_flag__: int
-    __members__: Dict[str, Any]
-    _restrict_type: Optional[type]
-    def __new__(
-        metacls: Type[Self],
-        name: str,
-        bases: Tuple[type, ...],
-        dct: Dict[str, Any],
-        restrict_type: Optional[type] = None,
-    ) -> Self: ...
-    def __setattr__(cls, name: str, value: Any) -> None: ...
-    def __delattr__(cls, name: str) -> None: ...
-    def __contains__(cls, member: Any) -> bool: ...
-    def __len__(cls) -> int: ...
-    def __iter__(cls: Type[Self]) -> Iterator[Self]: ...
-    @overload
-    def __getitem__(cls, item: type) -> Type[Enum]: ...
-    @overload
-    def __getitem__(cls, item: str) -> Any: ...
-    @staticmethod
-    def _gen_cls(restrict_type: type) -> Type[Enum]: ...
-    def _gen_auto_value(cls, name: Optional[str] = None) -> Union[str, int]: ...
-
-
-class Enum(metaclass=_EnumMeta):
-    __name: str
-    __value: Any
-    __hash: int
-    def __init__(self: ..., name: str, value: Any) -> None: ...
-    def __repr__(self) -> str: ...
-    def __hash__(self) -> int: ...
-    @property
-    def name(self) -> str: ...
-    @property
-    def value(self) -> Any: ...
+from collections import OrderedDict
+from itertools import count
+import sys
+from typing import Optional, ClassVar, Dict, Hashable, Sequence, Tuple, Any, Iterator, Type, List, NoReturn
+from typing_extensions import Self
+from ..core._types._typing import STuple, TimeEaseFuncType, T
+from ..core._utils import MappingProxy
 
 
 class auto(object):
+    _counter: ClassVar[count]
+    _order: int
+    def __init__(self: Self) -> None: ...
+
+
+def _get_member_type(cls_name: str, bases: Tuple[type, ...]) -> type: ...
+def _set_enum_attr(cls: Type[Enum], k: str, v: Any, cls_dict: Dict[str, Any]) -> None: ...
+_new_enum = type.__new__
+
+
+class EnumMeta(type):
+    _member_map_: OrderedDict[str, Enum]
+    _value2member_map_: Dict[Hashable, Enum]
+    _unhashable_values_: List[Any]
+    _member_names_: List[str]
+    _member_type_: Optional[type]
+    _ignore_: Optional[Sequence[str]]
+    def __new__(metacls: Type[T], cls_name: str, bases: Tuple[type, ...], cls_dict: Dict[str, Any]) -> T: ...
+    def __setattr__(cls, name: str, value: Any) -> NoReturn: ...
+    def __delattr__(cls, name: str) -> NoReturn: ...
+    def __call__(cls: Type[T], value: Any) -> T: ...
+    def __getitem__(cls: Type[T], name: str) -> T: ...
+    def __len__(cls) -> int: ...
+    def __iter__(cls: Type[T]) -> Iterator[T]: ...
+    @property
+    def __members__(cls: Type[T]) -> MappingProxy[str, T]: ...
+    def __contains__(cls, value: Any) -> bool: ...
+
+
+if sys.version_info >= (3, 4):
+    from enum import Enum as _Enum
+    class Enum(_Enum):
+        _member_map_: ClassVar[OrderedDict[str, Self]]
+        _value2member_map_: ClassVar[Dict[Hashable, Self]]
+        _unhashable_values_: ClassVar[List[Any]]
+        _member_names_: ClassVar[List[str]]
+        _member_type_: ClassVar[Optional[type]]
+        _ignore_: ClassVar[Optional[Sequence[str]]]
+        __members__: ClassVar[MappingProxy[str, Self]]
+        _name_: str
+        _value_: Any
+        _hash_: int
+        def __new__(cls: Type[T], value: Any) -> T: ...
+        def __init__(self: Self, *args: Any, **kwargs: Any) -> None: ...
+        def __repr__(self) -> str: ...
+        def __hash__(self) -> int: ...
+        def __format__(self, format_spec: str) -> str: ...
+        def __reduce_ex__(self: T, proto: int) -> Tuple[Type[T], Tuple[str, Any]]: ...
+        def __deepcopy__(self: T, memo: Any) -> T: ...
+        def __copy__(self: T) -> T: ...
+        @property
+        def name(self) -> str: ...
+        @property
+        def value(self) -> Any: ...
+        @staticmethod
+        def _generate_next_value_(name: str, count: int, last_values: List[Any]) -> Any: ...
+else:
+    class Enum(metaclass=EnumMeta):
+        _name_: str
+        _value_: Any
+        _hash_: int
+        def __new__(cls: Type[T], value: Any) -> T: ...
+        def __init__(self: Self, *args: Any, **kwargs: Any) -> None: ...
+        def __repr__(self) -> str: ...
+        def __hash__(self) -> int: ...
+        def __format__(self, format_spec: str) -> str: ...
+        def __reduce_ex__(self: T, proto: int) -> Tuple[Type[T], Tuple[str, Any]]: ...
+        def __deepcopy__(self: T, memo: Any) -> T: ...
+        def __copy__(self: T) -> T: ...
+        @property
+        def name(self) -> str: ...
+        @property
+        def value(self) -> Any: ...
+        @staticmethod
+        def _generate_next_value_(name: str, count: int, last_values: List[Any]) -> Any: ...
+
+
+class IntEnum(int, Enum):
+    _member_type_: ClassVar[int]
+    @property
+    def value(self) -> int: ...
+    @staticmethod
+    def _generate_next_value_(name: str, count: int, last_values: List[int]) -> int: ...
+
+
+class StrEnum(str, Enum):
+    _member_type_: ClassVar[str]
+    @property
+    def value(self) -> str: ...
+    @staticmethod
+    def _generate_next_value_(name: str, count: int, last_values: List[str]) -> str: ...
+
+
+class Flag(Enum):
     pass
 
 
-class ClientEvent(Enum[str]):
+def gen_lower_name(name: str, count: int, last_values: List[str]) -> str: ...
+def gen_minecraft_lower_name(name: str, count: int, last_values: List[str]) -> str: ...
+
+
+class ClientEvent(StrEnum):
     UIDefReloadSceneStackAfter: str
     """
     [事件]
@@ -2031,7 +2095,7 @@ class ClientEvent(Enum[str]):
     """
 
 
-class ServerEvent(Enum[str]):
+class ServerEvent(StrEnum):
     ItemPullOutCustomContainerServerEvent: str
     """
     [事件]
@@ -5539,27 +5603,27 @@ class TimeEaseFunc:
     IN_OUT_ELASTIC: TimeEaseFuncType
 
 
-class ToggleCallbackType(Enum[str]):
+class ToggleCallbackType(StrEnum):
     CHANGED: str
 
 
-class WheelCallbackType(Enum[str]):
+class WheelCallbackType(StrEnum):
     CLICK: str
     HOVER: str
 
 
-class GridCallbackType(Enum[str]):
+class GridCallbackType(StrEnum):
     UPDATE: str
     LOADED: str
 
 
-class ComboBoxCallbackType(Enum[str]):
+class ComboBoxCallbackType(StrEnum):
     OPEN: str
     CLOSE: str
     SELECT: str
 
 
-class ButtonCallbackType(Enum[str]):
+class ButtonCallbackType(StrEnum):
     UP: str
     DOWN: str
     CANCEL: str
@@ -5573,7 +5637,7 @@ class ButtonCallbackType(Enum[str]):
     SCREEN_EXIT: str
 
 
-class ControlType(Enum[str]):
+class ControlType(StrEnum):
     BASE_CONTROL: str
     BUTTON: str
     IMAGE: str
@@ -5594,10 +5658,10 @@ class ControlType(Enum[str]):
     SELECTION_WHEEL: str
     COMBO_BOX: str
     MINI_MAP: str
-    _NOT_SPECIAL: STuple
+    _AS_BASE: STuple
 
 
-class FriendlyMob(Enum[str]):
+class Mob(StrEnum):
     ALLAY: str
     ARMADILLO: str
     BAT: str
@@ -5622,7 +5686,7 @@ class FriendlyMob(Enum[str]):
     SQUID: str
     STRIDER: str
     TADPOLE: str
-    TROPICAL_FISH: str
+    TROPICALFISH: str
     TURTLE: str
     WANDERING_TRADER: str
     PUFFERFISH: str
@@ -5644,9 +5708,6 @@ class FriendlyMob(Enum[str]):
     TRADER_LLAMA: str
     WOLF: str
     ZOMBIE_HORSE: str
-
-
-class HostileMob(Enum[str]):
     BLAZE: str
     BOGGED: str
     BREEZE: str
@@ -5688,11 +5749,7 @@ class HostileMob(Enum[str]):
     WITHER: str
 
 
-class Mob(FriendlyMob, HostileMob):
-    pass
-
-
-class Feature(Enum[str]):
+class Feature(StrEnum):
     END_CITY: str
     FORTRESS: str
     MANSION: str
@@ -5711,7 +5768,7 @@ class Feature(Enum[str]):
     TRIAL_CHAMBERS: str
 
 
-class UiContainer(Enum[str]):
+class UiContainer(StrEnum):
     CRAFTING_TABLE: str
     ENCHANTING_TABLE: str
     BEACON: str
@@ -5728,7 +5785,7 @@ class UiContainer(Enum[str]):
     VILLAGER_V2: str
 
 
-class Container(Enum[str]):
+class Container(StrEnum):
     CHEST: str
     TRAPPED_CHEST: str
     ENDER_CHEST: str
@@ -5772,7 +5829,7 @@ class Container(Enum[str]):
     LLAMA: str
 
 
-class PositiveEffect(Enum[str]):
+class Effect(StrEnum):
     SPEED: str
     HASTE: str
     STRENGTH: str
@@ -5789,9 +5846,6 @@ class PositiveEffect(Enum[str]):
     SATURATION: str
     SLOW_FALLING: str
     VILLAGE_HERO: str
-
-
-class NegativeEffect(Enum[str]):
     SLOWDOWN: str
     MINING_FATIGUE: str
     INSTANT_DAMAGE: str
@@ -5808,12 +5862,99 @@ class NegativeEffect(Enum[str]):
     WEAVING: str
     OOZING: str
     INFESTED: str
-
-
-class NeutralEffect(Enum[str]):
     BAD_OMEN: str
     TRIAL_OMEN: str
     RAID_OMEN: str
+
+
+class Biome(StrEnum):
+    OCEAN: StrEnum
+    PLAINS: StrEnum
+    DESERT: StrEnum
+    EXTREME_HILLS: StrEnum
+    FOREST: StrEnum
+    TAIGA: StrEnum
+    SWAMPLAND: StrEnum
+    RIVER: StrEnum
+    HELL: StrEnum
+    THE_END: StrEnum
+    LEGACY_FROZEN_OCEAN: StrEnum
+    FROZEN_RIVER: StrEnum
+    ICE_PLAINS: StrEnum
+    ICE_MOUNTAINS: StrEnum
+    MUSHROOM_ISLAND: StrEnum
+    MUSHROOM_ISLAND_SHORE: StrEnum
+    BEACH: StrEnum
+    DESERT_HILLS: StrEnum
+    FOREST_HILLS: StrEnum
+    TAIGA_HILLS: StrEnum
+    EXTREME_HILLS_EDGE: StrEnum
+    JUNGLE: StrEnum
+    JUNGLE_HILLS: StrEnum
+    JUNGLE_EDGE: StrEnum
+    DEEP_OCEAN: StrEnum
+    STONE_BEACH: StrEnum
+    COLD_BEACH: StrEnum
+    BIRCH_FOREST: StrEnum
+    BIRCH_FOREST_HILLS: StrEnum
+    ROOFED_FOREST: StrEnum
+    COLD_TAIGA: StrEnum
+    COLD_TAIGA_HILLS: StrEnum
+    MEGA_TAIGA: StrEnum
+    MEGA_TAIGA_HILLS: StrEnum
+    EXTREME_HILLS_PLUS_TREES: StrEnum
+    SAVANNA: StrEnum
+    SAVANNA_PLATEAU: StrEnum
+    MESA: StrEnum
+    MESA_PLATEAU_STONE: StrEnum
+    MESA_PLATEAU: StrEnum
+    WARM_OCEAN: StrEnum
+    DEEP_WARM_OCEAN: StrEnum
+    LUKEWARM_OCEAN: StrEnum
+    DEEP_LUKEWARM_OCEAN: StrEnum
+    COLD_OCEAN: StrEnum
+    DEEP_COLD_OCEAN: StrEnum
+    FROZEN_OCEAN: StrEnum
+    DEEP_FROZEN_OCEAN: StrEnum
+    BAMBOO_JUNGLE: StrEnum
+    BAMBOO_JUNGLE_HILLS: StrEnum
+    SUNFLOWER_PLAINS: StrEnum
+    DESERT_MUTATED: StrEnum
+    EXTREME_HILLS_MUTATED: StrEnum
+    FLOWER_FOREST: StrEnum
+    TAIGA_MUTATED: StrEnum
+    SWAMPLAND_MUTATED: StrEnum
+    ICE_PLAINS_SPIKES: StrEnum
+    JUNGLE_MUTATED: StrEnum
+    JUNGLE_EDGE_MUTATED: StrEnum
+    BIRCH_FOREST_MUTATED: StrEnum
+    BIRCH_FOREST_HILLS_MUTATED: StrEnum
+    ROOFED_FOREST_MUTATED: StrEnum
+    COLD_TAIGA_MUTATED: StrEnum
+    REDWOOD_TAIGA_MUTATED: StrEnum
+    REDWOOD_TAIGA_HILLS_MUTATED: StrEnum
+    EXTREME_HILLS_PLUS_TREES_MUTATED: StrEnum
+    SAVANNA_MUTATED: StrEnum
+    SAVANNA_PLATEAU_MUTATED: StrEnum
+    MESA_BRYCE: StrEnum
+    MESA_PLATEAU_STONE_MUTATED: StrEnum
+    MESA_PLATEAU_MUTATED: StrEnum
+    SOULSAND_VALLEY: StrEnum
+    CRIMSON_FOREST: StrEnum
+    WARPED_FOREST: StrEnum
+    BASALT_DELTAS: StrEnum
+    JAGGED_PEAKS: StrEnum
+    FROZEN_PEAKS: StrEnum
+    SNOWY_SLOPES: StrEnum
+    GROVE: StrEnum
+    MEADOW: StrEnum
+    LUSH_CAVES: StrEnum
+    DRIPSTONE_CAVES: StrEnum
+    STONY_PEAKS: StrEnum
+    DEEP_DARK: StrEnum
+    MANGROVE_SWAMP: StrEnum
+    CHERRY_GROVE: StrEnum
+    PALE_GARDEN: StrEnum
 
 
 ENTITY_NAME_MAP: Dict[int, Tuple[int, str, str]]

@@ -30,6 +30,42 @@ __all__ = [
 ]
 
 
+class _UIControlType:
+    ALL = -1
+    BUTTON = 0
+    CUSTOM = 1
+    COLLECTION_PANEL = 2
+    DROPDOWN = 3
+    EDIT_BOX = 4
+    FACTORY = 5
+    GRID = 6
+    IMAGE = 7
+    INPUT_PANEL = 8
+    LABEL = 9
+    PANEL = 10
+    SCREEN = 11
+    SCROLLBAR_BOX = 12
+    SCROLL_TRACK = 13
+    SCROLL_VIEW = 14
+    SELECTION_WHEEL = 15
+    SLIDER = 16
+    SLIDER_BOX = 17
+    STACK_PANEL = 18
+    TOGGLE = 19
+    IMAGE_CYCLER = 20
+    LABEL_CYCLER = 21
+    GRID_PAGE_INDICATOR = 22
+    COMBOX = 23
+    LAYOUT = 24
+    STACK_GRID = 25
+    JOYSTICK = 26
+    RICH_TEXT = 27
+    SIXTEEN_NINE_LAYOUT = 28
+    MUL_LINES_EDIT = 29
+    AMIN_PROCESS_BAR = 30
+    UNKNOWN = 31
+
+
 def create_ui(namespace, ui_key, cls_path, screen_def="", register=True, param=None, push=False, client_system=None):
     """
     创建UI界面。
@@ -96,7 +132,7 @@ def to_control(screen_node, path, control_type=ControlType.BASE_CONTROL):
     :rtype: BaseUIControl|None
     """
     control = screen_node.GetBaseUIControl(path) if isinstance(path, str) else path
-    if control and control_type not in ControlType._NOT_SPECIAL:
+    if control and control_type not in ControlType._AS_BASE:
         control = getattr(control, "as" + control_type)()
     return control
 

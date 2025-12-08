@@ -1,6 +1,11 @@
 {
-    "main": {
-        "type": "screen",
+    "namespace": "nuoyanlib_test",
+    "screen@common.base_screen": {
+        "$screen_content": "nuoyanlib_test.root_panel"
+    },
+    "root_panel": {
+        "type": "panel",
+        "size": [ "default", "default" ],
         "controls": [
             {
                 "grid": {
@@ -375,7 +380,6 @@
             }
         ]
     },
-    "namespace": "nuoyanlib_test",
     "sv_content": {
         "type": "stack_panel",
         "size": [

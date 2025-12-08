@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-29
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
@@ -34,6 +34,42 @@ from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
 from ...core._types._typing import UiPathOrNyControl
 from ...utils.enum import ControlType
+
+
+class _UIControlType:
+    ALL: int
+    BUTTON: int
+    CUSTOM: int
+    COLLECTION_PANEL: int
+    DROPDOWN: int
+    EDIT_BOX: int
+    FACTORY: int
+    GRID: int
+    IMAGE: int
+    INPUT_PANEL: int
+    LABEL: int
+    PANEL: int
+    SCREEN: int
+    SCROLLBAR_BOX: int
+    SCROLL_TRACK: int
+    SCROLL_VIEW: int
+    SELECTION_WHEEL: int
+    SLIDER: int
+    SLIDER_BOX: int
+    STACK_PANEL: int
+    TOGGLE: int
+    IMAGE_CYCLER: int
+    LABEL_CYCLER: int
+    GRID_PAGE_INDICATOR: int
+    COMBOX: int
+    LAYOUT: int
+    STACK_GRID: int
+    JOYSTICK: int
+    RICH_TEXT: int
+    SIXTEEN_NINE_LAYOUT: int
+    MUL_LINES_EDIT: int
+    AMIN_PROCESS_BAR: int
+    UNKNOWN: int
 
 
 def create_ui(

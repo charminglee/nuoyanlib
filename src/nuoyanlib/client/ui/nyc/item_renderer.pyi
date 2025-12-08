@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-30
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Optional, TypedDict, NoReturn
 from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
 from .control import NyControl
@@ -29,7 +30,7 @@ class __UiItemDict(TypedDict):
 class NyItemRenderer(NyControl):
     _base_control: ItemRendererUIControl
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         item_renderer_control: ItemRendererUIControl,
     ) -> None: ...

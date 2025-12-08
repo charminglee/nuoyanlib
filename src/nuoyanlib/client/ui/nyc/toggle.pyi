@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Optional, Callable
 from mod.client.ui.controls.switchToggleUIControl import SwitchToggleUIControl
 from .control import NyControl
@@ -25,7 +26,7 @@ __ToggleChangedCallback = Callable[[dict], int]
 class NyToggle(NyControl):
     _base_control: SwitchToggleUIControl
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         toggle_control: SwitchToggleUIControl,
     ) -> None: ...

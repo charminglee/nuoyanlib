@@ -13,7 +13,6 @@
 
 
 import mod.client.extraClientApi as c_api
-from .._utils import lru_cache
 
 
 __all__ = [
@@ -54,13 +53,20 @@ MiniMapScreenNode = c_api.GetMiniMapScreenNodeCls()
 
 
 class CF(object):
-    __new__ = lru_cache()(object.__new__)
+    __cache__ = {}
+
+    def __new__(cls, target):
+        if target not in cls.__cache__:
+            cls.__cache__[target] = object.__new__(cls)
+        return cls.__cache__[target]
 
     def __init__(self, target):
         self._target = target
 
     def __getattr__(self, name):
         comp = getattr(CompFactory, "Create" + name)(self._target)
+        if not comp:
+            return
         setattr(self, name, comp)
         return comp
 

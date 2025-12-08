@@ -6,16 +6,15 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
 
 
 from ....core import error
-from ....core._utils import kwargs_setter, get_func, try_exec, cached_property
+from ....core._utils import kwargs_setter, try_exec, cached_property
 from ....core._types._checker import args_type_check
-from ....core.client.comp import ScreenNode
 from ....client.ui.ui_utils import get_children_path_by_level, get_parent_path, to_path
 from ....utils.enum import ControlType
 
@@ -24,42 +23,6 @@ __all__ = [
     "InteractableControl",
     "NyControl",
 ]
-
-
-class _UIControlType:
-    All = -1
-    Button = 0
-    Custom = 1
-    CollectionPanel = 2
-    Dropdown = 3
-    EditBox = 4
-    Factory = 5
-    Grid = 6
-    Image = 7
-    InputPanel = 8
-    Label = 9
-    Panel = 10
-    Screen = 11
-    ScrollbarBox = 12
-    ScrollTrack = 13
-    ScrollView = 14
-    SelectionWheel = 15
-    Slider = 16
-    SliderBox = 17
-    StackPanel = 18
-    Toggle = 19
-    ImageCycler = 20
-    LabelCycler = 21
-    GridPageIndicator = 22
-    Combox = 23
-    Layout = 24
-    StackGrid = 25
-    Joystick = 26
-    RichText = 27
-    SixteenNineLayout = 28
-    MulLinesEdit = 29
-    AminProcessBar = 30
-    Unknown = 31
 
 
 class InteractableControl(object):
@@ -147,8 +110,6 @@ class NyControl(object):
         'touch_enable',
         'property_bag',
     )
-
-    __get_control_type = staticmethod(get_func(ScreenNode, (103, 117, 105), (103, 101, 116, 95, 99, 111, 110, 116, 114, 111, 108, 95, 100, 101, 102, 95, 116, 121, 112, 101)))
 
     def __init__(self, screen_node_ex, control, **kwargs):
         from ..screen_node import ScreenNodeExtension
@@ -669,7 +630,7 @@ class NyControl(object):
         :rtype: NyControl|None
         """
         path = self.path + "/" + child_name
-        if self._is_control_exist(path):
+        if self.ui_node._is_control_exist(path):
             return NyControl.from_path(self.ui_node, path)
         control = self._screen_node.CreateChildControl(def_name, child_name, self._base_control, force_update)
         if control:
@@ -693,7 +654,7 @@ class NyControl(object):
         if not name:
             name = self.name
         new_path = parent_path + "/" + name
-        if self._is_control_exist(new_path):
+        if self.ui_node._is_control_exist(new_path):
             return NyControl.from_path(self.ui_node, new_path)
         if self._screen_node.Clone(self.path, parent_path, name, sync_refresh, force_update):
             return self.__class__.from_path(self.ui_node, new_path, **self._kwargs)
@@ -716,7 +677,7 @@ class NyControl(object):
         if not name:
             name = control_path.split("/")[-1]
         new_path = self.path + "/" + name
-        if self._is_control_exist(new_path):
+        if self.ui_node._is_control_exist(new_path):
             return NyControl.from_path(self.ui_node, new_path)
         if self._screen_node.Clone(control_path, self.path, name, sync_refresh, force_update):
             return NyControl.from_path(self.ui_node, new_path)
@@ -753,6 +714,8 @@ class NyControl(object):
     @classmethod
     def from_path(cls, screen_node_ex, path, **kwargs):
         """
+        [类方法]
+
         根据控件路径创建Ny控件实例，类型与当前类相同。
 
         -----
@@ -768,6 +731,8 @@ class NyControl(object):
     @classmethod
     def from_control(cls, screen_node_ex, control, **kwargs):
         """
+        [类方法]
+
         根据 ``BaseUIControl`` 实例创建Ny控件实例，类型与当前类相同。
 
         -----
@@ -1073,15 +1038,6 @@ class NyControl(object):
     ToSelectionWheel = to_selection_wheel
     ToComboBox = to_combo_box
     ToMiniMap = to_mini_map
-
-    # endregion
-
-    # region Internal ==================================================================================================
-
-    def _is_control_exist(self, path):
-        screen_name = self._screen_node.screen_name
-        full_path = self._screen_node.component_path + path
-        return NyControl.__get_control_type(screen_name, full_path) != _UIControlType.Unknown
 
     # endregion
 

@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-06
 |
 | ====================================================
 """
@@ -31,6 +31,7 @@ __all__ = [
     "unlisten_all_events",
     "is_listened",
     "EventArgsWrap",
+    "BaseEventProxy",
     "ClientEventProxy",
     "ServerEventProxy",
 ]
@@ -63,11 +64,16 @@ class _EventPool(object):
         # 事件触发（modsdk调用入口）
         if args is None:
             args = {}
+
+        # 加锁，防止在回调执行过程中再次监听/反监听了同一个事件，导致for循环抛出异常
         self.lock = True
+
+        # 按优先级调用
         for p in self.priorities:
             for f in self.pool[p]:
                 try_exec(f, args)
         self.lock = False
+
         while self.remove_lst:
             self._remove(*self.remove_lst.pop())
         while self.add_lst:
@@ -77,7 +83,9 @@ class _EventPool(object):
         p = -priority
         if p not in self.pool:
             self.pool[p] = set()
+            # 插入优先级并排序
             insort(self.priorities, p)
+
         func_set = self.pool[p]
         if func in func_set:
             return
@@ -126,10 +134,11 @@ class _EventPool(object):
 
     @staticmethod
     def is_listened(func, event_name, ns, sys_name, priority=0):
+        p = -priority
         ep = _EventPool._get(event_name, ns, sys_name, False)
-        if ep is None or priority not in ep.pool:
+        if ep is None or p not in ep.pool:
             return False
-        return func in ep.pool[priority]
+        return func in ep.pool[p]
 
 
 def _get_event_source(is_client, event_name):
@@ -373,6 +382,8 @@ class EventArgsWrap(object):
             return self._arg_dict[key]
         raise error.EventParameterError(self._event_name, key)
 
+    __getitem__ = __getattr__
+
     def __setattr__(self, key, value):
         if key in EventArgsWrap.__slots__:
             object.__setattr__(self, key, value)
@@ -383,6 +394,8 @@ class EventArgsWrap(object):
         else:
             raise error.EventParameterError(self._event_name, key)
 
+    __setitem__ = __setattr__
+
     def __repr__(self):
         s = "<EventArgsWrap of '%s':" % self._event_name
         for k, v in self._arg_dict.items():
@@ -390,31 +403,14 @@ class EventArgsWrap(object):
         s += "\n>"
         return s
 
-    # 兼容字典方法
-    get          = lambda self, *a: self._arg_dict.get(*a)
-    keys         = lambda self, *a: self._arg_dict.keys(*a)
-    values       = lambda self, *a: self._arg_dict.values(*a)
-    items        = lambda self, *a: self._arg_dict.items(*a)
-    has_key      = lambda self, *a: self._arg_dict.has_key(*a)
-    copy         = lambda self, *a: self._arg_dict.copy(*a)
-    iterkeys     = lambda self, *a: self._arg_dict.iterkeys(*a)
-    itervalues   = lambda self, *a: self._arg_dict.itervalues(*a)
-    iteritems    = lambda self, *a: self._arg_dict.iteritems(*a)
-    viewkeys     = lambda self, *a: self._arg_dict.viewkeys(*a)
-    viewvalues   = lambda self, *a: self._arg_dict.viewvalues(*a)
-    viewitems    = lambda self, *a: self._arg_dict.viewitems(*a)
-    __len__      = lambda self, *a: self._arg_dict.__len__(*a)
-    __contains__ = lambda self, *a: self._arg_dict.__contains__(*a)
-    __getitem__  = lambda self, *a: self._arg_dict.__getitem__(*a)
-    __setitem__  = lambda self, *a: self._arg_dict.__setitem__(*a)
-    __cmp__      = lambda self, *a: self._arg_dict.__cmp__(*a)
-    __eq__       = lambda self, *a: self._arg_dict.__eq__(*a)
-    __ge__       = lambda self, *a: self._arg_dict.__ge__(*a)
-    __gt__       = lambda self, *a: self._arg_dict.__gt__(*a)
-    __iter__     = lambda self, *a: self._arg_dict.__iter__(*a)
-    __le__       = lambda self, *a: self._arg_dict.__le__(*a)
-    __lt__       = lambda self, *a: self._arg_dict.__lt__(*a)
-    __ne__       = lambda self, *a: self._arg_dict.__ne__(*a)
+    __iter__        = lambda self, *args: self._arg_dict.__iter__()
+    __eq__          = lambda self, *args: self._arg_dict.__eq__(*args)
+    __len__         = lambda self, *args: self._arg_dict.__len__()
+    __contains__    = lambda self, *args: self._arg_dict.__contains__(*args)
+    keys            = lambda self, *args: self._arg_dict.keys()
+    values          = lambda self, *args: self._arg_dict.values()
+    items           = lambda self, *args: self._arg_dict.items()
+    get             = lambda self, *args: self._arg_dict.get(*args)
 
 
 class BaseEventProxy(object):
@@ -423,6 +419,7 @@ class BaseEventProxy(object):
         is_client = isinstance(self, ClientEventProxy)
         for attr in iter_obj_attrs(self):
             if not isinstance(attr, MethodType) or hasattr(attr, '_nyl_listen_args'):
+                # 跳过属性和已被@event装饰的方法
                 continue
             event_name = attr.__name__
             source = _get_event_source(is_client, event_name)
@@ -481,10 +478,14 @@ def __test__():
         # print(event)
         assert event.playerId == a['playerId']
         assert event.pos == a['pos']
-        assert event.itemDict == a['itemDict']
-        assert len(event) == 3
+        assert event.get('itemDict') == a['itemDict']
         assert 'playerId' in event
-        assert event['playerId'] == a['playerId']
+        for k in event:
+            assert event[k] == a[k]
+        assert event == a
+        assert len(event) == 3
+        assert event.keys() == a.keys()
+        assert event.values() == a.values()
         assert event.items() == a.items()
         event.playerId = "1919810"
         assert event.playerId == a['playerId'] == "1919810"
@@ -564,27 +565,27 @@ def __benchmark__(n, timer, *args):
     class C(ServerEventProxy, s_api.GetServerSystemCls()):
         def __init__(self, namespace, system_name):
             super(C, self).__init__(namespace, system_name)
-            listen_event(self.BlockRemoveServerEvent)
-            ep = _EventPool._get("BlockRemoveServerEvent", "Minecraft", "Engine")
+            listen_event(self.OnMobHitBlockServerEvent)
+            ep = _EventPool._get("OnMobHitBlockServerEvent", "Minecraft", "Engine")
 
             timer.start("nuoyanlib listen")
             for _ in xrange(n):
-                listen_event(self.BlockRemoveServerEvent)
+                listen_event(self.OnMobHitBlockServerEvent)
             timer.end("nuoyanlib listen")
 
             timer.start("nuoyanlib unlisten")
             for _ in xrange(n):
-                unlisten_event(self.BlockRemoveServerEvent)
+                unlisten_event(self.OnMobHitBlockServerEvent)
             timer.end("nuoyanlib unlisten")
 
             timer.start("modsdk listen")
             for _ in xrange(n):
-                self.ListenForEvent("Minecraft", "Engine", "BlockRemoveServerEvent", self, self.BlockRemoveServerEvent)
+                self.ListenForEvent("Minecraft", "Engine", "OnMobHitBlockServerEvent", self, self.OnMobHitBlockServerEvent)
             timer.end("modsdk listen")
 
             timer.start("modsdk unlisten")
             for _ in xrange(n):
-                self.UnListenForEvent("Minecraft", "Engine", "BlockRemoveServerEvent", self, self.BlockRemoveServerEvent)
+                self.UnListenForEvent("Minecraft", "Engine", "OnMobHitBlockServerEvent", self, self.OnMobHitBlockServerEvent)
             timer.end("modsdk unlisten")
 
             timer.start("event call")
@@ -594,11 +595,11 @@ def __benchmark__(n, timer, *args):
 
             timer.start("common call")
             for _ in xrange(n):
-                self.BlockRemoveServerEvent({})
+                self.OnMobHitBlockServerEvent({})
             timer.end("common call")
 
         @event
-        def BlockRemoveServerEvent(self, args):
+        def OnMobHitBlockServerEvent(self, args):
             pass
 
     C("", "")

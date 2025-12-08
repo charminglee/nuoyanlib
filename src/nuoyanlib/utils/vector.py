@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
@@ -112,6 +112,8 @@ class Vector(object):
     @staticmethod
     def zero(is_3d=True):
         """
+        [静态方法]
+
         创建一个零向量。
 
         -----
@@ -126,6 +128,8 @@ class Vector(object):
     @staticmethod
     def one(is_3d=True):
         """
+        [静态方法]
+
         创建一个所有分量均为 ``1.0`` 的向量。
 
         -----
@@ -140,6 +144,8 @@ class Vector(object):
     @staticmethod
     def left(is_3d=True):
         """
+        [静态方法]
+
         创建一个x分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
@@ -154,6 +160,8 @@ class Vector(object):
     @staticmethod
     def right(is_3d=True):
         """
+        [静态方法]
+
         创建一个x分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
@@ -168,6 +176,8 @@ class Vector(object):
     @staticmethod
     def up(is_3d=True):
         """
+        [静态方法]
+
         创建一个y分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
@@ -182,6 +192,8 @@ class Vector(object):
     @staticmethod
     def down(is_3d=True):
         """
+        [静态方法]
+
         创建一个y分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
@@ -196,6 +208,8 @@ class Vector(object):
     @staticmethod
     def forward():
         """
+        [静态方法]
+
         创建一个z分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----
@@ -208,6 +222,8 @@ class Vector(object):
     @staticmethod
     def backward():
         """
+        [静态方法]
+
         创建一个z分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
 
         -----

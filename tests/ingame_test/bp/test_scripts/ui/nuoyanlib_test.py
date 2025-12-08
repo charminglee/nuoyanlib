@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
@@ -82,6 +82,7 @@ class NuoyanlibTest(nyl.ClientEventProxy, ScreenNodeExtension, nyl.ScreenNode):
             self.button.cancel_movable()
             return
         print("button_up")
+        c_api.PopScreen()
 
     def OnButtonDown(self, args):
         print("button_down")

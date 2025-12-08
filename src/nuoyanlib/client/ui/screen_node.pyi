@@ -6,16 +6,17 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
 
 
 from typing import List, Tuple, Iterator, TypedDict, ClassVar, Optional, overload, Any, Dict, Type, Generator, Callable, Union
+from typing_extensions import Self
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
-from ...core._types._typing import FTuple2, Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, _F, _T
+from ...core._types._typing import FTuple2, Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, T, FuncDecorator
 from .nyc import *
 
 
@@ -36,7 +37,7 @@ class __FrameAnimData(TypedDict):
 class ScreenNodeExtension(object):
     ROOT_PANEL_PATH: ClassVar[str]
     """
-    使用基类画布时的根节点路径，所有自定义控件均挂接在该路径下。
+    基类画布的根面板（root_screen_panel）路径。
     """
     _nyc_cache_map: Dict[str, NyControlTypes]
     _ui_pos_data_key: str
@@ -49,17 +50,25 @@ class ScreenNodeExtension(object):
     """
     root_panel: NyControl
     """
-    当前界面根节点的 ``NyControl`` 实例。
+    当前界面根面板的 ``NyControl`` 实例。
     
-    根节点指：
+    当界面继承基类画布时，根面板为 ``root_screen_panel`` ，路径为 ``"/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel"`` 。
+    否则根面板为画布本身，路径为空字符串 ``""`` 。
+    """
+    has_created: bool
+    """
+    UI界面是否已创建完成。
     
-    - 当界面继承基类画布时，根节点为 ``root_screen_panel`` ，路径为 ``"/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel"`` 。
-    - 否则根节点为画布本身，路径为空字符串 ``""`` 。
+    若 ``has_created`` 为True，此时UI界面的 ``.Create()`` 或 ``.OnCreate()`` 方法已执行完毕。
+    """
+    is_base_screen: bool
+    """
+    是否是基类画布。
     """
     @overload
-    def __init__(self: ..., namespace: str, name: str, param: Optional[dict] = None, /) -> None: ...
+    def __init__(self: Self, namespace: str, name: str, param: Optional[dict] = None, /) -> None: ...
     @overload
-    def __init__(self: ..., screen_name: str, screen_node: ScreenNode, /) -> None: ...
+    def __init__(self: Self, screen_name: str, screen_node: ScreenNode, /) -> None: ...
     def __create__(self): ...
     def __destroy__(self): ...
     def _OnRenderTick(self, args: ArgsDict) -> None: ...
@@ -119,14 +128,14 @@ class ScreenNodeExtension(object):
     CreateNySlider = create_ny_slider
     CreateNyStackPanel = create_ny_stack_panel
     CreateNyToggle = create_ny_toggle
-    def _create_nyc(self, path_or_control: UiPathOrControl, typ: Type[_T] = NyControl, **kwargs: Any) -> _T: ...
+    def _create_nyc(self, path_or_control: UiPathOrControl, typ: Type[T] = NyControl, **kwargs: Any) -> T: ...
     def _destroy_nyc(self, nyc: NyControl) -> None: ...
     @staticmethod
     def button_callback(
         btn_path: str,
         *callback_types: str,
         touch_event_params: Optional[dict] = None,
-    ) -> Callable[[_F], _F]: ...
+    ) -> FuncDecorator: ...
     def _process_button_callback(self) -> None: ...
     def _expend_path(self, path: str) -> Generator[str]: ...
     def clear_all_pos_data(self) -> bool: ...
@@ -151,3 +160,4 @@ class ScreenNodeExtension(object):
     def _pause_frame_anim(self, ny_image: NyImage) -> None: ...
     def _stop_frame_anim(self, ny_image: NyImage) -> None: ...
     def _OnGridSizeChanged(self, args: ArgsDict) -> None: ...
+    def _is_control_exist(self, path: str) -> bool: ...

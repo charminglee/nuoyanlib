@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from types import MethodType
 from typing import Optional, Union, Dict, Tuple, Callable, Any, Literal, List, Type
 import mod.client.extraClientApi as c_api
@@ -44,7 +45,7 @@ class NuoyanLibBaseSystem(object):
     cond_func: Dict[int, Tuple[Callable[[], bool], Callable[[bool], Any], int]]
     cond_state: Dict[int, bool]
     event_pool: Dict[str, List[Callable[[dict], Any]]]
-    def __init__(self: ..., *args, **kwargs) -> None: ...
+    def __init__(self: Self, *args, **kwargs) -> None: ...
     @classmethod
     def register(cls) -> bool: ...
     def Update(self) -> None: ...

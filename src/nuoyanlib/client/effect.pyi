@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
+|   Date  : 2025-12-06
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Tuple, Union, Dict, Optional
 from mod.client.component.particleControlComp import ParticleControlComp
 from mod.client.component.particleTransComp import ParticleTransComp
@@ -23,6 +24,15 @@ from mod.client.component.frameAniEntityBindComp import FrameAniEntityBindComp
 from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindComp
 from ..core.client._lib_client import NuoyanLibClientSystem
 from ..core._types._typing import FTuple3, FTuple2
+
+
+def spawn_particle(
+    name: str,
+    pos: FTuple3,
+    rot: FTuple3 = (0, 0, 0),
+    var_dict: Optional[Dict[str, float]] = None,
+    rm_delay: float = 0,
+) -> int: ...
 
 
 class NeteaseParticle(object):
@@ -43,7 +53,7 @@ class NeteaseParticle(object):
     _playing: bool
     _destroyed: bool
     def __init__(
-        self: ...,
+        self: Self,
         json_path: str,
         pos: Optional[FTuple3] = None,
         bind_entity: Optional[Dict[str, Union[str, FTuple3, bool]]] = None,
@@ -151,7 +161,7 @@ class NeteaseFrameAnim(object):
     _playing: bool
     _destroyed: bool
     def __init__(
-        self: ...,
+        self: Self,
         json_path: str = "",
         tex_path: str = "",
         pos: Optional[FTuple3] = None,

@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
@@ -22,7 +22,7 @@ from .client.comp import CF as CCF
 #     entity_id: str
 #     _is_client: bool
 #     _cf: Union[SCF, CCF]
-#     def __init__(self: ..., entity_id: str) -> None: ...
+#     def __init__(self: Self, entity_id: str) -> None: ...
 
 
 

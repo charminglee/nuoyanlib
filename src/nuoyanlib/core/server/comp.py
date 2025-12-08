@@ -6,14 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-03
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
 import mod.server.extraServerApi as s_api
-from .._utils import lru_cache
 
 
 __all__ = [
@@ -35,13 +34,20 @@ CompFactory = s_api.GetEngineCompFactory()
 
 
 class CF(object):
-    __new__ = lru_cache()(object.__new__)
+    __cache__ = {}
+
+    def __new__(cls, target):
+        if target not in cls.__cache__:
+            cls.__cache__[target] = object.__new__(cls)
+        return cls.__cache__[target]
 
     def __init__(self, target):
         self._target = target
 
     def __getattr__(self, name):
         comp = getattr(CompFactory, "Create" + name)(self._target)
+        if not comp:
+            return
         setattr(self, name, comp)
         return comp
 
@@ -60,7 +66,7 @@ def __test__():
 
 def __benchmark__(n, timer, *args):
     import random
-    id_pool = tuple(str(i) for i in xrange(256))
+    id_pool = tuple(str(i) for i in xrange(2560))
     rand_eid = tuple(random.choice(id_pool) for _ in xrange(n))
     timer.start()
     for eid in rand_eid:

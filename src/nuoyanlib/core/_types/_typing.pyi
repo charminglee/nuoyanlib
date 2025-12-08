@@ -6,21 +6,24 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
 
 
-from typing import TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any
-from types import InstanceType
+from typing import TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from ...client.ui.nyc import *
 
 
-_T = TypeVar("_T")
-_F = TypeVar("_F", bound=Callable[..., Any])
+T = TypeVar("T")
+P = ParamSpec("P")
+F = TypeVar("F", bound=Callable[..., Any])
+FuncDecorator = Callable[[F], F]
+__T_type = TypeVar("__T_type", bound=type)
+ClassDecorator = Callable[[__T_type], __T_type]
 
 
 PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
@@ -70,8 +73,6 @@ UserData = Dict[str, Any]
 
 ArgsDict = Dict[str, PyBasicTypes]
 EntFilter = Optional[Callable[[str], bool]]
-EventCallbackFunc = Callable[[ArgsDict], Any]
-EventCallbackMethod = Callable[[InstanceType, ArgsDict], Any]
 
 
 UiPathOrControl = Union[str, BaseUIControl]

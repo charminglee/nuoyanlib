@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Callable, ClassVar, Literal, Tuple, overload, Union, Iterator, Dict
 from ..core._types._typing import STuple, FTuple3, FTuple2
 
@@ -31,13 +32,13 @@ class Vector(object):
     z: float
     _dim: int
     @overload
-    def __init__(self: ..., x: float, y: float, z: float, /) -> None: ...
+    def __init__(self: Self, x: float, y: float, z: float, /) -> None: ...
     @overload
-    def __init__(self: ..., x: float, y: float, /) -> None: ...
+    def __init__(self: Self, x: float, y: float, /) -> None: ...
     @overload
-    def __init__(self: ..., vec: FTuple3, /) -> None: ...
+    def __init__(self: Self, x: FTuple3, /) -> None: ...
     @overload
-    def __init__(self: ..., vec: FTuple2, /) -> None: ...
+    def __init__(self: Self, x: FTuple2, /) -> None: ...
     @property
     def dim(self) -> int: ...
     @staticmethod

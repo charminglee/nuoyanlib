@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Dict, Optional, Callable, Union
 from mod.server.system.serverSystem import ServerSystem
 from .._types._typing import ArgsDict
@@ -24,9 +25,7 @@ from ..listener import ServerEventProxy, _lib_sys_event
 class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem):
     query_cache: Dict[str, Dict[str, float]]
     callback_data: Dict[str, Dict[str, Union[Callable, int]]]
-    def __init__(self: ..., namespace: str, system_name: str) -> None: ...
-    @_lib_sys_event
-    def _ButtonCallbackTrigger(self, args: ArgsDict) -> None: ...
+    def __init__(self: Self, namespace: str, system_name: str) -> None: ...
     @_lib_sys_event
     def _BroadcastToAllClient(self, args: ArgsDict) -> None: ...
     @_lib_sys_event

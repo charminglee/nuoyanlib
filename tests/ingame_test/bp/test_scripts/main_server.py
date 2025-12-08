@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-01
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
@@ -21,13 +21,13 @@ from .nuoyanlib.server import (
     CF,
     event,
 )
-from .benchmark import run_benchmark, print_res
+from .benchmark import print_msg, run_benchmark, print_res
 
 
 class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
     def __init__(self, namespace, systemName):
         super(MainServerSystem, self).__init__(namespace, systemName)
-        LvComp.Game.AddTimer(10, self.run_benchmark)
+        LvComp.Game.AddTimer(8, self.run_benchmark)
         self.c = 0
         self.comm_time = 0
         self.comm_cost = 0
@@ -35,28 +35,27 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
 
     # =========================================== Engine Event Callback ================================================
 
-    def DamageEvent(self, args):
-        for i in repr(args).splitlines():
-            print(i)
+    def BlockRemoveServerEvent(self, args):
+        print_msg(args)
 
-    @event(priority=1)
-    @event(priority=2)
+    @event
+    @event
     def PlayerAttackEntityEvent(self, args):
-        print(1)
+        print_msg(1)
 
     # =========================================== Custom Event Callback ================================================
 
     # ============================================== Basic Function ====================================================
 
     def run_benchmark(self):
-        self.player_id = s_api.GetHostPlayerId()
+        self.player_id = s_api.GetPlayerList()[0]
         run_benchmark("nuoyanlib.core.listener", 10000)
         run_benchmark("nuoyanlib.core.server.comp")
         self.communicate_benchmark()
 
     def communicate_benchmark(self):
         def callback(success, ret, player_id):
-            print("return from client", success, ret, player_id)
+            print_msg("return from client: %s, %s, %s" % (success, ret, player_id))
             assert success and ret == "abc" and player_id == self.player_id
         nyl.call(
             MOD_NAME, CLIENT_SYSTEM_NAME,
@@ -66,9 +65,9 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
         )
 
         n = 1000
-        print("=" * 45)
-        print("[{}]".format("nuoyanlib.utils.communicate"))
-        print("n={}".format(n))
+        print_msg("=" * 45)
+        print_msg("[{}]".format("nuoyanlib.utils.communicate"))
+        print_msg("n={}".format(n))
 
         t = nyl.get_time()
         for _ in xrange(n):
@@ -99,7 +98,7 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
         )
 
     def test_s(self, p1, p2, p3):
-        print("server called from client", p1, p2, p3)
+        print_msg("server called from client: %s, %s, %s" % (p1, p2, p3))
         return "abc"
 
     def test1(self):

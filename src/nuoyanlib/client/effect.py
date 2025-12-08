@@ -6,20 +6,46 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-06
 |
 | ====================================================
 """
 
 
-from ..core.client.comp import CF
+from ..core.client.comp import CF, LvComp
 from ..core.client import _lib_client
 
 
 __all__ = [
+    "spawn_particle",
     "NeteaseParticle",
     "NeteaseFrameAnim",
 ]
+
+
+def spawn_particle(name, pos, rot=(0, 0, 0), var_dict=None, rm_delay=0):
+    """
+    在指定位置生成微软粒子发射器，创建后立即播放。
+
+    -----
+
+    :param str name: 粒子名称
+    :param tuple[float,float,float] pos: 生成坐标
+    :param tuple[float,float,float] rot: 粒子发射器创建后使用的三维旋转（使用角度制，按照ZYX顺序旋转）；默认为(0, 0, 0)
+    :param dict[str,float]|None var_dict: 粒子参数字典
+    :param float rm_delay: 延迟多长时间后自动销毁粒子发射器，单位为秒；默认为0，不自动销毁
+
+    :return: 若生成成功，返回粒子发射器ID，否则返回0
+    :rtype: int
+    """
+    comp = LvComp.ParticleSystem
+    par_id = comp.Create(name, pos, rot)
+    if var_dict:
+        for k, v in var_dict.items():
+            comp.SetVariable(par_id, k, v)
+    if rm_delay > 0:
+        LvComp.Game.AddTimer(rm_delay, comp.Remove, par_id)
+    return par_id
 
 
 class NeteaseParticle(object):

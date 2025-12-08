@@ -12,6 +12,7 @@
 """
 
 
+from typing_extensions import Self
 from typing import Optional, Callable, Any
 from ..core._types._typing import TimeEaseFuncType
 from .enum import TimeEaseFunc
@@ -34,7 +35,7 @@ class TimeEase(object):
     _val: float
     _state: int
     def __init__(
-        self: ...,
+        self: Self,
         start_val: float,
         end_val: float,
         total_tm: float,

@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-03
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Type, ClassVar, Dict
 from mod.server.system.serverSystem import ServerSystem
 from mod.server.component.domainGameCompServer import DomainGameCompServer
@@ -85,8 +86,7 @@ from mod.server.component.shareableCompServer import ShareableComponentServer
 from mod.server.component.blockUseEventWhiteListCompServer import BlockUseEventWhiteListComponentServer
 from mod.server.component.actorLootCompServer import ActorLootComponentServer
 from mod.common.component.baseComponent import BaseComponent
-from .._types._typing import STuple, _T
-from .._utils import lru_cache
+from .._types._typing import T
 
 
 ENGINE_NAMESPACE: str
@@ -99,9 +99,8 @@ CompFactory: EngineCompFactoryServer
 class CF(object):
     __cache__: ClassVar[Dict[str, CF]]
     _target: str
-    @lru_cache
-    def __new__(cls: Type[_T], target: str) -> _T: ...
-    def __init__(self: ..., target: str) -> None: ...
+    def __new__(cls: Type[T], target: str) -> T: ...
+    def __init__(self: Self, target: str) -> None: ...
     def __getattr__(self, name: str) -> BaseComponent: ...
     DomainGame: DomainGameCompServer
     Achievement: AchievementCompServer

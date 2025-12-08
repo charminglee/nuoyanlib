@@ -80,6 +80,8 @@ class EntityFilter:
     @staticmethod
     def mob(eid):
         """
+        [静态方法]
+
         过滤生物实体。
 
         判定标准为是否具有 ``minecraft:health`` 组件。
@@ -96,6 +98,8 @@ class EntityFilter:
     @staticmethod
     def non_mob(eid):
         """
+        [静态方法]
+
         过滤非生物实体。
 
         判定标准为是否具有 ``minecraft:health`` 组件。
@@ -112,6 +116,8 @@ class EntityFilter:
     @staticmethod
     def has_health(eid):
         """
+        [静态方法]
+
         过滤当前生命值大于0的实体。
 
         -----
@@ -272,7 +278,7 @@ def explode_damage(
     else:
         return
 
-    orig_rule = LvComp.Game.GetGameRulesInfoServer()
+    org_rule = LvComp.Game.GetGameRulesInfoServer()
     LvComp.Game.SetGameRulesInfoServer({'option_info': {'tile_drops': tile_drops, 'mob_loot': mob_loot}})
     hurt_comp = CF(source_id).Hurt
     try:
@@ -280,7 +286,7 @@ def explode_damage(
             hurt_comp.ImmuneDamage(True)
         LvComp.Explosion.CreateExplosion(pos, r, fire, breaks, source_id, player_id)
     finally:
-        LvComp.Game.SetGameRulesInfoServer(orig_rule)
+        LvComp.Game.SetGameRulesInfoServer(org_rule)
         if not hurt_source:
             hurt_comp.ImmuneDamage(False)
 

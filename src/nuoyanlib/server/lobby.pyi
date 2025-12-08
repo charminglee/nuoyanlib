@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
@@ -66,7 +66,7 @@ class LobbyDataMgr(ServerEventProxy):
     """
     玩家数据字典。
     """
-    def __init__(self: ...) -> None: ...
+    def __init__(self: Self) -> None: ...
     @event("UiInitFinished")
     def _on_player_join(self, args: ArgsDict) -> None: ...
     def _to_uid(self, player_id: str) -> int: ...

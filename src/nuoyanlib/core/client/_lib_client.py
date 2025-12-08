@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-03
 |
 | ====================================================
 """
@@ -38,7 +38,30 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
             c_api.SetMcpModLogCanPostDump(True)
         _logging.info("NuoyanLibClientSystem inited")
 
-    # region General ===================================================================================================
+    # region Events ====================================================================================================
+
+    def AddEntityClientEvent(self, args):
+        if args.engineTypeStr == _const.TypeStr.GROUND_SHATTER_EFFECT:
+            entity_id = args.id
+            cf = CF(entity_id)
+            self._ground_shatter_data[entity_id] = {
+                'inited': False,
+                'attr_comp': cf.ModAttr,
+                'render_comp': cf.ActorRender,
+                'te': None,
+                'geo_name': None,
+                'pos': (args.posX, args.posY, args.posZ),
+            }
+
+    def RemoveEntityClientEvent(self, args):
+        entity_id = args.id
+        if entity_id in CF.__cache__:
+            del CF.__cache__[entity_id]
+        if entity_id in self._ground_shatter_data:
+            del self._ground_shatter_data[entity_id]
+
+    def UiInitFinished(self, args):
+        self.NotifyToServer("UiInitFinished", {})
 
     if config.GSE_USE_RENDER_TICK:
         def GameRenderTickEvent(self, args):
@@ -47,9 +70,6 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         def Update(self):
             NuoyanLibBaseSystem.Update(self)
             self._update_ground_shatter_effect()
-
-    def UiInitFinished(self, args):
-        self.NotifyToServer("UiInitFinished", {})
 
     # def LoadClientAddonScriptsAfter(self, args):
     #     load_extensions()
@@ -167,24 +187,6 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     # endregion
 
     # region spawn_ground_shatter_effect ===============================================================================
-
-    def AddEntityClientEvent(self, args):
-        if args.engineTypeStr == _const.TypeStr.GROUND_SHATTER_EFFECT:
-            entity_id = args.id
-            cf = CF(entity_id)
-            self._ground_shatter_data[entity_id] = {
-                'inited': False,
-                'attr_comp': cf.ModAttr,
-                'render_comp': cf.ActorRender,
-                'te': None,
-                'geo_name': None,
-                'pos': (args.posX, args.posY, args.posZ),
-            }
-
-    def RemoveEntityClientEvent(self, args):
-        entity_id = args.id
-        if entity_id in self._ground_shatter_data:
-            del self._ground_shatter_data[entity_id]
 
     def _init_ground_shatter_effect(self, data):
         palette = LvComp.Block.GetBlankBlockPalette()

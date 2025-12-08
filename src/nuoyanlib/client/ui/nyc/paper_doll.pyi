@@ -6,13 +6,14 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-30
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
 from typing import Optional
+from typing_extensions import Self
 from mod.client.ui.controls.neteasePaperDollUIControl import NeteasePaperDollUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
@@ -22,7 +23,7 @@ from ....core._types._checker import args_type_check
 class NyPaperDoll(NyControl):
     _base_control: NeteasePaperDollUIControl
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         paper_doll_control: NeteasePaperDollUIControl,
     ) -> None: ...

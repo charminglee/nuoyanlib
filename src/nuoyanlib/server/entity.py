@@ -154,10 +154,10 @@ def attract_entities(
         if not epos:
             continue
         motion = cf.ActorMotion
-        orig_motion = motion.GetMotion()
+        org_motion = motion.GetMotion()
         vec = vec_p2p(epos, pos)
         vec = tuple(i * power for i in vec)
-        res_motion = vec_composite(False, orig_motion, vec)
+        res_motion = vec_composite(False, org_motion, vec)
         etype = cf.EngineType.GetEngineType()
         if etype == EntityType.Player:
             if motion.SetPlayerMotion(res_motion):

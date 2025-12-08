@@ -6,25 +6,26 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
+|   Date  : 2025-12-07
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Any, Callable, Union, List, Optional, Dict, Tuple
 from mod.client.system.clientSystem import ClientSystem
 from mod.server.system.serverSystem import ServerSystem
 
 
-__CallbackType = Optional[Callable[[Dict[str, Any]], Any]]
+__CallbackType = Union[Callable[[bool, Any], Any], Callable[[bool, Any, str], Any], None]
 
 
 class Caller(object):
     ns: str
     sys_name: str
     method: str
-    def __init__(self: ..., ns: str, sys_name: str, method: str = "") -> None: ...
+    def __init__(self: Self, ns: str, sys_name: str, method: str = "") -> None: ...
     def __call__(
         self,
         args: Optional[Tuple[Any, ...]] = None,

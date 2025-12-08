@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-06
 |
 | ====================================================
 """
@@ -217,18 +217,18 @@ def to_cartesian_coordinate(coordinate, rad=False, origin=(0, 0)):
     return x, y
 
 
-def probability(f):
+def probability(p):
     """
     以指定概率返回 ``True`` 。
 
     -----
 
-    :param float f: 概率，范围为[0, 1]
+    :param float p: 概率，范围为[0, 1]
 
-    :return: 以f的概率返回True，否则返回False
+    :return: 以p的概率返回True，否则返回False
     :rtype: bool
     """
-    return f > 0 and uniform(0, 1) <= f
+    return p > 0 and uniform(0, 1) <= p
 
 
 def pos_distance_to_line(pos, line_pos1, line_pos2):
@@ -329,8 +329,8 @@ def to_screen_pos(entity_pos, center_pos, screen_size, max_distance, ui_size, pl
     half_screen_size = screen_size / 2.0
     half_ui_size = ui_size / 2.0
     ratio = (relative_pos[0] / max_distance, relative_pos[2] / max_distance)
-    orig_pos = (half_screen_size * ratio[0], half_screen_size * ratio[1])
-    rotated_pos = pos_rotate(player_rot, orig_pos)
+    org_pos = (half_screen_size * ratio[0], half_screen_size * ratio[1])
+    rotated_pos = pos_rotate(player_rot, org_pos)
     screen_pos = (
         half_screen_size - rotated_pos[0] - half_ui_size,
         half_screen_size - rotated_pos[1] - half_ui_size,

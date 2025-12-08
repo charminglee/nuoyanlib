@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-01
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Optional, Callable, Any
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
 from .control import NyControl, InteractableControl
@@ -26,7 +27,7 @@ __WheelCallbackType = Callable[[], Any]
 class NySelectionWheel(InteractableControl, NyControl):
     _base_control: SelectionWheelUIControl
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         selection_wheel_control: SelectionWheelUIControl,
     ) -> None: ...

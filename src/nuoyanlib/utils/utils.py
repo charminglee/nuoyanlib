@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-07
 |
 | ====================================================
 """
@@ -19,6 +19,8 @@ from ..core._sys import get_lib_system, get_lv_comp, is_client
 
 
 __all__ = [
+    "rgb_to_hex",
+    "hex_to_rgb",
     "get_time",
     "timeit",
     "notify_error",
@@ -35,11 +37,76 @@ __all__ = [
 ]
 
 
+def rgb_to_hex(rgb_color, with_sign=True, upper=True):
+    """
+    将 ``(R,⠀G,⠀B)`` 元组转换为16进制颜色代码 ``#RRGGBB`` 。
+
+    -----
+
+    :param tuple[float,float,float]|tuple[int,int,int] rgb_color: RGB元组，支持Minecraft RGB格式（取值范围为0-1）
+    :param bool with_sign: 返回的16进制颜色代码是否包含"#"前缀，默认为True
+    :param bool upper: 返回的16进制颜色代码是否大写，默认为True
+
+    :return: 16进制颜色代码
+    :rtype: str
+
+    :raise ValueError: RGB元组格式有误时抛出
+    """
+    if len(rgb_color) != 3:
+        raise ValueError("'rgb_color' must be of 3 elements.")
+
+    if all(0 <= c <= 1 for c in rgb_color):
+        rgb_color = tuple(int(c * 255) for c in rgb_color)
+    elif all(isinstance(c, int) and 0 <= c <= 255 for c in rgb_color):
+        pass
+    else:
+        raise ValueError("illegal rgb color: %s" % str(rgb_color))
+
+    hex_color = "%02x%02x%02x" % rgb_color
+    if upper:
+        hex_color = hex_color.upper()
+    if with_sign:
+        hex_color = "#" + hex_color
+    return hex_color
+
+
+def hex_to_rgb(hex_color, mc_rgb=True):
+    """
+    将16进制颜色代码 ``#RRGGBB`` 转换为 ``(R,⠀G,⠀B)`` 元组。
+
+    -----
+
+    :param str hex_color: 16进制颜色代码，可不包含"#"前缀
+    :param bool mc_rgb: 是否转换为Minecraft RGB格式（取值范围为0-1），默认为True
+
+    :return: RGB元组
+    :rtype: tuple[float,float,float]|tuple[int,int,int]
+
+    :raise ValueError: hex_color格式有误时抛出
+    """
+    if hex_color[0] == "#":
+        hex_color = hex_color[1:]
+    if len(hex_color) != 6:
+        raise ValueError("'hex_color' must be 6 characters long.")
+
+    r_hex = hex_color[0:2]
+    g_hex = hex_color[2:4]
+    b_hex = hex_color[4:6]
+    r = int(r_hex, 16)
+    g = int(g_hex, 16)
+    b = int(b_hex, 16)
+    if mc_rgb:
+        r /= 255.0
+        g /= 255.0
+        b /= 255.0
+    return r, g, b
+
+
 def get_time():
     """
     获取当前时间。
 
-    注：仅用于计时，pc端返回 ``time.clock()`` （精度更高），手机端返回 ``time.time()`` 。
+    仅用于计时，PC端返回 ``time.clock()`` （精度更高，非真实时间），移动端返回 ``time.time()`` 。
 
     -----
 
@@ -70,14 +137,12 @@ def timeit(func, n=100000, print_res=False, args=None, kwargs=None):
     :return: 返回一个元组，元素分别为总耗时和平均耗时，单位为ms
     :rtype: tuple[float,float]
     """
-    try:
-        timer = time.clock
-    except AttributeError:
-        timer = time.time
-    t = timer()
+    args = args or ()
+    kwargs = kwargs or {}
+    t = get_time()
     for _ in xrange(n):
         func(*args, **kwargs)
-    total = timer() - t
+    total = get_time() - t
     total *= 1000
     avg = total / n
     if print_res:
@@ -236,20 +301,20 @@ def check_string2(string, *check):
     return result
 
 
-def turn_dict_value_to_tuple(orig_dict):
+def turn_dict_value_to_tuple(org_dict):
     """
     将字典值中的列表全部转换为元组。（改变原字典）
     
     -----
 
-    :param dict orig_dict: 字典
+    :param dict org_dict: 字典
 
     :return: 无
     :rtype: None
     """
-    for key, value in orig_dict.items():
+    for key, value in org_dict.items():
         if isinstance(value, list):
-            orig_dict[key] = turn_list_to_tuple(value)
+            org_dict[key] = turn_list_to_tuple(value)
 
 
 def turn_list_to_tuple(lst):
@@ -330,6 +395,18 @@ def translate_time(sec, separator="", unit=("h", "m", "s"), zfill=False):
 
 
 def __test__():
+    from ..core._utils import assert_error
+    assert rgb_to_hex((255, 69, 0)) == "#FF4500"
+    assert rgb_to_hex((255, 69, 0), with_sign=False, upper=False) == "ff4500"
+    assert rgb_to_hex((0, 0, 0)) == "#000000"
+    assert_error(rgb_to_hex, ((255, 69),), exc=ValueError)
+    assert_error(rgb_to_hex, ((255, 69, 300),), exc=ValueError)
+
+    assert hex_to_rgb("#FF4500", False) == (255, 69, 0)
+    assert hex_to_rgb("#000000", True) == (0, 0, 0)
+    assert_error(hex_to_rgb, ("#FF45",), exc=ValueError)
+    assert_error(hex_to_rgb, ("#FF45AV",), exc=ValueError)
+
     assert all_indexes([1, 1, 4, 5, 1, 4], 1) == [0, 1, 4]
     assert all_indexes([1, 1, 4, 5, 1, 4], 1, 4) == [0, 1, 2, 4, 5]
     assert all_indexes("abcdefg", "c", "g") == [2, 6]

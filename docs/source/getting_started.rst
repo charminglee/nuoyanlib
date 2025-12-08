@@ -168,24 +168,21 @@
 ModSDK事件
 ~~~~~~~~~~
 
-ModSDK事件系统的最大痛点——事件参数不支持IDE补全，经常需要手动查阅文档，非常麻烦，「nuoyanlib」很好地解决了这个问题。  
+ModSDK事件系统的最大痛点——事件参数不支持IDE补全，经常需要手动查阅文档，非常麻烦。在「nuoyanlib」中，你可以使用事件代理类来解决这些问题。
 
 .. image:: _static/event_proxy_pre.gif
     :align: center
 
-在上方的演示中，你可以看见：
+上方的动图演示了事件代理类的强大功能：
 
 - 键入任意一个ModSDK事件的名称，IDE会弹出事件列表，选中你需要的事件并按下回车键即可补全。  
-- 将鼠标停留在事件名上会显示该事件的完整文档。
-- 事件参数同样支持补全，输入 ``event.`` 后IDE会弹出该事件的参数列表。
-- 将鼠标停留在参数名上会显示该参数的说明。
+- 将鼠标停留在事件名上可查看该事件的完整文档。
+- 事件参数支持补全，输入 ``event.`` 后IDE会弹出该事件的参数列表。
+- 将鼠标停留在参数名上可查看该参数的说明。
 
-此外：
+此外，事件参数同样支持修改，如 ``event.cancel = True`` 。
 
-- 事件参数支持修改，如 ``event.cancel=True`` 。
-- 完全兼容旧版参数字典的写法，如 ``event['entityId']`` 。
-
-要使用这一功能，只需将你的客户端类继承 ``ClientEventProxy`` 即可。服务端对应的事件代理类为 ``ServerEventProxy`` ，用法相同，不再赘述。
+要使用事件代理类，只需将你的客户端类继承 ``ClientEventProxy`` 即可。服务端对应的事件代理类为 ``ServerEventProxy`` ，用法相同，不再赘述。
 
 .. code-block:: python
 
@@ -194,10 +191,6 @@ ModSDK事件系统的最大痛点——事件参数不支持IDE补全，经常�
     class MyClientSystem(nyl.ClientEventProxy, nyl.ClientSystem) # 继承事件代理类ClientEventProxy与原版ClientSystem类
         def __init__(self, namespace, system_name):
             super(MyClientSystem, self).__init__(namespace, system_name) # 此处建议使用super
-
-.. tip::
-
-    实际上，你可以在任何类中继承 ``ClientEventProxy`` ，并非强制绑定 ``ClientSystem`` 。
 
 自定义事件
 ~~~~~~~~~~

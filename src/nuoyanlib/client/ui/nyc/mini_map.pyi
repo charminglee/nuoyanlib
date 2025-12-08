@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-30
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Optional, NoReturn
 from mod.client.ui.controls.minimapUIControl import MiniMapUIControl
 from .control import NyControl
@@ -22,7 +23,7 @@ from ....core._types._checker import args_type_check
 class NyMiniMap(NyControl):
     _base_control: MiniMapUIControl
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         mini_map_control: MiniMapUIControl,
     ) -> None: ...

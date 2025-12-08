@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-01
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
@@ -47,13 +47,13 @@ def test(path):
     )
 
 
-test("core._utils")
-test("core.listener")
+test("utils.enum")
 test("core._types._checker")
+test("core._utils")
 test("core.server.comp")
+test("core.listener")
 test("client.ui.screen_node")
 test("client.ui.nyc.control")
-test("utils.enum")
 test("utils.item")
 test("utils.utils")
 test("utils.vector")

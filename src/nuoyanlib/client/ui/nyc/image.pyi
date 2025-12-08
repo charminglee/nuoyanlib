@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-01
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Callable, Optional, Tuple, NoReturn, Literal
 from mod.client.ui.controls.imageUIControl import ImageUIControl
 from .control import NyControl
@@ -38,7 +39,7 @@ __ImageAdaption = Literal[
 class NyImage(NyControl):
     _base_control: ImageUIControl
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         image_control: ImageUIControl,
     ) -> None: ...

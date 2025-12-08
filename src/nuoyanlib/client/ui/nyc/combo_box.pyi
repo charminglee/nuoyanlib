@@ -6,13 +6,14 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
 from typing import Any, Optional, Callable, Tuple, Union, List, Iterable
+from typing_extensions import Self
 from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUIControl
 from .control import NyControl, InteractableControl
 from ..screen_node import ScreenNodeExtension
@@ -32,7 +33,7 @@ class NyComboBox(InteractableControl, NyControl):
     下拉框项数据。
     """
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         combo_box_control: NeteaseComboBoxUIControl,
     ) -> None: ...

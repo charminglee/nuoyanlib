@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
@@ -14,6 +14,7 @@
 
 from typing import Callable, ClassVar, Optional, Dict, Union, List, Any
 from types import MethodType
+from typing_extensions import Self
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.common.utils.timer import CallLater
 from ....core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl, ItemDict
@@ -91,7 +92,7 @@ class NyButton(InteractableControl, NyControl):
     按钮文本控件的 ``NyLabel`` 实例。
     """
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         btn_control: ButtonUIControl,
         /,

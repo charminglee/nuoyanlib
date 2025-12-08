@@ -366,11 +366,11 @@ class NyButton(InteractableControl, NyControl):
         offset = (x - self._finger_pos[0], y - self._finger_pos[1])
         self._finger_pos = (x, y)
         for c in self._movable_controls:
-            orig_pos = c.position
-            new_pos = (orig_pos[0] + offset[0], orig_pos[1] + offset[1])
+            org_pos = c.position
+            new_pos = (org_pos[0] + offset[0], org_pos[1] + offset[1])
             c.position = new_pos
             if is_out_of_screen(c):
-                c.position = orig_pos
+                c.position = org_pos
 
     def _on_long_click_mov(self, args):
         self.set_callback(self._on_move_mov, ButtonCallbackType.MOVE)

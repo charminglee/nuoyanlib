@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-30
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Optional
 from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
 from .control import NyControl
@@ -23,7 +24,7 @@ from ....core._types._typing import FTuple2
 class NyInputPanel(NyControl):
     _base_control: InputPanelUIControl
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         input_panel_control: InputPanelUIControl,
     ) -> None: ...

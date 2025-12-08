@@ -6,12 +6,14 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-09
 |
 | ====================================================
 """
 
 
+from collections import OrderedDict
+import itertools
 from math import pi, sin, cos, sqrt
 from mod.common.minecraftEnum import (
     EntityType,
@@ -20,11 +22,19 @@ from mod.common.minecraftEnum import (
     EffectType,
     EnchantType,
 )
+from ..core._utils import MappingProxy
 
 
 __all__ = [
-    "Enum",
     "auto",
+    "EnumMeta",
+    "Enum",
+    "IntEnum",
+    "StrEnum",
+    "Flag",
+    "IntFlag",
+    "gen_lower_name",
+    "gen_minecraft_lower_name",
     "ClientEvent",
     "ServerEvent",
     "TimeEaseFunc",
@@ -33,15 +43,11 @@ __all__ = [
     "ComboBoxCallbackType",
     "ButtonCallbackType",
     "ControlType",
-    "FriendlyMob",
-    "HostileMob",
     "Mob",
     "Feature",
     "UiContainer",
     "Container",
-    "PositiveEffect",
-    "NegativeEffect",
-    "NeutralEffect",
+    "Effect",
     "ENTITY_NAME_MAP",
     "BIOME_NAME_MAP",
     "STRUCTURE_NAME_MAP",
@@ -50,142 +56,512 @@ __all__ = [
 ]
 
 
-class _EnumMeta(type):
-    def __new__(metacls, name, bases, dct, restrict_type=None):
-        dct['__enum_flag__'] = 0
-        cls = type.__new__(metacls, name, bases, dct) # type: type[Enum]
-        members = {}
-        if name != "Enum":
-            # 遍历当前Enum成员
-            for k, v in dct.items():
-                if k.startswith("_"):
-                    continue
-                if isinstance(v, auto):
-                    member = cls._gen_auto_value(k) # NOQA
-                elif cls._restrict_type:
-                    if type(v) is not cls._restrict_type:
-                        raise TypeError(
-                            "member of '%s' must be '%s', got '%s'"
-                            % (name, cls._restrict_type.__name__, type(v).__name__)
-                        )
-                    member = v
-                else:
-                    member = cls(k, v) # type: Enum
-                members[k] = member
-                setattr(cls, k, member)
-            # 继承父Enum成员
-            for base in bases:
-                if isinstance(base, _EnumMeta):
-                    members.update(base.__members__)
-        else:
-            cls._restrict_type = restrict_type
-        cls.__members__ = members
-        cls.__enum_flag__ = 1
-        return cls
-
-    def __setattr__(cls, name, value):
-        # 禁止动态设置枚举值
-        if getattr(cls, '__enum_flag__', 0) == 1:
-            raise AttributeError("can't set member '%s' in '%s'" % (name, cls.__name__))
-        type.__setattr__(cls, name, value)
-
-    def __delattr__(cls, name):
-        # 禁止删除枚举值
-        raise AttributeError("can't delete member '%s' in '%s'" % (name, cls.__name__))
-
-    def __contains__(cls, member):
-        # 支持in
-        for v in cls.__members__.values():
-            if cls._restrict_type:
-                if v == member:
-                    return True
-            elif v.value == member:
-                return True
-        return False
-
-    def __len__(cls):
-        # 支持len()
-        return len(cls.__members__)
-
-    def __iter__(cls):
-        # 支持遍历
-        return iter(cls.__members__.items())
-
-    def __getitem__(cls, item):
-        # 支持Enum[type]/Enum['xxx']
-        if cls is Enum:
-            return _EnumMeta._gen_cls(item)
-        else:
-            return cls.__members__[item]
-
-    @staticmethod
-    def _gen_cls(restrict_type):
-        dct = dict(Enum.__dict__)
-        del dct['__dict__']
-        del dct['__weakref__']
-        del dct['__members__']
-        del dct['__enum_flag__']
-        new_cls = _EnumMeta.__new__(_EnumMeta, "Enum", (object,), dct, restrict_type)
-        return new_cls
-
-    def _gen_auto_value(cls, name=None):
-        t = getattr(cls, '_restrict_type', None)
-        if t is str:
-            val = name
-        elif t is int:
-            val = getattr(cls, '_last_auto_value', -1) + 1
-            cls._last_auto_value = val
-        else:
-            raise TypeError("unsupported type '%s'" % t.__name__)
-        return val
+# region Enum Classes ==================================================================================================
 
 
-class Enum(object):
-    """
-    枚举类，用于实现自定义枚举值。
-
-    支持以下功能：
-
-    - ``len()``: 获取枚举值数量
-    - 通过for循环等方式进行遍历
-    - 通过 ``in`` 关键字判断某个值是否在枚举范围内
-    - 可通过 ``Enum[type]`` 的方式定义特定类型的枚举值，如 ``Enum[int]`` 定义int类型枚举值
-    - 可通过 ``MyEnum.xxx`` 或 ``MyEnum['xxx']`` 的方式获取指定枚举值
-
-    注意事项：
-
-    - 枚举值是无序的（类似于字典），因此遍历顺序与编写顺序无关
-    - 不支持动态插入或删除枚举值
-    - 枚举名不能以下划线开头
-    """
-
-    __metaclass__ = _EnumMeta
-
-    def __init__(self, name, value):
-        self.__name = name
-        self.__value = value
-        self.__hash = hash(name)
-
-    def __repr__(self):
-        return "<%s.%s: %s>" % (self.__class__.__name__, self.__name, repr(self.__value))
-
-    def __hash__(self):
-        return self.__hash
-
-    @property
-    def name(self):
-        return self.__name
-
-    @property
-    def value(self):
-        return self.__value
+Enum = IntEnum = StrEnum = Flag = IntFlag = None
 
 
 class auto(object):
-    pass
+    """
+    用于自动生成枚举值。
+
+    你可以在枚举类中定义 ``_generate_next_value_()`` 静态方法以自定义 ``auto()`` 的值生成逻辑。
+    该方法有三个参数，分别为枚举成员名称（str）、现有成员数量（int）和已分配值的列表（list），返回值即为最终的枚举值。
+
+    >>> class Color(Enum):
+    ...     @staticmethod
+    ...     def _generate_next_value_(name, count, last_values):
+    ...         return count * 10
+    ...
+    ...     RED = auto()
+    ...     GREEN = auto()
+    ...     BLUE = auto()
+    ...
+    >>> Color.RED
+    <Color.RED: 0>
+    >>> Color.GREEN
+    <Color.GREEN: 10>
+    >>> Color.BLUE
+    <Color.BLUE: 20>
+    """
+
+    _counter = itertools.count()
+
+    def __init__(self):
+        self._order = next(auto._counter)
 
 
-class ClientEvent(Enum[str]):
+def _get_member_type(cls_name, bases):
+    # StrEnum(Enum, str)
+    # StrEnum(str, Enum)
+    # SE(StrEnum)
+    types = set()
+    for chain in bases:
+        if chain is Enum:
+            continue
+        for base in chain.__mro__:
+            if base is object:
+                continue
+            if isinstance(base, EnumMeta):
+                if base._member_type_ is not object:
+                    types.add(base._member_type_)
+                    break
+                else:
+                    continue
+            types.add(base)
+            break
+    if len(types) > 1:
+        raise TypeError(
+            "too many data types for %s: (%s)"
+            % (cls_name, ", ".join(t.__name__ for t in types))
+        )
+    return types.pop() if types else object
+
+
+def _set_enum_attr(cls, k, v, cls_dict):
+    type.__setattr__(cls, k, v)
+    cls_dict[k] = v
+
+
+_new_enum = type.__new__
+
+
+class EnumMeta(type):
+    """
+    ``Enum`` 的元类。
+    """
+
+    def __new__(metacls, cls_name, bases, cls_dict):
+        # 往cls_dict添加属性而不是cls.xxx = xxx，避免触发__setattr__
+        _member_map_        = cls_dict['_member_map_']        = OrderedDict()
+        _value2member_map_  = cls_dict['_value2member_map_']  = {}
+        _unhashable_values_ = cls_dict['_unhashable_values_'] = []
+        _member_names_      = cls_dict['_member_names_']      = []
+        _member_type_       = cls_dict['_member_type_']       = _get_member_type(cls_name, bases)
+        _ignore_            = cls_dict.setdefault('_ignore_', [])
+
+        gnv = cls_dict.get('_generate_next_value_')
+        if gnv and type(gnv) is not staticmethod:
+            cls_dict['_generate_next_value_'] = staticmethod(gnv)
+
+        # 创建枚举类
+        cls = _new_enum(metacls, cls_name, bases, cls_dict)
+        if cls_name == "Enum" and bases == (object,):
+            return cls
+
+        # 确保枚举类使用正确的魔术方法
+        if _member_type_ is not object:
+            if '__format__' not in cls_dict:
+                _set_enum_attr(cls, '__format__', _member_type_.__format__, cls_dict)
+            if '__str__' not in cls_dict:
+                m = _member_type_.__str__
+                if m is object.__str__:
+                    m = _member_type_.__repr__
+                _set_enum_attr(cls, '__str__', m, cls_dict)
+        for method in ('__repr__', '__str__', '__format__', '__reduce_ex__'):
+            if method in cls_dict:
+                continue
+            found_method = getattr(cls, method)
+            enum_method = getattr(Enum, method)
+            object_method = getattr(object, method)
+            member_type_method = getattr(_member_type_, method)
+            if found_method in (object_method, member_type_method):
+                _set_enum_attr(cls, method, enum_method, cls_dict)
+        if '__new__' not in cls_dict:
+            __new__ = staticmethod(Enum.__new__)
+            _set_enum_attr(cls, '__new__', __new__, cls_dict)
+
+        cls_dict_items = cls_dict.items()
+        # 如果使用了auto()，按照定义顺序排序
+        cls_dict_items.sort(key=lambda x: x[1]._order if isinstance(x[1], auto) else -1)
+        count = 0
+        last_values = []
+
+        for k, v in cls_dict_items:
+            if k[0] == "_" or k in _ignore_:
+                continue
+            if isinstance(v, auto):
+                # 生成auto()值
+                v = cls._generate_next_value_(k, count, last_values)
+            if not isinstance(v, _member_type_):
+                raise TypeError(
+                    "enum member %s.%s must be %s, got %s"
+                    % (cls_name, k, _member_type_.__name__, type(v).__name__)
+                )
+
+            # 创建枚举成员
+            member = _member_type_.__new__(cls, v)
+            member._name_ = k
+            member._value_ = v
+            member._hash_ = hash(k)
+
+            _member_map_[k] = member
+            try:
+                _value2member_map_[v] = member
+            except TypeError:
+                _unhashable_values_.append(v)
+            _member_names_.append(k)
+            # 将成员对象更新到枚举类上
+            _set_enum_attr(cls, k, member, cls_dict)
+            count += 1
+            last_values.append(v)
+
+        return cls
+
+    def __setattr__(cls, name, value):
+        # 禁止动态设置枚举成员
+        raise AttributeError("can't set member '%s' of Enum object '%s'" % (name, cls.__name__))
+
+    def __delattr__(cls, name):
+        # 禁止删除枚举成员
+        raise AttributeError("can't delete member '%s' of Enum object '%s'" % (name, cls.__name__))
+
+    def __call__(cls, value):
+        """
+        通过值查找对应的枚举成员。
+
+        -----
+
+        :param Any value: 值
+
+        :return: 成员对象
+        :rtype: Enum
+        """
+        # 跳转到Enum.__new__
+        return cls.__new__(cls, value)
+
+    def __getitem__(cls, name):
+        """
+        通过字符串名称查找对应的枚举成员。
+
+        -----
+
+        :param str name: 成员名称
+
+        :return: 成员对象
+        :rtype: Enum
+        """
+        return cls._member_map_[name]
+
+    def __len__(cls):
+        """
+        返回枚举成员数量。
+
+        -----
+
+        :return: 枚举成员数量
+        :rtype: int
+        """
+        return len(cls._member_names_)
+
+    def __iter__(cls):
+        """
+        返回枚举成员迭代器。
+
+        -----
+
+        :return: 枚举成员迭代器
+        """
+        return (cls._member_map_[name] for name in cls._member_names_)
+
+    @property
+    def __members__(cls):
+        """
+        [只读属性]
+
+        枚举成员字典。
+
+        :rtype: dict[str,Enum]
+        """
+        return MappingProxy(cls._member_map_)
+
+    def __contains__(cls, value):
+        """
+        判断某个对象是否是枚举成员。
+
+        -----
+
+        :param Any value: 要判断的值
+
+        :return: 值在枚举范围内返回True，否则返回False
+        :rtype: bool
+        """
+        try:
+            cls(value)
+            return True
+        except ValueError:
+            return False
+
+    def __bool__(cls):
+        return True
+
+    __nonzero__ = __bool__
+
+    def __repr__(cls):
+        if issubclass(cls, Flag):
+            return "<flag %r>" % cls.__name__
+        else:
+            return "<enum %r>" % cls.__name__
+
+
+class Enum(object): # NOQA
+    """
+    枚举类，用于实现自定义枚举。
+
+    枚举类拥有以下特性：
+
+    - 枚举成员：每个枚举成员均为枚举类的实例，可通过 ``.name`` 和 ``.value`` 属性获取成员的名称和值。
+    >>> class Color(Enum):
+    ...     RED = 1
+    ...     GREEN = 2
+    ...     BLUE = 3
+    ...
+    >>> Color.RED
+    <Color.RED: 1>
+    >>> Color.RED == 1
+    False
+    >>> Color.RED.name
+    'RED'
+    >>> Color.RED.value
+    1
+
+    - 忽略成员：在枚举类中定义 ``_ignore_`` 属性（列表或元组），填入需要忽略的成员名称，这些成员将保留为普通类属性，不会成为枚举类的实例。
+      同时，以下划线开头的名称也不会成为枚举成员。
+    >>> class Color(Enum):
+    ...     _ignore_ = ['ALL']
+    ...     RED = 1
+    ...     GREEN = 2
+    ...     BLUE = 3
+    ...     _YELLOW = 4
+    ...     ALL = (1, 2, 3)
+    ...
+    >>> Color._YELLOW
+    4
+    >>> Color.ALL
+    (1, 2, 3)
+
+    - 成员安全：不允许动态插入/修改/删除枚举成员，否则将会抛出 ``AttributeError`` 。
+    >>> Color.RED = 4 # 抛出AttributeError
+    >>> del Color.RED # 抛出AttributeError
+
+    - 值查找：通过值查找对应的枚举成员，如果值不存在，则抛出 ``ValueError`` 。
+    >>> Color(1)
+    <Color.RED: 1>
+
+    - 名称查找：通过字符串名称查找对应的枚举成员，如果名称不存在，则抛出 ``KeyError`` 。
+    >>> Color['RED']
+    <Color.RED: 1>
+
+    - 成员数量：可通过 ``len()`` 函数获取枚举成员数量。
+    >>> len(Color)
+    3
+
+    - 成员遍历：可通过 ``for`` 循环等方式遍历枚举成员，或通过枚举类的 ``.__members__`` 属性获取成员字典，该字典的key和value对应成员名称和成员对象。
+    >>> for member in Color:
+    ...     print member.name, member.value
+    ...
+    'RED' 1
+    'GREEN' 2
+    'BLUE' 3
+
+    >>> for name, member in Color.__members__.items():
+    ...     print member.name, member.value
+    ...
+    'RED' 1
+    'GREEN' 2
+    'BLUE' 3
+
+    - 成员判断：可通过 ``in`` 关键字判断某个对象是否是枚举成员。
+    >>> 1 in Color
+    True
+    >>> Color.RED in Color
+    True
+    >>> 4 in Color
+    False
+
+    - 自动生成枚举值：使用 ``auto()`` 可自动生成枚举值，而无需手动编写。默认情况下，值从 ``1`` 开始递增。
+      你也可以自定义 ``auto()`` 的值生成逻辑，详见 ``auto()`` 的说明文档。
+    >>> class Color(Enum):
+    ...     RED = auto()
+    ...     GREEN = auto()
+    ...     BLUE = auto()
+    ...
+    >>> Color.RED
+    <Color.RED: 1>
+    >>> Color.GREEN
+    <Color.GREEN: 2>
+    >>> Color.BLUE
+    <Color.BLUE: 3>
+    """
+
+    __metaclass__ = EnumMeta
+
+    def __new__(cls, value):
+        # 值查找
+        if isinstance(value, cls):
+            # Color(Color.RED)
+            return value
+        try:
+            # Color(1)
+            return cls._value2member_map_[value]
+        except KeyError:
+            pass
+        except TypeError:
+            # 对不可哈希值采用线性查找
+            for member in cls._member_map_.values():
+                if member._value_ == value:
+                    return member
+        raise ValueError("%r is not a valid %s" % (value, cls.__name__))
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __str__(self):
+        return "%s.%s" % (self.__class__.__name__, self._name_)
+
+    def __repr__(self):
+        return "<%s.%s: %r>" % (self.__class__.__name__, self._name_, self._value_)
+
+    def __hash__(self):
+        return self._hash_
+
+    def __format__(self, format_spec):
+        return str.__format__(str(self), format_spec)
+
+    def __reduce_ex__(self, proto):
+        return self.__class__, (self._value_,)
+
+    def __deepcopy__(self, memo):
+        return self
+
+    def __copy__(self):
+        return self
+
+    @property
+    def name(self):
+        """
+        [只读属性]
+
+        枚举成员名称。
+
+        :rtype: str
+        """
+        return self._name_
+
+    @property
+    def value(self):
+        """
+        [只读属性]
+
+        枚举值。
+
+        :rtype: Any
+        """
+        return self._value_
+
+    @staticmethod
+    def _generate_next_value_(name, count, last_values):
+        """
+        [静态方法]
+
+        ``auto()`` 生成枚举值时调用该方法。
+
+        -----
+
+        :param str name: 枚举成员名称
+        :param int count: 现有成员数量
+        :param list[Any] last_values: 已分配值的列表
+
+        :return: 返回值将作为枚举值
+        :rtype: Any
+        """
+        if not last_values:
+            return 1
+        return max(last_values) + 1
+
+
+class IntEnum(int, Enum): # NOQA
+    """
+    整数类型枚举类。
+
+    ``IntEnum`` 拥有 ``Enum`` 的全部特性，且其枚举成员同时也是 ``int`` 类型，支持所有整数运算。
+
+    >>> class Permission(IntEnum):
+    ...     VISITOR = 0
+    ...     MEMBER = 1
+    ...     OPERATOR = 2
+    ...
+    >>> Permission.VISITOR
+    0
+    >>> Permission.VISITOR + 6
+    6
+    """
+
+
+class StrEnum(str, Enum): # NOQA
+    """
+    字符串类型枚举类。
+
+    ``StrEnum`` 拥有 ``Enum`` 的全部特性，且其枚举成员同时也是 ``str`` 类型，支持所有字符串运算。
+
+    >>> class Permission(StrEnum):
+    ...     VISITOR = "visitor"
+    ...     MEMBER = "member"
+    ...     OPERATOR = "operator"
+    ...
+    >>> Permission.VISITOR
+    'visitor'
+    >>> "My permission is %s." % Permission.VISITOR
+    'My permission is visitor.'
+
+    此外，使用 ``auto()`` 自动生成的枚举值与枚举名相同。
+
+    >>> class Permission(StrEnum):
+    ...     VISITOR = auto()
+    ...     MEMBER = auto()
+    ...     OPERATOR = auto()
+    ...
+    >>> Permission.VISITOR
+    'VISITOR'
+    """
+
+    @staticmethod
+    def _generate_next_value_(name, count, last_values):
+        return name
+
+
+class Flag(Enum): # NOQA
+    """
+    标志枚举类。
+    """
+
+    @staticmethod
+    def _generate_next_value_(name, count, last_values):
+        return 1 << count
+
+
+class IntFlag(int, Flag): # NOQA
+    """
+    整数类型标志枚举类。
+    """
+
+
+gen_lower_name = lambda name, _, __: name.lower()
+gen_minecraft_lower_name = lambda name, _, __: "minecraft:" + name.lower()
+
+
+# endregion
+
+
+# region Preset Enums ==================================================================================================
+
+
+class ClientEvent(StrEnum):
+    """
+    ModSDK客户端事件名枚举。
+    """
+
     UIDefReloadSceneStackAfter = auto()
     UpdatePlayerSkinClientEvent = auto()
     PlayerTryRemoveCustomContainerItemClientEvent = auto()
@@ -299,7 +675,11 @@ class ClientEvent(Enum[str]):
     UiInitFinished = auto()
 
 
-class ServerEvent(Enum[str]):
+class ServerEvent(StrEnum):
+    """
+    ModSDK服务端事件名枚举。
+    """
+
     ItemPullOutCustomContainerServerEvent = auto()
     ItemPushInCustomContainerServerEvent = auto()
     PlayerPermissionChangeServerEvent = auto()
@@ -477,100 +857,43 @@ class TimeEaseFunc:
     """
 
     LINEAR = staticmethod(lambda x: x)
-    """
-    线性缓动，变化速度均匀。
-    """
-
+    """ 线性缓动，变化速度均匀。 """
     SPRING = staticmethod(lambda x: 1 - cos(x * pi * (0.2 + 2.5 * x**2)))
-    """
-    弹簧缓动，效果通常表现为一个有些反复的波动，随着时间逐渐衰减。
-    """
-
+    """ 弹簧缓动，效果通常表现为一个有些反复的波动，随着时间逐渐衰减。 """
     IN_QUAD = staticmethod(lambda x: x**2)
-    """
-    二次加速，在开始时慢，随着时间推进加速，二次方增长。
-    """
-
+    """ 二次加速，在开始时慢，随着时间推进加速，二次方增长。 """
     OUT_QUAD = staticmethod(lambda x: 1 - (1 - x)**2)
-    """
-    二次减速，在开始时快速，随着时间推移减速，二次方衰减。
-    """
-
+    """ 二次减速，在开始时快速，随着时间推移减速，二次方衰减。 """
     IN_OUT_QUAD = staticmethod(lambda x: 2 * x**2 if x < 0.5 else 1 - (-2 * x + 2)**2 / 2.)
-    """
-    二次加减速，先加速然后减速，二次方的组合。
-    """
-
+    """ 二次加减速，先加速然后减速，二次方的组合。 """
     IN_CUBIC = staticmethod(lambda x: x**3)
-    """
-    三次加速，在开始时非常慢，然后迅速加速，三次方增长。
-    """
-
+    """ 三次加速，在开始时非常慢，然后迅速加速，三次方增长。 """
     OUT_CUBIC = staticmethod(lambda x: 1 - (1 - x)**3)
-    """
-    三次减速，在开始时快速，然后减速，三次方衰减。
-    """
-
+    """ 三次减速，在开始时快速，然后减速，三次方衰减。 """
     IN_OUT_CUBIC = staticmethod(lambda x: 4 * x**3 if x < 0.5 else 1 - (-2 * x + 2)**3 / 2.)
-    """
-    三次加减速，先加速然后减速，三次方的组合。
-    """
-
+    """ 三次加减速，先加速然后减速，三次方的组合。 """
     IN_QUART = staticmethod(lambda x: x**4)
-    """
-    四次加速，在开始时非常慢，然后迅速加速，四次方增长。
-    """
-
+    """ 四次加速，在开始时非常慢，然后迅速加速，四次方增长。 """
     OUT_QUART = staticmethod(lambda x: 1 - (1 - x)**4)
-    """
-    四次减速，在开始时非常快，然后逐渐减速，四次方衰减。
-    """
-
+    """ 四次减速，在开始时非常快，然后逐渐减速，四次方衰减。 """
     IN_OUT_QUART = staticmethod(lambda x: 8 * x**4 if x < 0.5 else 1 - (-2 * x + 2)**4 / 2.)
-    """
-    四次加减速，先加速然后减速，四次方的组合。
-    """
-
+    """ 四次加减速，先加速然后减速，四次方的组合。 """
     IN_QUINT = staticmethod(lambda x: x**5)
-    """
-    五次加速，在开始时非常慢，然后急剧加速，五次方增长。
-    """
-
+    """ 五次加速，在开始时非常慢，然后急剧加速，五次方增长。 """
     OUT_QUINT = staticmethod(lambda x: 1 - (1 - x)**5)
-    """
-    五次减速，在开始时非常快，随后减速，五次方衰减。
-    """
-
+    """ 五次减速，在开始时非常快，随后减速，五次方衰减。 """
     IN_OUT_QUINT = staticmethod(lambda x: 16 * x**5 if x < 0.5 else 1 - (-2 * x + 2)**5 / 2.)
-    """
-    五次加减速，先加速然后减速，五次方的组合。
-    """
-
+    """ 五次加减速，先加速然后减速，五次方的组合。 """
     IN_SINE = staticmethod(lambda x: 1 - cos(x * pi / 2))
-    """
-    正弦加速，在开始时慢，随着时间加速，遵循正弦函数的形式。
-    """
-
+    """ 正弦加速，在开始时慢，随着时间加速，遵循正弦函数的形式。 """
     OUT_SINE = staticmethod(lambda x:  sin(x * pi / 2))
-    """
-    正弦减速，在开始时快，随后减速，遵循正弦函数的形式。
-    """
-
+    """ 正弦减速，在开始时快，随后减速，遵循正弦函数的形式。 """
     IN_OUT_SINE = staticmethod(lambda x: -0.5 * (cos(pi * x) - 1))
-    """
-    正弦加减速，先加速然后减速，遵循正弦函数的形式。
-    """
-
+    """ 正弦加减速，先加速然后减速，遵循正弦函数的形式。 """
     IN_EXPO = staticmethod(lambda x: 0 if x == 0 else 2**(10 * (x - 1)))
-    """
-    指数加速，在开始时非常慢，随后迅速加速，遵循指数函数增长。
-    """
-
+    """ 指数加速，在开始时非常慢，随后迅速加速，遵循指数函数增长。 """
     OUT_EXPO = staticmethod(lambda x: 1 if x == 1 else 1 - 2**(-10 * x))
-    """
-    指数减速，在开始时非常快，随后减速，遵循指数衰减。
-    """
-
+    """ 指数减速，在开始时非常快，随后减速，遵循指数衰减。 """
     @staticmethod
     def IN_OUT_EXPO(x):
         """
@@ -581,29 +904,38 @@ class TimeEaseFunc:
         if x == 1:
             return 1.
         return 2**(10 * (x * 2 - 1)) / 2. if x < 0.5 else (2 - 2**(-10 * (x * 2 - 1))) / 2.
-
     IN_CIRC = staticmethod(lambda x: 1 - sqrt(1 - x**2))
-    """
-    圆形加速，在开始时较慢，然后加速，遵循圆形函数的效果。
-    """
-
+    """ 圆形加速，在开始时较慢，然后加速，遵循圆形函数的效果。 """
     OUT_CIRC = staticmethod(lambda x:  sqrt(1 - (x - 1)**2))
-    """
-    圆形减速，在开始时较快，然后减速，遵循圆形函数的效果。
-    """
-
+    """ 圆形减速，在开始时较快，然后减速，遵循圆形函数的效果。 """
     IN_OUT_CIRC = staticmethod(lambda x: 1 - sqrt(1 - (2 * x)**2) if x < 0.5 else sqrt(1 - (-2 * x + 2)**2) / 2.)
-    """
-    圆形加减速，先加速然后减速，遵循圆形函数的效果。
-    """
-
+    """ 圆形加减速，先加速然后减速，遵循圆形函数的效果。 """
+    IN_BACK = staticmethod(lambda x: x**3 - x * sin(x * pi) * 1.70158)
+    """ 回退加速，动画先稍微向后回退，然后加速。 """
+    OUT_BACK = staticmethod(lambda x: 1 - ((1 - x)**3 - (1 - x) * sin((1 - x) * pi) * 1.70158))
+    """ 回退减速，动画开始时很快，之后回退并逐渐减速。 """
+    IN_OUT_BACK = staticmethod(
+        lambda x:
+            (2 * x**3 - x * sin(x * pi) * 1.70158) if x < 0.5
+            else (1 - ((2 - 2 * x)**3 - (2 - 2 * x) * sin((2 - 2 * x) * pi) * 1.70158))
+    )
+    """ 回退加减速，先回退后加速，之后回弹并减速。 """
+    IN_ELASTIC = staticmethod(lambda x: 1 - sin(6 * pi * x) * x**2)
+    """ 弹性加速，具有弹性拉伸的效果，初期比较慢，然后加速。 """
+    OUT_ELASTIC = staticmethod(lambda x:  sin(6 * pi * x) * (1 - x)**2)
+    """ 弹性减速，弹性效果，快速运动然后逐渐回弹。 """
+    IN_OUT_ELASTIC = staticmethod(
+        lambda x:
+            (0.5 * (1 - sin(6 * pi * x) * x**2)) if x < 0.5
+            else (0.5 * (sin(6 * pi * (x - 0.5)) * (1 - x)**2 + 1))
+    )
+    """ 弹性加减速，先加速后减速，表现为弹性效果。 """
     @staticmethod
     def IN_BOUNCE(x):
         """
         弹跳加速，表现为一种反复弹跳的加速效果。
         """
         return 1 - TimeEaseFunc.OUT_BOUNCE(1 - x)
-
     @staticmethod
     def OUT_BOUNCE(x):
         """
@@ -620,7 +952,6 @@ class TimeEaseFunc:
         else:
             x -= 2.625 / 2.75
             return 7.5625 * x**2 + 0.984375
-
     @staticmethod
     def IN_OUT_BOUNCE(x):
         """
@@ -628,816 +959,354 @@ class TimeEaseFunc:
         """
         return 0.5 * TimeEaseFunc.IN_BOUNCE(x * 2) if x < 0.5 else 0.5 * TimeEaseFunc.OUT_BOUNCE(x * 2 - 1) + 0.5
 
-    IN_BACK = staticmethod(lambda x: x**3 - x * sin(x * pi) * 1.70158)
-    """
-    回退加速，动画先稍微向后回退，然后加速。
-    """
 
-    OUT_BACK = staticmethod(lambda x: 1 - ((1 - x)**3 - (1 - x) * sin((1 - x) * pi) * 1.70158))
-    """
-    回退减速，动画开始时很快，之后回退并逐渐减速。
-    """
-
-    IN_OUT_BACK = staticmethod(
-        lambda x:
-            (2 * x**3 - x * sin(x * pi) * 1.70158) if x < 0.5
-            else (1 - ((2 - 2 * x)**3 - (2 - 2 * x) * sin((2 - 2 * x) * pi) * 1.70158))
-    )
-    """
-    回退加减速，先回退后加速，之后回弹并减速。
-    """
-
-    IN_ELASTIC = staticmethod(lambda x: 1 - sin(6 * pi * x) * x**2)
-    """
-    弹性加速，具有弹性拉伸的效果，初期比较慢，然后加速。
-    """
-
-    OUT_ELASTIC = staticmethod(lambda x:  sin(6 * pi * x) * (1 - x)**2)
-    """
-    弹性减速，弹性效果，快速运动然后逐渐回弹。
-    """
-
-    IN_OUT_ELASTIC = staticmethod(
-        lambda x:
-            (0.5 * (1 - sin(6 * pi * x) * x**2)) if x < 0.5
-            else (0.5 * (sin(6 * pi * (x - 0.5)) * (1 - x)**2 + 1))
-    )
-    """
-    弹性加减速，先加速后减速，表现为弹性效果。
-    """
-
-
-class ToggleCallbackType(Enum[str]):
+class ToggleCallbackType(StrEnum):
     """
     开关回调函数类型枚举。
     """
 
     CHANGED = auto()
-    """
-    开关状态变化时触发。
-    """
+    """ 开关状态变化时触发。 """
 
 
-class WheelCallbackType(Enum[str]):
+class WheelCallbackType(StrEnum):
     """
     轮盘回调函数类型枚举。
     """
 
     CLICK = auto()
-    """
-    点击轮盘切片时触发。
-    """
-
+    """ 点击轮盘切片时触发。 """
     HOVER = auto()
-    """
-    选择轮盘切片时触发。
-    """
+    """ 选择轮盘切片时触发。 """
 
 
-class GridCallbackType(Enum[str]):
+class GridCallbackType(StrEnum):
     """
     网格回调函数类型枚举。
     """
 
     UPDATE = auto()
-    """
-    网格元素刷新时触发。
-    """
-
+    """ 网格元素刷新时触发。 """
     LOADED = auto()
-    """
-    网格初次加载完成时触发。
-    """
+    """ 网格初次加载完成时触发。 """
 
 
-class ComboBoxCallbackType(Enum[str]):
+class ComboBoxCallbackType(StrEnum):
     """
     下拉框回调函数类型枚举。
     """
 
     OPEN = auto()
-    """
-    展开下拉框。
-    """
-
+    """ 展开下拉框。 """
     CLOSE = auto()
-    """
-    关闭下拉框。
-    """
-
+    """ 关闭下拉框。 """
     SELECT = auto()
-    """
-    选中下拉框内容。
-    """
+    """ 选中下拉框内容。 """
 
 
-class ButtonCallbackType(Enum[str]):
+class ButtonCallbackType(StrEnum):
     """
     按钮回调函数类型枚举。
     """
 
     UP = auto()
-    """
-    触控在按钮范围内抬起。
-    """
-
+    """ 触控在按钮范围内抬起。 """
     DOWN = auto()
-    """
-    按钮按下。
-    """
-
+    """ 按钮按下。 """
     CANCEL = auto()
-    """
-    触控在按钮范围外抬起。
-    """
-
+    """ 触控在按钮范围外抬起。 """
     MOVE = auto()
-    """
-    按下后触控移动。
-    """
-
+    """ 按下后触控移动。 """
     MOVE_IN = auto()
-    """
-    按下按钮后触控进入按钮。
-    """
-
+    """ 按下按钮后触控进入按钮。 """
     MOVE_OUT = auto()
-    """
-    按下按钮后触控退出按钮。
-    """
-
+    """ 按下按钮后触控退出按钮。 """
     DOUBLE_CLICK = auto()
-    """
-    双击按钮。
-    """
-
+    """ 双击按钮。 """
     LONG_CLICK = auto()
-    """
-    长按按钮。
-    """
-
+    """ 长按按钮。 """
     HOVER_IN = auto()
-    """
-    鼠标进入按钮。
-    """
-
+    """ 鼠标进入按钮。 """
     HOVER_OUT = auto()
-    """
-    鼠标退出按钮。
-    """
-
+    """ 鼠标退出按钮。 """
     SCREEN_EXIT = auto()
-    """
-    按钮所在画布退出，且鼠标仍未抬起时触发。
-    """
+    """ 按钮所在画布退出，且鼠标仍未抬起时触发。 """
 
 
-class ControlType(Enum[str]):
+class ControlType(StrEnum):
     """
     UI控件类型枚举。
     """
 
     BASE_CONTROL = "BaseControl"
-    """
-    通用控件。
-    """
-
+    """ 通用控件。 """
     BUTTON = "Button"
-    """
-    按钮控件。
-    """
-
+    """ 按钮控件。 """
     IMAGE = "Image"
-    """
-    图片控件。
-    """
-
+    """ 图片控件。 """
     LABEL = "Label"
-    """
-    文本控件。
-    """
-
+    """ 文本控件。 """
     PANEL = "Panel"
-    """
-    面板控件。
-    """
-
+    """ 面板控件。 """
     INPUT_PANEL = "InputPanel"
-    """
-    输入面板控件。
-    """
-
+    """ 输入面板控件。 """
     STACK_PANEL = "StackPanel"
-    """
-    栈面板控件。
-    """
-
+    """ 栈面板控件。 """
     EDIT_BOX = "TextEditBox"
-    """
-    文本编辑框控件。
-    """
-
+    """ 文本编辑框控件。 """
     PAPER_DOLL = "PaperDoll"
-    """
-    纸娃娃控件。
-    """
-
+    """ 纸娃娃控件。 """
     NETEASE_PAPER_DOLL = "NeteasePaperDoll"
-    """
-    网易纸娃娃控件。
-    """
-
+    """ 网易纸娃娃控件。 """
     ITEM_RENDERER = "ItemRenderer"
-    """
-    物品渲染器控件。
-    """
-
+    """ 物品渲染器控件。 """
     GRADIENT_RENDERER = "GradientRenderer"
-    """
-    渐变渲染器控件。
-    """
-
+    """ 渐变渲染器控件。 """
     SCROLL_VIEW = "ScrollView"
-    """
-    滚动视图控件。
-    """
-
+    """ 滚动视图控件。 """
     GRID = "Grid"
-    """
-    网格控件。
-    """
-
+    """ 网格控件。 """
     PROGRESS_BAR = "ProgressBar"
-    """
-    进度条控件。
-    """
-
+    """ 进度条控件。 """
     TOGGLE = "SwitchToggle"
-    """
-    开关控件。
-    """
-
+    """ 开关控件。 """
     SLIDER = "Slider"
-    """
-    滑动条控件。
-    """
-
+    """ 滑动条控件。 """
     SELECTION_WHEEL = "SelectionWheel"
-    """
-    轮盘控件。
-    """
-
+    """ 轮盘控件。 """
     COMBO_BOX = "NeteaseComboBox"
-    """
-    下拉框控件。
-    """
-
+    """ 下拉框控件。 """
     MINI_MAP = "MiniMap"
-    """
-    小地图控件。
-    """
+    """ 小地图控件。 """
+    _AS_BASE = (BASE_CONTROL, PANEL, PAPER_DOLL, GRADIENT_RENDERER)
 
-    _NOT_SPECIAL = (BASE_CONTROL, PANEL, PAPER_DOLL, GRADIENT_RENDERER)
 
-
-class FriendlyMob(Enum[str]):
-    """
-    友好生物identifier枚举。
-
-    -----
-
-    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
-    """
-
-    ALLAY = "minecraft:allay"
-    """
-    悦灵。
-    """
-
-    ARMADILLO = "minecraft:armadillo"
-    """
-    犰狳。
-    """
-
-    BAT = "minecraft:bat"
-    """
-    蝙蝠。
-    """
-
-    CAMEL = "minecraft:camel"
-    """
-    骆驼。
-    """
-
-    CHICKEN = "minecraft:chicken"
-    """
-    鸡。
-    """
-
-    COD = "minecraft:cod"
-    """
-    鳕鱼。
-    """
-
-    COPPER_GOLEM = "minecraft:copper_golem"
-    """
-    铜傀儡。
-    """
-
-    COW = "minecraft:cow"
-    """
-    牛。
-    """
-
-    DONKEY = "minecraft:donkey"
-    """
-    驴。
-    """
-
-    GLOW_SQUID = "minecraft:glow_squid"
-    """
-    发光鱿鱼。
-    """
-
-    HAPPY_GHAST = "minecraft:happy_ghast"
-    """
-    快乐恶魂。
-    """
-
-    HORSE = "minecraft:horse"
-    """
-    马。
-    """
-
-    MOOSHROOM = "minecraft:mooshroom"
-    """
-    哞菇。
-    """
-
-    MULE = "minecraft:mule"
-    """
-    骡。
-    """
-
-    PARROT = "minecraft:parrot"
-    """
-    鹦鹉。
-    """
-
-    PIG = "minecraft:pig"
-    """
-    猪。
-    """
-
-    RABBIT = "minecraft:rabbit"
-    """
-    兔子。
-    """
-
-    SALMON = "minecraft:salmon"
-    """
-    鲑鱼。
-    """
-
-    SHEEP = "minecraft:sheep"
-    """
-    绵羊。
-    """
-
-    SKELETON_HORSE = "minecraft:skeleton_horse"
-    """
-    骷髅马。
-    """
-
-    SNIFFER = "minecraft:sniffer"
-    """
-    嗅探兽。
-    """
-
-    SQUID = "minecraft:squid"
-    """
-    鱿鱼。
-    """
-
-    STRIDER = "minecraft:strider"
-    """
-    炽足兽。
-    """
-
-    TADPOLE = "minecraft:tadpole"
-    """
-    蝌蚪。
-    """
-
-    TROPICAL_FISH = "minecraft:tropicalfish"
-    """
-    热带鱼。
-    """
-
-    TURTLE = "minecraft:turtle"
-    """
-    海龟。
-    """
-
-    WANDERING_TRADER = "minecraft:wandering_trader"
-    """
-    流浪商人。
-    """
-
-    PUFFERFISH = "minecraft:pufferfish"
-    """
-    河豚。
-    """
-
-    GOAT = "minecraft:goat"
-    """
-    山羊。
-    """
-
-    VILLAGER = "minecraft:villager"
-    """
-    旧版村民。
-    """
-
-    VILLAGER_V2 = "minecraft:villager_v2"
-    """
-    村民。
-    """
-
-    AXOLOTL = "minecraft:axolotl"
-    """
-    美西螈。
-    """
-
-    CAT = "minecraft:cat"
-    """
-    猫。
-    """
-
-    FROG = "minecraft:frog"
-    """
-    青蛙。
-    """
-
-    OCELOT = "minecraft:ocelot"
-    """
-    豹猫。
-    """
-
-    SNOW_GOLEM = "minecraft:snow_golem"
-    """
-    雪傀儡。
-    """
-
-    BEE = "minecraft:bee"
-    """
-    蜜蜂。
-    """
-
-    DOLPHIN = "minecraft:dolphin"
-    """
-    海豚。
-    """
-
-    FOX = "minecraft:fox"
-    """
-    狐狸。
-    """
-
-    IRON_GOLEM = "minecraft:iron_golem"
-    """
-    铁傀儡。
-    """
-
-    LLAMA = "minecraft:llama"
-    """
-    羊驼。
-    """
-
-    PANDA = "minecraft:panda"
-    """
-    熊猫。
-    """
-
-    POLAR_BEAR = "minecraft:polar_bear"
-    """
-    北极熊。
-    """
-
-    TRADER_LLAMA = "minecraft:trader_llama"
-    """
-    行商羊驼。
-    """
-
-    WOLF = "minecraft:wolf"
-    """
-    狼。
-    """
-
-    ZOMBIE_HORSE = "minecraft:zombie_horse"
-    """
-    僵尸马。
-    """
-
-
-class HostileMob(Enum[str]):
-    """
-    敌对生物identifier枚举。
-
-    -----
-
-    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
-    """
-
-    BLAZE = "minecraft:blaze"
-    """
-    烈焰人。
-    """
-
-    BOGGED = "minecraft:bogged"
-    """
-    沼骸。
-    """
-
-    BREEZE = "minecraft:breeze"
-    """
-    旋风人。
-    """
-
-    CREEPER = "minecraft:creeper"
-    """
-    苦力怕。
-    """
-
-    ELDER_GUARDIAN = "minecraft:elder_guardian"
-    """
-    远古守卫者。
-    """
-
-    ENDERMITE = "minecraft:endermite"
-    """
-    末影螨。
-    """
-
-    EVOCATION_ILLAGER = "minecraft:evocation_illager"
-    """
-    唤魔者。
-    """
-
-    GHAST = "minecraft:ghast"
-    """
-    恶魂。
-    """
-
-    GUARDIAN = "minecraft:guardian"
-    """
-    守卫者。
-    """
-
-    HOGLIN = "minecraft:hoglin"
-    """
-    疣猪兽。
-    """
-
-    HUSK = "minecraft:husk"
-    """
-    尸壳。
-    """
-
-    MAGMA_CUBE = "minecraft:magma_cube"
-    """
-    岩浆怪。
-    """
-
-    PHANTOM = "minecraft:phantom"
-    """
-    幻翼。
-    """
-
-    PIGLIN_BRUTE = "minecraft:piglin_brute"
-    """
-    猪灵蛮兵。
-    """
-
-    PILLAGER = "minecraft:pillager"
-    """
-    掠夺者。
-    """
-
-    RAVAGER = "minecraft:ravager"
-    """
-    劫掠兽。
-    """
-
-    SHULKER = "minecraft:shulker"
-    """
-    潜影贝。
-    """
-
-    SILVERFISH = "minecraft:silverfish"
-    """
-    蠹虫。
-    """
-
-    SKELETON = "minecraft:skeleton"
-    """
-    骷髅。
-    """
-
-    SLIME = "minecraft:slime"
-    """
-    史莱姆。
-    """
-
-    STRAY = "minecraft:stray"
-    """
-    流浪者。
-    """
-
-    VEX = "minecraft:vex"
-    """
-    恼鬼。
-    """
-
-    VINDICATOR = "minecraft:vindicator"
-    """
-    卫道士。
-    """
-
-    WARDEN = "minecraft:warden"
-    """
-    监守者。
-    """
-
-    WITCH = "minecraft:witch"
-    """
-    女巫。
-    """
-
-    WITHER_SKELETON = "minecraft:wither_skeleton"
-    """
-    凋零骷髅。
-    """
-
-    ZOGLIN = "minecraft:zoglin"
-    """
-    僵尸疣猪兽。
-    """
-
-    ZOMBIE = "minecraft:zombie"
-    """
-    僵尸。
-    """
-
-    ZOMBIE_VILLAGER = "minecraft:zombie_villager"
-    """
-    旧版僵尸村民。
-    """
-
-    ZOMBIE_VILLAGER_V2 = "minecraft:zombie_villager_v2"
-    """
-    僵尸村民。
-    """
-
-    CREAKING = "minecraft:creaking"
-    """
-    嘎枝。
-    """
-
-    DROWNED = "minecraft:drowned"
-    """
-    溺尸。
-    """
-
-    ENDERMAN = "minecraft:enderman"
-    """
-    末影人。
-    """
-
-    PIGLIN = "minecraft:piglin"
-    """
-    猪灵。
-    """
-
-    SPIDER = "minecraft:spider"
-    """
-    蜘蛛。
-    """
-
-    CAVE_SPIDER = "minecraft:cave_spider"
-    """
-    洞穴蜘蛛。
-    """
-
-    ZOMBIE_PIGMAN = "minecraft:zombie_pigman"
-    """
-    僵尸猪灵。
-    """
-
-    ENDER_DRAGON = "minecraft:ender_dragon"
-    """
-    末影龙。
-    """
-
-    WITHER = "minecraft:wither"
-    """
-    凋灵。
-    """
-
-
-class Mob(FriendlyMob, HostileMob):
+class Mob(StrEnum):
     """
     生物identifier枚举。
+
+    -----
+
+    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    | 截至版本：1.21.100
     """
 
+    _generate_next_value_ = gen_minecraft_lower_name
 
-class Feature(Enum[str]):
+    ALLAY = auto()
+    """ 悦灵。 """
+    ARMADILLO = auto()
+    """ 犰狳。 """
+    BAT = auto()
+    """ 蝙蝠。 """
+    CAMEL = auto()
+    """ 骆驼。 """
+    CHICKEN = auto()
+    """ 鸡。 """
+    COD = auto()
+    """ 鳕鱼。 """
+    COPPER_GOLEM = auto()
+    """ 铜傀儡。 """
+    COW = auto()
+    """ 牛。 """
+    DONKEY = auto()
+    """ 驴。 """
+    GLOW_SQUID = auto()
+    """ 发光鱿鱼。 """
+    HAPPY_GHAST = auto()
+    """ 快乐恶魂。 """
+    HORSE = auto()
+    """ 马。 """
+    MOOSHROOM = auto()
+    """ 哞菇。 """
+    MULE = auto()
+    """ 骡。 """
+    PARROT = auto()
+    """ 鹦鹉。 """
+    PIG = auto()
+    """ 猪。 """
+    RABBIT = auto()
+    """ 兔子。 """
+    SALMON = auto()
+    """ 鲑鱼。 """
+    SHEEP = auto()
+    """ 绵羊。 """
+    SKELETON_HORSE = auto()
+    """ 骷髅马。 """
+    SNIFFER = auto()
+    """ 嗅探兽。 """
+    SQUID = auto()
+    """ 鱿鱼。 """
+    STRIDER = auto()
+    """ 炽足兽。 """
+    TADPOLE = auto()
+    """ 蝌蚪。 """
+    TROPICALFISH = auto()
+    """ 热带鱼。 """
+    TURTLE = auto()
+    """ 海龟。 """
+    WANDERING_TRADER = auto()
+    """ 流浪商人。 """
+    PUFFERFISH = auto()
+    """ 河豚。 """
+    GOAT = auto()
+    """ 山羊。 """
+    VILLAGER = auto()
+    """ 旧版村民。 """
+    VILLAGER_V2 = auto()
+    """ 村民。 """
+    AXOLOTL = auto()
+    """ 美西螈。 """
+    CAT = auto()
+    """ 猫。 """
+    FROG = auto()
+    """ 青蛙。 """
+    OCELOT = auto()
+    """ 豹猫。 """
+    SNOW_GOLEM = auto()
+    """ 雪傀儡。 """
+    BEE = auto()
+    """ 蜜蜂。 """
+    DOLPHIN = auto()
+    """ 海豚。 """
+    FOX = auto()
+    """ 狐狸。 """
+    IRON_GOLEM = auto()
+    """ 铁傀儡。 """
+    LLAMA = auto()
+    """ 羊驼。 """
+    PANDA = auto()
+    """ 熊猫。 """
+    POLAR_BEAR = auto()
+    """ 北极熊。 """
+    TRADER_LLAMA = auto()
+    """ 行商羊驼。 """
+    WOLF = auto()
+    """ 狼。 """
+    ZOMBIE_HORSE = auto()
+    """ 僵尸马。 """
+    BLAZE = auto()
+    """ 烈焰人。 """
+    BOGGED = auto()
+    """ 沼骸。 """
+    BREEZE = auto()
+    """ 旋风人。 """
+    CREEPER = auto()
+    """ 苦力怕。 """
+    ELDER_GUARDIAN = auto()
+    """ 远古守卫者。 """
+    ENDERMITE = auto()
+    """ 末影螨。 """
+    EVOCATION_ILLAGER = auto()
+    """ 唤魔者。 """
+    GHAST = auto()
+    """ 恶魂。 """
+    GUARDIAN = auto()
+    """ 守卫者。 """
+    HOGLIN = auto()
+    """ 疣猪兽。 """
+    HUSK = auto()
+    """ 尸壳。 """
+    MAGMA_CUBE = auto()
+    """ 岩浆怪。 """
+    PHANTOM = auto()
+    """ 幻翼。 """
+    PIGLIN_BRUTE = auto()
+    """ 猪灵蛮兵。 """
+    PILLAGER = auto()
+    """ 掠夺者。 """
+    RAVAGER = auto()
+    """ 劫掠兽。 """
+    SHULKER = auto()
+    """ 潜影贝。 """
+    SILVERFISH = auto()
+    """ 蠹虫。 """
+    SKELETON = auto()
+    """ 骷髅。 """
+    SLIME = auto()
+    """ 史莱姆。 """
+    STRAY = auto()
+    """ 流浪者。 """
+    VEX = auto()
+    """ 恼鬼。 """
+    VINDICATOR = auto()
+    """ 卫道士。 """
+    WARDEN = auto()
+    """ 监守者。 """
+    WITCH = auto()
+    """ 女巫。 """
+    WITHER_SKELETON = auto()
+    """ 凋零骷髅。 """
+    ZOGLIN = auto()
+    """ 僵尸疣猪兽。 """
+    ZOMBIE = auto()
+    """ 僵尸。 """
+    ZOMBIE_VILLAGER = auto()
+    """ 旧版僵尸村民。 """
+    ZOMBIE_VILLAGER_V2 = auto()
+    """ 僵尸村民。 """
+    CREAKING = auto()
+    """ 嘎枝。 """
+    DROWNED = auto()
+    """ 溺尸。 """
+    ENDERMAN = auto()
+    """ 末影人。 """
+    PIGLIN = auto()
+    """ 猪灵。 """
+    SPIDER = auto()
+    """ 蜘蛛。 """
+    CAVE_SPIDER = auto()
+    """ 洞穴蜘蛛。 """
+    ZOMBIE_PIGMAN = auto()
+    """ 僵尸猪灵。 """
+    ENDER_DRAGON = auto()
+    """ 末影龙。 """
+    WITHER = auto()
+    """ 凋灵。 """
+
+
+class Feature(StrEnum):
     """
-    原版结构特征枚举，值为结构特征ID（字符串）。
+    原版结构特征ID枚举。
     """
 
-    END_CITY = "end_city"
-    """
-    末地城。
-    """
+    _generate_next_value_ = gen_lower_name
 
-    FORTRESS = "fortress"
-    """
-    下界要塞。
-    """
-
-    MANSION = "mansion"
-    """
-    林地府邸。
-    """
-
-    MINESHAFT = "mineshaft"
-    """
-    废弃矿井。
-    """
-
-    MONUMENT = "monument"
-    """
-    海底神殿。
-    """
-
-    STRONGHOLD = "stronghold"
-    """
-    要塞。
-    """
-
-    TEMPLE = "temple"
-    """
-    神殿（包括沙漠神殿/雪屋/丛林神庙/女巫小屋）。
-    """
-
-    VILLAGE = "village"
-    """
-    村庄。
-    """
-
-    SHIPWRECK = "shipwreck"
-    """
-    沉船。
-    """
-
-    BURIED_TREASURE = "buried_treasure"
-    """
-    埋藏的宝藏。
-    """
-
-    RUINS = "ruins"
-    """
-    海底废墟。
-    """
-
-    PILLAGER_OUTPOST = "pillager_outpost"
-    """
-    掠夺者前哨站。
-    """
-
-    BASTION_REMNANT = "bastion_remnant"
-    """
-    堡垒遗迹。
-    """
-
-    RUINED_PORTAL = "ruined_portal"
-    """
-    废弃传送门。
-    """
-
-    ANCIENT_CITY = "ancient_city"
-    """
-    远古城市。
-    """
-
-    TRIAL_CHAMBERS = "trial_chambers"
-    """
-    试炼密室。
-    """
+    END_CITY = auto()
+    """ 末地城。 """
+    FORTRESS = auto()
+    """ 下界要塞。 """
+    MANSION = auto()
+    """ 林地府邸。 """
+    MINESHAFT = auto()
+    """ 废弃矿井。 """
+    MONUMENT = auto()
+    """ 海底神殿。 """
+    STRONGHOLD = auto()
+    """ 要塞。 """
+    TEMPLE = auto()
+    """ 神殿（包括沙漠神殿/雪屋/丛林神庙/女巫小屋）。 """
+    VILLAGE = auto()
+    """ 村庄。 """
+    SHIPWRECK = auto()
+    """ 沉船。 """
+    BURIED_TREASURE = auto()
+    """ 埋藏的宝藏。 """
+    RUINS = auto()
+    """ 海底废墟。 """
+    PILLAGER_OUTPOST = auto()
+    """ 掠夺者前哨站。 """
+    BASTION_REMNANT = auto()
+    """ 堡垒遗迹。 """
+    RUINED_PORTAL = auto()
+    """ 废弃传送门。 """
+    ANCIENT_CITY = auto()
+    """ 远古城市。 """
+    TRIAL_CHAMBERS = auto()
+    """ 试炼密室。 """
 
 
-class UiContainer(Enum[str]):
+class UiContainer(StrEnum):
     """
     原版UI容器identifier（即仅存在容器UI，不能真正存储物品的容器）枚举（包括容器方块和容器实体）。
 
@@ -1446,78 +1315,39 @@ class UiContainer(Enum[str]):
     资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
-    CRAFTING_TABLE = "minecraft:crafting_table"
-    """
-    工作台。
-    """
+    _generate_next_value_ = gen_minecraft_lower_name
 
-    ENCHANTING_TABLE = "minecraft:enchanting_table"
-    """
-    附魔台。
-    """
-
-    BEACON = "minecraft:beacon"
-    """
-    信标。
-    """
-
-    ANVIL = "minecraft:anvil"
-    """
-    铁砧。
-    """
-
-    CHIPPED_ANVIL = "minecraft:chipped_anvil"
-    """
-    开裂的铁砧。
-    """
-
-    DAMAGED_ANVIL = "minecraft:damaged_anvil"
-    """
-    损坏的铁砧。
-    """
-
-    DEPRECATED_ANVIL = "minecraft:deprecated_anvil"
-    """
-    破碎的铁砧。
-    """
-
-    GRINDSTONE = "minecraft:grindstone"
-    """
-    砂轮。
-    """
-
-    CARTOGRAPHY_TABLE = "minecraft:cartography_table"
-    """
-    制图台。
-    """
-
-    STONECUTTER_BLOCK = "minecraft:stonecutter_block"
-    """
-    切石机。
-    """
-
-    LOOM = "minecraft:loom"
-    """
-    织布机。
-    """
-
-    SMITHING_TABLE = "minecraft:smithing_table"
-    """
-    锻造台。
-    """
-
-    VILLAGER = "minecraft:villager"
-    """
-    旧版村民。
-    """
-
-    VILLAGER_V2 = "minecraft:villager_v2"
-    """
-    村民。
-    """
+    CRAFTING_TABLE = auto()
+    """ 工作台。 """
+    ENCHANTING_TABLE = auto()
+    """ 附魔台。 """
+    BEACON = auto()
+    """ 信标。 """
+    ANVIL = auto()
+    """ 铁砧。 """
+    CHIPPED_ANVIL = auto()
+    """ 开裂的铁砧。 """
+    DAMAGED_ANVIL = auto()
+    """ 损坏的铁砧。 """
+    DEPRECATED_ANVIL = auto()
+    """ 破碎的铁砧。 """
+    GRINDSTONE = auto()
+    """ 砂轮。 """
+    CARTOGRAPHY_TABLE = auto()
+    """ 制图台。 """
+    STONECUTTER_BLOCK = auto()
+    """ 切石机。 """
+    LOOM = auto()
+    """ 织布机。 """
+    SMITHING_TABLE = auto()
+    """ 锻造台。 """
+    VILLAGER = auto()
+    """ 旧版村民。 """
+    VILLAGER_V2 = auto()
+    """ 村民。 """
 
 
-class Container(Enum[str]):
+class Container(StrEnum):
     """
     原版容器identifier枚举（包括容器方块和容器实体）。
 
@@ -1526,403 +1356,362 @@ class Container(Enum[str]):
     资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
-    CHEST = "minecraft:chest"
-    """
-    箱子。
-    """
-
-    TRAPPED_CHEST = "minecraft:trapped_chest"
-    """
-    陷阱箱。
-    """
-
-    ENDER_CHEST = "minecraft:ender_chest"
-    """
-    末影箱。
-    """
-
-    UNDYED_SHULKER_BOX = "minecraft:undyed_shulker_box"
-    """
-    潜影盒。
-    """
-
-    WHITE_SHULKER_BOX = "minecraft:white_shulker_box"
-    """
-    白色潜影盒。
-    """
-
-    ORANGE_SHULKER_BOX = "minecraft:orange_shulker_box"
-    """
-    橙色潜影盒。
-    """
-
-    MAGENTA_SHULKER_BOX = "minecraft:magenta_shulker_box"
-    """
-    品红色潜影盒。
-    """
-
-    LIGHT_BLUE_SHULKER_BOX = "minecraft:light_blue_shulker_box"
-    """
-    淡蓝色潜影盒。
-    """
-
-    YELLOW_SHULKER_BOX = "minecraft:yellow_shulker_box"
-    """
-    黄色潜影盒。
-    """
-
-    LIME_SHULKER_BOX = "minecraft:lime_shulker_box"
-    """
-    黄绿色潜影盒。
-    """
-
-    PINK_SHULKER_BOX = "minecraft:pink_shulker_box"
-    """
-    粉红色潜影盒。
-    """
-
-    GRAY_SHULKER_BOX = "minecraft:gray_shulker_box"
-    """
-    灰色潜影盒。
-    """
-
-    LIGHT_GRAY_SHULKER_BOX = "minecraft:light_gray_shulker_box"
-    """
-    淡灰色潜影盒。
-    """
-
-    CYAN_SHULKER_BOX = "minecraft:cyan_shulker_box"
-    """
-    青色潜影盒。
-    """
-
-    PURPLE_SHULKER_BOX = "minecraft:purple_shulker_box"
-    """
-    紫色潜影盒。
-    """
-
-    BLUE_SHULKER_BOX = "minecraft:blue_shulker_box"
-    """
-    蓝色潜影盒。
-    """
-
-    BROWN_SHULKER_BOX = "minecraft:brown_shulker_box"
-    """
-    棕色潜影盒。
-    """
-
-    GREEN_SHULKER_BOX = "minecraft:green_shulker_box"
-    """
-    绿色潜影盒。
-    """
-
-    RED_SHULKER_BOX = "minecraft:red_shulker_box"
-    """
-    红色潜影盒。
-    """
-
-    BLACK_SHULKER_BOX = "minecraft:black_shulker_box"
-    """
-    黑色潜影盒。
-    """
-
-    BARREL = "minecraft:barrel"
-    """
-    木桶。
-    """
-
-    FURNACE = "minecraft:furnace"
-    """
-    熔炉。
-    """
-
-    LIT_FURNACE = "minecraft:lit_furnace"
-    """
-    燃烧中的熔炉。
-    """
-
-    SMOKER = "minecraft:smoker"
-    """
-    烟熏炉。
-    """
-
-    LIT_SMOKER = "minecraft:lit_smoker"
-    """
-    燃烧中的烟熏炉。
-    """
-
-    BLAST_FURNACE = "minecraft:blast_furnace"
-    """
-    高炉。
-    """
-
-    LIT_BLAST_FURNACE = "minecraft:lit_blast_furnace"
-    """
-    燃烧中的高炉。
-    """
-
-    BREWING_STAND = "minecraft:brewing_stand"
-    """
-    酿造台。
-    """
-
-    DROPPER = "minecraft:dropper"
-    """
-    投掷器。
-    """
-
-    DISPENSER = "minecraft:dispenser"
-    """
-    发射器。
-    """
-
-    HOPPER = "minecraft:hopper"
-    """
-    漏斗。
-    """
-
-    CRAFTER = "minecraft:crafter"
-    """
-    合成器。
-    """
-
-    CHEST_MINECART = "minecraft:chest_minecart"
-    """
-    运输矿车。
-    """
-
-    CHEST_BOAT = "minecraft:chest_boat"
-    """
-    运输船。
-    """
-
-    HOPPER_MINECART = "minecraft:hopper_minecart"
-    """
-    漏斗矿车。
-    """
-
-    HORSE = "minecraft:horse"
-    """
-    马。
-    """
-
-    DONKEY = "minecraft:donkey"
-    """
-    驴。
-    """
-
-    MULE = "minecraft:mule"
-    """
-    骡。
-    """
-
-    CAMEL = "minecraft:camel"
-    """
-    骆驼。
-    """
-
-    TRADER_LLAMA = "minecraft:trader_llama"
-    """
-    行商羊驼。
-    """
-
-    LLAMA = "minecraft:llama"
-    """
-    羊驼。
-    """
-
-
-class PositiveEffect(Enum[str]):
-    """
-    正面状态效果枚举。
-    """
-
-    SPEED = EffectType.MOVEMENT_SPEED
-    """
-    迅捷。
-    """
-
-    HASTE = EffectType.DIG_SPEED
-    """
-    急迫。
-    """
-
-    STRENGTH = EffectType.DAMAGE_BOOST
-    """
-    力量。
-    """
-
-    INSTANT_HEALTH = EffectType.HEAL
-    """
-    瞬间治疗。
-    """
-
-    JUMP_BOOST = EffectType.JUMP
-    """
-    跳跃提升。
-    """
-
-    REGENERATION = EffectType.REGENERATION
-    """
-    生命恢复。
-    """
-
-    RESISTANCE = EffectType.DAMAGE_RESISTANCE
-    """
-    抗性提升。
-    """
-
-    FIRE_RESISTANCE = EffectType.FIRE_RESISTANCE
-    """
-    抗火。
-    """
-
-    WATER_BREATHING = EffectType.WATER_BREATHING
-    """
-    水下呼吸。
-    """
-
-    INVISIBILITY = EffectType.INVISIBILITY
-    """
-    隐身。
-    """
-
-    NIGHT_VISION = EffectType.NIGHT_VISION
-    """
-    夜视。
-    """
-
-    HEALTH_BOOST = EffectType.HEALTH_BOOST
-    """
-    生命提升。
-    """
-
-    ABSORPTION = EffectType.ABSORPTION
-    """
-    伤害吸收。
-    """
-
-    SATURATION = EffectType.SATURATION
-    """
-    饱和。
-    """
-
-    SLOW_FALLING = EffectType.SLOW_FALLING
-    """
-    缓降。
-    """
-
-    VILLAGE_HERO = EffectType.HERO_OF_THE_VILLAGE
-    """
-    村庄英雄。
-    """
-
-
-class NegativeEffect(Enum[str]):
-    """
-    负面状态效果枚举。
-    """
-
-    SLOWDOWN = EffectType.MOVEMENT_SLOWDOWN
-    """
-    缓慢。
-    """
-
-    MINING_FATIGUE = EffectType.DIG_SLOWDOWN
-    """
-    挖掘疲劳。
-    """
-
-    INSTANT_DAMAGE = EffectType.HARM
-    """
-    瞬间伤害。
-    """
-
-    NAUSEA = EffectType.CONFUSION
-    """
-    反胃。
-    """
-
-    BLINDNESS = EffectType.BLINDNESS
-    """
-    失明。
-    """
-
-    HUNGER = EffectType.HUNGER
-    """
-    饥饿。
-    """
-
-    WEAKNESS = EffectType.WEAKNESS
-    """
-    虚弱。
-    """
-
-    POISON = EffectType.POISON
-    """
-    中毒。
-    """
-
-    WITHER = EffectType.WITHER
-    """
-    凋零。
-    """
-
-    LEVITATION = EffectType.LEVITATION
-    """
-    飘浮。
-    """
-
-    FATAL_POISON = EffectType.FATAL_POISON
-    """
-    中毒（致命）。
-    """
-
-    DARKNESS = EffectType.DARKNESS
-    """
-    黑暗。
-    """
-
-    WIND_CHARGED = EffectType.WIND_CHARGED
-    """
-    蓄风。
-    """
-
-    WEAVING = EffectType.WEAVING
-    """
-    盘丝。
-    """
-
-    OOZING = EffectType.OOZING
-    """
-    渗浆。
-    """
-
-    INFESTED = EffectType.INFESTED
-    """
-    寄生。
-    """
-
-
-class NeutralEffect(Enum[str]):
-    """
-    中性状态效果枚举。
-    """
-
-    BAD_OMEN = EffectType.BAD_OMEN
-    """
-    不祥之兆。
-    """
-
-    TRIAL_OMEN = EffectType.TRIAL_OMEN
-    """
-    试炼之兆。
-    """
-
-    RAID_OMEN = EffectType.RAID_OMEN
-    """
-    袭击之兆。
-    """
+    _generate_next_value_ = gen_minecraft_lower_name
+
+    CHEST = auto()
+    """ 箱子。 """
+    TRAPPED_CHEST = auto()
+    """ 陷阱箱。 """
+    ENDER_CHEST = auto()
+    """ 末影箱。 """
+    UNDYED_SHULKER_BOX = auto()
+    """ 潜影盒。 """
+    WHITE_SHULKER_BOX = auto()
+    """ 白色潜影盒。 """
+    ORANGE_SHULKER_BOX = auto()
+    """ 橙色潜影盒。 """
+    MAGENTA_SHULKER_BOX = auto()
+    """ 品红色潜影盒。 """
+    LIGHT_BLUE_SHULKER_BOX = auto()
+    """ 淡蓝色潜影盒。 """
+    YELLOW_SHULKER_BOX = auto()
+    """ 黄色潜影盒。 """
+    LIME_SHULKER_BOX = auto()
+    """ 黄绿色潜影盒。 """
+    PINK_SHULKER_BOX = auto()
+    """ 粉红色潜影盒。 """
+    GRAY_SHULKER_BOX = auto()
+    """ 灰色潜影盒。 """
+    LIGHT_GRAY_SHULKER_BOX = auto()
+    """ 淡灰色潜影盒。 """
+    CYAN_SHULKER_BOX = auto()
+    """ 青色潜影盒。 """
+    PURPLE_SHULKER_BOX = auto()
+    """ 紫色潜影盒。 """
+    BLUE_SHULKER_BOX = auto()
+    """ 蓝色潜影盒。 """
+    BROWN_SHULKER_BOX = auto()
+    """ 棕色潜影盒。 """
+    GREEN_SHULKER_BOX = auto()
+    """ 绿色潜影盒。 """
+    RED_SHULKER_BOX = auto()
+    """ 红色潜影盒。 """
+    BLACK_SHULKER_BOX = auto()
+    """ 黑色潜影盒。 """
+    BARREL = auto()
+    """ 木桶。 """
+    FURNACE = auto()
+    """ 熔炉。 """
+    LIT_FURNACE = auto()
+    """ 燃烧中的熔炉。 """
+    SMOKER = auto()
+    """ 烟熏炉。 """
+    LIT_SMOKER = auto()
+    """ 燃烧中的烟熏炉。 """
+    BLAST_FURNACE = auto()
+    """ 高炉。 """
+    LIT_BLAST_FURNACE = auto()
+    """ 燃烧中的高炉。 """
+    BREWING_STAND = auto()
+    """ 酿造台。 """
+    DROPPER = auto()
+    """ 投掷器。 """
+    DISPENSER = auto()
+    """ 发射器。 """
+    HOPPER = auto()
+    """ 漏斗。 """
+    CRAFTER = auto()
+    """ 合成器。 """
+    CHEST_MINECART = auto()
+    """ 运输矿车。 """
+    CHEST_BOAT = auto()
+    """ 运输船。 """
+    HOPPER_MINECART = auto()
+    """ 漏斗矿车。 """
+    HORSE = auto()
+    """ 马。 """
+    DONKEY = auto()
+    """ 驴。 """
+    MULE = auto()
+    """ 骡。 """
+    CAMEL = auto()
+    """ 骆驼。 """
+    TRADER_LLAMA = auto()
+    """ 行商羊驼。 """
+    LLAMA = auto()
+    """ 羊驼。 """
+
+
+class Effect(StrEnum):
+    """
+    药水效果枚举。
+    """
+
+    _generate_next_value_ = gen_lower_name
+
+    SPEED = auto()
+    """ 迅捷。 """
+    HASTE = auto()
+    """ 急迫。 """
+    STRENGTH = auto()
+    """ 力量。 """
+    INSTANT_HEALTH = auto()
+    """ 瞬间治疗。 """
+    JUMP_BOOST = auto()
+    """ 跳跃提升。 """
+    REGENERATION = auto()
+    """ 生命恢复。 """
+    RESISTANCE = auto()
+    """ 抗性提升。 """
+    FIRE_RESISTANCE = auto()
+    """ 抗火。 """
+    WATER_BREATHING = auto()
+    """ 水下呼吸。 """
+    INVISIBILITY = auto()
+    """ 隐身。 """
+    NIGHT_VISION = auto()
+    """ 夜视。 """
+    HEALTH_BOOST = auto()
+    """ 生命提升。 """
+    ABSORPTION = auto()
+    """ 伤害吸收。 """
+    SATURATION = auto()
+    """ 饱和。 """
+    SLOW_FALLING = auto()
+    """ 缓降。 """
+    VILLAGE_HERO = auto()
+    """ 村庄英雄。 """
+    SLOWDOWN = auto()
+    """ 缓慢。 """
+    MINING_FATIGUE = auto()
+    """ 挖掘疲劳。 """
+    INSTANT_DAMAGE = auto()
+    """ 瞬间伤害。 """
+    NAUSEA = auto()
+    """ 反胃。 """
+    BLINDNESS = auto()
+    """ 失明。 """
+    HUNGER = auto()
+    """ 饥饿。 """
+    WEAKNESS = auto()
+    """ 虚弱。 """
+    POISON = auto()
+    """ 中毒。 """
+    WITHER = auto()
+    """ 凋零。 """
+    LEVITATION = auto()
+    """ 飘浮。 """
+    FATAL_POISON = auto()
+    """ 中毒（致命）。 """
+    DARKNESS = auto()
+    """ 黑暗。 """
+    WIND_CHARGED = auto()
+    """ 蓄风。 """
+    WEAVING = auto()
+    """ 盘丝。 """
+    OOZING = auto()
+    """ 渗浆。 """
+    INFESTED = auto()
+    """ 寄生。 """
+    BAD_OMEN = auto()
+    """ 不祥之兆。 """
+    TRIAL_OMEN = auto()
+    """ 试炼之兆。 """
+    RAID_OMEN = auto()
+    """ 袭击之兆。 """
+
+
+class Biome(StrEnum):
+    """
+    生物群系名称枚举。
+
+    -----
+
+    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    """
+
+    _generate_next_value_ = gen_lower_name
+
+    OCEAN = auto()
+    """ 海洋。 """
+    PLAINS = auto()
+    """ 平原。 """
+    DESERT = auto()
+    """ 沙漠。 """
+    EXTREME_HILLS = auto()
+    """ 山地。 """
+    FOREST = auto()
+    """ 森林。 """
+    TAIGA = auto()
+    """ 针叶林。 """
+    SWAMPLAND = auto()
+    """ 沼泽。 """
+    RIVER = auto()
+    """ 河流。 """
+    HELL = auto()
+    """ 下界荒地。 """
+    THE_END = auto()
+    """ 末地。 """
+    LEGACY_FROZEN_OCEAN = auto()
+    """ 冻洋。 """
+    FROZEN_RIVER = auto()
+    """ 冻河。 """
+    ICE_PLAINS = auto()
+    """ 积雪的冻原。 """
+    ICE_MOUNTAINS = auto()
+    """ 雪山。 """
+    MUSHROOM_ISLAND = auto()
+    """ 蘑菇岛。 """
+    MUSHROOM_ISLAND_SHORE = auto()
+    """ 蘑菇岛岸。 """
+    BEACH = auto()
+    """ 沙滩。 """
+    DESERT_HILLS = auto()
+    """ 沙漠丘陵。 """
+    FOREST_HILLS = auto()
+    """ 繁茂的丘陵。 """
+    TAIGA_HILLS = auto()
+    """ 针叶林丘陵。 """
+    EXTREME_HILLS_EDGE = auto()
+    """ 山地边缘。 """
+    JUNGLE = auto()
+    """ 丛林。 """
+    JUNGLE_HILLS = auto()
+    """ 丛林丘陵。 """
+    JUNGLE_EDGE = auto()
+    """ 丛林边缘。 """
+    DEEP_OCEAN = auto()
+    """ 深海。 """
+    STONE_BEACH = auto()
+    """ 石岸。 """
+    COLD_BEACH = auto()
+    """ 积雪的沙滩。 """
+    BIRCH_FOREST = auto()
+    """ 桦木森林。 """
+    BIRCH_FOREST_HILLS = auto()
+    """ 桦木森林丘陵。 """
+    ROOFED_FOREST = auto()
+    """ 黑森林。 """
+    COLD_TAIGA = auto()
+    """ 积雪的针叶林。 """
+    COLD_TAIGA_HILLS = auto()
+    """ 积雪的针叶林丘陵。 """
+    MEGA_TAIGA = auto()
+    """ 巨型针叶林。 """
+    MEGA_TAIGA_HILLS = auto()
+    """ 巨型针叶林丘陵。 """
+    EXTREME_HILLS_PLUS_TREES = auto()
+    """ 繁茂的山地。 """
+    SAVANNA = auto()
+    """ 热带草原。 """
+    SAVANNA_PLATEAU = auto()
+    """ 热带高原。 """
+    MESA = auto()
+    """ 恶地。 """
+    MESA_PLATEAU_STONE = auto()
+    """ 繁茂的恶地高原。 """
+    MESA_PLATEAU = auto()
+    """ 恶地高原。 """
+    WARM_OCEAN = auto()
+    """ 暖水海洋。 """
+    DEEP_WARM_OCEAN = auto()
+    """ 暖水深海。 """
+    LUKEWARM_OCEAN = auto()
+    """ 温水海洋。 """
+    DEEP_LUKEWARM_OCEAN = auto()
+    """ 温水深海。 """
+    COLD_OCEAN = auto()
+    """ 冷水海洋。 """
+    DEEP_COLD_OCEAN = auto()
+    """ 冷水深海。 """
+    FROZEN_OCEAN = auto()
+    """ 冻洋。 """
+    DEEP_FROZEN_OCEAN = auto()
+    """ 封冻深海。 """
+    BAMBOO_JUNGLE = auto()
+    """ 竹林。 """
+    BAMBOO_JUNGLE_HILLS = auto()
+    """ 竹林丘陵。 """
+    SUNFLOWER_PLAINS = auto()
+    """ 向日葵平原。 """
+    DESERT_MUTATED = auto()
+    """ 沙漠湖泊。 """
+    EXTREME_HILLS_MUTATED = auto()
+    """ 沙砾山地。 """
+    FLOWER_FOREST = auto()
+    """ 繁花森林。 """
+    TAIGA_MUTATED = auto()
+    """ 针叶林山地。 """
+    SWAMPLAND_MUTATED = auto()
+    """ 沼泽山丘。 """
+    ICE_PLAINS_SPIKES = auto()
+    """ 冰刺平原。 """
+    JUNGLE_MUTATED = auto()
+    """ 丛林变种。 """
+    JUNGLE_EDGE_MUTATED = auto()
+    """ 丛林边缘变种。 """
+    BIRCH_FOREST_MUTATED = auto()
+    """ 高大桦木森林。 """
+    BIRCH_FOREST_HILLS_MUTATED = auto()
+    """ 高大桦木丘陵。 """
+    ROOFED_FOREST_MUTATED = auto()
+    """ 黑森林丘陵。 """
+    COLD_TAIGA_MUTATED = auto()
+    """ 积雪的针叶林山地。 """
+    REDWOOD_TAIGA_MUTATED = auto()
+    """ 巨型云杉针叶林。 """
+    REDWOOD_TAIGA_HILLS_MUTATED = auto()
+    """ 巨型云杉针叶林丘陵。 """
+    EXTREME_HILLS_PLUS_TREES_MUTATED = auto()
+    """ 沙砾山地+。 """
+    SAVANNA_MUTATED = auto()
+    """ 破碎的热带草原。 """
+    SAVANNA_PLATEAU_MUTATED = auto()
+    """ 破碎的热带高原。 """
+    MESA_BRYCE = auto()
+    """ 被风蚀的恶地。 """
+    MESA_PLATEAU_STONE_MUTATED = auto()
+    """ 繁茂的恶地高原变种。 """
+    MESA_PLATEAU_MUTATED = auto()
+    """ 恶地高原变种。 """
+    SOULSAND_VALLEY = auto()
+    """ 灵魂沙峡谷。 """
+    CRIMSON_FOREST = auto()
+    """ 绯红森林。 """
+    WARPED_FOREST = auto()
+    """ 诡异森林。 """
+    BASALT_DELTAS = auto()
+    """ 玄武岩三角洲。 """
+    JAGGED_PEAKS = auto()
+    """ 尖峭山峰。 """
+    FROZEN_PEAKS = auto()
+    """ 冰封山峰。 """
+    SNOWY_SLOPES = auto()
+    """ 积雪的山坡。 """
+    GROVE = auto()
+    """ 雪林。 """
+    MEADOW = auto()
+    """ 草甸。 """
+    LUSH_CAVES = auto()
+    """ 繁茂洞穴。 """
+    DRIPSTONE_CAVES = auto()
+    """ 溶洞。 """
+    STONY_PEAKS = auto()
+    """ 裸岩山峰。 """
+    DEEP_DARK = auto()
+    """ 深暗之域。 """
+    MANGROVE_SWAMP = auto()
+    """ 红树林沼泽。 """
+    CHERRY_GROVE = auto()
+    """ 樱花树林。 """
+    PALE_GARDEN = auto()
+    """ 苍白之园。 """
+
+
+# endregion
+
+
+# region Maps ==========================================================================================================
 
 
 ENTITY_NAME_MAP = {
@@ -2161,7 +1950,7 @@ BIOME_NAME_MAP = {
 ::
 
     {
-        <biome_type: int>: (<orig_id: str>, <biome_name: str>)
+        <biome_type: int>: (<org_id: str>, <biome_name: str>)
     }
     
 -----
@@ -2193,7 +1982,7 @@ STRUCTURE_NAME_MAP = {
 ::
 
     {
-        <structure_type: int>: (<orig_id: str>, <structure_name: str>)
+        <structure_type: int>: (<org_id: str>, <structure_name: str>)
     }
 
 -----
@@ -2302,7 +2091,7 @@ ENCHANT_NAME_MAP = {
 ::
 
     {
-        <enchant_type: int>: (<orig_id: str>, <enchant_name: str>)
+        <enchant_type: int>: (<org_id: str>, <enchant_name: str>)
     }
 
 -----
@@ -2311,59 +2100,146 @@ ENCHANT_NAME_MAP = {
 """
 
 
+# endregion
+
+
 def __test__():
-    class E(Enum[str]):
-        a = auto()
-        b = auto()
-        c = auto()
-    class EE(Enum[str]):
-        aa = auto()
-        bb = auto()
-        cc = auto()
-    class T(E, EE):
-        d = auto()
-        e = auto()
-    assert E.a == "a"
-    assert T.a == "a"
-    assert T.aa == "aa"
-    assert T.d == "d"
-
-    class E1(Enum):
-        A = 1
-        B = 2
-        C = 3
-    class E2(E1):
-        X = 7
-        Y = 8
-        Z = 9
-    assert sorted(E2.__members__.keys()) == ["A", "B", "C", "X", "Y", "Z"]
-    assert 7 in E2
-    assert 0 not in E2
-    assert len(E2) == 6
-    assert isinstance(E2.X, E2)
-    assert E2.A.name == "A"
-    assert E2.A.value == 1
-    a = {E2.A, E2.X}
-    assert E2.A in a
-    assert E2.X in a
-
-    class E3(Enum[str]):
-        Q = "114514"
-    assert E3.Q == "114514"
     from ..core._utils import assert_error
-    def f():
-        E3.Q = 123
-    assert_error(f, exc=AttributeError)
-    def f():
-        del E3.Q
-    assert_error(f, exc=AttributeError)
 
-    class E4(Enum[int]):
-        a = auto()
-        b = auto()
-        c = auto()
-    assert sorted(E4.__members__.values()) == [0, 1, 2]
+    assert Enum._member_type_ is object
+    assert IntEnum._member_type_ is int
+    assert StrEnum._member_type_ is str
 
+    def test_enum(_IntEnum=IntEnum, _StrEnum=StrEnum):
+        class E(Enum):
+            A = 0
+            B = "1"
+            C = [2]
+
+        assert isinstance(E.A, E)
+        assert E.A.name == "A"
+        assert E.A.value == 0
+
+        def f():
+            E.A = 1
+        assert_error(f, exc=AttributeError)
+        def f():
+            del E.A
+        assert_error(f, exc=AttributeError)
+
+        assert E(0) is E.A
+        assert E("1") is E.B
+        assert E([2]) is E.C
+        assert E['A'] is E.A
+        assert len(E) == 3
+
+        for member in E:
+            assert isinstance(member, E)
+            assert E(member.value) is E[member.name]
+        for name, member in E.__members__.items():
+            assert isinstance(member, E)
+            assert E(member) is E[name]
+
+        assert repr(E) == "<enum 'E'>"
+        assert repr(E.A) == "<E.A: 0>"
+        assert repr(E.B) == "<E.B: '1'>"
+        assert repr(E.C) == "<E.C: [2]>"
+        assert str(E.A) == "E.A"
+        assert str(E.B) == "E.B"
+        assert str(E.C) == "E.C"
+
+        assert 0 in E
+        assert "1" in E
+        assert [2] in E
+        assert E.A in E
+        assert 4 not in E
+
+        class SE(_StrEnum):
+            A = "a"
+            B = "b"
+            C = "c"
+
+        assert isinstance(SE.A, SE)
+        assert SE.A.name == "A"
+        assert SE.A.value == "a"
+        assert SE.A == "a"
+        assert SE.B == "b"
+        assert SE.C == "c"
+        assert SE("a") is SE.A
+        assert SE['A'] is SE.A
+        assert repr(SE) == "<enum 'SE'>"
+        assert repr(SE.A) == "<SE.A: 'a'>"
+        assert str(SE.A) == "a"
+        assert "a" in SE
+        assert "d" not in SE
+        assert SE.A in SE
+        assert "a" + SE.A == "aa"
+        assert "a%s" % SE.A == "aa"
+
+        class IE(_IntEnum):
+            A = 0
+            B = 1
+            C = 2
+
+        assert isinstance(IE.A, IE)
+        assert IE.A.name == "A"
+        assert IE.A.value == 0
+        assert IE.A == 0
+        assert IE.B == 1
+        assert IE.C == 2
+        assert IE(0) is IE.A
+        assert IE['A'] is IE.A
+        assert repr(IE) == "<enum 'IE'>"
+        assert repr(IE.A) == "<IE.A: 0>"
+        assert str(IE.A) == "0"
+        assert 0 in IE
+        assert 4 not in IE
+        assert IE.A in IE
+        assert 1 + IE.C == 3
+        assert "%d" % IE.A == "0"
+
+        def f():
+            class SE(_StrEnum):
+                A = 0
+        assert_error(f, exc=TypeError)
+        def f():
+            class IE(_IntEnum):
+                A = "0"
+        assert_error(f, exc=TypeError)
+
+        class ASE(_StrEnum):
+            C = auto()
+            B = auto()
+            A = auto()
+        assert ASE._member_names_ == ["C", "B", "A"]
+        assert ASE.C == "C"
+        assert ASE.B == "B"
+
+        class AIE(_IntEnum):
+            C = auto()
+            A = auto()
+            B = auto()
+        assert AIE._member_names_ == ["C", "A", "B"]
+        assert AIE.C == 1
+        assert AIE.B == 3
+
+    test_enum()
+
+    class IntEnum2(Enum, int):
+        pass
+    class StrEnum2(Enum, str):
+        @staticmethod
+        def _generate_next_value_(name, count, last_values): # NOQA
+            return name
+
+    test_enum(IntEnum2, StrEnum2)
+
+    def f():
+        class IntEnum2(Enum, int, str):
+            pass
+    assert_error(f, exc=TypeError)
+
+    assert Mob.WITHER == "minecraft:wither"
 
 
 

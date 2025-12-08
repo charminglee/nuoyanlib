@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import List, Optional, Any, Dict, Callable, Union, TypedDict, Tuple
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.component.actorRenderCompClient import ActorRenderCompClient
@@ -46,7 +47,7 @@ class __GROUND_SHATTER_DATA(TypedDict):
 class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
     callback_data: Dict[str, Dict[str, Union[Callable, int]]]
     _ground_shatter_data: Dict[str, __GROUND_SHATTER_DATA]
-    def __init__(self: ..., namespace: str, system_name: str) -> None: ...
+    def __init__(self: Self, namespace: str, system_name: str) -> None: ...
     def broadcast_to_all_client(
         self,
         event_name: str,

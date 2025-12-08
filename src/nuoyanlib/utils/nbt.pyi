@@ -6,14 +6,9 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-08
 |
 | ====================================================
 """
 
 
-from typing import Tuple, Union
-from ._typing import FuncDecorator
-
-
-def args_type_check(*types: Union[type, Tuple[type, ...]], is_method: bool = False) -> FuncDecorator: ...

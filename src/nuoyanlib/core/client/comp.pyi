@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Type, ClassVar, Dict
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
@@ -79,12 +80,11 @@ from mod.client.component.playerAnimCompClient import PlayerAnimCompClient
 from mod.client.component.achievementCompClient import AchievementCompClient
 from mod.client.component.dimensionCompClient import DimensionCompClient
 from mod.common.component.baseComponent import BaseComponent
-from .._types._typing import FTuple2, STuple, _T
-from .._utils import lru_cache
+from .._types._typing import FTuple2, T
 
 
 class _MiniMapBaseScreen(ScreenNode):
-    def __init__(self: ..., namespace: str, name: str, param: dict) -> None: ...
+    def __init__(self: Self, namespace: str, name: str, param: dict) -> None: ...
     def AddEntityMarker(
         self,
         entity_id: str,
@@ -255,10 +255,10 @@ CompFactory: EngineCompFactoryClient
 
 
 class CF(object):
+    __cache__: ClassVar[Dict[str, CF]]
     _target: str
-    @lru_cache
-    def __new__(cls: Type[_T], target: str) -> _T: ...
-    def __init__(self: ..., target: str) -> None: ...
+    def __new__(cls: Type[T], target: str) -> T: ...
+    def __init__(self: Self, target: str) -> None: ...
     def __getattr__(self, name: str) -> BaseComponent: ...
     Drawing: DrawingCompClient
     Achievement: AchievementCompClient

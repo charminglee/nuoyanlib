@@ -6,17 +6,18 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-05
 |
 | ====================================================
 """
 
 
+from typing_extensions import Self
 from typing import Tuple, Callable, ClassVar, TypedDict, Any, Literal, NoReturn, Dict, Optional, Type, List
 from types import MethodType
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ....core._types._typing import UiPathOrNyControl, FTuple2, STuple, _T
+from ....core._types._typing import UiPathOrNyControl, FTuple2, STuple, T
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ..screen_node import ScreenNodeExtension
@@ -69,42 +70,6 @@ __UiPropertyNames = Literal[
 ]
 
 
-class _UIControlType:
-    All: int
-    Button: int
-    Custom: int
-    CollectionPanel: int
-    Dropdown: int
-    EditBox: int
-    Factory: int
-    Grid: int
-    Image: int
-    InputPanel: int
-    Label: int
-    Panel: int
-    Screen: int
-    ScrollbarBox: int
-    ScrollTrack: int
-    ScrollView: int
-    SelectionWheel: int
-    Slider: int
-    SliderBox: int
-    StackPanel: int
-    Toggle: int
-    ImageCycler: int
-    LabelCycler: int
-    GridPageIndicator: int
-    Combox: int
-    Layout: int
-    StackGrid: int
-    Joystick: int
-    RichText: int
-    SixteenNineLayout: int
-    MulLinesEdit: int
-    AminProcessBar: int
-    Unknown: int
-
-
 class InteractableControl(object):
     CALLBACK_TYPE: ClassVar[Type[Enum]]
     callbacks: Dict[str, List[Callable]]
@@ -128,7 +93,7 @@ class NyControl(object):
     _base_control: BaseUIControl
     _kwargs: Dict[str, Any]
     def __init__(
-        self: ...,
+        self: Self,
         screen_node_ex: ScreenNodeExtension,
         control: BaseUIControl,
         **kwargs: Any
@@ -246,12 +211,12 @@ class NyControl(object):
     ) -> None: ...
     def add_child(self, def_name: str, child_name: str, force_update: bool = True) -> Optional[NyControl]: ...
     def clone_to(
-        self: _T,
+        self: T,
         parent: UiPathOrNyControl,
         name: str = "",
         sync_refresh: bool = True,
         force_update: bool = True,
-    ) -> Optional[_T]: ...
+    ) -> T: ...
     def clone_from(
         self,
         control: UiPathOrNyControl,
@@ -263,18 +228,18 @@ class NyControl(object):
     def children_path(self, level: int = 1) -> List[str]: ...
     @classmethod
     def from_path(
-        cls: Type[_T],
+        cls: Type[T],
         screen_node_ex: ScreenNodeExtension,
         path: str,
         **kwargs: Any,
-    ) -> Optional[_T]: ...
+    ) -> T: ...
     @classmethod
     def from_control(
-        cls: Type[_T],
+        cls: Type[T],
         screen_node_ex: ScreenNodeExtension,
         control: BaseUIControl,
         **kwargs: Any,
-    ) -> Optional[_T]: ...
+    ) -> T: ...
     def destroy(self) -> None: ...
     ApplyAttr = apply_attr
     AddChild = add_child
@@ -324,7 +289,6 @@ class NyControl(object):
     ToSelectionWheel = to_selection_wheel
     ToComboBox = to_combo_box
     ToMiniMap = to_mini_map
-    def _is_control_exist(self, path: str) -> bool: ...
     SetPosition = BaseUIControl.SetPosition
     SetFullSize = BaseUIControl.SetFullSize
     GetFullSize = BaseUIControl.GetFullSize

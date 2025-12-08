@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-04
 |
 | ====================================================
 """
@@ -282,8 +282,6 @@ class NyGrid(NyControl):
 
     CONTROL_TYPE = ControlType.GRID
 
-    __get_dim = staticmethod(get_func(ScreenNode, (103, 117, 105), (103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)))
-
     @kwargs_setter(
         is_stack_grid=False,
         template_name="",
@@ -305,11 +303,11 @@ class NyGrid(NyControl):
         self.__template_name = template_name
         self.cell_visible_binding = kwargs['cell_visible_binding']
         self.collection_name_ = kwargs['collection_name']
+        self.gd_obj = None
         if self.cell_visible_binding and self.collection_name_:
             self.ui_node.build_binding(
                 self._return_cell_visible, ViewBinder.BF_BindBool, self.cell_visible_binding, self.collection_name_
             )
-        self.gd_obj = None
 
     def __destroy__(self):
         self._callback_map.clear()
@@ -595,6 +593,8 @@ class NyGrid(NyControl):
     # endregion
 
     # region Internal ==================================================================================================
+
+    __get_dim = staticmethod(get_func(ScreenNode, (103, 117, 105), (103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)))
 
     def _return_cell_visible(self, index):
         return self.visible and (self.__grid_size < 0 or index < self.__grid_size)

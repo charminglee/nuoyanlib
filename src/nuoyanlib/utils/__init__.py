@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-25
+|   Date  : 2025-12-04
 |
 |   「nuoyanlib」通用工具库。
 |
@@ -16,6 +16,7 @@
 
 from .mc_math import *
 from . import enum
+from .enum import Enum
 from .item import *
 from .mc_random import *
 from .timer import *

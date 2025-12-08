@@ -23,7 +23,7 @@ SERVER_SYSTEM_CLASS_PATH = "%s_scripts.main_server.%s" % (MOD_NAME_S, SERVER_SYS
 
 UI_NAME_NUOYANLIB_TEST = "NuoyanlibTest"
 UI_PATH_NUOYANLIB_TEST = "%s_scripts.ui.nuoyanlib_test.NuoyanlibTest" % MOD_NAME_S
-UI_DEF_NUOYANLIB_TEST = "nuoyanlib_test.main"
+UI_DEF_NUOYANLIB_TEST = "nuoyanlib_test.screen"
 
 
 
