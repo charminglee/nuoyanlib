@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-06
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -21,6 +21,8 @@ from .vector import Vector
 
 
 __all__ = [
+    "distance2nearest_entity",
+    "distance2nearest_player",
     "range_map",
     "to_chunk_pos",
     "to_aabb",
@@ -49,6 +51,57 @@ __all__ = [
     "rot_diff",
     "ray_aabb_intersection",
 ]
+
+
+def distance2nearest_entity(target):
+    """
+    获取指定目标与其距离最近的实体的距离。
+    
+    -----
+    
+    :param tuple[float,float,float]|str target: 目标，可传入坐标或实体ID
+    
+    :return: 目标与距离最近的实体的距离，若获取失败，返回-1
+    :rtype: float
+    """
+    tp = CF(target).Pos.GetFootPos() if isinstance(target, str) else target
+    if not tp:
+        return -1
+    min_dist2 = -1
+    for entity_id in get_all_entities():
+        ep = CF(entity_id).Pos.GetFootPos()
+        if not ep:
+            continue
+        dist2 = pos_distance_square(tp, ep)
+        if min_dist2 == -1 or dist2 < min_dist2:
+            min_dist2 = dist2
+    return sqrt(min_dist2) if min_dist2 != -1 else -1
+
+
+def distance2nearest_player(target):
+    """
+    获取指定目标与其距离最近的玩家的距离。
+    
+    -----
+    
+    :param tuple[float,float,float]|str target: 目标，可传入坐标或实体ID
+    
+    :return: 目标与距离最近的玩家的距离，若获取失败，返回-1
+    :rtype: float
+    """
+    tp = CF(target).Pos.GetFootPos() if isinstance(target, str) else target
+    if not tp:
+        return -1
+    player_lst = get_api().GetPlayerList()
+    min_dist2 = -1
+    for player_id in player_lst:
+        pp = CF(player_id).Pos.GetFootPos()
+        if not pp:
+            continue
+        dist2 = pos_distance_square(tp, pp)
+        if min_dist2 == -1 or dist2 < min_dist2:
+            min_dist2 = dist2
+    return sqrt(min_dist2) if min_dist2 != -1 else -1
 
 
 def range_map(x, output_range, input_range=(0, 1), func=lambda t: t):
