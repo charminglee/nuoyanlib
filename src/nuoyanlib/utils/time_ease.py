@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-10
 |
 | ====================================================
 """
@@ -40,7 +40,7 @@ class TimeEase(object):
     :param float start_val: 初始值
     :param float end_val: 最终值
     :param float total_tm: 变化总时间，单位为秒
-    :param int fps: 变化帧率，小于等于0的值将根据实际时间确定缓动值，默认为0
+    :param int fps: 变化帧率，小于等于0的值将根据真实时间确定缓动值，默认为0
     :param bool hold_on_last_frame: 是否停止在最后一帧；若设为True，TimeEase可无限迭代，变化结束后将始终返回最后一帧的值；若设为False，变化结束后继续迭代将抛出StopIteration异常；默认为False
     :param function ease_func: 时间缓动函数，可使用TimeEaseFunc提供的函数或自定义函数，如线性函数 lambda x: x ，参数x表示经过的时间比例，取值范围为 [0,⠀1] ，即只取缓动函数定义域中 [0,⠀1] 部分的值；默认为TimeEaseFunc.linear
     :param TimeEase|None next_te: 下一个时间缓动对象，若提供，则当前缓动迭代结束后自动切换到下一个缓动对象继续迭代；默认为None

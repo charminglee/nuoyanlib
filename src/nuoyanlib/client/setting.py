@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-09
 |
 | ====================================================
 """
@@ -52,7 +52,10 @@ def read_setting(name, is_global=True):
     """
     data = LvComp.ConfigClient.GetConfigData(name, is_global)
     if data:
-        data = {(str(k) if isinstance(k, unicode) else k): v for k, v in data.items()}
+        data = {
+            (str(k) if isinstance(k, unicode) else k): v
+            for k, v in data.items()
+        }
     return data
 
 

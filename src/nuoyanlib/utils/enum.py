@@ -127,6 +127,14 @@ def _set_enum_attr(cls, k, v, cls_dict):
 _new_enum = type.__new__
 
 
+def _new_member(member_t, enum_cls, value, name=None):
+    member = member_t.__new__(enum_cls, value)
+    member._name_ = name
+    member._value_ = value
+    member._hash_ = hash(name)
+    return member
+
+
 class EnumMeta(type):
     """
     ``Enum`` 的元类。
@@ -191,11 +199,7 @@ class EnumMeta(type):
                 )
 
             # 创建枚举成员
-            member = _member_type_.__new__(cls, v)
-            member._name_ = k
-            member._value_ = v
-            member._hash_ = hash(k)
-
+            member = _new_member(_member_type_, cls, v, k)
             _member_map_[k] = member
             try:
                 _value2member_map_[v] = member

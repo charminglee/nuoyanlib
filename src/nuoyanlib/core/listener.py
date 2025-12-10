@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-06
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -143,15 +143,15 @@ class _EventPool(object):
 
 def _get_event_source(is_client, event_name):
     if is_client:
-        if event_name in ClientEvent:
-            return c_api.GetEngineNamespace(), c_api.GetEngineSystemName()
-        elif event_name in ALL_CLIENT_LIB_EVENTS:
+        if event_name in ALL_CLIENT_LIB_EVENTS:
             return _const.LIB_NAME, ALL_CLIENT_LIB_EVENTS[event_name]
+        elif event_name in ClientEvent:
+            return c_api.GetEngineNamespace(), c_api.GetEngineSystemName()
     else:
-        if event_name in ServerEvent:
-            return s_api.GetEngineNamespace(), s_api.GetEngineSystemName()
-        elif event_name in ALL_SERVER_LIB_EVENTS:
+        if event_name in ALL_SERVER_LIB_EVENTS:
             return _const.LIB_NAME, ALL_SERVER_LIB_EVENTS[event_name]
+        elif event_name in ServerEvent:
+            return s_api.GetEngineNamespace(), s_api.GetEngineSystemName()
 
 
 def _parse_listen_args(func, event_name, ns, sys_name):
