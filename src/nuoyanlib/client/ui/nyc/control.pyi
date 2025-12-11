@@ -12,12 +12,11 @@
 """
 
 
-from typing_extensions import Self
 from typing import Tuple, Callable, ClassVar, TypedDict, Any, Literal, NoReturn, Dict, Optional, Type, List
 from types import MethodType
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ....core._types._typing import UiPathOrNyControl, FTuple2, STuple, T
+from ....core._types._typing import Self, UiPathOrNyControl, FTuple2, STuple, T
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ..screen_node import ScreenNodeExtension
@@ -75,7 +74,7 @@ class InteractableControl(object):
     callbacks: Dict[str, List[Callable]]
     _callback_flag: List[str]
     _callback_func_map: Dict[str, Tuple[MethodType, MethodType]]
-    def __init__(self, callback_func_map: Dict[str, Tuple[MethodType, MethodType]]) -> None: ...
+    def __init__(self: Self, callback_func_map: Dict[str, Tuple[MethodType, MethodType]]) -> None: ...
     def __destroy__(self) -> None: ...
     def _exec_callbacks(self, cb_type: str, *args: Any) -> None: ...
     def set_callback(self, func: Callable, cb_type: str = None) -> bool: ...

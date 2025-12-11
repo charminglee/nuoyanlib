@@ -12,11 +12,10 @@
 """
 
 
-from typing_extensions import Self
 from typing import Callable, Any, Optional, overload, Hashable, Dict
 from threading import Timer as _Timer
 from mod.common.utils.timer import CallLater
-from ..core._types._typing import F, FuncDecorator
+from ..core._types._typing import Self, F, FuncDecorator
 
 
 _c_delay_timers: Dict[Hashable, CallLater]

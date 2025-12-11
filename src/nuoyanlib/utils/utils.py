@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-07
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -14,7 +14,7 @@
 
 from functools import wraps
 import time
-from re import match
+import re
 from ..core._sys import get_lib_system, get_lv_comp, is_client
 
 
@@ -263,11 +263,11 @@ def check_string(string, *check):
     :rtype: bool
     """
     for i in string:
-        if "a-z" in check and match("[a-z]", i):
+        if "a-z" in check and re.match("[a-z]", i):
             continue
-        if "A-Z" in check and match("[A-Z]", i):
+        if "A-Z" in check and re.match("[A-Z]", i):
             continue
-        if "0-9" in check and match("[0-9]", i):
+        if "0-9" in check and re.match("[0-9]", i):
             continue
         if i in check:
             continue
@@ -291,11 +291,11 @@ def check_string2(string, *check):
     for i in string:
         if i in check:
             continue
-        if "a-z" in check and match("[a-z]", i):
+        if "a-z" in check and re.match("[a-z]", i):
             continue
-        if "A-Z" in check and match("[A-Z]", i):
+        if "A-Z" in check and re.match("[A-Z]", i):
             continue
-        if "0-9" in check and match("[0-9]", i):
+        if "0-9" in check and re.match("[0-9]", i):
             continue
         result.append(i)
     return result

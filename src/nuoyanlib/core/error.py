@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -22,8 +22,6 @@ __all__ = [
     "ScreenNodeNotFoundError",
     "EventParameterError",
     "VectorError",
-    "ZeroVectorError",
-    "VectorDimError",
     "EventSourceError",
     "EventNotFoundError",
 ]
@@ -86,14 +84,6 @@ class EventParameterError(AttributeError):
 
 
 class VectorError(Exception):
-    pass
-
-
-class ZeroVectorError(Exception):
-    pass
-
-
-class VectorDimError(Exception):
     pass
 
 

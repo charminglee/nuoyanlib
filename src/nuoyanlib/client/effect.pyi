@@ -12,7 +12,6 @@
 """
 
 
-from typing_extensions import Self
 from typing import Tuple, Union, Dict, Optional
 from mod.client.component.particleControlComp import ParticleControlComp
 from mod.client.component.particleTransComp import ParticleTransComp
@@ -23,7 +22,7 @@ from mod.client.component.frameAniTransComp import FrameAniTransComp
 from mod.client.component.frameAniEntityBindComp import FrameAniEntityBindComp
 from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindComp
 from ..core.client._lib_client import NuoyanLibClientSystem
-from ..core._types._typing import FTuple3, FTuple2
+from ..core._types._typing import Self, FTuple3, FTuple2
 
 
 def spawn_particle(

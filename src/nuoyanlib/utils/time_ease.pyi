@@ -12,9 +12,8 @@
 """
 
 
-from typing_extensions import Self
 from typing import Optional, Callable, Any
-from ..core._types._typing import TimeEaseFuncType
+from ..core._types._typing import Self, TimeEaseFuncType
 from .enum import TimeEaseFunc
 
 

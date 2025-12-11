@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from traceback import print_exc
+import traceback
 from uuid import uuid4
 import mod.client.extraClientApi as c_api
 from ..core._sys import get_api, is_client, get_lv_comp, get_lib_system
@@ -101,7 +101,7 @@ def _call_local(ns, sys_name, method, cb_or_uuid, delay_ret, args, kwargs):
     except:
         ret = None
         success = False
-        print_exc()
+        traceback.print_exc()
 
     if cb_or_uuid:
         if is_client():

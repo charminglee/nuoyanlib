@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-03
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from random import uniform
+import random
 import mod.client.extraClientApi as c_api
 from .. import _const, _logging
 from .._utils import singleton
@@ -203,11 +203,11 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         geo_name = str(id(palette))
         LvComp.BlockGeometry.CombineBlockPaletteToGeometry(palette, geo_name)
         tilt_angle = data['tilt_angle']
-        rot = tuple(uniform(-tilt_angle, tilt_angle) for _ in range(3))
+        rot = tuple(random.uniform(-tilt_angle, tilt_angle) for _ in range(3))
         data['render_comp'].AddActorBlockGeometry(geo_name, (0, -1.01, 0), rot)
         data['geo_name'] = geo_name
 
-        final_height = uniform(data['min_height'], data['max_height'])
+        final_height = random.uniform(data['min_height'], data['max_height'])
         out_te = TimeEase(
             final_height,
             final_height - data['out_dist'],

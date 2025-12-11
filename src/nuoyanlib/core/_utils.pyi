@@ -7,17 +7,16 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-12-05
+|   Date  : 2025-12-11
 |
 | ==============================================
 """
 
 
 import sys
-from typing_extensions import Self
 from types import MethodType
 from typing import Hashable, List, TypeVar, Callable, Any, Dict, Union, Tuple, Optional, Generator, overload
-from ._types._typing import ITuple, T, F, FuncDecorator, ClassDecorator
+from ._types._typing import Self, ITuple, T, F, FuncDecorator, ClassDecorator
 from ._types._checker import args_type_check
 
 

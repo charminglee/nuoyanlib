@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from math import pi
+import math
 import mod.client.extraClientApi as c_api
 from mod.common.minecraftEnum import RayFilterType
 from ..core.client.comp import LvComp, PLAYER_ID, CF
@@ -35,7 +35,7 @@ def __get_viewport_args():
     pass
 
 
-def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=pi / 5, ent_filter=None):
+def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=math.pi / 5, ent_filter=None):
     """
     获取当前屏幕内的实体。
 

@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from time import time
+import time
 from ....core.client.comp import LvComp
 from ....core._types._checker import args_type_check
 from ....core.listener import listen_event, unlisten_event, is_listened
@@ -250,12 +250,12 @@ class NyButton(InteractableControl, NyControl):
     def _on_touch_up_dc(self, args):
         if self.has_long_clicked:
             return
-        if time() - self._double_click_time <= 0.3:
+        if time.time() - self._double_click_time <= 0.3:
             # 触发双击
             self._double_click_time = 0
             self._on_double_click(args)
         else:
-            self._double_click_time = time()
+            self._double_click_time = time.time()
 
     def _on_touch_down_lc(self, args):
         threshold = LvComp.Operation.GetHoldTimeThresholdInMs() / 1000.0

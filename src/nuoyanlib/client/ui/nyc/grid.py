@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from math import ceil
+import math
 from ....core._utils import get_func, kwargs_setter, try_exec, cached_property
 from ....core._types._checker import args_type_check
 from ....core.client.comp import ScreenNode, ViewBinder
@@ -395,7 +395,7 @@ class NyGrid(NyControl):
             self._screen_node.SetStackGridCount(self.path, val)
         else:
             dx, dy = self.dimension
-            new_dy = int(ceil(float(val) / dx))
+            new_dy = int(math.ceil(float(val) / dx))
             if new_dy != dy:
                 self._base_control.SetGridDimension((dx, new_dy))
         self.__grid_size = val

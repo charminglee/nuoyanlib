@@ -13,11 +13,11 @@
 
 
 from typing import Any, Optional, Callable, Tuple, Union, List, Iterable
-from typing_extensions import Self
 from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUIControl
 from .control import NyControl, InteractableControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
+from ....core._types._typing import Self
 from ....utils.enum import ComboBoxCallbackType
 
 

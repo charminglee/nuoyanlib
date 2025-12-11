@@ -12,10 +12,9 @@
 """
 
 
-from typing_extensions import Self
 from typing import Dict, Optional, Callable, Union
 from mod.server.system.serverSystem import ServerSystem
-from .._types._typing import ArgsDict
+from .._types._typing import Self, ArgsDict
 from .._utils import singleton
 from .._sys import NuoyanLibBaseSystem
 from ..listener import ServerEventProxy, _lib_sys_event

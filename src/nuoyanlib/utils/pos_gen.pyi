@@ -6,26 +6,25 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from typing_extensions import Self
-from abc import abstractmethod, ABCMeta
-from typing import NoReturn, Iterator
-from ..core._types._typing import FTuple3, ITuple3, T
+from typing import Iterator, Any
+from ..core._types._typing import Self, FTuple3, ITuple3, T
 
 
-class _PosGenerator(Iterator[FTuple3], metaclass=ABCMeta):
+class _PosGenerator(Iterator[FTuple3]):
     __i: int
     len: int
+    def __init__(self: Self, *args: Any, **kwargs: Any) -> None: ...
     def __iter__(self: T) -> T: ...
-    def next(self) -> FTuple3: ...
+    def __next__(self) -> FTuple3: ...
+    next = __next__
     def __len__(self) -> int: ...
-    @abstractmethod
-    def __gen_pos__(self, i: int) -> NoReturn: ...
+    def __gen_pos__(self, i: int) -> FTuple3: ...
     def __getitem__(self, i: int) -> FTuple3: ...
 
 

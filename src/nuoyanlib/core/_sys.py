@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from threading import current_thread
+import threading
 import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
 from . import _const
@@ -97,7 +97,7 @@ def is_client():
     :return: 是则返回True，否则返回False
     :rtype: bool
     """
-    return current_thread().name == "MainThread"
+    return threading.current_thread().name == "MainThread"
 
 
 def get_api(_is_client=None):

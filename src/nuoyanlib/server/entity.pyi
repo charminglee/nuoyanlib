@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
+|   Date  : 2025-12-12
 |
 | ====================================================
 """
@@ -111,4 +111,3 @@ def get_entities_by_ray(
     filter_type_str: Optional[List[str]] = None,
     filter_abiotic: bool = False,
 ) -> List[Dict[str, Union[str, tuple]]]: ...
-def entity_distance(ent1: str, ent2: str) -> float: ...

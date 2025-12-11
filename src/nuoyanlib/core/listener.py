@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-12
 |
 | ====================================================
 """
 
 
-from bisect import insort
+import bisect
 from types import MethodType
 import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
@@ -84,7 +84,7 @@ class _EventPool(object):
         if p not in self.pool:
             self.pool[p] = set()
             # 插入优先级并排序
-            insort(self.priorities, p)
+            bisect.insort(self.priorities, p)
 
         func_set = self.pool[p]
         if func in func_set:
@@ -405,12 +405,17 @@ class EventArgsWrap(object):
 
     __iter__        = lambda self, *args: self._arg_dict.__iter__()
     __eq__          = lambda self, *args: self._arg_dict.__eq__(*args)
+    __ne__          = lambda self, *args: self._arg_dict.__ne__(*args)
     __len__         = lambda self, *args: self._arg_dict.__len__()
     __contains__    = lambda self, *args: self._arg_dict.__contains__(*args)
     keys            = lambda self, *args: self._arg_dict.keys()
     values          = lambda self, *args: self._arg_dict.values()
     items           = lambda self, *args: self._arg_dict.items()
+    iterkeys        = lambda self, *args: self._arg_dict.iterkeys()
+    itervalues      = lambda self, *args: self._arg_dict.itervalues()
+    iteritems       = lambda self, *args: self._arg_dict.iteritems()
     get             = lambda self, *args: self._arg_dict.get(*args)
+    copy            = lambda self, *args: self._arg_dict.copy()
 
 
 class BaseEventProxy(object):

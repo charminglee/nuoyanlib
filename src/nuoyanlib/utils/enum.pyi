@@ -16,8 +16,7 @@ from collections import OrderedDict
 from itertools import count
 import sys
 from typing import Optional, ClassVar, Dict, Hashable, Sequence, Tuple, Any, Iterator, Type, List, NoReturn
-from typing_extensions import Self
-from ..core._types._typing import STuple, TimeEaseFuncType, T
+from ..core._types._typing import Self, STuple, TimeEaseFuncType, T
 from ..core._utils import MappingProxy
 
 

@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from traceback import print_exc
+import traceback
 from types import MethodType
 from functools import wraps
 from ._doc import signature
@@ -129,7 +129,7 @@ class lru_cache(object):
                 old_root[RESULT] = res
                 # 让最旧节点成为新的根节点
                 root = self.root = old_root[NEXT]
-                old_key, old_result = root[KEY], root[RESULT]
+                old_key, _ = root[KEY], root[RESULT]
                 # 清空最旧节点上的数据
                 root[KEY] = root[RESULT] = None
                 # 刷新缓存
@@ -196,8 +196,9 @@ def singleton(init_once=True):
 
 class cached_property(object):
     def __init__(self, getter):
+        super(cached_property, self).__init__()
         self.getter = getter
-        self.__doc__ = getattr(getter, '__doc__', "")
+        self.__doc__ = getattr(getter, '__doc__', None)
 
     def __get__(self, ins, cls):
         value = self.getter(ins)
@@ -237,7 +238,7 @@ def try_exec(func, *args, **kwargs):
     try:
         return func(*args, **kwargs)
     except Exception as e:
-        print_exc()
+        traceback.print_exc()
         return e
 
 
@@ -290,14 +291,14 @@ def hook_method(org_method, before_hook=None, after_hook=None):
                 before_hook(*args, **kwargs)
             except:
                 try:
-                    print_exc()
+                    traceback.print_exc()
                 except:
                     pass
         try:
             org_method(*args, **kwargs)
         except:
             try:
-                print_exc()
+                traceback.print_exc()
             except:
                 pass
         if after_hook:

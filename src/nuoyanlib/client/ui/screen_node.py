@@ -6,16 +6,16 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
 from types import MethodType
-from time import time
-from itertools import product, cycle
-from fnmatch import fnmatchcase
+import time
+import itertools
+import fnmatch
 from ...core.client.comp import CustomUIScreenProxy, ScreenNode, ViewBinder
 from ...core import error
 from ...core.listener import listen_event, unlisten_event
@@ -562,7 +562,7 @@ class ScreenNodeExtension(object):
                     children_name = self._screen_node.GetChildrenName(parent_path)
                     if not children_name:
                         raise error.PathMatchError(path)
-                    path_split[i] = [cn for cn in children_name if fnmatchcase(cn, ps)]
+                    path_split[i] = [cn for cn in children_name if fnmatch.fnmatchcase(cn, ps)]
                     if not path_split[i]:
                         raise error.PathMatchError(path)
                 else:
@@ -570,7 +570,7 @@ class ScreenNodeExtension(object):
                 if i != 0:
                     parent_path += "/" + ps
             # 生成所有匹配的路径
-            for p in product(*path_split):
+            for p in itertools.product(*path_split):
                 yield "/".join(p)
 
     def clear_all_pos_data(self):
@@ -637,7 +637,7 @@ class ScreenNodeExtension(object):
         for path, data in self._frame_anim_data.items():
             if data['is_pausing']:
                 continue
-            now = time()
+            now = time.time()
             if now - data['last_time'] >= data['frame_time']:
                 try:
                     index = next(data['indexes'])
@@ -663,7 +663,7 @@ class ScreenNodeExtension(object):
             kwargs=None,
     ):
         if loop:
-            indexes = cycle(xrange(frame_count))
+            indexes = itertools.cycle(xrange(frame_count))
         else:
             indexes = iter(xrange(frame_count))
         if stop_frame < 0:
@@ -673,7 +673,7 @@ class ScreenNodeExtension(object):
             'tex_path': tex_path,
             'frame_time': 1.0 / frame_rate,
             'stop_frame': stop_frame,
-            'last_time': time(),
+            'last_time': time.time(),
             'indexes': indexes,
             'is_pausing': False,
             'callback': callback,

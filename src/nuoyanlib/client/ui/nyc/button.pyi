@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -14,10 +14,9 @@
 
 from typing import Callable, ClassVar, Optional, Dict, Union, List, Any
 from types import MethodType
-from typing_extensions import Self
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.common.utils.timer import CallLater
-from ....core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl, ItemDict
+from ....core._types._typing import Self, ArgsDict, FTuple2, UiPathOrNyControl, ItemDict
 from ....core._types._checker import args_type_check
 from .control import NyControl, InteractableControl
 from .image import NyImage

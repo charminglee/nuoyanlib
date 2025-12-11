@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -16,7 +16,7 @@ import operator
 import math
 from mod.common.utils.mcmath import Matrix
 from ..core._sys import get_cf, get_api
-from ..core.error import VectorError, ZeroVectorError, VectorDimError
+from ..core.error import VectorError
 
 
 __all__ = [
@@ -49,11 +49,6 @@ _OP_MAP = {
     '*': operator.mul,
     '/': operator.truediv,
     '//': operator.floordiv,
-    '+=': operator.iadd,
-    '-=': operator.isub,
-    '*=': operator.imul,
-    '/=': operator.itruediv,
-    '//=': operator.ifloordiv,
 }
 
 
@@ -96,7 +91,7 @@ class Vector(object):
                 self.x, self.y, self.z = args
                 self._dim = 3
         else:
-            raise VectorError("Invalid Vector construction arguments")
+            raise VectorError("Invalid Vector construction arguments: {}".format(args))
 
     @property
     def dim(self):
@@ -252,11 +247,11 @@ class Vector(object):
         设置向量长度。
 
         :type val: float
-        :raise ZeroVectorError: 对零向量调用时抛出
+        :raise VectorError: 对零向量调用时抛出
         """
         l = self.length
         if l < Vector._ZERO_EPS:
-            raise ZeroVectorError("can't set the length of zero vector")
+            raise VectorError("can't set the length of zero vector")
         mul = val / l
         self.x *= mul
         self.y *= mul
@@ -297,11 +292,11 @@ class Vector(object):
         :return: 标准化向量
         :rtype: Vector
 
-        :raise ZeroVectorError: 对零向量调用时抛出
+        :raise VectorError: 对零向量调用时抛出
         """
         l = self.length
         if l < Vector._ZERO_EPS:
-            raise ZeroVectorError("can't normalize zero vector")
+            raise VectorError("can't normalize zero vector")
         mul = 1 / l
         x = self.x * mul
         y = self.y * mul
@@ -416,7 +411,10 @@ class Vector(object):
             raise IndexError("Vector index out of range")
 
     def __iter__(self):
-        return iter((self.x, self.y) if self._dim == 2 else (self.x, self.y, self.z))
+        yield self.x
+        yield self.y
+        if self._dim == 3:
+            yield self.z
 
     def __len__(self):
         return self._dim
@@ -428,13 +426,15 @@ class Vector(object):
                 return Vector(op(self.x, other), op(self.y, other))
             else:
                 return Vector(op(self.x, other), op(self.y, other), op(self.z, other))
+
         if not scalar_only and isinstance(other, (Vector, tuple)):
             if self._dim != len(other):
-                raise VectorDimError("the dimensions of two vectors are mismatched")
+                raise VectorError("the dimensions of two vectors are mismatched")
             if self._dim == 2:
                 return Vector(op(self.x, other[0]), op(self.y, other[1]))
             else:
                 return Vector(op(self.x, other[0]), op(self.y, other[1]), op(self.z, other[2]))
+
         raise TypeError("unsupported operand type(s) for %s: 'Vector' and '%s'" % (operator, type(other).__name__))
 
     def _iop(self, other, operator, scalar_only=False):
@@ -445,17 +445,16 @@ class Vector(object):
             if self._dim == 3:
                 self.z = op(self.z, other)
             return self
+
         if not scalar_only and isinstance(other, (Vector, tuple)):
             if self._dim != len(other):
-                raise VectorDimError("the dimensions of two vectors are mismatched")
-            if self._dim == 2:
-                self.x = op(self.x, other[0])
-                self.y = op(self.y, other[1])
-            else:
-                self.x = op(self.x, other[0])
-                self.y = op(self.y, other[1])
+                raise VectorError("the dimensions of two vectors are mismatched")
+            self.x = op(self.x, other[0])
+            self.y = op(self.y, other[1])
+            if self._dim == 3:
                 self.z = op(self.z, other[2])
             return self
+
         raise TypeError("unsupported operand type(s) for %s: 'Vector' and '%s'" % (operator, type(other).__name__))
 
     def __add__(self, other):
@@ -473,7 +472,7 @@ class Vector(object):
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
         """
-        return self._op(other, "+")
+        return self._op(other, '+')
 
     def __radd__(self, other):
         """
@@ -507,7 +506,7 @@ class Vector(object):
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
         """
-        return self._iop(other, "+=")
+        return self._iop(other, '+')
 
     def __sub__(self, other):
         """
@@ -524,7 +523,7 @@ class Vector(object):
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
         """
-        return self._op(other, "-")
+        return self._op(other, '-')
 
     def __rsub__(self, other):
         """
@@ -558,7 +557,7 @@ class Vector(object):
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
         """
-        return self._iop(other, "-=")
+        return self._iop(other, '-')
 
     def __mul__(self, other):
         """
@@ -573,7 +572,7 @@ class Vector(object):
         :return: 新向量
         :rtype: Vector
         """
-        return self._op(other, "*", True)
+        return self._op(other, '*', True)
 
     def __rmul__(self, other):
         """
@@ -603,7 +602,7 @@ class Vector(object):
         :return: 向量本身
         :rtype: Vector
         """
-        return self._iop(other, "*=", True)
+        return self._iop(other, '*', True)
 
     def __truediv__(self, other):
         """
@@ -618,7 +617,7 @@ class Vector(object):
         :return: 新向量
         :rtype: Vector
         """
-        return self._op(other, "/", True)
+        return self._op(other, '/', True)
 
     def __itruediv__(self, other):
         """
@@ -633,7 +632,7 @@ class Vector(object):
         :return: 向量本身
         :rtype: Vector
         """
-        return self._iop(other, "/=", True)
+        return self._iop(other, '/', True)
 
     __div__ = __truediv__
     __idiv__ = __itruediv__
@@ -651,7 +650,7 @@ class Vector(object):
         :return: 新向量
         :rtype: Vector
         """
-        return self._op(other, "//", True)
+        return self._op(other, '//', True)
 
     def __ifloordiv__(self, other):
         """
@@ -666,7 +665,7 @@ class Vector(object):
         :return: 向量本身
         :rtype: Vector
         """
-        return self._iop(other, "//=", True)
+        return self._iop(other, '//', True)
 
     def dot(self, vec):
         """
@@ -679,10 +678,10 @@ class Vector(object):
         :return: 向量点积
         :rtype: float
 
-        :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise VectorError: 两个向量的维度不一致时抛出
         """
         if self._dim != len(vec):
-            raise VectorDimError("the dimensions of two vectors are mismatched")
+            raise VectorError("the dimensions of two vectors are mismatched")
         return sum(a * b for a, b in zip(self, vec))
 
     def cross(self, vec, inplace=True):
@@ -697,10 +696,10 @@ class Vector(object):
         :return: 向量叉积
         :rtype: Vector
 
-        :raise VectorDimError: 当前向量非三维向量，或传入非三维向量时抛出
+        :raise VectorError: 当前向量非三维向量，或传入非三维向量时抛出
         """
         if self._dim != 3 or len(vec) != 3:
-            raise VectorDimError("cross product only supports 3D vectors")
+            raise VectorError("cross product only supports 3D vectors")
         x = self.y * vec[2] - self.z * vec[1]
         y = self.z * vec[0] - self.x * vec[2]
         z = self.x * vec[1] - self.y * vec[0]
@@ -1143,7 +1142,7 @@ def __test__():
     assert v1[0] == 1
     assert tuple(v1) == (1, 2, 3)
 
-    assert_error(v1.dot, ((1, 2),), exc=VectorDimError)
+    assert_error(v1.dot, ((1, 2),), exc=VectorError)
     assert v1.dot(v2) == v1.dot((4, 5, 6)) == 32
     assert v1.cross(v2, False) == v1.cross((4, 5, 6), False) == (-3, 6, -3)
 

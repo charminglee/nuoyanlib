@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -36,8 +36,6 @@ class EventParameterError(AttributeError):
     param: str
     def __init__(self: Self, event_name: str, param: str) -> None: ...
 class VectorError(Exception): ...
-class ZeroVectorError(Exception): ...
-class VectorDimError(Exception): ...
 class EventSourceError(TypeError):
     args = Tuple[str, str, str]
     def __init__(self: Self, name: str, ns: str, sys_name: str) -> None: ...

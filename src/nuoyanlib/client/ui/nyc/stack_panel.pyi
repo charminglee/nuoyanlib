@@ -12,12 +12,12 @@
 """
 
 
-from typing_extensions import Self
 from typing import Optional, Literal
 from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
+from ....core._types._typing import Self
 
 
 class NyStackPanel(NyControl):

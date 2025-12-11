@@ -12,10 +12,10 @@
 """
 
 
-from typing_extensions import Self
 from typing import Any, Callable, Union, List, Optional, Dict, Tuple
 from mod.client.system.clientSystem import ClientSystem
 from mod.server.system.serverSystem import ServerSystem
+from ..core._types._typing import Self
 
 
 __CallbackType = Union[Callable[[bool, Any], Any], Callable[[bool, Any, str], Any], None]

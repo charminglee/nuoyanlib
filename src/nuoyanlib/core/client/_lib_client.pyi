@@ -12,12 +12,11 @@
 """
 
 
-from typing_extensions import Self
 from typing import List, Optional, Any, Dict, Callable, Union, TypedDict, Tuple
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.component.actorRenderCompClient import ActorRenderCompClient
 from mod.client.component.modAttrCompClient import ModAttrComponentClient
-from .._types._typing import ArgsDict, FTuple3
+from .._types._typing import Self, ArgsDict, FTuple3
 from .._const import LIB_NAME, LIB_CLIENT_NAME
 from .._sys import NuoyanLibBaseSystem
 from .._utils import singleton

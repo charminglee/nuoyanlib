@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from threading import Timer as _Timer
+import threading
 from ..core._sys import get_lv_comp, is_client
 
 
@@ -120,7 +120,7 @@ class Timer(object):
         self.kwargs = kwargs
         self._pause = False
         self._cancel = False
-        self.__timer = _Timer(sec, self.__func)
+        self.__timer = threading.Timer(sec, self.__func)
 
     def _execute(self):
         return self.func(*self.args, **self.kwargs)
@@ -128,7 +128,7 @@ class Timer(object):
     def __func(self):
         self._execute()
         if self.type == "r" and not self._cancel:
-            self.__timer = _Timer(self.sec, self.__func)
+            self.__timer = threading.Timer(self.sec, self.__func)
             self.__timer.start()
         else:
             self._release()

@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-12
 |
 | ====================================================
 """
@@ -44,7 +44,6 @@ __all__ = [
     "attack_nearest_mob",
     "has_effect",
     "get_entities_by_ray",
-    "entity_distance",
 ]
 
 
@@ -760,21 +759,6 @@ def get_entities_by_ray(
     return ent_list
 
 
-def entity_distance(ent1, ent2):
-    """
-    计算两个实体的距离。
-
-    -----
-
-    :param str ent1: 实体ID
-    :param str ent2: 实体ID
-
-    :return: 两个实体的距离
-    :rtype: float
-    """
-    pos1 = CF(ent1).Pos.GetFootPos()
-    pos2 = CF(ent2).Pos.GetFootPos()
-    return pos_distance(pos1, pos2)
 
 
 

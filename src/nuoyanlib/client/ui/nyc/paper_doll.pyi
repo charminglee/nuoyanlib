@@ -13,11 +13,11 @@
 
 
 from typing import Optional
-from typing_extensions import Self
 from mod.client.ui.controls.neteasePaperDollUIControl import NeteasePaperDollUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
+from ....core._types._typing import Self
 
 
 class NyPaperDoll(NyControl):

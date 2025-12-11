@@ -12,13 +12,12 @@
 """
 
 
-from typing_extensions import Self
 from typing import Optional, NoReturn, Literal
 from mod.client.ui.controls.labelUIControl import LabelUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
-from ....core._types._typing import FTuple3
+from ....core._types._typing import Self, FTuple3
 
 
 __TextFont = Literal[

@@ -13,10 +13,9 @@
 
 
 from typing import List, Tuple, Iterator, TypedDict, ClassVar, Optional, overload, Any, Dict, Type, Generator, Callable, Union
-from typing_extensions import Self
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
-from ...core._types._typing import FTuple2, Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, T, FuncDecorator
+from ...core._types._typing import Self, FTuple2, Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, T, FuncDecorator
 from .nyc import *
 
 

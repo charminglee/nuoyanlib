@@ -6,12 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
+import sys
 from typing import TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
@@ -24,6 +25,11 @@ F = TypeVar("F", bound=Callable[..., Any])
 FuncDecorator = Callable[[F], F]
 __T_type = TypeVar("__T_type", bound=type)
 ClassDecorator = Callable[[__T_type], __T_type]
+if sys.version_info >= (3, 11):
+    from typing_extensions import Self as _Self
+    Self = _Self
+else:
+    Self = T
 
 
 PyBasicTypes = Union[str, int, float, list, tuple, dict, None]

@@ -12,11 +12,10 @@
 """
 
 
-from typing_extensions import Self
 from typing import Dict, Union, Tuple, Callable, TypeVar, Optional, Any, List, Iterator, overload, Iterable, Generic, ClassVar
 from mod.client.ui.controls.gridUIControl import GridUIControl
 from .control import NyControl
-from ....core._types._typing import ITuple2, STuple, UiPathOrNyControl, T
+from ....core._types._typing import Self, ITuple2, STuple, UiPathOrNyControl, T
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ....utils.enum import GridCallbackType

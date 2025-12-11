@@ -6,17 +6,16 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-12
 |
 | ====================================================
 """
 
 
-from typing_extensions import Self
 from typing import ClassVar, Callable, Optional, Tuple, Generator, List, Any, Dict, Set, overload
 from types import MethodType
 from ._types._event_typing import ClientEvent, ServerEvent
-from ._types._typing import ArgsDict, PyBasicTypes, STuple, F, FuncDecorator
+from ._types._typing import Self, ArgsDict, PyBasicTypes, STuple, F, FuncDecorator
 
 
 ALL_CLIENT_LIB_EVENTS: Dict[str, str]
@@ -102,6 +101,19 @@ class EventArgsWrap(object):
     def __getattr__(self, key: str) -> PyBasicTypes: ...
     def __setattr__(self, key: str, value: PyBasicTypes) -> None: ...
     def __repr__(self) -> str: ...
+    __iter__ = dict.__iter__
+    __eq__ = dict.__eq__
+    __ne__ = dict.__ne__
+    __len__ = dict.__len__
+    __contains__ = dict.__contains__
+    keys = dict.keys
+    values = dict.values
+    items = dict.items
+    iterkeys = dict.iterkeys
+    itervalues = dict.itervalues
+    iteritems = dict.iteritems
+    get = dict.get
+    copy = dict.copy
 
 
 class BaseEventProxy(object):

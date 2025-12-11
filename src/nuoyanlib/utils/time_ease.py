@@ -6,13 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-10
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from time import time
+import time
 from .enum import TimeEaseFunc
 
 
@@ -125,8 +125,8 @@ class TimeEase(object):
             self._frame += 1
         else:
             if self._init_tm == 0:
-                self._init_tm = time()
-            x = min((time() - self._init_tm) / self.total_tm, 1)
+                self._init_tm = time.time()
+            x = min((time.time() - self._init_tm) / self.total_tm, 1)
         self._val = self.start_val + self.ease_func(x) * self._diff_val
         if x >= 1:
             self._on_end()

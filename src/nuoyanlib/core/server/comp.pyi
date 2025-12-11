@@ -12,7 +12,6 @@
 """
 
 
-from typing_extensions import Self
 from typing import Type, ClassVar, Dict
 from mod.server.system.serverSystem import ServerSystem
 from mod.server.component.domainGameCompServer import DomainGameCompServer
@@ -86,7 +85,7 @@ from mod.server.component.shareableCompServer import ShareableComponentServer
 from mod.server.component.blockUseEventWhiteListCompServer import BlockUseEventWhiteListComponentServer
 from mod.server.component.actorLootCompServer import ActorLootComponentServer
 from mod.common.component.baseComponent import BaseComponent
-from .._types._typing import T
+from .._types._typing import Self, T
 
 
 ENGINE_NAMESPACE: str

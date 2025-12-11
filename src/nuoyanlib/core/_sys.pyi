@@ -12,7 +12,6 @@
 """
 
 
-from typing_extensions import Self
 from types import MethodType
 from typing import Optional, Union, Dict, Tuple, Callable, Any, Literal, List, Type
 import mod.client.extraClientApi as c_api
@@ -23,6 +22,7 @@ from .client._lib_client import NuoyanLibClientSystem
 from .server._lib_server import NuoyanLibServerSystem
 from .client.comp import CF as CCF
 from .server.comp import CF as SCF
+from ._types._typing import Self
 
 
 def load_extensions() -> None: ...

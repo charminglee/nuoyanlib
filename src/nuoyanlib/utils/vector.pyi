@@ -6,15 +6,14 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from typing_extensions import Self
 from typing import Callable, ClassVar, Literal, Tuple, overload, Union, Iterator, Dict
-from ..core._types._typing import STuple, FTuple3, FTuple2
+from ..core._types._typing import STuple, FTuple3, FTuple2, Self
 
 
 __Vector = Union[FTuple3, FTuple2, Vector]

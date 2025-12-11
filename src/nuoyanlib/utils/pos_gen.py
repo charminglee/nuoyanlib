@@ -6,14 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
 
 
-from abc import abstractmethod, ABCMeta
-from math import sin, cos, pi, acos, sqrt
+import math
 
 
 __all__ = [
@@ -26,28 +25,28 @@ __all__ = [
 
 
 class _PosGenerator(object):
-    __metaclass__ = ABCMeta
-
-    __i = 0
-    len = 0
+    def __init__(self, *args, **kwargs):
+        self.__i = 0
+        self.len = 0
 
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.__i >= self.len:
             self.__i = 0
             raise StopIteration
-        pos = self.__gen_pos__(self.__i) # NOQA
+        pos = self.__gen_pos__(self.__i)
         self.__i += 1
         return pos
+
+    next = __next__
 
     def __len__(self):
         return self.len
 
-    @abstractmethod
     def __gen_pos__(self, i):
-        pass
+        raise NotImplementedError
 
     def __getitem__(self, i):
         if not isinstance(i, int):
@@ -74,6 +73,7 @@ class gen_line_pos(_PosGenerator):
     """
 
     def __init__(self, pos1, pos2, count, only=-1):
+        super(gen_line_pos, self).__init__()
         self.pos1 = pos1
         self.pos2 = pos2
         self.count = count
@@ -84,7 +84,6 @@ class gen_line_pos(_PosGenerator):
         self.__x_step = xd / (count - 1)
         self.__y_step = yd / (count - 1)
         self.__z_step = zd / (count - 1)
-        self.__i = 0
         self.len = only if only != -1 else count
 
     def __gen_pos__(self, i):
@@ -110,17 +109,18 @@ class gen_circle_pos(_PosGenerator):
     """
 
     def __init__(self, center_pos, radius, count):
+        super(gen_circle_pos, self).__init__()
         self.center_pos = center_pos
         self.radius = radius
         self.count = count
         self.len = count
-        self.__step = (2 * pi) / self.count
+        self.__step = (2 * math.pi) / self.count
 
     def __gen_pos__(self, i):
         angle = i * self.__step
-        x = self.radius * sin(angle) + self.center_pos[0]
+        x = self.radius * math.sin(angle) + self.center_pos[0]
         y = self.center_pos[1]
-        z = self.radius * cos(angle) + self.center_pos[2]
+        z = self.radius * math.cos(angle) + self.center_pos[2]
         return x, y, z
 
 
@@ -140,6 +140,7 @@ class gen_sphere_pos(_PosGenerator):
     """
 
     def __init__(self, center_pos, radius, count):
+        super(gen_sphere_pos, self).__init__()
         self.center_pos = center_pos
         self.radius = radius
         self.count = count
@@ -151,13 +152,13 @@ class gen_sphere_pos(_PosGenerator):
             phi = 0.0
         else:
             # 使用斐波那契球采样算法生成均匀分布的点
-            theta = acos(1 - 2.0 * i / (self.count - 1))
-            golden_ratio = (sqrt(5) + 1) / 2
+            theta = math.acos(1 - 2.0 * i / (self.count - 1))
+            golden_ratio = (math.sqrt(5) + 1) / 2
             # 使用黄金角度避免周期性重叠
-            phi = (2 * pi * i) / golden_ratio
-        x = self.center_pos[0] + self.radius * sin(theta) * cos(phi)
-        y = self.center_pos[1] + self.radius * sin(theta) * sin(phi)
-        z = self.center_pos[2] + self.radius * cos(theta)
+            phi = (2 * math.pi * i) / golden_ratio
+        x = self.center_pos[0] + self.radius * math.sin(theta) * math.cos(phi)
+        y = self.center_pos[1] + self.radius * math.sin(theta) * math.sin(phi)
+        z = self.center_pos[2] + self.radius * math.cos(theta)
         return x, y, z
 
 
@@ -177,6 +178,7 @@ class gen_cube_pos(_PosGenerator):
     """
 
     def __init__(self, pos1, pos2, count):
+        super(gen_cube_pos, self).__init__()
         self.pos1 = pos1
         self.pos2 = pos2
         self.count = count
@@ -225,6 +227,7 @@ class gen_spiral_pos(_PosGenerator):
     """
 
     def __init__(self, start_pos, count):
+        super(gen_spiral_pos, self).__init__()
         self.start_pos = start_pos
         self.count = count
         self.len = count

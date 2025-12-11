@@ -12,12 +12,12 @@
 """
 
 
-from typing_extensions import Self
 from typing import Optional, Callable
 from mod.client.ui.controls.switchToggleUIControl import SwitchToggleUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
+from ....core._types._typing import Self
 
 
 __ToggleChangedCallback = Callable[[dict], int]

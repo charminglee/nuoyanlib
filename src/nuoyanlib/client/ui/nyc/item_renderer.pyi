@@ -12,13 +12,12 @@
 """
 
 
-from typing_extensions import Self
 from typing import Optional, TypedDict, NoReturn
 from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
-from ....core._types._typing import UserData
+from ....core._types._typing import Self, UserData
 
 
 class __UiItemDict(TypedDict):

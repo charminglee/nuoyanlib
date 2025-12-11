@@ -12,7 +12,6 @@
 """
 
 
-from typing_extensions import Self
 from typing import Type, ClassVar, Dict
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
@@ -80,7 +79,7 @@ from mod.client.component.playerAnimCompClient import PlayerAnimCompClient
 from mod.client.component.achievementCompClient import AchievementCompClient
 from mod.client.component.dimensionCompClient import DimensionCompClient
 from mod.common.component.baseComponent import BaseComponent
-from .._types._typing import FTuple2, T
+from .._types._typing import Self, FTuple2, T
 
 
 class _MiniMapBaseScreen(ScreenNode):

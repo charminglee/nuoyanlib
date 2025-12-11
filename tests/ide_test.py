@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -30,20 +30,22 @@ t.join()
 
 
 try:
-    timer = time.clock
-except AttributeError:
     timer = time.perf_counter
+except AttributeError:
+    timer = time.clock
 
 
 def test(path):
+    n = 10000
     path = "nuoyanlib." + path
     module = import_module(path)
     t = timer()
-    module.__test__()
+    for _ in xrange(n):
+        module.__test__()
     cost = (timer() - t) * 1000
     print(
-        "Test passed: {:<40}".format(path + ",")
-        + " in {:<6.3f}ms,".format(cost)
+        "Test passed: {:<35}".format(path)
+        + " in {:<12.3f} avg {:<6.3f} (ms)".format(cost, cost / n)
     )
 
 

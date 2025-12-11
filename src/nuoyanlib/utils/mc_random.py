@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-11
 |
 | ====================================================
 """
@@ -14,7 +14,7 @@
 
 import math
 import random
-from string import digits, ascii_lowercase, ascii_uppercase
+import string
 from ..core._sys import get_lv_comp, is_client
 
 
@@ -78,7 +78,13 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
     :return: 随机字符串
     :rtype: str|list[str]
     """
-    s = (ascii_lowercase if lower else "") + (ascii_uppercase if upper else "") + (digits if num else "")
+    s = ""
+    if lower:
+        s += string.ascii_lowercase
+    if upper:
+        s += string.ascii_uppercase
+    if num:
+        s += string.digits
     rand = _random_ins.setdefault(seed, random.Random(seed))
     if generate_num == 1:
         return _gen_str(rand.choice, s, length)

@@ -12,12 +12,12 @@
 """
 
 
-from typing_extensions import Self
 from typing import Optional, Callable, Any
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
 from .control import NyControl, InteractableControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
+from ....core._types._typing import Self
 from ....utils.enum import WheelCallbackType
 
 

@@ -12,13 +12,12 @@
 """
 
 
-from typing_extensions import Self
 from typing import Callable, Optional, Tuple, NoReturn, Literal
 from mod.client.ui.controls.imageUIControl import ImageUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
-from ....core._types._typing import FTuple2, FTuple3, Args, Kwargs
+from ....core._types._typing import Self, FTuple2, FTuple3, Args, Kwargs
 
 
 __ClipDirection = Literal[
