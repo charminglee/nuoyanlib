@@ -6,17 +6,16 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
 
 
-from typing import Callable, ClassVar, Optional, Dict, Union, List, Any
-from types import MethodType
+from typing import Callable, ClassVar, Optional, Union, List, Any
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.common.utils.timer import CallLater
-from ....core._types._typing import Self, ArgsDict, FTuple2, UiPathOrNyControl, ItemDict
+from ....core._types._typing import Self, ArgsDict, FTuple2, UiPathOrNyControl
 from ....core._types._checker import args_type_check
 from .control import NyControl, InteractableControl
 from .image import NyImage
@@ -49,16 +48,12 @@ class NyButton(InteractableControl, NyControl):
     按钮文本控件相对路径。
     """
     _vibrate_time: int
-    _callbacks: Dict[str, List[__BtnCallbackType]]
-    _callback_flag: List[str]
-    _callback_api_map: Dict[str, MethodType]
-    _callback_func_map: Dict[str, MethodType]
     _double_click_time: float
     _long_click_timer: Optional[CallLater]
     _movable_controls: List[NyControl]
     _finger_pos: Optional[FTuple2]
     _base_control: ButtonUIControl
-    is_movable: ItemDict
+    is_movable: bool
     """
     按钮是否可拖动。
     """
@@ -114,8 +109,16 @@ class NyButton(InteractableControl, NyControl):
     SetHoverTexture = set_hover_texture
     SetPressedTexture = set_pressed_texture
     SetText = set_text
-    def set_callback(self, func: __BtnCallbackType, cb_type: str = ButtonCallbackType.UP) -> bool: ...
-    def remove_callback(self, func: __BtnCallbackType, cb_type: str = ButtonCallbackType.UP) -> bool: ...
+    def set_callback(
+        self,
+        func: __BtnCallbackType,
+        cb_type: ButtonCallbackType = ButtonCallbackType.UP,
+    ) -> bool: ...
+    def remove_callback(
+        self,
+        func: __BtnCallbackType,
+        cb_type: ButtonCallbackType = ButtonCallbackType.UP,
+    ) -> bool: ...
     def _register_long_click_callback(self, _) -> None: ...
     def _register_double_click_callback(self, _) -> None: ...
     def _on_up(self, *args: Any) -> None: ...

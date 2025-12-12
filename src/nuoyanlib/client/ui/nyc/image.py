@@ -6,10 +6,16 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from typing import Any
+    from mod.client.ui.controls.imageUIControl import ImageUIControl
+    from ..screen_node import ScreenNodeExtension
 
 
 from ....core import error

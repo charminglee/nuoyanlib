@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -34,7 +34,7 @@ def place_large_structure(pos, dimension_id, json_list, namespace):
     :param str namespace: 结构文件所在文件夹名称
 
     :return: 返回结构放置结果字典，key为各个小结构的名称，value为放置结果（成功为True，失败为False）
-    :rtype: dict[str, bool]
+    :rtype: dict[str,bool]
     """
     orgPos = json_list[0]['pos']
     result = {}

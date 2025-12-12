@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -90,7 +90,7 @@ def is_apollo():
 
 def is_client():
     """
-    | 判断当前环境是否是客户端。
+    判断当前环境是否是客户端。
 
     -----
 
@@ -190,16 +190,16 @@ class NuoyanLibBaseSystem(object):
                 self.cond_state[cond_id] = curr_state
 
     def Destroy(self):
-        self.UnListenAllEvents() # NOQA
+        self.UnListenAllEvents() # noqa
         self.cond_func.clear()
         self.cond_state.clear()
         self.event_pool.clear()
 
     def native_listen(self, ns, sys_name, event_name, method, priority=0):
-        self.ListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # NOQA
+        self.ListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # noqa
 
     def native_unlisten(self, ns, sys_name, event_name, method, priority=0):
-        self.UnListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # NOQA
+        self.UnListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # noqa
 
     def add_condition_to_func(self, cond, func, freq):
         cond_id = max(self.cond_func.iterkeys()) + 1 if self.cond_func else 0

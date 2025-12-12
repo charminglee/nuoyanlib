@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -34,8 +34,16 @@ class NySelectionWheel(InteractableControl, NyControl):
     @args_type_check(str, is_method=True)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
-    def set_callback(self, func: __WheelCallbackType, cb_type: str = WheelCallbackType.CLICK) -> bool: ...
-    def remove_callback(self, func: __WheelCallbackType, cb_type: str = WheelCallbackType.CLICK) -> bool: ...
+    def set_callback(
+        self,
+        func: __WheelCallbackType,
+        cb_type: WheelCallbackType = WheelCallbackType.CLICK
+    ) -> bool: ...
+    def remove_callback(
+        self,
+        func: __WheelCallbackType,
+        cb_type: WheelCallbackType = WheelCallbackType.CLICK,
+    ) -> bool: ...
     def _on_click(self) -> None: ...
     def _on_hover(self) -> None: ...
     SetCallback = set_callback

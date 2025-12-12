@@ -6,10 +6,14 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from mod.client.ui.controls.baseUIControl import BaseUIControl
 
 
 from types import MethodType
@@ -73,14 +77,14 @@ class ScreenNodeExtension(object):
         if isinstance(self, CustomUIScreenProxy):
             # 兼容UI代理
             self._screen_node = args[1]
-            hook_method(self.OnCreate, self.__create__, set_has_created) # NOQA
-            hook_method(self.OnDestroy, after_hook=self.__destroy__) # NOQA
+            hook_method(self.OnCreate, self.__create__, set_has_created) # noqa
+            hook_method(self.OnDestroy, after_hook=self.__destroy__) # noqa
         elif isinstance(self, ScreenNode):
             self._screen_node = self
             if len(args) == 3 and isinstance(args[2], dict):
                 self.cs = args[2].get('__cs__')
-            hook_method(self.Create, self.__create__, set_has_created) # NOQA
-            hook_method(self.Destroy, after_hook=self.__destroy__) # NOQA
+            hook_method(self.Create, self.__create__, set_has_created) # noqa
+            hook_method(self.Destroy, after_hook=self.__destroy__) # noqa
         else:
             raise error.ScreenNodeNotFoundError
 
@@ -119,8 +123,8 @@ class ScreenNodeExtension(object):
 
         :param function func: 绑定函数，支持普通函数与实例方法
         :param int flag: 绑定标志，参考ViewBinder中的枚举值
-        :param binding_name: 绑定名称；默认为"#<namespace>.<func_name>"，<namespace>为UI json文件中"namespace"对应的值，<func_name>为函数名
-        :param collection_name: 集合名称；若非集合绑定，忽略该参数即可；默认为空字符串
+        :param str binding_name: 绑定名称；默认为"#<namespace>.<func_name>"，<namespace>为UI json文件中"namespace"对应的值，<func_name>为函数名
+        :param str collection_name: 集合名称；若非集合绑定，忽略该参数即可；默认为空字符串
 
         :return: 是否成功
         :rtype: bool
@@ -139,9 +143,9 @@ class ScreenNodeExtension(object):
         self._binging_data[key] = (proxy, is_collection)
 
         if is_collection:
-            self._screen_node._process_collection(proxy, self._screen_node.screen_name) # NOQA
+            self._screen_node._process_collection(proxy, self._screen_node.screen_name) # noqa
         else:
-            self._screen_node._process_default(proxy, self._screen_node.screen_name) # NOQA
+            self._screen_node._process_default(proxy, self._screen_node.screen_name) # noqa
         return True
 
     def _create_binding_proxy(self, func, flag, binding_name="", collection_name=""):
@@ -175,9 +179,9 @@ class ScreenNodeExtension(object):
         proxy, is_collection = self._binging_data.pop(key)
 
         if is_collection:
-            self._screen_node._process_collection_unregister(proxy, self._screen_node.screen_name) # NOQA
+            self._screen_node._process_collection_unregister(proxy, self._screen_node.screen_name) # noqa
         else:
-            self._screen_node._process_default_unregister(proxy, self._screen_node.screen_name) # NOQA
+            self._screen_node._process_default_unregister(proxy, self._screen_node.screen_name) # noqa
         return True
 
     # endregion
@@ -523,7 +527,7 @@ class ScreenNodeExtension(object):
         -----
 
         :param str btn_path: 按钮路径，支持使用通配符"*"（目前仅支持最后一级控件名称使用通配符）
-        :param str callback_types: [变长位置参数] 按钮回调类型，支持同时设置多种回调，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
+        :param ButtonCallbackType callback_types: [变长位置参数] 按钮回调类型，支持同时设置多种回调，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
         :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
         """
         if not callback_types:
@@ -716,7 +720,7 @@ class ScreenNodeExtension(object):
     def _is_control_exist(self, path):
         screen_name = self._screen_node.screen_name
         full_path = self._screen_node.component_path + path
-        return ScreenNodeExtension.__get_control_type(screen_name, full_path) != _UIControlType.UNKNOWN # NOQA
+        return ScreenNodeExtension.__get_control_type(screen_name, full_path) != _UIControlType.UNKNOWN # noqa
 
     # endregion
 

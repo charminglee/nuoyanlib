@@ -85,7 +85,7 @@ class LobbyDataMgr(ServerEventProxy):
         if default is None:
             default = lambda: None
         if is_global:
-            self.global_data[key] = default()                                           # NOQA
+            self.global_data[key] = default()                                           # noqa
         else:
             self.uid_data[key] = {
                 self._to_uid(pid): default()
@@ -94,16 +94,16 @@ class LobbyDataMgr(ServerEventProxy):
         self._default[key] = default
 
     def _simplify_response(self, response):
-        entity = response.pop('entity')                                                 # NOQA
+        entity = response.pop('entity')                                                 # noqa
         if 'data' in entity:
-            response['data'] = {                                                        # NOQA
+            response['data'] = {                                                        # noqa
                 d['key']: d['value']
                 for d in entity['data']
             }
         elif 'orders' in entity:
             for d in entity['orders']:
                 order_id = d.pop('order_id')
-                response[order_id] = d                                                  # NOQA
+                response[order_id] = d                                                  # noqa
 
     def _set_default(self, response, keys):
         data = response['data']

@@ -6,10 +6,14 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from typing import Any
 
 
 import threading

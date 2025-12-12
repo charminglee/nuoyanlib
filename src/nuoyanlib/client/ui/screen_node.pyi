@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -17,6 +17,7 @@ from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
 from ...core._types._typing import Self, FTuple2, Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, T, FuncDecorator
 from .nyc import *
+from ...utils.enum import ButtonCallbackType
 
 
 class __FrameAnimData(TypedDict):
@@ -132,7 +133,7 @@ class ScreenNodeExtension(object):
     @staticmethod
     def button_callback(
         btn_path: str,
-        *callback_types: str,
+        *callback_types: ButtonCallbackType,
         touch_event_params: Optional[dict] = None,
     ) -> FuncDecorator: ...
     def _process_button_callback(self) -> None: ...

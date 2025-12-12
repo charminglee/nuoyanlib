@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-12-11
+|   Date  : 2025-12-12
 |
 | ==============================================
 """
@@ -21,6 +21,15 @@ from ._types._checker import args_type_check
 
 
 __T_type = TypeVar("__T_type", bound=type)
+
+
+class __Universal(object):
+    pass
+UNIVERSAL_OBJECT: __Universal
+
+
+def client_api(func: F) -> F: ...
+def server_api(func: F) -> F: ...
 
 
 if sys.version_info <= (2, 7):
@@ -48,8 +57,6 @@ class lru_cache(object):
     def __call__(self, func_or_cls: T) -> T: ...
 
 
-def client_api(func: F) -> F: ...
-def server_api(func: F) -> F: ...
 @overload
 def singleton(init_once: bool = True) -> ClassDecorator: ...
 @overload

@@ -6,10 +6,15 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
+    from ..screen_node import ScreenNodeExtension
 
 
 from ....utils.enum import ControlType

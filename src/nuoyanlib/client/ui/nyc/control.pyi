@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -21,7 +21,7 @@ from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ..screen_node import ScreenNodeExtension
 from . import *
-from ....utils.enum import Enum
+from ....utils.enum import Enum, ControlType
 
 
 __Anchor = Literal[
@@ -67,22 +67,42 @@ __UiPropertyNames = Literal[
     "uv",
     "wait",
 ]
+__AllowedApplyAttrs = Literal[
+    "position",
+    "anchor_from",
+    "anchor_to",
+    "clip_offset",
+    "clip_children",
+    "full_position_x",
+    "full_position_y",
+    "full_size_x",
+    "full_size_y",
+    "global_position",
+    "max_size",
+    "min_size",
+    "size",
+    "visible",
+    "alpha",
+    "layer",
+    "touch_enable",
+    "property_bag",
+]
 
 
 class InteractableControl(object):
     CALLBACK_TYPE: ClassVar[Type[Enum]]
-    callbacks: Dict[str, List[Callable]]
-    _callback_flag: List[str]
-    _callback_func_map: Dict[str, Tuple[MethodType, MethodType]]
+    callbacks: Dict[Enum, List[Callable]]
+    _callback_flag: List[Enum]
+    _callback_func_map: Dict[Enum, Tuple[MethodType, MethodType]]
     def __init__(self: Self, callback_func_map: Dict[str, Tuple[MethodType, MethodType]]) -> None: ...
     def __destroy__(self) -> None: ...
-    def _exec_callbacks(self, cb_type: str, *args: Any) -> None: ...
-    def set_callback(self, func: Callable, cb_type: str = None) -> bool: ...
-    def remove_callback(self, func: Callable, cb_type: str = None) -> bool: ...
+    def _exec_callbacks(self, cb_type: Enum, *args: Any) -> None: ...
+    def set_callback(self, func: Callable, cb_type: Optional[Enum] = None) -> bool: ...
+    def remove_callback(self, func: Callable, cb_type: Optional[Enum] = None) -> bool: ...
 
 
 class NyControl(object):
-    CONTROL_TYPE: ClassVar[str]
+    CONTROL_TYPE: ClassVar[ControlType]
     _ALLOWED_APPLY_ATTRS: ClassVar[STuple]
     _screen_node: ScreenNode
     ui_node: ScreenNodeExtension
@@ -183,31 +203,7 @@ class NyControl(object):
     @args_type_check(str, is_method=True)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
-    def apply_attr(
-        self,
-        attr: Literal[
-            "position",
-            "anchor_from",
-            "anchor_to",
-            "clip_offset",
-            "clip_children",
-            "full_position_x",
-            "full_position_y",
-            "full_size_x",
-            "full_size_y",
-            "global_position",
-            "max_size",
-            "min_size",
-            "size",
-            "visible",
-            "alpha",
-            "layer",
-            "touch_enable",
-            "property_bag",
-        ],
-        value: Any,
-        level: int = 1,
-    ) -> None: ...
+    def apply_attr(self, attr: __AllowedApplyAttrs, value: Any, level: int = 1) -> None: ...
     def add_child(self, def_name: str, child_name: str, force_update: bool = True) -> Optional[NyControl]: ...
     def clone_to(
         self: T,

@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
+|   Date  : 2025-12-12
 |
 | ====================================================
 """
@@ -48,7 +48,7 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
     # ============================================== Basic Function ====================================================
 
     def run_benchmark(self):
-        self.player_id = s_api.GetPlayerList()[0]
+        self.player_id = s_api.GetHostPlayerId()
         run_benchmark("nuoyanlib.core.listener", 10000)
         run_benchmark("nuoyanlib.core.server.comp")
         self.communicate_benchmark()

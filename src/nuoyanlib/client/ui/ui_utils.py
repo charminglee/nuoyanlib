@@ -6,16 +6,21 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
 
 
-from types import GeneratorType
+if 0:
+    from mod.client.ui.controls.baseUIControl import BaseUIControl
+    from mod.client.ui.screenNode import ScreenNode
+    from mod.client.system.clientSystem import ClientSystem
+    from .nyc import NyControl
+
+
 import mod.client.extraClientApi as c_api
-from mod.client.system.clientSystem import ClientSystem
-from ...core.client.comp import ScreenNode, LvComp
+from ...core.client.comp import LvComp
 from ...utils.enum import ControlType
 
 
@@ -126,7 +131,7 @@ def to_control(screen_node, path, control_type=ControlType.BASE_CONTROL):
 
     :param ScreenNode screen_node: 控件所在UI类的实例
     :param str|BaseUIControl path: 控件路径
-    :param str control_type: 控件类型，返回该类型对应的实例，请使用ControlType枚举值，默认为ControlType.BASE_CONTROL
+    :param ControlType control_type: 控件类型，返回该类型对应的实例，请使用ControlType枚举值，默认为ControlType.BASE_CONTROL
 
     :return: 控件实例，获取不到时返回None
     :rtype: BaseUIControl|None
@@ -164,8 +169,6 @@ def is_out_of_screen(control, screen_node=None):
 
 def get_children_path_by_level(control, screen_node, level=1):
     """
-    [迭代器]
-
     获取控件指定层次的所有子控件的路径。
 
     -----
@@ -174,8 +177,8 @@ def get_children_path_by_level(control, screen_node, level=1):
     :param ScreenNode screen_node: 控件所在UI类的实例
     :param int level: 子控件层次，默认为1，传入0或负值时，获取所有层次
 
-    :return: 指定层次的所有子控件路径的迭代器，获取不到时返回空迭代器
-    :rtype: GeneratorType
+    :return: 指定层次的所有子控件路径的列表，获取不到时返回空列表
+    :rtype: list[str]
     """
     path = to_path(control)
     if level == 1:
@@ -199,8 +202,6 @@ def get_children_path_by_level(control, screen_node, level=1):
 
 def get_children_by_level(control, screen_node, level=1):
     """
-    [迭代器]
-
     获取控件指定层次的所有子控件的 ``BaseUIControl`` 实例。
 
     -----
@@ -209,8 +210,8 @@ def get_children_by_level(control, screen_node, level=1):
     :param ScreenNode screen_node: 控件所在UI类的实例
     :param int level: 子控件层次，默认为1，传入0或负值时，获取所有层次
 
-    :return: 指定层次的所有子控件实例的迭代器，获取不到时返回空迭代器
-    :rtype: GeneratorType
+    :return: 指定层次的所有子控件实例的列表，获取不到时返回空列表
+    :rtype: list[BaseUIControl]
     """
     return [
         to_control(screen_node, p)
@@ -246,10 +247,3 @@ def get_parent(control, screen_node):
     :rtype: BaseUIControl|None
     """
     return screen_node.GetBaseUIControl(get_parent_path(control))
-
-
-
-
-
-
-

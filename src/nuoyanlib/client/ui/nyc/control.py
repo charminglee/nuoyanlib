@@ -6,14 +6,21 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
 
 
+if 0:
+    from typing import Any, TypeVar
+    from mod.client.ui.controls.baseUIControl import BaseUIControl
+    from ..screen_node import ScreenNodeExtension
+    from . import *
+
+
 from ....core import error
-from ....core._utils import kwargs_setter, try_exec, cached_property
+from ....core._utils import kwargs_setter, try_exec, cached_property, UNIVERSAL_OBJECT
 from ....core._types._checker import args_type_check
 from ....client.ui.ui_utils import get_children_path_by_level, get_parent_path, to_path
 from ....utils.enum import ControlType
@@ -26,7 +33,7 @@ __all__ = [
 
 
 class InteractableControl(object):
-    CALLBACK_TYPE = None
+    CALLBACK_TYPE = UNIVERSAL_OBJECT
 
     def __init__(self, callback_func_map):
         if not self.CALLBACK_TYPE:
@@ -398,7 +405,7 @@ class NyControl(object):
 
         :type val: tuple[float,float]
         """
-        self._base_control.SetGlobalPosition(tuple(val)) # NOQA
+        self._base_control.SetGlobalPosition(tuple(val)) # noqa
 
     @property
     def max_size(self):

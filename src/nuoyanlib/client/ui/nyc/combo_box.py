@@ -6,10 +6,16 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from typing import Any
+    from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUIControl
+    from ..screen_node import ScreenNodeExtension
 
 
 from ....core._types._checker import args_type_check
@@ -134,7 +140,7 @@ class NyComboBox(InteractableControl, NyControl):
             return [index]
 
     def _get_opt_path(self, index):
-        return self._base_control.comboBox.uiControlPathList[index] # NOQA
+        return self._base_control.comboBox.uiControlPathList[index] # noqa
 
     @args_type_check((int, str, slice), is_method=True)
     def __getitem__(self, item):
@@ -210,7 +216,7 @@ class NyComboBox(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用ComboBoxCallbackType枚举值，默认为ComboBoxCallbackType.SELECT
+        :param ComboBoxCallbackType cb_type: 回调类型，请使用ComboBoxCallbackType枚举值，默认为ComboBoxCallbackType.SELECT
 
         :return: 是否成功
         :rtype: bool
@@ -226,7 +232,7 @@ class NyComboBox(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用ComboBoxCallbackType枚举值，默认为ComboBoxCallbackType.SELECT
+        :param ComboBoxCallbackType cb_type: 回调类型，请使用ComboBoxCallbackType枚举值，默认为ComboBoxCallbackType.SELECT
 
         :return: 是否成功
         :rtype: bool

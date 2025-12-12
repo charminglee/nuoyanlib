@@ -6,10 +6,16 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from typing import Any
+    from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
+    from ..screen_node import ScreenNodeExtension
 
 
 from ....utils.enum import ControlType, WheelCallbackType
@@ -99,7 +105,7 @@ class NySelectionWheel(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用WheelCallbackType枚举值，默认为WheelCallbackType.CLICK
+        :param WheelCallbackType cb_type: 回调类型，请使用WheelCallbackType枚举值，默认为WheelCallbackType.CLICK
 
         :return: 是否成功
         :rtype: bool
@@ -115,7 +121,7 @@ class NySelectionWheel(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用WheelCallbackType枚举值，默认为WheelCallbackType.CLICK
+        :param WheelCallbackType cb_type: 回调类型，请使用WheelCallbackType枚举值，默认为WheelCallbackType.CLICK
 
         :return: 是否成功
         :rtype: bool

@@ -6,10 +6,14 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from typing import Any, Sequence
 
 
 from functools import wraps
@@ -87,7 +91,7 @@ def hex_to_rgb(hex_color, mc_rgb=True):
     if hex_color[0] == "#":
         hex_color = hex_color[1:]
     if len(hex_color) != 6:
-        raise ValueError("'hex_color' must be 6 characters long.")
+        raise ValueError("'hex_color' must be 6 characters long")
 
     r_hex = hex_color[0:2]
     g_hex = hex_color[2:4]

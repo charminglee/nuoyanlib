@@ -6,10 +6,17 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from typing import Any
+    from mod.client.ui.controls.gridUIControl import GridUIControl
+    from mod.client.ui.controls.baseUIControl import BaseUIControl
+    from ..screen_node import ScreenNodeExtension
 
 
 import math
@@ -18,6 +25,7 @@ from ....core._types._checker import args_type_check
 from ....core.client.comp import ScreenNode, ViewBinder
 from ....utils.enum import ControlType, GridCallbackType
 from .control import NyControl
+from ..ui_utils import to_path
 
 
 __all__ = [
@@ -492,12 +500,13 @@ class NyGrid(NyControl):
 
         -----
 
-        :param cell: 网格元素的路径或实例
+        :param str|BaseUIControl|NyControl cell: 网格元素的路径或实例
 
         :return: 元素索引
         :rtype: int
         """
-        return int(cell.GetPath().split(self.template_name)[-1]) - 1
+        path = to_path(cell)
+        return int(path.split(self.template_name)[-1]) - 1
 
     def update_grid_data(self):
         if not self.gd_obj:
@@ -549,7 +558,7 @@ class NyGrid(NyControl):
         -----
 
         :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
+        :param GridCallbackType cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
 
         :return: 是否成功
         :rtype: bool
@@ -569,7 +578,7 @@ class NyGrid(NyControl):
         -----
 
         :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
+        :param GridCallbackType cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
 
         :return: 是否成功
         :rtype: bool

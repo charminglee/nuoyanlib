@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-07
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -123,7 +123,7 @@ def gen_minecraft_lower_name(name: str, count: int, last_values: List[str]) -> s
 
 
 class ClientEvent(StrEnum):
-    UIDefReloadSceneStackAfter: str
+    UIDefReloadSceneStackAfter = ...
     """
     [事件]
 
@@ -135,7 +135,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    UpdatePlayerSkinClientEvent: str
+    UpdatePlayerSkinClientEvent = ...
     """
     [事件]
 
@@ -153,7 +153,7 @@ class ClientEvent(StrEnum):
 
     - ``playerId`` -- str，更换皮肤的玩家实体ID
     """
-    PlayerTryRemoveCustomContainerItemClientEvent: str
+    PlayerTryRemoveCustomContainerItemClientEvent = ...
     """
     [事件]
 
@@ -180,7 +180,7 @@ class ClientEvent(StrEnum):
     - ``z`` -- int，容器方块z坐标
     - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次操作
     """
-    PlayerTryAddCustomContainerItemClientEvent: str
+    PlayerTryAddCustomContainerItemClientEvent = ...
     """
     [事件]
 
@@ -206,7 +206,7 @@ class ClientEvent(StrEnum):
     - ``z`` -- int，容器方块z坐标
     - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次添加到自定义容器的操作
     """
-    PlayerTryPutCustomContainerItemClientEvent: str
+    PlayerTryPutCustomContainerItemClientEvent = ...
     """
     [事件]
 
@@ -234,7 +234,7 @@ class ClientEvent(StrEnum):
     - ``z`` -- int，容器方块z坐标
     - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次放入自定义容器的操作
     """
-    PlayerPermissionChangeClientEvent: str
+    PlayerPermissionChangeClientEvent = ...
     """
     [事件]
 
@@ -266,7 +266,7 @@ class ClientEvent(StrEnum):
     - ``newPermission`` -- dict，变化后的权限字典
     - ``changeCause`` -- int，变化原因，详见Minecraft枚举值文档的 `PermissionChangeCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PermissionChangeCause.html>`_
     """
-    HudButtonChangedClientEvent: str
+    HudButtonChangedClientEvent = ...
     """
     [事件]
 
@@ -284,7 +284,7 @@ class ClientEvent(StrEnum):
 
     - ``changedList`` -- tuple[dict]，修改后的按钮列表
     """
-    BlockAnimateRandomTickEvent: str
+    BlockAnimateRandomTickEvent = ...
     """
     [事件]
 
@@ -300,7 +300,7 @@ class ClientEvent(StrEnum):
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     - ``auxData`` -- int，方块附加值
     """
-    PlayerAttackEntityEvent: str
+    PlayerAttackEntityEvent = ...
     """
     [事件]
 
@@ -315,7 +315,7 @@ class ClientEvent(StrEnum):
     - ``damage`` -- float，客户端收到的是真实伤害值，且修改无效
     - ``isCrit`` -- bool，本次攻击是否产生暴击，不支持修改
     """
-    OnLocalPlayerActionClientEvent: str
+    OnLocalPlayerActionClientEvent = ...
     """
     [事件]
 
@@ -327,7 +327,7 @@ class ClientEvent(StrEnum):
 
     - ``actionType`` -- int，动作事件枚举，详见Minecraft枚举值文档的 `PlayerActionType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerActionType.html>`_
     """
-    OnLocalPlayerStartJumpClientEvent: str
+    OnLocalPlayerStartJumpClientEvent = ...
     """
     [事件]
 
@@ -339,7 +339,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    GameRenderTickEvent: str
+    GameRenderTickEvent = ...
     """
     [事件]
 
@@ -351,7 +351,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    GyroSensorChangedClientEvent: str
+    GyroSensorChangedClientEvent = ...
     """
     [事件]
 
@@ -373,7 +373,7 @@ class ClientEvent(StrEnum):
     - ``orientation`` -- int，当前屏幕朝向，0竖屏正向，1横屏向左，2竖屏倒置，3横屏向右
     - ``timestamp`` -- float，触发时间戳，秒
     """
-    ModBlockEntityTickClientEvent: str
+    ModBlockEntityTickClientEvent = ...
     """
     [事件]
 
@@ -396,7 +396,7 @@ class ClientEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     """
-    ModBlockEntityRemoveClientEvent: str
+    ModBlockEntityRemoveClientEvent = ...
     """
     [事件]
 
@@ -412,7 +412,7 @@ class ClientEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     """
-    AchievementButtonMovedClientEvent: str
+    AchievementButtonMovedClientEvent = ...
     """
     [事件]
 
@@ -425,7 +425,7 @@ class ClientEvent(StrEnum):
     - ``oldPosition`` -- tuple[float, float]，移动前该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
     - ``newPosition`` -- tuple[float, float]，移动后该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
     """
-    OnKeyboardControllerLayoutChangeClientEvent: str
+    OnKeyboardControllerLayoutChangeClientEvent = ...
     """
     [事件]
 
@@ -439,7 +439,7 @@ class ClientEvent(StrEnum):
     - ``newKey`` -- int，修改后的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
     - ``oldKey`` -- int，修改前的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
     """
-    OnGamepadControllerLayoutChangeClientEvent: str
+    OnGamepadControllerLayoutChangeClientEvent = ...
     """
     [事件]
 
@@ -453,7 +453,7 @@ class ClientEvent(StrEnum):
     - ``newKey`` -- int，修改后的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
     - ``oldKey`` -- int，修改前的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
     """
-    OnGamepadTriggerClientEvent: str
+    OnGamepadTriggerClientEvent = ...
     """
     [事件]
 
@@ -466,7 +466,7 @@ class ClientEvent(StrEnum):
     - ``key`` -- int，键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
     - ``magnitude`` -- float，扣动扳机的力度，取值为 0 ~ 1.0
     """
-    OnGamepadStickClientEvent: str
+    OnGamepadStickClientEvent = ...
     """
     [事件]
 
@@ -480,7 +480,7 @@ class ClientEvent(StrEnum):
     - ``x`` -- float，摇杆水平方向的值，从左到右取值为 -1.0 ~ 1.0
     - ``y`` -- float，摇杆竖直方向的值，从下到上取值为 -1.0 ~ 1.0
     """
-    OnGamepadKeyPressClientEvent: str
+    OnGamepadKeyPressClientEvent = ...
     """
     [事件]
 
@@ -494,7 +494,7 @@ class ClientEvent(StrEnum):
     - ``key`` -- int，键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
     - ``isDown`` -- str，是否按下，按下为1，弹起为0
     """
-    ModBlockEntityLoadedClientEvent: str
+    ModBlockEntityLoadedClientEvent = ...
     """
     [事件]
 
@@ -516,7 +516,7 @@ class ClientEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     """
-    CloseNeteaseShopEvent: str
+    CloseNeteaseShopEvent = ...
     """
     [事件]
 
@@ -528,7 +528,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    PopScreenAfterClientEvent: str
+    PopScreenAfterClientEvent = ...
     """
     [事件]
 
@@ -547,7 +547,7 @@ class ClientEvent(StrEnum):
     - ``screenName`` -- str，UI名字
     - ``screenDef`` -- str，包含命名空间的UI名字，格式为namespace.screenName
     """
-    TapOrHoldReleaseClientEvent: str
+    TapOrHoldReleaseClientEvent = ...
     """
     [事件]
 
@@ -566,7 +566,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    TapBeforeClientEvent: str
+    TapBeforeClientEvent = ...
     """
     [事件]
 
@@ -595,7 +595,7 @@ class ClientEvent(StrEnum):
 
     - ``cancel`` -- bool，设置为True可拦截原版的攻击或放置响应
     """
-    RightClickReleaseClientEvent: str
+    RightClickReleaseClientEvent = ...
     """
     [事件]
 
@@ -615,7 +615,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    RightClickBeforeClientEvent: str
+    RightClickBeforeClientEvent = ...
     """
     [事件]
 
@@ -627,7 +627,7 @@ class ClientEvent(StrEnum):
 
     - ``cancel`` -- bool，设置为True可拦截原版的物品使用/实体交互响应
     """
-    OnMouseMiddleDownClientEvent: str
+    OnMouseMiddleDownClientEvent = ...
     """
     [事件]
 
@@ -647,7 +647,7 @@ class ClientEvent(StrEnum):
     - ``mousePositionX`` -- float，按下时的x坐标
     - ``mousePositionY`` -- float，按下时的y坐标
     """
-    OnKeyPressInGame: str
+    OnKeyPressInGame = ...
     """
     [事件]
 
@@ -661,7 +661,7 @@ class ClientEvent(StrEnum):
     - ``key`` -- str，键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
     - ``isDown`` -- str，是否按下，按下为1，弹起为0
     """
-    OnClientPlayerStopMove: str
+    OnClientPlayerStopMove = ...
     """
     [事件]
 
@@ -673,7 +673,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    OnClientPlayerStartMove: str
+    OnClientPlayerStartMove = ...
     """
     [事件]
 
@@ -685,7 +685,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    OnBackButtonReleaseClientEvent: str
+    OnBackButtonReleaseClientEvent = ...
     """
     [事件]
 
@@ -697,7 +697,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    MouseWheelClientEvent: str
+    MouseWheelClientEvent = ...
     """
     [事件]
 
@@ -709,7 +709,7 @@ class ClientEvent(StrEnum):
 
     - ``direction`` -- int，1为向上滚动，0为向下滚动
     """
-    LeftClickReleaseClientEvent: str
+    LeftClickReleaseClientEvent = ...
     """
     [事件]
 
@@ -721,7 +721,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    LeftClickBeforeClientEvent: str
+    LeftClickBeforeClientEvent = ...
     """
     [事件]
 
@@ -733,7 +733,7 @@ class ClientEvent(StrEnum):
 
     - ``cancel`` -- bool，设置为True可拦截原版的挖方块或攻击响应
     """
-    HoldBeforeClientEvent: str
+    HoldBeforeClientEvent = ...
     """
     [事件]
 
@@ -759,7 +759,7 @@ class ClientEvent(StrEnum):
 
     - ``cancel`` -- bool，设置为True可拦截原版的挖方块/使用物品/与实体交互响应
     """
-    GetEntityByCoordReleaseClientEvent: str
+    GetEntityByCoordReleaseClientEvent = ...
     """
     [事件]
 
@@ -772,7 +772,7 @@ class ClientEvent(StrEnum):
     - ``x`` -- int，手指点击位置x坐标
     - ``y`` -- int，手指点击位置y坐标
     """
-    GetEntityByCoordEvent: str
+    GetEntityByCoordEvent = ...
     """
     [事件]
 
@@ -784,7 +784,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    ClientJumpButtonReleaseEvent: str
+    ClientJumpButtonReleaseEvent = ...
     """
     [事件]
 
@@ -796,7 +796,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    ClientJumpButtonPressDownEvent: str
+    ClientJumpButtonPressDownEvent = ...
     """
     [事件]
 
@@ -808,7 +808,7 @@ class ClientEvent(StrEnum):
 
     - ``continueJump`` -- bool，设置是否执行跳跃逻辑
     """
-    PlaySoundClientEvent: str
+    PlaySoundClientEvent = ...
     """
     [事件]
 
@@ -824,7 +824,7 @@ class ClientEvent(StrEnum):
     - ``pitch`` -- float，播放速度，正常速度为1
     - ``cancel`` -- bool，设为True可屏蔽该次音效播放
     """
-    PlayMusicClientEvent: str
+    PlayMusicClientEvent = ...
     """
     [事件]
 
@@ -837,7 +837,7 @@ class ClientEvent(StrEnum):
     - ``name`` -- str，即资源包中sounds/music_definitions.json中的event_name，并且对应sounds/sound_definitions.json中的key
     - ``cancel`` -- bool，设为True可屏蔽该次音效播放
     """
-    OnMusicStopClientEvent: str
+    OnMusicStopClientEvent = ...
     """
     [事件]
 
@@ -849,7 +849,7 @@ class ClientEvent(StrEnum):
 
     - ``musicName`` -- str，音乐名称
     """
-    ScreenSizeChangedClientEvent: str
+    ScreenSizeChangedClientEvent = ...
     """
     [事件]
 
@@ -864,7 +864,7 @@ class ClientEvent(StrEnum):
     - ``afterX`` -- float，屏幕大小改变后的宽度
     - ``afterY`` -- float，屏幕大小改变后的高度
     """
-    PushScreenEvent: str
+    PushScreenEvent = ...
     """
     [事件]
 
@@ -877,7 +877,7 @@ class ClientEvent(StrEnum):
     - ``screenName`` -- str，UI名字
     - ``screenDef`` -- str，包含命名空间的UI名字，格式为namespace.screenName
     """
-    PopScreenEvent: str
+    PopScreenEvent = ...
     """
     [事件]
 
@@ -896,7 +896,7 @@ class ClientEvent(StrEnum):
     - ``screenName`` -- str，UI名字
     - ``screenDef`` -- str，包含命名空间的UI名字，格式为"namespace.screenName"
     """
-    PlayerChatButtonClickClientEvent: str
+    PlayerChatButtonClickClientEvent = ...
     """
     [事件]
 
@@ -908,7 +908,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    OnItemSlotButtonClickedEvent: str
+    OnItemSlotButtonClickedEvent = ...
     """
     [事件]
 
@@ -920,7 +920,7 @@ class ClientEvent(StrEnum):
 
     - ``slotIndex`` -- int，点击的物品槽的编号，编号对应位置详见 `物品栏 <https://minecraft.fandom.com/zh/wiki/%E7%89%A9%E5%93%81%E6%A0%8F>`_
     """
-    GridComponentSizeChangedClientEvent: str
+    GridComponentSizeChangedClientEvent = ...
     """
     [事件]
 
@@ -932,7 +932,7 @@ class ClientEvent(StrEnum):
 
     - ``path`` -- str，grid网格所在的路径（从UI根节点算起）
     """
-    ClientPlayerInventoryOpenEvent: str
+    ClientPlayerInventoryOpenEvent = ...
     """
     [事件]
 
@@ -945,7 +945,7 @@ class ClientEvent(StrEnum):
     - ``isCreative`` -- bool，是否是创造模式背包界面
     - ``cancel`` -- bool，是否取消打开物品背包界面。
     """
-    ClientPlayerInventoryCloseEvent: str
+    ClientPlayerInventoryCloseEvent = ...
     """
     [事件]
 
@@ -957,7 +957,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    ClientChestOpenEvent: str
+    ClientChestOpenEvent = ...
     """
     [事件]
 
@@ -972,7 +972,7 @@ class ClientEvent(StrEnum):
     - ``y`` -- int，箱子y坐标
     - ``z`` -- int，箱子z坐标
     """
-    ClientChestCloseEvent: str
+    ClientChestCloseEvent = ...
     """
     [事件]
 
@@ -984,7 +984,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    WalkAnimEndClientEvent: str
+    WalkAnimEndClientEvent = ...
     """
     [事件]
 
@@ -996,7 +996,7 @@ class ClientEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    WalkAnimBeginClientEvent: str
+    WalkAnimBeginClientEvent = ...
     """
     [事件]
 
@@ -1008,7 +1008,7 @@ class ClientEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    AttackAnimEndClientEvent: str
+    AttackAnimEndClientEvent = ...
     """
     [事件]
 
@@ -1020,7 +1020,7 @@ class ClientEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    AttackAnimBeginClientEvent: str
+    AttackAnimBeginClientEvent = ...
     """
     [事件]
 
@@ -1032,7 +1032,7 @@ class ClientEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    StopUsingItemClientEvent: str
+    StopUsingItemClientEvent = ...
     """
     [事件]
 
@@ -1045,7 +1045,7 @@ class ClientEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    StartUsingItemClientEvent: str
+    StartUsingItemClientEvent = ...
     """
     [事件]
 
@@ -1058,7 +1058,7 @@ class ClientEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    PlayerTryDropItemClientEvent: str
+    PlayerTryDropItemClientEvent = ...
     """
     [事件]
 
@@ -1072,7 +1072,7 @@ class ClientEvent(StrEnum):
     - ``itemDict`` -- dict，`物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``cancel`` -- bool，是否取消此次操作
     """
-    OnCarriedNewItemChangedClientEvent: str
+    OnCarriedNewItemChangedClientEvent = ...
     """
     [事件]
 
@@ -1090,7 +1090,7 @@ class ClientEvent(StrEnum):
 
     - ``itemDict`` -- dict | None，切换后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    ItemReleaseUsingClientEvent: str
+    ItemReleaseUsingClientEvent = ...
     """
     [事件]
 
@@ -1106,7 +1106,7 @@ class ClientEvent(StrEnum):
     - ``maxUseDuration`` -- int，最大蓄力时长
     - ``cancel`` -- bool，设置为True可以取消，需要同时取消服务端事件ItemReleaseUsingServerEvent
     """
-    InventoryItemChangedClientEvent: str
+    InventoryItemChangedClientEvent = ...
     """
     [事件]
 
@@ -1129,7 +1129,7 @@ class ClientEvent(StrEnum):
     - ``oldItemDict`` -- dict | None，变化前槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``newItemDict`` -- dict | None，变化后槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    GrindStoneRemovedEnchantClientEvent: str
+    GrindStoneRemovedEnchantClientEvent = ...
     """
     [事件]
 
@@ -1145,7 +1145,7 @@ class ClientEvent(StrEnum):
     - ``newItemDict`` -- dict，合成后的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``exp`` -- int，本次合成返还的经验
     """
-    ClientShapedRecipeTriggeredEvent: str
+    ClientShapedRecipeTriggeredEvent = ...
     """
     [事件]
 
@@ -1157,7 +1157,7 @@ class ClientEvent(StrEnum):
 
     - ``recipeId`` -- str，配方ID，对应配方json文件中的identifier字段
     """
-    ClientItemUseOnEvent: str
+    ClientItemUseOnEvent = ...
     """
     [事件] [tick]
 
@@ -1187,7 +1187,7 @@ class ClientEvent(StrEnum):
     - ``clickZ`` -- float，点击点的z比例位置
     - ``ret`` -- bool，设为True可取消物品的使用
     """
-    ClientItemTryUseEvent: str
+    ClientItemTryUseEvent = ...
     """
     [事件]
 
@@ -1209,7 +1209,7 @@ class ClientEvent(StrEnum):
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``cancel`` -- bool，是否取消使用物品
     """
-    AnvilCreateResultItemAfterClientEvent: str
+    AnvilCreateResultItemAfterClientEvent = ...
     """
     [事件]
 
@@ -1225,7 +1225,7 @@ class ClientEvent(StrEnum):
     - ``oldItemDict`` -- dict，合成前的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第一个物品）
     - ``materialItemDict`` -- dict，合成所使用材料的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第二个物品）
     """
-    ActorUseItemClientEvent: str
+    ActorUseItemClientEvent = ...
     """
     [事件]
 
@@ -1239,7 +1239,7 @@ class ClientEvent(StrEnum):
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``useMethod`` -- int，使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
     """
-    ActorAcquiredItemClientEvent: str
+    ActorAcquiredItemClientEvent = ...
     """
     [事件]
 
@@ -1254,7 +1254,7 @@ class ClientEvent(StrEnum):
     - ``itemDict`` -- dict，获取到的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``acquireMethod`` -- int，获得物品的方法，详见 `ItemAcquisitionMethod <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
     """
-    StepOnBlockClientEvent: str
+    StepOnBlockClientEvent = ...
     """
     [事件]
 
@@ -1289,7 +1289,7 @@ class ClientEvent(StrEnum):
     - `RegisterOnStepOn <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnStepOn&docindex=2&type=0>`_
     - `UnRegisterOnStepOn <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnStepOn&docindex=1&type=0>`_
     """
-    StartDestroyBlockClientEvent: str
+    StartDestroyBlockClientEvent = ...
     """
     [事件]
 
@@ -1312,7 +1312,7 @@ class ClientEvent(StrEnum):
     - ``cancel`` -- bool，修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockServerEvent一起修改。
     - ``face`` -- int，方块被敲击面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
     """
-    StepOffBlockClientEvent: str
+    StepOffBlockClientEvent = ...
     """
     [事件]
 
@@ -1343,7 +1343,7 @@ class ClientEvent(StrEnum):
     - `RegisterOnStepOff <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnStepOff&docindex=2&type=0>`_
     - `UnRegisterOnStepOff <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnStepOff&docindex=2&type=0>`_
     """
-    ShearsDestoryBlockBeforeClientEvent: str
+    ShearsDestoryBlockBeforeClientEvent = ...
     """
     [事件]
 
@@ -1370,7 +1370,7 @@ class ClientEvent(StrEnum):
     - ``dimensionId`` -- int，玩家触发时的维度ID
     - ``cancelShears`` -- bool，是否取消剪刀效果
     """
-    PlayerTryDestroyBlockClientEvent: str
+    PlayerTryDestroyBlockClientEvent = ...
     """
     [事件]
 
@@ -1395,7 +1395,7 @@ class ClientEvent(StrEnum):
     - ``playerId`` -- str，试图破坏方块的玩家的实体ID
     - ``cancel`` -- bool，默认为False，在脚本层设置为True就能取消该方块的破坏
     """
-    OnStandOnBlockClientEvent: str
+    OnStandOnBlockClientEvent = ...
     """
     [事件] [tick]
 
@@ -1434,7 +1434,7 @@ class ClientEvent(StrEnum):
     - `RegisterOnStandOn <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnStandOn&docindex=2&type=0>`_
     - `UnRegisterOnStandOn <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnStandOn&docindex=2&type=0>`_
     """
-    OnModBlockNeteaseEffectCreatedClientEvent: str
+    OnModBlockNeteaseEffectCreatedClientEvent = ...
     """
     [事件]
 
@@ -1455,7 +1455,7 @@ class ClientEvent(StrEnum):
     - ``effectType`` -- int，该特效的类型，0为粒子特效，1为序列帧特效
     - ``blockPos`` -- tuple[float, float, float]，该特效绑定的自定义方块实体的世界坐标
     """
-    OnEntityInsideBlockClientEvent: str
+    OnEntityInsideBlockClientEvent = ...
     """
     [事件] [tick]
 
@@ -1493,7 +1493,7 @@ class ClientEvent(StrEnum):
     - `RegisterOnEntityInside <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnEntityInside&docindex=2&type=0>`_
     - `UnRegisterOnEntityInside <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnEntityInside&docindex=2&type=0>`_
     """
-    OnAfterFallOnBlockClientEvent: str
+    OnAfterFallOnBlockClientEvent = ...
     """
     [事件] [tick]
 
@@ -1523,7 +1523,7 @@ class ClientEvent(StrEnum):
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     - ``calculate`` -- bool，是否按脚本层传值计算力
     """
-    FallingBlockCauseDamageBeforeClientEvent: str
+    FallingBlockCauseDamageBeforeClientEvent = ...
     """
     [事件]
 
@@ -1552,7 +1552,7 @@ class ClientEvent(StrEnum):
     - ``isHarmful`` -- bool，客户端始终为false，因为客户端不会计算伤害值
     - ``fallDamage`` -- int，对实体的伤害
     """
-    ClientBlockUseEvent: str
+    ClientBlockUseEvent = ...
     """
     [事件] [tick]
 
@@ -1579,7 +1579,7 @@ class ClientEvent(StrEnum):
     - ``clickY`` -- float，点击点的y比例位置
     - ``clickZ`` -- float，点击点的z比例位置
     """
-    PerspChangeClientEvent: str
+    PerspChangeClientEvent = ...
     """
     [事件]
 
@@ -1598,7 +1598,7 @@ class ClientEvent(StrEnum):
     - ``from`` -- int，切换前的视角（请使用event['from']获取该参数）
     - ``to`` -- int，切换后的视角
     """
-    OnPlayerHitBlockClientEvent: str
+    OnPlayerHitBlockClientEvent = ...
     """
     [事件]
 
@@ -1629,7 +1629,7 @@ class ClientEvent(StrEnum):
     - `OpenPlayerHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=OpenPlayerHitBlockDetection&docindex=4&type=0>`_
     - `ClosePlayerHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=ClosePlayerHitBlockDetection&docindex=1&type=0>`_
     """
-    GameTypeChangedClientEvent: str
+    GameTypeChangedClientEvent = ...
     """
     [事件]
 
@@ -1650,7 +1650,7 @@ class ClientEvent(StrEnum):
     - ``oldGameType`` -- int，切换前的游戏模式
     - ``newGameType`` -- int，切换后的游戏模式
     """
-    ExtinguishFireClientEvent: str
+    ExtinguishFireClientEvent = ...
     """
     [事件]
 
@@ -1664,7 +1664,7 @@ class ClientEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``cancel`` -- bool，修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireServerEvent一起修改。
     """
-    DimensionChangeFinishClientEvent: str
+    DimensionChangeFinishClientEvent = ...
     """
     [事件]
 
@@ -1685,7 +1685,7 @@ class ClientEvent(StrEnum):
     - ``toDimensionId`` -- int，维度改变后的维度
     - ``toPos`` -- tuple[float, float, float]，改变后的位置(x,y,z)，其中y值为脚底加上角色的身高值
     """
-    DimensionChangeClientEvent: str
+    DimensionChangeClientEvent = ...
     """
     [事件]
 
@@ -1711,7 +1711,7 @@ class ClientEvent(StrEnum):
     - ``toY`` -- float，改变后的位置y
     - ``toZ`` -- float，改变后的位置z
     """
-    CameraMotionStopClientEvent: str
+    CameraMotionStopClientEvent = ...
     """
     [事件]
 
@@ -1730,7 +1730,7 @@ class ClientEvent(StrEnum):
     - ``motionId`` -- int，运动器ID
     - ``remove`` -- bool，是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除
     """
-    CameraMotionStartClientEvent: str
+    CameraMotionStartClientEvent = ...
     """
     [事件]
 
@@ -1742,7 +1742,7 @@ class ClientEvent(StrEnum):
 
     - ``motionId`` -- int，运动器ID
     """
-    LeaveEntityClientEvent: str
+    LeaveEntityClientEvent = ...
     """
     [事件]
 
@@ -1755,7 +1755,7 @@ class ClientEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``entityId`` -- str，远离的生物的实体ID
     """
-    StartRidingClientEvent: str
+    StartRidingClientEvent = ...
     """
     [事件]
 
@@ -1774,7 +1774,7 @@ class ClientEvent(StrEnum):
     - ``actorId`` -- str，骑乘者的实体ID
     - ``victimId`` -- str，被骑乘者的实体ID
     """
-    OnMobHitMobClientEvent: str
+    OnMobHitMobClientEvent = ...
     """
     [事件]
 
@@ -1801,7 +1801,7 @@ class ClientEvent(StrEnum):
     - `OpenPlayerHitMobDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=OpenPlayerHitMobDetection&docindex=4&type=0>`_
     - `ClosePlayerHitMobDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=ClosePlayerHitMobDetection&docindex=1&type=0>`_
     """
-    OnGroundClientEvent: str
+    OnGroundClientEvent = ...
     """
     [事件]
 
@@ -1813,7 +1813,7 @@ class ClientEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    HealthChangeClientEvent: str
+    HealthChangeClientEvent = ...
     """
     [事件]
 
@@ -1827,7 +1827,7 @@ class ClientEvent(StrEnum):
     - ``from`` -- float，变化前的生命值（请使用event['from']获取该参数）
     - ``to`` -- float，变化后的生命值
     """
-    EntityStopRidingEvent: str
+    EntityStopRidingEvent = ...
     """
     [事件]
 
@@ -1859,7 +1859,7 @@ class ClientEvent(StrEnum):
     - ``switchingRides`` -- bool，是否换乘坐骑
     - ``cancel`` -- bool，设置为True可以取消（需要与服务端事件一同取消）
     """
-    EntityModelChangedClientEvent: str
+    EntityModelChangedClientEvent = ...
     """
     [事件]
 
@@ -1873,7 +1873,7 @@ class ClientEvent(StrEnum):
     - ``newModel`` -- str，新的模型名字
     - ``oldModel`` -- str，旧的模型名字
     """
-    ApproachEntityClientEvent: str
+    ApproachEntityClientEvent = ...
     """
     [事件]
 
@@ -1886,7 +1886,7 @@ class ClientEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``entityId`` -- str，靠近的生物的实体ID
     """
-    UnLoadClientAddonScriptsBefore: str
+    UnLoadClientAddonScriptsBefore = ...
     """
     [事件]
 
@@ -1898,7 +1898,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    RemovePlayerAOIClientEvent: str
+    RemovePlayerAOIClientEvent = ...
     """
     [事件]
 
@@ -1910,7 +1910,7 @@ class ClientEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    RemoveEntityClientEvent: str
+    RemoveEntityClientEvent = ...
     """
     [事件]
 
@@ -1928,7 +1928,7 @@ class ClientEvent(StrEnum):
 
     - ``id`` -- str，移除的实体ID
     """
-    OnLocalPlayerStopLoading: str
+    OnLocalPlayerStopLoading = ...
     """
     [事件]
 
@@ -1940,7 +1940,7 @@ class ClientEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    OnCommandOutputClientEvent: str
+    OnCommandOutputClientEvent = ...
     """
     [事件]
 
@@ -1959,7 +1959,7 @@ class ClientEvent(StrEnum):
     - ``command`` -- str，命令名称
     - ``message`` -- str，命令返回的消息
     """
-    LoadClientAddonScriptsAfter: str
+    LoadClientAddonScriptsAfter = ...
     """
     [事件]
 
@@ -1971,7 +1971,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    ChunkLoadedClientEvent: str
+    ChunkLoadedClientEvent = ...
     """
     [事件]
 
@@ -1985,7 +1985,7 @@ class ClientEvent(StrEnum):
     - ``chunkPosX`` -- int，区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
     - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
     """
-    ChunkAcquireDiscardedClientEvent: str
+    ChunkAcquireDiscardedClientEvent = ...
     """
     [事件]
 
@@ -2005,7 +2005,7 @@ class ClientEvent(StrEnum):
     - ``chunkPosX`` -- int，区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
     - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
     """
-    AddPlayerCreatedClientEvent: str
+    AddPlayerCreatedClientEvent = ...
     """
     [事件]
 
@@ -2024,7 +2024,7 @@ class ClientEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    AddPlayerAOIClientEvent: str
+    AddPlayerAOIClientEvent = ...
     """
     [事件]
 
@@ -2042,7 +2042,7 @@ class ClientEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    AddEntityClientEvent: str
+    AddEntityClientEvent = ...
     """
     [事件]
 
@@ -2062,7 +2062,7 @@ class ClientEvent(StrEnum):
     - ``itemName`` -- str，物品identifier（仅当物品实体时存在该字段）
     - ``auxValue`` -- int，物品附加值（仅当物品实体时存在该字段）
     """
-    OnScriptTickClient: str
+    OnScriptTickClient = ...
     """
     [事件] [tick]
 
@@ -2074,7 +2074,7 @@ class ClientEvent(StrEnum):
 
     无
     """
-    UiInitFinished: str
+    UiInitFinished = ...
     """
     [事件]
 
@@ -2095,7 +2095,7 @@ class ClientEvent(StrEnum):
 
 
 class ServerEvent(StrEnum):
-    ItemPullOutCustomContainerServerEvent: str
+    ItemPullOutCustomContainerServerEvent = ...
     """
     [事件]
 
@@ -2113,7 +2113,7 @@ class ServerEvent(StrEnum):
     - ``z`` -- int，容器方块z坐标
     - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次漏出物品的操作
     """
-    ItemPushInCustomContainerServerEvent: str
+    ItemPushInCustomContainerServerEvent = ...
     """
     [事件]
 
@@ -2131,7 +2131,7 @@ class ServerEvent(StrEnum):
     - ``z`` -- int，容器方块z坐标
     - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次漏入物品的操作
     """
-    PlayerPermissionChangeServerEvent: str
+    PlayerPermissionChangeServerEvent = ...
     """
     [事件]
 
@@ -2158,7 +2158,7 @@ class ServerEvent(StrEnum):
     - ``changeCause`` -- int，变化原因，详见Minecraft枚举值文档的 `PermissionChangeCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PermissionChangeCause.html>`_
     - ``cancel`` -- bool，为True时，取消本次权限变更
     """
-    PlayerTryRemoveCustomContainerItemServerEvent: str
+    PlayerTryRemoveCustomContainerItemServerEvent = ...
     """
     [事件]
 
@@ -2183,7 +2183,7 @@ class ServerEvent(StrEnum):
     - ``y`` -- int，容器方块y坐标
     - ``z`` -- int，容器方块z坐标
     """
-    PlayerTryAddCustomContainerItemServerEvent: str
+    PlayerTryAddCustomContainerItemServerEvent = ...
     """
     [事件]
 
@@ -2209,7 +2209,7 @@ class ServerEvent(StrEnum):
     - ``y`` -- int，容器方块y坐标
     - ``z`` -- int，容器方块z坐标
     """
-    PlayerTryPutCustomContainerItemServerEvent: str
+    PlayerTryPutCustomContainerItemServerEvent = ...
     """
     [事件]
 
@@ -2236,7 +2236,7 @@ class ServerEvent(StrEnum):
     - ``z`` -- int，容器方块z坐标
     - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次放入自定义容器的操作
     """
-    MountTamingEvent: str
+    MountTamingEvent = ...
     """
     [事件]
 
@@ -2255,7 +2255,7 @@ class ServerEvent(StrEnum):
     - ``eid`` -- str，生物实体ID
     - ``pid`` -- str，玩家实体ID
     """
-    OnPlayerActionServerEvent: str
+    OnPlayerActionServerEvent = ...
     """
     [事件]
 
@@ -2268,7 +2268,7 @@ class ServerEvent(StrEnum):
     - ``playerId`` -- str，玩家实体ID
     - ``actionType`` -- int，动作事件枚举，详见Minecraft枚举值文档的 `PlayerActionType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerActionType.html>`_
     """
-    CustomCommandTriggerServerEvent: str
+    CustomCommandTriggerServerEvent = ...
     """
     [事件]
 
@@ -2307,7 +2307,7 @@ class ServerEvent(StrEnum):
     - ``return_failed`` -- bool，设置自定义命令是否执行失败，默认为False，如果执行失败，返回信息以红色字体显示
     - ``return_msg_key`` -- str，设置返回给玩家或命令方块的信息，支持在语言文件（.lang）中定义，默认值为commands.custom.success（自定义命令执行成功）
     """
-    GlobalCommandServerEvent: str
+    GlobalCommandServerEvent = ...
     """
     [事件]
 
@@ -2323,7 +2323,7 @@ class ServerEvent(StrEnum):
     - ``dimension`` -- int，执行命令的实体或方块所在维度ID
     - ``cancel`` -- bool，设置为True可以取消命令执行
     """
-    PlayerPickupArrowServerEvent: str
+    PlayerPickupArrowServerEvent = ...
     """
     [事件]
 
@@ -2339,7 +2339,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，设置为True时将取消本次拾取
     - ``pickupDelay`` -- int，取消拾取后重新设置该物品的拾取cd，小于15帧将视作15帧，大于等于97813帧将视作无法拾取，每秒30帧
     """
-    EntityDieLoottableAfterServerEvent: str
+    EntityDieLoottableAfterServerEvent = ...
     """
     [事件]
 
@@ -2362,7 +2362,7 @@ class ServerEvent(StrEnum):
     - ``itemList`` -- list[dict]，掉落物品列表，每个元素为一个itemDict，格式可参考 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``itemEntityIdList`` -- list[str]，掉落物品的实体ID列表
     """
-    PlayerHungerChangeServerEvent: str
+    PlayerHungerChangeServerEvent = ...
     """
     [事件]
 
@@ -2384,7 +2384,7 @@ class ServerEvent(StrEnum):
     - ``hunger`` -- float，变化后的饥饿度
     - ``cancel`` -- bool，是否取消饥饿度变化
     """
-    ItemDurabilityChangedServerEvent: str
+    ItemDurabilityChangedServerEvent = ...
     """
     [事件]
 
@@ -2407,7 +2407,7 @@ class ServerEvent(StrEnum):
     - ``durability`` -- int，变化后耐久度，支持修改。但是请注意修改范围，支持范围为[-32768,32767)
     - ``canChange`` -- bool，是否支持修改，为True时支持通过durability修改，为False时不支持
     """
-    PlaceNeteaseLargeFeatureServerEvent: str
+    PlaceNeteaseLargeFeatureServerEvent = ...
     """
     [事件]
 
@@ -2425,7 +2425,7 @@ class ServerEvent(StrEnum):
     - ``ignoreFitInContext`` -- bool，是否允许生成过结构的地方继续生成结构
     - ``cancel`` -- bool，设置为True时可阻止该大型结构的放置
     """
-    PlayerNamedEntityServerEvent: str
+    PlayerNamedEntityServerEvent = ...
     """
     [事件]
 
@@ -2441,7 +2441,7 @@ class ServerEvent(StrEnum):
     - ``afterName`` -- str，实体重命名后的名字
     - ``cancel`` -- bool，是否取消触发，默认为False，若设为True，可阻止触发后续的实体命名逻辑
     """
-    PlayerFeedEntityServerEvent: str
+    PlayerFeedEntityServerEvent = ...
     """
     [事件]
 
@@ -2467,7 +2467,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict，当前玩家手持物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``cancel`` -- bool，是否取消触发，默认为False，若设为True，可阻止触发后续的生物喂养逻辑
     """
-    lobbyGoodBuySucServerEvent: str
+    lobbyGoodBuySucServerEvent = ...
     """
     [事件]
 
@@ -2480,7 +2480,7 @@ class ServerEvent(StrEnum):
     - ``eid`` -- str，玩家的实体ID
     - ``buyItem`` -- bool，玩家登录时为False，玩家购买了商品时为True
     """
-    UrgeShipEvent: str
+    UrgeShipEvent = ...
     """
     [事件]
 
@@ -2492,7 +2492,7 @@ class ServerEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    PlayerInventoryOpenScriptServerEvent: str
+    PlayerInventoryOpenScriptServerEvent = ...
     """
     [事件]
 
@@ -2505,7 +2505,7 @@ class ServerEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``isCreative`` -- str，是否是创造模式背包界面
     """
-    WalkAnimEndServerEvent: str
+    WalkAnimEndServerEvent = ...
     """
     [事件]
 
@@ -2523,7 +2523,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    WalkAnimBeginServerEvent: str
+    WalkAnimBeginServerEvent = ...
     """
     [事件]
 
@@ -2541,7 +2541,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    JumpAnimBeginServerEvent: str
+    JumpAnimBeginServerEvent = ...
     """
     [事件]
 
@@ -2559,7 +2559,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    AttackAnimEndServerEvent: str
+    AttackAnimEndServerEvent = ...
     """
     [事件]
 
@@ -2577,7 +2577,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    AttackAnimBeginServerEvent: str
+    AttackAnimBeginServerEvent = ...
     """
     [事件]
 
@@ -2595,7 +2595,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    UIContainerItemChangedServerEvent: str
+    UIContainerItemChangedServerEvent = ...
     """
     [事件]
 
@@ -2619,7 +2619,7 @@ class ServerEvent(StrEnum):
     - ``oldItemDict`` -- dict，旧 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``newItemDict`` -- dict，生成的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    ShearsUseToBlockBeforeServerEvent: str
+    ShearsUseToBlockBeforeServerEvent = ...
     """
     [事件] [tick]
 
@@ -2648,7 +2648,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``cancelShears`` -- int，是否取消剪刀效果
     """
-    ServerPlayerTryTouchEvent: str
+    ServerPlayerTryTouchEvent = ...
     """
     [事件]
 
@@ -2664,7 +2664,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，设置为True时将取消本次拾取
     - ``pickupDelay`` -- int，取消拾取后重新设置该物品的拾取cd，小于15帧将视作15帧，大于等于97813帧将视作无法拾取
     """
-    ServerItemTryUseEvent: str
+    ServerItemTryUseEvent = ...
     """
     [事件]
 
@@ -2685,7 +2685,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``cancel`` -- bool，设为True可取消物品的使用
     """
-    PlayerDropItemServerEvent: str
+    PlayerDropItemServerEvent = ...
     """
     [事件]
 
@@ -2698,7 +2698,7 @@ class ServerEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``itemEntityId`` -- str，物品的实体ID
     """
-    OnPlayerBlockedByShieldBeforeServerEvent: str
+    OnPlayerBlockedByShieldBeforeServerEvent = ...
     """
     [事件]
 
@@ -2719,7 +2719,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict，盾牌 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``damage`` -- float，抵挡的伤害数值
     """
-    OnPlayerBlockedByShieldAfterServerEvent: str
+    OnPlayerBlockedByShieldAfterServerEvent = ...
     """
     [事件]
 
@@ -2734,7 +2734,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict，盾牌 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``damage`` -- float，抵挡的伤害数值
     """
-    OnPlayerActiveShieldServerEvent: str
+    OnPlayerActiveShieldServerEvent = ...
     """
     [事件]
 
@@ -2750,7 +2750,7 @@ class ServerEvent(StrEnum):
     - ``cancelable`` -- bool，是否可以取消。如果玩家在潜行状态切换盾牌，则无法取消
     - ``cancel`` -- bool，是否取消这次激活
     """
-    OnOffhandItemChangedServerEvent: str
+    OnOffhandItemChangedServerEvent = ...
     """
     [事件]
 
@@ -2771,7 +2771,7 @@ class ServerEvent(StrEnum):
     - ``newArmorDict`` -- dict | None，新物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当新物品为空时，此项属性为None
     - ``playerId`` -- str，玩家的实体ID
     """
-    OnNewArmorExchangeServerEvent: str
+    OnNewArmorExchangeServerEvent = ...
     """
     [事件]
 
@@ -2793,7 +2793,7 @@ class ServerEvent(StrEnum):
     - ``oldArmorDict`` -- dict | None，旧装备的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当旧装备为空时，此项属性为None
     - ``newArmorDict`` -- dict | None，新装备的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当新装备为空时，此项属性为None
     """
-    OnItemPutInEnchantingModelServerEvent: str
+    OnItemPutInEnchantingModelServerEvent = ...
     """
     [事件]
 
@@ -2823,7 +2823,7 @@ class ServerEvent(StrEnum):
     - ``options`` -- list[dict]，附魔台选项
     - ``change`` -- bool，传入True时，附魔台选项会被新传入的options覆盖
     """
-    ItemUseOnAfterServerEvent: str
+    ItemUseOnAfterServerEvent = ...
     """
     [事件]
 
@@ -2852,7 +2852,7 @@ class ServerEvent(StrEnum):
     - ``blockAuxValue`` -- int，方块的附加值
     - ``dimensionId`` -- int，维度ID
     """
-    ItemUseAfterServerEvent: str
+    ItemUseAfterServerEvent = ...
     """
     [事件]
 
@@ -2871,7 +2871,7 @@ class ServerEvent(StrEnum):
     - ``entityId`` -- str，玩家的实体ID
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    ItemReleaseUsingServerEvent: str
+    ItemReleaseUsingServerEvent = ...
     """
     [事件]
 
@@ -2888,7 +2888,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，设置为True可以取消，需要同时取消客户端事件ItemReleaseUsingClientEvent
     - ``changeItem`` -- bool，如果要在该事件的回调中修改当前使用槽位的物品，需设置这个参数为True，否则将修改物品失败，例如修改耐久度或者替换成新物品
     """
-    InventoryItemChangedServerEvent: str
+    InventoryItemChangedServerEvent = ...
     """
     [事件]
 
@@ -2912,7 +2912,7 @@ class ServerEvent(StrEnum):
     - ``oldItemDict`` -- dict | None，变化前的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``newItemDict`` -- dict | None，变化后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    FurnaceBurnFinishedServerEvent: str
+    FurnaceBurnFinishedServerEvent = ...
     """
     [事件]
 
@@ -2928,7 +2928,7 @@ class ServerEvent(StrEnum):
     - ``posZ`` -- float，位置z
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    CraftItemOutputChangeServerEvent: str
+    CraftItemOutputChangeServerEvent = ...
     """
     [事件]
 
@@ -2953,7 +2953,7 @@ class ServerEvent(StrEnum):
     - ``screenContainerType`` -- int，当前界面类型，类型含义见： `ContainerType枚举枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ContainerType.html?key=ContainerType&docindex=1&type=0>`_
     - ``cancel`` -- bool，是否取消生成物品
     """
-    ContainerItemChangedServerEvent: str
+    ContainerItemChangedServerEvent = ...
     """
     [事件]
 
@@ -2979,7 +2979,7 @@ class ServerEvent(StrEnum):
     - ``oldItemDict`` -- dict | None，旧 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``newItemDict`` -- dict | None，新 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     """
-    StepOnBlockServerEvent: str
+    StepOnBlockServerEvent = ...
     """
     [事件]
 
@@ -3006,7 +3006,7 @@ class ServerEvent(StrEnum):
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     - ``dimensionId`` -- int，维度ID
     """
-    StepOffBlockServerEvent: str
+    StepOffBlockServerEvent = ...
     """
     [事件]
 
@@ -3037,7 +3037,7 @@ class ServerEvent(StrEnum):
     - `RegisterOnStepOff <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnStepOff&docindex=2&type=0>`_
     - `UnRegisterOnStepOff <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnStepOff&docindex=2&type=0>`_
     """
-    StartDestroyBlockServerEvent: str
+    StartDestroyBlockServerEvent = ...
     """
     [事件]
 
@@ -3066,7 +3066,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockClientEvent一起修改
     - ``face`` -- int，方块被敲击面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
     """
-    ShearsDestoryBlockBeforeServerEvent: str
+    ShearsDestoryBlockBeforeServerEvent = ...
     """
     [事件]
 
@@ -3095,7 +3095,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``cancelShears`` -- bool，是否取消剪刀效果
     """
-    ServerPlayerTryDestroyBlockEvent: str
+    ServerPlayerTryDestroyBlockEvent = ...
     """
     [事件]
 
@@ -3122,7 +3122,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，默认为False，在脚本层设置为True就能取消该方块的破坏
     - ``spawnResources`` -- bool，是否生成掉落物，默认为True，在脚本层设置为False就能取消生成掉落物
     """
-    ServerPlaceBlockEntityEvent: str
+    ServerPlaceBlockEntityEvent = ...
     """
     [事件]
 
@@ -3138,7 +3138,7 @@ class ServerEvent(StrEnum):
     - ``posY`` -- int，方块y坐标
     - ``posZ`` -- int，方块z坐标
     """
-    ServerEntityTryPlaceBlockEvent: str
+    ServerEntityTryPlaceBlockEvent = ...
     """
     [事件]
 
@@ -3168,7 +3168,7 @@ class ServerEvent(StrEnum):
     - ``clickY`` -- float，点击点的y比例位置
     - ``clickZ`` -- float，点击点的z比例位置
     """
-    ServerBlockEntityTickEvent: str
+    ServerBlockEntityTickEvent = ...
     """
     [事件] [tick]
 
@@ -3191,7 +3191,7 @@ class ServerEvent(StrEnum):
     - ``posY`` -- int，方块y坐标
     - ``posZ`` -- int，方块z坐标
     """
-    PistonActionServerEvent: str
+    PistonActionServerEvent = ...
     """
     [事件]
 
@@ -3213,7 +3213,7 @@ class ServerEvent(StrEnum):
     - ``breakBlockList`` -- list[tuple[int, int, int]]，活塞运动影响到产生被破坏效果的方块坐标(x,y,z)，均为int类型
     - ``entityList`` -- list[str]，活塞运动影响到产生被移动或被破坏效果的实体ID列表
     """
-    OnStandOnBlockServerEvent: str
+    OnStandOnBlockServerEvent = ...
     """
     [事件] [tick]
 
@@ -3245,7 +3245,7 @@ class ServerEvent(StrEnum):
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     - ``cancel`` -- bool，可由脚本层回传True给引擎，阻止触发后续原版逻辑
     """
-    OnBeforeFallOnBlockServerEvent: str
+    OnBeforeFallOnBlockServerEvent = ...
     """
     [事件]
 
@@ -3271,7 +3271,7 @@ class ServerEvent(StrEnum):
     - ``fallDistance`` -- float，实体下降距离，可在脚本层传给引擎
     - ``cancel`` -- bool，是否取消引擎对实体下降伤害的计算
     """
-    OnAfterFallOnBlockServerEvent: str
+    OnAfterFallOnBlockServerEvent = ...
     """
     [事件] [tick]
 
@@ -3301,7 +3301,7 @@ class ServerEvent(StrEnum):
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     - ``calculate`` -- bool，是否按脚本层传值计算力
     """
-    HopperTryPullOutServerEvent: str
+    HopperTryPullOutServerEvent = ...
     """
     [事件]
 
@@ -3320,7 +3320,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``canHopper`` -- bool，是否允许容器往漏斗加东西(要关闭此交互，需先监听此事件再放置容器)
     """
-    HopperTryPullInServerEvent: str
+    HopperTryPullInServerEvent = ...
     """
     [事件]
 
@@ -3339,7 +3339,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``canHopper`` -- bool，是否允许容器往漏斗加东西(要关闭此交互，需先监听此事件再放置容器)
     """
-    HeavyBlockStartFallingServerEvent: str
+    HeavyBlockStartFallingServerEvent = ...
     """
     [事件]
 
@@ -3362,7 +3362,7 @@ class ServerEvent(StrEnum):
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     - ``dimensionId`` -- int，维度ID
     """
-    GrassBlockToDirtBlockServerEvent: str
+    GrassBlockToDirtBlockServerEvent = ...
     """
     [事件]
 
@@ -3383,7 +3383,7 @@ class ServerEvent(StrEnum):
     - ``y`` -- int，方块y坐标
     - ``z`` -- int，方块z坐标
     """
-    FarmBlockToDirtBlockServerEvent: str
+    FarmBlockToDirtBlockServerEvent = ...
     """
     [事件]
 
@@ -3405,7 +3405,7 @@ class ServerEvent(StrEnum):
     - ``z`` -- int，方块z坐标
     - ``setBlockType`` -- int，耕地退化为泥土的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
     """
-    FallingBlockReturnHeavyBlockServerEvent: str
+    FallingBlockReturnHeavyBlockServerEvent = ...
     """
     [事件]
 
@@ -3430,7 +3430,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``fallTickAmount`` -- int，下落的方块实体持续下落了多少tick
     """
-    FallingBlockCauseDamageBeforeServerEvent: str
+    FallingBlockCauseDamageBeforeServerEvent = ...
     """
     [事件]
 
@@ -3459,7 +3459,7 @@ class ServerEvent(StrEnum):
     - ``isHarmful`` -- bool，是否计算对实体的伤害，引擎传来的值由json配置和伤害是否大于0决定，可在脚本层修改传回引擎
     - ``fallDamage`` -- int，对实体的伤害，引擎传来的值距离和json配置决定，可在脚本层修改传回引擎
     """
-    FallingBlockBreakServerEvent: str
+    FallingBlockBreakServerEvent = ...
     """
     [事件]
 
@@ -3484,7 +3484,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``cancelDrop`` -- bool，是否取消方块物品掉落，可以在脚本层中设置
     """
-    EntityPlaceBlockAfterServerEvent: str
+    EntityPlaceBlockAfterServerEvent = ...
     """
     [事件]
 
@@ -3509,7 +3509,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``face`` -- int，点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
     """
-    DirtBlockToGrassBlockServerEvent: str
+    DirtBlockToGrassBlockServerEvent = ...
     """
     [事件]
 
@@ -3530,7 +3530,7 @@ class ServerEvent(StrEnum):
     - ``y`` -- int，方块y坐标
     - ``z`` -- int，方块z坐标
     """
-    CommandBlockUpdateEvent: str
+    CommandBlockUpdateEvent = ...
     """
     [事件]
 
@@ -3556,7 +3556,7 @@ class ServerEvent(StrEnum):
     - ``victimId`` -- str，命令方块对应的逻辑实体的实体ID，当isBlock为False时有效
     - ``cancel`` -- bool，修改为True时，可以阻止玩家修改命令方块的内置命令
     """
-    CommandBlockContainerOpenEvent: str
+    CommandBlockContainerOpenEvent = ...
     """
     [事件]
 
@@ -3574,7 +3574,7 @@ class ServerEvent(StrEnum):
     - ``victimId`` -- str，命令方块对应的逻辑实体的实体ID，当isBlock为False时有效
     - ``cancel`` -- bool，修改为True时，可以阻止玩家打开命令方块的设置界面
     """
-    ChestBlockTryPairWithServerEvent: str
+    ChestBlockTryPairWithServerEvent = ...
     """
     [事件]
 
@@ -3593,7 +3593,7 @@ class ServerEvent(StrEnum):
     - ``otherBlockZ`` -- int，将要与之组合的另外一个小箱子方块z坐标
     - ``dimensionId`` -- int，维度ID
     """
-    BlockStrengthChangedServerEvent: str
+    BlockStrengthChangedServerEvent = ...
     """
     [事件]
 
@@ -3612,7 +3612,7 @@ class ServerEvent(StrEnum):
     - ``oldStrength`` -- int，变化前的红石信号量
     - ``dimensionId`` -- int，维度ID
     """
-    BlockSnowStateChangeServerEvent: str
+    BlockSnowStateChangeServerEvent = ...
     """
     [事件]
 
@@ -3629,7 +3629,7 @@ class ServerEvent(StrEnum):
     - ``turnSnow`` -- bool，是否转为含雪，true则转为含雪，false则脱离含雪
     - ``setBlockType`` -- int，方块进入脱离含雪的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
     """
-    BlockSnowStateChangeAfterServerEvent: str
+    BlockSnowStateChangeAfterServerEvent = ...
     """
     [事件]
 
@@ -3646,7 +3646,7 @@ class ServerEvent(StrEnum):
     - ``turnSnow`` -- bool，是否转为含雪，true则转为含雪，false则脱离含雪
     - ``setBlockType`` -- int，方块进入脱离含雪的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
     """
-    BlockRemoveServerEvent: str
+    BlockRemoveServerEvent = ...
     """
     [事件]
 
@@ -3669,7 +3669,7 @@ class ServerEvent(StrEnum):
 
     - `ListenOnBlockRemoveEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=ListenOnBlockRemoveEvent&docindex=3&type=0>`_
     """
-    BlockRandomTickServerEvent: str
+    BlockRandomTickServerEvent = ...
     """
     [事件]
 
@@ -3687,7 +3687,7 @@ class ServerEvent(StrEnum):
     - ``fullName`` -- str，方块的identifier，包含命名空间及名称
     - ``auxValue`` -- int，方块的附加值
     """
-    BlockNeighborChangedServerEvent: str
+    BlockNeighborChangedServerEvent = ...
     """
     [事件]
 
@@ -3710,7 +3710,7 @@ class ServerEvent(StrEnum):
     - ``toBlockName`` -- str，方块变化后的identifier，包含命名空间及名称
     - ``toAuxValue`` -- int，方块变化后附加值
     """
-    BlockLiquidStateChangeServerEvent: str
+    BlockLiquidStateChangeServerEvent = ...
     """
     [事件]
 
@@ -3728,7 +3728,7 @@ class ServerEvent(StrEnum):
     - ``z`` -- int，方块z坐标
     - ``turnLiquid`` -- bool，是否转为含水，True则转为含水，False则脱离含水
     """
-    BlockLiquidStateChangeAfterServerEvent: str
+    BlockLiquidStateChangeAfterServerEvent = ...
     """
     [事件]
 
@@ -3746,7 +3746,7 @@ class ServerEvent(StrEnum):
     - ``z`` -- int，方块z坐标
     - ``turnLiquid`` -- bool，是否转为含水，True则转为含水，False则脱离含水
     """
-    BlockDestroyByLiquidServerEvent: str
+    BlockDestroyByLiquidServerEvent = ...
     """
     [事件]
 
@@ -3770,7 +3770,7 @@ class ServerEvent(StrEnum):
     - ``auxValue`` -- int，方块的附加值
     - ``dimensionId`` -- int，方块所在维度ID
     """
-    StoreBuySuccServerEvent: str
+    StoreBuySuccServerEvent = ...
     """
     [事件]
 
@@ -3782,7 +3782,7 @@ class ServerEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    ServerPlayerGetExperienceOrbEvent: str
+    ServerPlayerGetExperienceOrbEvent = ...
     """
     [事件]
 
@@ -3802,7 +3802,7 @@ class ServerEvent(StrEnum):
     - ``experienceValue`` -- int，经验球经验值
     - ``cancel`` -- bool，是否取消
     """
-    PlayerTrySleepServerEvent: str
+    PlayerTrySleepServerEvent = ...
     """
     [事件]
 
@@ -3815,7 +3815,7 @@ class ServerEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``cancel`` -- bool，是否取消
     """
-    PlayerTeleportEvent: str
+    PlayerTeleportEvent = ...
     """
     [事件]
 
@@ -3827,7 +3827,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，玩家的实体ID
     """
-    PlayerStopSleepServerEvent: str
+    PlayerStopSleepServerEvent = ...
     """
     [事件]
 
@@ -3839,7 +3839,7 @@ class ServerEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    PlayerSleepServerEvent: str
+    PlayerSleepServerEvent = ...
     """
     [事件]
 
@@ -3851,7 +3851,7 @@ class ServerEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    PlayerRespawnFinishServerEvent: str
+    PlayerRespawnFinishServerEvent = ...
     """
     [事件]
 
@@ -3870,7 +3870,7 @@ class ServerEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    PlayerRespawnEvent: str
+    PlayerRespawnEvent = ...
     """
     [事件]
 
@@ -3888,7 +3888,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，玩家的实体ID
     """
-    PlayerHurtEvent: str
+    PlayerHurtEvent = ...
     """
     [事件]
 
@@ -3903,7 +3903,7 @@ class ServerEvent(StrEnum):
     - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
     - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
-    PlayerEatFoodServerEvent: str
+    PlayerEatFoodServerEvent = ...
     """
     [事件]
 
@@ -3924,7 +3924,7 @@ class ServerEvent(StrEnum):
     - ``hunger`` -- int，食物增加的饥饿值，可修改
     - ``nutrition`` -- float，食物的营养价值，回复饱和度 = 食物增加的饥饿值 * 食物的营养价值 * 2，饱和度最大不超过当前饥饿值，可修改
     """
-    PlayerDieEvent: str
+    PlayerDieEvent = ...
     """
     [事件]
 
@@ -3939,7 +3939,7 @@ class ServerEvent(StrEnum):
     - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
     - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
-    OnPlayerHitBlockServerEvent: str
+    OnPlayerHitBlockServerEvent = ...
     """
     [事件]
 
@@ -3971,7 +3971,7 @@ class ServerEvent(StrEnum):
     - `OpenPlayerHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=OpenPlayerHitBlockDetection&docindex=4&type=0>`_
     - `ClosePlayerHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=ClosePlayerHitBlockDetection&docindex=1&type=0>`_
     """
-    GameTypeChangedServerEvent: str
+    GameTypeChangedServerEvent = ...
     """
     [事件]
 
@@ -3993,7 +3993,7 @@ class ServerEvent(StrEnum):
     - ``oldGameType`` -- int，切换前的游戏模式
     - ``newGameType`` -- int，切换后的游戏模式
     """
-    ExtinguishFireServerEvent: str
+    ExtinguishFireServerEvent = ...
     """
     [事件]
 
@@ -4013,7 +4013,7 @@ class ServerEvent(StrEnum):
     - ``playerId`` -- str，玩家的实体ID
     - ``cancel`` -- bool，修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireClientEvent一起修改
     """
-    DimensionChangeServerEvent: str
+    DimensionChangeServerEvent = ...
     """
     [事件]
 
@@ -4039,7 +4039,7 @@ class ServerEvent(StrEnum):
     - ``toY`` -- float，改变后的位置y
     - ``toZ`` -- float，改变后的位置z
     """
-    ChangeLevelUpCostServerEvent: str
+    ChangeLevelUpCostServerEvent = ...
     """
     [事件]
 
@@ -4059,7 +4059,7 @@ class ServerEvent(StrEnum):
 
     - `ClearDefinedLevelUpCost <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=ClearDefinedLevelUpCost&docindex=1&type=0>`_
     """
-    AddLevelEvent: str
+    AddLevelEvent = ...
     """
     [事件]
 
@@ -4073,7 +4073,7 @@ class ServerEvent(StrEnum):
     - ``addLevel`` -- int，增加的等级值
     - ``newLevel`` -- int，新的等级
     """
-    AddExpEvent: str
+    AddExpEvent = ...
     """
     [事件]
 
@@ -4086,7 +4086,7 @@ class ServerEvent(StrEnum):
     - ``id`` -- str，玩家的实体ID
     - ``addExp`` -- int，增加的经验值
     """
-    WillTeleportToServerEvent: str
+    WillTeleportToServerEvent = ...
     """
     [事件]
 
@@ -4114,7 +4114,7 @@ class ServerEvent(StrEnum):
     - ``toZ`` -- float，传送后的位置z
     - ``cause`` -- str，传送理由，详情见EntityTeleportCause枚举
     """
-    WillAddEffectServerEvent: str
+    WillAddEffectServerEvent = ...
     """
     [事件]
 
@@ -4131,7 +4131,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，设置为True可以取消
     - ``damage`` -- float，状态将会造成的伤害值，如药水；需要注意，该值不一定是最终的伤害值，例如被伤害吸收效果扣除。只有持续时间为0时有用
     """
-    StartRidingServerEvent: str
+    StartRidingServerEvent = ...
     """
     [事件]
 
@@ -4145,7 +4145,7 @@ class ServerEvent(StrEnum):
     - ``actorId`` -- str，骑乘者的实体ID
     - ``victimId`` -- str，被骑乘的实体ID
     """
-    RemoveEffectServerEvent: str
+    RemoveEffectServerEvent = ...
     """
     [事件]
 
@@ -4160,7 +4160,7 @@ class ServerEvent(StrEnum):
     - ``effectDuration`` -- int，被移除状态效果的剩余持续时间，单位秒
     - ``effectAmplifier`` -- int，被移除状态效果等级
     """
-    RefreshEffectServerEvent: str
+    RefreshEffectServerEvent = ...
     """
     [事件]
 
@@ -4176,7 +4176,7 @@ class ServerEvent(StrEnum):
     - ``effectAmplifier`` -- int，更新后的状态效果放大倍数
     - ``damage`` -- float，状态造成的伤害值，如药水
     """
-    ProjectileCritHitEvent: str
+    ProjectileCritHitEvent = ...
     """
     [事件]
 
@@ -4202,7 +4202,7 @@ class ServerEvent(StrEnum):
     - `OpenPlayerCritBox <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=OpenPlayerCritBox&docindex=3&type=0>`_
     - `ClosePlayerCritBox <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=ClosePlayerCritBox&docindex=1&type=0>`_
     """
-    OnMobHitMobServerEvent: str
+    OnMobHitMobServerEvent = ...
     """
     [事件]
 
@@ -4229,7 +4229,7 @@ class ServerEvent(StrEnum):
     - `OpenPlayerHitMobDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=OpenPlayerHitMobDetection&docindex=4&type=0>`_
     - `ClosePlayerHitMobDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=ClosePlayerHitMobDetection&docindex=1&type=0>`_
     """
-    OnKnockBackServerEvent: str
+    OnKnockBackServerEvent = ...
     """
     [事件]
 
@@ -4241,7 +4241,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    OnFireHurtEvent: str
+    OnFireHurtEvent = ...
     """
     [事件]
 
@@ -4257,7 +4257,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，是否取消此处火焰伤害
     - ``cancelIgnite`` -- bool，是否取消点燃效果
     """
-    MobGriefingBlockServerEvent: str
+    MobGriefingBlockServerEvent = ...
     """
     [事件]
 
@@ -4281,7 +4281,7 @@ class ServerEvent(StrEnum):
     - ``blockName`` -- str，方块的identifier，包含命名空间及名称
     - ``dimensionId`` -- int，维度ID
     """
-    HealthChangeServerEvent: str
+    HealthChangeServerEvent = ...
     """
     [事件]
 
@@ -4296,7 +4296,7 @@ class ServerEvent(StrEnum):
     - ``to`` -- str，变化后的生命值
     - ``byScript`` -- str，是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
     """
-    EntityTickServerEvent: str
+    EntityTickServerEvent = ...
     """
     [事件] [tick]
 
@@ -4315,7 +4315,7 @@ class ServerEvent(StrEnum):
 
     - `AddEntityTickEventWhiteList <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=AddEntityTickEventWhiteList&docindex=3&type=0>`_
     """
-    EntityPickupItemServerEvent: str
+    EntityPickupItemServerEvent = ...
     """
     [事件]
 
@@ -4329,7 +4329,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``secondaryActor`` -- str，物品给予者的实体ID（一般是玩家），如果不存在给予者的话，这里为空字符串
     """
-    EntityMotionStopServerEvent: str
+    EntityMotionStopServerEvent = ...
     """
     [事件]
 
@@ -4349,7 +4349,7 @@ class ServerEvent(StrEnum):
     - ``entityId`` -- str，实体ID
     - ``remove`` -- bool，是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除，该参数设置只对非玩家实体有效
     """
-    EntityMotionStartServerEvent: str
+    EntityMotionStartServerEvent = ...
     """
     [事件]
 
@@ -4362,7 +4362,7 @@ class ServerEvent(StrEnum):
     - ``motionId`` -- int，运动器ID
     - ``entityId`` -- str，实体ID
     """
-    EntityLoadScriptEvent: str
+    EntityLoadScriptEvent = ...
     """
     [事件]
 
@@ -4380,7 +4380,7 @@ class ServerEvent(StrEnum):
 
     - ``args`` -- list，该事件的参数为长度为2的list，而非dict，其中list的第一个元素为实体ID
     """
-    EntityEffectDamageServerEvent: str
+    EntityEffectDamageServerEvent = ...
     """
     [事件]
 
@@ -4398,7 +4398,7 @@ class ServerEvent(StrEnum):
     - ``isInstantaneous`` -- bool，是否为立即生效状态
     - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
     """
-    EntityDroppedItemServerEvent: str
+    EntityDroppedItemServerEvent = ...
     """
     [事件]
 
@@ -4412,7 +4412,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``itemEntityId`` -- str，物品的实体ID
     """
-    EntityChangeDimensionServerEvent: str
+    EntityChangeDimensionServerEvent = ...
     """
     [事件]
 
@@ -4439,7 +4439,7 @@ class ServerEvent(StrEnum):
     - ``toY`` -- float，改变后的位置y
     - ``toZ`` -- float，改变后的位置z
     """
-    ChangeSwimStateServerEvent: str
+    ChangeSwimStateServerEvent = ...
     """
     [事件]
 
@@ -4459,7 +4459,7 @@ class ServerEvent(StrEnum):
     - ``formState`` -- bool，事件触发前，实体是否在游泳状态
     - ``toState`` -- bool，事件触发后，实体是否在游泳状态
     """
-    AddEffectServerEvent: str
+    AddEffectServerEvent = ...
     """
     [事件]
 
@@ -4475,7 +4475,7 @@ class ServerEvent(StrEnum):
     - ``effectAmplifier`` -- int，状态效果的等级
     - ``damage`` -- float，状态造成的伤害值（真实扣除生命值的量）。只有持续时间为0时有用
     """
-    ActorHurtServerEvent: str
+    ActorHurtServerEvent = ...
     """
     [事件]
 
@@ -4491,7 +4491,7 @@ class ServerEvent(StrEnum):
     - ``absorbedDamage`` -- int，被伤害吸收效果吸收的伤害值
     - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
-    ServerSpawnMobEvent: str
+    ServerSpawnMobEvent = ...
     """
     [事件]
 
@@ -4519,7 +4519,7 @@ class ServerEvent(StrEnum):
     - ``realIdentifier`` -- int，生成实体的命名空间，通过MOD API生成的生物在这个参数也能获取到真正的命名空间，而不是以custom开头的
     - ``cancel`` -- bool，是否取消生成该实体
     """
-    ServerPreBlockPatternEvent: str
+    ServerPreBlockPatternEvent = ...
     """
     [事件]
 
@@ -4536,7 +4536,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``entityWillBeGenerated`` -- str，即将生成生物的名字，如"minecraft:pig"
     """
-    ServerPostBlockPatternEvent: str
+    ServerPostBlockPatternEvent = ...
     """
     [事件]
 
@@ -4553,7 +4553,7 @@ class ServerEvent(StrEnum):
     - ``z`` -- int，方块z坐标
     - ``dimensionId`` -- int，维度ID
     """
-    ServerChatEvent: str
+    ServerChatEvent = ...
     """
     [事件]
 
@@ -4575,7 +4575,7 @@ class ServerEvent(StrEnum):
     - ``gameChatPrefixColorG`` -- float，设置当前玩家在网易聊天界面中前缀颜色rgb的g值，范围为[0,1]。颜色数值输入其他格式时会被置为0。若cancel为True，会取消掉本次的颜色修改
     - ``gameChatPrefixColorB`` -- float，设置当前玩家在网易聊天界面中前缀颜色rgb的b值，范围为[0,1]。颜色数值输入其他格式时会被置为0。若cancel为True，会取消掉本次的颜色修改
     """
-    PlayerLeftMessageServerEvent: str
+    PlayerLeftMessageServerEvent = ...
     """
     [事件]
 
@@ -4590,7 +4590,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，是否显示提示文字，允许修改。True：不显示提示
     - ``message`` -- str，玩家离开游戏的提示文字，允许修改
     """
-    PlayerJoinMessageEvent: str
+    PlayerJoinMessageEvent = ...
     """
     [事件]
 
@@ -4611,7 +4611,7 @@ class ServerEvent(StrEnum):
     - ``cancel`` -- bool，是否显示提示文字，允许修改。True：不显示提示
     - ``message`` -- str，玩家加入游戏的提示文字，允许修改
     """
-    PlayerIntendLeaveServerEvent: str
+    PlayerIntendLeaveServerEvent = ...
     """
     [事件]
 
@@ -4629,7 +4629,7 @@ class ServerEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    PlaceNeteaseStructureFeatureEvent: str
+    PlaceNeteaseStructureFeatureEvent = ...
     """
     [事件]
 
@@ -4664,7 +4664,7 @@ class ServerEvent(StrEnum):
     - `RemoveNeteaseFeatureWhiteList <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=RemoveNeteaseFeatureWhiteList&docindex=1&type=0>`_
     - `ClearAllNeteaseFeatureWhiteList <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=ClearAllNeteaseFeatureWhiteList&docindex=1&type=0>`_
     """
-    OnRainLevelChangeServerEvent: str
+    OnRainLevelChangeServerEvent = ...
     """
     [事件]
 
@@ -4677,7 +4677,7 @@ class ServerEvent(StrEnum):
     - ``oldLevel`` -- float，改变前的下雨强度
     - ``newLevel`` -- float，改变后的下雨强度
     """
-    OnLocalRainLevelChangeServerEvent: str
+    OnLocalRainLevelChangeServerEvent = ...
     """
     [事件]
 
@@ -4691,7 +4691,7 @@ class ServerEvent(StrEnum):
     - ``newLevel`` -- float，改变后的下雨强度
     - ``dimensionId`` -- int，维度ID
     """
-    OnLocalLightningLevelChangeServerEvent: str
+    OnLocalLightningLevelChangeServerEvent = ...
     """
     [事件]
 
@@ -4705,7 +4705,7 @@ class ServerEvent(StrEnum):
     - ``newLevel`` -- float，改变后的打雷强度
     - ``dimensionId`` -- int，维度ID
     """
-    OnLightningLevelChangeServerEvent: str
+    OnLightningLevelChangeServerEvent = ...
     """
     [事件]
 
@@ -4718,7 +4718,7 @@ class ServerEvent(StrEnum):
     - ``oldLevel`` -- float，改变前的打雷强度
     - ``newLevel`` -- float，改变后的打雷强度
     """
-    OnContainerFillLoottableServerEvent: str
+    OnContainerFillLoottableServerEvent = ...
     """
     [事件]
 
@@ -4739,7 +4739,7 @@ class ServerEvent(StrEnum):
     - ``itemList`` -- list[dict]，掉落物品列表，每个元素为一个itemDict，格式可参考 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``dirty`` -- bool，默认为False，如果需要修改掉落列表需将该值设为True
     """
-    OnCommandOutputServerEvent: str
+    OnCommandOutputServerEvent = ...
     """
     [事件]
 
@@ -4758,7 +4758,7 @@ class ServerEvent(StrEnum):
     - ``command`` -- str，命令名称
     - ``message`` -- str，命令返回的消息
     """
-    NewOnEntityAreaEvent: str
+    NewOnEntityAreaEvent = ...
     """
     [事件]
 
@@ -4785,7 +4785,7 @@ class ServerEvent(StrEnum):
     - `RegisterEntityAOIEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=RegisterEntityAOIEvent&docindex=3&type=0>`_
     - `UnRegisterEntityAOIEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=UnRegisterEntityAOIEvent&docindex=1&type=0>`_
     """
-    LoadServerAddonScriptsAfter: str
+    LoadServerAddonScriptsAfter = ...
     """
     [事件]
 
@@ -4797,7 +4797,7 @@ class ServerEvent(StrEnum):
 
     无
     """
-    DelServerPlayerEvent: str
+    DelServerPlayerEvent = ...
     """
     [事件]
 
@@ -4811,7 +4811,7 @@ class ServerEvent(StrEnum):
     - ``isTransfer`` -- bool，是否是切服时退出服务器，仅用于Apollo。如果是True，则表示切服时退出服务器；若是False，则表示退出网络游戏
     - ``uid`` -- long，玩家的netease uid，玩家的唯一标识
     """
-    CommandEvent: str
+    CommandEvent = ...
     """
     [事件]
 
@@ -4831,7 +4831,7 @@ class ServerEvent(StrEnum):
     - ``command`` -- str，指令字符串
     - ``cancel`` -- bool，是否取消
     """
-    ClientLoadAddonsFinishServerEvent: str
+    ClientLoadAddonsFinishServerEvent = ...
     """
     [事件]
 
@@ -4843,7 +4843,7 @@ class ServerEvent(StrEnum):
 
     - ``playerId`` -- str，玩家的实体ID
     """
-    ChunkLoadedServerEvent: str
+    ChunkLoadedServerEvent = ...
     """
     [事件]
 
@@ -4864,7 +4864,7 @@ class ServerEvent(StrEnum):
     - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[z * 16, z * 16 + 15]
     - ``blockEntities`` -- list[dict]，随区块加载而加载进世界的自定义方块实体的坐标的列表，列表元素dict包含posX，posY，posZ三个int表示自定义方块实体的坐标，blockName表示方块的identifier，包含命名空间及名称
     """
-    ChunkGeneratedServerEvent: str
+    ChunkGeneratedServerEvent = ...
     """
     [事件]
 
@@ -4877,9 +4877,9 @@ class ServerEvent(StrEnum):
     - ``dimension`` -- int，维度ID
     - ``chunkPosX`` -- int，区块的x坐标，对应方块x坐标区间为[chunkPosX * 16, chunkPosX * 16 + 15]
     - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[chunkPosZ * 16, chunkPosZ * 16 + 15]
-    - ``blockEntityData`` -- list[dict] | None，该区块中的自定义方块实体列表，通常是由自定义特征生成的自定义方块，没有自定义方块实体时该值为None。列表元素dict的结构如下：{'blockName': str, 'posX': int, 'posY': int, 'posZ': int}
+    - ``blockEntityData`` -- list[dict] | None，该区块中的自定义方块实体列表，通常是由自定义特征生成的自定义方块，没有自定义方块实体时该值为None。列表元素dict的结构如下：{'blockName' = ..., 'posX': int, 'posY': int, 'posZ': int}
     """
-    ChunkAcquireDiscardedServerEvent: str
+    ChunkAcquireDiscardedServerEvent = ...
     """
     [事件]
 
@@ -4901,7 +4901,7 @@ class ServerEvent(StrEnum):
     - ``entities`` -- list[str]，随区块卸载而从世界移除的实体ID的列表。注意事件触发时已经无法获取到这些实体的信息，仅供脚本资源回收用
     - ``blockEntities`` -- list[dict]，随区块卸载而从世界移除的自定义方块实体的坐标的列表，列表元素dict包含posX，posY，posZ三个int表示自定义方块实体的坐标。注意事件触发时已经无法获取到这些方块实体的信息，仅供脚本资源回收用
     """
-    AddServerPlayerEvent: str
+    AddServerPlayerEvent = ...
     """
     [事件]
 
@@ -4927,7 +4927,7 @@ class ServerEvent(StrEnum):
     - ``uid`` -- long，仅用于Apollo，玩家的netease uid，玩家的唯一标识
     - ``proxyId`` -- int，仅用于Apollo，当前客户端连接的proxy服务器id
     """
-    AchievementCompleteEvent: str
+    AchievementCompleteEvent = ...
     """
     [事件]
 
@@ -4943,7 +4943,7 @@ class ServerEvent(StrEnum):
     - ``title`` -- str，成就标题
     - ``description`` -- str，成就描述
     """
-    PlayerAttackEntityEvent: str
+    PlayerAttackEntityEvent = ...
     """
     [事件]
 
@@ -4961,7 +4961,7 @@ class ServerEvent(StrEnum):
     - ``isKnockBack`` -- bool，是否支持击退效果，默认支持，当不支持时将屏蔽武器击退附魔效果
     - ``isCrit`` -- bool，本次攻击是否产生暴击，不支持修改
     """
-    ServerBlockUseEvent: str
+    ServerBlockUseEvent = ...
     """
     [事件] [tick]
 
@@ -5001,7 +5001,7 @@ class ServerEvent(StrEnum):
     - `RemoveBlockItemListenForUseEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RemoveBlockItemListenForUseEvent&docindex=1&type=0>`_
     - `ClearAllListenForBlockUseEventItems <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=ClearAllListenForBlockUseEventItems&docindex=1&type=0>`_
     """
-    OnGroundServerEvent: str
+    OnGroundServerEvent = ...
     """
     [事件]
 
@@ -5013,7 +5013,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    SpawnProjectileServerEvent: str
+    SpawnProjectileServerEvent = ...
     """
     [事件]
 
@@ -5033,7 +5033,7 @@ class ServerEvent(StrEnum):
     - ``projectileIdentifier`` -- str，抛射物的identifier
     - ``spawnerId`` -- str，发射者的实体ID，没有发射者时为-1
     """
-    EntityDieLoottableServerEvent: str
+    EntityDieLoottableServerEvent = ...
     """
     [事件]
 
@@ -5056,7 +5056,7 @@ class ServerEvent(StrEnum):
     - ``itemList`` -- list[dict]，掉落物品列表，每个元素为一个itemDict，格式可参考 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``dirty`` -- bool，默认为False，如果需要修改掉落列表需将该值设为True
     """
-    ActuallyHurtServerEvent: str
+    ActuallyHurtServerEvent = ...
     """
     [事件]
 
@@ -5085,7 +5085,7 @@ class ServerEvent(StrEnum):
     - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_
     - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
-    HealthChangeBeforeServerEvent: str
+    HealthChangeBeforeServerEvent = ...
     """
     [事件]
 
@@ -5101,7 +5101,7 @@ class ServerEvent(StrEnum):
     - ``byScript`` -- bool，是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
     - ``cancel`` -- bool，是否取消该变化
     """
-    DimensionChangeFinishServerEvent: str
+    DimensionChangeFinishServerEvent = ...
     """
     [事件]
 
@@ -5122,7 +5122,7 @@ class ServerEvent(StrEnum):
     - ``toDimensionId`` -- int，维度改变后的维度
     - ``toPos`` -- tuple[float, float, float]，改变后的位置，其中y值为脚底加上角色的身高值
     """
-    EntityDefinitionsEventServerEvent: str
+    EntityDefinitionsEventServerEvent = ...
     """
     [事件]
 
@@ -5135,7 +5135,7 @@ class ServerEvent(StrEnum):
     - ``entityId`` -- str，实体ID
     - ``eventName`` -- str，触发的事件名称
     """
-    PlayerDoInteractServerEvent: str
+    PlayerDoInteractServerEvent = ...
     """
     [事件]
 
@@ -5149,7 +5149,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``interactEntityId`` -- str，交互生物的实体ID
     """
-    PlayerInteractServerEvent: str
+    PlayerInteractServerEvent = ...
     """
     [事件]
 
@@ -5171,7 +5171,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict，玩家手持物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``victimId`` -- str，交互生物的实体ID
     """
-    MobDieEvent: str
+    MobDieEvent = ...
     """
     [事件]
 
@@ -5192,7 +5192,7 @@ class ServerEvent(StrEnum):
     - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
     - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
-    AddEntityServerEvent: str
+    AddEntityServerEvent = ...
     """
     [事件]
 
@@ -5218,7 +5218,7 @@ class ServerEvent(StrEnum):
     - ``itemName`` -- str，物品identifier（仅当物品实体时存在该字段）
     - ``auxValue`` -- int，物品附加值（仅当物品实体时存在该字段）
     """
-    OnMobHitBlockServerEvent: str
+    OnMobHitBlockServerEvent = ...
     """
     [事件]
 
@@ -5243,7 +5243,7 @@ class ServerEvent(StrEnum):
     - `OpenMobHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=OpenMobHitBlockDetection&docindex=3&type=0>`_
     - `CloseMobHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=CloseMobHitBlockDetection&docindex=1&type=0>`_
     """
-    OnEntityInsideBlockServerEvent: str
+    OnEntityInsideBlockServerEvent = ...
     """
     [事件] [tick]
 
@@ -5280,7 +5280,7 @@ class ServerEvent(StrEnum):
     - `RegisterOnEntityInside <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnEntityInside&docindex=2&type=0>`_
     - `UnRegisterOnEntityInside <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnEntityInside&docindex=2&type=0>`_
     """
-    EntityStartRidingEvent: str
+    EntityStartRidingEvent = ...
     """
     [事件]
 
@@ -5293,7 +5293,7 @@ class ServerEvent(StrEnum):
     - ``id`` -- str，骑乘者实体ID
     - ``rideId`` -- str，坐骑实体ID
     """
-    EntityStopRidingEvent: str
+    EntityStopRidingEvent = ...
     """
     [事件]
 
@@ -5325,7 +5325,7 @@ class ServerEvent(StrEnum):
     - ``switchingRides`` -- bool，是否换乘坐骑
     - ``cancel`` -- bool，设置为True可以取消（需要与客户端事件一同取消）
     """
-    ServerItemUseOnEvent: str
+    ServerItemUseOnEvent = ...
     """
     [事件] [tick]
 
@@ -5356,7 +5356,7 @@ class ServerEvent(StrEnum):
     - ``clickZ`` -- float，点击点的z比例位置
     - ``ret`` -- bool，设为True可取消物品的使用
     """
-    ActorUseItemServerEvent: str
+    ActorUseItemServerEvent = ...
     """
     [事件]
 
@@ -5381,7 +5381,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``useMethod`` -- int，使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
     """
-    ActorAcquiredItemServerEvent: str
+    ActorAcquiredItemServerEvent = ...
     """
     [事件]
 
@@ -5396,7 +5396,7 @@ class ServerEvent(StrEnum):
     - ``itemDict`` -- dict，获得的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
     - ``acquireMethod`` -- int，获得物品的方法，详见 `ItemAcquisitionMethod枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
     """
-    DestroyBlockEvent: str
+    DestroyBlockEvent = ...
     """
     [事件]
 
@@ -5422,7 +5422,7 @@ class ServerEvent(StrEnum):
     - ``dimensionId`` -- int，维度ID
     - ``dropEntityIds`` -- list[str]，掉落物实体ID列表
     """
-    DamageEvent: str
+    DamageEvent = ...
     """
     [事件]
 
@@ -5454,7 +5454,7 @@ class ServerEvent(StrEnum):
     - ``ignite`` -- bool，是否点燃被伤害者，允许修改，设置该值为True产生点燃效果，反之亦然
     - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
     """
-    ExplosionServerEvent: str
+    ExplosionServerEvent = ...
     """
     [事件]
 
@@ -5477,7 +5477,7 @@ class ServerEvent(StrEnum):
     - ``explodePos`` -- list[float, float, float]，爆炸位置[x, y, z]
     - ``dimensionId`` -- int，维度ID
     """
-    ProjectileDoHitEffectEvent: str
+    ProjectileDoHitEffectEvent = ...
     """
     [事件]
 
@@ -5500,7 +5500,7 @@ class ServerEvent(StrEnum):
     - ``srcId`` -- str，抛射物创建者的实体ID
     - ``cancel`` -- bool，是否取消这个碰撞事件，若取消可以设置为True
     """
-    OnCarriedNewItemChangedServerEvent: str
+    OnCarriedNewItemChangedServerEvent = ...
     """
     [事件]
 
@@ -5520,7 +5520,7 @@ class ServerEvent(StrEnum):
     - ``newItemDict`` -- dict | None，新物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当新物品为空时，此项属性为None
     - ``playerId`` -- str，玩家的实体ID
     """
-    EntityRemoveEvent: str
+    EntityRemoveEvent = ...
     """
     [事件]
 
@@ -5541,7 +5541,7 @@ class ServerEvent(StrEnum):
 
     - ``id`` -- str，实体ID
     """
-    OnScriptTickServer: str
+    OnScriptTickServer = ...
     """
     [事件] [tick]
 
@@ -5553,7 +5553,7 @@ class ServerEvent(StrEnum):
 
     无
     """
-    UiInitFinished: str
+    UiInitFinished = ...
     """
     [nuoyanlib] [事件]
 
@@ -5603,357 +5603,357 @@ class TimeEaseFunc:
 
 
 class ToggleCallbackType(StrEnum):
-    CHANGED: str
+    CHANGED = ...
 
 
 class WheelCallbackType(StrEnum):
-    CLICK: str
-    HOVER: str
+    CLICK = ...
+    HOVER = ...
 
 
 class GridCallbackType(StrEnum):
-    UPDATE: str
-    LOADED: str
+    UPDATE = ...
+    LOADED = ...
 
 
 class ComboBoxCallbackType(StrEnum):
-    OPEN: str
-    CLOSE: str
-    SELECT: str
+    OPEN = ...
+    CLOSE = ...
+    SELECT = ...
 
 
 class ButtonCallbackType(StrEnum):
-    UP: str
-    DOWN: str
-    CANCEL: str
-    MOVE: str
-    MOVE_IN: str
-    MOVE_OUT: str
-    DOUBLE_CLICK: str
-    LONG_CLICK: str
-    HOVER_IN: str
-    HOVER_OUT: str
-    SCREEN_EXIT: str
+    UP = ...
+    DOWN = ...
+    CANCEL = ...
+    MOVE = ...
+    MOVE_IN = ...
+    MOVE_OUT = ...
+    DOUBLE_CLICK = ...
+    LONG_CLICK = ...
+    HOVER_IN = ...
+    HOVER_OUT = ...
+    SCREEN_EXIT = ...
 
 
 class ControlType(StrEnum):
-    BASE_CONTROL: str
-    BUTTON: str
-    IMAGE: str
-    LABEL: str
-    PANEL: str
-    INPUT_PANEL: str
-    STACK_PANEL: str
-    EDIT_BOX: str
-    PAPER_DOLL: str
-    NETEASE_PAPER_DOLL: str
-    ITEM_RENDERER: str
-    GRADIENT_RENDERER: str
-    SCROLL_VIEW: str
-    GRID: str
-    PROGRESS_BAR: str
-    TOGGLE: str
-    SLIDER: str
-    SELECTION_WHEEL: str
-    COMBO_BOX: str
-    MINI_MAP: str
+    BASE_CONTROL = ...
+    BUTTON = ...
+    IMAGE = ...
+    LABEL = ...
+    PANEL = ...
+    INPUT_PANEL = ...
+    STACK_PANEL = ...
+    EDIT_BOX = ...
+    PAPER_DOLL = ...
+    NETEASE_PAPER_DOLL = ...
+    ITEM_RENDERER = ...
+    GRADIENT_RENDERER = ...
+    SCROLL_VIEW = ...
+    GRID = ...
+    PROGRESS_BAR = ...
+    TOGGLE = ...
+    SLIDER = ...
+    SELECTION_WHEEL = ...
+    COMBO_BOX = ...
+    MINI_MAP = ...
     _AS_BASE: STuple
 
 
 class Mob(StrEnum):
-    ALLAY: str
-    ARMADILLO: str
-    BAT: str
-    CAMEL: str
-    CHICKEN: str
-    COD: str
-    COPPER_GOLEM: str
-    COW: str
-    DONKEY: str
-    GLOW_SQUID: str
-    HAPPY_GHAST: str
-    HORSE: str
-    MOOSHROOM: str
-    MULE: str
-    PARROT: str
-    PIG: str
-    RABBIT: str
-    SALMON: str
-    SHEEP: str
-    SKELETON_HORSE: str
-    SNIFFER: str
-    SQUID: str
-    STRIDER: str
-    TADPOLE: str
-    TROPICALFISH: str
-    TURTLE: str
-    WANDERING_TRADER: str
-    PUFFERFISH: str
-    GOAT: str
-    VILLAGER: str
-    VILLAGER_V2: str
-    AXOLOTL: str
-    CAT: str
-    FROG: str
-    OCELOT: str
-    SNOW_GOLEM: str
-    BEE: str
-    DOLPHIN: str
-    FOX: str
-    IRON_GOLEM: str
-    LLAMA: str
-    PANDA: str
-    POLAR_BEAR: str
-    TRADER_LLAMA: str
-    WOLF: str
-    ZOMBIE_HORSE: str
-    BLAZE: str
-    BOGGED: str
-    BREEZE: str
-    CREEPER: str
-    ELDER_GUARDIAN: str
-    ENDERMITE: str
-    EVOCATION_ILLAGER: str
-    GHAST: str
-    GUARDIAN: str
-    HOGLIN: str
-    HUSK: str
-    MAGMA_CUBE: str
-    PHANTOM: str
-    PIGLIN_BRUTE: str
-    PILLAGER: str
-    RAVAGER: str
-    SHULKER: str
-    SILVERFISH: str
-    SKELETON: str
-    SLIME: str
-    STRAY: str
-    VEX: str
-    VINDICATOR: str
-    WARDEN: str
-    WITCH: str
-    WITHER_SKELETON: str
-    ZOGLIN: str
-    ZOMBIE: str
-    ZOMBIE_VILLAGER: str
-    ZOMBIE_VILLAGER_V2: str
-    CREAKING: str
-    DROWNED: str
-    ENDERMAN: str
-    PIGLIN: str
-    SPIDER: str
-    CAVE_SPIDER: str
-    ZOMBIE_PIGMAN: str
-    ENDER_DRAGON: str
-    WITHER: str
+    ALLAY = ...
+    ARMADILLO = ...
+    BAT = ...
+    CAMEL = ...
+    CHICKEN = ...
+    COD = ...
+    COPPER_GOLEM = ...
+    COW = ...
+    DONKEY = ...
+    GLOW_SQUID = ...
+    HAPPY_GHAST = ...
+    HORSE = ...
+    MOOSHROOM = ...
+    MULE = ...
+    PARROT = ...
+    PIG = ...
+    RABBIT = ...
+    SALMON = ...
+    SHEEP = ...
+    SKELETON_HORSE = ...
+    SNIFFER = ...
+    SQUID = ...
+    STRIDER = ...
+    TADPOLE = ...
+    TROPICALFISH = ...
+    TURTLE = ...
+    WANDERING_TRADER = ...
+    PUFFERFISH = ...
+    GOAT = ...
+    VILLAGER = ...
+    VILLAGER_V2 = ...
+    AXOLOTL = ...
+    CAT = ...
+    FROG = ...
+    OCELOT = ...
+    SNOW_GOLEM = ...
+    BEE = ...
+    DOLPHIN = ...
+    FOX = ...
+    IRON_GOLEM = ...
+    LLAMA = ...
+    PANDA = ...
+    POLAR_BEAR = ...
+    TRADER_LLAMA = ...
+    WOLF = ...
+    ZOMBIE_HORSE = ...
+    BLAZE = ...
+    BOGGED = ...
+    BREEZE = ...
+    CREEPER = ...
+    ELDER_GUARDIAN = ...
+    ENDERMITE = ...
+    EVOCATION_ILLAGER = ...
+    GHAST = ...
+    GUARDIAN = ...
+    HOGLIN = ...
+    HUSK = ...
+    MAGMA_CUBE = ...
+    PHANTOM = ...
+    PIGLIN_BRUTE = ...
+    PILLAGER = ...
+    RAVAGER = ...
+    SHULKER = ...
+    SILVERFISH = ...
+    SKELETON = ...
+    SLIME = ...
+    STRAY = ...
+    VEX = ...
+    VINDICATOR = ...
+    WARDEN = ...
+    WITCH = ...
+    WITHER_SKELETON = ...
+    ZOGLIN = ...
+    ZOMBIE = ...
+    ZOMBIE_VILLAGER = ...
+    ZOMBIE_VILLAGER_V2 = ...
+    CREAKING = ...
+    DROWNED = ...
+    ENDERMAN = ...
+    PIGLIN = ...
+    SPIDER = ...
+    CAVE_SPIDER = ...
+    ZOMBIE_PIGMAN = ...
+    ENDER_DRAGON = ...
+    WITHER = ...
 
 
 class Feature(StrEnum):
-    END_CITY: str
-    FORTRESS: str
-    MANSION: str
-    MINESHAFT: str
-    MISSINGNO: str
-    MONUMENT: str
-    STRONGHOLD: str
-    TEMPLE: str
-    VILLAGE: str
-    SHIPWRECK: str
-    BURIED_TREASURE: str
-    RUINS: str
-    PILLAGER_OUTPOST: str
-    BASTION_REMNANT: str
-    RUINED_PORTAL: str
-    TRIAL_CHAMBERS: str
+    END_CITY = ...
+    FORTRESS = ...
+    MANSION = ...
+    MINESHAFT = ...
+    MISSINGNO = ...
+    MONUMENT = ...
+    STRONGHOLD = ...
+    TEMPLE = ...
+    VILLAGE = ...
+    SHIPWRECK = ...
+    BURIED_TREASURE = ...
+    RUINS = ...
+    PILLAGER_OUTPOST = ...
+    BASTION_REMNANT = ...
+    RUINED_PORTAL = ...
+    TRIAL_CHAMBERS = ...
 
 
 class UiContainer(StrEnum):
-    CRAFTING_TABLE: str
-    ENCHANTING_TABLE: str
-    BEACON: str
-    ANVIL: str
-    CHIPPED_ANVIL: str
-    DAMAGED_ANVIL: str
-    DEPRECATED_ANVIL: str
-    GRINDSTONE: str
-    CARTOGRAPHY_TABLE: str
-    STONECUTTER_BLOCK: str
-    LOOM: str
-    SMITHING_TABLE: str
-    VILLAGER: str
-    VILLAGER_V2: str
+    CRAFTING_TABLE = ...
+    ENCHANTING_TABLE = ...
+    BEACON = ...
+    ANVIL = ...
+    CHIPPED_ANVIL = ...
+    DAMAGED_ANVIL = ...
+    DEPRECATED_ANVIL = ...
+    GRINDSTONE = ...
+    CARTOGRAPHY_TABLE = ...
+    STONECUTTER_BLOCK = ...
+    LOOM = ...
+    SMITHING_TABLE = ...
+    VILLAGER = ...
+    VILLAGER_V2 = ...
 
 
 class Container(StrEnum):
-    CHEST: str
-    TRAPPED_CHEST: str
-    ENDER_CHEST: str
-    UNDYED_SHULKER_BOX: str
-    WHITE_SHULKER_BOX: str
-    ORANGE_SHULKER_BOX: str
-    MAGENTA_SHULKER_BOX: str
-    LIGHT_BLUE_SHULKER_BOX: str
-    YELLOW_SHULKER_BOX: str
-    LIME_SHULKER_BOX: str
-    PINK_SHULKER_BOX: str
-    GRAY_SHULKER_BOX: str
-    LIGHT_GRAY_SHULKER_BOX: str
-    CYAN_SHULKER_BOX: str
-    PURPLE_SHULKER_BOX: str
-    BLUE_SHULKER_BOX: str
-    BROWN_SHULKER_BOX: str
-    GREEN_SHULKER_BOX: str
-    RED_SHULKER_BOX: str
-    BLACK_SHULKER_BOX: str
-    BARREL: str
-    FURNACE: str
-    LIT_FURNACE: str
-    SMOKER: str
-    LIT_SMOKER: str
-    BLAST_FURNACE: str
-    LIT_BLAST_FURNACE: str
-    BREWING_STAND: str
-    DROPPER: str
-    DISPENSER: str
-    HOPPER: str
-    CRAFTER: str
-    CHEST_MINECART: str
-    CHEST_BOAT: str
-    HOPPER_MINECART: str
-    HORSE: str
-    DONKEY: str
-    MULE: str
-    CAMEL: str
-    TRADER_LLAMA: str
-    LLAMA: str
+    CHEST = ...
+    TRAPPED_CHEST = ...
+    ENDER_CHEST = ...
+    UNDYED_SHULKER_BOX = ...
+    WHITE_SHULKER_BOX = ...
+    ORANGE_SHULKER_BOX = ...
+    MAGENTA_SHULKER_BOX = ...
+    LIGHT_BLUE_SHULKER_BOX = ...
+    YELLOW_SHULKER_BOX = ...
+    LIME_SHULKER_BOX = ...
+    PINK_SHULKER_BOX = ...
+    GRAY_SHULKER_BOX = ...
+    LIGHT_GRAY_SHULKER_BOX = ...
+    CYAN_SHULKER_BOX = ...
+    PURPLE_SHULKER_BOX = ...
+    BLUE_SHULKER_BOX = ...
+    BROWN_SHULKER_BOX = ...
+    GREEN_SHULKER_BOX = ...
+    RED_SHULKER_BOX = ...
+    BLACK_SHULKER_BOX = ...
+    BARREL = ...
+    FURNACE = ...
+    LIT_FURNACE = ...
+    SMOKER = ...
+    LIT_SMOKER = ...
+    BLAST_FURNACE = ...
+    LIT_BLAST_FURNACE = ...
+    BREWING_STAND = ...
+    DROPPER = ...
+    DISPENSER = ...
+    HOPPER = ...
+    CRAFTER = ...
+    CHEST_MINECART = ...
+    CHEST_BOAT = ...
+    HOPPER_MINECART = ...
+    HORSE = ...
+    DONKEY = ...
+    MULE = ...
+    CAMEL = ...
+    TRADER_LLAMA = ...
+    LLAMA = ...
 
 
 class Effect(StrEnum):
-    SPEED: str
-    HASTE: str
-    STRENGTH: str
-    INSTANT_HEALTH: str
-    JUMP_BOOST: str
-    REGENERATION: str
-    RESISTANCE: str
-    FIRE_RESISTANCE: str
-    WATER_BREATHING: str
-    INVISIBILITY: str
-    NIGHT_VISION: str
-    HEALTH_BOOST: str
-    ABSORPTION: str
-    SATURATION: str
-    SLOW_FALLING: str
-    VILLAGE_HERO: str
-    SLOWDOWN: str
-    MINING_FATIGUE: str
-    INSTANT_DAMAGE: str
-    NAUSEA: str
-    BLINDNESS: str
-    HUNGER: str
-    WEAKNESS: str
-    POISON: str
-    WITHER: str
-    LEVITATION: str
-    FATAL_POISON: str
-    DARKNESS: str
-    WIND_CHARGED: str
-    WEAVING: str
-    OOZING: str
-    INFESTED: str
-    BAD_OMEN: str
-    TRIAL_OMEN: str
-    RAID_OMEN: str
+    SPEED = ...
+    HASTE = ...
+    STRENGTH = ...
+    INSTANT_HEALTH = ...
+    JUMP_BOOST = ...
+    REGENERATION = ...
+    RESISTANCE = ...
+    FIRE_RESISTANCE = ...
+    WATER_BREATHING = ...
+    INVISIBILITY = ...
+    NIGHT_VISION = ...
+    HEALTH_BOOST = ...
+    ABSORPTION = ...
+    SATURATION = ...
+    SLOW_FALLING = ...
+    VILLAGE_HERO = ...
+    SLOWDOWN = ...
+    MINING_FATIGUE = ...
+    INSTANT_DAMAGE = ...
+    NAUSEA = ...
+    BLINDNESS = ...
+    HUNGER = ...
+    WEAKNESS = ...
+    POISON = ...
+    WITHER = ...
+    LEVITATION = ...
+    FATAL_POISON = ...
+    DARKNESS = ...
+    WIND_CHARGED = ...
+    WEAVING = ...
+    OOZING = ...
+    INFESTED = ...
+    BAD_OMEN = ...
+    TRIAL_OMEN = ...
+    RAID_OMEN = ...
 
 
 class Biome(StrEnum):
-    OCEAN: StrEnum
-    PLAINS: StrEnum
-    DESERT: StrEnum
-    EXTREME_HILLS: StrEnum
-    FOREST: StrEnum
-    TAIGA: StrEnum
-    SWAMPLAND: StrEnum
-    RIVER: StrEnum
-    HELL: StrEnum
-    THE_END: StrEnum
-    LEGACY_FROZEN_OCEAN: StrEnum
-    FROZEN_RIVER: StrEnum
-    ICE_PLAINS: StrEnum
-    ICE_MOUNTAINS: StrEnum
-    MUSHROOM_ISLAND: StrEnum
-    MUSHROOM_ISLAND_SHORE: StrEnum
-    BEACH: StrEnum
-    DESERT_HILLS: StrEnum
-    FOREST_HILLS: StrEnum
-    TAIGA_HILLS: StrEnum
-    EXTREME_HILLS_EDGE: StrEnum
-    JUNGLE: StrEnum
-    JUNGLE_HILLS: StrEnum
-    JUNGLE_EDGE: StrEnum
-    DEEP_OCEAN: StrEnum
-    STONE_BEACH: StrEnum
-    COLD_BEACH: StrEnum
-    BIRCH_FOREST: StrEnum
-    BIRCH_FOREST_HILLS: StrEnum
-    ROOFED_FOREST: StrEnum
-    COLD_TAIGA: StrEnum
-    COLD_TAIGA_HILLS: StrEnum
-    MEGA_TAIGA: StrEnum
-    MEGA_TAIGA_HILLS: StrEnum
-    EXTREME_HILLS_PLUS_TREES: StrEnum
-    SAVANNA: StrEnum
-    SAVANNA_PLATEAU: StrEnum
-    MESA: StrEnum
-    MESA_PLATEAU_STONE: StrEnum
-    MESA_PLATEAU: StrEnum
-    WARM_OCEAN: StrEnum
-    DEEP_WARM_OCEAN: StrEnum
-    LUKEWARM_OCEAN: StrEnum
-    DEEP_LUKEWARM_OCEAN: StrEnum
-    COLD_OCEAN: StrEnum
-    DEEP_COLD_OCEAN: StrEnum
-    FROZEN_OCEAN: StrEnum
-    DEEP_FROZEN_OCEAN: StrEnum
-    BAMBOO_JUNGLE: StrEnum
-    BAMBOO_JUNGLE_HILLS: StrEnum
-    SUNFLOWER_PLAINS: StrEnum
-    DESERT_MUTATED: StrEnum
-    EXTREME_HILLS_MUTATED: StrEnum
-    FLOWER_FOREST: StrEnum
-    TAIGA_MUTATED: StrEnum
-    SWAMPLAND_MUTATED: StrEnum
-    ICE_PLAINS_SPIKES: StrEnum
-    JUNGLE_MUTATED: StrEnum
-    JUNGLE_EDGE_MUTATED: StrEnum
-    BIRCH_FOREST_MUTATED: StrEnum
-    BIRCH_FOREST_HILLS_MUTATED: StrEnum
-    ROOFED_FOREST_MUTATED: StrEnum
-    COLD_TAIGA_MUTATED: StrEnum
-    REDWOOD_TAIGA_MUTATED: StrEnum
-    REDWOOD_TAIGA_HILLS_MUTATED: StrEnum
-    EXTREME_HILLS_PLUS_TREES_MUTATED: StrEnum
-    SAVANNA_MUTATED: StrEnum
-    SAVANNA_PLATEAU_MUTATED: StrEnum
-    MESA_BRYCE: StrEnum
-    MESA_PLATEAU_STONE_MUTATED: StrEnum
-    MESA_PLATEAU_MUTATED: StrEnum
-    SOULSAND_VALLEY: StrEnum
-    CRIMSON_FOREST: StrEnum
-    WARPED_FOREST: StrEnum
-    BASALT_DELTAS: StrEnum
-    JAGGED_PEAKS: StrEnum
-    FROZEN_PEAKS: StrEnum
-    SNOWY_SLOPES: StrEnum
-    GROVE: StrEnum
-    MEADOW: StrEnum
-    LUSH_CAVES: StrEnum
-    DRIPSTONE_CAVES: StrEnum
-    STONY_PEAKS: StrEnum
-    DEEP_DARK: StrEnum
-    MANGROVE_SWAMP: StrEnum
-    CHERRY_GROVE: StrEnum
-    PALE_GARDEN: StrEnum
+    OCEAN = ...
+    PLAINS = ...
+    DESERT = ...
+    EXTREME_HILLS = ...
+    FOREST = ...
+    TAIGA = ...
+    SWAMPLAND = ...
+    RIVER = ...
+    HELL = ...
+    THE_END = ...
+    LEGACY_FROZEN_OCEAN = ...
+    FROZEN_RIVER = ...
+    ICE_PLAINS = ...
+    ICE_MOUNTAINS = ...
+    MUSHROOM_ISLAND = ...
+    MUSHROOM_ISLAND_SHORE = ...
+    BEACH = ...
+    DESERT_HILLS = ...
+    FOREST_HILLS = ...
+    TAIGA_HILLS = ...
+    EXTREME_HILLS_EDGE = ...
+    JUNGLE = ...
+    JUNGLE_HILLS = ...
+    JUNGLE_EDGE = ...
+    DEEP_OCEAN = ...
+    STONE_BEACH = ...
+    COLD_BEACH = ...
+    BIRCH_FOREST = ...
+    BIRCH_FOREST_HILLS = ...
+    ROOFED_FOREST = ...
+    COLD_TAIGA = ...
+    COLD_TAIGA_HILLS = ...
+    MEGA_TAIGA = ...
+    MEGA_TAIGA_HILLS = ...
+    EXTREME_HILLS_PLUS_TREES = ...
+    SAVANNA = ...
+    SAVANNA_PLATEAU = ...
+    MESA = ...
+    MESA_PLATEAU_STONE = ...
+    MESA_PLATEAU = ...
+    WARM_OCEAN = ...
+    DEEP_WARM_OCEAN = ...
+    LUKEWARM_OCEAN = ...
+    DEEP_LUKEWARM_OCEAN = ...
+    COLD_OCEAN = ...
+    DEEP_COLD_OCEAN = ...
+    FROZEN_OCEAN = ...
+    DEEP_FROZEN_OCEAN = ...
+    BAMBOO_JUNGLE = ...
+    BAMBOO_JUNGLE_HILLS = ...
+    SUNFLOWER_PLAINS = ...
+    DESERT_MUTATED = ...
+    EXTREME_HILLS_MUTATED = ...
+    FLOWER_FOREST = ...
+    TAIGA_MUTATED = ...
+    SWAMPLAND_MUTATED = ...
+    ICE_PLAINS_SPIKES = ...
+    JUNGLE_MUTATED = ...
+    JUNGLE_EDGE_MUTATED = ...
+    BIRCH_FOREST_MUTATED = ...
+    BIRCH_FOREST_HILLS_MUTATED = ...
+    ROOFED_FOREST_MUTATED = ...
+    COLD_TAIGA_MUTATED = ...
+    REDWOOD_TAIGA_MUTATED = ...
+    REDWOOD_TAIGA_HILLS_MUTATED = ...
+    EXTREME_HILLS_PLUS_TREES_MUTATED = ...
+    SAVANNA_MUTATED = ...
+    SAVANNA_PLATEAU_MUTATED = ...
+    MESA_BRYCE = ...
+    MESA_PLATEAU_STONE_MUTATED = ...
+    MESA_PLATEAU_MUTATED = ...
+    SOULSAND_VALLEY = ...
+    CRIMSON_FOREST = ...
+    WARPED_FOREST = ...
+    BASALT_DELTAS = ...
+    JAGGED_PEAKS = ...
+    FROZEN_PEAKS = ...
+    SNOWY_SLOPES = ...
+    GROVE = ...
+    MEADOW = ...
+    LUSH_CAVES = ...
+    DRIPSTONE_CAVES = ...
+    STONY_PEAKS = ...
+    DEEP_DARK = ...
+    MANGROVE_SWAMP = ...
+    CHERRY_GROVE = ...
+    PALE_GARDEN = ...
 
 
 ENTITY_NAME_MAP: Dict[int, Tuple[int, str, str]]

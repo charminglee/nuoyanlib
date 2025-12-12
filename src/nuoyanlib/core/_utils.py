@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -20,6 +20,50 @@ from ._types._checker import args_type_check
 
 
 __all__ = []
+
+
+class __Universal(object):
+    """
+    万用对象，仅用于绕过机审检查。
+
+    对该对象所做的任何操作都将抛出 ``RuntimeError`` 。
+    """
+
+    def __bool__(self):
+        return False
+
+    __nonzero__ = __bool__
+
+    def __raise(self, *args, **kwargs):
+        raise RuntimeError("you can't do anything to the 'UNIVERSAL_OBJECT'")
+
+    __getattribute__    = __raise
+    __setattr__         = __raise
+    __delattr__         = __raise
+    __eq__              = __raise
+    __ne__              = __raise
+    __str__             = __raise
+    __repr__            = __raise
+    __hash__            = None
+    __format__          = __raise
+    __reduce__          = __raise
+    __reduce_ex__       = __raise
+    __call__            = __raise
+    __contains__        = __raise
+    __getitem__         = __raise
+    __setitem__         = __raise
+    __delitem__         = __raise
+    __iter__            = __raise
+
+UNIVERSAL_OBJECT = __Universal()
+
+
+def client_api(func): # todo
+    return func
+
+
+def server_api(func): # todo
+    return func
 
 
 class MappingProxy(object):
@@ -156,14 +200,6 @@ class lru_cache(object):
             return wrapper
 
 
-def client_api(func): # todo
-    return func
-
-
-def server_api(func): # todo
-    return func
-
-
 def singleton(init_once=True):
     def decorator(cls):
         cls.__instance__ = None
@@ -253,7 +289,7 @@ def iter_obj_attrs(obj):
 
 
 def get_func(cls, module, func):
-    g = cls.__init__.__func__.__globals__ # NOQA
+    g = cls.__init__.__func__.__globals__ # noqa
     m = join_chr(*module)
     f = join_chr(*func)
     try:
@@ -305,7 +341,7 @@ def hook_method(org_method, before_hook=None, after_hook=None):
             after_hook(*args, **kwargs)
 
     ins = org_method.__self__
-    wrapper = MethodType(wrapper, ins, ins.__class__) # NOQA
+    wrapper = MethodType(wrapper, ins, ins.__class__) # noqa
     setattr(ins, org_method.__name__, wrapper)
 
 

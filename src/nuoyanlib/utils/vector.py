@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -113,7 +113,7 @@ class Vector(object):
 
         -----
 
-        :param is_3d: 是否返回三维向量
+        :param bool is_3d: 是否返回三维向量
 
         :return: 零向量
         :rtype: Vector
@@ -129,7 +129,7 @@ class Vector(object):
 
         -----
 
-        :param is_3d: 是否返回三维向量
+        :param bool is_3d: 是否返回三维向量
 
         :return: 所有分量均为1.0的向量
         :rtype: Vector
@@ -145,7 +145,7 @@ class Vector(object):
 
         -----
 
-        :param is_3d: 是否返回三维向量
+        :param bool is_3d: 是否返回三维向量
 
         :return: x分量为1.0，其余分量为0.0的向量
         :rtype: Vector
@@ -161,7 +161,7 @@ class Vector(object):
 
         -----
 
-        :param is_3d: 是否返回三维向量
+        :param bool is_3d: 是否返回三维向量
 
         :return: x分量为-1.0，其余分量为0.0的向量
         :rtype: Vector
@@ -177,7 +177,7 @@ class Vector(object):
 
         -----
 
-        :param is_3d: 是否返回三维向量
+        :param bool is_3d: 是否返回三维向量
 
         :return: y分量为1.0，其余分量为0.0的向量
         :rtype: Vector
@@ -193,7 +193,7 @@ class Vector(object):
 
         -----
 
-        :param is_3d: 是否返回三维向量
+        :param bool is_3d: 是否返回三维向量
 
         :return: y分量为1.0，其余分量为0.0的向量
         :rtype: Vector

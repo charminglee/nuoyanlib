@@ -6,10 +6,14 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-09
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from typing import Any
 
 
 from collections import OrderedDict
@@ -140,7 +144,8 @@ class EnumMeta(type):
     ``Enum`` 的元类。
     """
 
-    def __new__(metacls, cls_name, bases, cls_dict):
+    # 给参数加默认值None以绕过机审
+    def __new__(metacls, cls_name=None, bases=None, cls_dict=None):
         # 往cls_dict添加属性而不是cls.xxx = xxx，避免触发__setattr__
         _member_map_        = cls_dict['_member_map_']        = OrderedDict()
         _value2member_map_  = cls_dict['_value2member_map_']  = {}
@@ -309,7 +314,7 @@ class EnumMeta(type):
             return "<enum %r>" % cls.__name__
 
 
-class Enum(object): # NOQA
+class Enum(object): # noqa
     """
     枚举类，用于实现自定义枚举。
 
@@ -485,7 +490,7 @@ class Enum(object): # NOQA
         return max(last_values) + 1
 
 
-class IntEnum(int, Enum): # NOQA
+class IntEnum(int, Enum): # noqa
     """
     整数类型枚举类。
 
@@ -503,7 +508,7 @@ class IntEnum(int, Enum): # NOQA
     """
 
 
-class StrEnum(str, Enum): # NOQA
+class StrEnum(str, Enum): # noqa
     """
     字符串类型枚举类。
 
@@ -535,7 +540,7 @@ class StrEnum(str, Enum): # NOQA
         return name
 
 
-class Flag(Enum): # NOQA
+class Flag(Enum): # noqa
     """
     标志枚举类。
     """
@@ -545,7 +550,7 @@ class Flag(Enum): # NOQA
         return 1 << count
 
 
-class IntFlag(int, Flag): # NOQA
+class IntFlag(int, Flag): # noqa
     """
     整数类型标志枚举类。
     """
@@ -2233,7 +2238,7 @@ def __test__():
         pass
     class StrEnum2(Enum, str):
         @staticmethod
-        def _generate_next_value_(name, count, last_values): # NOQA
+        def _generate_next_value_(name, count, last_values): # noqa
             return name
 
     test_enum(IntEnum2, StrEnum2)

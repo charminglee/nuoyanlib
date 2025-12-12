@@ -6,10 +6,17 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
+
+
+if 0:
+    from typing import Any
+    from mod.client.ui.controls.buttonUIControl import ButtonUIControl
+    from mod.client.ui.controls.baseUIControl import BaseUIControl
+    from ..screen_node import ScreenNodeExtension
 
 
 import time
@@ -202,7 +209,7 @@ class NyButton(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param str cb_type: 回调类型，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
+        :param ButtonCallbackType cb_type: 回调类型，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
 
         :return: 是否成功
         :rtype: bool
@@ -218,7 +225,7 @@ class NyButton(InteractableControl, NyControl):
         -----
 
         :param function func: 要移除的回调函数
-        :param int cb_type: 回调类型，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
+        :param ButtonCallbackType cb_type: 回调类型，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
 
         :return: 是否成功
         :rtype: bool

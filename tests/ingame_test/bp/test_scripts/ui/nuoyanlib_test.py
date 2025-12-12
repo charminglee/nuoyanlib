@@ -6,14 +6,13 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
+|   Date  : 2025-12-12
 |
 | ====================================================
 """
 
 
 import mod.client.extraClientApi as c_api
-from mod.client.ui.viewRequest import ViewRequest
 from mod.common.minecraftEnum import *
 from ..common.mod_config import *
 from ..nuoyanlib import client as nyl
@@ -24,6 +23,11 @@ from ..nuoyanlib.client import (
     PLAYER_ID,
     event,
     ScreenNodeExtension,
+)
+from ..nuoyanlib.utils.enum import (
+    ControlType,
+    ButtonCallbackType,
+    ComboBoxCallbackType,
 )
 
 
@@ -61,17 +65,17 @@ class NuoyanlibTest(nyl.ClientEventProxy, ScreenNodeExtension, nyl.ScreenNode):
 
         self.build_binding(self.label_binding, nyl.ViewBinder.BF_BindString)
 
-        self.button.set_callback(self.OnButtonUp, nyl.enum.ButtonCallbackType.UP)
-        self.button.set_callback(self.OnButtonDown, nyl.enum.ButtonCallbackType.DOWN)
-        self.button.set_callback(self.OnButtonLongClick, nyl.enum.ButtonCallbackType.LONG_CLICK)
-        self.button.set_callback(self.OnButtonDoubleClick, nyl.enum.ButtonCallbackType.DOUBLE_CLICK)
+        self.button.set_callback(self.OnButtonUp, ButtonCallbackType.UP)
+        self.button.set_callback(self.OnButtonDown, ButtonCallbackType.DOWN)
+        self.button.set_callback(self.OnButtonLongClick, ButtonCallbackType.LONG_CLICK)
+        self.button.set_callback(self.OnButtonDoubleClick, ButtonCallbackType.DOUBLE_CLICK)
         (self.button / "toggle").to_toggle().set_callback(self.OnToggleChanged)
 
         self.switch_toggle.set_callback(self.OnToggleChanged1)
 
-        self.combo_box.set_callback(self.OnComboBoxOpen, nyl.enum.ComboBoxCallbackType.OPEN)
-        self.combo_box.set_callback(self.OnComboBoxClose, nyl.enum.ComboBoxCallbackType.CLOSE)
-        self.combo_box.set_callback(self.OnComboBoxSelect, nyl.enum.ComboBoxCallbackType.SELECT)
+        self.combo_box.set_callback(self.OnComboBoxOpen, ComboBoxCallbackType.OPEN)
+        self.combo_box.set_callback(self.OnComboBoxClose, ComboBoxCallbackType.CLOSE)
+        self.combo_box.set_callback(self.OnComboBoxSelect, ComboBoxCallbackType.SELECT)
         self.combo_box.bind_data(("选项%d" % i, None, i) for i in range(6))
 
     def label_binding(self):
@@ -97,11 +101,11 @@ class NuoyanlibTest(nyl.ClientEventProxy, ScreenNodeExtension, nyl.ScreenNode):
     def OnToggleChanged(self, args):
         print(1, args)
         self.move_parent = args['state']
-        return ViewRequest.Refresh
+        return nyl.ViewRequest.Refresh
 
     def OnToggleChanged1(self, args):
         print(2, args)
-        return ViewRequest.Refresh
+        return nyl.ViewRequest.Refresh
 
     def OnComboBoxOpen(self):
         print("combo_box_open")

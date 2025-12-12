@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
@@ -143,8 +143,16 @@ class NyGrid(NyControl):
     def bind_data(self, gd: GridData) -> None: ...
     def get_cell(self, index: int) -> Optional[NyControl]: ...
     def get_all_cells(self) -> List[NyControl]: ...
-    def set_callback(self, func: __GridCallbackType, cb_type: str = GridCallbackType.UPDATE) -> bool: ...
-    def remove_callback(self, func: __GridCallbackType, cb_type: str = GridCallbackType.UPDATE) -> bool: ...
+    def set_callback(
+        self,
+        func: __GridCallbackType,
+        cb_type: GridCallbackType = GridCallbackType.UPDATE,
+    ) -> bool: ...
+    def remove_callback(
+        self,
+        func: __GridCallbackType,
+        cb_type: GridCallbackType = GridCallbackType.UPDATE,
+    ) -> bool: ...
     GetCellIndex = get_cell_index
     UpdateGridData = update_grid_data
     BindData = bind_data
