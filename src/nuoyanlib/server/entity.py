@@ -16,7 +16,7 @@ import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import EntityType
 from ..core.server.comp import CF, LvComp
 from ..core.server import _lib_server
-from ..utils.mc_math import pos_distance, ray_aabb_intersection
+from ..utils.mc_math import distance, ray_aabb_intersection
 from ..utils.vector import vec_p2p, vec_composite
 
 
@@ -285,7 +285,7 @@ def entity_filter(entity_list, *args):
         for arg in args:
             if not arg:
                 continue
-            if isinstance(arg, tuple) and pos_distance(arg[0], ent_pos) > arg[1]:
+            if isinstance(arg, tuple) and distance(arg[0], ent_pos) > arg[1]:
                 return False
             if isinstance(arg, set):
                 for i in arg:
@@ -350,7 +350,7 @@ def sort_entity_list_by_dist(entity_list, pos):
         ep = CF(eid).Pos.GetFootPos()
         if not ep:
             not_exist.append(eid)
-        return pos_distance(ep, pos)
+        return distance(ep, pos)
     entity_list.sort(key=func)
     for i in not_exist:
         entity_list.remove(i)
@@ -734,9 +734,7 @@ def get_entities_by_ray(
     entities = entity_filter(
         entities, fa, filter_ids, filter_types, filter_type_str, {str(dimension)}
     )
-    entities.sort(
-        key=lambda x: pos_distance(CF(x).Pos.GetFootPos(), start_pos)
-    )
+    entities.sort(key=lambda x: distance(x, start_pos))
     ent_list = []
     for entity_id in entities:
         cf = CF(entity_id)

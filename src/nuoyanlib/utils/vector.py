@@ -929,13 +929,13 @@ def vec_rot_p2p(pos1, pos2):
     :return: 角度元组，分别为竖直角度、水平角度
     :rtype: tuple[float,float]
     """
-    from .mc_math import pos_distance
+    from .mc_math import distance
     x = pos2[0] - pos1[0]
     if x == 0:
         x = 0.000000001
     y = pos2[1] - pos1[1]
     z = pos2[2] - pos1[2]
-    hori_dis = pos_distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
+    hori_dis = distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
     if hori_dis == 0:
         hori_dis = 0.000000001
     horizontal_rot = (math.atan(z / x) / math.pi) * 180

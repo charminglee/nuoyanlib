@@ -18,7 +18,7 @@ from mod.common.minecraftEnum import AttrType, ActorDamageCause, EntityComponent
 from ..core._sys import get_lib_system
 from ..core.server.comp import CF, LvComp
 from ..core._utils import kwargs_setter
-from ..utils.mc_math import is_in_sector, pos_distance_square, is_in_cube, is_in_cylinder
+from ..utils.mc_math import is_in_sector, distance_square, is_in_cube, is_in_cylinder
 from .entity import get_all_entities
 
 
@@ -422,7 +422,7 @@ def sphere_damage(damage, r, pos, dim, **kwargs):
         ep = _get_basic_pos(eid, basic_pos)
         if not ep:
             return False
-        return pos_distance_square(ep, pos) <= r2
+        return distance_square(ep, pos) <= r2
     kwargs['ent_filter'] = _filter
 
     if visualize:

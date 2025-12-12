@@ -17,7 +17,7 @@ import mod.client.extraClientApi as c_api
 from mod.common.minecraftEnum import RayFilterType
 from ..core.client.comp import LvComp, PLAYER_ID, CF
 from ..utils.vector import vec_p2p, vec_angle
-from ..utils.mc_math import pos_distance
+from ..utils.mc_math import distance
 
 
 __all__ = [
@@ -62,7 +62,7 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=math.pi 
             continue
         target_dir = vec_p2p(center, ent_pos)
         angle = vec_angle(camera_dir, target_dir)
-        w_dist = pos_distance(center, ent_pos)
+        w_dist = distance(center, ent_pos)
         s_dist = 1 # todo
         if (
                 angle < angle_dist # todo

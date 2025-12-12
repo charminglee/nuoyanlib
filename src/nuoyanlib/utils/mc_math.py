@@ -6,35 +6,35 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
+|   Date  : 2025-12-13
 |
 | ====================================================
 """
 
 
-from math import degrees, atan2, sqrt, pi, sin, cos, floor, radians
-from random import uniform
+import math
+import random
 from mod.common.utils.mcmath import Vector3
 from mod.common.minecraftEnum import Facing
-from ..core._sys import get_comp_factory, get_api, LEVEL_ID
+from ..core._sys import get_comp_factory, get_api, LEVEL_ID, get_cf
 from .vector import Vector
 
 
 __all__ = [
     "distance2nearest_entity",
     "distance2nearest_player",
+    "distance2line",
+    "distance_square",
+    "distance",
     "range_map",
     "to_chunk_pos",
     "to_aabb",
-    "pos_distance_square",
     "clamp",
     "pos_block_facing",
     "to_polar_coordinate",
     "to_cartesian_coordinate",
     "probability",
-    "pos_distance_to_line",
     "pos_floor",
-    "pos_distance",
     "to_relative_pos",
     "to_screen_pos",
     "pos_rotate",
@@ -53,55 +53,107 @@ __all__ = [
 ]
 
 
+def _to_pos(target):
+    return get_cf(target).Pos.GetFootPos() if isinstance(target, str) else target
+
+
 def distance2nearest_entity(target):
     """
-    获取指定目标与其距离最近的实体的距离。
-    
+    计算坐标或实体与其距离最近的实体的距离。
+
     -----
-    
-    :param tuple[float,float,float]|str target: 目标，可传入坐标或实体ID
-    
-    :return: 目标与距离最近的实体的距离，若获取失败，返回-1
+
+    :param tuple[float,float,float]|str target: 坐标或实体ID
+
+    :return: 与距离最近的实体的距离，若计算失败，返回-1
     :rtype: float
     """
-    tp = CF(target).Pos.GetFootPos() if isinstance(target, str) else target
-    if not tp:
-        return -1
+    api = get_api()
     min_dist2 = -1
-    for entity_id in get_all_entities():
-        ep = CF(entity_id).Pos.GetFootPos()
-        if not ep:
-            continue
-        dist2 = pos_distance_square(tp, ep)
+    allEnts = api.GetEngineActor().keys() + api.GetPlayerList()
+    for entity_id in allEnts:
+        dist2 = distance_square(target, entity_id)
         if min_dist2 == -1 or dist2 < min_dist2:
             min_dist2 = dist2
-    return sqrt(min_dist2) if min_dist2 != -1 else -1
+    return math.sqrt(min_dist2) if min_dist2 != -1 else -1
 
 
 def distance2nearest_player(target):
     """
-    获取指定目标与其距离最近的玩家的距离。
-    
+    计算坐标或实体与其距离最近的玩家的距离。
+
     -----
-    
-    :param tuple[float,float,float]|str target: 目标，可传入坐标或实体ID
-    
-    :return: 目标与距离最近的玩家的距离，若获取失败，返回-1
+
+    :param tuple[float,float,float]|str target: 坐标或实体ID
+
+    :return: 与距离最近的玩家的距离，若计算失败，返回-1
     :rtype: float
     """
-    tp = CF(target).Pos.GetFootPos() if isinstance(target, str) else target
-    if not tp:
-        return -1
-    player_lst = get_api().GetPlayerList()
     min_dist2 = -1
+    player_lst = get_api().GetPlayerList()
     for player_id in player_lst:
-        pp = CF(player_id).Pos.GetFootPos()
-        if not pp:
-            continue
-        dist2 = pos_distance_square(tp, pp)
+        dist2 = distance_square(target, player_id)
         if min_dist2 == -1 or dist2 < min_dist2:
             min_dist2 = dist2
-    return sqrt(min_dist2) if min_dist2 != -1 else -1
+    return math.sqrt(min_dist2) if min_dist2 != -1 else -1
+
+
+def distance2line(target, line_pos1, line_pos2):
+    """
+    计算坐标或实体与某一直线的距离。
+
+    -----
+
+    :param tuple[float,float,float]|str target: 坐标或实体ID
+    :param tuple[float,float,float] line_pos1: 直线上任意一点的坐标
+    :param tuple[float,float,float] line_pos2: 直线上另一点的坐标，不能与line_pos1一致
+
+    :return: 与指定直线的距离
+    :rtype: float
+    """
+    a = distance(target, line_pos1)
+    b = distance(target, line_pos2)
+    c = distance(line_pos1, line_pos2)
+    p = (a + b + c) / 2
+    s = math.sqrt(p * (p - a) * (p - b) * (p - c)) # 海伦公式
+    h = s / c * 2
+    return h
+
+
+def distance_square(target1, target2):
+    """
+    计算两个坐标或实体间距离的平方，相比于直接计算距离速度更快。
+
+    -----
+
+    :param tuple[float]|str target1: 坐标或实体ID
+    :param tuple[float]|str target2: 坐标或实体ID
+
+    :return: 距离的平方，若任一坐标为None，返回-1
+    :rtype: float
+    """
+    p1, p2 = _to_pos(target1), _to_pos(target2)
+    if not p1 or not p2:
+        return -1
+    return sum((p1[i] - p2[i])**2 for i in range(len(p1)))
+
+
+def distance(target1, target2):
+    """
+    计算两个坐标或实体间的距离。
+
+    -----
+
+    :param tuple[float]|str target1: 坐标或实体ID
+    :param tuple[float]|str target2: 坐标或实体ID
+
+    :return: 距离，若任一坐标为None，返回-1
+    :rtype: float
+    """
+    dist2 = distance_square(target1, target2)
+    if dist2 == -1:
+        return -1
+    return math.sqrt(dist2)
 
 
 def range_map(x, output_range, input_range=(0, 1), func=lambda t: t):
@@ -159,23 +211,6 @@ def to_aabb(pos1, pos2):
     min_pos = (min(pos1[0], pos2[0]), min(pos1[1], pos2[1]), min(pos1[2], pos2[2]))
     max_pos = (max(pos1[0], pos2[0]), max(pos1[1], pos2[1]), max(pos1[2], pos2[2]))
     return min_pos, max_pos
-
-
-def pos_distance_square(pos1, pos2):
-    """
-    计算两个坐标间距离的平方，相比于直接计算距离速度更快。
-
-    -----
-
-    :param tuple[float] pos1: 坐标1
-    :param tuple[float] pos2: 坐标2
-
-    :return: 坐标距离的平方，若任一坐标为None，返回-1.0
-    :rtype: float
-    """
-    if not pos1 or not pos2:
-        return -1.0
-    return sum((a - b) ** 2 for a, b in zip(pos1, pos2))
 
 
 def clamp(x, min_value, max_value):
@@ -242,10 +277,10 @@ def to_polar_coordinate(coordinate, rad=False, origin=(0, 0)):
     x, y = coordinate
     x -= origin[0]
     y -= origin[1]
-    r = sqrt(x ** 2 + y ** 2)
-    theta = atan2(y, x)
+    r = math.sqrt(x ** 2 + y ** 2)
+    theta = math.atan2(y, x)
     if not rad:
-        theta = degrees(theta)
+        theta = math.degrees(theta)
     return r, theta
 
 
@@ -264,9 +299,9 @@ def to_cartesian_coordinate(coordinate, rad=False, origin=(0, 0)):
     """
     r, theta = coordinate
     if not rad:
-        theta = radians(theta)
-    x = r * cos(theta) + origin[0]
-    y = r * sin(theta) + origin[1]
+        theta = math.radians(theta)
+    x = r * math.cos(theta) + origin[0]
+    y = r * math.sin(theta) + origin[1]
     return x, y
 
 
@@ -281,29 +316,7 @@ def probability(p):
     :return: 以p的概率返回True，否则返回False
     :rtype: bool
     """
-    return p > 0 and uniform(0, 1) <= p
-
-
-def pos_distance_to_line(pos, line_pos1, line_pos2):
-    """
-    计算指定坐标 ``pos`` 与指定直线的距离。
-
-    -----
-
-    :param tuple[float,float,float] pos: 指定坐标
-    :param tuple[float,float,float] line_pos1: 指定直线上的坐标1
-    :param tuple[float,float,float] line_pos2: 指定直线上的坐标2
-        
-    :return: pos与指定直线的距离
-    :rtype: float
-    """
-    a = pos_distance(pos, line_pos1)
-    b = pos_distance(pos, line_pos2)
-    c = pos_distance(line_pos1, line_pos2)
-    p = (a + b + c) / 2
-    s = sqrt(p * (p - a) * (p - b) * (p - c)) # 海伦公式
-    h = s / c * 2
-    return h
+    return p > 0 and random.uniform(0, 1) <= p
 
 
 def pos_floor(pos):
@@ -319,26 +332,7 @@ def pos_floor(pos):
     :return: 取整后的坐标
     :rtype: tuple[int]
     """
-    return tuple(int(floor(i)) for i in pos)
-
-
-def pos_distance(pos1, pos2):
-    """
-    计算两个坐标间的距离。
-
-    支持n维坐标。
-
-    -----
-
-    :param tuple[float] pos1: 坐标1
-    :param tuple[float] pos2: 坐标2
-        
-    :return: 坐标距离，若任一坐标为None，返回-1.0
-    :rtype: float
-    """
-    if not pos1 or not pos2:
-        return -1.0
-    return sqrt(sum((a - b)**2 for a, b in zip(pos1, pos2)))
+    return tuple(int(math.floor(i)) for i in pos)
 
 
 def to_relative_pos(entity_pos1, entity_pos2):
@@ -405,9 +399,9 @@ def pos_rotate(angle, pos):
     """
     if not angle or not pos:
         return
-    radian = (-angle / 180) * pi
-    rotate_x = cos(radian) * pos[0] - sin(radian) * pos[1]
-    rotate_y = cos(radian) * pos[1] + sin(radian) * pos[0]
+    radian = (-angle / 180) * math.pi
+    rotate_x = math.cos(radian) * pos[0] - math.sin(radian) * pos[1]
+    rotate_y = math.cos(radian) * pos[1] + math.sin(radian) * pos[0]
     return rotate_x, rotate_y
 
 
@@ -608,12 +602,12 @@ def is_in_sector(pos, r, angle, center, direction):
     dist2 = v.length2
     if dist2 > r**2:
         return False
-    v_len = sqrt(dist2)
+    v_len = math.sqrt(dist2)
     if v_len <= 0:
         return True
     cos_alpha = v.dot(direction) / v_len
-    theta = radians(angle)
-    cos_theta_half = cos(theta / 2.0)
+    theta = math.radians(angle)
+    cos_theta_half = math.cos(theta / 2.0)
     return cos_alpha >= cos_theta_half
 
 
@@ -731,7 +725,7 @@ def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter
     :param list[str]|None filter_blocks: 过滤的方块ID列表，默认过滤空气
 
     :return: 射线经过的方块的列表，顺序为由近到远，列表每个元素为一个字典，字典结构请见上方
-    :rtype: list[dict[str, str|int|tuple]]
+    :rtype: list[dict[str,str|int|tuple]]
     """
     if filter_blocks is None:
         filter_blocks = ["minecraft:air"]
@@ -741,8 +735,8 @@ def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter
         d = direction[n]
         if d == 0:
             continue
-        start = int(floor(s))
-        end = int(floor(s + d * length))
+        start = int(math.floor(s))
+        end = int(math.floor(s + d * length))
         step_range = range(start + 1, end + 1) if d > 0 else range(start, end, -1)
         for i in step_range:
             t_list.append((i - s) / d)
@@ -758,7 +752,7 @@ def get_blocks_by_ray(start_pos, direction, length, dimension=0, count=0, filter
             intersection[n] = pos_val
             if pos_val.is_integer() and direction[n] < 0:
                 pos_val -= 1
-            block_pos[n] = int(floor(pos_val))
+            block_pos[n] = int(math.floor(pos_val))
         block_pos = tuple(block_pos)
         block = comp.GetBlockNew(block_pos, dimension)
         if block and block['name'] not in filter_blocks:
