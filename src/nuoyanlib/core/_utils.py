@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-13
+|   Date  : 2025-12-15
 |
 | ====================================================
 """
@@ -20,6 +20,15 @@ from ._types._checker import args_type_check
 
 
 __all__ = []
+
+
+def inject_is_client(is_client):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(is_client, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 class __Universal(object):

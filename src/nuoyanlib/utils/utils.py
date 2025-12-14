@@ -169,8 +169,8 @@ def notify_error(player_id=None):
     :rtype: None
     """
     from traceback import format_exc
-    lv_comp = get_lv_comp()
     ic = is_client()
+    lv_comp = get_lv_comp(ic)
     for line in format_exc().splitlines():
         if ic:
             lv_comp.TextNotifyClient.SetLeftCornerNotify(line)

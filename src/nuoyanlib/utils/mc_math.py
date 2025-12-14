@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-12-13
+|   Date  : 2025-12-15
 |
 | ====================================================
 """
@@ -17,6 +17,8 @@ import random
 from mod.common.utils.mcmath import Vector3
 from mod.common.minecraftEnum import Facing
 from ..core._sys import get_comp_factory, get_api, LEVEL_ID, get_cf
+from ..core._doc import signature
+from ..core._utils import inject_is_client
 from .vector import Vector
 
 
@@ -28,7 +30,7 @@ __all__ = [
     "distance",
     "range_map",
     "to_chunk_pos",
-    "to_aabb",
+    "aabb_min_max",
     "clamp",
     "pos_block_facing",
     "to_polar_coordinate",
@@ -53,49 +55,77 @@ __all__ = [
 ]
 
 
+_INF = float('inf')
+_NAN = float('nan')
+
+
 def _to_pos(target):
     return get_cf(target).Pos.GetFootPos() if isinstance(target, str) else target
 
 
-def distance2nearest_entity(target):
+def _get_dim(entity_id):
+    return get_cf(entity_id, False).Dimension.GetEntityDimensionId()
+
+
+@signature(start=1)
+@inject_is_client
+def distance2nearest_entity(_is_client_, target, dim=None):
     """
     计算坐标或实体与其距离最近的实体的距离。
 
     -----
 
     :param tuple[float,float,float]|str target: 坐标或实体ID
+    :param int|None dim: 维度ID；若当前为客户端或 target 为实体ID，可忽略该参数；默认为 None
 
-    :return: 与距离最近的实体的距离，若计算失败，返回-1
+    :return: 与距离最近的实体的距离；若找不到最近实体，返回 float('inf')
     :rtype: float
     """
-    api = get_api()
-    min_dist2 = -1
-    allEnts = api.GetEngineActor().keys() + api.GetPlayerList()
-    for entity_id in allEnts:
+    api = get_api(_is_client_)
+    if not _is_client_ and isinstance(target, str):
+        dim = _get_dim(target)
+
+    min_dist2 = _INF
+    all_entities = api.GetEngineActor()
+    for player_id in api.GetPlayerList():
+        all_entities[player_id] = {'dimensionId': _get_dim(player_id)}
+
+    for entity_id, data in all_entities:
+        if not _is_client_ and data['dimensionId'] != dim:
+            continue
         dist2 = distance_square(target, entity_id)
-        if min_dist2 == -1 or dist2 < min_dist2:
+        if dist2 < min_dist2:
             min_dist2 = dist2
-    return math.sqrt(min_dist2) if min_dist2 != -1 else -1
+    return math.sqrt(min_dist2)
 
 
-def distance2nearest_player(target):
+@signature(start=1)
+@inject_is_client
+def distance2nearest_player(_is_client_, target, dim=None):
     """
     计算坐标或实体与其距离最近的玩家的距离。
 
     -----
 
     :param tuple[float,float,float]|str target: 坐标或实体ID
+    :param int|None dim: 维度ID；若当前为客户端或 target 为实体ID，可忽略该参数；默认为 None
 
-    :return: 与距离最近的玩家的距离，若计算失败，返回-1
+    :return: 与距离最近的玩家的距离；若找不到最近玩家，返回 float('inf')
     :rtype: float
     """
-    min_dist2 = -1
-    player_lst = get_api().GetPlayerList()
-    for player_id in player_lst:
+    api = get_api(_is_client_)
+    if not _is_client_ and isinstance(target, str):
+        dim = _get_dim(target)
+
+    min_dist2 = _INF
+    all_players = api.GetPlayerList()
+    for player_id in all_players:
+        if not _is_client_ and _get_dim(player_id) != dim:
+            continue
         dist2 = distance_square(target, player_id)
-        if min_dist2 == -1 or dist2 < min_dist2:
+        if dist2 < min_dist2:
             min_dist2 = dist2
-    return math.sqrt(min_dist2) if min_dist2 != -1 else -1
+    return math.sqrt(min_dist2)
 
 
 def distance2line(target, line_pos1, line_pos2):
@@ -108,12 +138,14 @@ def distance2line(target, line_pos1, line_pos2):
     :param tuple[float,float,float] line_pos1: 直线上任意一点的坐标
     :param tuple[float,float,float] line_pos2: 直线上另一点的坐标，不能与line_pos1一致
 
-    :return: 与指定直线的距离
+    :return: 与指定直线的距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
     a = distance(target, line_pos1)
     b = distance(target, line_pos2)
     c = distance(line_pos1, line_pos2)
+    if a is _INF or b is _INF or c is _INF:
+        return _INF
     p = (a + b + c) / 2
     s = math.sqrt(p * (p - a) * (p - b) * (p - c)) # 海伦公式
     h = s / c * 2
@@ -129,12 +161,12 @@ def distance_square(target1, target2):
     :param tuple[float]|str target1: 坐标或实体ID
     :param tuple[float]|str target2: 坐标或实体ID
 
-    :return: 距离的平方，若任一坐标为None，返回-1
+    :return: 距离的平方；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
     p1, p2 = _to_pos(target1), _to_pos(target2)
     if not p1 or not p2:
-        return -1
+        return _INF
     return sum((p1[i] - p2[i])**2 for i in range(len(p1)))
 
 
@@ -147,13 +179,10 @@ def distance(target1, target2):
     :param tuple[float]|str target1: 坐标或实体ID
     :param tuple[float]|str target2: 坐标或实体ID
 
-    :return: 距离，若任一坐标为None，返回-1
+    :return: 距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
-    dist2 = distance_square(target1, target2)
-    if dist2 == -1:
-        return -1
-    return math.sqrt(dist2)
+    return math.sqrt(distance_square(target1, target2))
 
 
 def range_map(x, output_range, input_range=(0, 1), func=lambda t: t):
@@ -179,7 +208,7 @@ def range_map(x, output_range, input_range=(0, 1), func=lambda t: t):
 
 def to_chunk_pos(pos):
     """
-    将世界坐标转换为所在区块坐标。
+    将世界坐标转换为区块坐标。
 
     -----
 
@@ -194,20 +223,18 @@ def to_chunk_pos(pos):
     return int(pos[0] // 16), int(pos[2] // 16)
 
 
-def to_aabb(pos1, pos2):
+def aabb_min_max(pos1, pos2):
     """
-    将任意两点坐标转换为以这两点为顶点的长方体区域的最小点和最大点（AABB）。
+    根据任意两个对角坐标，计算以这两点为顶点的立方体（AABB）的最小点和最大点坐标。
 
     -----
 
-    :param tuple[float,float,float] pos1: 坐标1
-    :param tuple[float,float,float] pos2: 坐标2
+    :param tuple[float,float,float] pos1: 对角坐标1
+    :param tuple[float,float,float] pos2: 对角坐标2
 
     :return: 最小点和最大点坐标
     :rtype: tuple[tuple[float,float,float],tuple[float,float,float]]|None
     """
-    if not pos1 or not pos2:
-        return
     min_pos = (min(pos1[0], pos2[0]), min(pos1[1], pos2[1]), min(pos1[2], pos2[2]))
     max_pos = (max(pos1[0], pos2[0]), max(pos1[1], pos2[1]), max(pos1[2], pos2[2]))
     return min_pos, max_pos
@@ -563,7 +590,7 @@ def is_in_cylinder(pos, r, center1, center2):
     :param tuple[float,float,float] center1: 圆柱体底面中心坐标
     :param tuple[float,float,float] center2: 圆柱体另一底面中心坐标
 
-    :return: 在圆柱体区域内则返回True，否则返回False
+    :return: 是否在圆柱体区域内
     :rtype: bool
     """
     pos = Vector(pos)
@@ -580,19 +607,20 @@ def is_in_cylinder(pos, r, center1, center2):
     dist2 = pos_len2 - t * t * axis_len2
     return dist2 <= r2
 
+
 def is_in_sector(pos, r, angle, center, direction):
     """
     判断给定坐标是否在扇形区域内。
 
     -----
 
-    :param tuple[float,float,float] pos: 待测试的坐标
+    :param tuple[float,float,float] pos: 坐标
     :param float r: 扇形半径
     :param float angle: 扇形张开的角度
     :param tuple[float,float,float] center: 扇形圆心坐标
     :param tuple[float,float,float] direction: 扇形方向向量
 
-    :return: 在扇形区域内则返回True，否则返回False
+    :return: 是否在扇形区域内
     :rtype: bool
     """
     pos = Vector(pos)
@@ -615,30 +643,27 @@ def _num_in_range(num, r1, r2):
     return r1 <= num <= r2 or r2 <= num <= r1
 
 
-def is_in_cube(obj, pos1, pos2, ignore_y=False):
+def is_in_cube(target, pos1, pos2, ignore_y=False):
     """
-    判断对象是否在立方体区域内。
+    判断坐标或实体是否在立方体区域内。
         
     -----
     
-    :param str|tuple[float,float,float] obj: 实体ID或坐标
+    :param tuple[float,float,float]|str target: 实体ID或坐标
     :param tuple[float,float,float] pos1: 立方体对角顶点坐标1
     :param tuple[float,float,float] pos2: 立方体对角顶点坐标2
-    :param bool ignore_y: 是否忽略Y轴
+    :param bool ignore_y: 是否忽略Y轴，默认为False
         
-    :return: 在立方体区域内返回True，否则返回False
+    :return: 是否在立方体区域内
     :rtype: bool
     """
-    if isinstance(obj, str):
-        target_pos = get_comp_factory().CreatePos(obj).GetFootPos()
-    else:
-        target_pos = obj
-    if not target_pos or not pos1 or not pos2:
+    tp = _to_pos(target)
+    if not tp or not pos1 or not pos2:
         return False
     for i in range(3):
         if ignore_y and i == 1:
             continue
-        if not _num_in_range(target_pos[i], pos1[i], pos2[i]):
+        if not (pos1[i] <= tp[i] <= pos2[i] or pos2[i] <= tp[i] <= pos1[i]):
             return False
     return True
 

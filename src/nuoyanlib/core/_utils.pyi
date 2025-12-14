@@ -7,7 +7,7 @@
 |   Author: Nuoyan
 |   Email : 1279735247@qq.com
 |   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-12-12
+|   Date  : 2025-12-15
 |
 | ==============================================
 """
@@ -21,6 +21,9 @@ from ._types._checker import args_type_check
 
 
 __T_type = TypeVar("__T_type", bound=type)
+
+
+def inject_is_client(is_client: bool) -> FuncDecorator: ...
 
 
 class __Universal(object):
