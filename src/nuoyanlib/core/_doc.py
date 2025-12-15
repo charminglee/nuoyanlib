@@ -6,7 +6,7 @@
 |
 |   Author: `Nuoyan <https://github.com/charminglee>`_
 |   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
+|   Date  : 2025-12-15
 |
 | ====================================================
 """
@@ -18,15 +18,22 @@ import re
 __all__ = []
 
 
-def signature(s):
+def signature(s="", start=None):
     def decorator(func):
-        _s = "%s(%s)" % (func.__name__, s)
-        doc = getattr(func, '__doc__', "")
+        if not s:
+            _s = ""
+        else:
+            _s = s
+
+        _s = "%s(%s)" % (func.__name__, _s)
+
+        doc = getattr(func, '__doc__', None)
         if not doc:
             doc = _s
         else:
             doc = _s + "\n" + doc
         func.__doc__ = doc
+
         return func
     return decorator
 
