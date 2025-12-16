@@ -1,22 +1,17 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-07
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
-from typing import Union, TypeVar, Sequence, Any, List, Callable, Tuple, Optional
+from typing import Union, Sequence, Any, List, Callable, Tuple, Optional
 from ..core._types._typing import FTuple2, ITuple3, FTuple3
-
-
-_T_type = TypeVar("_T_type", bound=type)
 
 
 def rgb_to_hex(rgb_color: Union[FTuple3, ITuple3], with_sign: bool = True, upper: bool = True) -> str: ...

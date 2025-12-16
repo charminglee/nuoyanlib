@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-11-24
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 def save_setting(name: str, data_dict: dict, is_global: bool = True) -> bool: ...

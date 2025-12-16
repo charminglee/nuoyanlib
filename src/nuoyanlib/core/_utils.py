@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-15
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 import traceback
@@ -19,16 +17,17 @@ from ._doc import signature
 from ._types._checker import args_type_check
 
 
-__all__ = []
+def inject_is_client(func):
+    @wraps(func)
+    def c(*args, **kwargs):
+        return func(True, *args, **kwargs)
 
+    @wraps(func)
+    def s(*args, **kwargs):
+        return func(False, *args, **kwargs)
 
-def inject_is_client(is_client):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            return func(is_client, *args, **kwargs)
-        return wrapper
-    return decorator
+    func._nyl_inject_is_client = (c, s)
+    return func
 
 
 class __Universal(object):
@@ -257,7 +256,7 @@ def kwargs_setter(**kwargs):
         co = func.__code__
         sgn = co.co_varnames[:co.co_argcount]
 
-        # 设置完整的函数签名，用于文档生成
+        # 设置完整的函数签名（用于文档生成）
         sgn_str = ", ".join(sgn)
         sgn_str += ", *, "
         sgn_str += ", ".join("%s=%s" % i for i in kwargs.items())
@@ -347,7 +346,13 @@ def hook_method(org_method, before_hook=None, after_hook=None):
             except:
                 pass
         if after_hook:
-            after_hook(*args, **kwargs)
+            try:
+                after_hook(*args, **kwargs)
+            except:
+                try:
+                    traceback.print_exc()
+                except:
+                    pass
 
     ins = org_method.__self__
     wrapper = MethodType(wrapper, ins, ins.__class__) # noqa

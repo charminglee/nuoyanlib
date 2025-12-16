@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-02
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 # todo：Entity类、Player类，对事件返回的entityId、playerId进行封装

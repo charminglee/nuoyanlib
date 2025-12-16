@@ -1,22 +1,27 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
-|
-|   「nuoyanlib」通用工具库。
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 from .mc_math import *
 from . import enum
-from .enum import Enum
+from .enum import (
+    Enum,
+    auto,
+    IntEnum,
+    StrEnum,
+    Flag,
+    IntFlag,
+    gen_lower_name,
+    gen_minecraft_lower_name
+)
 from .item import *
 from .mc_random import *
 from .timer import *

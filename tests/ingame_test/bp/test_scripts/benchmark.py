@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-04
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 from collections import OrderedDict
@@ -41,7 +39,7 @@ class Timer(object):
 def print_msg(msg):
     print(msg)
     if is_client():
-        get_lv_comp().Game.SetNotifyMsg(str(msg))
+        get_lv_comp().TextNotifyClient.SetLeftCornerNotify(str(msg))
     else:
         get_lv_comp().Msg.NotifyOneMessage(s_api.GetPlayerList()[0], str(msg))
 

@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-11
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 import random
@@ -21,9 +19,6 @@ from ..listener import ClientEventProxy, _lib_sys_event
 from .comp import ClientSystem, CF, LvComp
 from ... import config
 from ...utils.time_ease import TimeEase
-
-
-__all__ = []
 
 
 @singleton

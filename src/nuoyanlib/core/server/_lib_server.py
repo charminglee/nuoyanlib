@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-03
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 import mod.server.extraServerApi as s_api
@@ -19,9 +17,6 @@ from .._sys import NuoyanLibBaseSystem, load_extensions
 from ..listener import ServerEventProxy, _lib_sys_event
 from .comp import ServerSystem, CF
 from ... import config
-
-
-__all__ = []
 
 
 @singleton

@@ -1,29 +1,23 @@
 # -*- coding: utf-8 -*-
-"""
-| ==============================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: Nuoyan
-|   Email : 1279735247@qq.com
-|   Gitee : https://gitee.com/charming-lee
-|   Date  : 2025-12-15
-|
-| ==============================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 import sys
 from types import MethodType
-from typing import Hashable, List, TypeVar, Callable, Any, Dict, Union, Tuple, Optional, Generator, overload
-from ._types._typing import Self, ITuple, T, F, FuncDecorator, ClassDecorator
+from typing import Hashable, List, Callable, Any, Dict, Union, Tuple, Optional, Generator, overload
+from ._types._typing import Self, ITuple, T, F, T_type
 from ._types._checker import args_type_check
 
 
-__T_type = TypeVar("__T_type", bound=type)
-
-
-def inject_is_client(is_client: bool) -> FuncDecorator: ...
+def inject_is_client(func: F) -> F: ...
 
 
 class __Universal(object):
@@ -61,9 +55,9 @@ class lru_cache(object):
 
 
 @overload
-def singleton(init_once: bool = True) -> ClassDecorator: ...
+def singleton(init_once: bool = True) -> Callable[[T_type], T_type]: ...
 @overload
-def singleton(init_once: __T_type) -> __T_type: ...
+def singleton(init_once: T_type) -> T_type: ...
 
 
 class cached_property(object):
@@ -73,7 +67,7 @@ class cached_property(object):
     def __get__(self, ins: Any, cls: type) -> Any: ...
 
 
-def kwargs_setter(**kwargs: Any) -> FuncDecorator: ...
+def kwargs_setter(**kwargs: Any) -> Callable[[F], F]: ...
 def try_exec(func: Callable, *args: Any, **kwargs: Any) -> Union[Any, Exception]: ...
 def iter_obj_attrs(obj: Any) -> Generator[Any]: ...
 def get_func(cls: type, module: ITuple, func: ITuple) -> Optional[Callable]: ...

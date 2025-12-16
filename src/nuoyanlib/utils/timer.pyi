@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-05
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 from typing import Callable, Any, Optional, overload, Hashable, Dict
 from threading import Timer as _Timer
 from mod.common.utils.timer import CallLater
-from ..core._types._typing import Self, F, FuncDecorator
+from ..core._types._typing import Self, F
 
 
 _c_delay_timers: Dict[Hashable, CallLater]
@@ -26,11 +24,11 @@ _s_repeat_timers: Dict[Hashable, CallLater]
 
 def _set_timer(t: float, func: Callable[[], Any], is_repeat: bool, key: Optional[Hashable]) -> None: ...
 @overload
-def delay(t: float = 0, key: Optional[Hashable] = None) -> FuncDecorator: ...
+def delay(t: float = 0, key: Optional[Hashable] = None) -> Callable[[F], F]: ...
 @overload
 def delay(t: F, key: Optional[Hashable] = None) -> F: ...
 @overload
-def repeat(t: float = 0, key: Optional[Hashable] = None) -> FuncDecorator: ...
+def repeat(t: float = 0, key: Optional[Hashable] = None) -> Callable[[F], F]: ...
 @overload
 def repeat(t: F, key: Optional[Hashable] = None) -> F: ...
 

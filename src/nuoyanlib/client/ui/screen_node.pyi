@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-13
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 from typing import List, Tuple, Iterator, TypedDict, ClassVar, Optional, overload, Any, Dict, Type, Generator, Callable, Union
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.system.clientSystem import ClientSystem
-from ...core._types._typing import Self, FTuple2, Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, T, FuncDecorator
+from ...core._types._typing import Self, FTuple2, Args, Kwargs, UiPathOrControl, NyControlTypes, ArgsDict, T, F
 from .nyc import *
 from ...utils.enum import ButtonCallbackType
 
@@ -135,7 +133,7 @@ class ScreenNodeExtension(object):
         btn_path: str,
         *callback_types: ButtonCallbackType,
         touch_event_params: Optional[dict] = None,
-    ) -> FuncDecorator: ...
+    ) -> Callable[[F], F]: ...
     def _process_button_callback(self) -> None: ...
     def _expend_path(self, path: str) -> Generator[str]: ...
     def clear_all_pos_data(self) -> bool: ...

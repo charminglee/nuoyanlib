@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-15
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 import math
@@ -67,8 +65,8 @@ def _get_dim(entity_id):
     return get_cf(entity_id, False).Dimension.GetEntityDimensionId()
 
 
-@signature(start=1)
 @inject_is_client
+@signature(start=1)
 def distance2nearest_entity(_is_client_, target, dim=None):
     """
     计算坐标或实体与其距离最近的实体的距离。
@@ -99,8 +97,8 @@ def distance2nearest_entity(_is_client_, target, dim=None):
     return math.sqrt(min_dist2)
 
 
-@signature(start=1)
 @inject_is_client
+@signature(start=1)
 def distance2nearest_player(_is_client_, target, dim=None):
     """
     计算坐标或实体与其距离最近的玩家的距离。
@@ -144,7 +142,7 @@ def distance2line(target, line_pos1, line_pos2):
     a = distance(target, line_pos1)
     b = distance(target, line_pos2)
     c = distance(line_pos1, line_pos2)
-    if a is _INF or b is _INF or c is _INF:
+    if a == _INF or b == _INF or c == _INF:
         return _INF
     p = (a + b + c) / 2
     s = math.sqrt(p * (p - a) * (p - b) * (p - c)) # 海伦公式

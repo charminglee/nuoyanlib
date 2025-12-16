@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-12
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 from typing import ClassVar, Callable, Optional, Tuple, Generator, List, Any, Dict, Set, overload
 from types import MethodType
 from ._types._event_typing import ClientEvent, ServerEvent
-from ._types._typing import Self, ArgsDict, PyBasicTypes, STuple, F, FuncDecorator
+from ._types._typing import Self, ArgsDict, PyBasicTypes, STuple, F
 
 
 ALL_CLIENT_LIB_EVENTS: Dict[str, str]
@@ -55,7 +53,7 @@ def event(
     sys_name: str = "",
     priority: int = 0,
     is_method: bool = True,
-) -> FuncDecorator: ...
+) -> Callable[[F], F]: ...
 @overload
 def event(
     event_name: F,

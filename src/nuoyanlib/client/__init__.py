@@ -1,17 +1,13 @@
 # -*- coding: utf-8 -*-
-"""
-| ====================================================
-|
-|   Copyright (c) 2025 Nuoyan
-|
-|   Author: `Nuoyan <https://github.com/charminglee>`_
-|   Email : 1279735247@qq.com
-|   Date  : 2025-12-15
-|
-|   「nuoyanlib」客户端库。
-|
-| ====================================================
-"""
+# =================================================
+#  ⠀
+#   Copyright (c) 2025 Nuoyan
+#  ⠀
+#   Author: Nuoyan <https://github.com/charminglee>
+#   Email : 1279735247@qq.com
+#   Date  : 2025-12-17
+#  ⠀
+# =================================================
 
 
 try:
@@ -22,7 +18,6 @@ except ImportError:
     _t = 0
 from ..core import _logging, _sys
 from ..core.client._lib_client import NuoyanLibClientSystem as _NuoyanLibClientSystem
-# from ..core._utils import is_client_wrapper as _is_client_wrapper
 
 
 _sys.check_env("client")
@@ -48,9 +43,9 @@ from ..utils import *
 from .. import config
 
 
-# _is_client_wrapper = _is_client_wrapper(True)
-# distance2nearest_entity = _is_client_wrapper(distance2nearest_entity)
-# distance2nearest_player = _is_client_wrapper(distance2nearest_player)
+for k, v in globals().items():
+    if hasattr(v, '_nyl_inject_is_client'):
+        globals()[k] = v._nyl_inject_is_client[0]
 
 
 if _clock:
@@ -61,4 +56,3 @@ if _clock:
 
 del _logging, _sys, _NuoyanLibClientSystem
 del _clock, _t
-del _is_client_wrapper
