@@ -8,6 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/.venv3" />
       <excludeFolder url="file://$MODULE_DIR$/tests/ingame_test/bp/test_scripts/nuoyanlib" />
+      <excludeFolder url="file://$MODULE_DIR$/docs/source/api/apis" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.12 (nyl-dev)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

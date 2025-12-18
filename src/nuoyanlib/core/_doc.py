@@ -13,37 +13,36 @@
 import re
 
 
-__all__ = []
+def get_signature(func, start=0):
+    s = ""
+    code = func.__code__
+    defs = func.__defaults__ or ()
+    arg_names = code.co_varnames[:code.co_argcount]
+    no_def_argcount = code.co_argcount - len(defs)
+
+    for i, name in enumerate(arg_names):
+        if i < start:
+            continue
+        if i < no_def_argcount:
+            # 无默认值参数
+            s += "%s, " % name
+        else:
+            # 带默认值参数
+            s += "%s=%s, " % (name, defs[i - no_def_argcount])
+    s = s[:-2]
+
+    # 如果有*args
+    if code.co_flags & 0x04:
+        s += ", *args"
+    # 如果有**kwargs
+    if code.co_flags & 0x08:
+        s += ", **kwargs"
+    return s
 
 
 def signature(s="", start=0):
     def decorator(func):
-        if not s:
-            # 解析函数签名
-            _s = ""
-            code = func.__code__
-            defs = func.__defaults__ or ()
-            arg_names = code.co_varnames[:code.co_argcount]
-            no_def_argcount = code.co_argcount - len(defs)
-            for i, var in enumerate(arg_names):
-                if i < start:
-                    continue
-                if i < no_def_argcount:
-                    # 无默认值参数
-                    _s += "%s, " % var
-                else:
-                    # 带默认值参数
-                    _s += "%s=%s, " % (var, defs[i - no_def_argcount])
-            _s = _s[:-2]
-            # 如果有*args
-            if code.co_flags & 0x04:
-                _s += ", *args"
-            # 如果有**kwargs
-            if code.co_flags & 0x08:
-                _s += ", **kwargs"
-        else:
-            _s = s
-
+        _s = s if s else get_signature(func, start)
         _s = "%s(%s)" % (func.__name__, _s)
 
         doc = getattr(func, '__doc__', None)

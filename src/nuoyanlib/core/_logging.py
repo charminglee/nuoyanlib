@@ -10,7 +10,6 @@
 # =================================================
 
 
-from ..core._utils import kwargs_setter
 from .. import config
 
 
@@ -25,9 +24,8 @@ if config.ENABLED_LOG and logging:
         def __init__(self, level):
             self.level = level
 
-        @kwargs_setter(show_env=True)
         def log(self, msg, *args, **kwargs):
-            if kwargs['show_env']:
+            if kwargs.get('show_env', False):
                 from ..core._sys import get_env
                 print("[%s] [nuoyanlib] (%s) %s" % (self.level, get_env(), msg % args))
             else:

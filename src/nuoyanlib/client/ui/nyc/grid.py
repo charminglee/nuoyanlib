@@ -16,7 +16,7 @@ if 0:
 
 
 import math
-from ....core._utils import get_func, kwargs_setter, try_exec, cached_property
+from ....core._utils import get_func, kwargs_defaults, try_exec, cached_property
 from ....core._types._checker import args_type_check
 from ....core.client.comp import ScreenNode, ViewBinder
 from ....utils.enum import ControlType, GridCallbackType
@@ -286,7 +286,7 @@ class NyGrid(NyControl):
 
     CONTROL_TYPE = ControlType.GRID
 
-    @kwargs_setter(
+    @kwargs_defaults(
         is_stack_grid=False,
         template_name="",
         cell_visible_binding="",

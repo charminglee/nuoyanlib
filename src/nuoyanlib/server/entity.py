@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-18
 #  ⠀
 # =================================================
 
@@ -14,7 +14,7 @@ import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import EntityType
 from ..core.server.comp import CF, LvComp
 from ..core.server import _lib_server
-from ..utils.mc_math import distance, ray_aabb_intersection
+from ..utils.mc_math import distance, ray_box_intersection
 from ..utils.vector import vec_p2p, vec_composite
 
 
@@ -742,7 +742,7 @@ def get_entities_by_ray(
         ent_pos = cf.Pos.GetFootPos()
         center = (ent_pos[0], ent_pos[1] + size[1] / 2.0, ent_pos[2])
         cube_size = (size[0], size[1], size[0])
-        intersection = ray_aabb_intersection(start_pos, direction, length, center, cube_size)
+        intersection = ray_box_intersection(start_pos, direction, length, center, cube_size)
         if intersection:
             ent_list.append({
                 'entity_id': entity_id,

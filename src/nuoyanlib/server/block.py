@@ -12,7 +12,7 @@
 
 from ..core._sys import get_lib_system
 from ..core.server.comp import LvComp, CF
-from ..core._utils import kwargs_setter
+from ..core._utils import kwargs_defaults
 from ..core import _const
 from ..utils.mc_random import random_even_poses
 from ..utils.mc_math import pos_floor
@@ -23,7 +23,7 @@ __all__ = [
 ]
 
 
-@kwargs_setter(
+@kwargs_defaults(
     time=3.0,
     tilt_angle=22.0,
     min_height=0.0,

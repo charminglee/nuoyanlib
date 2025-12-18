@@ -264,9 +264,9 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
 
 
 def instance():
-    if not NuoyanLibClientSystem.__instance__:
-        NuoyanLibClientSystem.__instance__ = c_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
-    return NuoyanLibClientSystem.__instance__
+    if not NuoyanLibClientSystem.singleton:
+        NuoyanLibClientSystem.singleton = c_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
+    return NuoyanLibClientSystem.singleton
 
 
 

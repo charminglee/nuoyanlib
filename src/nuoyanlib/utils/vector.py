@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-18
 #  ⠀
 # =================================================
 
@@ -48,6 +48,7 @@ _OP_MAP = {
     '/': operator.truediv,
     '//': operator.floordiv,
 }
+_ZERO_EPS = 1e-8
 
 
 class Vector(object):
@@ -62,7 +63,6 @@ class Vector(object):
     """
 
     __slots__ = ('x', 'y', 'z', '_dim')
-    _ZERO_EPS = 1e-8
 
     def __init__(self, *args):
         l = len(args)
@@ -248,7 +248,7 @@ class Vector(object):
         :raise VectorError: 对零向量调用时抛出
         """
         l = self.length
-        if l < Vector._ZERO_EPS:
+        if l < _ZERO_EPS:
             raise VectorError("can't set the length of zero vector")
         mul = val / l
         self.x *= mul
@@ -277,7 +277,7 @@ class Vector(object):
         :return: 是否是零向量
         :rtype: bool
         """
-        return self.length < Vector._ZERO_EPS
+        return self.length < _ZERO_EPS
 
     def normalize(self, inplace=True):
         """
@@ -287,13 +287,13 @@ class Vector(object):
 
         :param bool inplace: 是否就地修改，默认为True
 
-        :return: 标准化向量
+        :return: 标准化向量；就地修改时，返回向量自身
         :rtype: Vector
 
         :raise VectorError: 对零向量调用时抛出
         """
         l = self.length
-        if l < Vector._ZERO_EPS:
+        if l < _ZERO_EPS:
             raise VectorError("can't normalize zero vector")
         mul = 1 / l
         x = self.x * mul
@@ -1017,19 +1017,19 @@ def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", re
     cos_z, sin_z = math.cos(z_angle), math.sin(z_angle)
 
     x_matrix = Matrix.Create([
-        [1, 0, 0],
+        [1, 0,     0],
         [0, cos_x, -sin_x],
         [0, sin_x, cos_x],
     ])
     y_matrix = Matrix.Create([
-        [cos_y, 0, sin_y],
-        [0, 1, 0],
+        [cos_y,  0, sin_y],
+        [0,      1, 0],
         [-sin_y, 0, cos_y],
     ])
     z_matrix = Matrix.Create([
         [cos_z, -sin_z, 0],
-        [sin_z, cos_z, 0],
-        [0, 0, 1],
+        [sin_z, cos_z,  0],
+        [0,     0,      1],
     ])
 
     acc_matrix = Matrix.CreateEye(3)

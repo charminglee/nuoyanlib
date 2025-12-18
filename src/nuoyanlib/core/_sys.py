@@ -14,11 +14,11 @@ import threading
 import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
 from . import _const
-from ._utils import try_exec
 from ._logging import warning, info
 
 
 def load_extensions():
+    from ._utils import try_exec
     imp = get_api().ImportModule
     if _const.ROOT == "nuoyanlib":
         module_path = "nuoyanlib.extensions"

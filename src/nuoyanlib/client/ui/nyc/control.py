@@ -17,7 +17,7 @@ if 0:
 
 
 from ....core import error
-from ....core._utils import kwargs_setter, try_exec, cached_property, UNIVERSAL_OBJECT
+from ....core._utils import kwargs_defaults, try_exec, cached_property, UNIVERSAL_OBJECT
 from ....core._types._checker import args_type_check
 from ....client.ui.ui_utils import get_children_path_by_level, get_parent_path, to_path
 from ....utils.enum import ControlType
@@ -775,7 +775,7 @@ class NyControl(object):
 
     # region Conversion ================================================================================================
 
-    @kwargs_setter(touch_event_params=None)
+    @kwargs_defaults(touch_event_params=None)
     def to_button(self, **kwargs):
         """
         转换为 ``NyButton`` 实例。

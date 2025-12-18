@@ -12,7 +12,7 @@
 
 import mod.server.extraServerApi as s_api
 from ..core.server.comp import LvComp
-from ..core._utils import kwargs_setter
+from ..core._utils import kwargs_defaults
 from ..core.listener import event, ServerEventProxy
 
 
@@ -116,7 +116,7 @@ class LobbyDataMgr(ServerEventProxy):
             for k, v in data.items():
                 self.uid_data[k][uid] = v
 
-    @kwargs_setter(callback=None, simulate=None)
+    @kwargs_defaults(callback=None, simulate=None)
     def fetch(self, player=0, *keys, **kwargs):
         """
         从云端获取数据并缓存。
@@ -183,7 +183,7 @@ class LobbyDataMgr(ServerEventProxy):
             else:
                 LvComp.ExtraData.SetExtraData(_UID_DATA_KEY, self.uid_data)
 
-    @kwargs_setter(order_id=None, callback=None)
+    @kwargs_defaults(order_id=None, callback=None)
     def update(self, key, exp, player=0, **kwargs):
         """
         更新云端数据。
@@ -216,7 +216,7 @@ class LobbyDataMgr(ServerEventProxy):
 
         self._set(cb, player, order_id, getter)
 
-    @kwargs_setter(order_id=None, callback=None)
+    @kwargs_defaults(order_id=None, callback=None)
     def set(self, key, value, player=0, **kwargs):
         """
         强制设置云端某个数据的值。
@@ -268,7 +268,7 @@ class LobbyDataMgr(ServerEventProxy):
             player = self._to_uid(player)
         return self.global_data[key] if player == 0 else self.uid_data[key][player]
 
-    @kwargs_setter(callback=None)
+    @kwargs_defaults(callback=None)
     def ship(self, order_id, player, **kwargs):
         """
         设置订单发货。
@@ -299,7 +299,7 @@ class LobbyDataMgr(ServerEventProxy):
         else:
             cb({'code': 0, 'entity': {'data': []}})
 
-    @kwargs_setter(callback=None, simulate=None)
+    @kwargs_defaults(callback=None, simulate=None)
     def query(self, player, **kwargs):
         """
         查询还未发货的订单。

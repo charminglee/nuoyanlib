@@ -19,7 +19,7 @@ import time
 from ....core.client.comp import LvComp
 from ....core._types._checker import args_type_check
 from ....core.listener import listen_event, unlisten_event, is_listened
-from ....core._utils import kwargs_setter
+from ....core._utils import kwargs_defaults
 from ....utils.enum import ButtonCallbackType, ControlType, ClientEvent
 from ..ui_utils import is_out_of_screen
 from .control import NyControl, InteractableControl
@@ -52,7 +52,7 @@ class NyButton(InteractableControl, NyControl):
     PRESSED_IMG_PATH = "/pressed"
     BTN_LABEL_PATH = "/button_label"
 
-    @kwargs_setter(touch_event_params=None)
+    @kwargs_defaults(touch_event_params=None)
     def __init__(self, screen_node_ex, btn_control, **kwargs):
         NyControl.__init__(self, screen_node_ex, btn_control)
         InteractableControl.__init__(

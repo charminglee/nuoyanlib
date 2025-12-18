@@ -129,9 +129,9 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
 
 
 def instance():
-    if not NuoyanLibServerSystem.__instance__:
-        NuoyanLibServerSystem.__instance__ = s_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
-    return NuoyanLibServerSystem.__instance__
+    if not NuoyanLibServerSystem.singleton:
+        NuoyanLibServerSystem.singleton = s_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
+    return NuoyanLibServerSystem.singleton
 
 
 

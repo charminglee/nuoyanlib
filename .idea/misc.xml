@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Black">
-    <option name="enabledOnReformat" value="true" />
-    <option name="executionMode" value="BINARY" />
-    <option name="pathToExecutable" value="C:\Python312\Scripts\black.exe" />
     <option name="sdkName" value="Python 3.12 (nyl-dev)" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (nyl-dev)" project-jdk-type="Python SDK" />

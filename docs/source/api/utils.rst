@@ -61,26 +61,24 @@
     clamp
     pos_block_facing
     to_polar_coordinate
-    to_cartesian_coordinate
+    cartesian_coord
     probability_true_i
     probability_true_f
     pos_distance_to_line
     pos_floor
     pos_distance
-    to_relative_pos
-    to_screen_pos
+    relative_pos
+    screen_pos
     pos_rotate
     midpoint
     camera_rot_p2p
     pos_entity_facing
     pos_forward_rot
-    n_quantiles_index_list
-    cube_center
-    cube_longest_side_len
+    box_center
+    box_max_edge_len
     is_in_sector
-    is_in_cube
-    rot_diff
-    ray_aabb_intersection
+    is_in_box
+    ray_box_intersection
 
 
 随机

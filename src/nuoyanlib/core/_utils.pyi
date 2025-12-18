@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-18
 #  ⠀
 # =================================================
 
@@ -38,8 +38,6 @@ else:
 
 
 _KWARGS_MARK: Tuple[object]
-
-
 def _lru_key(args: tuple, kwargs: dict) -> Hashable: ...
 
 
@@ -67,7 +65,7 @@ class cached_property(object):
     def __get__(self, ins: Any, cls: type) -> Any: ...
 
 
-def kwargs_setter(**kwargs: Any) -> Callable[[F], F]: ...
+def kwargs_defaults(**kwargs: Any) -> Callable[[F], F]: ...
 def try_exec(func: Callable, *args: Any, **kwargs: Any) -> Union[Any, Exception]: ...
 def iter_obj_attrs(obj: Any) -> Generator[Any]: ...
 def get_func(cls: type, module: ITuple, func: ITuple) -> Optional[Callable]: ...

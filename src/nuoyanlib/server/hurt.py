@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-18
 #  ⠀
 # =================================================
 
@@ -15,8 +15,8 @@ import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import AttrType, ActorDamageCause, EntityComponentType
 from ..core._sys import get_lib_system
 from ..core.server.comp import CF, LvComp
-from ..core._utils import kwargs_setter
-from ..utils.mc_math import is_in_sector, distance_square, is_in_cube, is_in_cylinder
+from ..core._utils import kwargs_defaults
+from ..utils.mc_math import is_in_sector, distance_square, is_in_box, is_in_cylinder
 from .entity import get_all_entities
 
 
@@ -308,7 +308,7 @@ def _get_basic_pos(entity_id, base):
     return pos
 
 
-__damage_kwargs_setter = kwargs_setter(
+__damage_kwargs_defaults = kwargs_defaults(
     cause=ActorDamageCause.EntityAttack,
     attacker_id=None,
     child_id=None,
@@ -324,7 +324,7 @@ __damage_kwargs_setter = kwargs_setter(
 )
 
 
-@__damage_kwargs_setter
+@__damage_kwargs_defaults
 def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     """
     对圆柱体区域内所有实体造成伤害。
@@ -376,7 +376,7 @@ def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     return hurt_mobs(get_all_entities(), damage, **kwargs)
 
 
-@__damage_kwargs_setter
+@__damage_kwargs_defaults
 def sphere_damage(damage, r, pos, dim, **kwargs):
     """
     对球体区域内所有实体造成伤害。
@@ -429,7 +429,7 @@ def sphere_damage(damage, r, pos, dim, **kwargs):
     return hurt_mobs(get_all_entities(), damage, **kwargs)
 
 
-@__damage_kwargs_setter
+@__damage_kwargs_defaults
 def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
     """
     朝攻击者视线前方造成扇形范围伤害。
@@ -483,7 +483,7 @@ def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
     return hurt_mobs(get_all_entities(), damage, **kwargs)
 
 
-@__damage_kwargs_setter
+@__damage_kwargs_defaults
 def rectangle_damage(damage, pos1, pos2, dim, **kwargs):
     """
     对指定矩形区域内所有实体造成伤害。
@@ -525,7 +525,7 @@ def rectangle_damage(damage, pos1, pos2, dim, **kwargs):
         ep = _get_basic_pos(eid, basic_pos)
         if not ep:
             return False
-        return is_in_cube(ep, pos1, pos2)
+        return is_in_box(ep, pos1, pos2)
     kwargs['ent_filter'] = _filter
 
     if visualize:

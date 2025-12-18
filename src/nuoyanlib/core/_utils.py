@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-19
 #  ⠀
 # =================================================
 
@@ -13,11 +13,14 @@
 import traceback
 from types import MethodType
 from functools import wraps
-from ._doc import signature
+from ._doc import signature, get_signature
 from ._types._checker import args_type_check
+from ._sys import is_client
 
 
 def inject_is_client(func):
+    signature(start=1)(func)
+
     @wraps(func)
     def c(*args, **kwargs):
         return func(True, *args, **kwargs)
@@ -26,10 +29,45 @@ def inject_is_client(func):
     def s(*args, **kwargs):
         return func(False, *args, **kwargs)
 
-    func._nyl_inject_is_client = (c, s)
-    return func
+    @wraps(func)
+    def auto(*args, **kwargs):
+        return func(is_client(), *args, **kwargs)
+
+    auto._nyl_inject_is_client = (c, s)
+    return auto
 
 
+def singleton(init_once=True):
+    def decorator(cls):
+        cls.singleton = None
+        cls._inited = False
+        org_new = cls.__new__
+        org_init = cls.__init__
+
+        def new_new(*args, **kwargs):
+            return cls.singleton or org_new(*args, **kwargs)
+
+        def new_init(self, *args, **kwargs):
+            if cls.singleton is None:
+                cls.singleton = self
+            # 如果init_once为True，则__init__方法只会被执行一次
+            if not cls._inited or not _init_once:
+                org_init(self, *args, **kwargs)
+                cls._inited = True
+
+        cls.__new__ = staticmethod(new_new)
+        cls.__init__ = new_init
+        return cls
+
+    if isinstance(init_once, bool):
+        _init_once = init_once
+        return decorator
+    else:
+        _init_once = True
+        return decorator(init_once)
+
+
+@singleton
 class __Universal(object):
     """
     万用对象，仅用于绕过机审检查。
@@ -208,36 +246,6 @@ class lru_cache(object):
             return wrapper
 
 
-def singleton(init_once=True):
-    def decorator(cls):
-        cls.__instance__ = None
-        cls.__inited__ = False
-        org_new = cls.__new__
-        org_init = cls.__init__
-
-        def new_new(*args, **kwargs):
-            return cls.__instance__ or org_new(*args, **kwargs)
-
-        def new_init(self, *args, **kwargs):
-            if cls.__instance__ is None:
-                cls.__instance__ = self
-            # 如果init_once为True，则__init__方法只会被执行一次
-            if not cls.__inited__ or not _init_once:
-                org_init(self, *args, **kwargs)
-                cls.__inited__ = True
-
-        cls.__new__ = staticmethod(new_new)
-        cls.__init__ = new_init
-        return cls
-
-    if isinstance(init_once, bool):
-        _init_once = init_once
-        return decorator
-    else:
-        _init_once = True
-        return decorator(init_once)
-
-
 class cached_property(object):
     def __init__(self, getter):
         super(cached_property, self).__init__()
@@ -251,21 +259,23 @@ class cached_property(object):
         return value
 
 
-def kwargs_setter(**kwargs):
+def kwargs_defaults(**kwargs):
     def decorator(func):
         co = func.__code__
-        sgn = co.co_varnames[:co.co_argcount]
+        arg_names = co.co_varnames[:co.co_argcount]
 
         # 设置完整的函数签名（用于文档生成）
-        sgn_str = ", ".join(sgn)
-        sgn_str += ", *, "
-        sgn_str += ", ".join("%s=%s" % i for i in kwargs.items())
-        func = signature(sgn_str)(func)
+        sgn = get_signature(func)
+        sgn = sgn[:sgn.rindex(",")] # 去掉末尾**kwargs
+        sgn += ", *"
+        for i in kwargs.items():
+            sgn += ", %s=%s" % i
+        signature(sgn)(func)
 
         @wraps(func)
         def wrapper(*f_args, **f_kwargs):
             for k in f_kwargs:
-                if k not in kwargs and k not in sgn:
+                if k not in kwargs and k not in arg_names:
                     raise TypeError(
                         "%s() got an unexpected keyword argument '%s'"
                         % (func.__name__, k)
@@ -432,14 +442,14 @@ def __test__():
     assert t.prop2 == "cd"
     assert a[0] == 2
 
-    @kwargs_setter(c=3, d=4)
+    @kwargs_defaults(c=3, d=4)
     def func(a, b=2, **kwargs):
         return a, b, kwargs['c'], kwargs['d']
     assert func(1, 2) == (1, 2, 3, 4)
     assert func(1, 2, c=6) == (1, 2, 6, 4)
     assert func(1, b=5, c=6) == (1, 5, 6, 4)
     assert func(1, c=6) == (1, 2, 6, 4)
-    assert func.__doc__ == "func(a, b, *, c=3, d=4)"
+    assert func.__doc__ == "func(a, b=2, *, c=3, d=4)"
     assert_error(func, (1,), {'e': 1}, TypeError)
 
 

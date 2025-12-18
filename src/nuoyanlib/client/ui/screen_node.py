@@ -17,7 +17,7 @@ import fnmatch
 from ...core.client.comp import CustomUIScreenProxy, ScreenNode, ViewBinder
 from ...core import error
 from ...core.listener import listen_event, unlisten_event
-from ...core._utils import hook_method, iter_obj_attrs, kwargs_setter, try_exec, get_func
+from ...core._utils import hook_method, iter_obj_attrs, kwargs_defaults, try_exec, get_func
 from .ui_utils import to_control, to_path, _UIControlType
 from ...utils.enum import ButtonCallbackType, ClientEvent
 from .nyc import *
@@ -509,7 +509,7 @@ class ScreenNodeExtension(object):
     # region Button APIs ===============================================================================================
 
     @staticmethod
-    @kwargs_setter(touch_event_params=None)
+    @kwargs_defaults(touch_event_params=None)
     def button_callback(btn_path, *callback_types, **kwargs): # todo
         """
         [静态方法] [装饰器]
