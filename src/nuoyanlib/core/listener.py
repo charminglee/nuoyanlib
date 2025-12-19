@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -568,7 +568,7 @@ def __test__():
     assert not getattr(lib_sys, "Minecraft_Engine_LoadClientAddonScriptsAfter")
 
 
-def __benchmark__(n, timer, *args):
+def __benchmark__(n, timer, **kwargs):
     class C(ServerEventProxy, s_api.GetServerSystemCls()):
         def __init__(self, namespace, system_name):
             super(C, self).__init__(namespace, system_name)

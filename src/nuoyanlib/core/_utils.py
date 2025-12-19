@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-19
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -33,7 +33,8 @@ def inject_is_client(func):
     def auto(*args, **kwargs):
         return func(is_client(), *args, **kwargs)
 
-    auto._nyl_inject_is_client = (c, s)
+    auto._inject_is_client = (c, s)
+    auto._org_func = func
     return auto
 
 

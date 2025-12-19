@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -25,11 +25,11 @@ from .benchmark import print_msg, run_benchmark, print_res
 class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
     def __init__(self, namespace, systemName):
         super(MainServerSystem, self).__init__(namespace, systemName)
-        LvComp.Game.AddTimer(8, self.run_benchmark)
         self.c = 0
         self.comm_time = 0
         self.comm_cost = 0
         self.player_id = None
+        LvComp.Game.AddTimer(8, self.run_benchmark)
 
     # =========================================== Engine Event Callback ================================================
 
@@ -47,8 +47,9 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
 
     def run_benchmark(self):
         self.player_id = s_api.GetHostPlayerId()
-        run_benchmark("nuoyanlib.core.listener", 10000)
-        run_benchmark("nuoyanlib.core.server.comp")
+        run_benchmark("nuoyanlib.core.listener", self.player_id, 10000)
+        run_benchmark("nuoyanlib.core.server.comp", self.player_id)
+        run_benchmark("nuoyanlib.utils.mc_math", self.player_id)
         self.communicate_benchmark()
 
     def communicate_benchmark(self):
@@ -63,7 +64,7 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
         )
 
         n = 1000
-        print_msg("=" * 45)
+        print_msg("=" * 75)
         print_msg("[{}]".format("nuoyanlib.utils.communicate"))
         print_msg("n={}".format(n))
 

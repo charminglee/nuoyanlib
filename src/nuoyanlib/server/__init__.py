@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -43,8 +43,8 @@ from .. import config
 
 
 for k, v in globals().items():
-    if hasattr(v, '_nyl_inject_is_client'):
-        globals()[k] = v._nyl_inject_is_client[1]
+    if hasattr(v, '_inject_is_client'):
+        globals()[k] = v._inject_is_client[1]
 
 
 if _clock:

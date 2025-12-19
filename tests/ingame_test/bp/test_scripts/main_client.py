@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -46,12 +46,6 @@ class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
             push=True,
             client_system=self,
         )
-
-    def print_res(self, path, cost, n):
-        print_msg("=" * 45)
-        print_msg("[{}]".format(path))
-        print_msg("n={}".format(n))
-        print_res(cost, n)
 
     def communicate_benchmark(self):
         def callback(success, ret):

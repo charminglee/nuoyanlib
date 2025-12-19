@@ -5,12 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-19
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
 
-import math
+from math import sin, cos, atan2, sqrt, degrees, radians
 import random
 from mod.common.minecraftEnum import Facing
 from ..core._sys import get_api, get_cf
@@ -39,14 +39,23 @@ __all__ = [
     "midpoint",
     "box_center",
     "ray_box_intersection",
+    "is_in_sphere",
     "is_in_cylinder",
     "is_in_sector",
     "is_in_box",
+    "fpp_camera_rot",
+    "tpp_camera_rot",
+    "dir2rot",
+    "rot2dir",
+    "rot_look_at",
+    "angle_normalize",
+    "bezier_curve",
+    "catmull_rom",
+    "lerp",
     "range_map",
     "clamp",
     "probability",
     "box_max_edge_len",
-    "camera_rot_p2p",
 ]
 
 
@@ -54,22 +63,22 @@ if 0:
     # 绕过机审专用
     distance2nearest_entity = lambda *_, **__: UNIVERSAL_OBJECT
     distance2nearest_player = lambda *_, **__: UNIVERSAL_OBJECT
+    distance2line = lambda *_, **__: UNIVERSAL_OBJECT
     distance_square = lambda *_, **__: UNIVERSAL_OBJECT
     distance = lambda *_, **__: UNIVERSAL_OBJECT
     pos_entity_facing = lambda *_, **__: UNIVERSAL_OBJECT
-    pos_forward_rot = lambda *_, **__: UNIVERSAL_OBJECT
+    is_in_sphere = lambda *_, **__: UNIVERSAL_OBJECT
     is_in_cylinder = lambda *_, **__: UNIVERSAL_OBJECT
     is_in_sector = lambda *_, **__: UNIVERSAL_OBJECT
     is_in_box = lambda *_, **__: UNIVERSAL_OBJECT
-    camera_rot_p2p = lambda *_, **__: UNIVERSAL_OBJECT
 
 
 _INF = float('inf')
 _NAN = float('nan')
-_ZERO_EPS = 1e-8
+_ZERO_EPS = 1e-9
 
 
-def _to_pos(target, is_client=None):
+def _get_pos(target, is_client=None):
     return get_cf(target, is_client).Pos.GetFootPos() if isinstance(target, str) else target
 
 
@@ -78,6 +87,14 @@ def _get_dim(entity_id):
 
 
 # region Distance ======================================================================================================
+
+
+def _dist_square(p1, p2):
+    return sum((a - b)**2 for a, b in zip(p1, p2))
+
+
+def _dist(p1, p2):
+    return sqrt(_dist_square(p1, p2))
 
 
 @inject_is_client
@@ -94,21 +111,29 @@ def distance2nearest_entity(__is_client__, target, dim=None):
     :rtype: float
     """
     api = get_api(__is_client__)
-    if not __is_client__ and isinstance(target, str):
+    # 传入实体ID时，若为服务端，获取该实体所在维度
+    if not __is_client__ and isinstance(target, str) and dim is None:
         dim = _get_dim(target)
+    tp = _get_pos(target, __is_client__)
+    if not tp:
+        return _INF
 
     min_dist2 = _INF
     all_entities = api.GetEngineActor()
     for player_id in api.GetPlayerList():
-        all_entities[player_id] = {'dimensionId': _get_dim(player_id)}
+        all_entities[player_id] = {'dimensionId': -1 if __is_client__ else _get_dim(player_id)}
 
-    for entity_id, data in all_entities:
+    for entity_id, data in all_entities.items():
+        # 处于客户端时跳过维度判断
         if not __is_client__ and data['dimensionId'] != dim:
             continue
-        dist2 = distance_square(target, entity_id)
+        ep = _get_pos(entity_id, __is_client__)
+        if not ep:
+            continue
+        dist2 = _dist_square(tp, ep)
         if dist2 < min_dist2:
             min_dist2 = dist2
-    return math.sqrt(min_dist2)
+    return sqrt(min_dist2)
 
 
 @inject_is_client
@@ -125,21 +150,31 @@ def distance2nearest_player(__is_client__, target, dim=None):
     :rtype: float
     """
     api = get_api(__is_client__)
-    if not __is_client__ and isinstance(target, str):
+    # 传入实体ID时，若为服务端，获取该实体所在维度
+    if not __is_client__ and isinstance(target, str) and dim is None:
         dim = _get_dim(target)
+    tp = _get_pos(target, __is_client__)
+    if not tp:
+        return _INF
 
     min_dist2 = _INF
     all_players = api.GetPlayerList()
+
     for player_id in all_players:
+        # 处于客户端时跳过维度判断
         if not __is_client__ and _get_dim(player_id) != dim:
             continue
-        dist2 = distance_square(target, player_id)
+        pp = _get_pos(player_id, __is_client__)
+        if not pp:
+            continue
+        dist2 = _dist_square(tp, pp)
         if dist2 < min_dist2:
             min_dist2 = dist2
-    return math.sqrt(min_dist2)
+    return sqrt(min_dist2)
 
 
-def distance2line(target, line_pos1, line_pos2):
+@inject_is_client
+def distance2line(__is_client__, target, line_pos1, line_pos2):
     """
     计算坐标或实体与某一直线的距离。
 
@@ -152,13 +187,16 @@ def distance2line(target, line_pos1, line_pos2):
     :return: 与指定直线的距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
-    a = distance(target, line_pos1)
-    b = distance(target, line_pos2)
-    c = distance(line_pos1, line_pos2)
-    if a == _INF or b == _INF or c == _INF:
+    if not line_pos1 or not line_pos2:
         return _INF
+    tp = _get_pos(target, __is_client__)
+    if not tp:
+        return _INF
+    a = _dist(tp, line_pos1)
+    b = _dist(tp, line_pos2)
+    c = _dist(line_pos1, line_pos2)
     p = (a + b + c) / 2
-    s = math.sqrt(p * (p - a) * (p - b) * (p - c))
+    s = sqrt(p * (p - a) * (p - b) * (p - c))
     h = s / c * 2
     return h
 
@@ -176,7 +214,7 @@ def distance_square(__is_client__, target1, target2):
     :return: 距离的平方；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
-    p1, p2 = _to_pos(target1, __is_client__), _to_pos(target2, __is_client__)
+    p1, p2 = _get_pos(target1, __is_client__), _get_pos(target2, __is_client__)
     if not p1 or not p2:
         return _INF
     return sum((a - b)**2 for a, b in zip(p1, p2))
@@ -195,10 +233,10 @@ def distance(__is_client__, target1, target2):
     :return: 距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
-    p1, p2 = _to_pos(target1, __is_client__), _to_pos(target2, __is_client__)
+    p1, p2 = _get_pos(target1, __is_client__), _get_pos(target2, __is_client__)
     if not p1 or not p2:
         return _INF
-    return math.sqrt(sum((a - b)**2 for a, b in zip(p1, p2)))
+    return sqrt(sum((a - b)**2 for a, b in zip(p1, p2)))
 
 
 # endregion
@@ -240,10 +278,10 @@ def polar_coord(coord, rad=False, origin=(0, 0)):
     x, y = coord
     x -= origin[0]
     y -= origin[1]
-    r = math.sqrt(x**2 + y**2)
-    theta = math.atan2(y, x)
+    r = sqrt(x**2 + y**2)
+    theta = atan2(y, x)
     if not rad:
-        theta = math.degrees(theta)
+        theta = degrees(theta)
     return r, theta
 
 
@@ -262,9 +300,9 @@ def cartesian_coord(coord, rad=False, origin=(0, 0)):
     """
     r, theta = coord
     if not rad:
-        theta = math.radians(theta)
-    x = r * math.cos(theta) + origin[0]
-    y = r * math.sin(theta) + origin[1]
+        theta = radians(theta)
+    x = r * cos(theta) + origin[0]
+    y = r * sin(theta) + origin[1]
     return x, y
 
 
@@ -400,13 +438,12 @@ def pos_entity_facing(__is_client__, entity_id, dist, use_0yaw=False, height_off
     :rtype: tuple[float,float,float]|None
     """
     cf = get_cf(entity_id, __is_client__)
-    api = get_api(__is_client__)
     rot = cf.Rot.GetRot()
     if not rot:
         return
     if use_0yaw:
         rot = (0, rot[1])
-    direction = api.GetDirFromRot(rot)
+    direction = rot2dir(rot)
     pos = cf.Pos.GetFootPos()
     if not pos:
         return
@@ -445,8 +482,7 @@ def pos_block_facing(pos, face=Facing.North, dist=1.0):
     raise ValueError("invalid face value")
 
 
-@inject_is_client
-def pos_forward_rot(__is_client__, pos, rot, dist):
+def pos_forward_rot(pos, rot, dist):
     """
     计算以指定坐标为起点，沿指定视角方向前进指定距离后的坐标。
 
@@ -461,7 +497,7 @@ def pos_forward_rot(__is_client__, pos, rot, dist):
     """
     if not pos or not rot:
         return
-    direction = get_api(__is_client__).GetDirFromRot(rot)
+    direction = rot2dir(rot)
     return tuple(p + d * dist for p, d in zip(pos, direction))
 
 
@@ -496,14 +532,14 @@ def pos_rotate(pos, angle, basis=(0, 0), rad=False):
     :rtype: tuple[float,float]|None
     """
     if not rad:
-        angle = math.radians(angle)
+        angle = radians(angle)
     x, y = pos
     bx, by = basis
     x -= bx
     y -= by
     return (
-        bx + x * math.cos(angle) - y * math.sin(angle),
-        by + y * math.cos(angle) + x * math.sin(angle),
+        bx + x * cos(angle) - y * sin(angle),
+        by + y * cos(angle) + x * sin(angle),
     )
 
 
@@ -607,6 +643,26 @@ def ray_box_intersection(start_pos, ray_dir, length, aabb_center, aabb_size, han
 
 
 @inject_is_client
+def is_in_sphere(__is_client__, target, r, center):
+    """
+    判断坐标或实体是否在球体区域内。
+
+    -----
+
+    :param tuple[float,float,float]|str target: 坐标或实体ID
+    :param float r: 球体半径
+    :param tuple[float,float,float] center: 球心坐标
+
+    :return: 是否在球体区域内
+    :rtype: bool
+    """
+    tp = _get_pos(target, __is_client__)
+    if not tp:
+        return False
+    return _dist_square(tp, center) <= r**2
+
+
+@inject_is_client
 def is_in_cylinder(__is_client__, target, r, center1, center2):
     """
     判断坐标或实体是否在圆柱体区域内。
@@ -615,17 +671,17 @@ def is_in_cylinder(__is_client__, target, r, center1, center2):
 
     :param tuple[float,float,float]|str target: 坐标或实体ID
     :param float r: 圆柱体半径
-    :param tuple[float,float,float] center1: 圆柱体底面中心坐标
-    :param tuple[float,float,float] center2: 圆柱体另一底面中心坐标
+    :param tuple[float,float,float] center1: 圆柱体底面圆心坐标
+    :param tuple[float,float,float] center2: 圆柱体另一底面圆心坐标
 
     :return: 是否在圆柱体区域内
     :rtype: bool
     """
-    tp = _to_pos(target, __is_client__)
+    tp = _get_pos(target, __is_client__)
     if not tp:
         return False
     tp = Vector(tp)
-    center1 = Vector(center1)
+    # center1 = Vector(center1)
     center2 = Vector(center2)
     axis_vec = center2 - center1
     axis_len2 = axis_vec.length2
@@ -656,7 +712,7 @@ def is_in_sector(__is_client__, target, r, h, angle, center, direction):
     :return: 是否在扇形区域内
     :rtype: bool
     """
-    tp = _to_pos(target, __is_client__)
+    tp = _get_pos(target, __is_client__)
     if not tp:
         return False
 
@@ -675,10 +731,10 @@ def is_in_sector(__is_client__, target, r, h, angle, center, direction):
     if dist2 - proj**2 > h**2 / 4.0:
         return False
 
-    v_len = math.sqrt(dist2)
+    v_len = sqrt(dist2)
     cos_alpha = proj / v_len
-    theta = math.radians(angle / 2.0)
-    cos_theta = math.cos(theta)
+    theta = radians(angle / 2.0)
+    cos_theta = cos(theta)
     return cos_alpha >= cos_theta
 
 
@@ -697,7 +753,7 @@ def is_in_box(__is_client__, target, pos1, pos2, ignore_y=False):
     :return: 是否在包围盒内
     :rtype: bool
     """
-    tp = _to_pos(target, __is_client__)
+    tp = _get_pos(target, __is_client__)
     if not tp:
         return False
     pos1, pos2 = box_min_max(pos1, pos2)
@@ -713,29 +769,251 @@ def is_in_box(__is_client__, target, pos1, pos2, ignore_y=False):
 # endregion
 
 
+# region Rotation ======================================================================================================
+
+
+def fpp_camera_rot(rot):
+    """
+    将第三人称相机视角转换为第一人称相机视角。
+
+    -----
+
+    :param tuple[float,float,float]|tuple[float,float] rot: 第三人称相机视角
+
+    :return: 第一人称相机视角
+    :rtype: tuple[float,float,float]|tuple[float,float]|None
+    """
+    if not rot:
+        return
+    yaw = angle_normalize(rot[1] - 180)
+    return (rot[0], yaw, rot[2]) if len(rot) == 3 else (rot[0], yaw)
+
+
+def tpp_camera_rot(rot):
+    """
+    将第一人称相机视角转换为第三人称相机视角。
+
+    -----
+
+    :param tuple[float,float,float]|tuple[float,float] rot: 第一人称相机视角
+
+    :return: 第三人称相机视角
+    :rtype: tuple[float,float,float]|tuple[float,float]|None
+    """
+    if not rot:
+        return
+    yaw = angle_normalize(rot[1] + 180)
+    return (rot[0], yaw, rot[2]) if len(rot) == 3 else (rot[0], yaw)
+
+
+def dir2rot(direction):
+    """
+    将方向向量转换为实体头部视角。
+
+    -----
+
+    :param tuple[float,float,float] direction: 方向向量
+
+    :return: 头部视角
+    :rtype: tuple[float,float]|None
+    """
+    if not direction:
+        return
+    x, y, z = direction
+    hori_len = sqrt(x**2 + z**2)
+    pitch = degrees(-atan2(y, hori_len))
+    yaw = degrees(atan2(-x, z))
+    return pitch, yaw
+
+
+def rot2dir(rot):
+    """
+    将实体头部视角转换为方向向量。
+
+    -----
+
+    :param tuple[float,float] rot: 头部视角
+
+    :return: 方向向量（单位向量）
+    :rtype: tuple[float,float,float]|None
+    """
+    if not rot:
+        return
+    pitch = radians(rot[0])
+    yaw = radians(rot[1])
+    x = -sin(yaw) * cos(pitch)
+    y = -sin(pitch)
+    z = cos(yaw) * cos(pitch)
+    return x, y, z
+
+
+def rot_look_at(start, end):
+    """
+    计算从起始坐标看向终点坐标的实体头部视角。
+
+    -----
+
+    :param tuple[float,float,float] start: 起始坐标
+    :param tuple[float,float,float] end: 终点坐标
+
+    :return: 头部视角
+    :rtype: tuple[float,float]|None
+    """
+    if not start or not end:
+        return
+    return dir2rot((
+        end[0] - start[0],
+        end[1] - start[1],
+        end[2] - start[2],
+    ))
+
+
+def angle_normalize(angle):
+    """
+    将角度标准化到 ``[-180,⠀180]``。
+
+    -----
+
+    :param float angle: 角度
+
+    :return: 标准化角度
+    :rtype: float
+    """
+    angle %= 360.0
+    if angle > 180:
+        angle -= 360
+    return angle
+
+
+# endregion
+
+
+# region Curve =========================================================================================================
+
+
+def bezier_curve(control_points, t):
+    """
+    通用贝塞尔曲线（支持任意阶数）。
+
+    控制点越多，计算越慢，通常不超过4个点。
+
+    -----
+
+    :param list[tuple[float,float,float]] control_points: 控制点列表
+    :param float t: 插值因子，范围 [0, 1]
+
+    :return: 曲线上的点
+    :rtype: tuple[float,float,float]
+    """
+    n = len(control_points)
+    if n == 0:
+        return 0, 0, 0
+    if n == 1:
+        return control_points[0]
+
+    points = list(control_points)
+    for r in range(1, n):
+        for i in range(n - r):
+            points[i] = (
+                (1.0 - t) * points[i][0] + t * points[i + 1][0],
+                (1.0 - t) * points[i][1] + t * points[i + 1][1],
+                (1.0 - t) * points[i][2] + t * points[i + 1][2],
+            )
+    return points[0]
+
+
+def catmull_rom(p0, p1, p2, p3, t, alpha=0.5):
+    """
+    Catmull-Rom样条曲线。
+
+    曲线会经过 ``p1`` 和 ``p2`` ， ``p0`` 和 ``p3`` 用于确定切线方向。
+
+    -----
+
+    :param tuple[float,float,float] p0: 前一个点
+    :param tuple[float,float,float] p1: 起点
+    :param tuple[float,float,float] p2: 终点
+    :param tuple[float,float,float] p3: 后一个点
+    :param float t: 插值因子，范围 [0, 1]
+    :param float alpha: 张力参数，默认为0.5
+
+    :return: 曲线上的点
+    :rtype: tuple[float,float,float]
+    """
+    def get_t(_p0, _p1):
+        dx = _p1[0] - _p0[0]
+        dy = _p1[1] - _p0[1]
+        dz = _p1[2] - _p0[2]
+        dist = sqrt(dx**2 + dy**2 + dz**2)
+        return dist ** alpha
+
+    t0 = 0.0
+    t1 = get_t(p0, p1)
+    t2 = t1 + get_t(p1, p2)
+    if t2 - t1 < _ZERO_EPS:
+        return p1
+    t3 = t2 + get_t(p2, p3)
+    _t = t1 + t * (t2 - t1)
+
+    def calc_component(c0, c1, c2, c3):
+        A1 = (t1 - _t) / (t1 - t0) * c0 + (_t - t0) / (t1 - t0) * c1 if t1 - t0 > _ZERO_EPS else c1
+        A2 = (t2 - _t) / (t2 - t1) * c1 + (_t - t1) / (t2 - t1) * c2
+        A3 = (t3 - _t) / (t3 - t2) * c2 + (_t - t2) / (t3 - t2) * c3 if t3 - t2 > _ZERO_EPS else c2
+
+        B1 = (t2 - _t) / (t2 - t0) * A1 + (_t - t0) / (t2 - t0) * A2 if t2 - t0 > _ZERO_EPS else A2
+        B2 = (t3 - _t) / (t3 - t1) * A2 + (_t - t1) / (t3 - t1) * A3 if t3 - t1 > _ZERO_EPS else A2
+
+        C = (t2 - _t) / (t2 - t1) * B1 + (_t - t1) / (t2 - t1) * B2
+        return C
+
+    x = calc_component(p0[0], p1[0], p2[0], p3[0])
+    y = calc_component(p0[1], p1[1], p2[1], p3[1])
+    z = calc_component(p0[2], p1[2], p2[2], p3[2])
+    return x, y, z
+
+
+# endregion
+
+
 # region Misc ==========================================================================================================
 
 
-def range_map(x, output_range, input_range=[0, 1], func=None): # noqa
+def lerp(a, b, t):
     """
-    将某个区间内的数值映射到另一个区间。
+    线性插值。
+
+    -----
+
+    :param float a: 起始值
+    :param float b: 结束值
+    :param float t: 插值因子，范围为 [0, 1]
+
+    :return: 插值结果
+    :rtype: float
+    """
+    return a + (b - a) * t
+
+
+def range_map(x, output_range, input_range=[0, 1], interp=None): # noqa
+    """
+    将某个区间内的数值映射到另一区间。
 
     -----
 
     :param float x: 输入值
     :param tuple[float,float] output_range: 输出区间（闭区间）
     :param tuple[float,float] input_range: 输入区间（闭区间），默认为 [0, 1]
-    :param function func: 插值函数，接受一个参数 t ∈ [0, 1]，返回 [0, 1] 的值；默认为 None
+    :param function interp: 插值函数，接受一个参数 t ∈ [0, 1]，返回 [0, 1] 的值；默认为线性插值
 
     :return: 映射值
     :rtype: float
     """
-    j, k = output_range
-    m, n = input_range
-    t = float(x - m) / (n - m)
-    if func:
-        t = func(t)
-    return j + (k - j) * t
+    a, b = output_range
+    j, k = input_range
+    t = float(x - j) / (k - j)
+    if interp:
+        t = interp(t)
+    return a + (b - a) * t
 
 
 def clamp(x, min_value, max_value):
@@ -785,34 +1063,53 @@ def box_max_edge_len(pos1, pos2):
     return max(abs(a - b) for a, b in zip(pos1, pos2))
 
 
-@inject_is_client
-def camera_rot_p2p(__is_client__, pos1, pos2):
-    """
-    计算从 ``pos1`` 指向 ``pos2`` 的相机角度。
-
-    可用于将实体相机视角锁定到某一坐标。
-
-    -----
-
-    :param tuple[float,float,float] pos1: 坐标1
-    :param tuple[float,float,float] pos2: 坐标2
-
-    :return: 相机角度：(竖直角度, 水平角度)
-    :rtype: tuple[float,float]|None
-    """
-    if not pos1 or not pos2:
-        return
-    api = get_api(__is_client__)
-    return api.GetRotFromDir(
-        pos2[0] - pos1[0],
-        pos2[1] - pos1[1],
-        pos2[2] - pos1[2],
-    )
-
-
 # endregion
 
 
+def __benchmark__(n, timer, pid, info, **kwargs):
+    timer.start("distance2nearest_entity")
+    for _ in xrange(n):
+        distance2nearest_entity._org_func(False, pid)
+    timer.end("distance2nearest_entity")
+
+    from mod.server.extraServerApi import GetEngineActor
+    eid = GetEngineActor().keys()[0]
+    timer.start("distance")
+    for _ in xrange(n):
+        distance._org_func(False, pid, eid)
+    timer.end("distance")
+
+    timer.start("pos_entity_facing")
+    for _ in xrange(n):
+        pos_entity_facing._org_func(False, pid, 1)
+    timer.end("pos_entity_facing")
+
+    timer.start("is_in_sphere")
+    for _ in xrange(n):
+        is_in_sphere._org_func(False, pid, 1, (0, 0, 0))
+    timer.end("is_in_sphere")
+
+    timer.start("is_in_cylinder")
+    for _ in xrange(n):
+        is_in_cylinder._org_func(False, pid, 1, (0, 0, 0), (0, 1, 0))
+    timer.end("is_in_cylinder")
+
+    timer.start("is_in_sector")
+    for _ in xrange(n):
+        is_in_sector._org_func(False, pid, 1, 1, 30, (0, 0, 0), (1, 0, 0))
+    timer.end("is_in_sector")
+
+    timer.start("is_in_box")
+    for _ in xrange(n):
+        is_in_box._org_func(False, pid, (0, 0, 0), (1, 1, 1))
+    timer.end("is_in_box")
+
+    timer.start("catmull_rom")
+    for _ in xrange(n):
+        catmull_rom((0, 0, 0), (5, 5, 5), (10, 0, 0), (15, 0, 0), 0.5)
+    timer.end("catmull_rom")
+
+    info.append("entity count: %d" % len(GetEngineActor()))
 
 
 

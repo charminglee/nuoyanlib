@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -62,7 +62,7 @@ def __test__():
     assert LvComp.BlockInfo is LvComp.BlockInfo
 
 
-def __benchmark__(n, timer, *args):
+def __benchmark__(n, timer, **kwargs):
     import random
     id_pool = tuple(str(i) for i in xrange(2560))
     rand_eid = tuple(random.choice(id_pool) for _ in xrange(n))

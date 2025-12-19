@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -44,12 +44,12 @@ def print_msg(msg):
         get_lv_comp().Msg.NotifyOneMessage(s_api.GetPlayerList()[0], str(msg))
 
 
-def run_benchmark(path, n=100000):
+def run_benchmark(path, pid, n=100000):
     module = _imp("test_scripts." + path)
     timer = Timer()
     info = []
-    module.__benchmark__(n, timer, info)
-    print_msg("=" * 45)
+    module.__benchmark__(n, timer, info=info, pid=pid)
+    print_msg("=" * 75)
     print_msg("[{}]".format(path))
     print_msg("n={}".format(n))
     for part_name, cost in timer.part_cost.items():
