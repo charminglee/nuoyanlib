@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-18
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -41,6 +41,12 @@ __all__ = [
 ]
 
 
+_ZERO_EPS = 1e-9
+
+
+# region Vector Class ==================================================================================================
+
+
 _OP_MAP = {
     '+': operator.add,
     '-': operator.sub,
@@ -48,59 +54,47 @@ _OP_MAP = {
     '/': operator.truediv,
     '//': operator.floordiv,
 }
-_ZERO_EPS = 1e-8
 
 
 class Vector(object):
     """
     向量类，支持三维向量与二维向量。
 
-    可传入2个或3个 ``float`` / ``int`` ，也可传入一个包含2个或3个 ``float`` / ``int`` 的 ``tuple`` ，若不传入任何参数，则创建一个三维零向量。
+    可传入2个或3个 ``float`` / ``int`` ，也可传入一个包含2个或3个 ``float`` / ``int`` 的 ``tuple`` 。若不传入任何参数，则创建一个三维零向量。
 
     -----
 
     :raise VectorError: 传入的参数不合法
     """
 
-    __slots__ = ('x', 'y', 'z', '_dim')
+    __slots__ = ('_x', '_y', '_z', '_dim')
 
     def __init__(self, *args):
         l = len(args)
-        if l == 0:
-            self.x = 0.0
-            self.y = 0.0
-            self.z = 0.0
-            self._dim = 3
-        elif l == 1 and isinstance(args[0], tuple):
-            vec = args[0]
-            if len(vec) == 2:
-                self.x, self.y = vec
-                self.z = 0.0
-                self._dim = 2
-            else:
-                self.x, self.y, self.z = vec
+        try:
+            if l == 0:
+                self._x = self._y = self._z = 0.0
                 self._dim = 3
-        elif l > 1 and all(isinstance(a, (float, int)) for a in args):
-            if l == 2:
-                self.x, self.y = args
-                self.z = 0.0
+            elif l == 1:
+                vec = map(float, args[0])
+                if len(vec) == 2:
+                    self._x, self._y = vec
+                    self._z = 0.0
+                    self._dim = 2
+                else:
+                    self._x, self._y, self._z = map(float, vec)
+                    self._dim = 3
+            elif l == 2:
+                self._x, self._y = map(float, args)
+                self._z = 0.0
                 self._dim = 2
             elif l == 3:
-                self.x, self.y, self.z = args
+                self._x, self._y, self._z = map(float, args)
                 self._dim = 3
-        else:
-            raise VectorError("Invalid Vector construction arguments: {}".format(args))
-
-    @property
-    def dim(self):
-        """
-        [只读属性]
-
-        向量维度。
-
-        :rtype: int
-        """
-        return self._dim
+            else:
+                raise
+        except:
+            raise VectorError("invalid Vector construction arguments: {}".format(args))
 
     @staticmethod
     def zero(is_3d=True):
@@ -227,6 +221,139 @@ class Vector(object):
         return Vector(0.0, 0.0, -1.0)
 
     @property
+    def dim(self):
+        """
+        [只读属性]
+
+        向量维度。
+
+        :rtype: int
+        """
+        return self._dim
+
+    @property
+    def x(self):
+        """
+        [可读写属性]
+
+        向量的x分量。
+
+        :rtype: float
+        """
+        return self._x
+
+    @x.setter
+    def x(self, val):
+        """
+        [可读写属性]
+
+        设置向量的x分量。
+
+        :type val: float
+        """
+        self._x = float(val)
+
+    @property
+    def y(self):
+        """
+        [可读写属性]
+
+        向量的y分量。
+
+        :rtype: float
+        """
+        return self._y
+
+    @y.setter
+    def y(self, val):
+        """
+        [可读写属性]
+
+        设置向量的y分量。
+
+        :type val: float
+        """
+        self._y = float(val)
+
+    @property
+    def z(self):
+        """
+        [可读写属性]
+
+        向量的z分量。
+
+        若向量为二维向量，则z分量为 ``0.0`` 。
+
+        :rtype: float
+        """
+        return self._z
+
+    @z.setter
+    def z(self, val):
+        """
+        [可读写属性]
+
+        设置向量的z分量。
+
+        :type val: float
+        :raise VectorError: 若向量为二维向量则抛出
+        """
+        if self._dim == 2:
+            raise VectorError("2D vector has no z-component")
+        self._z = float(val)
+
+    @property
+    def xy(self):
+        """
+        [只读属性]
+
+        返回由向量xy分量组成的元组 ``(x,⠀y)`` 。
+
+        :rtype: tuple[float,float]
+        """
+        return self._x, self._y
+
+    @property
+    def xz(self):
+        """
+        [只读属性]
+
+        返回由向量xz分量组成的元组 ``(x,⠀z)`` 。
+
+        若向量为二维向量，则z分量为 ``0.0`` 。
+
+        :rtype: tuple[float,float]
+        """
+        return self._x, self._z
+
+    @property
+    def yz(self):
+        """
+        [只读属性]
+
+        返回由向量yz分量组成的元组 ``(y,⠀z)`` 。
+
+        若向量为二维向量，则z分量为 ``0.0`` 。
+
+        :rtype: tuple[float,float]
+        """
+        return self._y, self._z
+
+    @property
+    def xyz(self):
+        """
+        [只读属性]
+
+        返回由向量xyz分量组成的元组 ``(x,⠀y,⠀z)`` 。
+
+        等价于 ``tuple(vec)`` 。
+        若向量为二维向量，则z分量为 ``0.0`` 。
+
+        :rtype: tuple[float,float,float]
+        """
+        return self._x, self._y, self._z
+
+    @property
     def length(self):
         """
         [可读写属性]
@@ -235,7 +362,7 @@ class Vector(object):
 
         :rtype: float
         """
-        return math.sqrt(self.length2)
+        return 0.0 if self.is_zero() else math.sqrt(self.length2)
 
     @length.setter
     def length(self, val):
@@ -248,12 +375,12 @@ class Vector(object):
         :raise VectorError: 对零向量调用时抛出
         """
         l = self.length
-        if l < _ZERO_EPS:
+        if l == 0:
             raise VectorError("can't set the length of zero vector")
         mul = val / l
-        self.x *= mul
-        self.y *= mul
-        self.z *= mul
+        self._x *= mul
+        self._y *= mul
+        self._z *= mul
 
     @property
     def length2(self):
@@ -266,7 +393,7 @@ class Vector(object):
 
         :rtype: float
         """
-        return self.x**2 + self.y**2 + self.z**2
+        return 0.0 if self.is_zero() else (self._x**2 + self._y**2 + self._z**2)
 
     def is_zero(self):
         """
@@ -277,7 +404,7 @@ class Vector(object):
         :return: 是否是零向量
         :rtype: bool
         """
-        return self.length < _ZERO_EPS
+        return abs(self._x) < _ZERO_EPS and abs(self._y) < _ZERO_EPS and abs(self._z) < _ZERO_EPS
 
     def normalize(self, inplace=True):
         """
@@ -293,14 +420,14 @@ class Vector(object):
         :raise VectorError: 对零向量调用时抛出
         """
         l = self.length
-        if l < _ZERO_EPS:
+        if l == 0:
             raise VectorError("can't normalize zero vector")
         mul = 1 / l
-        x = self.x * mul
-        y = self.y * mul
-        z = self.z * mul
+        x = self._x * mul
+        y = self._y * mul
+        z = self._z * mul
         if inplace:
-            self.x, self.y, self.z = x, y, z
+            self._x, self._y, self._z = x, y, z
             return self
         else:
             return Vector(x, y) if self._dim == 2 else Vector(x, y, z)
@@ -314,7 +441,7 @@ class Vector(object):
         :return: 相反向量
         :rtype: Vector
         """
-        return Vector(-self.x, -self.y) if self._dim == 2 else Vector(-self.x, -self.y, -self.z)
+        return Vector(-self._x, -self._y) if self._dim == 2 else Vector(-self._x, -self._y, -self._z)
 
     def neg(self, inplace=True):
         """
@@ -324,45 +451,53 @@ class Vector(object):
 
         :param bool inplace: 是否就地修改，默认为True
 
-        :return: 相反向量
+        :return: 相反向量；就地修改时，返回向量自身
         :rtype: Vector
         """
         if inplace:
-            self.x = -self.x
-            self.y = -self.y
-            self.z = -self.z
+            self._x = -self._x
+            self._y = -self._y
+            self._z = -self._z
             return self
         else:
             return -self
 
     def __eq__(self, other):
-        if not isinstance(other, (Vector, tuple)) or self._dim != len(other):
+        try:
+            if self._dim == 2:
+                return len(other) == 2 and self._x == other[0] and self._y == other[1]
+            else:
+                return len(other) == 3 and self._x == other[0] and self._y == other[1] and self._z == other[2]
+        except:
             return False
-        return self.x == other[0] and self.y == other[1] and self.z == other[2]
 
     def __ne__(self, other):
         return not self == other
 
     def copy(self):
         """
-        复制向量。
+        返回当前向量的拷贝。
 
         -----
 
         :return: 新向量
         :rtype: Vector
         """
-        return Vector(self.x, self.y) if self._dim == 2 else Vector(self.x, self.y, self.z)
+        return Vector(self._x, self._y) if self._dim == 2 else Vector(self._x, self._y, self._z)
 
     __deepcopy__ = __copy__ = copy
 
     def __repr__(self):
         if self._dim == 2:
-            return "Vector({}, {})".format(self.x, self.y)
+            return "Vector({}, {})".format(self._x, self._y)
         else:
-            return "Vector({}, {}, {})".format(self.x, self.y, self.z)
+            return "Vector({}, {}, {})".format(self._x, self._y, self._z)
 
-    __str__ = __repr__
+    def __str__(self):
+        if self._dim == 2:
+            return "({}, {})".format(self._x, self._y)
+        else:
+            return "({}, {}, {})".format(self._x, self._y, self._z)
 
     def __getitem__(self, i):
         """
@@ -378,11 +513,11 @@ class Vector(object):
         :raise IndexError: 索引超出范围
         """
         if i == 0:
-            return self.x
+            return self._x
         if i == 1:
-            return self.y
+            return self._y
         if i == 2 and self._dim == 3:
-            return self.z
+            return self._z
         raise IndexError("Vector index out of range")
 
     def __setitem__(self, i, value):
@@ -400,60 +535,80 @@ class Vector(object):
         :raise IndexError: 索引超出范围
         """
         if i == 0:
-            self.x = value
+            self._x = float(value)
         elif i == 1:
-            self.y = value
+            self._y = float(value)
         elif i == 2 and self._dim == 3:
-            self.z = value
+            self._z = float(value)
         else:
             raise IndexError("Vector index out of range")
 
     def __iter__(self):
-        yield self.x
-        yield self.y
+        yield self._x
+        yield self._y
         if self._dim == 3:
-            yield self.z
+            yield self._z
 
     def __len__(self):
         return self._dim
 
     def _op(self, other, operator, scalar_only=False):
         op = _OP_MAP[operator]
+
         if isinstance(other, (int, float)):
             if self._dim == 2:
-                return Vector(op(self.x, other), op(self.y, other))
+                return Vector(op(self._x, other), op(self._y, other))
             else:
-                return Vector(op(self.x, other), op(self.y, other), op(self.z, other))
+                return Vector(op(self._x, other), op(self._y, other), op(self._z, other))
 
-        if not scalar_only and isinstance(other, (Vector, tuple)):
-            if self._dim != len(other):
-                raise VectorError("the dimensions of two vectors are mismatched")
-            if self._dim == 2:
-                return Vector(op(self.x, other[0]), op(self.y, other[1]))
-            else:
-                return Vector(op(self.x, other[0]), op(self.y, other[1]), op(self.z, other[2]))
+        elif not scalar_only:
+            try:
+                if self._dim != len(other):
+                    raise VectorError("the dimensions of two vectors are mismatched")
+                if self._dim == 2:
+                    return Vector(op(self._x, other[0]), op(self._y, other[1]))
+                else:
+                    return Vector(op(self._x, other[0]), op(self._y, other[1]), op(self._z, other[2]))
+            except VectorError:
+                raise
+            except:
+                # 跳转到下方的TypeError
+                pass
 
-        raise TypeError("unsupported operand type(s) for %s: 'Vector' and '%s'" % (operator, type(other).__name__))
+        raise TypeError(
+            "unsupported operand type(s) for %s: 'Vector' and '%s'"
+            % (operator, type(other).__name__)
+        )
 
     def _iop(self, other, operator, scalar_only=False):
         op = _OP_MAP[operator]
+
         if isinstance(other, (int, float)):
-            self.x = op(self.x, other)
-            self.y = op(self.y, other)
+            self._x = op(self._x, other)
+            self._y = op(self._y, other)
             if self._dim == 3:
-                self.z = op(self.z, other)
+                self._z = op(self._z, other)
             return self
 
-        if not scalar_only and isinstance(other, (Vector, tuple)):
-            if self._dim != len(other):
-                raise VectorError("the dimensions of two vectors are mismatched")
-            self.x = op(self.x, other[0])
-            self.y = op(self.y, other[1])
-            if self._dim == 3:
-                self.z = op(self.z, other[2])
-            return self
+        elif not scalar_only:
+            try:
+                if self._dim != len(other):
+                    raise VectorError("the dimensions of two vectors are mismatched")
+                self._x = op(self._x, other[0])
+                self._y = op(self._y, other[1])
+                if self._dim == 3:
+                    self._z = op(self._z, other[2])
+                return self
+            except VectorError:
+                raise
+            except:
+                # 跳转到下方的TypeError
+                pass
 
-        raise TypeError("unsupported operand type(s) for %s: 'Vector' and '%s'" % (operator, type(other).__name__))
+        raise TypeError(
+            "unsupported operand type(s) for %s=: 'Vector' and '%s'"
+            % (operator, type(other).__name__)
+        )
 
     def __add__(self, other):
         """
@@ -469,6 +624,7 @@ class Vector(object):
         :rtype: Vector
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._op(other, '+')
 
@@ -486,6 +642,7 @@ class Vector(object):
         :rtype: Vector
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self + other
 
@@ -499,10 +656,11 @@ class Vector(object):
 
         :param Vector|tuple[float]|float other: 另一向量（Vector、tuple）或标量（int、float）
 
-        :return: 向量本身
+        :return: 向量自身
         :rtype: Vector
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._iop(other, '+')
 
@@ -520,6 +678,7 @@ class Vector(object):
         :rtype: Vector
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._op(other, '-')
 
@@ -537,6 +696,7 @@ class Vector(object):
         :rtype: Vector
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return -self + other
 
@@ -550,10 +710,11 @@ class Vector(object):
 
         :param Vector|tuple[float]|float other: 另一向量（Vector、tuple）或标量（int、float）
 
-        :return: 向量本身
+        :return: 向量自身
         :rtype: Vector
 
         :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._iop(other, '-')
 
@@ -569,6 +730,8 @@ class Vector(object):
 
         :return: 新向量
         :rtype: Vector
+
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._op(other, '*', True)
 
@@ -584,6 +747,8 @@ class Vector(object):
 
         :return: 新向量
         :rtype: Vector
+
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self * other
 
@@ -597,8 +762,10 @@ class Vector(object):
 
         :param float other: 标量（int、float）
 
-        :return: 向量本身
+        :return: 向量自身
         :rtype: Vector
+
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._iop(other, '*', True)
 
@@ -614,6 +781,8 @@ class Vector(object):
 
         :return: 新向量
         :rtype: Vector
+
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._op(other, '/', True)
 
@@ -627,8 +796,10 @@ class Vector(object):
 
         :param float other: 标量（int、float）
 
-        :return: 向量本身
+        :return: 向量自身
         :rtype: Vector
+
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._iop(other, '/', True)
 
@@ -637,7 +808,7 @@ class Vector(object):
 
     def __floordiv__(self, other):
         """
-        向量除法（向下整除）（返回新向量）。
+        向量除法（向下整除，返回新向量）。
 
         只允许与标量相除，结果为每个分量同时除以该标量。
 
@@ -647,12 +818,14 @@ class Vector(object):
 
         :return: 新向量
         :rtype: Vector
+
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._op(other, '//', True)
 
     def __ifloordiv__(self, other):
         """
-        向量除法（向下整除）（就地修改）。
+        向量除法（向下整除，就地修改）。
 
         只允许与标量相除，结果为每个分量同时除以该标量。
 
@@ -660,8 +833,10 @@ class Vector(object):
 
         :param float other: 标量（int、float）
 
-        :return: 向量本身
+        :return: 向量自身
         :rtype: Vector
+
+        :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._iop(other, '//', True)
 
@@ -680,39 +855,40 @@ class Vector(object):
         """
         if self._dim != len(vec):
             raise VectorError("the dimensions of two vectors are mismatched")
-        return sum(a * b for a, b in zip(self, vec))
+        return sum(self[i] * vec[i] for i in xrange(self._dim))
 
     def cross(self, vec, inplace=True):
         """
-        向量叉积，仅支持三维向量。
+        向量叉积。
+
+        仅支持三维向量。
 
         -----
 
         :param Vector|tuple[float,float,float] vec: 另一向量（Vector、tuple）
         :param bool inplace: 是否就地修改，默认为True
 
-        :return: 向量叉积
+        :return: 向量叉积；就地修改时，返回向量自身
         :rtype: Vector
 
         :raise VectorError: 当前向量非三维向量，或传入非三维向量时抛出
         """
         if self._dim != 3 or len(vec) != 3:
             raise VectorError("cross product only supports 3D vectors")
-        x = self.y * vec[2] - self.z * vec[1]
-        y = self.z * vec[0] - self.x * vec[2]
-        z = self.x * vec[1] - self.y * vec[0]
+        x = self._y * vec[2] - self._z * vec[1]
+        y = self._z * vec[0] - self._x * vec[2]
+        z = self._x * vec[1] - self._y * vec[0]
         if inplace:
-            self.x, self.y, self.z = x, y, z
+            self._x, self._y, self._z = x, y, z
             return self
         else:
             return Vector(x, y, z)
 
 
-def _to_vector(vec):
-    if isinstance(vec, Vector):
-        return vec.copy()
-    else:
-        return Vector(vec)
+# endregion
+
+
+# region Functional APIs ===============================================================================================
 
 
 def is_zero_vec(vec):
@@ -721,12 +897,12 @@ def is_zero_vec(vec):
 
     -----
 
-    :param Vector|tuple[float] vec: 向量
+    :param tuple[float] vec: 向量
 
     :return: 是否是零向量
     :rtype: bool
     """
-    return _to_vector(vec).is_zero()
+    return all(abs(v) < _ZERO_EPS for v in vec)
 
 
 def set_vec_length(vec, length, ret_vector=False):
@@ -1130,7 +1306,11 @@ def vec_scale(vec, scale, ret_vector=False):
     return res if ret_vector else tuple(res)
 
 
+# endregion
+
+
 def __test__():
+    Vector("NY")
     from ..core._utils import assert_error
     v1 = Vector(1, 2, 3)
     v2 = Vector(4, 5, 6)
