@@ -891,6 +891,10 @@ class Vector(object):
 # region Functional APIs ===============================================================================================
 
 
+def _is_scalar(val):
+    return isinstance(val, (float, int))
+
+
 def is_zero_vec(vec):
     """
     判断向量是否是零向量。
@@ -903,6 +907,80 @@ def is_zero_vec(vec):
     :rtype: bool
     """
     return all(abs(v) < _ZERO_EPS for v in vec)
+
+
+def vec_add(vec, *more):
+    """
+    向量加法。
+
+    -----
+
+    :param tuple[float] vec: 向量
+    :param tuple[float]|float more: [变长位置参数] 一个或多个向量或标量，按顺序相加
+
+    :return: 结果向量
+    :rtype: tuple[float]
+    """
+    vec = list(vec)
+    for i in xrange(len(vec)):
+        for m in more:
+            if _is_scalar(m):
+                vec[i] += m
+            else:
+                vec[i] += m[i]
+    return tuple(vec)
+
+
+def vec_sub(vec, *more):
+    """
+    向量减法。
+
+    -----
+
+    :param tuple[float] vec: 向量
+    :param tuple[float]|float more: [变长位置参数] 一个或多个向量或标量，按顺序相减
+
+    :return: 结果向量
+    :rtype: tuple[float]
+    """
+    vec = list(vec)
+    for i in xrange(len(vec)):
+        for m in more:
+            if _is_scalar(m):
+                vec[i] -= m
+            else:
+                vec[i] -= m[i]
+    return tuple(vec)
+
+
+def vec_mul(vec, scalar):
+    """
+    向量与标量相乘。
+
+    -----
+
+    :param tuple[float] vec: 向量
+    :param float scalar: 标量
+
+    :return: 结果向量
+    :rtype: tuple[float]
+    """
+    return tuple(v * scalar for v in vec)
+
+
+def vec_div(vec, scalar):
+    """
+    向量与标量相除。
+
+    -----
+
+    :param tuple[float] vec: 向量
+    :param float scalar: 标量
+
+    :return: 结果向量
+    :rtype: tuple[float]
+    """
+    return tuple(v / scalar for v in vec)
 
 
 def set_vec_length(vec, length, ret_vector=False):
@@ -925,26 +1003,22 @@ def set_vec_length(vec, length, ret_vector=False):
     return vec if ret_vector else tuple(vec)
 
 
-def vec_orthogonal_decomposition(vec, basis1, basis2, ret_vector=False):
+def vec_orthogonal_decomposition(vec, basis1, basis2):
     """
     对向量进行正交分解。
 
     -----
 
-    :param Vector|tuple[float] vec: 要分解的向量
-    :param Vector|tuple[float] basis1: 正交基1
-    :param Vector|tuple[float] basis2: 正交基2
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param tuple[float] vec: 向量
+    :param tuple[float] basis1: 正交基1
+    :param tuple[float] basis2: 正交基2
 
     :return: 分解后的两个向量，第一个向量沿basis1方向，第二个向量沿basis2方向
-    :rtype: tuple[Vector|tuple[float],Vector|tuple[float]]
+    :rtype: tuple[tuple[float],tuple[float]]
     """
-    vec = _to_vector(vec)
-    basis1 = _to_vector(basis1)
-    basis2 = _to_vector(basis2)
-    vec1 = (vec.dot(basis1) / basis1.dot(basis1)) * basis1
-    vec2 = (vec.dot(basis2) / basis2.dot(basis2)) * basis2
-    return (vec1, vec2) if ret_vector else (tuple(vec1), tuple(vec2))
+    vec1 = vec_mul(basis1, vec_dot(vec, basis1) / vec_dot(basis1, basis1))
+    vec2 = vec_mul(basis2, vec_dot(vec, basis2) / vec_dot(basis2, basis2))
+    return vec1, vec2
 
 
 def vec_entity_left(entity_id, ret_vector=False):
