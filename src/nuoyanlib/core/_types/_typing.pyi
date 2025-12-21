@@ -11,7 +11,7 @@
 
 
 import sys
-from typing import TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
+from typing import Protocol, Iterator, TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from ...client.ui.nyc import *
@@ -42,6 +42,16 @@ STuple = Tuple[str, ...]
 Matrix = List[List[float]]
 Args = Tuple[Any, ...]
 Kwargs = Dict[str, Any]
+if sys.version_info <= (2, 7):
+    Scalar = Union[float, int, long]
+else:
+    Scalar = Union[float, int]
+class VectorLike(Protocol):
+    def __iter__(self) -> Iterator[float]: ...
+    def __getitem__(self, i: int) -> float: ...
+    def __len__(self) -> int: ...
+GeneralVector = Union[FTuple3, FTuple2]
+VectorLikeT = TypeVar("VectorLikeT", bound=VectorLike)
 
 
 class ItemDict(TypedDict, total=False):

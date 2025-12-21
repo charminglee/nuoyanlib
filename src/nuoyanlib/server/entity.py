@@ -14,8 +14,8 @@ import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import EntityType
 from ..core.server.comp import CF, LvComp
 from ..core.server import _lib_server
-from ..utils.vector import vec_p2p, vec_composite
 from ..utils.mc_math import distance, ray_box_intersection, pos_floor
+from ..utils.vector import dir_from_to, vec_add
 
 
 __all__ = [
@@ -152,9 +152,9 @@ def attract_entities(
             continue
         motion = cf.ActorMotion
         org_motion = motion.GetMotion()
-        vec = vec_p2p(epos, pos)
+        vec = dir_from_to(epos, pos)
         vec = tuple(i * power for i in vec)
-        res_motion = vec_composite(False, org_motion, vec)
+        res_motion = vec_add(org_motion, vec)
         etype = cf.EngineType.GetEngineType()
         if etype == EntityType.Player:
             if motion.SetPlayerMotion(res_motion):

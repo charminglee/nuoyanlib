@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-22
 #  ⠀
 # =================================================
 
@@ -14,7 +14,7 @@ import math
 import mod.client.extraClientApi as c_api
 from mod.common.minecraftEnum import RayFilterType
 from ..core.client.comp import LvComp, PLAYER_ID, CF
-from ..utils.vector import vec_p2p, vec_angle
+from ..utils.vector import dir_from_to, vec_angle_between
 from ..utils.mc_math import distance
 
 
@@ -58,8 +58,8 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=math.pi 
         ent_pos = CF(eid).Pos.GetFootPos()
         if not ent_pos:
             continue
-        target_dir = vec_p2p(center, ent_pos)
-        angle = vec_angle(camera_dir, target_dir)
+        target_dir = dir_from_to(center, ent_pos)
+        angle = vec_angle_between(camera_dir, target_dir)
         w_dist = distance(center, ent_pos)
         s_dist = 1 # todo
         if (

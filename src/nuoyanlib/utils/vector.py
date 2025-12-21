@@ -5,43 +5,69 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-22
 #  ⠀
 # =================================================
 
 
 import operator
-import math
+from math import degrees, sin, cos, acos, sqrt, radians, atan2
 from mod.common.utils.mcmath import Matrix
-from ..core._sys import get_cf, get_api
+from ..core._sys import get_cf
 from ..core.error import VectorError
 
 
 __all__ = [
+    "VEC_ZERO",
+    "VEC_ONE",
+    "VEC_UP",
+    "VEC_DOWN",
+    "VEC_LEFT",
+    "VEC_RIGHT",
+    "VEC_FORWARD",
+    "VEC_BACKWARD",
     "Vector",
-    "is_zero_vec",
+    "dir2rot",
+    "rot2dir",
+    "dir_from_to",
+    "vec_length2",
+    "vec_length",
     "set_vec_length",
-    "vec_orthogonal_decomposition",
+    "vec_normalize",
+    "is_zero_vec",
+    "vec_neg",
+    "vec_add",
+    "vec_sub",
+    "vec_mul",
+    "vec_div",
+    "vec_dot",
+    "vec_cross",
+    "vec_project",
+    "vec_project_length",
+    "vec_angle_between",
+    "vec_euler_rotate",
+    "vec_rotate_around",
+    "vec_entity_up",
+    "vec_entity_down",
     "vec_entity_left",
     "vec_entity_right",
     "vec_entity_forward",
     "vec_entity_backward",
-    "vec_entity_up",
-    "vec_entity_down",
-    "vec_normalize",
-    "vec_rot_p2p",
-    "vec_p2p",
-    "vec_length",
-    "vec_angle",
-    "vec_euler_rotate",
-    "vec_rotate_around",
     "outgoing_vec",
-    "vec_composite",
-    "vec_scale",
 ]
 
 
-_ZERO_EPS = 1e-9
+_ZERO_EPS = 1e-8
+
+
+VEC_ZERO     = (0.0, 0.0, 0.0)
+VEC_ONE      = (1.0, 1.0, 1.0)
+VEC_UP       = (0.0, 1.0, 0.0)
+VEC_DOWN     = (0.0, -1.0, 0.0)
+VEC_LEFT     = (1.0, 0.0, 0.0)
+VEC_RIGHT    = (-1.0, 0.0, 0.0)
+VEC_FORWARD  = (0.0, 0.0, 1.0)
+VEC_BACKWARD = (0.0, 0.0, -1.0)
 
 
 # region Vector Class ==================================================================================================
@@ -60,7 +86,17 @@ class Vector(object):
     """
     向量类，支持三维向量与二维向量。
 
-    可传入2个或3个 ``float`` / ``int`` ，也可传入一个包含2个或3个 ``float`` / ``int`` 的 ``tuple`` 。若不传入任何参数，则创建一个三维零向量。
+    用法：
+
+    - 构造向量
+    >>> Vector(1, 2, 3) # 三维向量
+    >>> Vector(1, 2)    # 二维向量
+    >>> Vector()        # 三维零向量
+
+    - 从可迭代对象构造（如列表、元组、生成器等）
+    >>> vec = [1, 2, 3]
+    >>> Vector(vec)
+    >>> Vector(v * 2 for v in vec)
 
     -----
 
@@ -77,12 +113,12 @@ class Vector(object):
                 self._dim = 3
             elif l == 1:
                 vec = map(float, args[0])
-                if len(vec) == 2:
+                if len(vec) == 2: # noqa
                     self._x, self._y = vec
                     self._z = 0.0
                     self._dim = 2
                 else:
-                    self._x, self._y, self._z = map(float, vec)
+                    self._x, self._y, self._z = vec
                     self._dim = 3
             elif l == 2:
                 self._x, self._y = map(float, args)
@@ -105,12 +141,12 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否返回三维向量
+        :param bool is_3d: 是否创建三维向量，默认为 True
 
         :return: 零向量
         :rtype: Vector
         """
-        return Vector(0.0, 0.0, 0.0) if is_3d else Vector(0.0, 0.0)
+        return Vector(VEC_ZERO) if is_3d else Vector(VEC_ZERO[:2])
 
     @staticmethod
     def one(is_3d=True):
@@ -121,12 +157,12 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否返回三维向量
+        :param bool is_3d: 是否创建三维向量，默认为 True
 
         :return: 所有分量均为1.0的向量
         :rtype: Vector
         """
-        return Vector(1.0, 1.0, 1.0) if is_3d else Vector(1.0, 1.0)
+        return Vector(VEC_ONE) if is_3d else Vector(VEC_ONE[:2])
 
     @staticmethod
     def left(is_3d=True):
@@ -137,12 +173,12 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否返回三维向量
+        :param bool is_3d: 是否创建三维向量
 
         :return: x分量为1.0，其余分量为0.0的向量
         :rtype: Vector
         """
-        return Vector(1.0, 0.0, 0.0) if is_3d else Vector(1.0, 0.0)
+        return Vector(VEC_LEFT) if is_3d else Vector(VEC_LEFT[:2])
 
     @staticmethod
     def right(is_3d=True):
@@ -153,12 +189,12 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否返回三维向量
+        :param bool is_3d: 是否创建三维向量，默认为 True
 
         :return: x分量为-1.0，其余分量为0.0的向量
         :rtype: Vector
         """
-        return Vector(-1.0, 0.0, 0.0) if is_3d else Vector(-1.0, 0.0)
+        return Vector(VEC_RIGHT) if is_3d else Vector(VEC_RIGHT[:2])
 
     @staticmethod
     def up(is_3d=True):
@@ -169,12 +205,12 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否返回三维向量
+        :param bool is_3d: 是否创建三维向量，默认为 True
 
         :return: y分量为1.0，其余分量为0.0的向量
         :rtype: Vector
         """
-        return Vector(0.0, 1.0, 0.0) if is_3d else Vector(0.0, 1.0)
+        return Vector(VEC_UP) if is_3d else Vector(VEC_UP[:2])
 
     @staticmethod
     def down(is_3d=True):
@@ -185,40 +221,40 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否返回三维向量
+        :param bool is_3d: 是否创建三维向量，默认为 True
 
         :return: y分量为1.0，其余分量为0.0的向量
         :rtype: Vector
         """
-        return Vector(0.0, -1.0, 0.0) if is_3d else Vector(0.0, -1.0)
+        return Vector(VEC_DOWN) if is_3d else Vector(VEC_DOWN[:2])
 
     @staticmethod
     def forward():
         """
         [静态方法]
 
-        创建一个z分量为 ``1.0`` ，其余分量为 ``0.0`` 的向量。
+        创建一个z分量为 ``1.0`` ，其余分量为 ``0.0`` 的三维向量。
 
         -----
 
         :return: z分量为1.0，其余分量为0.0的向量
         :rtype: Vector
         """
-        return Vector(0.0, 0.0, 1.0)
+        return Vector(VEC_FORWARD)
 
     @staticmethod
     def backward():
         """
         [静态方法]
 
-        创建一个z分量为 ``-1.0`` ，其余分量为 ``0.0`` 的向量。
+        创建一个z分量为 ``-1.0`` ，其余分量为 ``0.0`` 的三维向量。
 
         -----
 
         :return: z分量为-1.0，其余分量为0.0的向量
         :rtype: Vector
         """
-        return Vector(0.0, 0.0, -1.0)
+        return Vector(VEC_BACKWARD)
 
     @property
     def dim(self):
@@ -307,7 +343,7 @@ class Vector(object):
         """
         [只读属性]
 
-        返回由向量xy分量组成的元组 ``(x,⠀y)`` 。
+        返回由向量xy分量组成的元组 ``(vec.x,⠀vec.y)`` 。
 
         :rtype: tuple[float,float]
         """
@@ -318,7 +354,7 @@ class Vector(object):
         """
         [只读属性]
 
-        返回由向量xz分量组成的元组 ``(x,⠀z)`` 。
+        返回由向量xz分量组成的元组 ``(vec.x,⠀vec.z)`` 。
 
         若向量为二维向量，则z分量为 ``0.0`` 。
 
@@ -331,7 +367,7 @@ class Vector(object):
         """
         [只读属性]
 
-        返回由向量yz分量组成的元组 ``(y,⠀z)`` 。
+        返回由向量yz分量组成的元组 ``(vec.y,⠀vec.z)`` 。
 
         若向量为二维向量，则z分量为 ``0.0`` 。
 
@@ -344,14 +380,44 @@ class Vector(object):
         """
         [只读属性]
 
-        返回由向量xyz分量组成的元组 ``(x,⠀y,⠀z)`` 。
+        返回由向量xyz分量组成的元组 ``(vec.x,⠀vec.y,⠀vec.z)`` 。
 
-        等价于 ``tuple(vec)`` 。
         若向量为二维向量，则z分量为 ``0.0`` 。
 
         :rtype: tuple[float,float,float]
         """
         return self._x, self._y, self._z
+
+    @property
+    def T(self):
+        """
+        [只读属性]
+
+        向量转置。
+
+        返回当前向量的列向量形式，例如：
+
+        >>> vec = Vector(1, 2, 3)
+        >>> vec.T
+        [[1.0], [2.0], [3.0]]
+
+        :rtype: list[list[float]]
+        """
+        return [[self._x], [self._y]] if self._dim == 2 else [[self._x], [self._y], [self._z]]
+
+    @property
+    def length2(self):
+        """
+        [只读属性]
+
+        向量长度的平方。
+
+        相比于直接计算长度，速度更快。
+
+        :rtype: float
+        """
+        l = self._x**2 + self._y**2 + self._z**2
+        return 0.0 if abs(l) < _ZERO_EPS else l
 
     @property
     def length(self):
@@ -362,7 +428,7 @@ class Vector(object):
 
         :rtype: float
         """
-        return 0.0 if self.is_zero() else math.sqrt(self.length2)
+        return sqrt(self.length2)
 
     @length.setter
     def length(self, val):
@@ -381,19 +447,6 @@ class Vector(object):
         self._x *= mul
         self._y *= mul
         self._z *= mul
-
-    @property
-    def length2(self):
-        """
-        [只读属性]
-
-        向量长度的平方。
-
-        相比于直接计算长度，速度更快。
-
-        :rtype: float
-        """
-        return 0.0 if self.is_zero() else (self._x**2 + self._y**2 + self._z**2)
 
     def is_zero(self):
         """
@@ -414,7 +467,7 @@ class Vector(object):
 
         :param bool inplace: 是否就地修改，默认为True
 
-        :return: 标准化向量；就地修改时，返回向量自身
+        :return: 标准化向量，长度为1；就地修改时，返回向量自身
         :rtype: Vector
 
         :raise VectorError: 对零向量调用时抛出
@@ -422,10 +475,9 @@ class Vector(object):
         l = self.length
         if l == 0:
             raise VectorError("can't normalize zero vector")
-        mul = 1 / l
-        x = self._x * mul
-        y = self._y * mul
-        z = self._z * mul
+        x = self._x / l
+        y = self._y / l
+        z = self._z / l
         if inplace:
             self._x, self._y, self._z = x, y, z
             return self
@@ -483,25 +535,25 @@ class Vector(object):
         :return: 新向量
         :rtype: Vector
         """
-        return Vector(self._x, self._y) if self._dim == 2 else Vector(self._x, self._y, self._z)
+        return Vector(self)
 
-    __deepcopy__ = __copy__ = copy
+    __pos__ = __deepcopy__ = __copy__ = copy
 
     def __repr__(self):
         if self._dim == 2:
-            return "Vector({}, {})".format(self._x, self._y)
+            return "{0}({1}, {2})".format(self.__class__.__name__, *self)
         else:
-            return "Vector({}, {}, {})".format(self._x, self._y, self._z)
+            return "{0}({1}, {2}, {3})".format(self.__class__.__name__, *self)
 
     def __str__(self):
         if self._dim == 2:
-            return "({}, {})".format(self._x, self._y)
+            return "({0}, {1})".format(*self)
         else:
-            return "({}, {}, {})".format(self._x, self._y, self._z)
+            return "({0}, {1}, {2})".format(*self)
 
     def __getitem__(self, i):
         """
-        获取向量分量。
+        根据索引获取向量分量。
 
         -----
 
@@ -522,7 +574,7 @@ class Vector(object):
 
     def __setitem__(self, i, value):
         """
-        设置向量某个分量的值。
+        根据索引设置向量某个分量的值。
 
         -----
 
@@ -554,18 +606,19 @@ class Vector(object):
 
     def _op(self, other, operator, scalar_only=False):
         op = _OP_MAP[operator]
+        dim = self._dim
 
-        if isinstance(other, (int, float)):
-            if self._dim == 2:
+        if _is_scalar(other):
+            if dim == 2:
                 return Vector(op(self._x, other), op(self._y, other))
             else:
                 return Vector(op(self._x, other), op(self._y, other), op(self._z, other))
 
         elif not scalar_only:
             try:
-                if self._dim != len(other):
+                if dim != len(other):
                     raise VectorError("the dimensions of two vectors are mismatched")
-                if self._dim == 2:
+                if dim == 2:
                     return Vector(op(self._x, other[0]), op(self._y, other[1]))
                 else:
                     return Vector(op(self._x, other[0]), op(self._y, other[1]), op(self._z, other[2]))
@@ -582,21 +635,22 @@ class Vector(object):
 
     def _iop(self, other, operator, scalar_only=False):
         op = _OP_MAP[operator]
+        dim = self._dim
 
-        if isinstance(other, (int, float)):
+        if _is_scalar(other):
             self._x = op(self._x, other)
             self._y = op(self._y, other)
-            if self._dim == 3:
+            if dim == 3:
                 self._z = op(self._z, other)
             return self
 
         elif not scalar_only:
             try:
-                if self._dim != len(other):
+                if dim != len(other):
                     raise VectorError("the dimensions of two vectors are mismatched")
                 self._x = op(self._x, other[0])
                 self._y = op(self._y, other[1])
-                if self._dim == 3:
+                if dim == 3:
                     self._z = op(self._z, other[2])
                 return self
             except VectorError:
@@ -623,28 +677,12 @@ class Vector(object):
         :return: 新向量
         :rtype: Vector
 
-        :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise VectorError: 两个向量的维度不一致时抛出
         :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._op(other, '+')
 
-    def __radd__(self, other):
-        """
-        向量加法（返回新向量）。
-
-        与另一向量相加时，结果为对应分量相加，两个向量的维度需一致；与标量相加时，结果为每个分量同时加上该标量。
-
-        -----
-
-        :param Vector|tuple[float]|float other: 另一向量（Vector、tuple）或标量（int、float）
-
-        :return: 新向量
-        :rtype: Vector
-
-        :raise VectorDimError: 两个向量的维度不一致时抛出
-        :raise TypeError: 与不支持的类型进行运算时抛出
-        """
-        return self + other
+    __radd__ = __add__
 
     def __iadd__(self, other):
         """
@@ -659,7 +697,7 @@ class Vector(object):
         :return: 向量自身
         :rtype: Vector
 
-        :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise VectorError: 两个向量的维度不一致时抛出
         :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._iop(other, '+')
@@ -677,7 +715,7 @@ class Vector(object):
         :return: 新向量
         :rtype: Vector
 
-        :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise VectorError: 两个向量的维度不一致时抛出
         :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._op(other, '-')
@@ -695,7 +733,7 @@ class Vector(object):
         :return: 新向量
         :rtype: Vector
 
-        :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise VectorError: 两个向量的维度不一致时抛出
         :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return -self + other
@@ -713,7 +751,7 @@ class Vector(object):
         :return: 向量自身
         :rtype: Vector
 
-        :raise VectorDimError: 两个向量的维度不一致时抛出
+        :raise VectorError: 两个向量的维度不一致时抛出
         :raise TypeError: 与不支持的类型进行运算时抛出
         """
         return self._iop(other, '-')
@@ -840,22 +878,33 @@ class Vector(object):
         """
         return self._iop(other, '//', True)
 
-    def dot(self, vec):
+    def dot(self, vec=None):
         """
         向量点积。
 
+        若不传入参数，则计算向量与自身的点积，其数值等于向量长度的平方，即：
+
+        >>> vec.dot() == vec.length2
+        True
+
         -----
 
-        :param Vector|tuple[float] vec: 另一向量（Vector、tuple）
+        :param Vector|tuple[float]|None vec: 另一向量（Vector、tuple）；若不传入该参数，则计算与自身的点积
 
         :return: 向量点积
         :rtype: float
 
         :raise VectorError: 两个向量的维度不一致时抛出
         """
-        if self._dim != len(vec):
+        if vec is None:
+            return self.length2
+        dim = self._dim
+        if dim != len(vec):
             raise VectorError("the dimensions of two vectors are mismatched")
-        return sum(self[i] * vec[i] for i in xrange(self._dim))
+        if dim == 2:
+            return self._x * vec[0] + self._y * vec[1]
+        else:
+            return self._x * vec[0] + self._y * vec[1] + self._z * vec[2]
 
     def cross(self, vec, inplace=True):
         """
@@ -871,13 +920,204 @@ class Vector(object):
         :return: 向量叉积；就地修改时，返回向量自身
         :rtype: Vector
 
-        :raise VectorError: 当前向量非三维向量，或传入非三维向量时抛出
+        :raise VectorError: 当前向量或传入的向量非三维向量时抛出
         """
         if self._dim != 3 or len(vec) != 3:
-            raise VectorError("cross product only supports 3D vectors")
-        x = self._y * vec[2] - self._z * vec[1]
-        y = self._z * vec[0] - self._x * vec[2]
-        z = self._x * vec[1] - self._y * vec[0]
+            raise VectorError("Vector.cross() only supports 3D vectors")
+        vx, vy, vz = vec
+        _x, _y, _z = self._x, self._y, self._z
+        x = _y * vz - _z * vy
+        y = _z * vx - _x * vz
+        z = _x * vy - _y * vx
+        if inplace:
+            self._x, self._y, self._z = x, y, z
+            return self
+        else:
+            return Vector(x, y, z)
+
+    def project(self, basis, inplace=True):
+        """
+        计算当前向量在另一向量上的投影。
+
+        -----
+
+        :param Vector|tuple[float] basis: 另一向量
+        :param bool inplace: 是否就地修改，默认为True
+
+        :return: 投影向量；就地修改时，返回向量自身
+        :rtype: Vector
+
+        :raise VectorError: 两个向量的维度不一致时抛出
+        """
+        dim = self._dim
+        if dim != len(basis):
+            raise VectorError("the dimensions of two vectors are mismatched")
+        if dim == 2:
+            bx, by = basis
+            proj_len = (self._x*bx + self._y*by) / (bx**2 + by**2)
+            x = bx * proj_len
+            y = by * proj_len
+            if inplace:
+                self._x, self._y = x, y
+                return self
+            else:
+                return Vector(x, y)
+        else:
+            bx, by, bz = basis
+            proj_len = (self._x*bx + self._y*by + self._z*bz) / (bx**2 + by**2 + bz**2)
+            x = bx * proj_len
+            y = by * proj_len
+            z = bz * proj_len
+            if inplace:
+                self._x, self._y, self._z = x, y, z
+                return self
+            else:
+                return Vector(x, y, z)
+
+    def project_length(self, basis):
+        """
+        计算当前向量在另一向量上的投影的长度。
+
+        -----
+
+        :param Vector|tuple[float] basis: 另一向量
+
+        :return: 投影长度
+        :rtype: float
+
+        :raise VectorError: 两个向量的维度不一致时抛出
+        """
+        dim = self._dim
+        if dim != len(basis):
+            raise VectorError("the dimensions of two vectors are mismatched")
+        if dim == 2:
+            bx, by = basis
+            proj_len = (self._x*bx + self._y*by) / (bx**2 + by**2)
+        else:
+            bx, by, bz = basis
+            proj_len = (self._x*bx + self._y*by + self._z*bz) / (bx**2 + by**2 + bz**2)
+        return proj_len
+
+    def angle_between(self, vec, ret_cos=False, rad=False):
+        """
+        计算当前向量与另一向量之间的夹角。
+
+        -----
+
+        :param Vector|tuple[float] vec: 向量
+        :param bool ret_cos: 是否返回夹角的 cos 值，默认为 False
+        :param bool rad: 是否使用弧度制，仅 ret_cos 为 False 时有效，默认为 False
+
+        :return: 向量夹角
+        :rtype: float
+        """
+        len1 = self.length
+        len2 = vec_length(vec)
+        cos = self.dot(vec) / (len1 * len2)
+        if ret_cos:
+            return cos
+        cos = max(-1.0, min(1.0, cos)) # 防止浮点误差超出acos定义域[-1, 1]
+        angle = acos(cos)
+        return angle if rad else degrees(angle)
+
+    def rotate(self, angle, axis, rad=False, inplace=True):
+        """
+        对向量应用欧拉旋转。
+
+        仅支持三维向量。
+
+        -----
+
+        :param float angle: 旋转角度
+        :param str axis: 旋转轴，可选值为 "x"、"y"、"z"
+        :param bool rad: 旋转角度是否使用弧度制，默认为 False
+        :param bool inplace: 是否就地修改，默认为True
+
+        :return: 旋转后的向量；就地修改时，返回向量自身
+        :rtype: Vector
+
+        :raise VectorError: 当前向量非三维向量时抛出
+        """
+        if self._dim != 3:
+            raise VectorError("Vector.rotate() only supports 3D vector")
+        if not rad:
+            angle = radians(angle)
+
+        c, s = cos(angle), sin(angle)
+        if axis == "x":
+            r_mat = Matrix.Create([
+                [1.0, 0.0, 0.0],
+                [0.0, c, -s],
+                [0.0, s, c],
+            ])
+        elif axis == "y":
+            r_mat = Matrix.Create([
+                [c, 0.0, s],
+                [0.0, 1.0, 0.0],
+                [-s, 0.0, c],
+            ])
+        elif axis == "z":
+            r_mat = Matrix.Create([
+                [c, -s, 0.0],
+                [s, c, 0.0],
+                [0.0, 0.0, 1.0],
+            ])
+        else:
+            r_mat = Matrix.CreateEye(3)
+
+        column_vec = Matrix.Create(self.T)
+        res = r_mat * column_vec
+        x, y, z = res[0, 0], res[1, 0], res[2, 0]
+
+        if inplace:
+            self._x, self._y, self._z = x, y, z
+            return self
+        else:
+            return Vector(x, y, z)
+
+    def rotate_around(self, u, angle, rad=False, inplace=True):
+        """
+        将当前向量绕另一向量旋转。
+
+        仅支持三维向量。
+
+        -----
+
+        :param Vector|tuple[float,float,float] u: 旋转轴向量
+        :param float angle: 旋转角度
+        :param bool rad: 旋转角度是否使用弧度制，默认为 False
+        :param bool inplace: 是否就地修改，默认为True
+
+        :return: 旋转后的向量；就地修改时，返回向量自身
+        :rtype: Vector
+
+        :raise VectorError: 当前向量或旋转轴向量非三维向量，或旋转轴为零向量时抛出
+        """
+        if self._dim != 3:
+            raise VectorError("Vector.rotate_around() only supports 3D vectors")
+        u_len = vec_length(u)
+        if u_len == 0:
+            raise VectorError("the rotation axis vector must be a non-zero vector")
+
+        vx, vy, vz = self
+        ux = u[0] / u_len
+        uy = u[1] / u_len
+        uz = u[2] / u_len
+
+        if not rad:
+            angle = radians(angle)
+        cos_theta = cos(angle)
+        cos_theta_d = 1 - cos_theta
+        sin_theta = sin(angle)
+        dot = ux * vx + uy * vy + uz * vz
+        cross_x = uy * vz - uz * vy
+        cross_y = uz * vx - ux * vz
+        cross_z = ux * vy - uy * vx
+
+        x = vx * cos_theta + ux * cos_theta_d * dot + cross_x * sin_theta
+        y = vy * cos_theta + uy * cos_theta_d * dot + cross_y * sin_theta
+        z = vz * cos_theta + uz * cos_theta_d * dot + cross_z * sin_theta
+
         if inplace:
             self._x, self._y, self._z = x, y, z
             return self
@@ -891,8 +1131,116 @@ class Vector(object):
 # region Functional APIs ===============================================================================================
 
 
+def dir2rot(direction):
+    """
+    将方向向量转换为实体头部视角。
+
+    -----
+
+    :param tuple[float,float,float] direction: 方向向量
+
+    :return: 头部视角
+    :rtype: tuple[float,float]|None
+    """
+    if not direction:
+        return
+    x, y, z = direction
+    hori_len = sqrt(x**2 + z**2)
+    pitch = degrees(-atan2(y, hori_len))
+    yaw = degrees(atan2(-x, z))
+    return pitch, yaw
+
+
+def rot2dir(rot):
+    """
+    将实体头部视角转换为方向向量。
+
+    -----
+
+    :param tuple[float,float] rot: 头部视角
+
+    :return: 方向向量（单位向量）
+    :rtype: tuple[float,float,float]|None
+    """
+    if not rot:
+        return
+    pitch = radians(rot[0])
+    yaw = radians(rot[1])
+    x = -sin(yaw) * cos(pitch)
+    y = -sin(pitch)
+    z = cos(yaw) * cos(pitch)
+    return x, y, z
+
+
+def dir_from_to(start, end):
+    """
+    计算由起点指向终点的方向向量。
+
+    -----
+
+    :param tuple[float] start: 起点坐标
+    :param tuple[float] end: 终点坐标
+
+    :return: 方向向量（单位向量）
+    :rtype: tuple[float]
+    """
+    vec = vec_sub(end, start)
+    return vec_normalize(vec)
+
+
 def _is_scalar(val):
     return isinstance(val, (float, int))
+
+
+def vec_length2(vec):
+    """
+    计算向量长度的平方。
+
+    相比于直接计算长度，速度更快。
+
+    -----
+
+    :param tuple[float] vec: 向量
+
+    :return: 向量长度
+    :rtype: float
+    """
+    l = sum(v**2 for v in vec)
+    return 0.0 if abs(l) < _ZERO_EPS else l
+
+
+def vec_length(vec):
+    """
+    计算向量长度。
+
+    -----
+
+    :param tuple[float] vec: 向量
+
+    :return: 向量长度
+    :rtype: float
+    """
+    return sqrt(vec_length2(vec))
+
+
+def set_vec_length(vec, length):
+    """
+    设置向量长度。
+
+    -----
+
+    :param tuple[float] vec: 向量
+    :param float length: 长度
+
+    :return: 新向量
+    :rtype: tuple[float]
+
+    :raise VectorError: 对零向量调用时抛出
+    """
+    l = vec_length(vec)
+    if l == 0:
+        raise VectorError("can't set the length of zero vector")
+    return vec_mul(vec, length / l)
 
 
 def is_zero_vec(vec):
@@ -909,6 +1257,39 @@ def is_zero_vec(vec):
     return all(abs(v) < _ZERO_EPS for v in vec)
 
 
+def vec_normalize(vec):
+    """
+    向量标准化。
+
+    -----
+
+    :param tuple[float] vec: 向量
+
+    :return: 标准化向量，长度为1
+    :rtype: tuple[float]
+
+    :raise VectorError: 对零向量调用时抛出
+    """
+    l = vec_length(vec)
+    if l == 0:
+        raise VectorError("can't normalize zero vector")
+    return tuple(v / l for v in vec)
+
+
+def vec_neg(vec):
+    """
+    向量取反。
+
+    -----
+
+    :param tuple[float] vec: 向量
+
+    :return: 相反向量
+    :rtype: tuple[float]
+    """
+    return tuple(-v for v in vec)
+
+
 def vec_add(vec, *more):
     """
     向量加法。
@@ -922,11 +1303,13 @@ def vec_add(vec, *more):
     :rtype: tuple[float]
     """
     vec = list(vec)
-    for i in xrange(len(vec)):
-        for m in more:
-            if _is_scalar(m):
+    rng = xrange(len(vec))
+    for m in more:
+        if _is_scalar(m):
+            for i in rng:
                 vec[i] += m
-            else:
+        else:
+            for i in rng:
                 vec[i] += m[i]
     return tuple(vec)
 
@@ -944,11 +1327,13 @@ def vec_sub(vec, *more):
     :rtype: tuple[float]
     """
     vec = list(vec)
-    for i in xrange(len(vec)):
-        for m in more:
-            if _is_scalar(m):
+    rng = xrange(len(vec))
+    for m in more:
+        if _is_scalar(m):
+            for i in rng:
                 vec[i] -= m
-            else:
+        else:
+            for i in rng:
                 vec[i] -= m[i]
     return tuple(vec)
 
@@ -983,125 +1368,188 @@ def vec_div(vec, scalar):
     return tuple(v / scalar for v in vec)
 
 
-def set_vec_length(vec, length, ret_vector=False):
+def vec_dot(vec1, vec2):
     """
-    设置向量长度。
+    向量点积。
 
     -----
 
-    :param Vector|tuple[float] vec: 向量
-    :param float length: 长度
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param tuple[float] vec1: 向量1
+    :param tuple[float] vec2: 向量2
 
-    :return: 向量
-    :rtype: Vector|tuple[float]
-
-    :raise ZeroVectorError: 传入零向量时抛出
+    :return: 向量点积
+    :rtype: float
     """
-    vec = _to_vector(vec)
-    vec.length = length
-    return vec if ret_vector else tuple(vec)
+    return sum(v1 * v2 for v1, v2 in zip(vec1, vec2))
 
 
-def vec_orthogonal_decomposition(vec, basis1, basis2):
+def vec_cross(vec1, vec2):
     """
-    对向量进行正交分解。
+    向量叉积。
+
+    仅支持三维向量。
+
+    -----
+
+    :param tuple[float,float,float] vec1: 向量1
+    :param tuple[float,float,float] vec2: 向量2
+
+    :return: 向量叉积
+    :rtype: tuple[float,float,float]
+    """
+    x1, y1, z1 = vec1
+    x2, y2, z2 = vec2
+    x = y1 * z2 - z1 * y2
+    y = z1 * x2 - x1 * z2
+    z = x1 * y2 - y1 * x2
+    return x, y, z
+
+
+def vec_project(vec, basis):
+    """
+    计算向量在另一向量上的投影。
 
     -----
 
     :param tuple[float] vec: 向量
-    :param tuple[float] basis1: 正交基1
-    :param tuple[float] basis2: 正交基2
+    :param tuple[float] basis: 另一向量
 
-    :return: 分解后的两个向量，第一个向量沿basis1方向，第二个向量沿basis2方向
-    :rtype: tuple[tuple[float],tuple[float]]
+    :return: 投影向量
+    :rtype: tuple[float]
     """
-    vec1 = vec_mul(basis1, vec_dot(vec, basis1) / vec_dot(basis1, basis1))
-    vec2 = vec_mul(basis2, vec_dot(vec, basis2) / vec_dot(basis2, basis2))
-    return vec1, vec2
+    proj_len = vec_dot(vec, basis) / vec_length2(basis)
+    return vec_mul(basis, proj_len)
 
 
-def vec_entity_left(entity_id, ret_vector=False):
+def vec_project_length(vec, basis):
     """
-    获取实体局部坐标系中朝左的单位向量。
+    计算当前向量在另一向量上的投影的长度。
 
     -----
 
-    :param str entity_id: 实体ID
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param tuple[float] vec: 向量
+    :param tuple[float] basis: 另一向量
 
-    :return: 实体局部坐标系中朝左的单位向量，获取失败返回None
-    :rtype: Vector|tuple[float,float,float]|None
+    :return: 投影长度
+    :rtype: float
     """
-    f = vec_entity_forward(entity_id, ret_vector=True)
-    if not f:
-        return None
-    l = Vector.up().cross(f).normalize()
-    return l if ret_vector else tuple(l)
+    return vec_dot(vec, basis) / vec_length2(basis)
 
 
-def vec_entity_right(entity_id, ret_vector=False):
+def vec_angle_between(vec1, vec2, ret_cos=False, rad=False):
     """
-    获取实体局部坐标系中朝右的单位向量。
+    计算两个向量之间的夹角。
 
     -----
 
-    :param str entity_id: 实体ID
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param tuple[float] vec1: 向量1
+    :param tuple[float] vec2: 向量2
+    :param bool ret_cos: 是否返回夹角的 cos 值，默认为 False
+    :param bool rad: 是否使用弧度制，仅 ret_cos 为 False 时有效，默认为 False
 
-    :return: 实体局部坐标系中朝右的单位向量，获取失败返回None
-    :rtype: Vector|tuple[float,float,float]|None
+    :return: 向量夹角
+    :rtype: float
     """
-    l = vec_entity_left(entity_id, True)
-    if not l:
-        return
-    r = l.neg()
-    return r if ret_vector else tuple(r)
+    vec1_len = vec_length(vec1)
+    vec2_len = vec_length(vec2)
+    cos = vec_dot(vec1, vec2) / (vec1_len * vec2_len)
+    if ret_cos:
+        return cos
+    cos = max(-1.0, min(1.0, cos)) # 防止浮点误差超出acos定义域[-1, 1]
+    angle = acos(cos)
+    return angle if rad else degrees(angle)
 
 
-def vec_entity_forward(entity_id, ignore_rot_x=False, ret_vector=False):
+def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", rad=False):
     """
-    获取实体局部坐标系中朝前的单位向量。
+    对向量应用欧拉旋转。
+
+    仅支持三维向量。
 
     -----
 
-    :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param tuple[float,float,float] vec: 要旋转的向量
+    :param float x_angle: 绕x轴的旋转角度，默认为 0.0
+    :param float y_angle: 绕y轴的旋转角度，默认为 0.0
+    :param float z_angle: 绕z轴的旋转角度，默认为 0.0
+    :param str order: 旋转顺序，默认为 "zyx"
+    :param bool rad: 旋转角度是否使用弧度制，默认为 False
 
-    :return: 实体局部坐标系中朝前的单位向量，获取失败返回None
-    :rtype: Vector|tuple[float,float,float]|None
+    :return: 旋转后的向量
+    :rtype: tuple[float,float,float]
     """
-    rot = get_cf(entity_id).Rot.GetRot()
-    if not rot:
-        return
-    if ignore_rot_x:
-        rot = (0, rot[1])
-    f = get_api().GetDirFromRot(rot)
-    return Vector(f) if ret_vector else f
+    if not rad:
+        x_angle = radians(x_angle)
+        y_angle = radians(y_angle)
+        z_angle = radians(z_angle)
+    cos_x, sin_x = cos(x_angle), sin(x_angle)
+    cos_y, sin_y = cos(y_angle), sin(y_angle)
+    cos_z, sin_z = cos(z_angle), sin(z_angle)
+
+    x_matrix = Matrix.Create([
+        [1.0, 0.0,   0.0],
+        [0.0, cos_x, -sin_x],
+        [0.0, sin_x, cos_x],
+    ])
+    y_matrix = Matrix.Create([
+        [cos_y,  0.0, sin_y],
+        [0.0,    1.0, 0.0],
+        [-sin_y, 0.0, cos_y],
+    ])
+    z_matrix = Matrix.Create([
+        [cos_z, -sin_z, 0.0],
+        [sin_z, cos_z,  0.0],
+        [0.0,   0.0,    1.0],
+    ])
+
+    acc_matrix = Matrix.CreateEye(3)
+    for o in order:
+        if o == "x":
+            acc_matrix *= x_matrix
+        elif o == "y":
+            acc_matrix *= y_matrix
+        elif o == "z":
+            acc_matrix *= z_matrix
+
+    column_vec = Matrix.Create([[i] for i in vec])
+    res = acc_matrix * column_vec
+    return res[0, 0], res[1, 0], res[2, 0]
 
 
-def vec_entity_backward(entity_id, ignore_rot_x=False, ret_vector=False):
+def vec_rotate_around(v, u, angle, rad=False):
     """
-    获取实体局部坐标系中朝后的单位向量。
+    将向量v绕着向量u旋转。
+
+    仅支持三维向量。
 
     -----
 
-    :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param tuple[float,float,float] v: 要旋转的向量
+    :param tuple[float,float,float] u: 旋转轴向量
+    :param float angle: 旋转角度
+    :param bool rad: 旋转角度是否使用弧度制，默认为 False
 
-    :return: 实体局部坐标系中朝后的单位向量，获取失败返回None
-    :rtype: Vector|tuple[float,float,float]|None
+    :return: 旋转后的向量
+    :rtype: tuple[float,float,float]
     """
-    f = vec_entity_forward(entity_id, ignore_rot_x, True)
-    if not f:
-        return
-    b = f.neg()
-    return b if ret_vector else tuple(b)
+    u = vec_normalize(u)
+
+    if not rad:
+        angle = radians(angle)
+    cos_theta = cos(angle)
+    sin_theta = sin(angle)
+    dot = vec_dot(u, v)
+    cross = vec_cross(u, v)
+
+    # v * cos_theta + u * (1 - cos_theta) * dot + cross * sin_theta
+    a = vec_mul(v, cos_theta)
+    b = vec_mul(u, (1 - cos_theta) * dot)
+    c = vec_mul(cross, sin_theta)
+    res = vec_add(a, b, c)
+    return res
 
 
-def vec_entity_up(entity_id, ignore_rot_x=False, ret_vector=False):
+def vec_entity_up(entity_id, ignore_rot_x=False):
     """
     获取实体局部坐标系中朝上的单位向量。
 
@@ -1109,23 +1557,22 @@ def vec_entity_up(entity_id, ignore_rot_x=False, ret_vector=False):
 
     :param str entity_id: 实体ID
     :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
 
-    :return: 实体局部坐标系中朝上的单位向量，获取失败返回None
-    :rtype: Vector|tuple[float,float,float]|None
+    :return: 实体局部坐标系中朝上的单位向量，获取失败时返回None
+    :rtype: tuple[float,float,float]|None
     """
     if ignore_rot_x:
-        u = Vector.up()
+        u = VEC_UP
     else:
-        f = vec_entity_forward(entity_id, ret_vector=True)
+        f = vec_entity_forward(entity_id)
         if not f:
-            return None
-        l = Vector.up().cross(f).normalize()
-        u = f.cross(l)
-    return u if ret_vector else tuple(u)
+            return
+        l = vec_normalize(vec_cross(VEC_UP, f))
+        u = vec_cross(f, l)
+    return u
 
 
-def vec_entity_down(entity_id, ignore_rot_x=False, ret_vector=False):
+def vec_entity_down(entity_id, ignore_rot_x=False):
     """
     获取实体局部坐标系中朝下的单位向量。
 
@@ -1133,258 +1580,118 @@ def vec_entity_down(entity_id, ignore_rot_x=False, ret_vector=False):
 
     :param str entity_id: 实体ID
     :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
 
-    :return: 实体局部坐标系中朝下的单位向量，获取失败返回None
-    :rtype: Vector|tuple[float,float,float]|None
+    :return: 实体局部坐标系中朝下的单位向量，获取失败时返回None
+    :rtype: tuple[float,float,float]|None
     """
     if ignore_rot_x:
-        d = Vector.down()
+        d = VEC_DOWN
     else:
-        u = vec_entity_up(entity_id, ret_vector=True)
+        u = vec_entity_up(entity_id)
         if not u:
             return
-        d = u.neg()
-    return d if ret_vector else tuple(d)
+        d = vec_neg(u)
+    return d
 
 
-def vec_normalize(vec, ret_vector=False):
+def vec_entity_left(entity_id):
     """
-    向量标准化。
+    获取实体局部坐标系中朝左的单位向量。
 
     -----
 
-    :param Vector|tuple[float] vec: 向量
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param str entity_id: 实体ID
 
-    :return: 单位向量，长度为1
-    :rtype: Vector|tuple[float]
-
-    :raise ZeroVectorError: 传入零向量时抛出
+    :return: 实体局部坐标系中朝左的单位向量，获取失败时返回None
+    :rtype: tuple[float,float,float]|None
     """
-    return set_vec_length(vec, 1, ret_vector)
+    f = vec_entity_forward(entity_id)
+    if not f:
+        return
+    l = vec_normalize(vec_cross(VEC_UP, f))
+    return l
 
 
-def vec_rot_p2p(pos1, pos2):
+def vec_entity_right(entity_id):
     """
-    计算从 ``pos1`` 指向 ``pos2`` 的向量角度。
+    获取实体局部坐标系中朝右的单位向量。
 
     -----
 
-    :param tuple[float,float,float] pos1: 坐标1
-    :param tuple[float,float,float] pos2: 坐标2
+    :param str entity_id: 实体ID
 
-    :return: 角度元组，分别为竖直角度、水平角度
-    :rtype: tuple[float,float]
+    :return: 实体局部坐标系中朝右的单位向量，获取失败时返回None
+    :rtype: tuple[float,float,float]|None
     """
-    from .mc_math import distance
-    x = pos2[0] - pos1[0]
-    if x == 0:
-        x = 0.000000001
-    y = pos2[1] - pos1[1]
-    z = pos2[2] - pos1[2]
-    hori_dis = distance((pos2[0], pos2[2]), (pos1[0], pos1[2]))
-    if hori_dis == 0:
-        hori_dis = 0.000000001
-    horizontal_rot = (math.atan(z / x) / math.pi) * 180
-    vertical_rot = (math.atan(y / hori_dis) / math.pi) * 180 * (-1 if x < 0 else 1)
-    return vertical_rot, horizontal_rot
+    l = vec_entity_left(entity_id)
+    if not l:
+        return
+    r = vec_neg(l)
+    return r
 
 
-def vec_p2p(pos1, pos2, ret_vector=False):
+def vec_entity_forward(entity_id, ignore_rot_x=False):
     """
-    计算从 ``pos1`` 指向 ``pos2`` 的单位向量。
+    获取实体局部坐标系中朝前的单位向量。
 
     -----
 
-    :param tuple[float,float,float] pos1: 坐标1
-    :param tuple[float,float,float] pos2: 坐标2
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param str entity_id: 实体ID
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
 
-    :return: 从pos1指向pos2的单位向量
-    :rtype: Vector|tuple[float,float,float]
+    :return: 实体局部坐标系中朝前的单位向量，获取失败时返回None
+    :rtype: tuple[float,float,float]|None
     """
-    vec = _to_vector(pos2) - _to_vector(pos1)
-    vec.normalize()
-    return vec if ret_vector else tuple(vec)
+    rot = get_cf(entity_id).Rot.GetRot()
+    if not rot:
+        return
+    if ignore_rot_x:
+        rot = (0, rot[1])
+    f = rot2dir(rot)
+    return f
 
 
-def vec_length(vec):
+def vec_entity_backward(entity_id, ignore_rot_x=False):
     """
-    计算向量长度。
+    获取实体局部坐标系中朝后的单位向量。
 
     -----
 
-    :param Vector|tuple[float] vec: 向量
+    :param str entity_id: 实体ID
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
 
-    :return: 向量长度
-    :rtype: float
+    :return: 实体局部坐标系中朝后的单位向量，获取失败时返回None
+    :rtype: tuple[float,float,float]|None
     """
-    return _to_vector(vec).length
+    f = vec_entity_forward(entity_id, ignore_rot_x)
+    if not f:
+        return
+    b = vec_neg(f)
+    return b
 
 
-def vec_angle(vec1, vec2):
+def outgoing_vec(vec, normal):
     """
-    计算两个向量之间的夹角。
+    根据入射向量和法线计算出射向量。
 
     -----
 
-    :param Vector|tuple[float] vec1: 向量1
-    :param Vector|tuple[float] vec2: 向量2
-
-    :return: 夹角弧度值
-    :rtype: float
-    """
-    vec1 = _to_vector(vec1)
-    vec2 = _to_vector(vec2)
-    vec1_len = vec1.length
-    vec2_len = vec2.length
-    cos = vec1.dot(vec2) / (vec1_len * vec2_len)
-    return math.acos(cos)
-
-
-def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", ret_vector=False):
-    """
-    对指定向量应用欧拉旋转。
-
-    -----
-
-    :param Vector|tuple[float,float,float] vec: 要旋转的向量
-    :param float x_angle: 绕x轴的旋转角度（角度制，下同）
-    :param float y_angle: 绕y轴的旋转角度
-    :param float z_angle: 绕z轴的旋转角度
-    :param str order: 旋转顺序，默认为"zyx"，即先按z轴旋转，再按y轴旋转，最后按x轴旋转
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
-
-    :return: 旋转后的向量
-    :rtype: Vector|tuple[float,float,float]
-    """
-    x_angle = math.radians(x_angle)
-    y_angle = math.radians(y_angle)
-    z_angle = math.radians(z_angle)
-    cos_x, sin_x = math.cos(x_angle), math.sin(x_angle)
-    cos_y, sin_y = math.cos(y_angle), math.sin(y_angle)
-    cos_z, sin_z = math.cos(z_angle), math.sin(z_angle)
-
-    x_matrix = Matrix.Create([
-        [1, 0,     0],
-        [0, cos_x, -sin_x],
-        [0, sin_x, cos_x],
-    ])
-    y_matrix = Matrix.Create([
-        [cos_y,  0, sin_y],
-        [0,      1, 0],
-        [-sin_y, 0, cos_y],
-    ])
-    z_matrix = Matrix.Create([
-        [cos_z, -sin_z, 0],
-        [sin_z, cos_z,  0],
-        [0,     0,      1],
-    ])
-
-    acc_matrix = Matrix.CreateEye(3)
-    for axis in order:
-        if axis == 'x':
-            acc_matrix *= x_matrix
-        elif axis == 'y':
-            acc_matrix *= y_matrix
-        elif axis == 'z':
-            acc_matrix *= z_matrix
-
-    column_vec = Matrix.Create([[i] for i in vec])
-    rotated = acc_matrix * column_vec
-    if ret_vector:
-        return Vector(rotated[0, 0], rotated[1, 0], rotated[2, 0])
-    else:
-        return rotated[0, 0], rotated[1, 0], rotated[2, 0]
-
-
-def vec_rotate_around(v, u, angle, ret_vector=False):
-    """
-    将向量v绕着向量u旋转。
-
-    :param Vector|tuple[float] v: 要旋转的向量
-    :param Vector|tuple[float] u: 旋转轴向量
-    :param float angle: 旋转角度
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
-
-    :return: 旋转后的向量
-    :rtype: Vector|tuple[float]
-    """
-    v = _to_vector(v)
-    v_len = v.length
-    v.normalize()
-    u = _to_vector(u).normalize()
-    theta = math.radians(angle)
-    cos = math.cos(theta)
-    sin = math.sin(theta)
-    dot = u.dot(v)
-    cross = u.cross(v, False)
-    res = v * cos + u * (1 - cos) * dot + cross * sin # 罗德里格旋转公式
-    res *= v_len
-    return res if ret_vector else tuple(res)
-
-
-def outgoing_vec(vec, normal, ret_vector=False):
-    """
-    已知入射向量和法线求出射向量。
-
-    -----
-
-    :param Vector|tuple[float] vec: 入射向量
-    :param Vector|tuple[float] normal: 法线向量
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
+    :param tuple[float] vec: 入射向量
+    :param tuple[float] normal: 法线向量
 
     :return: 出射向量
-    :rtype: Vector|tuple[float]
+    :rtype: tuple[float]
     """
-    v = _to_vector(vec)
-    n = _to_vector(normal)
-    reflex_vec = v - 2 * v.dot(n) * n
-    return reflex_vec if ret_vector else tuple(reflex_vec)
-
-
-def vec_composite(ret_vector, vec, *more_vec):
-    """
-    向量的合成。
-
-    -----
-
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
-    :param Vector|tuple[float] vec: 向量
-    :param Vector|tuple[float] more_vec: 更多向量
-
-    :return: 合向量
-    :rtype: Vector|tuple[float]
-    """
-    res = _to_vector(vec)
-    for v in more_vec:
-        res += _to_vector(v)
-    return res if ret_vector else tuple(res)
-
-
-def vec_scale(vec, scale, ret_vector=False):
-    """
-    向量缩放。
-
-    -----
-
-    :param Vector|tuple[float] vec: 向量
-    :param float scale: 缩放倍率
-    :param bool ret_vector: 是否以Vector类型返回，默认为False，返回tuple
-
-    :return: 缩放后的向量
-    :rtype: Vector|tuple[float]
-    """
-    res = _to_vector(vec) * scale
-    return res if ret_vector else tuple(res)
+    dot = vec_dot(vec, normal)
+    # v - 2 * v.dot(n) * n
+    res = vec_sub(vec, vec_mul(normal, 2 * dot))
+    return res
 
 
 # endregion
 
 
 def __test__():
-    Vector("NY")
     from ..core._utils import assert_error
     v1 = Vector(1, 2, 3)
     v2 = Vector(4, 5, 6)
@@ -1437,7 +1744,109 @@ def __test__():
     assert v1 == (7, 8, 9)
 
 
+def __benchmark__(n, timer, info, **kwargs):
+    v1 = Vector(1, 0, 0)
+    v2 = Vector(0, 0, 1)
 
+    timer.start("Vector+")
+    for _ in xrange(n):
+        v1 + v2
+    timer.end("Vector+")
+
+    timer.start("Vector+=")
+    for _ in xrange(n):
+        v1 += v2
+    timer.end("Vector+=")
+
+    timer.start("Vector-")
+    for _ in xrange(n):
+        v1 - v2
+    timer.end("Vector-")
+
+    timer.start("Vector-=")
+    for _ in xrange(n):
+        v1 -= v2
+    timer.end("Vector-=")
+
+    timer.start("Vector*")
+    for _ in xrange(n):
+        v1 * 1.0
+    timer.end("Vector*")
+
+    timer.start("Vector*=")
+    for _ in xrange(n):
+        v1 *= 1.0
+    timer.end("Vector*=")
+
+    timer.start("Vector/")
+    for _ in xrange(n):
+        v1 / 1.0
+    timer.end("Vector/")
+
+    timer.start("Vector/=")
+    for _ in xrange(n):
+        v1 /= 1.0
+    timer.end("Vector/=")
+
+    timer.start("Vector//")
+    for _ in xrange(n):
+        v1 // 1.0
+    timer.end("Vector//")
+
+    timer.start("Vector//=")
+    for _ in xrange(n):
+        v1 //= 1.0
+    timer.end("Vector//=")
+
+    timer.start("Vector.normalize")
+    for _ in xrange(n):
+        v1.normalize()
+    timer.end("Vector.normalize")
+
+    timer.start("Vector.dot")
+    for _ in xrange(n):
+        v1.dot(v2)
+    timer.end("Vector.dot")
+
+    timer.start("Vector.cross")
+    for _ in xrange(n):
+        v1.cross(v2)
+    timer.end("Vector.cross")
+
+    from mod.common.utils.mcmath import Vector3
+
+    def vec_rotate_around2(v, u, angle):
+        v = Vector3(v)
+        u = Vector3(u).Normalized()
+        angle = radians(angle)
+        cos_theta = cos(angle)
+        sin_theta = sin(angle)
+        dot = Vector3.Dot(u, v)
+        cross = Vector3.Cross(u, v)
+        res = v * cos_theta + u * (1 - cos_theta) * dot + cross * sin_theta
+        return res.ToTuple()
+
+    args = (1.0, 2.0, 3.0), (0.0, 1.0, 0.0), 45.0
+    v = Vector(args[0])
+    u, angle = args[1:]
+    info.append(vec_rotate_around(*args))
+    info.append(v.rotate_around(u, angle))
+    info.append(vec_rotate_around2(*args))
+
+    timer.start("vec_rotate_around | tuple calc")
+    for _ in xrange(n):
+        vec_rotate_around(*args)
+    timer.end("vec_rotate_around | tuple calc")
+
+    timer.start("vec_rotate_around | nuoyanlib Vector")
+    for _ in xrange(n):
+        v.rotate_around(u, angle)
+    timer.end("vec_rotate_around | nuoyanlib Vector")
+
+    timer.start("vec_rotate_around | modsdk Vector3")
+    for _ in xrange(n):
+        vec_rotate_around2(*args)
+    timer.end("vec_rotate_around | modsdk Vector3")
 
 
 

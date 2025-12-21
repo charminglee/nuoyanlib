@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-22
 #  ⠀
 # =================================================
 
@@ -15,10 +15,11 @@ import random
 from mod.common.minecraftEnum import Facing
 from ..core._sys import get_api, get_cf
 from ..core._utils import inject_is_client, UNIVERSAL_OBJECT
-from .vector import Vector
+from .vector import Vector, dir2rot, rot2dir
 
 
 __all__ = [
+    "manhattan_distance",
     "distance2nearest_entity",
     "distance2nearest_player",
     "distance2line",
@@ -45,8 +46,6 @@ __all__ = [
     "is_in_box",
     "fpp_camera_rot",
     "tpp_camera_rot",
-    "dir2rot",
-    "rot2dir",
     "rot_look_at",
     "angle_normalize",
     "bezier_curve",
@@ -61,6 +60,7 @@ __all__ = [
 
 if 0:
     # 绕过机审专用
+    manhattan_distance = lambda *_, **__: UNIVERSAL_OBJECT
     distance2nearest_entity = lambda *_, **__: UNIVERSAL_OBJECT
     distance2nearest_player = lambda *_, **__: UNIVERSAL_OBJECT
     distance2line = lambda *_, **__: UNIVERSAL_OBJECT
@@ -75,7 +75,7 @@ if 0:
 
 _INF = float('inf')
 _NAN = float('nan')
-_ZERO_EPS = 1e-9
+_ZERO_EPS = 1e-8
 
 
 def _get_pos(target, is_client=None):
@@ -87,6 +87,25 @@ def _get_dim(entity_id):
 
 
 # region Distance ======================================================================================================
+
+
+@inject_is_client
+def manhattan_distance(__is_client__, target1, target2):
+    """
+    计算两个坐标或实体间的曼哈顿距离。
+
+    -----
+
+    :param tuple[float]|str target1: 坐标或实体ID
+    :param tuple[float]|str target2: 坐标或实体ID
+
+    :return: 曼哈顿距离；若任一坐标为 None，返回 float('inf')
+    :rtype: float
+    """
+    p1, p2 = _get_pos(target1, __is_client__), _get_pos(target2, __is_client__)
+    if not p1 or not p2:
+        return _INF
+    return sum(abs(p1 - p2) for p1, p2 in zip(p1, p2))
 
 
 def _dist_square(p1, p2):
@@ -105,7 +124,7 @@ def distance2nearest_entity(__is_client__, target, dim=None):
     -----
 
     :param tuple[float,float,float]|str target: 坐标或实体ID
-    :param int|None dim: 维度ID；若当前为客户端或 target 为实体ID，可忽略该参数；默认为 None
+    :param int|None dim: 维度ID；若当前为客户端或 target 为实体ID，可忽略该参数
 
     :return: 与距离最近的实体的距离；若找不到最近实体，返回 float('inf')
     :rtype: float
@@ -144,7 +163,7 @@ def distance2nearest_player(__is_client__, target, dim=None):
     -----
 
     :param tuple[float,float,float]|str target: 坐标或实体ID
-    :param int|None dim: 维度ID；若当前为客户端或 target 为实体ID，可忽略该参数；默认为 None
+    :param int|None dim: 维度ID；若当前为客户端或 target 为实体ID，可忽略该参数
 
     :return: 与距离最近的玩家的距离；若找不到最近玩家，返回 float('inf')
     :rtype: float
@@ -406,8 +425,8 @@ def box_min_max(pos1, pos2):
             z1, z2 = z2, z1
         return (x1, y1, z1), (x2, y2, z2)
     else:
-        x1, y1 = pos1
-        x2, y2 = pos2
+        x1, y1 = pos1 # noqa
+        x2, y2 = pos2 # noqa
         if x1 > x2:
             x1, x2 = x2, x1
         if y1 > y2:
@@ -466,7 +485,7 @@ def pos_block_facing(pos, face=Facing.North, dist=1.0):
     """
     if not pos:
         return
-    pos = map(float, pos) # type: list[float]
+    pos = map(float, pos)
     if face == Facing.Up:
         return pos[0], pos[1] + dist, pos[2]
     elif face == Facing.Down:
@@ -806,47 +825,6 @@ def tpp_camera_rot(rot):
     return (rot[0], yaw, rot[2]) if len(rot) == 3 else (rot[0], yaw)
 
 
-def dir2rot(direction):
-    """
-    将方向向量转换为实体头部视角。
-
-    -----
-
-    :param tuple[float,float,float] direction: 方向向量
-
-    :return: 头部视角
-    :rtype: tuple[float,float]|None
-    """
-    if not direction:
-        return
-    x, y, z = direction
-    hori_len = sqrt(x**2 + z**2)
-    pitch = degrees(-atan2(y, hori_len))
-    yaw = degrees(atan2(-x, z))
-    return pitch, yaw
-
-
-def rot2dir(rot):
-    """
-    将实体头部视角转换为方向向量。
-
-    -----
-
-    :param tuple[float,float] rot: 头部视角
-
-    :return: 方向向量（单位向量）
-    :rtype: tuple[float,float,float]|None
-    """
-    if not rot:
-        return
-    pitch = radians(rot[0])
-    yaw = radians(rot[1])
-    x = -sin(yaw) * cos(pitch)
-    y = -sin(pitch)
-    z = cos(yaw) * cos(pitch)
-    return x, y, z
-
-
 def rot_look_at(start, end):
     """
     计算从起始坐标看向终点坐标的实体头部视角。
@@ -1076,7 +1054,7 @@ def __benchmark__(n, timer, pid, info, **kwargs):
     eid = GetEngineActor().keys()[0]
     timer.start("distance")
     for _ in xrange(n):
-        distance._org_func(False, pid, eid)
+        distance._org_func(False, pid, eid) # noqa
     timer.end("distance")
 
     timer.start("pos_entity_facing")
@@ -1101,7 +1079,7 @@ def __benchmark__(n, timer, pid, info, **kwargs):
 
     timer.start("is_in_box")
     for _ in xrange(n):
-        is_in_box._org_func(False, pid, (0, 0, 0), (1, 1, 1))
+        is_in_box._org_func(False, pid, (0, 0, 0), (1, 1, 1)) # noqa
     timer.end("is_in_box")
 
     timer.start("catmull_rom")

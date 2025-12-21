@@ -139,9 +139,9 @@
     vec_entity_back
     vec_normalize
     vec_rot_p2p
-    vec_p2p
+    dir_from_to
     vec_length
-    vec_angle
+    vec_angle_between
     vec_euler_rotate
     vec_rotate_around
     outgoing_vec
