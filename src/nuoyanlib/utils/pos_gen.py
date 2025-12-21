@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     for i in poses:
         print(i)
     # poses[3]
-    poses[:3]
+    # poses[:3]
 
 
 

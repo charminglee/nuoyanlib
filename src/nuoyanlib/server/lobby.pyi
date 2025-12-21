@@ -5,13 +5,13 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
 
 from typing import Dict, Any, Optional, Callable, Union, TypedDict, List
-from ..core._types._typing import ArgsDict, STuple
+from ..core._types._typing import ArgsDict, STuple, Self
 from ..core.listener import event, ServerEventProxy
 
 
@@ -81,7 +81,7 @@ class LobbyDataMgr(ServerEventProxy):
     ) -> None: ...
     def _set(
         self,
-        callback: __Callback,
+        callback: Callable[[Optional[__CallbackDict]], Any],
         uid: int,
         order_id: Optional[int],
         getter: Callable[[], List[__DataDict]],

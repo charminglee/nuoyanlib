@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-18
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -61,7 +61,7 @@ __all__ = [
 # region Enum Classes ==================================================================================================
 
 
-Enum = IntEnum = StrEnum = Flag = IntFlag = None
+Enum = IntEnum = StrEnum = Flag = IntFlag = None # noqa
 
 
 class auto(object):
@@ -2173,7 +2173,7 @@ def __test__():
         assert SE.B == "b"
         assert SE.C == "c"
         assert SE("a") is SE.A
-        assert SE['A'] is SE.A
+        assert SE['A'] is SE.A # noqa
         assert repr(SE) == "<enum 'SE'>"
         assert repr(SE.A) == "<SE.A: 'a'>"
         assert str(SE.A) == "a"
@@ -2239,7 +2239,7 @@ def __test__():
         def _generate_next_value_(name, count, last_values): # noqa
             return name
 
-    test_enum(IntEnum2, StrEnum2)
+    test_enum(IntEnum2, StrEnum2) # noqa
 
     def f():
         class IntEnum2(Enum, int, str):

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-18
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -14,8 +14,8 @@ import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import EntityType
 from ..core.server.comp import CF, LvComp
 from ..core.server import _lib_server
-from ..utils.mc_math import distance, ray_box_intersection
 from ..utils.vector import vec_p2p, vec_composite
+from ..utils.mc_math import distance, ray_box_intersection, pos_floor
 
 
 __all__ = [
@@ -510,8 +510,8 @@ def get_entities_in_area(
     """
     if not pos or radius <= 0:
         return []
-    start_pos = tuple(i - radius for i in pos)
-    end_pos = tuple(i + radius for i in pos)
+    start_pos = pos_floor(i - radius for i in pos)
+    end_pos = pos_floor(i + radius for i in pos)
     entities = LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dimension)
     fa = {EntityType.Mob} if filter_abiotic else None
     entities = entity_filter(
@@ -535,8 +535,8 @@ def get_entities_by_type(type_id, pos=None, dimension=0, radius=0.0):
     :rtype: list[str]
     """
     if pos:
-        start_pos = tuple(i - radius for i in pos)
-        end_pos = tuple(i + radius for i in pos)
+        start_pos = pos_floor(i - radius for i in pos)
+        end_pos = pos_floor(i + radius for i in pos)
         entities = LvComp.Game.GetEntitiesInSquareArea(None, start_pos, end_pos, dimension)
         entities = entity_filter(entities, {type_id}, (pos, radius))
     else:

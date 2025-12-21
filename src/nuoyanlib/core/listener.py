@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -250,7 +250,7 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
         return add_listener
     # @event
     else:
-        return add_listener(event_name)
+        return add_listener(event_name) # noqa
 
 
 def _get_listen_args(func):
@@ -587,12 +587,12 @@ def __benchmark__(n, timer, **kwargs):
 
             timer.start("modsdk listen")
             for _ in xrange(n):
-                self.ListenForEvent("Minecraft", "Engine", "OnMobHitBlockServerEvent", self, self.OnMobHitBlockServerEvent)
+                self.ListenForEvent("Minecraft", "Engine", "OnMobHitBlockServerEvent", self, self.OnMobHitBlockServerEvent) # noqa
             timer.end("modsdk listen")
 
             timer.start("modsdk unlisten")
             for _ in xrange(n):
-                self.UnListenForEvent("Minecraft", "Engine", "OnMobHitBlockServerEvent", self, self.OnMobHitBlockServerEvent)
+                self.UnListenForEvent("Minecraft", "Engine", "OnMobHitBlockServerEvent", self, self.OnMobHitBlockServerEvent) # noqa
             timer.end("modsdk unlisten")
 
             timer.start("event call")
@@ -602,7 +602,7 @@ def __benchmark__(n, timer, **kwargs):
 
             timer.start("common call")
             for _ in xrange(n):
-                self.OnMobHitBlockServerEvent({})
+                self.OnMobHitBlockServerEvent({}) # noqa
             timer.end("common call")
 
         @event

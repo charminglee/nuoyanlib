@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -56,7 +56,7 @@ def hurt_mobs(
     on_hurt_after: Optional[Callable[[str], Optional[str]]] = None,
 ) -> List[str]: ...
 def explode_damage(
-    r: float,
+    r: int,
     pos: FTuple3,
     source_id: str,
     dim: int,

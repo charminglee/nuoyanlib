@@ -5,12 +5,13 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
 
 from typing import Tuple
+from ._types._typing import Self
 
 
 class SystemNotFoundError(RuntimeError):

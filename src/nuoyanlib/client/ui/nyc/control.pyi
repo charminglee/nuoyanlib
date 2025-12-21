@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -91,8 +91,8 @@ class InteractableControl(object):
     CALLBACK_TYPE: ClassVar[Type[Enum]]
     callbacks: Dict[Enum, List[Callable]]
     _callback_flag: List[Enum]
-    _callback_func_map: Dict[Enum, Tuple[MethodType, MethodType]]
-    def __init__(self: Self, callback_func_map: Dict[str, Tuple[MethodType, MethodType]]) -> None: ...
+    _callback_func_map: Dict[Enum, Tuple[Callable, Callable]]
+    def __init__(self: Self, callback_func_map: Dict[Enum, Tuple[Callable, Callable]]) -> None: ...
     def __destroy__(self) -> None: ...
     def _exec_callbacks(self, cb_type: Enum, *args: Any) -> None: ...
     def set_callback(self, func: Callable, cb_type: Optional[Enum] = None) -> bool: ...
@@ -102,12 +102,12 @@ class InteractableControl(object):
 class NyControl(object):
     CONTROL_TYPE: ClassVar[ControlType]
     _ALLOWED_APPLY_ATTRS: ClassVar[STuple]
-    _screen_node: ScreenNode
-    ui_node: ScreenNodeExtension
+    _screen_node: Optional[ScreenNode]
+    ui_node: Optional[ScreenNodeExtension]
     """
     控件所在UI类的实例。
     """
-    _base_control: BaseUIControl
+    _base_control: Optional[BaseUIControl]
     _kwargs: Dict[str, Any]
     def __init__(
         self: Self,

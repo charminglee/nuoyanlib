@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-18
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -256,7 +256,7 @@ def explode_damage(
     
     -----
 
-    :param float r: 爆炸强度
+    :param int r: 爆炸强度
     :param tuple[float,float,float] pos: 爆炸中心坐标
     :param str source_id: 爆炸伤害源的实体ID
     :param int dim: 爆炸维度
@@ -474,7 +474,7 @@ def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
         ep = _get_basic_pos(eid, basic_pos)
         if not ep:
             return False
-        return is_in_sector(ep, r, angle, center, direction)
+        return is_in_sector(ep, r, r, angle, center, direction)
     kwargs['ent_filter'] = _filter
 
     if visualize:

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -18,6 +18,7 @@ import math
 import random
 import string
 from ..core._sys import get_lv_comp, is_client
+from .mc_math import pos_floor
 
 
 __all__ = [
@@ -47,9 +48,9 @@ def random_pos(center_pos, r, dim=0, use_top_height=False):
     z = center_pos[2] + random.uniform(-r, r)
     if use_top_height:
         if is_client():
-            y = get_lv_comp(True).BlockInfo.GetTopBlockHeight((x, z))
+            y = get_lv_comp(True).BlockInfo.GetTopBlockHeight(pos_floor((x, z)))
         else:
-            y = get_lv_comp(False).BlockInfo.GetTopBlockHeight((x, z), dim)
+            y = get_lv_comp(False).BlockInfo.GetTopBlockHeight(pos_floor((x, z)), dim)
         if y is not None:
             return x, y, z
     else:

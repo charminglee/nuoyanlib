@@ -65,7 +65,7 @@ def singleton(init_once=True):
         return decorator
     else:
         _init_once = True
-        return decorator(init_once)
+        return decorator(init_once) # noqa
 
 
 @singleton
@@ -171,7 +171,7 @@ class lru_cache(object):
         # 双向循环链表
         root = []
         root[:] = [root, root, None, None]
-        self.root = root
+        self.root = root # noqa
         self.hits = 0
         self.misses = 0
 

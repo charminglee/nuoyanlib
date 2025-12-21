@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -51,13 +51,13 @@ class EnumMeta(type):
 if sys.version_info >= (3, 4):
     from enum import Enum as _Enum
     class Enum(_Enum):
-        _member_map_: ClassVar[OrderedDict[str, Self]]
-        _value2member_map_: ClassVar[Dict[Hashable, Self]]
+        _member_map_: ClassVar[OrderedDict[str, Enum]]
+        _value2member_map_: ClassVar[Dict[Hashable, Enum]]
         _unhashable_values_: ClassVar[List[Any]]
         _member_names_: ClassVar[List[str]]
         _member_type_: ClassVar[Optional[type]]
-        _ignore_: ClassVar[Optional[Sequence[str]]]
-        __members__: ClassVar[MappingProxy[str, Self]]
+        _ignore_: ClassVar[Optional[Sequence[str]]] # noqa
+        __members__: ClassVar[MappingProxy[str, Enum]]
         _name_: str
         _value_: Any
         _hash_: int
@@ -74,7 +74,7 @@ if sys.version_info >= (3, 4):
         @property
         def value(self) -> Any: ...
         @staticmethod
-        def _generate_next_value_(name: str, count: int, last_values: List[Any]) -> Any: ...
+        def _generate_next_value_(name: str, count: int, last_values: List[Any]) -> Any: ... # noqa
 else:
     class Enum(metaclass=EnumMeta):
         _name_: str

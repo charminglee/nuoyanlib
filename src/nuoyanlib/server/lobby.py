@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -83,7 +83,7 @@ class LobbyDataMgr(ServerEventProxy):
         if default is None:
             default = lambda: None
         if is_global:
-            self.global_data[key] = default()                                           # noqa
+            self.global_data[key] = default() # noqa
         else:
             self.uid_data[key] = {
                 self._to_uid(pid): default()
@@ -92,16 +92,16 @@ class LobbyDataMgr(ServerEventProxy):
         self._default[key] = default
 
     def _simplify_response(self, response):
-        entity = response.pop('entity')                                                 # noqa
+        entity = response.pop('entity')
         if 'data' in entity:
-            response['data'] = {                                                        # noqa
+            response['data'] = {
                 d['key']: d['value']
                 for d in entity['data']
             }
         elif 'orders' in entity:
             for d in entity['orders']:
                 order_id = d.pop('order_id')
-                response[order_id] = d                                                  # noqa
+                response[order_id] = d
 
     def _set_default(self, response, keys):
         data = response['data']
@@ -149,7 +149,7 @@ class LobbyDataMgr(ServerEventProxy):
                 callback(response)
 
         if _IS_LOBBY:
-            LvComp.Http.LobbyGetStorage(cb, player, keys)
+            LvComp.Http.LobbyGetStorage(cb, player, keys) # noqa
         else:
             if simulate:
                 d = [
@@ -177,7 +177,7 @@ class LobbyDataMgr(ServerEventProxy):
         if _IS_LOBBY:
             LvComp.Http.LobbySetStorageAndUserItem(callback, uid, order_id, getter)
         else:
-            callback({'entity': {'data': getter()}})
+            callback({'entity': {'data': getter()}}) # noqa
             if uid == 0:
                 LvComp.ExtraData.SetExtraData(_GLOBAL_DATA_KEY, self.global_data)
             else:

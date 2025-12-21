@@ -5,11 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
 
+from __future__ import division
 import time
 from .enum import TimeEaseFunc
 
@@ -63,7 +64,7 @@ class TimeEase(object):
         self.start_val = start_val
         self.end_val = end_val
         self.total_tm = total_tm
-        self.fps = fps
+        self.fps = int(fps)
         self.hold_on_last_frame = hold_on_last_frame
         self.ease_func = ease_func
         self.next_te = next_te
@@ -71,7 +72,7 @@ class TimeEase(object):
         self.on_end = on_end
         self._init_tm = 0
         self._frame = 0
-        self._total_frame = fps * total_tm
+        self._total_frame = int(fps * total_tm)
         self._diff_val = self.end_val - self.start_val
         self._val = 0
         self._state = 0
@@ -141,7 +142,7 @@ class TimeEase(object):
         """
         self._init_tm = 0
         self._frame = 0
-        self._total_frame = self.fps * self.total_tm
+        self._total_frame = int(self.fps * self.total_tm)
         self._diff_val = self.end_val - self.start_val
         self._state = 0
 

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -41,10 +41,10 @@ else:
 
 def disable_modsdk_loggers():
     if logging:
-        logging.getLogger("Developer").disabled = 1
-        logging.getLogger("Engine").disabled = 1
-        logging.getLogger("Part").disabled = 1
-        # logging.getLogger("mcp").disabled = 1
+        logging.getLogger("Developer").disabled = True
+        logging.getLogger("Engine").disabled = True
+        logging.getLogger("Part").disabled = True
+        # logging.getLogger("mcp").disabled = True
 
 
 

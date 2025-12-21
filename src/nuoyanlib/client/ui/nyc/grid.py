@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -347,7 +347,7 @@ class NyGrid(NyControl):
                 name = children_names[0]
                 for i in name[::-1]:
                     if not i.isdigit():
-                        return name[:i + 1]
+                        return name[:int(i) + 1]
         else:
             return self.__template_name
 

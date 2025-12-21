@@ -27,7 +27,7 @@ if not _NuoyanLibServerSystem.register():
 
 from ..core.server.comp import *
 from ..core.listener import *
-from ..core import error
+from ..core.error import *
 
 
 from .entity import *

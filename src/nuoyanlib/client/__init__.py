@@ -27,7 +27,7 @@ if not _NuoyanLibClientSystem.register():
 
 from ..core.client.comp import *
 from ..core.listener import *
-from ..core import error
+from ..core.error import *
 
 
 from .effect import *

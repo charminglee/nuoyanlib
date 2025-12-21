@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-22
 #  ⠀
 # =================================================
 
@@ -18,9 +18,10 @@ from ...client.ui.nyc import *
 
 
 T = TypeVar("T")
+T2 = TypeVar("T2")
 P = ParamSpec("P")
 F = TypeVar("F", bound=Callable[..., Any])
-T_type = TypeVar("T_type", bound=type)
+TypeT = TypeVar("TypeT", bound=type)
 if sys.version_info >= (3, 11):
     from typing_extensions import Self as _Self
     Self = _Self

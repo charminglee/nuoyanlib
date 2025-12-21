@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
@@ -13,19 +13,18 @@
 from typing import Dict, Union, Tuple, Callable, TypeVar, Optional, Any, List, Iterator, overload, Iterable, Generic, ClassVar
 from mod.client.ui.controls.gridUIControl import GridUIControl
 from .control import NyControl
-from ....core._types._typing import Self, ITuple2, STuple, UiPathOrNyControl, T
+from ....core._types._typing import Self, ITuple2, STuple, UiPathOrNyControl, T, T2
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ....utils.enum import GridCallbackType
 from ..screen_node import ScreenNodeExtension
 
 
-__T2 = TypeVar("__T2")
-__T_co = TypeVar("__T_co", covariant=True, bound=NyControl)
+__NyControlT = TypeVar("__NyControlT", covariant=True, bound=NyControl)
 __GridCallbackType = Callable[[], Any]
 
 
-class GridData(list, Generic[T, __T2]):
+class GridData(list, Generic[T, T2]):
     src: List[T]
     """
     网格数据源。
@@ -36,7 +35,7 @@ class GridData(list, Generic[T, __T2]):
     
     接受三个参数，分别为网格元素索引、元素的NyControl实例、元素对应的数据。网格刷新时会自动对每个元素调用一次该函数，并传入上述三个参数，实现网格元素与数据的自动管理。
     """
-    default: Optional[__T2]
+    default: Optional[T2]
     """
     网格元素索引超出数据源范围（越界）时使用的默认数据。
     """
@@ -48,7 +47,7 @@ class GridData(list, Generic[T, __T2]):
         self: Self,
         src: List[T],
         op_func: Callable[[int, NyControl, T], Any],
-        default: Optional[__T2] = None,
+        default: Optional[T2] = None,
     ) -> None: ...
     def bind_grid(self, grid: NyGrid) -> None: ...
     def _get_data(self, index: int) -> T: ...
@@ -60,21 +59,21 @@ def _index_2_coord(i: int, dx: int) -> ITuple2: ...
 def _coord_2_index(x: int, y: int, dx: int) -> int: ...
 
 
-class ElemGroup(Iterable[__T_co]):
+class ElemGroup(Iterable[__NyControlT]):
     __slots__: ClassVar[STuple]
     _ALLOWED_SET_ATTRS: ClassVar[STuple]
     _ALLOWED_GET_ATTRS: ClassVar[STuple]
     _ALLOWED_METHODS: ClassVar[STuple]
     grid: NyGrid
-    cell_list: List[__T_co]
+    cell_list: List[__NyControlT]
     _len: int
-    def __init__(self: Self, grid: NyGrid, cell_list: List[__T_co]) -> None: ...
-    def __iter__(self) -> Iterator[__T_co]: ...
+    def __init__(self: Self, grid: NyGrid, cell_list: List[__NyControlT]) -> None: ...
+    def __iter__(self) -> Iterator[__NyControlT]: ...
     def __len__(self) -> int: ...
     @overload
-    def __getitem__(self, item: int) -> __T_co: ...
+    def __getitem__(self, item: int) -> __NyControlT: ...
     @overload
-    def __getitem__(self, item: slice) -> List[__T_co]: ...
+    def __getitem__(self, item: slice) -> List[__NyControlT]: ...
     def __setattr__(self, key: str, value: Any) -> None: ...
     def __getattr__(self, key: str) -> Union[List[Any], Callable[[...], List[Any]]]: ...
 

@@ -5,15 +5,15 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-18
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
 
 import sys
 from types import MethodType
-from typing import Hashable, List, Callable, Any, Dict, Union, Tuple, Optional, Generator, overload
-from ._types._typing import Self, ITuple, T, F, T_type
+from typing import Hashable, List, Callable, Any, Dict, Type, Union, Tuple, Optional, Generator, overload
+from ._types._typing import Self, ITuple, T, F, TypeT
 from ._types._checker import args_type_check
 
 
@@ -53,9 +53,9 @@ class lru_cache(object):
 
 
 @overload
-def singleton(init_once: bool = True) -> Callable[[T_type], T_type]: ...
+def singleton(init_once: bool = True) -> Callable[[TypeT], TypeT]: ...
 @overload
-def singleton(init_once: T_type) -> T_type: ...
+def singleton(init_once: TypeT) -> TypeT: ...
 
 
 class cached_property(object):
@@ -73,7 +73,7 @@ def assert_error(
     func: Callable,
     args: Tuple[Any, ...] = (),
     kwargs: Dict[str, Any] = None,
-    exc: Union[Exception, Tuple[Exception, ...]] = (),
+    exc: Union[Type[Exception], Tuple[Type[Exception], ...]] = (),
 ) -> None: ...
 def join_chr(*seq: int) -> str: ...
 def hook_method(

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -29,7 +29,7 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
         self.comm_time = 0
         self.comm_cost = 0
         self.player_id = None
-        LvComp.Game.AddTimer(8, self.run_benchmark)
+        LvComp.Game.AddTimer(6, self.run_benchmark)
 
     # =========================================== Engine Event Callback ================================================
 

@@ -5,12 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
 
-from typing import Any, Optional, Callable, Tuple, Union, List, Iterable
+from typing import Any, Optional, Callable, Tuple, Union, List
 from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUIControl
 from .control import NyControl, InteractableControl
 from ..screen_node import ScreenNodeExtension
@@ -54,7 +54,7 @@ class NyComboBox(InteractableControl, NyControl):
     def __getitem__(self, item: Union[int, str, slice]) -> Union[NyControl, List[NyControl]]: ...
     @args_type_check((int, str, slice), is_method=True)
     def __delitem__(self, item: Union[int, str, slice]) -> None: ...
-    def bind_data(self, data: Iterable[Tuple[str, Optional[str], Optional[Any]]]) -> None: ...
+    def bind_data(self, data: List[Tuple[str, Optional[str], Optional[Any]]]) -> None: ...
     BindData = bind_data
     def set_callback(
         self,

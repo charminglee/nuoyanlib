@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -31,7 +31,7 @@ serverEvent = event(ns=MOD_NAME, sys_name=SERVER_SYSTEM_NAME)
 class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
     def __init__(self, namespace, systemName):
         super(MainClientSystem, self).__init__(namespace, systemName)
-        LvComp.Game.AddTimer(8, self.run_benchmark)
+        LvComp.Game.AddTimer(6, self.run_benchmark)
 
     # =========================================== Engine Event Callback ================================================
 

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-21
 #  ⠀
 # =================================================
 
@@ -18,20 +18,6 @@ from .nyc import *
 from ...utils.enum import ButtonCallbackType
 
 
-class __FrameAnimData(TypedDict):
-    control: NyImage
-    tex_path: str
-    frame_time: float
-    stop_frame: int
-    loop: bool
-    last_time: float
-    indexes: Iterator[int]
-    is_pausing: bool
-    callback: Callable
-    args: Tuple[Any, ...]
-    kwargs: Dict[str, Any]
-
-
 class ScreenNodeExtension(object):
     ROOT_PANEL_PATH: ClassVar[str]
     """
@@ -39,14 +25,14 @@ class ScreenNodeExtension(object):
     """
     _nyc_cache_map: Dict[str, NyControlTypes]
     _ui_pos_data_key: str
-    _screen_node: ScreenNode
-    _frame_anim_data: Dict[str, __FrameAnimData]
-    _binging_data: Dict[Callable, Callable]
+    _screen_node: Optional[ScreenNode]
+    _frame_anim_data: Dict[str, Dict[str, Any]]
+    _binging_data: Dict[Union[Callable, Tuple[Callable, object]], Tuple[Callable, bool]]
     cs: Union[ClientSystem, Any]
     """
     创建该UI的客户端实例。
     """
-    root_panel: NyControl
+    root_panel: Optional[NyControl]
     """
     当前界面根面板的 ``NyControl`` 实例。
     

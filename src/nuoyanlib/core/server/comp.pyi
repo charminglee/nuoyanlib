@@ -5,12 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-20
 #  ⠀
 # =================================================
 
 
-from typing import Type, ClassVar, Dict
+from typing import Type, ClassVar, Dict, Union
 from mod.server.system.serverSystem import ServerSystem
 from mod.server.component.domainGameCompServer import DomainGameCompServer
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
@@ -95,9 +95,9 @@ CompFactory: EngineCompFactoryServer
 
 class CF(object):
     __cache__: ClassVar[Dict[str, CF]]
-    _target: str
-    def __new__(cls: Type[T], target: str) -> T: ...
-    def __init__(self: Self, target: str) -> None: ...
+    _target: Union[str, int]
+    def __new__(cls: Type[T], target: Union[str, int]) -> T: ...
+    def __init__(self: Self, target: Union[str, int]) -> None: ...
     def __getattr__(self, name: str) -> BaseComponent: ...
     DomainGame: DomainGameCompServer
     Achievement: AchievementCompServer
