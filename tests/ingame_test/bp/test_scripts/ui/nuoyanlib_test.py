@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-22
 #  ⠀
 # =================================================
 
@@ -36,16 +36,16 @@ serverEvent = event(ns=MOD_NAME, sys_name=SERVER_SYSTEM_NAME)
 class NuoyanlibTest(nyl.ClientEventProxy, ScreenNodeExtension, nyl.ScreenNode):
     def __init__(self, namespace, name, param):
         super(NuoyanlibTest, self).__init__(namespace, name, param)
-        self.grid = None            # type: nyl.NyGrid
-        self.stack_panel = None     # type: nyl.NyStackPanel
-        self.scroll_view = None     # type: nyl.NyScrollView
-        self.label = None           # type: nyl.NyLabel
-        self.button = None          # type: nyl.NyButton
-        self.image = None           # type: nyl.NyImage
-        self.switch_toggle = None   # type: nyl.NyToggle
-        self.progress_bar = None    # type: nyl.NyProgressBar
-        self.edit_box = None        # type: nyl.NyEditBox
-        self.combo_box = None       # type: nyl.NyComboBox
+        self.grid = None            # type: nyl.NyGrid | None
+        self.stack_panel = None     # type: nyl.NyStackPanel | None
+        self.scroll_view = None     # type: nyl.NyScrollView | None
+        self.label = None           # type: nyl.NyLabel | None
+        self.button = None          # type: nyl.NyButton | None
+        self.image = None           # type: nyl.NyImage | None
+        self.switch_toggle = None   # type: nyl.NyToggle | None
+        self.progress_bar = None    # type: nyl.NyProgressBar | None
+        self.edit_box = None        # type: nyl.NyEditBox | None
+        self.combo_box = None       # type: nyl.NyComboBox | None
         self.a = False
         self.move_parent = False
 

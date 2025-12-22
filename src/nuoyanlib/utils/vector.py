@@ -107,30 +107,30 @@ class Vector(object):
 
     def __init__(self, *args):
         l = len(args)
-        try:
-            if l == 0:
-                self._x = self._y = self._z = 0.0
-                self._dim = 3
-            elif l == 1:
-                vec = map(float, args[0])
-                if len(vec) == 2: # noqa
-                    self._x, self._y = vec
-                    self._z = 0.0
-                    self._dim = 2
-                else:
-                    self._x, self._y, self._z = vec
-                    self._dim = 3
-            elif l == 2:
-                self._x, self._y = map(float, args)
+        if l == 0:
+            self._x = self._y = self._z = 0.0
+            self._dim = 3
+            return
+        if l == 1:
+            vec = map(float, args[0])
+            if len(vec) == 2: # noqa
+                self._x, self._y = vec
                 self._z = 0.0
                 self._dim = 2
-            elif l == 3:
-                self._x, self._y, self._z = map(float, args)
-                self._dim = 3
             else:
-                raise
-        except:
-            raise VectorError("invalid Vector construction arguments: {}".format(args))
+                self._x, self._y, self._z = vec
+                self._dim = 3
+            return
+        if l == 2:
+            self._x, self._y = map(float, args)
+            self._z = 0.0
+            self._dim = 2
+            return
+        if l == 3:
+            self._x, self._y, self._z = map(float, args)
+            self._dim = 3
+            return
+        raise VectorError("invalid Vector construction arguments: {}".format(args))
 
     @staticmethod
     def zero(is_3d=True):
@@ -925,7 +925,7 @@ class Vector(object):
         if self._dim != 3 or len(vec) != 3:
             raise VectorError("Vector.cross() only supports 3D vectors")
         vx, vy, vz = vec
-        _x, _y, _z = self._x, self._y, self._z
+        _x, _y, _z = self
         x = _y * vz - _z * vy
         y = _z * vx - _x * vz
         z = _x * vy - _y * vx
@@ -1044,30 +1044,21 @@ class Vector(object):
             angle = radians(angle)
 
         c, s = cos(angle), sin(angle)
+        _x, _y, _z = self
         if axis == "x":
-            r_mat = Matrix.Create([
-                [1.0, 0.0, 0.0],
-                [0.0, c, -s],
-                [0.0, s, c],
-            ])
+            x = _x
+            y = c * _y - s * _z
+            z = s * _y + c * _z
         elif axis == "y":
-            r_mat = Matrix.Create([
-                [c, 0.0, s],
-                [0.0, 1.0, 0.0],
-                [-s, 0.0, c],
-            ])
+            x = c * _x + s * _z
+            y = _y
+            z = -s * _x + c * _z
         elif axis == "z":
-            r_mat = Matrix.Create([
-                [c, -s, 0.0],
-                [s, c, 0.0],
-                [0.0, 0.0, 1.0],
-            ])
+            x = c * _x - s * _y
+            y = s * _x + c * _y
+            z = _z
         else:
-            r_mat = Matrix.CreateEye(3)
-
-        column_vec = Matrix.Create(self.T)
-        res = r_mat * column_vec
-        x, y, z = res[0, 0], res[1, 0], res[2, 0]
+            x, y, z = _x, _y, _z
 
         if inplace:
             self._x, self._y, self._z = x, y, z

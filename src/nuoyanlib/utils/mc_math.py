@@ -11,7 +11,6 @@
 
 
 from math import sin, cos, atan2, sqrt, degrees, radians
-import random
 from mod.common.minecraftEnum import Facing
 from ..core._sys import get_api, get_cf
 from ..core._utils import inject_is_client, UNIVERSAL_OBJECT
@@ -53,7 +52,6 @@ __all__ = [
     "lerp",
     "range_map",
     "clamp",
-    "probability",
     "box_max_edge_len",
 ]
 
@@ -1010,20 +1008,6 @@ def clamp(x, min_value, max_value):
     :rtype: float
     """
     return max(min_value, min(max_value, x))
-
-
-def probability(p):
-    """
-    以指定概率返回 ``True`` 。
-
-    -----
-
-    :param float p: 概率，范围为 [0, 1]
-
-    :return: 以 p 的概率返回 True，否则返回 False
-    :rtype: bool
-    """
-    return p > random.random()
 
 
 def box_max_edge_len(pos1, pos2):
