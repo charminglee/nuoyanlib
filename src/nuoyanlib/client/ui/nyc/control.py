@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -610,7 +610,7 @@ class NyControl(object):
 
         :param str attr: 需要设置的属性名
         :param Any value: 需要设置的值
-        :param int level: 子控件所在层次，默认为1，传入0或负值表示所有层次
+        :param int level: 子控件所在层次；默认为1，传入0或负值表示所有层次
 
         :return: 无
         :rtype: None
@@ -628,7 +628,7 @@ class NyControl(object):
 
         :param str def_name: 控件定义名称，格式为"<namespace>.<control_name>"；<namespace>对应UI json文件中"namespace"对应的值，UI编辑器生成的UI json文件该值等于文件名；<control_name>对应想创建的控件的名称，该控件需要置于UI json文件顶层（即与main画布同级，不能是任何一个控件的子控件），或在UI编辑器中将该控件添加至自定义控件库
         :param str child_name: 控件名称
-        :param bool force_update: 是否需要强制刷新，默认为True；设为True则进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量新建子控件操作且在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新；默认为True；设为True则进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量新建子控件操作且在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
 
         :return: 新控件的NyControl实例；若当前控件已存在同名子控件，则返回其NyControl实例；创建失败时返回None
         :rtype: NyControl|None
@@ -647,9 +647,9 @@ class NyControl(object):
         -----
 
         :param str|BaseUIControl|NyControl parent: 父控件路径或实例
-        :param str name: 新控件的名称，默认为当前控件的名称
-        :param bool sync_refresh: 是否需要同步刷新，默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
-        :param bool force_update: 是否需要强制刷新，默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+        :param str name: 新控件的名称；默认为当前控件的名称
+        :param bool sync_refresh: 是否需要同步刷新；默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新；默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
 
         :return: 新控件的Ny控件实例，类型与当前控件相同；若父控件已存在同名子控件，则返回其NyControl实例；克隆失败时返回None
         :rtype: NyControl|None
@@ -670,9 +670,9 @@ class NyControl(object):
         -----
 
         :param str|BaseUIControl|NyControl control: 被克隆控件的路径或实例
-        :param str name: 新控件的名称，默认为被克隆控件的名称
-        :param bool sync_refresh: 是否需要同步刷新，默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
-        :param bool force_update: 是否需要强制刷新，默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+        :param str name: 新控件的名称；默认为被克隆控件的名称
+        :param bool sync_refresh: 是否需要同步刷新；默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新；默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
 
         :return: 新控件的NyControl实例；若当前控件已存在同名子控件，则返回其NyControl实例；克隆失败时返回None
         :rtype: NyControl|None
@@ -692,7 +692,7 @@ class NyControl(object):
 
         -----
 
-        :param int level: 子控件层次，默认为1，传入0或负值表示所有层次
+        :param int level: 子控件层次；默认为1，传入0或负值表示所有层次
 
         :return: 指定层次所有子控件的NyControl列表
         :rtype: list[NyControl]
@@ -708,7 +708,7 @@ class NyControl(object):
 
         -----
 
-        :param int level: 子控件层次，默认为1，传入0或负值表示所有层次
+        :param int level: 子控件层次；默认为1，传入0或负值表示所有层次
 
         :return: 指定层次所有子控件的路径列表
         :rtype: list[str]
@@ -782,7 +782,7 @@ class NyControl(object):
 
         -----
 
-        :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+        :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为None，详细说明见AddTouchEventParams
 
         :return: NyButton实例
         :rtype: NyButton|None
@@ -929,7 +929,7 @@ class NyControl(object):
 
         -----
 
-        :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
+        :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid；默认为False
         :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
         :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
         :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明

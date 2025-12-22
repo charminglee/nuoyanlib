@@ -375,7 +375,7 @@ class NyImage(NyControl):
         :param int frame_count: 帧数（一共有多少帧）
         :param int frame_rate: 帧率（每秒播放多少帧）
         :param int stop_frame: 播放结束后停留在哪一帧，仅loop参数设为False时有效；0为第一帧，1为第二帧，-1为最后一帧，以此类推；默认为-1
-        :param bool loop: 是否循环播放，默认为False
+        :param bool loop: 是否循环播放；默认为False
         :param function|None callback: 播放结束后触发的回调函数，仅loop参数设为False时有效；默认为None
         :param tuple|None args: 回调函数位置参数元组；默认为None
         :param dict[str,Any]|None kwargs: 回调函数关键字参数字典；默认为None

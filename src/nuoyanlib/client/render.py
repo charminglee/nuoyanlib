@@ -34,7 +34,7 @@ def set_query_mod_var(entity_id, name, value, sync=True):
     :param str entity_id: 实体ID
     :param str name: 变量名，仅支持query.mod开头的变量
     :param float value: 设置的值
-    :param bool sync: 是否进行全局同步，默认为True
+    :param bool sync: 是否进行全局同步；默认为True
 
     :return: 无
     :rtype: None

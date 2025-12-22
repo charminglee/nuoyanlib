@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -278,7 +278,7 @@ class NyGrid(NyControl):
 
     :param ScreenNodeExtension screen_node_ex: 网格所在UI类的实例（需继承ScreenNodeExtension）
     :param GridUIControl grid_control: 通过asGrid()等方式获取的GridUIControl实例
-    :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
+    :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid；默认为False
     :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
     :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素visible的绑定名称，详见上方说明
     :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
@@ -545,7 +545,7 @@ class NyGrid(NyControl):
         :return: 网格所有元素的NyControl实例列表
         :rtype: list[NyControl]
         """
-        return [self.get_cell(i) for i in range(self.grid_size)]
+        return [self.get_cell(i) for i in xrange(self.grid_size)]
 
     def set_callback(self, func, cb_type=GridCallbackType.UPDATE):
         """
@@ -554,7 +554,7 @@ class NyGrid(NyControl):
         -----
 
         :param function func: 回调函数
-        :param GridCallbackType cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
+        :param GridCallbackType cb_type: 回调类型，请使用GridCallbackType枚举值；默认为GridCallbackType.UPDATE
 
         :return: 是否成功
         :rtype: bool
@@ -574,7 +574,7 @@ class NyGrid(NyControl):
         -----
 
         :param function func: 回调函数
-        :param GridCallbackType cb_type: 回调类型，请使用GridCallbackType枚举值，默认为GridCallbackType.UPDATE
+        :param GridCallbackType cb_type: 回调类型，请使用GridCallbackType枚举值；默认为GridCallbackType.UPDATE
 
         :return: 是否成功
         :rtype: bool

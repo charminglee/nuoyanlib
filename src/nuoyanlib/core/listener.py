@@ -228,11 +228,11 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
 
     -----
 
-    :param str|function event_name: 事件名称，默认为被装饰函数名
+    :param str|function event_name: 事件名称；默认为被装饰函数名
     :param str ns: 事件来源命名空间
     :param str sys_name: 事件来源系统名称
-    :param int priority: 优先级，值越大优先级越高，默认为0
-    :param bool is_method: 被装饰函数是否是实例方法，默认为True
+    :param int priority: 优先级，值越大优先级越高；默认为0
+    :param bool is_method: 被装饰函数是否是实例方法；默认为True
     """
     def add_listener(func):
         # 解析事件参数
@@ -269,7 +269,7 @@ def listen_event(func, event_name="", ns="", sys_name="", priority=0, use_decora
     :param str event_name: 事件名称；事件名与函数名相同时，可省略该参数
     :param str ns: 事件来源命名空间；监听ModSDK事件时，可省略该参数
     :param str sys_name: 事件来源系统名称；监听ModSDK事件时，可省略该参数
-    :param int priority: 优先级，值越大优先级越高，默认为0
+    :param int priority: 优先级，值越大优先级越高；默认为0
     :param bool use_decorator: 是否使用从 @event 装饰器传入的参数，设为True时，忽略event_name、ns、sys_name和priority参数；默认为False
 
     :return: 无
@@ -294,7 +294,7 @@ def unlisten_event(func, event_name="", ns="", sys_name="", priority=0, use_deco
     :param str event_name: 事件名称；事件名与函数名相同时，可省略该参数
     :param str ns: 事件来源命名空间；监听ModSDK事件时，可省略该参数
     :param str sys_name: 事件来源系统名称；监听ModSDK事件时，可省略该参数
-    :param int priority: 优先级，值越大优先级越高，默认为0
+    :param int priority: 优先级，值越大优先级越高；默认为0
     :param bool use_decorator: 是否使用从 @event 装饰器传入的参数，设为True时，忽略event_name、ns、sys_name和priority参数；默认为False
 
     :return: 无
@@ -362,7 +362,7 @@ def is_listened(func, event_name="", ns="", sys_name="", priority=0):
     :param str event_name: 事件名称；事件名与函数名相同时，可省略该参数
     :param str ns: 事件来源命名空间；监听ModSDK事件时，可省略该参数
     :param str sys_name: 事件来源系统名称；监听ModSDK事件时，可省略该参数
-    :param int priority: 优先级，值越大优先级越高，默认为0
+    :param int priority: 优先级，值越大优先级越高；默认为0
 
     :return: 已监听返回True，否则返回False
     :rtype: bool

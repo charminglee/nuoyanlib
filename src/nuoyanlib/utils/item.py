@@ -77,9 +77,9 @@ def gen_item_dict(
     -----
 
     :param str newItemName: 必须设置，物品的identifier，即"命名空间:物品名"
-    :param int newAuxValue: 可选，物品附加值，默认为0
-    :param int count: 可选，物品数量，设置为0时为空物品，默认为1
-    :param bool showInHand: 可选，是否显示在手上，默认为True
+    :param int newAuxValue: 可选，物品附加值；默认为0
+    :param int count: 可选，物品数量，设置为0时为空物品；默认为1
+    :param bool showInHand: 可选，是否显示在手上；默认为True
     :param list[tuple[int,int]]|None enchantData: 可选，附魔数据，类型为列表，列表中每个元素为元组：( `附魔类型 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EnchantType.html>`_, 附魔等级)
     :param list[tuple[str,int]]|None modEnchantData: 可选，自定义附魔数据，类型为列表，列表中每个元素为元组：(自定义附魔id, 自定义附魔等级)
     :param str customTips: 可选，物品的自定义tips，修改该内容后会覆盖实例的组件 `netease:customtips <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/1-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%89%A9%E5%93%81/1-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%BA%E7%A1%80%E7%89%A9%E5%93%81.html?key=netease%3Acustomtips&docindex=1&type=0>`_ 的内容
@@ -111,7 +111,7 @@ def get_item_count(player_id, name, aux=-1):
 
     :param str player_id: 玩家的实体ID
     :param str name: 物品名称
-    :param int aux: 物品特殊值（-1表示任意特殊值），默认为-1
+    :param int aux: 物品特殊值（-1表示任意特殊值）；默认为-1
 
     :return: 指定物品在背包中的总数
     :rtype: int
@@ -133,7 +133,7 @@ def set_namespace(name, namespace="minecraft"):
     -----
 
     :param str name: 物品名称
-    :param str namespace: 命名空间，默认为"minecraft"
+    :param str namespace: 命名空间；默认为"minecraft"
 
     :return: 新的物品名称
     :rtype: str
@@ -196,7 +196,7 @@ def is_empty_item(item, zero_is_emp=True):
     -----
 
     :param dict item: 物品信息字典
-    :param bool zero_is_emp: 是否把数量为0的物品视为空物品，默认为True
+    :param bool zero_is_emp: 是否把数量为0的物品视为空物品；默认为True
 
     :return: 空物品则返回True，否则返回False
     :rtype: bool

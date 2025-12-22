@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -57,9 +57,9 @@ class NeteaseParticle(object):
     -----
 
     :param str json_path: 粒子特效json文件路径，包含后缀名.json，如"effects/my_effect.json"
-    :param tuple[float,float,float]|None pos: 粒子的世界坐标位置，默认为(0, 0, 0)，绑定实体或骨骼时可忽略该参数
-    :param dict[str,str|tuple[float,float,float]|bool]|None bind_entity: 实体绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
-    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
+    :param tuple[float,float,float]|None pos: 粒子的世界坐标位置，绑定实体或骨骼时可忽略该参数；默认为(0, 0, 0)
+    :param dict[str,str|tuple[float,float,float]|bool]|None bind_entity: 实体绑定参数字典；默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
+    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典；默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
 
     :raise RuntimeError: 粒子创建失败/绑定粒子到实体或骨骼时出现问题
     :raise ValueError: 同时传入bind_entity和bind_skeleton参数时抛出
@@ -480,9 +480,9 @@ class NeteaseParticle(object):
         -----
 
         :param str ent_id: 特效绑定的实体ID
-        :param tuple[float,float,float] offset: 绑定的偏移量，默认为(0, 0, 0)
-        :param tuple[float,float,float] rot: 绑定的旋转角度，默认为(0, 0, 0)
-        :param bool correction: 是否开启特效旋转角度修正，开启后可以使特效的旋转角度准确设置为参照玩家的相对角度，默认为False
+        :param tuple[float,float,float] offset: 绑定的偏移量；默认为(0, 0, 0)
+        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为(0, 0, 0)
+        :param bool correction: 是否开启特效旋转角度修正，开启后可以使特效的旋转角度准确设置为参照玩家的相对角度；默认为False
 
         :return: 是否成功
         :rtype: bool
@@ -507,8 +507,8 @@ class NeteaseParticle(object):
 
         :param int model_id: 绑定的骨骼模型的ID（使用Model组件的GetModelId获取）
         :param str bone_name: 绑定具体骨骼的名称
-        :param tuple[float,float,float] offset: 绑定的偏移量，默认为(0, 0, 0)
-        :param tuple[float,float,float] rot: 绑定的旋转角度，默认为(0, 0, 0)
+        :param tuple[float,float,float] offset: 绑定的偏移量；默认为(0, 0, 0)
+        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为(0, 0, 0)
 
         :return: 是否成功
         :rtype: bool
@@ -651,13 +651,13 @@ class NeteaseFrameAnim(object):
 
     -----
 
-    :param str json_path: 特效json配置路径，如"effects/xxx.json"；json_path与tex_path选择其中一个参数传入即可，两个参数都传入时以json_path为准，默认为空字符串
-    :param str tex_path: 特效贴图路径，如"textures/xxx"，不用后缀名；json_path与tex_path选择其中一个参数传入即可，两个参数都传入时以json_path为准，默认为空字符串
-    :param tuple[float,float,float] pos: 创建位置，默认为None，绑定实体或骨骼时可忽略该参数
-    :param tuple[float,float,float] rot: 角度，默认为None，绑定实体或骨骼时可忽略该参数
-    :param tuple[float,float,float] scale: 缩放系数，默认为None
-    :param dict[str,str|tuple[float,float,float]]|None bind_entity: 实体绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
-    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典，默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
+    :param str json_path: 特效json配置路径，如"effects/xxx.json"；json_path与tex_path选择其中一个参数传入即可，两个参数都传入时以json_path为准；默认为空字符串
+    :param str tex_path: 特效贴图路径，如"textures/xxx"，不用后缀名；json_path与tex_path选择其中一个参数传入即可，两个参数都传入时以json_path为准；默认为空字符串
+    :param tuple[float,float,float] pos: 创建位置；默认为None，绑定实体或骨骼时可忽略该参数
+    :param tuple[float,float,float] rot: 角度；默认为None，绑定实体或骨骼时可忽略该参数
+    :param tuple[float,float,float] scale: 缩放系数；默认为None
+    :param dict[str,str|tuple[float,float,float]]|None bind_entity: 实体绑定参数字典；默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
+    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典；默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
 
     :raise ValueError: 同时传入json_path和tex_path，或bind_entity和bind_skeleton参数时抛出
     :raise RuntimeError: 创建序列帧失败/将序列帧绑定到实体或骨骼时出现问题
@@ -977,8 +977,8 @@ class NeteaseFrameAnim(object):
         -----
 
         :param str bind_entity_id: 特效绑定的实体ID
-        :param tuple[float,float,float] offset: 绑定的偏移量，默认为(0, 0, 0)
-        :param tuple[float,float,float] rot: 绑定的旋转角度，默认为(0, 0, 0)
+        :param tuple[float,float,float] offset: 绑定的偏移量；默认为(0, 0, 0)
+        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为(0, 0, 0)
 
         :return: 是否成功
         :rtype: bool
@@ -1002,8 +1002,8 @@ class NeteaseFrameAnim(object):
 
         :param int model_id: 绑定的骨骼模型的ID（使用Model组件的GetModelId获取）
         :param str bone_name: 绑定具体骨骼的名称
-        :param tuple[float,float,float] offset: 绑定的偏移量，默认为(0, 0, 0)
-        :param tuple[float,float,float] rot: 绑定的旋转角度，默认为(0, 0, 0)
+        :param tuple[float,float,float] offset: 绑定的偏移量；默认为(0, 0, 0)
+        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为(0, 0, 0)
 
         :return: 是否成功
         :rtype: bool
@@ -1165,7 +1165,7 @@ class NeteaseFrameAnim(object):
 
         -----
 
-        :param bool isGlobal: True为全局，False为非全局，默认为False
+        :param bool isGlobal: True为全局，False为非全局；默认为False
 
         :return: 是否成功
         :rtype: bool

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-22
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -286,8 +286,8 @@ def polar_coord(coord, rad=False, origin=(0, 0)):
     -----
 
     :param tuple[float,float] coord: 平面直角坐标
-    :param bool rad: 是否使用弧度制，默认为False
-    :param tuple[float,float] origin: 坐标原点，默认为(0, 0)
+    :param bool rad: 是否使用弧度制；默认为False
+    :param tuple[float,float] origin: 坐标原点；默认为(0, 0)
 
     :return: 极坐标
     :rtype: tuple[float,float]
@@ -309,8 +309,8 @@ def cartesian_coord(coord, rad=False, origin=(0, 0)):
     -----
 
     :param tuple[float,float] coord: 极坐标
-    :param bool rad: 是否使用弧度制，默认为False
-    :param tuple[float,float] origin: 坐标原点，默认为(0, 0)
+    :param bool rad: 是否使用弧度制；默认为False
+    :param tuple[float,float] origin: 坐标原点；默认为(0, 0)
 
     :return: 平面直角坐标
     :rtype: tuple[float,float]
@@ -367,11 +367,11 @@ def screen_pos(pos, world_basis, screen_basis=(0, 0), scale=1, offset=(0, 0), ro
 
     :param tuple[float,float,float] pos: 世界坐标
     :param tuple[float,float,float] world_basis: 屏幕坐标系原点对应的世界坐标
-    :param tuple[float,float] screen_basis: 屏幕坐标系原点，默认为 (0, 0)
+    :param tuple[float,float] screen_basis: 屏幕坐标系原点；默认为 (0, 0)
     :param float scale: 屏幕上1像素所对应的世界距离；默认为1
-    :param tuple[float,float] offset: 屏幕坐标xy偏移量，默认为 (0, 0)
-    :param float rotation: 绕坐标原点的旋转角度，默认为0
-    :param bool rad: 旋转角是否使用弧度制，默认为False
+    :param tuple[float,float] offset: 屏幕坐标xy偏移量；默认为 (0, 0)
+    :param float rotation: 绕坐标原点的旋转角度；默认为0
+    :param bool rad: 旋转角是否使用弧度制；默认为False
 
     :return: 屏幕坐标
     :rtype: tuple[float,float]|None
@@ -448,8 +448,8 @@ def pos_entity_facing(__is_client__, entity_id, dist, use_0yaw=False, height_off
 
     :param str entity_id: 实体ID
     :param float dist: 距离，可为负数
-    :param bool use_0yaw: 是否将实体竖直方向上的视角视为0，默认为False
-    :param float height_offset: 高度偏移量，默认为0
+    :param bool use_0yaw: 是否将实体竖直方向上的视角视为0；默认为False
+    :param float height_offset: 高度偏移量；默认为0
 
     :return: 坐标；若实体不存在，返回 None
     :rtype: tuple[float,float,float]|None
@@ -475,8 +475,8 @@ def pos_block_facing(pos, face=Facing.North, dist=1.0):
     -----
 
     :param tuple[float,float,float] pos: 起始坐标
-    :param int face: 方块朝向，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_，默认为 Facing.North
-    :param float dist: 距离，默认为1.0
+    :param int face: 方块朝向，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_；默认为 Facing.North
+    :param float dist: 距离；默认为1.0
 
     :return: 坐标
     :rtype: tuple[float,float,float]|None
@@ -542,8 +542,8 @@ def pos_rotate(pos, angle, basis=(0, 0), rad=False):
 
     :param tuple[float,float] pos: 二维坐标
     :param float angle: 旋转角
-    :param tuple[float,float] basis: 旋转中心坐标，默认为 (0, 0)
-    :param bool rad: 旋转角是否使用弧度制，默认为False
+    :param tuple[float,float] basis: 旋转中心坐标；默认为 (0, 0)
+    :param bool rad: 旋转角是否使用弧度制；默认为False
 
     :return: 旋转后的坐标
     :rtype: tuple[float,float]|None
@@ -765,7 +765,7 @@ def is_in_box(__is_client__, target, pos1, pos2, ignore_y=False):
     :param tuple[float]|str target: 坐标或实体ID
     :param tuple[float] pos1: 包围盒对角顶点坐标1
     :param tuple[float] pos2: 包围盒对角顶点坐标2
-    :param bool ignore_y: 是否忽略Y轴，默认为False
+    :param bool ignore_y: 是否忽略Y轴；默认为False
 
     :return: 是否在包围盒内
     :rtype: bool
@@ -911,7 +911,7 @@ def catmull_rom(p0, p1, p2, p3, t, alpha=0.5):
     :param tuple[float,float,float] p2: 终点
     :param tuple[float,float,float] p3: 后一个点
     :param float t: 插值因子，范围 [0, 1]
-    :param float alpha: 张力参数，默认为0.5
+    :param float alpha: 张力参数；默认为0.5
 
     :return: 曲线上的点
     :rtype: tuple[float,float,float]
@@ -978,7 +978,7 @@ def range_map(x, output_range, input_range=[0, 1], interp=None): # noqa
 
     :param float x: 输入值
     :param tuple[float,float] output_range: 输出区间（闭区间）
-    :param tuple[float,float] input_range: 输入区间（闭区间），默认为 [0, 1]
+    :param tuple[float,float] input_range: 输入区间（闭区间）；默认为 [0, 1]
     :param function interp: 插值函数，接受一个参数 t ∈ [0, 1]，返回 [0, 1] 的值；默认为线性插值
 
     :return: 映射值
@@ -1026,6 +1026,10 @@ def box_max_edge_len(pos1, pos2):
 
 
 # endregion
+
+
+def __test__():
+    pass
 
 
 def __benchmark__(n, timer, pid, info, **kwargs):

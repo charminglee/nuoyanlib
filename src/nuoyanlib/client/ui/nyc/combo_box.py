@@ -213,7 +213,7 @@ class NyComboBox(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param ComboBoxCallbackType cb_type: 回调类型，请使用ComboBoxCallbackType枚举值，默认为ComboBoxCallbackType.SELECT
+        :param ComboBoxCallbackType cb_type: 回调类型，请使用ComboBoxCallbackType枚举值；默认为ComboBoxCallbackType.SELECT
 
         :return: 是否成功
         :rtype: bool
@@ -229,7 +229,7 @@ class NyComboBox(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param ComboBoxCallbackType cb_type: 回调类型，请使用ComboBoxCallbackType枚举值，默认为ComboBoxCallbackType.SELECT
+        :param ComboBoxCallbackType cb_type: 回调类型，请使用ComboBoxCallbackType枚举值；默认为ComboBoxCallbackType.SELECT
 
         :return: 是否成功
         :rtype: bool

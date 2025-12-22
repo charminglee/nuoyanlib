@@ -78,10 +78,10 @@ def create_ui(namespace, ui_key, cls_path, screen_def="", register=True, param=N
     :param str ui_key: UI唯一标识，建议为UI json中的"namespace"的值
     :param str cls_path: UI类路径
     :param str screen_def: UI画布路径，格式为"<namespace>.<screen_name>"，<namespace>为UI json中"namespace"的值，<screen_name>为想要创建的画布名称；默认为"<ui_key>.main"
-    :param bool register: 创建前是否注册UI，默认为True
+    :param bool register: 创建前是否注册UI；默认为True
     :param dict|None param: UI参数字典；不通过堆栈管理的方式创建UI时，该参数默认为{'isHud': 1}
-    :param bool push: 是否通过堆栈管理（PushScreen）的方式创建UI，默认为False
-    :param ClientSystem|None client_system: 客户端类实例，默认为None；若指定，可在UI类中通过param字典的 '__cs__' 键获取到该实例
+    :param bool push: 是否通过堆栈管理（PushScreen）的方式创建UI；默认为False
+    :param ClientSystem|None client_system: 客户端类实例；默认为None；若指定，可在UI类中通过param字典的 '__cs__' 键获取到该实例
 
     :return: UI类实例，创建失败时返回None
     :rtype: ScreenNode|None
@@ -128,7 +128,7 @@ def to_control(screen_node, path, control_type=ControlType.BASE_CONTROL):
 
     :param ScreenNode screen_node: 控件所在UI类的实例
     :param str|BaseUIControl path: 控件路径
-    :param ControlType control_type: 控件类型，返回该类型对应的实例，请使用ControlType枚举值，默认为ControlType.BASE_CONTROL
+    :param ControlType control_type: 控件类型，返回该类型对应的实例，请使用ControlType枚举值；默认为ControlType.BASE_CONTROL
 
     :return: 控件实例，获取不到时返回None
     :rtype: BaseUIControl|None
@@ -172,7 +172,7 @@ def get_children_path_by_level(control, screen_node, level=1):
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层次，默认为1，传入0或负值时，获取所有层次
+    :param int level: 子控件层次；默认为1，传入0或负值时，获取所有层次
 
     :return: 指定层次的所有子控件路径的列表，获取不到时返回空列表
     :rtype: list[str]
@@ -205,7 +205,7 @@ def get_children_by_level(control, screen_node, level=1):
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层次，默认为1，传入0或负值时，获取所有层次
+    :param int level: 子控件层次；默认为1，传入0或负值时，获取所有层次
 
     :return: 指定层次的所有子控件实例的列表，获取不到时返回空列表
     :rtype: list[BaseUIControl]

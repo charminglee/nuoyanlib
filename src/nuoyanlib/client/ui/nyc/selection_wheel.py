@@ -102,7 +102,7 @@ class NySelectionWheel(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param WheelCallbackType cb_type: 回调类型，请使用WheelCallbackType枚举值，默认为WheelCallbackType.CLICK
+        :param WheelCallbackType cb_type: 回调类型，请使用WheelCallbackType枚举值；默认为WheelCallbackType.CLICK
 
         :return: 是否成功
         :rtype: bool
@@ -118,7 +118,7 @@ class NySelectionWheel(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param WheelCallbackType cb_type: 回调类型，请使用WheelCallbackType枚举值，默认为WheelCallbackType.CLICK
+        :param WheelCallbackType cb_type: 回调类型，请使用WheelCallbackType枚举值；默认为WheelCallbackType.CLICK
 
         :return: 是否成功
         :rtype: bool

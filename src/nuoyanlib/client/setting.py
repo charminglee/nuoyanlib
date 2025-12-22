@@ -28,7 +28,7 @@ def save_setting(name, data_dict, is_global=True):
     
     :param str name: 数据名，只能包含字母、数字和下划线字符
     :param dict data_dict: 数据字典
-    :param bool is_global: 是否为全局数据，默认为True
+    :param bool is_global: 是否为全局数据；默认为True
     
     :return: 是否保存成功
     :rtype: bool
@@ -43,7 +43,7 @@ def read_setting(name, is_global=True):
     -----
 
     :param str name: 数据名，只能包含字母、数字和下划线字符
-    :param bool is_global: 是否为全局数据，默认为True
+    :param bool is_global: 是否为全局数据；默认为True
     
     :return: 数据字典
     :rtype: dict
@@ -65,7 +65,7 @@ def check_setting(name, item_list, is_global=True):
 
     :param str name: 数据名，只能包含字母、数字和下划线字符
     :param list item_list: 检测项目列表
-    :param bool is_global: 是否为全局数据，默认为True
+    :param bool is_global: 是否为全局数据；默认为True
 
     :return: 缺失项目列表
     :rtype: list

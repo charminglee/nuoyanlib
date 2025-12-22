@@ -152,7 +152,7 @@ class NyLabel(NyControl):
         文本字体大小缩放值。
 
         默认字体大小，取值有限为 ``"small"`` 、``"normal"`` 、``"large"`` ，
-        ``font_scale`` 是在这个默认字体的基础上进行字体大小缩放，默认为 ``1.0`` 。
+        ``font_scale`` 是在这个默认字体的基础上进行字体大小缩放；默认为 ``1.0`` 。
 
         :rtype: None
         """
@@ -166,7 +166,7 @@ class NyLabel(NyControl):
         文本字体大小缩放值。
 
         默认字体大小，取值有限为 ``"small"`` 、``"normal"`` 、``"large"`` ，
-        ``font_scale`` 是在这个默认字体的基础上进行字体大小缩放，默认为 ``1.0`` 。
+        ``font_scale`` 是在这个默认字体的基础上进行字体大小缩放；默认为 ``1.0`` 。
 
         :type val: float
         """

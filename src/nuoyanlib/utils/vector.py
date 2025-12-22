@@ -141,7 +141,7 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否创建三维向量，默认为 True
+        :param bool is_3d: 是否创建三维向量；默认为 True
 
         :return: 零向量
         :rtype: Vector
@@ -157,7 +157,7 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否创建三维向量，默认为 True
+        :param bool is_3d: 是否创建三维向量；默认为 True
 
         :return: 所有分量均为1.0的向量
         :rtype: Vector
@@ -189,7 +189,7 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否创建三维向量，默认为 True
+        :param bool is_3d: 是否创建三维向量；默认为 True
 
         :return: x分量为-1.0，其余分量为0.0的向量
         :rtype: Vector
@@ -205,7 +205,7 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否创建三维向量，默认为 True
+        :param bool is_3d: 是否创建三维向量；默认为 True
 
         :return: y分量为1.0，其余分量为0.0的向量
         :rtype: Vector
@@ -221,7 +221,7 @@ class Vector(object):
 
         -----
 
-        :param bool is_3d: 是否创建三维向量，默认为 True
+        :param bool is_3d: 是否创建三维向量；默认为 True
 
         :return: y分量为1.0，其余分量为0.0的向量
         :rtype: Vector
@@ -465,7 +465,7 @@ class Vector(object):
 
         -----
 
-        :param bool inplace: 是否就地修改，默认为True
+        :param bool inplace: 是否就地修改；默认为True
 
         :return: 标准化向量，长度为1；就地修改时，返回向量自身
         :rtype: Vector
@@ -501,7 +501,7 @@ class Vector(object):
 
         -----
 
-        :param bool inplace: 是否就地修改，默认为True
+        :param bool inplace: 是否就地修改；默认为True
 
         :return: 相反向量；就地修改时，返回向量自身
         :rtype: Vector
@@ -915,7 +915,7 @@ class Vector(object):
         -----
 
         :param Vector|tuple[float,float,float] vec: 另一向量（Vector、tuple）
-        :param bool inplace: 是否就地修改，默认为True
+        :param bool inplace: 是否就地修改；默认为True
 
         :return: 向量叉积；就地修改时，返回向量自身
         :rtype: Vector
@@ -942,7 +942,7 @@ class Vector(object):
         -----
 
         :param Vector|tuple[float] basis: 另一向量
-        :param bool inplace: 是否就地修改，默认为True
+        :param bool inplace: 是否就地修改；默认为True
 
         :return: 投影向量；就地修改时，返回向量自身
         :rtype: Vector
@@ -1005,8 +1005,8 @@ class Vector(object):
         -----
 
         :param Vector|tuple[float] vec: 向量
-        :param bool ret_cos: 是否返回夹角的 cos 值，默认为 False
-        :param bool rad: 是否使用弧度制，仅 ret_cos 为 False 时有效，默认为 False
+        :param bool ret_cos: 是否返回夹角的 cos 值；默认为 False
+        :param bool rad: 是否使用弧度制，仅 ret_cos 为 False 时有效；默认为 False
 
         :return: 向量夹角
         :rtype: float
@@ -1030,8 +1030,8 @@ class Vector(object):
 
         :param float angle: 旋转角度
         :param str axis: 旋转轴，可选值为 "x"、"y"、"z"
-        :param bool rad: 旋转角度是否使用弧度制，默认为 False
-        :param bool inplace: 是否就地修改，默认为True
+        :param bool rad: 旋转角度是否使用弧度制；默认为 False
+        :param bool inplace: 是否就地修改；默认为True
 
         :return: 旋转后的向量；就地修改时，返回向量自身
         :rtype: Vector
@@ -1076,8 +1076,8 @@ class Vector(object):
 
         :param Vector|tuple[float,float,float] u: 旋转轴向量
         :param float angle: 旋转角度
-        :param bool rad: 旋转角度是否使用弧度制，默认为 False
-        :param bool inplace: 是否就地修改，默认为True
+        :param bool rad: 旋转角度是否使用弧度制；默认为 False
+        :param bool inplace: 是否就地修改；默认为True
 
         :return: 旋转后的向量；就地修改时，返回向量自身
         :rtype: Vector
@@ -1435,8 +1435,8 @@ def vec_angle_between(vec1, vec2, ret_cos=False, rad=False):
 
     :param tuple[float] vec1: 向量1
     :param tuple[float] vec2: 向量2
-    :param bool ret_cos: 是否返回夹角的 cos 值，默认为 False
-    :param bool rad: 是否使用弧度制，仅 ret_cos 为 False 时有效，默认为 False
+    :param bool ret_cos: 是否返回夹角的 cos 值；默认为 False
+    :param bool rad: 是否使用弧度制，仅 ret_cos 为 False 时有效；默认为 False
 
     :return: 向量夹角
     :rtype: float
@@ -1460,11 +1460,11 @@ def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", ra
     -----
 
     :param tuple[float,float,float] vec: 要旋转的向量
-    :param float x_angle: 绕x轴的旋转角度，默认为 0.0
-    :param float y_angle: 绕y轴的旋转角度，默认为 0.0
-    :param float z_angle: 绕z轴的旋转角度，默认为 0.0
-    :param str order: 旋转顺序，默认为 "zyx"
-    :param bool rad: 旋转角度是否使用弧度制，默认为 False
+    :param float x_angle: 绕x轴的旋转角度；默认为 0.0
+    :param float y_angle: 绕y轴的旋转角度；默认为 0.0
+    :param float z_angle: 绕z轴的旋转角度；默认为 0.0
+    :param str order: 旋转顺序；默认为 "zyx"
+    :param bool rad: 旋转角度是否使用弧度制；默认为 False
 
     :return: 旋转后的向量
     :rtype: tuple[float,float,float]
@@ -1518,7 +1518,7 @@ def vec_rotate_around(v, u, angle, rad=False):
     :param tuple[float,float,float] v: 要旋转的向量
     :param tuple[float,float,float] u: 旋转轴向量
     :param float angle: 旋转角度
-    :param bool rad: 旋转角度是否使用弧度制，默认为 False
+    :param bool rad: 旋转角度是否使用弧度制；默认为 False
 
     :return: 旋转后的向量
     :rtype: tuple[float,float,float]
@@ -1547,7 +1547,7 @@ def vec_entity_up(entity_id, ignore_rot_x=False):
     -----
 
     :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0；默认为False
 
     :return: 实体局部坐标系中朝上的单位向量，获取失败时返回None
     :rtype: tuple[float,float,float]|None
@@ -1570,7 +1570,7 @@ def vec_entity_down(entity_id, ignore_rot_x=False):
     -----
 
     :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0；默认为False
 
     :return: 实体局部坐标系中朝下的单位向量，获取失败时返回None
     :rtype: tuple[float,float,float]|None
@@ -1628,7 +1628,7 @@ def vec_entity_forward(entity_id, ignore_rot_x=False):
     -----
 
     :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0；默认为False
 
     :return: 实体局部坐标系中朝前的单位向量，获取失败时返回None
     :rtype: tuple[float,float,float]|None
@@ -1649,7 +1649,7 @@ def vec_entity_backward(entity_id, ignore_rot_x=False):
     -----
 
     :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0，默认为False
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0；默认为False
 
     :return: 实体局部坐标系中朝后的单位向量，获取失败时返回None
     :rtype: tuple[float,float,float]|None

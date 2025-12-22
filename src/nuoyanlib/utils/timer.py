@@ -175,7 +175,7 @@ class Timer(object):
 
         -----
 
-        :param float|None sec: 暂停秒数，默认为None，表示无限期暂停
+        :param float|None sec: 暂停秒数；默认为None，表示无限期暂停
 
         :return: 定时器自身
         :rtype: Timer

@@ -46,8 +46,8 @@ def rgb_to_hex(rgb_color, with_sign=True, upper=True):
     -----
 
     :param tuple[float,float,float]|tuple[int,int,int] rgb_color: RGB元组，支持Minecraft RGB格式（取值范围为0-1）
-    :param bool with_sign: 返回的16进制颜色代码是否包含"#"前缀，默认为True
-    :param bool upper: 返回的16进制颜色代码是否大写，默认为True
+    :param bool with_sign: 返回的16进制颜色代码是否包含"#"前缀；默认为True
+    :param bool upper: 返回的16进制颜色代码是否大写；默认为True
 
     :return: 16进制颜色代码
     :rtype: str
@@ -79,7 +79,7 @@ def hex_to_rgb(hex_color, mc_rgb=True):
     -----
 
     :param str hex_color: 16进制颜色代码，可不包含"#"前缀
-    :param bool mc_rgb: 是否转换为Minecraft RGB格式（取值范围为0-1），默认为True
+    :param bool mc_rgb: 是否转换为Minecraft RGB格式（取值范围为0-1）；默认为True
 
     :return: RGB元组
     :rtype: tuple[float,float,float]|tuple[int,int,int]
@@ -131,10 +131,10 @@ def timeit(func, n=100000, print_res=False, args=None, kwargs=None):
     -----
 
     :param function func: 函数
-    :param int n: 执行次数，默认为100000
-    :param bool print_res: 是否打印计算结果，默认为False
-    :param Any args: 函数位置参数元组，默认为None
-    :param Any kwargs: 函数关键字参数字典，默认为None
+    :param int n: 执行次数；默认为100000
+    :param bool print_res: 是否打印计算结果；默认为False
+    :param Any args: 函数位置参数元组；默认为None
+    :param Any kwargs: 函数关键字参数字典；默认为None
 
     :return: 返回一个元组，元素分别为总耗时和平均耗时，单位为ms
     :rtype: tuple[float,float]
@@ -208,7 +208,7 @@ def add_condition_to_func(cond, func, freq=1):
 
     :param function cond: 条件函数，无参数，需要返回一个bool，当返回的bool（即条件）发生变化时，自动执行一次func
     :param function func: 条件发生变化时执行的函数，该函数需要接受一个类型为bool的参数，即当前的条件状态（cond的返回值）
-    :param int freq: 条件判断频率，单位为tick，默认为1，即每1tick判断一次，小于1的值会被视为1
+    :param int freq: 条件判断频率，单位为tick；默认为1，即每1tick判断一次，小于1的值会被视为1
 
     :return: 返回一个int型ID，后续可用该ID移除添加的条件和函数，添加失败时返回-1
     :rtype: int
@@ -364,9 +364,9 @@ def translate_time(sec, separator="", unit=("h", "m", "s"), zfill=False):
     -----
 
     :param int sec: 秒数
-    :param str separator: 分隔符，默认为空字符串
+    :param str separator: 分隔符；默认为空字符串
     :param tuple[str,str,str] unit: 时间单位，三元组，对应时分秒，传入None则表示不带单位；默认为("h", "m", "s")
-    :param bool zfill: 是否在数字前补零，默认为False
+    :param bool zfill: 是否在数字前补零；默认为False
 
     :return: h/m/s格式字符串
     :rtype: str

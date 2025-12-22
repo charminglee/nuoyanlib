@@ -68,7 +68,7 @@ class LobbyDataMgr(ServerEventProxy):
 
         :param str key: 数据键
         :param str|int|float|bool|list|dict|None default: 数据默认值；需传入一个函数，无参数，返回值即为数据默认值；默认为None
-        :param bool is_global: 是否为全局数据（即不依赖玩家uid），默认为False
+        :param bool is_global: 是否为全局数据（即不依赖玩家uid）；默认为False
 
         :return: 无
         :rtype: None
@@ -125,9 +125,9 @@ class LobbyDataMgr(ServerEventProxy):
 
         -----
 
-        :param int|str player: 玩家UID或实体ID，传入0表示全局数据，默认为0
+        :param int|str player: 玩家UID或实体ID，传入0表示全局数据；默认为0
         :param str keys: [变长位置参数] 需要获取的数据键，省略该参数将获取所有已注册的数据
-        :param function|None callback: [仅关键字参数] 获取结果回调函数，默认为None
+        :param function|None callback: [仅关键字参数] 获取结果回调函数；默认为None
         :param dict[str,int|str|dict]|None simulate: [仅关键字参数] 联机大厅模拟数据，传入该参数后获取结果将使用该数据，正式服环境会忽略该参数；默认为None
 
         :return: 无
@@ -192,9 +192,9 @@ class LobbyDataMgr(ServerEventProxy):
 
         :param str key: 数据键
         :param function exp: 更新表达式函数，接受当前数据值作为唯一参数，返回更新后的数据值；如lambda x: x + 1，表述数据自增1
-        :param int|str player: 玩家UID或实体ID，传入0表示全局数据，默认为0
-        :param int|None order_id: [仅关键字参数] 需要标记为发货的订单ID，默认为None
-        :param function|None callback: [仅关键字参数] 设置结果回调函数，默认为None
+        :param int|str player: 玩家UID或实体ID，传入0表示全局数据；默认为0
+        :param int|None order_id: [仅关键字参数] 需要标记为发货的订单ID；默认为None
+        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为None
 
         :return: 无
         :rtype: None
@@ -227,9 +227,9 @@ class LobbyDataMgr(ServerEventProxy):
 
         :param str key: 数据键
         :param str|int|float|bool|list|dict|None value: 数据值
-        :param int|str player: 玩家UID或实体ID，传入0表示全局数据，默认为0
-        :param int|None order_id: [仅关键字参数] 需要标记为发货的订单ID，默认为None
-        :param function|None callback: [仅关键字参数] 设置结果回调函数，默认为None
+        :param int|str player: 玩家UID或实体ID，传入0表示全局数据；默认为0
+        :param int|None order_id: [仅关键字参数] 需要标记为发货的订单ID；默认为None
+        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为None
 
         :return: 无
         :rtype: None
@@ -259,7 +259,7 @@ class LobbyDataMgr(ServerEventProxy):
         -----
 
         :param str key: 数据键
-        :param int|str player: 玩家UID或实体ID，传入0表示全局数据，默认为0
+        :param int|str player: 玩家UID或实体ID，传入0表示全局数据；默认为0
 
         :return: 数据值
         :rtype: str|int|float|bool|list|dict|None
@@ -279,7 +279,7 @@ class LobbyDataMgr(ServerEventProxy):
 
         :param int order_id: 订单ID
         :param int|str player: 玩家UID或实体ID
-        :param function|None callback: [仅关键字参数] 设置结果回调函数，默认为None
+        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为None
 
         :return: 无
         :rtype: None
@@ -307,7 +307,7 @@ class LobbyDataMgr(ServerEventProxy):
         -----
 
         :param int|str player: 玩家UID或实体ID
-        :param function|None callback: [仅关键字参数] 查询结果回调函数，默认为None
+        :param function|None callback: [仅关键字参数] 查询结果回调函数；默认为None
         :param dict[int,dict[str,int|str]]|None simulate: [仅关键字参数] 联机大厅模拟数据，传入该参数后查询结果将使用该数据，正式服环境会忽略该参数；默认为None
 
         :return: 无

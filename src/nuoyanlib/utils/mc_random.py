@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-22
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -57,7 +57,7 @@ def random_pos(__is_client__, center_pos, r, dim=None, use_top_height=False):
     :param tuple[float,float,float] center_pos: 区域中心坐标
     :param float r: 区域半径
     :param int|None dim: 维度ID，若在客户端调用可忽略该参数；默认为 None
-    :param bool use_top_height: 是否以最高的非空气方块的高度作为返回坐标的y值，默认为False
+    :param bool use_top_height: 是否以最高的非空气方块的高度作为返回坐标的y值；默认为False
 
     :return: 坐标，获取失败时返回 None
     :rtype: tuple[float,float,float]|None
@@ -82,7 +82,7 @@ def random_pos(__is_client__, center_pos, r, dim=None, use_top_height=False):
 
 
 def _gen_str(choice, s, l):
-    return "".join(choice(s) for _ in range(l))
+    return "".join(choice(s) for _ in xrange(l))
 
 
 _random_ins = {}
@@ -95,11 +95,11 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
     -----
 
     :param int length: 生成的字符串长度
-    :param bool lower: 是否包含小写字母，默认为 True
-    :param bool upper: 是否包含大写字母，默认为 True
-    :param bool num: 是否包含数字，默认为 True
-    :param Any|None seed: 随机数种子，默认为 None
-    :param int generate_num: 生成数量，默认为1，大于1时将以列表返回结果
+    :param bool lower: 是否包含小写字母；默认为 True
+    :param bool upper: 是否包含大写字母；默认为 True
+    :param bool num: 是否包含数字；默认为 True
+    :param Any|None seed: 随机数种子；默认为 None
+    :param int generate_num: 生成数量；默认为1，大于1时将以列表返回结果
 
     :return: 随机字符串
     :rtype: str|list[str]

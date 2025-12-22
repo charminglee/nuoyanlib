@@ -207,7 +207,7 @@ class ScreenNodeExtension(object):
         -----
 
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为None，详细说明见AddTouchEventParams
 
         :return: NyButton按钮实例，创建失败返回None
         :rtype: NyButton|None
@@ -272,7 +272,7 @@ class ScreenNodeExtension(object):
         -----
 
         :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-        :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid，默认为False
+        :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid；默认为False
         :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
         :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
         :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
@@ -521,8 +521,8 @@ class ScreenNodeExtension(object):
         -----
 
         :param str btn_path: 按钮路径，支持使用通配符"*"（目前仅支持最后一级控件名称使用通配符）
-        :param ButtonCallbackType callback_types: [变长位置参数] 按钮回调类型，支持同时设置多种回调，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
-        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+        :param ButtonCallbackType callback_types: [变长位置参数] 按钮回调类型，支持同时设置多种回调，请使用ButtonCallbackType枚举值；默认为ButtonCallbackType.UP
+        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为None，详细说明见AddTouchEventParams
         """
         if not callback_types:
             callback_types = (ButtonCallbackType.UP,)

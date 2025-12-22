@@ -42,7 +42,7 @@ class NyButton(InteractableControl, NyControl):
 
     :param ScreenNodeExtension screen_node_ex: 按钮所在UI类的实例（需继承ScreenNodeExtension）
     :param ButtonUIControl btn_control: 通过asButton()等方式获取的ButtonUIControl实例
-    :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典，默认为None，详细说明见AddTouchEventParams
+    :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为None，详细说明见AddTouchEventParams
     """
 
     CONTROL_TYPE = ControlType.BUTTON
@@ -205,7 +205,7 @@ class NyButton(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param ButtonCallbackType cb_type: 回调类型，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
+        :param ButtonCallbackType cb_type: 回调类型，请使用ButtonCallbackType枚举值；默认为ButtonCallbackType.UP
 
         :return: 是否成功
         :rtype: bool
@@ -221,7 +221,7 @@ class NyButton(InteractableControl, NyControl):
         -----
 
         :param function func: 要移除的回调函数
-        :param ButtonCallbackType cb_type: 回调类型，请使用ButtonCallbackType枚举值，默认为ButtonCallbackType.UP
+        :param ButtonCallbackType cb_type: 回调类型，请使用ButtonCallbackType枚举值；默认为ButtonCallbackType.UP
 
         :return: 是否成功
         :rtype: bool
@@ -289,7 +289,7 @@ class NyButton(InteractableControl, NyControl):
 
         -----
 
-        :param bool move_parent: 是否同步拖动父控件，默认为False
+        :param bool move_parent: 是否同步拖动父控件；默认为False
         :param str|BaseUIControl|NyControl|list[str|BaseUIControl|NyControl]|None associated_uis: 关联拖动的其他控件，拖动该按钮时也会同步拖动这些控件，可传入控件路径或实例，如有多个控件可使用列表传入；默认为None
         :param bool auto_save: 是否自动保存位置；默认为False
 
@@ -307,7 +307,7 @@ class NyButton(InteractableControl, NyControl):
 
         -----
 
-        :param bool move_parent: 是否同步拖动父控件，默认为False
+        :param bool move_parent: 是否同步拖动父控件；默认为False
         :param str|BaseUIControl|NyControl|list[str|BaseUIControl|NyControl]|None associated_uis: 关联拖动的其他控件，拖动该按钮时也会同步拖动这些控件，可传入控件路径或实例，如有多个控件可使用列表传入；默认为None
         :param bool auto_save: 是否自动保存位置；默认为False
 

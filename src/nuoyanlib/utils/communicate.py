@@ -158,10 +158,10 @@ def call(ns, sys_name, method, args=None, kwargs=None, player_id=None, callback=
     :param str ns: 被调用函数所在系统的命名空间
     :param str sys_name: 被调用函数所在系统的名称
     :param str method: 被调用函数名
-    :param tuple args: 位置参数元组，展开后传入被调用函数，默认为None
-    :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数，默认为None
+    :param tuple args: 位置参数元组，展开后传入被调用函数；默认为None
+    :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数；默认为None
     :param str|list[str]|None player_id: 调用客户端时，需指定玩家实体ID；传入玩家实体ID/玩家实体ID列表表示单个/多个玩家，传入"*"（星号）表示所有玩家；调用服务端时忽略该参数即可
-    :param function|None callback: 回调函数，参数说明见上方，默认为None
+    :param function|None callback: 回调函数，参数说明见上方；默认为None
     :param float delay_ret: 延迟返回时间，单位为秒；若设置了该值，则callback触发前会延迟给定时间；由于跨端调用本身存在不可避免的网络延迟，因此实际的延迟时间会大于此处给定的值；默认为-1，即无延迟
 
     :return: 无

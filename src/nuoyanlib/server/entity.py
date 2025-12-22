@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -101,10 +101,10 @@ def bounce_entities(
     :param int dim: 维度ID
     :param float radius: 弹开半径
     :param float power: 弹开强度
-    :param list[str]|None filter_ids: 过滤的实体ID列表，默认为不过滤
-    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
-    :param list[str]|None filter_type_str: 过滤的原版实体类型ID列表（如"minecraft:zombie"），默认为不过滤
-    :param bool filter_abiotic: 是否过滤非生物实体，默认为不过滤
+    :param list[str]|None filter_ids: 过滤的实体ID列表；默认为不过滤
+    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举）；默认为不过滤
+    :param list[str]|None filter_type_str: 过滤的原版实体类型ID列表（如"minecraft:zombie"）；默认为不过滤
+    :param bool filter_abiotic: 是否过滤非生物实体；默认为不过滤
 
     :return: 被弹开的实体ID列表
     :rtype: list[str]
@@ -133,10 +133,10 @@ def attract_entities(
     :param int dim: 维度ID
     :param float radius: 吸引半径
     :param float power: 吸引强度
-    :param list[str]|None filter_ids: 过滤的实体ID列表，默认为不过滤
-    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
-    :param list[str]|None filter_type_str: 过滤的原版实体类型ID列表（如"minecraft:zombie"），默认为不过滤
-    :param bool filter_abiotic: 是否过滤非生物实体，默认为不过滤
+    :param list[str]|None filter_ids: 过滤的实体ID列表；默认为不过滤
+    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举）；默认为不过滤
+    :param list[str]|None filter_type_str: 过滤的原版实体类型ID列表（如"minecraft:zombie"）；默认为不过滤
+    :param bool filter_abiotic: 是否过滤非生物实体；默认为不过滤
 
     :return: 被吸引的实体ID列表
     :rtype: list[str]
@@ -372,13 +372,13 @@ def launch_projectile(
 
     :param str projectile_name: 抛射物类型ID
     :param str spawner_id: 发射者的实体ID
-    :param float|None power: 抛射物威力（速度），默认为json配置中的值
-    :param int|None damage: 抛射物伤害，默认为json配置中的值
-    :param tuple[float,float,float]|None position: 初始位置，默认为比发射者脚底高1.6格的位置
-    :param tuple[float,float,float]|None direction: 初始朝向，默认为发射者准星方向
-    :param float|None gravity: 抛射物重力，默认为json配置中的值
+    :param float|None power: 抛射物威力（速度）；默认为json配置中的值
+    :param int|None damage: 抛射物伤害；默认为json配置中的值
+    :param tuple[float,float,float]|None position: 初始位置；默认为比发射者脚底高1.6格的位置
+    :param tuple[float,float,float]|None direction: 初始朝向；默认为发射者准星方向
+    :param float|None gravity: 抛射物重力；默认为json配置中的值
     :param str target_id: 抛射物目标（指定了target_id之后，会和潜影贝导弹是一个效果），默认无目标
-    :param bool damage_owner: 对创建者是否造成伤害，默认为不造成
+    :param bool damage_owner: 对创建者是否造成伤害；默认为不造成
 
     :return: 抛射物ID；创建失败返回"-1"
     :rtype: str
@@ -475,7 +475,7 @@ def get_all_entities(ent_filter=None):
 
     -----
 
-    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否获取该实体，可以使用「nuoyanlib」预设的过滤器EntityFilter，默认为None
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个bool值，表示是否获取该实体，可以使用「nuoyanlib」预设的过滤器EntityFilter；默认为None
 
     :return: 实体ID列表
     :rtype: list[str]
@@ -499,11 +499,11 @@ def get_entities_in_area(
 
     :param tuple[float,float,float] pos: 区域中心点坐标
     :param float radius: 区域半径
-    :param int dimension: 维度，默认为0
-    :param list[str]|None filter_ids: 过滤的实体ID列表，默认为不过滤
-    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
-    :param list[str]|None filter_type_str: 过滤的原版实体类型ID列表（如"minecraft:zombie"），默认为不过滤
-    :param bool filter_abiotic: 是否过滤非生物实体，默认为不过滤
+    :param int dimension: 维度；默认为0
+    :param list[str]|None filter_ids: 过滤的实体ID列表；默认为不过滤
+    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举）；默认为不过滤
+    :param list[str]|None filter_type_str: 过滤的原版实体类型ID列表（如"minecraft:zombie"）；默认为不过滤
+    :param bool filter_abiotic: 是否过滤非生物实体；默认为不过滤
 
     :return: 实体ID列表
     :rtype: list[str]
@@ -527,7 +527,7 @@ def get_entities_by_type(type_id, pos=None, dimension=0, radius=0.0):
     -----
 
     :param int type_id: 实体类型ID（网易版）
-    :param tuple[float,float,float]|None pos: 获取位置坐标（传入None表示全图范围），默认为全图范围
+    :param tuple[float,float,float]|None pos: 获取位置坐标（传入None表示全图范围）；默认为全图范围
     :param int dimension: 获取维度（指定pos时生效）
     :param float radius: 获取半径（指定pos时生效）
 
@@ -571,9 +571,9 @@ def get_entities_by_locking(entity_id, dist=-1.0, filter_ids=None, filter_types=
     -----
 
     :param str entity_id: 生物的实体ID
-    :param float dist: 最远获取距离，-1.0表示无视距离，默认为无视距离
-    :param list[str]|None filter_ids: 过滤的实体ID列表，默认为不过滤
-    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
+    :param float dist: 最远获取距离，-1.0表示无视距离；默认为无视距离
+    :param list[str]|None filter_ids: 过滤的实体ID列表；默认为不过滤
+    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举）；默认为不过滤
 
     :return: 实体ID列表
     :rtype: list[str]
@@ -610,12 +610,12 @@ def get_nearest_entity(
     -----
 
     :param str|tuple[float,float,float] obj: 实体ID或坐标
-    :param int count: 获取的实体数量，默认为1
-    :param int dim: 获取维度（obj传入坐标时生效），默认为0
-    :param float radius: 获取半径，-1.0表示全图范围，默认为全图范围w
-    :param list[str]|None filter_ids: 过滤的实体ID列表，默认为不过滤
-    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
-    :param bool filter_abiotic: 是否过滤非生物实体，默认为不过滤
+    :param int count: 获取的实体数量；默认为1
+    :param int dim: 获取维度（obj传入坐标时生效）；默认为0
+    :param float radius: 获取半径，-1.0表示全图范围；默认为全图范围w
+    :param list[str]|None filter_ids: 过滤的实体ID列表；默认为不过滤
+    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举）；默认为不过滤
+    :param bool filter_abiotic: 是否过滤非生物实体；默认为不过滤
 
     :return: 若count==1，返回实体ID；若count>1，返回实体ID列表；获取不到实体返回None
     :rtype: str|list[str]|None
@@ -651,9 +651,9 @@ def attack_nearest_mob(entity_id, r=15.0, filter_ids=None, filter_types=None):
     -----
 
     :param str entity_id: 实体ID
-    :param float r: 最远攻击距离，默认为15.0
-    :param list[str]|None filter_ids: 过滤的实体ID列表，默认为不过滤
-    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
+    :param float r: 最远攻击距离；默认为15.0
+    :param list[str]|None filter_ids: 过滤的实体ID列表；默认为不过滤
+    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举）；默认为不过滤
 
     :return: 攻击目标的实体ID；无攻击目标返回None
     :rtype: str|None
@@ -715,12 +715,12 @@ def get_entities_by_ray(
     :param tuple[float,float,float] start_pos: 射线起始坐标
     :param tuple[float,float,float] direction: 射线方向向量（单位向量）
     :param float length: 射线长度
-    :param int dimension: 维度，默认为0
-    :param int count: 获取到多少个实体后停止，默认为0，表示不限制数量
-    :param list[str]|None filter_ids: 过滤的实体ID列表，默认为不过滤
-    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举），默认为不过滤
-    :param list[str]|None filter_type_str: 过滤的原版实体类型ID列表（如"minecraft:zombie"），默认为不过滤
-    :param bool filter_abiotic: 是否过滤非生物实体，默认为不过滤
+    :param int dimension: 维度；默认为0
+    :param int count: 获取到多少个实体后停止；默认为0，表示不限制数量
+    :param list[str]|None filter_ids: 过滤的实体ID列表；默认为不过滤
+    :param list[int]|None filter_types: 过滤的网易版实体类型ID列表（`EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_ 枚举）；默认为不过滤
+    :param list[str]|None filter_type_str: 过滤的原版实体类型ID列表（如"minecraft:zombie"）；默认为不过滤
+    :param bool filter_abiotic: 是否过滤非生物实体；默认为不过滤
 
     :return: 射线经过的实体的列表，顺序为由近到远，列表每个元素为一个字典，字典结构请见上方
     :rtype: list[dict[str,str|tuple]]
