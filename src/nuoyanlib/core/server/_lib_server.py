@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -33,8 +33,8 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
 
     def EntityRemoveEvent(self, args):
         entity_id = args.id
-        if entity_id in CF.__cache__:
-            del CF.__cache__[entity_id]
+        if entity_id in CF._cache:
+            del CF._cache[entity_id]
 
     def UiInitFinished(self, args):
         if self.query_cache:

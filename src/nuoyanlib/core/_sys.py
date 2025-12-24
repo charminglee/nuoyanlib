@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -77,10 +77,6 @@ def get_lib_system(_is_client=None):
             from .server._lib_server import instance
             _lib_server = instance()
         return _lib_server
-
-
-def is_apollo():
-    return False
 
 
 def is_client():

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -18,6 +18,7 @@ from functools import wraps
 import time
 import re
 from ..core._sys import get_lib_system, get_lv_comp, is_client
+from ..core._utils import singleton, lru_cache, cached_property
 
 
 __all__ = [
@@ -36,6 +37,9 @@ __all__ = [
     "turn_list_to_tuple",
     "is_method_overridden",
     "translate_time",
+    "singleton",
+    "lru_cache",
+    "cached_property",
 ]
 
 

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-22
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -17,7 +17,7 @@ from ..core._types._typing import FTuple3
 
 def probability(p: float) -> bool: ...
 def random_pos(
-    center_pos: FTuple3,
+    center: FTuple3,
     r: float,
     dim: Optional[int] = None,
     use_top_height: bool = False,

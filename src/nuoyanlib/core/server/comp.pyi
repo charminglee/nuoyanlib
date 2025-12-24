@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -94,7 +94,7 @@ CompFactory: EngineCompFactoryServer
 
 
 class CF(object):
-    __cache__: ClassVar[Dict[str, CF]]
+    _cache: ClassVar[Dict[str, CF]]
     _target: Union[str, int]
     def __new__(cls: Type[T], target: Union[str, int]) -> T: ...
     def __init__(self: Self, target: Union[str, int]) -> None: ...

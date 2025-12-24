@@ -5,11 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-22
+#   Date  : 2025-12-24
 #  ⠀
 # =================================================
 
 
+from __future__ import division
 import operator
 from math import degrees, sin, cos, acos, sqrt, radians, atan2
 from mod.common.utils.mcmath import Matrix
@@ -112,7 +113,7 @@ class Vector(object):
             self._dim = 3
             return
         if l == 1:
-            vec = map(float, args[0])
+            vec = args[0]
             if len(vec) == 2: # noqa
                 self._x, self._y = vec
                 self._z = 0.0
@@ -122,12 +123,12 @@ class Vector(object):
                 self._dim = 3
             return
         if l == 2:
-            self._x, self._y = map(float, args)
+            self._x, self._y = args
             self._z = 0.0
             self._dim = 2
             return
         if l == 3:
-            self._x, self._y, self._z = map(float, args)
+            self._x, self._y, self._z = args
             self._dim = 3
             return
         raise VectorError("invalid Vector construction arguments: {}".format(args))
@@ -287,7 +288,7 @@ class Vector(object):
 
         :type val: float
         """
-        self._x = float(val)
+        self._x = val
 
     @property
     def y(self):
@@ -309,7 +310,7 @@ class Vector(object):
 
         :type val: float
         """
-        self._y = float(val)
+        self._y = val
 
     @property
     def z(self):
@@ -336,7 +337,7 @@ class Vector(object):
         """
         if self._dim == 2:
             raise VectorError("2D vector has no z-component")
-        self._z = float(val)
+        self._z = val
 
     @property
     def xy(self):
@@ -587,11 +588,11 @@ class Vector(object):
         :raise IndexError: 索引超出范围
         """
         if i == 0:
-            self._x = float(value)
+            self._x = value
         elif i == 1:
-            self._y = float(value)
+            self._y = value
         elif i == 2 and self._dim == 3:
-            self._z = float(value)
+            self._z = value
         else:
             raise IndexError("Vector index out of range")
 

@@ -5,9 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
+
+
+from ..nuoyanlib.utils.enum import StrEnum, auto
 
 
 MOD_NAME = "Test"
@@ -24,7 +27,8 @@ UI_PATH_NUOYANLIB_TEST = "%s_scripts.ui.nuoyanlib_test.NuoyanlibTest" % MOD_NAME
 UI_DEF_NUOYANLIB_TEST = "nuoyanlib_test.screen"
 
 
-
+class ClientEvent(StrEnum):
+    OnKeyPressInGame = auto()
 
 
 

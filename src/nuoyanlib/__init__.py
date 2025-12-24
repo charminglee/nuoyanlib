@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -17,7 +17,7 @@
 # todo：完善接口的异常处理
 # todo：@async
 # todo：容器UI
-# todo：NBT类
+# todo：nbt
 
 
 __version__ = "1.0.0-beta.1"

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-23
 #  ⠀
 # =================================================
 
@@ -51,12 +51,12 @@ MiniMapScreenNode = c_api.GetMiniMapScreenNodeCls()
 
 
 class CF(object):
-    __cache__ = {}
+    _cache = {}
 
     def __new__(cls, target):
-        if target not in cls.__cache__:
-            cls.__cache__[target] = object.__new__(cls)
-        return cls.__cache__[target]
+        if target not in cls._cache:
+            cls._cache[target] = object.__new__(cls)
+        return cls._cache[target]
 
     def __init__(self, target):
         self._target = target

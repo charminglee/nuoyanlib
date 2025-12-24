@@ -48,13 +48,13 @@ def probability(p):
 
 
 @inject_is_client
-def random_pos(__is_client__, center_pos, r, dim=None, use_top_height=False):
+def random_pos(__is_client__, center, r, dim=None, use_top_height=False):
     """
     在指定区域内随机获取一点坐标。
     
     -----
 
-    :param tuple[float,float,float] center_pos: 区域中心坐标
+    :param tuple[float,float,float] center: 区域中心坐标
     :param float r: 区域半径
     :param int|None dim: 维度ID，若在客户端调用可忽略该参数；默认为 None
     :param bool use_top_height: 是否以最高的非空气方块的高度作为返回坐标的y值；默认为False
@@ -62,10 +62,10 @@ def random_pos(__is_client__, center_pos, r, dim=None, use_top_height=False):
     :return: 坐标，获取失败时返回 None
     :rtype: tuple[float,float,float]|None
     """
-    if not center_pos:
+    if not center:
         return
-    x = center_pos[0] + random.uniform(-r, r)
-    z = center_pos[2] + random.uniform(-r, r)
+    x = center[0] + random.uniform(-r, r)
+    z = center[2] + random.uniform(-r, r)
     if use_top_height:
         pos = pos_floor((x, z))
         if __is_client__:
@@ -77,7 +77,7 @@ def random_pos(__is_client__, center_pos, r, dim=None, use_top_height=False):
         if y is not None:
             return x, y, z
     else:
-        y = center_pos[1] + random.uniform(-r, r)
+        y = center[1] + random.uniform(-r, r)
         return x, y, z
 
 
