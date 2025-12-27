@@ -5,79 +5,153 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2025-12-27
 #  ⠀
 # =================================================
 
 
-from typing import Iterator, Any
-from ..core._types._typing import Self, FTuple3, ITuple3, T
+from typing import ClassVar, Any, Dict, Generic, Iterator, Generator, List, Literal, Optional, overload
+from random import Random
+from ..core._types._typing import Self, FTuple3, ITuple3, STuple, PosT, ITuple2, FTuple2
 
 
-class _PosGenerator(Iterator[FTuple3]):
-    __i: int
-    len: int
-    def __init__(self: Self, *args: Any, **kwargs: Any) -> None: ...
-    def __iter__(self: T) -> T: ...
-    def __next__(self) -> FTuple3: ...
-    next = __next__
+class _PosGenerator(Generic[PosT]):
+    count: int
+    def __init__(self: Self) -> None: ...
+    def __iter__(self) -> Iterator[PosT]: ...
     def __len__(self) -> int: ...
-    def __gen_pos__(self, i: int) -> FTuple3: ...
-    def __getitem__(self, i: int) -> FTuple3: ...
+    def __gen_pos__(self, i: int) -> PosT: ...
+    @overload
+    def __getitem__(self, item: slice) -> Generator[PosT]: ...
+    @overload
+    def __getitem__(self, item: int) -> PosT: ...
 
 
-class gen_line_pos(_PosGenerator):
-    pos1: FTuple3
-    pos2: FTuple3
-    count: int
-    only: int
-    __x_step: float
-    __y_step: float
-    __z_step: float
-    def __init__(self: Self, pos1: FTuple3, pos2: FTuple3, count: int, only: int = -1) -> None: ...
-    def __gen_pos__(self, i: int) -> FTuple3: ...
-
-
-class gen_circle_pos(_PosGenerator):
-    center_pos: FTuple3
+class gen_random_even_pos(_PosGenerator[PosT]):
+    __slots__: ClassVar[STuple]
+    _spawned: Dict[int, PosT]
+    _uniform = Random.uniform
+    _random = Random.random
+    center: PosT
     radius: float
     count: int
-    __step: float
-    def __init__(self: Self, center_pos: FTuple3, radius: float, count: int) -> None: ...
-    def __gen_pos__(self, i: int) -> FTuple3: ...
+    fixed_x: bool
+    fixed_y: bool
+    fixed_z: bool
+    def __init__(
+        self: Self,
+        center: PosT,
+        radius: float,
+        count: int,
+        fixed_x: bool = False,
+        fixed_y: bool = False,
+        fixed_z: bool = False,
+        seed: Optional[Any] = None,
+    ) -> None: ...
+    def __gen_pos__(self, i: int) -> PosT: ...
 
 
-class gen_sphere_pos(_PosGenerator):
-    center_pos: FTuple3
+def _gen_line_pos(start: PosT, i: int, x_step: float = 0, y_step: float = 0, z_step: float = 0) -> PosT: ...
+
+
+class gen_line_pos(_PosGenerator[PosT]):
+    __slots__: ClassVar[STuple]
+    _x_step: float
+    _y_step: float
+    _z_step: float
+    start: PosT
+    end: PosT
+    count: int
+    def __init__(self: Self, start: PosT, end: PosT, count: int) -> None: ...
+    def __gen_pos__(self, i: int) -> PosT: ...
+
+
+class gen_ring_pos(_PosGenerator[PosT]):
+    __slots__: ClassVar[STuple]
+    _step: float
+    center: PosT
     radius: float
     count: int
-    def __init__(self: Self, center_pos: FTuple3, radius: float, count: int) -> None: ...
-    def __gen_pos__(self, i: int) -> FTuple3: ...
+    axis_dir: Literal["x", "y", "z"]
+    def __init__(self: Self, center: PosT, radius: float, count: int, axis_dir: Literal["x", "y", "z"]) -> None: ...
+    def __gen_pos__(self, i: int) -> PosT: ...
 
 
-class gen_cube_pos(_PosGenerator):
-    pos1: FTuple3
-    pos2: FTuple3
+_GOLDEN_RATIO: float
+
+
+class gen_sphere_pos(_PosGenerator[FTuple3]):
+    __slots__: ClassVar[STuple]
+    _fixed_count: int
+    center: FTuple3
+    radius: float
     count: int
-    __minx: float
-    __miny: float
-    __minz: float
-    __maxx: float
-    __maxy: float
-    __maxz: float
-    __count_x: int
-    __count_y: int
-    __count_z: int
-    __x_step: float
-    __y_step: float
-    __z_step: float
-    def __init__(self: Self, pos1: FTuple3, pos2: FTuple3, count: int) -> None: ...
-    def _calculate_axis_counts(self, count: int) -> ITuple3: ...
+    fixed_x: bool
+    fixed_y: bool
+    fixed_z: bool
+    def __init__(
+        self: Self,
+        center: FTuple3,
+        radius: float,
+        count: int,
+        fixed_x: bool = False,
+        fixed_y: bool = False,
+        fixed_z: bool = False,
+    ) -> None: ...
     def __gen_pos__(self, i: int) -> FTuple3: ...
 
 
-class gen_spiral_pos(_PosGenerator):
-    start_pos: FTuple3
+@overload
+def _calc_axis_counts(min_pos: FTuple3, max_pos: FTuple3, count: int) -> ITuple3: ...
+@overload
+def _calc_axis_counts(min_pos: FTuple2, max_pos: FTuple2, count: int) -> ITuple2: ...
+
+
+class gen_box_pos(_PosGenerator[PosT]):
+    __slots__: ClassVar[STuple]
+    _min_pos: PosT
+    _count_x: int
+    _count_y: int
+    _x_step: float
+    _y_step: float
+    _z_step: float
+    pos1: PosT
+    pos2: PosT
+    interval: float
     count: int
-    def __init__(self: Self, start_pos: FTuple3, count: int) -> None: ...
-    def __gen_pos__(self, i: int) -> FTuple3: ...
+    def __init__(self: Self, pos1: PosT, pos2: PosT, interval: float) -> None: ...
+    def __gen_pos__(self, i: int) -> PosT: ...
+
+
+class gen_box_surface_pos(_PosGenerator[PosT]):
+    __slots__: ClassVar[STuple]
+    _min_pos: PosT
+    _step_x: float
+    _step_y: float
+    _step_z: float
+    pos1: PosT
+    pos2: PosT
+    count_x: int
+    count_y: int
+    count_z: int
+    count: int
+    def __init__(self: Self, pos1: PosT, pos2: PosT, count_x: int, count_y: int, count_z: int) -> None: ...
+    def __gen_pos__(self, i: int) -> PosT: ...
+
+
+class gen_box_frame_pos(_PosGenerator[PosT]):
+    __slots__: ClassVar[STuple]
+    _min_pos: PosT
+    _max_pos: PosT
+    _step_x: float
+    _step_y: float
+    _step_z: float
+    _vertices: List[PosT]
+    pos1: PosT
+    pos2: PosT
+    count_x: int
+    count_y: int
+    count_z: int
+    count: int
+    def __init__(self: Self, pos1: PosT, pos2: PosT, count_x: int = 1, count_y: int = 1, count_z: int = 1) -> None: ...
+    def __gen_pos__(self, i: int) -> PosT: ...

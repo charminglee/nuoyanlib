@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-26
 #  ⠀
 # =================================================
 
@@ -17,6 +17,18 @@ from ._types._typing import Self, ITuple, T, F, TypeT
 from ._types._checker import args_type_check
 
 
+@overload
+def parse_indices(index: slice, length: int, cls: type, op: Callable[[int], T]) -> List[T]: ...
+@overload
+def parse_indices(index: slice, length: int, cls: type) -> int: ...
+@overload
+def parse_indices(index: int, length: int, cls: type, op: Callable[[int], T]) -> T: ...
+@overload
+def parse_indices(index: int, length: int, cls: type) -> int: ...
+@overload
+def parse_indices_generator(index: Union[slice, int], length: int, cls: type, op: Callable[[int], T]) -> Generator[T]: ...
+@overload
+def parse_indices_generator(index: Union[slice, int], length: int, cls: type) -> Generator[int]: ...
 def inject_is_client(func: F) -> F: ...
 
 

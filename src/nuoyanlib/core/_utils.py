@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2025-12-26
 #  ⠀
 # =================================================
 
@@ -14,8 +14,44 @@ import traceback
 from types import MethodType
 from functools import wraps
 from ._doc import signature, get_signature
-from ._types._checker import args_type_check
 from ._sys import is_client
+
+
+def parse_indices(index, length, cls, op=None):
+    if isinstance(index, slice):
+        start, stop, step = index.indices(length)
+        return [
+            (op(i) if op else i)
+            for i in xrange(start, stop, step)
+        ]
+    elif isinstance(index, int):
+        if index < 0:
+            index += length
+        if index < 0 or index >= length:
+            raise IndexError("%s index out of range" % cls.__name__)
+        return op(index) if op else index
+    raise TypeError(
+        "%s indices must be integers or slices, not %s"
+        % (cls.__name__, type(index).__name__)
+    )
+
+
+def parse_indices_generator(index, length, cls, op=None):
+    if isinstance(index, slice):
+        start, stop, step = index.indices(length)
+        for i in xrange(start, stop, step):
+            yield op(i) if op else i
+    elif isinstance(index, int):
+        if index < 0:
+            index += length
+        if index < 0 or index >= length:
+            raise IndexError("%s index out of range" % cls.__name__)
+        yield op(index) if op else index
+    else:
+        raise TypeError(
+            "%s indices must be integers or slices, not %s"
+            % (cls.__name__, type(index).__name__)
+        )
 
 
 def inject_is_client(func):
@@ -82,7 +118,7 @@ class __Universal(object):
     __nonzero__ = __bool__
 
     def __raise(self, *args, **kwargs):
-        raise RuntimeError("you can't do anything to the 'UNIVERSAL_OBJECT'")
+        raise RuntimeError("you can't do anything to the UNIVERSAL_OBJECT")
 
     __getattribute__    = __raise
     __setattr__         = __raise
@@ -164,7 +200,6 @@ def _lru_key(args, kwargs):
 
 
 class lru_cache(object):
-    @args_type_check(int, is_method=True)
     def __init__(self, size=128):
         self.size = size
         self.full = False

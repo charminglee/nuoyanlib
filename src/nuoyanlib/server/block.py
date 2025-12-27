@@ -14,7 +14,7 @@ from ..core._sys import get_lib_system
 from ..core.server.comp import LvComp, CF
 from ..core._utils import kwargs_defaults
 from ..core import _const
-from ..utils.mc_random import random_even_poses
+from ..utils.pos_gen import gen_random_even_pos
 from ..utils.mc_math import pos_floor
 
 
@@ -57,7 +57,7 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
     """
     lib_sys = get_lib_system(False)
     eid_list = []
-    for p in random_even_poses(pos, r, num, fixed_y=True):
+    for p in gen_random_even_pos(pos, r, num, fixed_y=True):
         block = LvComp.BlockInfo.GetBlockNew(pos_floor(p), dim)
         if not block or block['name'] == "minecraft:air":
             continue
