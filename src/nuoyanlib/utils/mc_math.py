@@ -5,16 +5,21 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2025-12-28
 #  ⠀
 # =================================================
 
 
+from __future__ import division
 from math import sin, cos, atan2, sqrt, degrees, radians
 from mod.common.minecraftEnum import Facing
 from ..core._sys import get_api, get_cf
 from ..core._utils import inject_is_client, UNIVERSAL_OBJECT
 from .vector import Vector, dir2rot, rot2dir
+
+
+if 0:
+    from typing import Iterable
 
 
 __all__ = [
@@ -45,7 +50,7 @@ __all__ = [
     "is_in_box",
     "fpp_camera_rot",
     "tpp_camera_rot",
-    "rot_look_at",
+    "rot_from_to",
     "angle_normalize",
     "bezier_curve",
     "catmull_rom",
@@ -281,46 +286,69 @@ def chunk_pos(pos):
 
 def polar_coord(coord, rad=False, origin=(0, 0)):
     """
-    将平面直角坐标转换为极坐标。
+    将直角坐标转换为极坐标。
 
     -----
 
-    :param tuple[float,float] coord: 平面直角坐标
-    :param bool rad: 是否使用弧度制；默认为False
-    :param tuple[float,float] origin: 坐标原点；默认为(0, 0)
+    :param tuple[float,float,float]|tuple[float,float] coord: 直角坐标
+    :param bool rad: 是否使用弧度制；默认为 False
+    :param tuple[float,float,float]|tuple[float,float] origin: 坐标原点；默认为 (0, 0, 0) 或 (0, 0)，根据 coord 的维度确定
 
     :return: 极坐标
-    :rtype: tuple[float,float]
+    :rtype: tuple[float,float,float]|tuple[float,float]
     """
-    x, y = coord
-    x -= origin[0]
-    y -= origin[1]
-    r = sqrt(x**2 + y**2)
-    theta = atan2(y, x)
-    if not rad:
-        theta = degrees(theta)
-    return r, theta
+    if len(coord) == 2:
+        x, y = coord # noqa
+        x -= origin[0]
+        y -= origin[1]
+        r = sqrt(x**2 + y**2)
+        theta = atan2(y, x)
+        if not rad:
+            theta = degrees(theta)
+        return r, theta
+    else:
+        x, y, z = coord
+        x -= origin[0]
+        y -= origin[1]
+        z -= origin[2]
+        r = sqrt(x**2 + y**2 + z**2)
+        theta = atan2(sqrt(x**2 + y**2), z)
+        phi = atan2(y, x)
+        if not rad:
+            theta = degrees(theta)
+            phi = degrees(phi)
+        return r, theta, phi
 
 
-def cartesian_coord(coord, rad=False, origin=(0, 0)):
+def cartesian_coord(coord, rad=False, origin=None):
     """
-    将极坐标转换为平面直角坐标。
+    将极坐标转换为直角坐标。
 
     -----
 
-    :param tuple[float,float] coord: 极坐标
-    :param bool rad: 是否使用弧度制；默认为False
-    :param tuple[float,float] origin: 坐标原点；默认为(0, 0)
+    :param tuple[float,float,float]|tuple[float,float] coord: 极坐标
+    :param bool rad: 是否使用弧度制；默认为 False
+    :param tuple[float,float,float]|tuple[float,float] origin: 坐标原点；默认为 (0, 0, 0) 或 (0, 0)，根据 coord 的维度确定
 
-    :return: 平面直角坐标
-    :rtype: tuple[float,float]
+    :return: 直角坐标
+    :rtype: tuple[float,float,float]|tuple[float,float]
     """
-    r, theta = coord
-    if not rad:
-        theta = radians(theta)
-    x = r * cos(theta) + origin[0]
-    y = r * sin(theta) + origin[1]
-    return x, y
+    if len(coord) == 2:
+        r, theta = coord # noqa
+        if not rad:
+            theta = radians(theta)
+        x = origin[0] + r * cos(theta)
+        y = origin[1] + r * sin(theta)
+        return x, y
+    else:
+        r, theta, phi = coord
+        if not rad:
+            theta = radians(theta)
+            phi = radians(phi)
+        x = origin[0] + r * sin(theta) * cos(phi)
+        y = origin[1] + r * sin(theta) * sin(phi)
+        z = origin[2] + r * cos(theta)
+        return x, y, z
 
 
 def relative_pos(pos, basis):
@@ -378,7 +406,6 @@ def screen_pos(pos, world_basis, screen_basis=(0, 0), scale=1, offset=(0, 0), ro
     """
     if not pos or not world_basis:
         return
-    scale = float(scale)
     rel_pos = relative_pos(pos, world_basis)
     scr_rel_pos = (
         rel_pos[0] / scale,
@@ -438,11 +465,11 @@ def pos_entity_facing(__is_client__, entity_id, dist, use_0yaw=False, height_off
     计算实体视角方向上、给定距离上的位置的坐标。
 
     计算将以实体 FootPos 作为起点，沿实体视角方向前进指定距离后的位置即为最终结果。
-    可通过 ``height_offset`` 参数调整起点的高度偏移量，最终的起点坐标为：
+    可通过 ``height_offset`` 参数调整起点的高度偏移量，最终的起点坐标即为：
     ::
 
         (FootPos[0], FootPos[1] + height_offset, FootPos[2])
-    若实体为玩家，将 ``height_offset`` 设为 ``1.63`` 即可使起点位于眼睛（准星）位置。
+    若实体为玩家，将 ``height_offset`` 设为 ``1.62`` 即可使起点位于玩家眼睛（准星）位置。
 
     -----
 
@@ -483,7 +510,6 @@ def pos_block_facing(pos, face=Facing.North, dist=1.0):
     """
     if not pos:
         return
-    pos = map(float, pos)
     if face == Facing.Up:
         return pos[0], pos[1] + dist, pos[2]
     elif face == Facing.Down:
@@ -496,7 +522,7 @@ def pos_block_facing(pos, face=Facing.North, dist=1.0):
         return pos[0], pos[1], pos[2] + dist
     elif face == Facing.North:
         return pos[0], pos[1], pos[2] - dist
-    raise ValueError("invalid face value")
+    raise ValueError("invalid 'face' value")
 
 
 def pos_forward_rot(pos, rot, dist):
@@ -515,7 +541,7 @@ def pos_forward_rot(pos, rot, dist):
     if not pos or not rot:
         return
     direction = rot2dir(rot)
-    return tuple(p + d * dist for p, d in zip(pos, direction))
+    return tuple((p + d * dist) for p, d in zip(pos, direction))
 
 
 def pos_floor(pos):
@@ -574,7 +600,7 @@ def midpoint(pos1, pos2):
     """
     if not pos1 or not pos2:
         return
-    return tuple((a + b) / 2.0 for a, b in zip(pos1, pos2))
+    return tuple((a + b) / 2 for a, b in zip(pos1, pos2))
 
 
 def box_center(pos1, pos2):
@@ -619,7 +645,7 @@ def ray_box_intersection(start_pos, ray_dir, length, aabb_center, aabb_size, han
     t_max = float('inf')
 
     for i in range(3):
-        half_size = aabb_size[i] / 2.0
+        half_size = aabb_size[i] / 2
         start = local_start_pos[i]
         d = ray_dir[i]
         if abs(d) < _ZERO_EPS:
@@ -745,12 +771,12 @@ def is_in_sector(__is_client__, target, r, h, angle, center, direction):
     if proj < 0 or proj > r:
         return False
     # 超出扇形高度范围
-    if dist2 - proj**2 > h**2 / 4.0:
+    if dist2 - proj**2 > h**2 / 4:
         return False
 
     v_len = sqrt(dist2)
     cos_alpha = proj / v_len
-    theta = radians(angle / 2.0)
+    theta = radians(angle / 2)
     cos_theta = cos(theta)
     return cos_alpha >= cos_theta
 
@@ -823,7 +849,7 @@ def tpp_camera_rot(rot):
     return (rot[0], yaw, rot[2]) if len(rot) == 3 else (rot[0], yaw)
 
 
-def rot_look_at(start, end):
+def rot_from_to(start, end):
     """
     计算从起始坐标看向终点坐标的实体头部视角。
 
@@ -855,7 +881,7 @@ def angle_normalize(angle):
     :return: 标准化角度
     :rtype: float
     """
-    angle %= 360.0
+    angle %= 360
     if angle > 180:
         angle -= 360
     return angle
@@ -883,17 +909,17 @@ def bezier_curve(control_points, t):
     """
     n = len(control_points)
     if n == 0:
-        return 0, 0, 0
+        return 0.0, 0.0, 0.0
     if n == 1:
         return control_points[0]
 
     points = list(control_points)
-    for r in range(1, n):
-        for i in range(n - r):
+    for r in xrange(1, n):
+        for i in xrange(n - r):
             points[i] = (
-                (1.0 - t) * points[i][0] + t * points[i + 1][0],
-                (1.0 - t) * points[i][1] + t * points[i + 1][1],
-                (1.0 - t) * points[i][2] + t * points[i + 1][2],
+                (1 - t) * points[i][0] + t * points[i + 1][0],
+                (1 - t) * points[i][1] + t * points[i + 1][1],
+                (1 - t) * points[i][2] + t * points[i + 1][2],
             )
     return points[0]
 
@@ -951,7 +977,41 @@ def catmull_rom(p0, p1, p2, p3, t, alpha=0.5):
 # endregion
 
 
-# region Misc ==========================================================================================================
+# region Common ========================================================================================================
+
+
+# todo: 正态分布、meam、median、std、var、sign
+
+
+def mean(arg1, *args):
+    """
+    计算一组数据的算术平均值。
+
+    可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
+    ::
+
+        mean(iterable) -> float
+        mean(arg1, arg2, *args) -> float
+
+    -----
+
+    :param Iterable[float]|float arg1: 只传入一个参数时，该参数需为可迭代对象
+    :param float args: [变长位置参数] 展开传入多个数据
+
+    :return: 平均值
+    :rtype: float
+    """
+    if not args:
+        s, n = 0.0, 0
+        for a in arg1:
+            s += a
+            n += 1
+    else:
+        s, n = arg1, 1 # noqa
+        for a in args:
+            s += a
+            n += 1
+    return s / n
 
 
 def lerp(a, b, t):
@@ -986,7 +1046,7 @@ def range_map(x, output_range, input_range=[0, 1], interp=None): # noqa
     """
     a, b = output_range
     j, k = input_range
-    t = float(x - j) / (k - j)
+    t = (x - j) / (k - j)
     if interp:
         t = interp(t)
     return a + (b - a) * t
