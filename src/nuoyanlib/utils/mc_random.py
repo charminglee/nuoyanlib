@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2025-12-28
 #  ⠀
 # =================================================
 
@@ -17,7 +17,7 @@ if 0:
 import random
 import string
 from ..core._sys import get_lv_comp
-from ..core._utils import inject_is_client
+from ..core._utils import inject_is_client, UNIVERSAL_OBJECT
 from .mc_math import pos_floor
 
 

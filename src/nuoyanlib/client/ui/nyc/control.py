@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2025-12-28
 #  ⠀
 # =================================================
 
@@ -34,7 +34,7 @@ class InteractableControl(object):
 
     def __init__(self, callback_func_map):
         if not self.CALLBACK_TYPE:
-            raise TypeError("unknown CALLBACK_TYPE")
+            raise ValueError("unknown CALLBACK_TYPE")
         self.callbacks = {}
         self._callback_flag = []
         self._callback_func_map = callback_func_map
