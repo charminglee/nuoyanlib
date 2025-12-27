@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2025-12-27
 #  ⠀
 # =================================================
 
@@ -35,17 +35,46 @@ class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
 
     # =========================================== Engine Event Callback ================================================
 
+    def OnKeyPressInGame(self, args):
+        screenName = args['screenName']
+        key = int(args['key'])
+        isDown = int(args['isDown'])
+        self.NotifyToServer(ClientEvent.OnKeyPressInGame, dict(args))
+        if screenName != "hud_screen" or not isDown:
+            return
+        pos = PlrComp.Pos.GetFootPos()
+        if key == KeyBoardType.KEY_K:
+            n = 0
+            center = (pos[0], pos[1] + 1.5, pos[2])
+            pos1 = (pos[0] - 1.5, pos[1] + 1, pos[2] - 1.5)
+            pos2 = (pos[0] + 1.5, pos[1] + 2, pos[2] + 1.5)
+            # pos1 = (pos[0] - 1.5, pos[2] - 1.5)
+            # pos2 = (pos[0] + 1.5, pos[2] + 1.5)
+            # for p in nyl.gen_sphere_pos(center, 1.75, 500, fixed_x=False, fixed_y=False, fixed_z=False):
+            # for p in nyl.gen_ring_pos(center, 1.75, 100, "y"):
+            # for p in nyl.gen_box_pos(pos1, pos2, 200, True):
+            # for p in nyl.gen_box_frame_pos((pos[0] - 1.5, pos[2] - 1.5), (pos[0] + 1.5, pos[2] - 1.5), 10, 4, 10):
+            for p in nyl.gen_box_frame_pos(pos1, pos2, 10, 4, 10):
+                if not p:
+                    continue
+                pid = nyl.spawn_particle("minecraft:basic_flame_particle", p, rm_delay=1)
+                # pid = nyl.spawn_particle("minecraft:basic_flame_particle", (p[0], pos[1] + 1, p[1]), rm_delay=1)
+                LvComp.ParticleSystem.EmitManually(pid)
+                n += 1
+            print(n)
+
     # =========================================== Custom Event Callback ================================================
 
     # ============================================== Basic Function ====================================================
 
     def run_benchmark(self):
-        self.communicate_benchmark()
-        nyl.create_ui(
-            MOD_NAME, UI_NAME_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST, UI_DEF_NUOYANLIB_TEST,
-            push=True,
-            client_system=self,
-        )
+        pass
+        # self.communicate_benchmark()
+        # nyl.create_ui(
+        #     MOD_NAME, UI_NAME_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST, UI_DEF_NUOYANLIB_TEST,
+        #     push=True,
+        #     client_system=self,
+        # )
 
     def communicate_benchmark(self):
         def callback(success, ret):

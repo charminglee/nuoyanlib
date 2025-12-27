@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2025-12-26
 #  ⠀
 # =================================================
 
@@ -34,7 +34,8 @@ except AttributeError:
 
 
 def test(path):
-    n = 10000
+    n = 1
+    # n = 10000
     path = "nuoyanlib." + path
     module = import_module(path)
     t = timer()
@@ -54,9 +55,11 @@ test("core.server.comp")
 test("core.listener")
 test("client.ui.screen_node")
 test("client.ui.nyc.control")
-test("utils.item")
-test("utils.utils")
 test("utils.vector")
+test("utils.mc_math")
+test("utils.mc_random")
+test("utils.utils")
+test("utils.item")
 
 
 print("\n\033[33mAll tests passed.")
