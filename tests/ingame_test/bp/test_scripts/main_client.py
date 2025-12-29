@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-27
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
@@ -54,7 +54,7 @@ class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
             # for p in nyl.gen_ring_pos(center, 1.75, 100, "y"):
             # for p in nyl.gen_box_pos(pos1, pos2, 200, True):
             # for p in nyl.gen_box_frame_pos((pos[0] - 1.5, pos[2] - 1.5), (pos[0] + 1.5, pos[2] - 1.5), 10, 4, 10):
-            for p in nyl.gen_box_frame_pos(pos1, pos2, 10, 4, 10):
+            for p in nyl.gen_box_frame_pos(pos1, pos2, 8, 4, 8):
                 if not p:
                     continue
                 pid = nyl.spawn_particle("minecraft:basic_flame_particle", p, rm_delay=1)

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-26
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
@@ -76,23 +76,24 @@ def inject_is_client(func):
 
 def singleton(init_once=True):
     def decorator(cls):
-        cls.singleton = None
+        cls._instance = None
         cls._inited = False
         org_new = cls.__new__
         org_init = cls.__init__
 
+        @staticmethod # noqa
         def new_new(*args, **kwargs):
-            return cls.singleton or org_new(*args, **kwargs)
+            return cls._instance or org_new(*args, **kwargs)
 
         def new_init(self, *args, **kwargs):
-            if cls.singleton is None:
-                cls.singleton = self
+            if cls._instance is None:
+                cls._instance = self
             # 如果init_once为True，则__init__方法只会被执行一次
             if not cls._inited or not _init_once:
                 org_init(self, *args, **kwargs)
                 cls._inited = True
 
-        cls.__new__ = staticmethod(new_new)
+        cls.__new__ = new_new
         cls.__init__ = new_init
         return cls
 

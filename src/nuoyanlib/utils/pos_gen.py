@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-28
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
@@ -481,19 +481,15 @@ class gen_box_frame_pos(_PosGenerator):
     """
 
     __slots__ = (
-        '_min_pos',
-        '_max_pos',
-        '_step_x',
-        '_step_y',
-        '_step_z',
-        '_vertices',
-        '_vertices',
         'pos1',
         'pos2',
         'count_x',
         'count_y',
         'count_z',
         'count',
+        '_vertices',
+        '_segments',
+        '_dim',
     )
 
     def __init__(self, pos1, pos2, count_x=2, count_y=2, count_z=2): # noqa
@@ -512,32 +508,29 @@ class gen_box_frame_pos(_PosGenerator):
         self.count_y = count_y
         self.count_z = count_z
 
-        self._min_pos, self._max_pos = box_min_max(pos1, pos2)
+        self._dim = dim = len(pos1)
+        min_pos, max_pos = box_min_max(pos1, pos2)
         dx = abs(pos1[0] - pos2[0])
         dy = abs(pos1[1] - pos2[1])
-        self._step_x = dx / (count_x - 1)
-        self._step_y = dy / (count_y - 1)
-        self.count = 0
+        step_x = dx / (count_x - 1)
+        step_y = dy / (count_y - 1)
 
-        if len(pos1) == 2:
-            min_x, min_y = self._min_pos
-            max_x, max_y = self._max_pos
+        if dim == 2:
+            step_z = 0.0
+            min_x, min_y = min_pos
+            max_x, max_y = max_pos
+            min_z = max_z = None
             self._vertices = list({
                 (min_x, min_y),
                 (max_x, min_y),
                 (min_x, max_y),
                 (max_x, max_y),
             })
-            self._step_z = 0.0
-            axis = (dx > 0) + (dy > 0)
-            if self._step_x > 0:
-                self.count += (count_x - 2) * axis
-            if self._step_y > 0:
-                self.count += (count_y - 2) * axis
-
         else:
-            min_x, min_y, min_z = self._min_pos
-            max_x, max_y, max_z = self._max_pos
+            dz = abs(pos1[2] - pos2[2])
+            step_z = dz / (count_z - 1)
+            min_x, min_y, min_z = min_pos
+            max_x, max_y, max_z = max_pos
             self._vertices = list({
                 (min_x, min_y, min_z),
                 (max_x, min_y, min_z),
@@ -548,276 +541,86 @@ class gen_box_frame_pos(_PosGenerator):
                 (min_x, max_y, max_z),
                 (max_x, max_y, max_z),
             })
-            dz = abs(pos1[2] - pos2[2])
-            self._step_z = dz / (count_z - 1)
-            axis = (dx > 0) + (dy > 0) + (dz > 0)
-            if self._step_x > 0:
-                self.count += (count_x - 2) * 2**(axis - 1)
-            if self._step_y > 0:
-                self.count += (count_y - 2) * 2**(axis - 1)
-            if self._step_z > 0:
-                self.count += (count_z - 2) * 2**(axis - 1)
-
         self._vertices.sort()
-        self.count += len(self._vertices)
+        self.count = len(self._vertices)
+
+        self._segments = []
+        def add_segment(c, start, step):
+            c2 = c - 2
+            if c2 > 0 and any(s > 0 for s in step):
+                self._segments.append((c2, start, step))
+                self.count += c2
+
+        x_not_same = (min_x != max_x)
+        y_not_same = (min_y != max_y)
+        z_not_same = (min_z != max_z)
+        if dim == 2:
+            step_vec_x = (step_x, 0.0)
+            step_vec_y = (0.0, step_y)
+            # 下右上左
+            add_segment(count_x, (min_x, min_y), step_vec_x)
+            if x_not_same:
+                add_segment(count_y, (max_x, min_y), step_vec_y)
+            if y_not_same:
+                add_segment(count_x, (min_x, max_y), step_vec_x)
+            add_segment(count_y, (min_x, min_y), step_vec_y)
+        else:
+            step_vec_x = (step_x, 0.0, 0.0)
+            step_vec_y = (0.0, step_y, 0.0)
+            step_vec_z = (0.0, 0.0, step_z)
+            # 底面
+            add_segment(count_x, (min_x, min_y, min_z), step_vec_x)
+            if x_not_same:
+                add_segment(count_z, (max_x, min_y, min_z), step_vec_z)
+            if z_not_same:
+                add_segment(count_x, (min_x, min_y, max_z), step_vec_x)
+            add_segment(count_z, (min_x, min_y, min_z), step_vec_z)
+            # 顶面
+            if y_not_same:
+                add_segment(count_x, (min_x, max_y, min_z), step_vec_x)
+            if x_not_same and y_not_same:
+                add_segment(count_z, (max_x, max_y, min_z), step_vec_z)
+            if y_not_same and z_not_same:
+                add_segment(count_x, (min_x, max_y, max_z), step_vec_x)
+            if y_not_same:
+                add_segment(count_z, (min_x, max_y, min_z), step_vec_z)
+            # 四条竖边
+            add_segment(count_y, (min_x, min_y, min_z), step_vec_y)
+            if x_not_same:
+                add_segment(count_y, (max_x, min_y, min_z), step_vec_y)
+            if x_not_same and z_not_same:
+                add_segment(count_y, (max_x, min_y, max_z), step_vec_y)
+            if z_not_same:
+                add_segment(count_y, (min_x, min_y, max_z), step_vec_y)
 
     def __gen_pos__(self, i):
-        # 顶点
-        vl = len(self._vertices)
-        if i < vl:
+        # 优先返回顶点
+        vn = len(self._vertices)
+        if i < vn:
             return self._vertices[i]
-        i -= vl
+        i -= vn
 
-        count_x = self.count_x
-        count_y = self.count_y
-        count_z = self.count_z
-        step_x = self._step_x
-        step_y = self._step_y
-        step_z = self._step_z
+        for seg in self._segments:
+            c = seg[0]
+            if i < c:
+                k = i + 1
+                if self._dim == 2:
+                    x, y = seg[1]
+                    step_x, step_y = seg[2]
+                    return (
+                        x + step_x * k,
+                        y + step_y * k
+                    )
+                else:
+                    x, y, z = seg[1]
+                    step_x, step_y, step_z = seg[2]
+                    return (
+                        x + step_x * k,
+                        y + step_y * k,
+                        z + step_z * k
+                    )
 
-        if len(self.pos1) == 2:
-            min_x, min_y = self._min_pos
-            max_x, max_y = self._max_pos
-            # 仅有y方向
-            if step_x == 0:
-                return (
-                    min_x,
-                    min_y + (i + 1) * step_y,
-                )
-            # 仅有x方向
-            if step_y == 0:
-                return (
-                    min_x + (i + 1) * step_x,
-                    min_y,
-                )
-            # 下
-            if i < count_x - 2:
-                return (
-                    min_x + (i + 1) * step_x,
-                    min_y,
-                )
-            i -= count_x - 2
-            # 右
-            if i < count_y - 2:
-                return (
-                    max_x,
-                    min_y + (i + 1) * step_y,
-                )
-            i -= count_y - 2
-            # 上
-            if i < count_x - 2:
-                return (
-                    min_x + (i + 1) * step_x,
-                    max_y,
-                )
-            i -= count_x - 2
-            # 左
-            return (
-                min_x,
-                min_y + (i + 1) * step_y,
-            )
-
-        else:
-            min_x, min_y, min_z = self._min_pos
-            max_x, max_y, max_z = self._max_pos
-
-            # 仅有z方向
-            if step_x == 0 and step_y == 0:
-                return (
-                    min_x,
-                    min_y,
-                    min_z + (i + 1) * step_z,
-                )
-            # 仅有y方向
-            if step_x == 0 and step_z == 0:
-                return (
-                    min_x,
-                    min_y + (i + 1) * step_y,
-                    min_z
-                )
-            # 仅有x方向
-            if step_y == 0 and step_z == 0:
-                return (
-                    min_x + (i + 1) * step_x,
-                    min_y,
-                    min_z
-                )
-
-            # 仅有yz方向
-            if step_x == 0:
-                if i < count_z - 2:
-                    return (
-                        min_x,
-                        min_y,
-                        min_z + (i + 1) * step_z,
-                    )
-                i -= count_z - 2
-                if i < count_y - 2:
-                    return (
-                        min_x,
-                        min_y + (i + 1) * step_y,
-                        min_z,
-                    )
-                i -= count_y - 2
-                if i < count_z - 2:
-                    return (
-                        min_x,
-                        max_y,
-                        min_z + (i + 1) * step_z,
-                    )
-                i -= count_z - 2
-                return (
-                    min_x,
-                    min_y + (i + 1) * step_y,
-                    max_z,
-                )
-            # 仅有xz方向
-            if step_y == 0:
-                if i < count_x - 2:
-                    return (
-                        min_x + (i + 1) * step_x,
-                        min_y,
-                        min_z,
-                    )
-                i -= count_x - 2
-                if i < count_z - 2:
-                    return (
-                        min_x,
-                        min_y,
-                        min_z + (i + 1) * step_z,
-                    )
-                i -= count_z - 2
-                if i < count_x - 2:
-                    return (
-                        min_x + (i + 1) * step_x,
-                        min_y,
-                        max_z,
-                    )
-                i -= count_x - 2
-                return (
-                    max_x,
-                    min_y,
-                    min_z + (i + 1) * step_z,
-                )
-            # 仅有xy方向
-            if step_z == 0:
-                if i < count_x - 2:
-                    return (
-                        min_x + (i + 1) * step_x,
-                        min_y,
-                        min_z,
-                    )
-                i -= count_x - 2
-                if i < count_y - 2:
-                    return (
-                        min_x,
-                        min_y + (i + 1) * step_y,
-                        min_z,
-                    )
-                i -= count_y - 2
-                if i < count_x - 2:
-                    return (
-                        min_x + (i + 1) * step_x,
-                        max_y,
-                        min_z,
-                    )
-                i -= count_x - 2
-                return (
-                    max_x,
-                    min_y + (i + 1) * step_y,
-                    min_z,
-                )
-
-            # 底面矩形
-            bottom_count = count_x * 2 + count_z * 2 - 8
-            if i < bottom_count:
-                if i < count_x - 2:
-                    return (
-                        min_x + (i + 1) * step_x,
-                        min_y,
-                        min_z,
-                    )
-                i -= count_x - 2
-                if i < count_z - 2:
-                    return (
-                        max_x,
-                        min_y,
-                        min_z + (i + 1) * step_z,
-                    )
-                i -= count_z - 2
-                if i < count_x - 2:
-                    return (
-                        min_x + (i + 1) * step_x,
-                        min_y,
-                        max_z,
-                    )
-                i -= count_x - 2
-                return (
-                    min_x,
-                    min_y,
-                    min_z + (i + 1) * step_z,
-                )
-            i -= bottom_count
-
-            # 顶面矩形
-            if step_x and step_y and step_z:
-                top_count = bottom_count
-                if i < top_count:
-                    if i < count_x - 2:
-                        return (
-                            min_x + (i + 1) * step_x,
-                            max_y,
-                            min_z,
-                        )
-                    i -= count_x - 2
-                    if i < count_z - 2:
-                        return (
-                            max_x,
-                            max_y,
-                            min_z + (i + 1) * step_z,
-                        )
-                    i -= count_z - 2
-                    if i < count_x - 2:
-                        return (
-                            min_x + (i + 1) * step_x,
-                            max_y,
-                            max_z,
-                        )
-                    i -= count_x - 2
-                    return (
-                        min_x,
-                        max_y,
-                        min_z + (i + 1) * step_z,
-                    )
-                i -= top_count
-
-            # 四条竖边
-            if i < count_y - 2:
-                return (
-                    min_x,
-                    min_y + (i + 1) * step_y,
-                    min_z,
-                )
-            i -= count_y - 2
-            if i < count_y - 2:
-                return (
-                    max_x,
-                    min_y + (i + 1) * step_y,
-                    min_z,
-                )
-            i -= count_y - 2
-            if i < count_y - 2:
-                return (
-                    max_x,
-                    min_y + (i + 1) * step_y,
-                    max_z,
-                )
-            i -= count_y - 2
-            return (
-                min_x,
-                min_y + (i + 1) * step_y,
-                max_z,
-            )
+            i -= c
 
 
 

@@ -5,12 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-27
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
 
-from typing import ClassVar, Any, Dict, Generic, Iterator, Generator, List, Literal, Optional, overload
+from typing import Tuple, ClassVar, Any, Dict, Generic, Iterator, Generator, List, Literal, Optional, overload
 from random import Random
 from ..core._types._typing import Self, FTuple3, ITuple3, STuple, PosT, ITuple2, FTuple2
 
@@ -141,17 +141,14 @@ class gen_box_surface_pos(_PosGenerator[PosT]):
 
 class gen_box_frame_pos(_PosGenerator[PosT]):
     __slots__: ClassVar[STuple]
-    _min_pos: PosT
-    _max_pos: PosT
-    _step_x: float
-    _step_y: float
-    _step_z: float
-    _vertices: List[PosT]
     pos1: PosT
     pos2: PosT
     count_x: int
     count_y: int
     count_z: int
     count: int
+    _vertices: List[PosT]
+    _segments: List[Tuple[int, PosT, PosT]]
+    _dim: int
     def __init__(self: Self, pos1: PosT, pos2: PosT, count_x: int = 1, count_y: int = 1, count_z: int = 1) -> None: ...
     def __gen_pos__(self, i: int) -> PosT: ...

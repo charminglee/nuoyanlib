@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
@@ -264,9 +264,9 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
 
 
 def instance():
-    if not NuoyanLibClientSystem.singleton:
-        NuoyanLibClientSystem.singleton = c_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
-    return NuoyanLibClientSystem.singleton
+    if not NuoyanLibClientSystem._instance:
+        NuoyanLibClientSystem._instance = c_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
+    return NuoyanLibClientSystem._instance
 
 
 

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
@@ -129,9 +129,9 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
 
 
 def instance():
-    if not NuoyanLibServerSystem.singleton:
-        NuoyanLibServerSystem.singleton = s_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
-    return NuoyanLibServerSystem.singleton
+    if not NuoyanLibServerSystem._instance:
+        NuoyanLibServerSystem._instance = s_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
+    return NuoyanLibServerSystem._instance
 
 
 
