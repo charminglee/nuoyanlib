@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-28
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
@@ -35,6 +35,7 @@ __all__ = [
     "relative_pos",
     "absolute_pos",
     "screen_pos",
+    "box_vertices",
     "box_min_max",
     "pos_entity_facing",
     "pos_block_facing",
@@ -99,8 +100,8 @@ def manhattan_distance(__is_client__, target1, target2):
 
     -----
 
-    :param tuple[float]|str target1: 坐标或实体ID
-    :param tuple[float]|str target2: 坐标或实体ID
+    :param tuple[float,float,float]|tuple[float,float]|str target1: 坐标或实体ID
+    :param tuple[float,float,float]|tuple[float,float]|str target2: 坐标或实体ID
 
     :return: 曼哈顿距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
@@ -230,8 +231,8 @@ def distance_square(__is_client__, target1, target2):
 
     -----
 
-    :param tuple[float]|str target1: 坐标或实体ID
-    :param tuple[float]|str target2: 坐标或实体ID
+    :param tuple[float,float,float]|tuple[float,float]|str target1: 坐标或实体ID
+    :param tuple[float,float,float]|tuple[float,float]|str target2: 坐标或实体ID
 
     :return: 距离的平方；若任一坐标为 None，返回 float('inf')
     :rtype: float
@@ -249,8 +250,8 @@ def distance(__is_client__, target1, target2):
 
     -----
 
-    :param tuple[float]|str target1: 坐标或实体ID
-    :param tuple[float]|str target2: 坐标或实体ID
+    :param tuple[float,float,float]|tuple[float,float]|str target1: 坐标或实体ID
+    :param tuple[float,float,float]|tuple[float,float]|str target2: 坐标或实体ID
 
     :return: 距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
@@ -275,7 +276,7 @@ def chunk_pos(pos):
 
     :param tuple[float,float,float] pos: 世界坐标
 
-    :return: 区块坐标
+    :return: 区块坐标；传入的世界坐标为 None 时，返回 None
     :rtype: tuple[int,int]|None
     """
     if not pos:
@@ -294,7 +295,7 @@ def polar_coord(coord, rad=False, origin=(0, 0)):
     :param bool rad: 是否使用弧度制；默认为 False
     :param tuple[float,float,float]|tuple[float,float] origin: 坐标原点；默认为 (0, 0, 0) 或 (0, 0)，根据 coord 的维度确定
 
-    :return: 极坐标
+    :return: 极坐标；传入的直角坐标坐标为 None 时，返回 None
     :rtype: tuple[float,float,float]|tuple[float,float]
     """
     if len(coord) == 2:
@@ -330,7 +331,7 @@ def cartesian_coord(coord, rad=False, origin=None):
     :param bool rad: 是否使用弧度制；默认为 False
     :param tuple[float,float,float]|tuple[float,float] origin: 坐标原点；默认为 (0, 0, 0) 或 (0, 0)，根据 coord 的维度确定
 
-    :return: 直角坐标
+    :return: 直角坐标；传入的极坐标为 None 时，返回 None
     :rtype: tuple[float,float,float]|tuple[float,float]
     """
     if len(coord) == 2:
@@ -357,11 +358,11 @@ def relative_pos(pos, basis):
 
     -----
 
-    :param tuple[float] pos: 绝对坐标
-    :param tuple[float] basis: 基准坐标
+    :param tuple[float,float,float]|tuple[float,float] pos: 绝对坐标
+    :param tuple[float,float,float]|tuple[float,float] basis: 基准坐标
 
-    :return: 相对坐标
-    :rtype: tuple[float]|None
+    :return: 相对坐标；传入的任一坐标为 None 时，返回 None
+    :rtype: tuple[float,float,float]|tuple[float,float]|None
     """
     if not basis or not pos:
         return
@@ -374,11 +375,11 @@ def absolute_pos(pos, basis):
 
     -----
 
-    :param tuple[float] pos: 相对坐标
-    :param tuple[float] basis: 基准坐标
+    :param tuple[float,float,float]|tuple[float,float] pos: 相对坐标
+    :param tuple[float,float,float]|tuple[float,float] basis: 基准坐标
 
-    :return: 绝对坐标
-    :rtype: tuple[float]|None
+    :return: 绝对坐标；传入的任一坐标为 None 时，返回 None
+    :rtype: tuple[float,float,float]|tuple[float,float]|None
     """
     if not basis or not pos:
         return
@@ -401,7 +402,7 @@ def screen_pos(pos, world_basis, screen_basis=(0, 0), scale=1, offset=(0, 0), ro
     :param float rotation: 绕坐标原点的旋转角度；默认为0
     :param bool rad: 旋转角是否使用弧度制；默认为False
 
-    :return: 屏幕坐标
+    :return: 屏幕坐标；传入的任一坐标为 None 时，返回 None
     :rtype: tuple[float,float]|None
     """
     if not pos or not world_basis:
@@ -425,21 +426,68 @@ def screen_pos(pos, world_basis, screen_basis=(0, 0), scale=1, offset=(0, 0), ro
 # region Coordinate Calculation ========================================================================================
 
 
-def box_min_max(pos1, pos2):
+def box_vertices(pos1, pos2):
     """
-    根据任意两个对角坐标，计算以这两点为顶点的包围盒的最小点和最大点坐标。
+    根据任意两个对角坐标，计算以这两点为顶点的AABB包围盒的所有顶点的坐标。
 
     -----
 
-    :param tuple[float] pos1: 对角坐标1
-    :param tuple[float] pos2: 对角坐标2
+    :param tuple[float,float,float]|tuple[float,float] pos1: 对角坐标1
+    :param tuple[float,float,float]|tuple[float,float] pos2: 对角坐标2
 
-    :return: 最小点和最大点坐标
-    :rtype: tuple[tuple[float],tuple[float]]|None
+    :return: 所有顶点坐标的列表；二维坐标返回4个顶点，三维坐标返回8个顶点；传入的任一坐标为 None 时，返回空列表
+    :rtype: list[tuple[float,float,float]|tuple[float,float]]
+    """
+    if not pos1 or not pos2:
+        return []
+    pos1, pos2 = box_min_max(pos1, pos2)
+    if len(pos1) == 2:
+        x1, y1 = pos1 # noqa
+        x2, y2 = pos2 # noqa
+        return [
+            (x1, y1),
+            (x1, y2),
+            (x2, y1),
+            (x2, y2),
+        ]
+    else:
+        x1, y1, z1 = pos1
+        x2, y2, z2 = pos2
+        return [
+            (x1, y1, z1),
+            (x1, y1, z2),
+            (x1, y2, z1),
+            (x1, y2, z2),
+            (x2, y1, z1),
+            (x2, y1, z2),
+            (x2, y2, z1),
+            (x2, y2, z2),
+        ]
+
+
+def box_min_max(pos1, pos2):
+    """
+    根据任意两个对角坐标，计算以这两点为顶点的AABB包围盒的最小和最大坐标。
+
+    -----
+
+    :param tuple[float,float,float]|tuple[float,float] pos1: 对角坐标1
+    :param tuple[float,float,float]|tuple[float,float] pos2: 对角坐标2
+
+    :return: 最小和最大坐标；传入的任一坐标 None 时，返回 None
+    :rtype: tuple[tuple[float,float,float]|tuple[float,float],tuple[float,float,float]|tuple[float,float]]|None
     """
     if not pos1 or not pos2:
         return
-    if len(pos1) == 3:
+    if len(pos1) == 2:
+        x1, y1 = pos1 # noqa
+        x2, y2 = pos2 # noqa
+        if x1 > x2:
+            x1, x2 = x2, x1
+        if y1 > y2:
+            y1, y2 = y2, y1
+        return (x1, y1), (x2, y2)
+    else:
         x1, y1, z1 = pos1
         x2, y2, z2 = pos2
         if x1 > x2:
@@ -449,14 +497,6 @@ def box_min_max(pos1, pos2):
         if z1 > z2:
             z1, z2 = z2, z1
         return (x1, y1, z1), (x2, y2, z2)
-    else:
-        x1, y1 = pos1 # noqa
-        x2, y2 = pos2 # noqa
-        if x1 > x2:
-            x1, x2 = x2, x1
-        if y1 > y2:
-            y1, y2 = y2, y1
-        return (x1, y1), (x2, y2)
 
 
 @inject_is_client
@@ -505,7 +545,7 @@ def pos_block_facing(pos, face=Facing.North, dist=1.0):
     :param int face: 方块朝向，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_；默认为 Facing.North
     :param float dist: 距离；默认为1.0
 
-    :return: 坐标
+    :return: 坐标；传入的起始坐标为 None 时，返回 None
     :rtype: tuple[float,float,float]|None
     """
     if not pos:
@@ -535,7 +575,7 @@ def pos_forward_rot(pos, rot, dist):
     :param tuple[float,float] rot: 视角：(竖直角度, 水平角度)
     :param float dist: 距离
 
-    :return: 坐标
+    :return: 坐标；传入的起点坐标或视角为 None 时，返回 None
     :rtype: tuple[float,float,float]|None
     """
     if not pos or not rot:
@@ -550,10 +590,10 @@ def pos_floor(pos):
 
     -----
 
-    :param tuple[float] pos: 坐标
+    :param tuple[float,float,float]|tuple[float,float] pos: 坐标
 
-    :return: 取整后的坐标
-    :rtype: tuple[int]|None
+    :return: 取整后的坐标；传入的坐标为 None 时，返回 None
+    :rtype: tuple[int,int,int]|tuple[int,int]|None
     """
     if not pos:
         return
@@ -592,11 +632,11 @@ def midpoint(pos1, pos2):
 
     -----
 
-    :param tuple[float] pos1: 坐标1
-    :param tuple[float] pos2: 坐标2
+    :param tuple[float,float,float]|tuple[float,float] pos1: 坐标1
+    :param tuple[float,float,float]|tuple[float,float] pos2: 坐标2
 
-    :return: 中点坐标
-    :rtype: tuple[float]|None
+    :return: 中点坐标；传入的任一坐标为 None 时，返回 None
+    :rtype: tuple[float,float,float]|tuple[float,float]|None
     """
     if not pos1 or not pos2:
         return
@@ -605,22 +645,22 @@ def midpoint(pos1, pos2):
 
 def box_center(pos1, pos2):
     """
-    计算包围盒中心坐标。
+    计算AABB包围盒的中心坐标。
 
     -----
 
-    :param tuple[float] pos1: 包围盒对角顶点坐标1
-    :param tuple[float] pos2: 包围盒对角顶点坐标2
+    :param tuple[float,float,float]|tuple[float,float] pos1: 包围盒对角顶点坐标1
+    :param tuple[float,float,float]|tuple[float,float] pos2: 包围盒对角顶点坐标2
 
-    :return: 中心坐标
-    :rtype: tuple[float]|None
+    :return: 中心坐标；传入的任一坐标为 None 时，返回 None
+    :rtype: tuple[float,float,float]|tuple[float,float]|None
     """
     return midpoint(pos1, pos2)
 
 
 def ray_box_intersection(start_pos, ray_dir, length, aabb_center, aabb_size, handle_inside="none"):
     """
-    计算射线与指定包围盒的第一个交点的坐标，未相交时返回 ``None`` 。
+    计算射线与指定AABB包围盒的第一个交点的坐标，未相交时返回 ``None`` 。
 
     -----
 
@@ -784,13 +824,13 @@ def is_in_sector(__is_client__, target, r, h, angle, center, direction):
 @inject_is_client
 def is_in_box(__is_client__, target, pos1, pos2, ignore_y=False):
     """
-    判断坐标或实体是否在包围盒内。
+    判断坐标或实体是否在AABB包围盒内。
 
     -----
 
-    :param tuple[float]|str target: 坐标或实体ID
-    :param tuple[float] pos1: 包围盒对角顶点坐标1
-    :param tuple[float] pos2: 包围盒对角顶点坐标2
+    :param tuple[float,float,float]|tuple[float,float]|str target: 坐标或实体ID
+    :param tuple[float,float,float]|tuple[float,float] pos1: 包围盒对角顶点坐标1
+    :param tuple[float,float,float]|tuple[float,float] pos2: 包围盒对角顶点坐标2
     :param bool ignore_y: 是否忽略Y轴；默认为False
 
     :return: 是否在包围盒内
@@ -823,7 +863,7 @@ def fpp_camera_rot(rot):
 
     :param tuple[float,float,float]|tuple[float,float] rot: 第三人称相机视角
 
-    :return: 第一人称相机视角
+    :return: 第一人称相机视角；传入的视角为 None 时，返回 None
     :rtype: tuple[float,float,float]|tuple[float,float]|None
     """
     if not rot:
@@ -840,7 +880,7 @@ def tpp_camera_rot(rot):
 
     :param tuple[float,float,float]|tuple[float,float] rot: 第一人称相机视角
 
-    :return: 第三人称相机视角
+    :return: 第三人称相机视角；传入的视角为 None 时，返回 None
     :rtype: tuple[float,float,float]|tuple[float,float]|None
     """
     if not rot:
@@ -858,7 +898,7 @@ def rot_from_to(start, end):
     :param tuple[float,float,float] start: 起始坐标
     :param tuple[float,float,float] end: 终点坐标
 
-    :return: 头部视角
+    :return: 头部视角；传入的任一坐标为 None 时，返回 None
     :rtype: tuple[float,float]|None
     """
     if not start or not end:
@@ -1072,12 +1112,12 @@ def clamp(x, min_value, max_value):
 
 def box_max_edge_len(pos1, pos2):
     """
-    计算包围盒最大棱长。
+    计算AABB包围盒的最大棱长。
         
     -----
     
-    :param tuple[float] pos1: 包围盒对角坐标1
-    :param tuple[float] pos2: 包围盒对角坐标2
+    :param tuple[float,float,float]|tuple[float,float] pos1: 包围盒对角坐标1
+    :param tuple[float,float,float]|tuple[float,float] pos2: 包围盒对角坐标2
         
     :return: 包围盒最大棱长
     :rtype: float

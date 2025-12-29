@@ -5,12 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-28
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
 
-from typing import Iterable, Literal, TypeVar, Union, Optional, Callable, Tuple, Sequence, overload
+from typing import List, Iterable, Literal, TypeVar, Union, Optional, Callable, Tuple, Sequence, overload
 from mod.common.minecraftEnum import Facing
 from ..core._types._typing import FTuple2, FTuple3, ITuple3, ITuple2
 
@@ -80,6 +80,10 @@ def screen_pos(
     rotation: float = 0,
     rad: bool = False,
 ) -> Optional[FTuple2]: ...
+@overload
+def box_vertices(pos1: FTuple3, pos2: FTuple3) -> Optional[List[FTuple3]]: ...
+@overload
+def box_vertices(pos1: FTuple2, pos2: FTuple2) -> Optional[List[FTuple2]]: ...
 @overload
 def box_min_max(pos1: FTuple3, pos2: FTuple3) -> Optional[Tuple[FTuple3, FTuple3]]: ...
 @overload
