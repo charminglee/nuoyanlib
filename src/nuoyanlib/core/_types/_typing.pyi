@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-24
+#   Date  : 2025-12-30
 #  ⠀
 # =================================================
 
@@ -42,26 +42,32 @@ STuple = Tuple[str, ...]
 Matrix = List[List[float]]
 Args = Tuple[Any, ...]
 Kwargs = Dict[str, Any]
+ArgsDict = Dict[str, PyBasicTypes]
+EntFilter = Optional[Callable[[str], bool]]
+TimeEaseFuncType = Callable[[float], float]
 
 
-class VectorLike(Protocol):
-    def __iter__(self) -> Iterator[float]: ...
-    def __getitem__(self, i: int) -> float: ...
-    def __len__(self) -> int: ...
+if sys.version_info <= (2, 7):
+    Number = Union[float, int, long]
+else:
+    Number = Union[float, int]
+NumberT = TypeVar("NumberT", bound=Number)
+
+
+Pos = Union[FTuple3, FTuple2]
+PosT = TypeVar("PosT", bound=Pos)
 
 
 if sys.version_info <= (2, 7):
     Scalar = Union[float, int, long]
 else:
     Scalar = Union[float, int]
+class VectorLike(Protocol):
+    def __iter__(self) -> Iterator[float]: ...
+    def __getitem__(self, i: int) -> float: ...
+    def __len__(self) -> int: ...
 GeneralVector = Union[FTuple3, FTuple2]
-ArgsDict = Dict[str, PyBasicTypes]
-EntFilter = Optional[Callable[[str], bool]]
-TimeEaseFuncType = Callable[[float], float]
-
-
 VectorLikeT = TypeVar("VectorLikeT", bound=VectorLike)
-PosT = TypeVar("PosT", bound=Union[FTuple3, FTuple2])
 
 
 class ItemDict(TypedDict, total=False):

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-30
+#   Date  : 2025-12-31
 #  ⠀
 # =================================================
 
@@ -55,6 +55,11 @@ __all__ = [
     "angle_normalize",
     "bezier_curve",
     "catmull_rom",
+    "median",
+    "std",
+    "var",
+    "mean",
+    "sign",
     "lerp",
     "range_map",
     "clamp",
@@ -109,7 +114,7 @@ def manhattan_distance(__is_client__, target1, target2):
     p1, p2 = _get_pos(target1, __is_client__), _get_pos(target2, __is_client__)
     if not p1 or not p2:
         return _INF
-    return sum(abs(p1 - p2) for p1, p2 in zip(p1, p2))
+    return float(sum(abs(p1 - p2) for p1, p2 in zip(p1, p2)))
 
 
 def _dist_square(p1, p2):
@@ -240,7 +245,7 @@ def distance_square(__is_client__, target1, target2):
     p1, p2 = _get_pos(target1, __is_client__), _get_pos(target2, __is_client__)
     if not p1 or not p2:
         return _INF
-    return sum((a - b)**2 for a, b in zip(p1, p2))
+    return sum((a - b)**2.0 for a, b in zip(p1, p2))
 
 
 @inject_is_client
@@ -474,11 +479,11 @@ def box_min_max(pos1, pos2):
     :param tuple[float,float,float]|tuple[float,float] pos1: 对角坐标1
     :param tuple[float,float,float]|tuple[float,float] pos2: 对角坐标2
 
-    :return: 最小和最大坐标；传入的任一坐标 None 时，返回 None
-    :rtype: tuple[tuple[float,float,float]|tuple[float,float],tuple[float,float,float]|tuple[float,float]]|None
+    :return: 坐标列表，第一个元素为最小坐标，第二个元素为最大坐标；传入的任一坐标 None 时，返回空列表
+    :rtype: list[tuple[float,float,float]|tuple[float,float]]
     """
     if not pos1 or not pos2:
-        return
+        return []
     if len(pos1) == 2:
         x1, y1 = pos1 # noqa
         x2, y2 = pos2 # noqa
@@ -486,7 +491,7 @@ def box_min_max(pos1, pos2):
             x1, x2 = x2, x1
         if y1 > y2:
             y1, y2 = y2, y1
-        return (x1, y1), (x2, y2)
+        return [(x1, y1), (x2, y2)]
     else:
         x1, y1, z1 = pos1
         x2, y2, z2 = pos2
@@ -496,7 +501,7 @@ def box_min_max(pos1, pos2):
             y1, y2 = y2, y1
         if z1 > z2:
             z1, z2 = z2, z1
-        return (x1, y1, z1), (x2, y2, z2)
+        return [(x1, y1, z1), (x2, y2, z2)]
 
 
 @inject_is_client
@@ -921,7 +926,7 @@ def angle_normalize(angle):
     :return: 标准化角度
     :rtype: float
     """
-    angle %= 360
+    angle %= 360.0
     if angle > 180:
         angle -= 360
     return angle
@@ -1020,10 +1025,70 @@ def catmull_rom(p0, p1, p2, p3, t, alpha=0.5):
 # region Common ========================================================================================================
 
 
-# todo: 正态分布、meam、median、std、var、sign
+def median(*args):
+    """
+    计算一组数据的中位数。
+
+    可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
+    ::
+
+        median(iterable) -> float
+        median(arg1, arg2, ...) -> float
+
+    -----
+
+    :return: 中位数
+    :rtype: float
+    """
+    data = sorted(args[0] if len(args) == 1 else args)
+    n = len(data)
+    mid = n // 2
+    if n % 2 == 1:
+        return float(data[mid])
+    else:
+        return (data[mid - 1] + data[mid]) / 2.0
 
 
-def mean(arg1, *args):
+def var(*args):
+    """
+    计算一组数据的方差（总体方差）。
+
+    可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
+    ::
+
+        var(iterable) -> float
+        var(arg1, arg2, ...) -> float
+
+    -----
+
+    :return: 方差
+    :rtype: float
+    """
+    data = tuple(args[0]) if len(args) == 1 else args
+    n = len(data)
+    m = sum(data) / n
+    return sum((x - m)**2.0 for x in data) / n
+
+
+def std(*args):
+    """
+    计算一组数据的标准差（总体标准差）。
+
+    可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
+    ::
+
+        std(iterable) -> float
+        std(arg1, arg2, ...) -> float
+
+    -----
+
+    :return: 标准差
+    :rtype: float
+    """
+    return sqrt(var(*args))
+
+
+def mean(*args):
     """
     计算一组数据的算术平均值。
 
@@ -1031,27 +1096,34 @@ def mean(arg1, *args):
     ::
 
         mean(iterable) -> float
-        mean(arg1, arg2, *args) -> float
+        mean(arg1, arg2, ...) -> float
 
     -----
-
-    :param Iterable[float]|float arg1: 只传入一个参数时，该参数需为可迭代对象
-    :param float args: [变长位置参数] 展开传入多个数据
 
     :return: 平均值
     :rtype: float
     """
-    if not args:
-        s, n = 0.0, 0
-        for a in arg1:
-            s += a
-            n += 1
+    data = tuple(args[0]) if len(args) == 1 else args
+    return float(sum(data) / len(data))
+
+
+def sign(x):
+    """
+    获取数值的符号。
+
+    -----
+
+    :param float x: 数值
+
+    :return: 符号；正数返回1，负数返回-1，零返回0
+    :rtype: int
+    """
+    if x > 0:
+        return 1
+    elif x < 0:
+        return -1
     else:
-        s, n = arg1, 1 # noqa
-        for a in args:
-            s += a
-            n += 1
-    return s / n
+        return 0
 
 
 def lerp(a, b, t):
@@ -1067,7 +1139,7 @@ def lerp(a, b, t):
     :return: 插值结果
     :rtype: float
     """
-    return a + (b - a) * t
+    return float(a + (b - a) * t)
 
 
 def range_map(x, output_range, input_range=[0, 1], interp=None): # noqa
@@ -1089,7 +1161,7 @@ def range_map(x, output_range, input_range=[0, 1], interp=None): # noqa
     t = (x - j) / (k - j)
     if interp:
         t = interp(t)
-    return a + (b - a) * t
+    return float(a + (b - a) * t)
 
 
 def clamp(x, min_value, max_value):
@@ -1107,7 +1179,7 @@ def clamp(x, min_value, max_value):
     :return: 限制值
     :rtype: float
     """
-    return max(min_value, min(max_value, x))
+    return float(max(min_value, min(max_value, x)))
 
 
 def box_max_edge_len(pos1, pos2):
@@ -1122,7 +1194,7 @@ def box_max_edge_len(pos1, pos2):
     :return: 包围盒最大棱长
     :rtype: float
     """
-    return max(abs(a - b) for a, b in zip(pos1, pos2))
+    return float(max(abs(a - b) for a, b in zip(pos1, pos2)))
 
 
 # endregion
