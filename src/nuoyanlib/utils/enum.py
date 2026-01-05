@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2026-1-6
 #  ⠀
 # =================================================
 
@@ -569,6 +569,11 @@ class ClientEvent(StrEnum):
     ModSDK客户端事件名枚举。
     """
 
+    PhysxTouchClientEvent = auto()
+    OnCustomGamepadChangedEvent = auto()
+    OnCustomGamepadPressInGame = auto()
+    OnCustomKeyChangedEvent = auto()
+    OnCustomKeyPressInGame = auto()
     UIDefReloadSceneStackAfter = auto()
     UpdatePlayerSkinClientEvent = auto()
     PlayerTryRemoveCustomContainerItemClientEvent = auto()
@@ -687,6 +692,7 @@ class ServerEvent(StrEnum):
     ModSDK服务端事件名枚举。
     """
 
+    PhysxTouchServerEvent = auto()
     ItemPullOutCustomContainerServerEvent = auto()
     ItemPushInCustomContainerServerEvent = auto()
     PlayerPermissionChangeServerEvent = auto()

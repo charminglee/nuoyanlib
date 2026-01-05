@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-6
 #  ⠀
 # =================================================
 
@@ -17,8 +17,8 @@ from all_events import ClientEvent, ServerEvent
 
 
 root = os.getcwd()
-event_dir = f"{root}/src/nuoyanlib/_core"
-script_dir = f"{root}/scripts/event_typehint"
+event_dir = f"{root}\\src\\nuoyanlib\\core"
+script_dir = f"{root}\\scripts\\event_typehint"
 
 
 def extract_events(cls):
@@ -56,7 +56,7 @@ s_events = extract_events(ServerEvent)
 print("events:", len(c_events) + len(s_events))
 
 
-shutil.copyfile(f"{event_dir}/_types/_event_typing.pyi", f"{script_dir}/_event_typing.pyi")
+shutil.copyfile(f"{event_dir}\\_types\\_event_typing.pyi", f"{script_dir}\\_event_typing.pyi")
 
 
 def read(path, mode="r"):
@@ -70,7 +70,7 @@ def write(path, content, mode="w"):
         f.write(content)
 
 
-_event_typing = read(f"{script_dir}/_event_typing.pyi")
+_event_typing = read(f"{script_dir}\\_event_typing.pyi")
 _event_typing = re.sub(r"# clear.*", "# clear\n\n\n", _event_typing, 1, re.S)
 _event_typing += "class ClientEvent:\n"
 
@@ -101,30 +101,30 @@ for data in c_events, s_events:
         else:
             _event_typing += "    pass\n"
         n += 1
-write(f"{script_dir}/_event_typing.pyi", _event_typing)
+write(f"{script_dir}\\_event_typing.pyi", _event_typing)
 
 
 # 生成enum.py
-enum_py = "class ClientEvent(Enum[str]):\n"
+enum_py = "class ClientEvent(StrEnum):\n"
 for data in c_events, s_events:
     for event_name in data:
         enum_py += f"    {event_name} = auto()\n"
-    if "ServerEvent(Enum[str])" not in enum_py:
-        enum_py += "\n\nclass ServerEvent(Enum[str]):\n"
-write(f"{script_dir}/enum.py", enum_py)
+    if "ServerEvent(StrEnum)" not in enum_py:
+        enum_py += "\n\nclass ServerEvent(StrEnum):\n"
+write(f"{script_dir}\\enum.py", enum_py)
 
 
 # 生成enum.pyi
-enum_pyi = "class ClientEvent(Enum[str]):\n"
+enum_pyi = "class ClientEvent(StrEnum):\n"
 for data in c_events, s_events:
     for event_name, (args, doc) in data.items():
-        enum_pyi += f"    {event_name}: str\n"
+        enum_pyi += f"    {event_name} = ...\n"
         enum_pyi += '    """'
         enum_pyi += doc.replace("\n        ", "\n    ")
         enum_pyi += '"""\n'
-    if "ServerEvent(Enum[str])" not in enum_pyi:
-        enum_pyi += "\n\nclass ServerEvent(Enum[str]):\n"
-write(f"{script_dir}/enum.pyi", enum_pyi)
+    if "ServerEvent(StrEnum)" not in enum_pyi:
+        enum_pyi += "\n\nclass ServerEvent(StrEnum):\n"
+write(f"{script_dir}\\enum.pyi", enum_pyi)
 
 
 

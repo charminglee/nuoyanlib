@@ -1,16 +1,126 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-6
 #  ⠀
 # =================================================
 
 
 class ClientEvent:
+    def PhysxTouchClientEvent(self, args):
+        """
+        [事件]
+
+        给自定义刚体添加的碰撞体，与其他碰撞体或原版实体发生碰撞/结束碰撞时触发。
+
+        -----
+
+        【注意】
+
+        需要在碰撞体创建时使用 ``PxEventMask.Client`` 才会触发。
+
+        ``found`` 列表每个元素的内容：
+        ::
+
+            {
+                "entityId0": str,                    # 一个碰撞体所属实体的entityId
+                "identifier0": str,                  # 一个碰撞体所属实体的identifier
+                "shape0": str | None,                # 一个碰撞体的userData
+                "entityId1": str,                    # 另一个碰撞体所属实体的entityId
+                "identifier1": str,                  # 另一个碰撞体所属实体的identifier
+                "shape1": str | None,                # 另一个碰撞体的userData
+                "pos": tuple[float, float, float],   # 碰撞点的世界坐标。其中一个碰撞体在创建时使用了PxEventMask.Found_Detail才有该字段
+                "normal": tuple[float, float, float] # 碰撞产生的力的方向，由碰撞体1指向碰撞体0。其中一个碰撞体在创建时使用了PxEventMask.Found_Detail才有该字段
+            }
+
+        ``lost`` 列表每个元素的内容：
+        ::
+
+            {
+                "entityId0": str,     # 一个碰撞体所属实体的entityId
+                "identifier0": str,   # 一个碰撞体所属实体的identifier
+                "shape0": str | None, # 一个碰撞体的userData
+                "entityId1": str,     # 另一个碰撞体所属实体的entityId
+                "identifier1": str,   # 另一个碰撞体所属实体的identifier
+                "shape1": str | None  # 另一个碰撞体的userData
+            }
+
+        列表中的碰撞对不分先后，每个碰撞对中的碰撞体0与碰撞体1也不分先后。
+
+        -----
+
+        【事件参数】
+
+        - ``found`` -- list[dict]，开始接触的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Found，他与其他碰撞体/原版实体开始接触时，会出现在列表中
+        - ``lost`` -- list[dict]，结束接触的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Lost，他与其他碰撞体/原版实体结束接触时，会出现在列表中
+        """
+    def OnCustomGamepadChangedEvent(self, args):
+        """
+        [事件]
+
+        当自定义手柄按键绑定发生改变时触发。
+
+        -----
+
+        【事件参数】
+
+        - ``name`` -- str，按键名称
+        - ``oldKey`` -- str，旧的键码
+        - ``newKey`` -- str，新的键码
+        """
+    def OnCustomGamepadPressInGame(self, args):
+        """
+        [事件]
+
+        当玩家按下自定义手柄按键时触发。
+
+        -----
+
+        【事件参数】
+
+        - ``name`` -- str，按键名称
+        - ``key`` -- str，键码
+        - ``category`` -- str，按键分类
+        - ``isDown`` -- str，按下状态 ("1"为按下, "0"为抬起)
+        - ``magnitude`` -- float，扳机力度 (0.0~1.0)，仅扳机键有效
+        - ``x`` -- float，摇杆X轴偏移 (-1.0~1.0)，仅摇杆键有效
+        - ``y`` -- float，摇杆Y轴偏移 (-1.0~1.0)，仅摇杆键有效
+        - ``screenName`` -- str，当前屏幕名称
+        """
+    def OnCustomKeyChangedEvent(self, args):
+        """
+        [事件]
+
+        当自定义按键绑定发生改变时触发。
+
+        -----
+
+        【事件参数】
+
+        - ``name`` -- str，按键名称
+        - ``oldKey`` -- str，旧的键码
+        - ``newKey`` -- str，新的键码
+        """
+    def OnCustomKeyPressInGame(self, args):
+        """
+        [事件]
+
+        当玩家按下自定义按键时触发。
+
+        -----
+
+        【事件参数】
+
+        - ``name`` -- str，按键名称
+        - ``key`` -- str，键码
+        - ``category`` -- str，按键分类
+        - ``isDown`` -- str，按下状态 ("1"为按下, "0"为抬起)
+        - ``screenName`` -- str，当前屏幕名称
+        """
     def UIDefReloadSceneStackAfter(self, args):
         """
         [事件]
@@ -1983,6 +2093,53 @@ class ClientEvent:
 
 
 class ServerEvent:
+    def PhysxTouchServerEvent(self, args):
+        """
+        [事件]
+
+        给自定义刚体添加的碰撞体，与其他碰撞体或原版实体发生碰撞/结束碰撞时触发。
+
+        -----
+
+        【注意】
+
+        需要在碰撞体创建时使用 ``PxEventMask.Server`` 才会触发。
+
+        ``found`` 列表每个元素的内容：
+        ::
+
+            {
+                "entityId0": str,                    # 一个碰撞体所属实体的entityId
+                "identifier0": str,                  # 一个碰撞体所属实体的identifier
+                "shape0": str | None,                # 一个碰撞体的userData
+                "entityId1": str,                    # 另一个碰撞体所属实体的entityId
+                "identifier1": str,                  # 另一个碰撞体所属实体的identifier
+                "shape1": str | None,                # 另一个碰撞体的userData
+                "pos": tuple[float, float, float],   # 碰撞点的世界坐标。其中一个碰撞体在创建时使用了PxEventMask.Found_Detail才有该字段
+                "normal": tuple[float, float, float] # 碰撞产生的力的方向，由碰撞体1指向碰撞体0。其中一个碰撞体在创建时使用了PxEventMask.Found_Detail才有该字段
+            }
+
+        ``lost`` 列表每个元素的内容：
+        ::
+
+            {
+                "entityId0": str,     # 一个碰撞体所属实体的entityId
+                "identifier0": str,   # 一个碰撞体所属实体的identifier
+                "shape0": str | None, # 一个碰撞体的userData
+                "entityId1": str,     # 另一个碰撞体所属实体的entityId
+                "identifier1": str,   # 另一个碰撞体所属实体的identifier
+                "shape1": str | None  # 另一个碰撞体的userData
+            }
+
+        列表中的碰撞对不分先后，每个碰撞对中的碰撞体0与碰撞体1也不分先后。
+
+        -----
+
+        【事件参数】
+
+        - ``found`` -- list[dict]，开始接触的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Found，他与其他碰撞体/原版实体开始接触时，会出现在列表中
+        - ``lost`` -- list[dict]，结束接触的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Lost，他与其他碰撞体/原版实体结束接触时，会出现在列表中
+        """
     def ItemPullOutCustomContainerServerEvent(self, args):
         """
         [事件]
@@ -1999,6 +2156,7 @@ class ServerEvent:
         - ``x`` -- int，容器方块x坐标
         - ``y`` -- int，容器方块y坐标
         - ``z`` -- int，容器方块z坐标
+        - ``dimension`` -- int，容器方块所在的维度ID
         - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次漏出物品的操作
         """
     def ItemPushInCustomContainerServerEvent(self, args):
@@ -2017,6 +2175,7 @@ class ServerEvent:
         - ``x`` -- int，容器方块x坐标
         - ``y`` -- int，容器方块y坐标
         - ``z`` -- int，容器方块z坐标
+        - ``dimension`` -- int，容器方块所在的维度ID
         - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次漏入物品的操作
         """
     def PlayerPermissionChangeServerEvent(self, args):
