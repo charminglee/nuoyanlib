@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-31
+#   Date  : 2026-1-6
 #  ⠀
 # =================================================
 
@@ -1090,7 +1090,7 @@ def std(*args):
 
 def mean(*args):
     """
-    计算一组数据的算术平均值。
+    计算一组数据的算术平均数。
 
     可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
     ::
@@ -1115,7 +1115,7 @@ def sign(x):
 
     :param float x: 数值
 
-    :return: 符号；正数返回1，负数返回-1，零返回0
+    :return: 符号；正数返回1，负数返回-1，零值返回0
     :rtype: int
     """
     if x > 0:

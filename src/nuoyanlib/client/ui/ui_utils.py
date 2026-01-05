@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-4
 #  ⠀
 # =================================================
 
@@ -22,6 +22,7 @@ from ...utils.enum import ControlType
 
 
 __all__ = [
+    "pop_to_hud",
     "create_ui",
     "to_path",
     "to_control",
@@ -30,6 +31,19 @@ __all__ = [
     "get_parent_path",
     "get_parent",
 ]
+
+
+def pop_to_hud():
+    """
+    依次弹出栈顶UI直到HUD界面。
+
+    -----
+
+    :return: 无
+    :rtype: None
+    """
+    while not c_api.GetTopUI() != "hud_screen":
+        c_api.PopTopUI()
 
 
 class _UIControlType:

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-4
 #  ⠀
 # =================================================
 
@@ -32,6 +32,9 @@ from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
 from ...core._types._typing import UiPathOrNyControl
 from ...utils.enum import ControlType
+
+
+def pop_to_hud() -> None: ...
 
 
 class _UIControlType:
