@@ -5,28 +5,17 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-01-09
 #  ⠀
 # =================================================
 
 
-def save_setting(name: str, data_dict: dict, is_global: bool = True) -> bool: ...
-def read_setting(name: str, is_global: bool = True) -> dict: ...
-def check_setting(name: str, item_list: list, is_global: bool = True) -> list: ...
+from typing import Any, overload
+from ..core._types._typing import T
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def save_setting(name: str, data: Any, is_global: bool = True) -> bool: ...
+@overload
+def read_setting(name: str, default: None = None, is_global: bool = True) -> Any: ...
+@overload
+def read_setting(name: str, default: T, is_global: bool = True) -> T: ...
