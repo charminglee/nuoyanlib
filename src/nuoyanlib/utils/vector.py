@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-24
+#   Date  : 2026-1-7
 #  ⠀
 # =================================================
 
@@ -396,7 +396,7 @@ class Vector(object):
 
         向量转置。
 
-        返回当前向量的列向量形式，例如：
+        以列表返回当前向量的列向量形式，例如：
 
         >>> vec = Vector(1, 2, 3)
         >>> vec.T

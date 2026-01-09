@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
@@ -15,7 +15,7 @@ from typing import Optional, Callable, Dict, Any, Union, List
 from ..core._types._typing import FTuple3
 
 
-def probability(p: float) -> bool: ...
+def chance(p: float) -> bool: ...
 def random_pos(
     center: FTuple3,
     r: float,

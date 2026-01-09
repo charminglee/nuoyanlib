@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2026-1-9
 #  ⠀
 # =================================================
 
@@ -25,6 +25,7 @@ if not _NuoyanLibServerSystem.register():
     _logging.error("NuoyanLibServerSystem register failed!")
 
 
+from ..core._const import *
 from ..core.server.comp import *
 from ..core.listener import *
 from ..core.error import *
@@ -33,13 +34,12 @@ from ..core.error import *
 from .entity import *
 from .hurt import *
 from .inv import *
-from .structure import *
 from .block import *
 from .lobby import *
 
 
 from ..utils import *
-from .. import config
+from .. import config, __version__, __author__, __author_qq__, __author_email__
 
 
 for k, v in globals().items():

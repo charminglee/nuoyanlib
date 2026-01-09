@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-9
 #  ⠀
 # =================================================
 
@@ -25,9 +25,9 @@ ROOT = __C.__module__.split(".")[0]
 del __C
 
 
-SHORTCUT = "_shortcut"
-INV27 = "_inv27"
-INV36 = "_inv36"
+# SHORTCUT = "_shortcut"
+# INV27 = "_inv27"
+# INV36 = "_inv36"
 
 
 class TypeStr:
