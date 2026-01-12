@@ -5,14 +5,14 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-30
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
 
-from typing import Tuple, ClassVar, Any, Dict, Generic, Iterator, Generator, List, Literal, Optional, overload
+from typing import Tuple, Any, Dict, Generic, Iterator, Generator, List, Literal, Optional, overload
 from random import Random
-from ..core._types._typing import Self, FTuple3, ITuple3, STuple, PosT, ITuple2, FTuple2
+from ..core._types._typing import Self, FTuple3, ITuple3, SlotsType, PosT, ITuple2, FTuple2
 
 
 class _PosGenerator(Generic[PosT]):
@@ -28,7 +28,7 @@ class _PosGenerator(Generic[PosT]):
 
 
 class gen_random_even_pos(_PosGenerator[PosT]):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _spawned: Dict[int, PosT]
     _uniform = Random.uniform
     _random = Random.random
@@ -55,7 +55,7 @@ def _gen_line_pos(start: PosT, i: int, x_step: float = 0, y_step: float = 0, z_s
 
 
 class gen_line_pos(_PosGenerator[PosT]):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _x_step: float
     _y_step: float
     _z_step: float
@@ -67,7 +67,7 @@ class gen_line_pos(_PosGenerator[PosT]):
 
 
 class gen_ring_pos(_PosGenerator[PosT]):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _step: float
     center: PosT
     radius: float
@@ -81,7 +81,7 @@ _GOLDEN_RATIO: float
 
 
 class gen_sphere_pos(_PosGenerator[FTuple3]):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _fixed_count: int
     center: FTuple3
     radius: float
@@ -108,7 +108,7 @@ def _calc_axis_counts(min_pos: FTuple2, max_pos: FTuple2, count: int) -> ITuple2
 
 
 class gen_box_pos(_PosGenerator[PosT]):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _min_pos: PosT
     _count_x: int
     _count_y: int
@@ -124,7 +124,7 @@ class gen_box_pos(_PosGenerator[PosT]):
 
 
 class gen_box_surface_pos(_PosGenerator[PosT]):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _min_pos: PosT
     _step_x: float
     _step_y: float
@@ -140,7 +140,7 @@ class gen_box_surface_pos(_PosGenerator[PosT]):
 
 
 class gen_box_frame_pos(_PosGenerator[PosT]):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     pos1: PosT
     pos2: PosT
     count_x: int

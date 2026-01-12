@@ -5,15 +5,15 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
 
-from typing import ClassVar, Callable, Optional, Tuple, Generator, List, Any, Dict, Set, overload
+from typing import Callable, Optional, Tuple, Generator, List, Any, Dict, Set, overload
 from types import MethodType
 from ._types._event_typing import ClientEvent, ServerEvent
-from ._types._typing import Self, ArgsDict, PyBasicTypes, STuple, F
+from ._types._typing import Self, ArgsDict, PyBasicTypes, SlotsType, F
 
 
 ALL_CLIENT_LIB_EVENTS: Dict[str, str]
@@ -21,7 +21,7 @@ ALL_SERVER_LIB_EVENTS: Dict[str, str]
 
 
 class _EventPool(object):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     pool: Dict[int, Set[Callable]]
     priorities: List[int]
     lock: bool
@@ -92,7 +92,7 @@ def is_listened(
 
 
 class EventArgsWrap(object):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _arg_dict: ArgsDict
     _event_name: str
     def __init__(self: Self, arg_dict: ArgsDict, event_name: str) -> None: ...

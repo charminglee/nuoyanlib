@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-28
+#   Date  : 2026-1-12
 #  ⠀
 # =================================================
 
@@ -137,7 +137,9 @@ class NyControl(object):
         self.ui_node = None
 
     def __repr__(self):
-        return "<%s object at '%s'>" % (self.__class__.__name__, self._base_control.FullPath())
+        r = object.__repr__(self)
+        fp = self._base_control.FullPath()
+        return r[:-1] + ", for '%s'>" % fp
 
     # region Properties ================================================================================================
 

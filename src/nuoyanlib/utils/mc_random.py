@@ -69,11 +69,11 @@ def random_pos(__is_client__, center, r, dim=None, use_top_height=False):
     if use_top_height:
         pos = pos_floor((x, z))
         if __is_client__:
-            y = get_lv_comp(True).BlockInfo.GetTopBlockHeight(pos)
+            y = get_lv_comp().BlockInfo.GetTopBlockHeight(pos)
         else:
             if dim is None:
                 dim = 0
-            y = get_lv_comp(False).BlockInfo.GetTopBlockHeight(pos, dim)
+            y = get_lv_comp().BlockInfo.GetTopBlockHeight(pos, dim)
         if y is not None:
             return x, y, z
     else:

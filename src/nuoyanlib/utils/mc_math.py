@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-6
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
@@ -69,17 +69,8 @@ __all__ = [
 
 if 0:
     # 绕过机审专用
-    manhattan_distance = lambda *_, **__: UNIVERSAL_OBJECT
     distance2nearest_entity = lambda *_, **__: UNIVERSAL_OBJECT
     distance2nearest_player = lambda *_, **__: UNIVERSAL_OBJECT
-    distance2line = lambda *_, **__: UNIVERSAL_OBJECT
-    distance_square = lambda *_, **__: UNIVERSAL_OBJECT
-    distance = lambda *_, **__: UNIVERSAL_OBJECT
-    pos_entity_facing = lambda *_, **__: UNIVERSAL_OBJECT
-    is_in_sphere = lambda *_, **__: UNIVERSAL_OBJECT
-    is_in_cylinder = lambda *_, **__: UNIVERSAL_OBJECT
-    is_in_sector = lambda *_, **__: UNIVERSAL_OBJECT
-    is_in_box = lambda *_, **__: UNIVERSAL_OBJECT
 
 
 _INF = float('inf')
@@ -87,19 +78,18 @@ _NAN = float('nan')
 _ZERO_EPS = 1e-8
 
 
-def _get_pos(target, is_client=None):
-    return get_cf(target, is_client).Pos.GetFootPos() if isinstance(target, str) else target
+def _get_pos(target):
+    return get_cf(target).Pos.GetFootPos() if isinstance(target, str) else target
 
 
 def _get_dim(entity_id):
-    return get_cf(entity_id, False).Dimension.GetEntityDimensionId()
+    return get_cf(entity_id).Dimension.GetEntityDimensionId()
 
 
 # region Distance ======================================================================================================
 
 
-@inject_is_client
-def manhattan_distance(__is_client__, target1, target2):
+def manhattan_distance(target1, target2):
     """
     计算两个坐标或实体间的曼哈顿距离。
 
@@ -111,7 +101,7 @@ def manhattan_distance(__is_client__, target1, target2):
     :return: 曼哈顿距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
-    p1, p2 = _get_pos(target1, __is_client__), _get_pos(target2, __is_client__)
+    p1, p2 = _get_pos(target1), _get_pos(target2)
     if not p1 or not p2:
         return _INF
     return float(sum(abs(p1 - p2) for p1, p2 in zip(p1, p2)))
@@ -138,11 +128,11 @@ def distance2nearest_entity(__is_client__, target, dim=None):
     :return: 与距离最近的实体的距离；若找不到最近实体，返回 float('inf')
     :rtype: float
     """
-    api = get_api(__is_client__)
+    api = get_api()
     # 传入实体ID时，若为服务端，获取该实体所在维度
     if not __is_client__ and isinstance(target, str) and dim is None:
         dim = _get_dim(target)
-    tp = _get_pos(target, __is_client__)
+    tp = _get_pos(target)
     if not tp:
         return _INF
 
@@ -155,7 +145,7 @@ def distance2nearest_entity(__is_client__, target, dim=None):
         # 处于客户端时跳过维度判断
         if not __is_client__ and data['dimensionId'] != dim:
             continue
-        ep = _get_pos(entity_id, __is_client__)
+        ep = _get_pos(entity_id)
         if not ep:
             continue
         dist2 = _dist_square(tp, ep)
@@ -177,11 +167,11 @@ def distance2nearest_player(__is_client__, target, dim=None):
     :return: 与距离最近的玩家的距离；若找不到最近玩家，返回 float('inf')
     :rtype: float
     """
-    api = get_api(__is_client__)
+    api = get_api()
     # 传入实体ID时，若为服务端，获取该实体所在维度
     if not __is_client__ and isinstance(target, str) and dim is None:
         dim = _get_dim(target)
-    tp = _get_pos(target, __is_client__)
+    tp = _get_pos(target)
     if not tp:
         return _INF
 
@@ -192,7 +182,7 @@ def distance2nearest_player(__is_client__, target, dim=None):
         # 处于客户端时跳过维度判断
         if not __is_client__ and _get_dim(player_id) != dim:
             continue
-        pp = _get_pos(player_id, __is_client__)
+        pp = _get_pos(player_id)
         if not pp:
             continue
         dist2 = _dist_square(tp, pp)
@@ -201,8 +191,7 @@ def distance2nearest_player(__is_client__, target, dim=None):
     return sqrt(min_dist2)
 
 
-@inject_is_client
-def distance2line(__is_client__, target, line_pos1, line_pos2):
+def distance2line(target, line_pos1, line_pos2):
     """
     计算坐标或实体与某一直线的距离。
 
@@ -217,7 +206,7 @@ def distance2line(__is_client__, target, line_pos1, line_pos2):
     """
     if not line_pos1 or not line_pos2:
         return _INF
-    tp = _get_pos(target, __is_client__)
+    tp = _get_pos(target)
     if not tp:
         return _INF
     a = _dist(tp, line_pos1)
@@ -229,8 +218,7 @@ def distance2line(__is_client__, target, line_pos1, line_pos2):
     return h
 
 
-@inject_is_client
-def distance_square(__is_client__, target1, target2):
+def distance_square(target1, target2):
     """
     计算两个坐标或实体间距离的平方，相比于直接计算距离速度更快。
 
@@ -242,14 +230,13 @@ def distance_square(__is_client__, target1, target2):
     :return: 距离的平方；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
-    p1, p2 = _get_pos(target1, __is_client__), _get_pos(target2, __is_client__)
+    p1, p2 = _get_pos(target1), _get_pos(target2)
     if not p1 or not p2:
         return _INF
     return sum((a - b)**2.0 for a, b in zip(p1, p2))
 
 
-@inject_is_client
-def distance(__is_client__, target1, target2):
+def distance(target1, target2):
     """
     计算两个坐标或实体间的距离。
 
@@ -261,7 +248,7 @@ def distance(__is_client__, target1, target2):
     :return: 距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
     """
-    p1, p2 = _get_pos(target1, __is_client__), _get_pos(target2, __is_client__)
+    p1, p2 = _get_pos(target1), _get_pos(target2)
     if not p1 or not p2:
         return _INF
     return sqrt(sum((a - b)**2 for a, b in zip(p1, p2)))
@@ -504,8 +491,7 @@ def box_min_max(pos1, pos2):
         return [(x1, y1, z1), (x2, y2, z2)]
 
 
-@inject_is_client
-def pos_entity_facing(__is_client__, entity_id, dist, use_0yaw=False, height_offset=0):
+def pos_entity_facing(entity_id, dist, use_0yaw=False, height_offset=0):
     """
     计算实体视角方向上、给定距离上的位置的坐标。
 
@@ -526,7 +512,7 @@ def pos_entity_facing(__is_client__, entity_id, dist, use_0yaw=False, height_off
     :return: 坐标；若实体不存在，返回 None
     :rtype: tuple[float,float,float]|None
     """
-    cf = get_cf(entity_id, __is_client__)
+    cf = get_cf(entity_id)
     rot = cf.Rot.GetRot()
     if not rot:
         return
@@ -730,8 +716,7 @@ def ray_box_intersection(start_pos, ray_dir, length, aabb_center, aabb_size, han
 # region Area Test =====================================================================================================
 
 
-@inject_is_client
-def is_in_sphere(__is_client__, target, r, center):
+def is_in_sphere(target, r, center):
     """
     判断坐标或实体是否在球体区域内。
 
@@ -744,14 +729,13 @@ def is_in_sphere(__is_client__, target, r, center):
     :return: 是否在球体区域内
     :rtype: bool
     """
-    tp = _get_pos(target, __is_client__)
+    tp = _get_pos(target)
     if not tp:
         return False
     return _dist_square(tp, center) <= r**2
 
 
-@inject_is_client
-def is_in_cylinder(__is_client__, target, r, center1, center2):
+def is_in_cylinder(target, r, center1, center2):
     """
     判断坐标或实体是否在圆柱体区域内。
 
@@ -765,7 +749,7 @@ def is_in_cylinder(__is_client__, target, r, center1, center2):
     :return: 是否在圆柱体区域内
     :rtype: bool
     """
-    tp = _get_pos(target, __is_client__)
+    tp = _get_pos(target)
     if not tp:
         return False
     tp = Vector(tp)
@@ -783,8 +767,7 @@ def is_in_cylinder(__is_client__, target, r, center1, center2):
     return dist2 <= r2
 
 
-@inject_is_client
-def is_in_sector(__is_client__, target, r, h, angle, center, direction):
+def is_in_sector(target, r, h, angle, center, direction):
     """
     判断坐标或实体是否在扇形（饼状三维扇形）区域内。
 
@@ -800,7 +783,7 @@ def is_in_sector(__is_client__, target, r, h, angle, center, direction):
     :return: 是否在扇形区域内
     :rtype: bool
     """
-    tp = _get_pos(target, __is_client__)
+    tp = _get_pos(target)
     if not tp:
         return False
 
@@ -826,8 +809,7 @@ def is_in_sector(__is_client__, target, r, h, angle, center, direction):
     return cos_alpha >= cos_theta
 
 
-@inject_is_client
-def is_in_box(__is_client__, target, pos1, pos2, ignore_y=False):
+def is_in_box(target, pos1, pos2, ignore_y=False):
     """
     判断坐标或实体是否在AABB包围盒内。
 
@@ -841,7 +823,7 @@ def is_in_box(__is_client__, target, pos1, pos2, ignore_y=False):
     :return: 是否在包围盒内
     :rtype: bool
     """
-    tp = _get_pos(target, __is_client__)
+    tp = _get_pos(target)
     if not tp:
         return False
     pos1, pos2 = box_min_max(pos1, pos2)

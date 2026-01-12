@@ -5,13 +5,9 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-6
+#   Date  : 2026-1-12
 #  ⠀
 # =================================================
-
-
-if 0:
-    from typing import Any
 
 
 from collections import OrderedDict
@@ -25,6 +21,10 @@ from mod.common.minecraftEnum import (
     EnchantType,
 )
 from ..core._utils import MappingProxy
+
+
+if 0:
+    from typing import Any
 
 
 __all__ = [
@@ -69,7 +69,11 @@ class auto(object):
     用于自动生成枚举值。
 
     你可以在枚举类中定义 ``_generate_next_value_()`` 静态方法以自定义 ``auto()`` 的值生成逻辑。
+    如果定义了 ``_generate_next_value_()`` 方法， ``auto()`` 会调用该方法以生成枚举值，否则使用默认的生成逻辑。
     该方法有三个参数，分别为枚举成员名称（str）、现有成员数量（int）和已分配值的列表（list），返回值即为最终的枚举值。
+
+    示例
+    ----
 
     >>> class Color(Enum):
     ...     @staticmethod
@@ -316,9 +320,11 @@ class Enum(object): # noqa
     """
     枚举类，用于实现自定义枚举。
 
-    枚举类拥有以下特性：
+    用法与 Python3 的 ``enum`` 标准库类似，每个枚举成员均为枚举类的实例，可通过 ``.name`` 和 ``.value`` 属性获取成员的名称和值。
 
-    - 枚举成员：每个枚举成员均为枚举类的实例，可通过 ``.name`` 和 ``.value`` 属性获取成员的名称和值。
+    示例
+    ----
+
     >>> class Color(Enum):
     ...     RED = 1
     ...     GREEN = 2
@@ -326,6 +332,8 @@ class Enum(object): # noqa
     ...
     >>> Color.RED
     <Color.RED: 1>
+    >>> isinstance(Color.RED, Color)
+    True
     >>> Color.RED == 1
     False
     >>> Color.RED.name
@@ -333,8 +341,9 @@ class Enum(object): # noqa
     >>> Color.RED.value
     1
 
-    - 忽略成员：在枚举类中定义 ``_ignore_`` 属性（列表或元组），填入需要忽略的成员名称，这些成员将保留为普通类属性，不会成为枚举类的实例。
-      同时，以下划线开头的名称也不会成为枚举成员。
+    在枚举类中定义 ``_ignore_`` 属性（列表或元组），填入需要忽略的成员名称，这些成员将保留为普通类属性，不会成为枚举类的实例。
+    同时，以下划线开头的名称也不会成为枚举成员。
+
     >>> class Color(Enum):
     ...     _ignore_ = ['ALL']
     ...     RED = 1
@@ -348,23 +357,28 @@ class Enum(object): # noqa
     >>> Color.ALL
     (1, 2, 3)
 
-    - 成员安全：不允许动态插入/修改/删除枚举成员，否则将会抛出 ``AttributeError`` 。
+    不允许动态插入/修改/删除枚举成员，否则将会抛出 ``AttributeError`` 。
+
     >>> Color.RED = 4 # 抛出AttributeError
     >>> del Color.RED # 抛出AttributeError
 
-    - 值查找：通过值查找对应的枚举成员，如果值不存在，则抛出 ``ValueError`` 。
+    值查找：通过值查找对应的枚举成员，如果值不存在，则抛出 ``ValueError`` 。
+
     >>> Color(1)
     <Color.RED: 1>
 
-    - 名称查找：通过字符串名称查找对应的枚举成员，如果名称不存在，则抛出 ``KeyError`` 。
+    名称查找：通过字符串名称查找对应的枚举成员，如果名称不存在，则抛出 ``KeyError`` 。
+
     >>> Color['RED']
     <Color.RED: 1>
 
-    - 成员数量：可通过 ``len()`` 函数获取枚举成员数量。
+    可通过 ``len()`` 函数获取枚举成员数量。
+
     >>> len(Color)
     3
 
-    - 成员遍历：可通过 ``for`` 循环等方式遍历枚举成员，或通过枚举类的 ``.__members__`` 属性获取成员字典，该字典的key和value对应成员名称和成员对象。
+    可通过 ``for`` 循环等方式遍历枚举成员，或通过枚举类的 ``.__members__`` 属性获取成员字典，该字典的 key 和 value 对应成员名称和成员对象。
+
     >>> for member in Color:
     ...     print member.name, member.value
     ...
@@ -379,7 +393,8 @@ class Enum(object): # noqa
     'GREEN' 2
     'BLUE' 3
 
-    - 成员判断：可通过 ``in`` 关键字判断某个对象是否是枚举成员。
+    可通过 ``in`` 关键字判断某个对象是否是枚举成员。
+
     >>> 1 in Color
     True
     >>> Color.RED in Color
@@ -387,8 +402,9 @@ class Enum(object): # noqa
     >>> 4 in Color
     False
 
-    - 自动生成枚举值：使用 ``auto()`` 可自动生成枚举值，而无需手动编写。默认情况下，值从 ``1`` 开始递增。
-      你也可以自定义 ``auto()`` 的值生成逻辑，详见 ``auto()`` 的说明文档。
+    使用 ``auto()`` 可自动生成枚举值，而无需手动编写。默认情况下，值从 ``1`` 开始递增。
+    你也可以自定义 ``auto()`` 的值生成逻辑，详见 ``auto()`` 的说明文档。
+
     >>> class Color(Enum):
     ...     RED = auto()
     ...     GREEN = auto()
@@ -494,6 +510,9 @@ class IntEnum(int, Enum): # noqa
 
     ``IntEnum`` 拥有 ``Enum`` 的全部特性，且其枚举成员同时也是 ``int`` 类型，支持所有整数运算。
 
+    示例
+    ----
+
     >>> class Permission(IntEnum):
     ...     VISITOR = 0
     ...     MEMBER = 1
@@ -512,6 +531,9 @@ class StrEnum(str, Enum): # noqa
 
     ``StrEnum`` 拥有 ``Enum`` 的全部特性，且其枚举成员同时也是 ``str`` 类型，支持所有字符串运算。
 
+    示例
+    ----
+
     >>> class Permission(StrEnum):
     ...     VISITOR = "visitor"
     ...     MEMBER = "member"
@@ -519,8 +541,8 @@ class StrEnum(str, Enum): # noqa
     ...
     >>> Permission.VISITOR
     'visitor'
-    >>> "My permission is %s." % Permission.VISITOR
-    'My permission is visitor.'
+    >>> "I am a %s." % Permission.VISITOR
+    'I am a visitor.'
 
     此外，使用 ``auto()`` 自动生成的枚举值与枚举名相同。
 
@@ -538,6 +560,7 @@ class StrEnum(str, Enum): # noqa
         return name
 
 
+# todo
 class Flag(Enum): # noqa
     """
     标志枚举类。
@@ -548,6 +571,7 @@ class Flag(Enum): # noqa
         return 1 << count
 
 
+# todo
 class IntFlag(int, Flag): # noqa
     """
     整数类型标志枚举类。

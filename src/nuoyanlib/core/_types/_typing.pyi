@@ -5,13 +5,13 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-30
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
 
 import sys
-from typing import Protocol, Iterator, TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
+from typing import ClassVar, Protocol, Iterator, TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from ...client.ui.nyc import *
@@ -42,6 +42,9 @@ STuple = Tuple[str, ...]
 Matrix = List[List[float]]
 Args = Tuple[Any, ...]
 Kwargs = Dict[str, Any]
+SlotsType = ClassVar[STuple]
+
+
 ArgsDict = Dict[str, PyBasicTypes]
 EntFilter = Optional[Callable[[str], bool]]
 TimeEaseFuncType = Callable[[float], float]

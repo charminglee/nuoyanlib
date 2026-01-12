@@ -5,18 +5,18 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-30
+#   Date  : 2026-1-12
 #  ⠀
 # =================================================
 
 
 import mod.server.extraServerApi as s_api
+from ... import config
 from .. import _const, _logging
 from .._utils import singleton
 from .._sys import NuoyanLibBaseSystem, load_extensions
 from ..listener import ServerEventProxy, _lib_sys_event
 from .comp import ServerSystem, CF
-from ... import config
 
 
 @singleton
@@ -37,8 +37,10 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
             del CF._cache[entity_id]
 
     def UiInitFinished(self, args):
+        player_id = args.__id__
         if self.query_cache:
-            self.NotifyToClient(args.__id__, "_SetQueryCache", self.query_cache)
+            self.NotifyToClient(player_id, "_SetQueryCache", self.query_cache)
+        self.sync_all(player_id)
 
     # def LoadServerAddonScriptsAfter(self, args):
     #     load_extensions()

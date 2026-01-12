@@ -5,13 +5,13 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-22
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
 
-from typing import List, Optional, Any, Iterable, Iterator, Callable, ClassVar, Literal, Union, overload, Dict
-from ..core._types._typing import STuple, FTuple3, FTuple2, Self, VectorLike, Scalar, GeneralVector
+from typing import List, Optional, Any, Iterable, Iterator, Callable, Literal, Union, overload, Dict
+from ..core._types._typing import SlotsType, FTuple3, FTuple2, Self, VectorLike, Scalar, GeneralVector
 
 
 _ZERO_EPS: float
@@ -27,7 +27,7 @@ _OP_MAP = Dict[str, Callable[[Any, Any], Any]]
 
 
 class Vector(object):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _x: float
     _y: float
     _z: float

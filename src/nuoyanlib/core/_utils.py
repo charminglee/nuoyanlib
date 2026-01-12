@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-30
+#   Date  : 2026-1-11
 #  ⠀
 # =================================================
 
@@ -15,6 +15,11 @@ from types import MethodType
 from functools import wraps
 from ._doc import signature, get_signature
 from ._sys import is_client
+
+
+def get_file_path(index=-2):
+    stack = traceback.extract_stack()
+    return stack[index][0] if stack else ""
 
 
 def parse_indices(index, length, cls, op=None):

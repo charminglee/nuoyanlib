@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
@@ -291,7 +291,7 @@ def explode_damage(
 
 def _visualize_area(area_type, *args):
     try:
-        get_lib_system(False).BroadcastToAllClient(
+        get_lib_system().BroadcastToAllClient(
             "_NuoyanLibVisualizeArea",
             {'area_type': area_type, 'args': args}
         )

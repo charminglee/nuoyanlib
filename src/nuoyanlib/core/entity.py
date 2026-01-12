@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
@@ -26,7 +26,7 @@ class Entity(object):
         if _is_client is None:
             _is_client = is_client()
         self._is_client = _is_client
-        self._cf = get_cf(entity_id, _is_client)
+        self._cf = get_cf(entity_id)
         self.entity_id = entity_id
 
     # region Properties ================================================================================================

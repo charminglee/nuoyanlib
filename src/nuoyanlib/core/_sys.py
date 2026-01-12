@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-1-12
 #  ⠀
 # =================================================
 
 
+from collections import defaultdict
 import threading
 import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
@@ -58,25 +59,17 @@ def check_env(target):
         raise error.AcrossImportError
 
 
-_lib_client = None
-_lib_server = None
+_THREAD_LOCAL = threading.local()
 
 
-def get_lib_system(_is_client=None):
-    if _is_client is None:
-        _is_client = is_client()
-    if _is_client:
-        global _lib_client
-        if not _lib_client:
+def get_lib_system():
+    if not hasattr(_THREAD_LOCAL, 'lib_sys'):
+        if is_client():
             from .client._lib_client import instance
-            _lib_client = instance()
-        return _lib_client
-    else:
-        global _lib_server
-        if not _lib_server:
+        else:
             from .server._lib_server import instance
-            _lib_server = instance()
-        return _lib_server
+        _THREAD_LOCAL.lib_sys = instance()
+    return _THREAD_LOCAL.lib_sys
 
 
 def is_client():
@@ -91,56 +84,30 @@ def is_client():
     return threading.current_thread().name == "MainThread"
 
 
-def get_api(_is_client=None):
-    if _is_client is None:
-        _is_client = is_client()
-    return c_api if _is_client else s_api
+def get_api():
+    if not hasattr(_THREAD_LOCAL, 'api'):
+        _THREAD_LOCAL.api = c_api if is_client() else s_api
+    return _THREAD_LOCAL.api
 
 
-def get_comp_factory(_is_client=None):
-    return get_api(_is_client).GetEngineCompFactory()
-
-
-_CLvComp = None
-_SLvComp = None
-
-
-def get_lv_comp(_is_client=None):
-    if _is_client is None:
-        _is_client = is_client()
-    if _is_client:
-        global _CLvComp
-        if not _CLvComp:
+def get_lv_comp():
+    if not hasattr(_THREAD_LOCAL, 'LvComp'):
+        if is_client():
             from .client.comp import LvComp
-            _CLvComp = LvComp
-        return _CLvComp
-    else:
-        global _SLvComp
-        if not _SLvComp:
+        else:
             from .server.comp import LvComp
-            _SLvComp = LvComp
-        return _SLvComp
+        _THREAD_LOCAL.LvComp = LvComp
+    return _THREAD_LOCAL.LvComp
 
 
-_CCF = None
-_SCF = None
-
-
-def get_cf(entity_id, _is_client=None):
-    if _is_client is None:
-        _is_client = is_client()
-    if _is_client:
-        global _CCF
-        if not _CCF:
+def get_cf(entity_id):
+    if not hasattr(_THREAD_LOCAL, 'CF'):
+        if is_client():
             from .client.comp import CF
-            _CCF = CF
-        return _CCF(entity_id)
-    else:
-        global _SCF
-        if not _SCF:
+        else:
             from .server.comp import CF
-            _SCF = CF
-        return _SCF(entity_id)
+        _THREAD_LOCAL.CF = CF
+    return _THREAD_LOCAL.CF(entity_id)
 
 
 LEVEL_ID = get_api().GetLevelId()
@@ -152,7 +119,14 @@ class NuoyanLibBaseSystem(object):
         self.__tick = 0
         self.cond_func = {}
         self.cond_state = {}
-        self.event_pool = {}
+        self.all_sd = defaultdict(list)
+        self.unregister_sd_data = {}
+        self.is_client = is_client()
+        if self.is_client:
+            sys_name = _const.LIB_SERVER_NAME
+        else:
+            sys_name = _const.LIB_CLIENT_NAME
+        self.native_listen(_const.LIB_NAME, sys_name, "_NuoyanLibSyncData", self._NuoyanLibSyncData)
 
     @classmethod
     def register(cls):
@@ -169,6 +143,11 @@ class NuoyanLibBaseSystem(object):
             path = cls.__module__ + "." + cls.__name__
             return bool(api.RegisterSystem(_const.LIB_NAME, sys_name, path))
 
+    def Destroy(self):
+        self.UnListenAllEvents() # noqa
+        self.cond_func.clear()
+        self.cond_state.clear()
+
     def Update(self):
         self.__tick += 1
         for cond_id, (cond, func, freq) in self.cond_func.items():
@@ -179,12 +158,6 @@ class NuoyanLibBaseSystem(object):
             if curr_state != old_state:
                 func(curr_state)
                 self.cond_state[cond_id] = curr_state
-
-    def Destroy(self):
-        self.UnListenAllEvents() # noqa
-        self.cond_func.clear()
-        self.cond_state.clear()
-        self.event_pool.clear()
 
     def native_listen(self, ns, sys_name, event_name, method, priority=0):
         self.ListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # noqa
@@ -205,6 +178,55 @@ class NuoyanLibBaseSystem(object):
             del self.cond_state[cond_id]
             return True
         return False
+
+    # region SyncData ==================================================================================================
+
+    def _NuoyanLibSyncData(self, all_data):
+        for k, v in all_data.items():
+            if k in self.all_sd:
+                for sd in self.all_sd[k]:
+                    if sd._flag != sd.F_SOURCE:
+                        sd._on_engine_sync(v)
+            else:
+                self.unregister_sd_data[k] = v
+
+    def register_sd(self, sd):
+        k = sd.key
+        if k in self.all_sd and self.all_sd[k][0]._flag == sd.F_SOURCE:
+            # 已存在同名数据源
+            raise KeyError("SyncData key '%s' already exists" % k)
+        if sd._flag != sd.F_SOURCE:
+            if k in self.all_sd:
+                sd.value = self.all_sd[k][0].value
+            elif k in self.unregister_sd_data:
+                sd.value = self.unregister_sd_data.pop(k)
+        self.all_sd[k].append(sd)
+
+    def sync(self, key):
+        data = {key: self.all_sd[key][0].value}
+        if self.is_client:
+            self.NotifyToServer("_NuoyanLibSyncData", data) # noqa
+        else:
+            self.BroadcastToAllClient("_NuoyanLibSyncData", data) # noqa
+
+    def sync_all(self, player_id=None):
+        if not self.all_sd:
+            return
+        all_data = {
+            key: sd_list[0].value
+            for key, sd_list in self.all_sd.items()
+            if len(sd_list) == 1
+        }
+        if self.is_client:
+            self.NotifyToServer("_NuoyanLibSyncData", all_data) # noqa
+        else:
+            if player_id:
+                self.NotifyToClient(player_id, "_NuoyanLibSyncData", all_data) # noqa
+            else:
+                self.BroadcastToAllClient("_NuoyanLibSyncData", all_data) # noqa
+
+    # endregion
+
 
 
 

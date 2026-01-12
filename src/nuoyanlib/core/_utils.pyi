@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-26
+#   Date  : 2026-1-11
 #  ⠀
 # =================================================
 
@@ -17,6 +17,7 @@ from ._types._typing import Self, ITuple, T, F, TypeT
 from ._types._checker import args_type_check
 
 
+def get_file_path(index: int = -2) -> str: ...
 @overload
 def parse_indices(index: slice, length: int, cls: type, op: Callable[[int], T]) -> List[T]: ...
 @overload

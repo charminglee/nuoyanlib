@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
@@ -171,10 +171,10 @@ def notify_error(player_id=None):
     :rtype: None
     """
     from traceback import format_exc
-    ic = is_client()
-    lv_comp = get_lv_comp(ic)
+    client = is_client()
+    lv_comp = get_lv_comp()
     for line in format_exc().splitlines():
-        if ic:
+        if client:
             lv_comp.TextNotifyClient.SetLeftCornerNotify(line)
         else:
             lv_comp.Msg.NotifyOneMessage(player_id, line)

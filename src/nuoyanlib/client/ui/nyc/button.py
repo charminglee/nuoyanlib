@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-12
 #  ⠀
 # =================================================
 
@@ -82,16 +82,16 @@ class NyButton(InteractableControl, NyControl):
         self.touch_event_params = kwargs['touch_event_params']
         self.default_img = self / NyButton.DEFAULT_IMG_PATH
         if self.default_img:
-            self.default_img.to_image()
+            self.default_img = self.default_img.to_image()
         self.hover_img = self / NyButton.HOVER_IMG_PATH
         if self.hover_img:
-            self.hover_img.to_image()
+            self.hover_img = self.hover_img.to_image()
         self.pressed_img = self / NyButton.PRESSED_IMG_PATH
         if self.pressed_img:
-            self.pressed_img.to_image()
+            self.pressed_img = self.pressed_img.to_image()
         self.btn_label = self / NyButton.BTN_LABEL_PATH
         if self.btn_label:
-            self.btn_label.to_label()
+            self.btn_label = self.btn_label.to_label()
         self._base_control.AddTouchEventParams(self.touch_event_params)
         self._base_control.AddHoverEventParams()
 

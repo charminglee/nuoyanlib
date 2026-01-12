@@ -5,19 +5,19 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
 
 from typing import Dict, Union, Tuple, Callable, TypeVar, Optional, Any, List, Iterator, overload, Iterable, Generic, ClassVar
 from mod.client.ui.controls.gridUIControl import GridUIControl
-from .control import NyControl
-from ....core._types._typing import Self, ITuple2, STuple, UiPathOrNyControl, T, T2
+from ....core._types._typing import Self, ITuple2, STuple, UiPathOrNyControl, T, T2, SlotsType
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ....utils.enum import GridCallbackType
 from ..screen_node import ScreenNodeExtension
+from .control import NyControl
 
 
 __NyControlT = TypeVar("__NyControlT", covariant=True, bound=NyControl)
@@ -60,7 +60,7 @@ def _coord_2_index(x: int, y: int, dx: int) -> int: ...
 
 
 class ElemGroup(Iterable[__NyControlT]):
-    __slots__: ClassVar[STuple]
+    __slots__: SlotsType
     _ALLOWED_SET_ATTRS: ClassVar[STuple]
     _ALLOWED_GET_ATTRS: ClassVar[STuple]
     _ALLOWED_METHODS: ClassVar[STuple]

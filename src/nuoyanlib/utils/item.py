@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-10
 #  ⠀
 # =================================================
 
 
 from mod.common.minecraftEnum import ItemPosType
-from ..core._sys import get_comp_factory, LEVEL_ID
+from ..core._sys import get_cf, get_lv_comp
 
 
 __all__ = [
@@ -117,7 +117,7 @@ def get_item_count(player_id, name, aux=-1):
     :rtype: int
     """
     count = 0
-    items = get_comp_factory().CreateItem(player_id).GetPlayerAllItems(ItemPosType.INVENTORY)
+    items = get_cf(player_id).Item.GetPlayerAllItems(ItemPosType.INVENTORY)
     for item in items:
         if is_empty_item(item):
             continue
@@ -225,9 +225,8 @@ def get_max_stack(item):
     aux = item.get('newAuxValue', 0)
     if aux == -1:
         aux = 0
-    comp = get_comp_factory().CreateItem(LEVEL_ID)
     try:
-        return comp.GetItemBasicInfo(name, aux)['maxStackSize']
+        return get_lv_comp().Item.GetItemBasicInfo(name, aux)['maxStackSize']
     except KeyError:
         return -1
 
