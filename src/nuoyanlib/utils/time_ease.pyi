@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -31,6 +31,7 @@ class TimeEase(object):
     _diff_val: float
     _val: float
     _state: int
+    _is_static: bool
     def __init__(
         self: Self,
         start_val: float,
@@ -43,8 +44,18 @@ class TimeEase(object):
         on_start: Optional[Callable[[], Any]] = None,
         on_end: Optional[Callable[[], Any]] = None,
     ) -> None: ...
+    @staticmethod
+    def static(
+        val: float,
+        total_tm: float,
+        hold_on_last_frame: bool = False,
+        next_te: Optional[TimeEase] = None,
+        on_start: Optional[Callable[[], Any]] = None,
+        on_end: Optional[Callable[[], Any]] = None,
+    ) -> TimeEase: ...
     def __iter__(self) -> TimeEase: ...
     def _on_start(self) -> None: ...
     def _on_end(self) -> None: ...
-    def next(self) -> float: ...
+    def __next__(self) -> float: ...
+    next = __next__
     def reset(self) -> None: ...

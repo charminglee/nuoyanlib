@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -24,7 +24,10 @@ class TimeEase(object):
     """
     时间缓动类。
 
-    内置各种时间缓动函数，可用于实现UI动画、运镜等的平滑过渡效果。
+    用于实现UI动画、运镜等功能的平滑过渡效果。
+
+    说明
+    ----
 
     时间缓动对象为一个迭代器，每次迭代或调用 ``.next()`` 方法时，会返回最新的缓动值。缓动值按照以下公式进行计算：
 
@@ -39,14 +42,12 @@ class TimeEase(object):
     :param float start_val: 初始值
     :param float end_val: 最终值
     :param float total_tm: 变化总时间，单位为秒
-    :param int fps: 变化帧率，小于等于0的值将根据真实时间确定缓动值；默认为0
-    :param bool hold_on_last_frame: 是否停止在最后一帧；若设为True，TimeEase可无限迭代，变化结束后将始终返回最后一帧的值；若设为False，变化结束后继续迭代将抛出StopIteration异常；默认为False
-    :param function ease_func: 时间缓动函数，可使用TimeEaseFunc提供的函数或自定义函数，如线性函数 lambda x: x ，参数x表示经过的时间比例，取值范围为 [0,⠀1] ，即只取缓动函数定义域中 [0,⠀1] 部分的值；默认为TimeEaseFunc.linear
-    :param TimeEase|None next_te: 下一个时间缓动对象，若提供，则当前缓动迭代结束后自动切换到下一个缓动对象继续迭代；默认为None
-    :param function|None on_start: 缓动开始时调用的函数；默认为None
-    :param function|None on_end: 缓动结束时调用的函数；默认为None
-
-    :raise ValueError: 传入的参数错误，请检查参数是否符合要求
+    :param int fps: 变化帧率，小于等于 0 的值将根据现实时间确定缓动值；默认为 0
+    :param bool hold_on_last_frame: 是否停止在最后一帧；若设为 True，TimeEase 可无限迭代，变化结束后将始终返回最后一帧的值；若设为 False，变化结束后继续迭代将抛出 StopIteration 异常；默认为 False
+    :param function ease_func: 时间缓动函数，可使用 TimeEaseFunc 提供的预设函数或自定义函数，如线性缓动 lambda x: x ，参数 x 表示经过的时间比例，取值范围为 [0,⠀1]；默认为 TimeEaseFunc.LINEAR
+    :param TimeEase|None next_te: 下一个时间缓动对象；若提供，则当前缓动迭代结束后自动切换到下一个缓动对象继续迭代；默认为 None
+    :param function|None on_start: 变化开始时触发的回调函数；默认为None
+    :param function|None on_end: 变化结束时触发的回调函数；默认为None
     """
 
     def __init__(
@@ -76,6 +77,35 @@ class TimeEase(object):
         self._diff_val = self.end_val - self.start_val
         self._val = 0
         self._state = 0
+        self._is_static = False
+
+    @staticmethod
+    def static(val, total_tm, hold_on_last_frame=False, next_te=None, on_start=None, on_end=None):
+        """
+        创建一个静态的时间缓动对象，始终返回相同的值。
+
+        -----
+
+        :param float val: 静态值
+        :param float total_tm: 变化总时间，单位为秒
+        :param bool hold_on_last_frame: 是否停止在最后一帧；若设为 True，TimeEase 可无限迭代，变化结束后将始终返回最后一帧的值；若设为 False，变化结束后继续迭代将抛出 StopIteration 异常；默认为 False
+        :param TimeEase|None next_te: 下一个时间缓动对象；若提供，则当前缓动迭代结束后自动切换到下一个缓动对象继续迭代；默认为 None
+        :param function|None on_start: 变化开始时触发的回调函数；默认为None
+        :param function|None on_end: 变化结束时触发的回调函数；默认为None
+
+        :return: 时间缓动对象
+        :rtype: TimeEase
+        """
+        te = TimeEase(
+            val, val, total_tm,
+            hold_on_last_frame=hold_on_last_frame,
+            next_te=next_te,
+            on_start=on_start,
+            on_end=on_end,
+        )
+        te._val = val
+        te._is_static = True
+        return te
 
     def __iter__(self):
         return self
@@ -98,10 +128,12 @@ class TimeEase(object):
             self.ease_func = self.next_te.ease_func
             self.on_start = self.next_te.on_start
             self.on_end = self.next_te.on_end
+            self._val = self.next_te._val
+            self._is_static = self.next_te._is_static
             self.next_te = self.next_te.next_te
             self.reset()
 
-    def next(self):
+    def __next__(self):
         """
         计算并返回下一个缓动值。
 
@@ -117,6 +149,7 @@ class TimeEase(object):
                 return self._val
             else:
                 raise StopIteration
+
         if self.total_tm <= 0:
             x = 1
         elif self.fps > 0:
@@ -126,10 +159,15 @@ class TimeEase(object):
             if self._init_tm == 0:
                 self._init_tm = time.time()
             x = min((time.time() - self._init_tm) / self.total_tm, 1)
-        self._val = self.start_val + self.ease_func(x) * self._diff_val
+
+        if not self._is_static:
+            self._val = self.start_val + self.ease_func(x) * self._diff_val
+
         if x >= 1:
             self._on_end()
         return self._val
+
+    next = __next__
 
     def reset(self):
         """
@@ -146,9 +184,9 @@ class TimeEase(object):
         self._diff_val = self.end_val - self.start_val
         self._state = 0
 
+    # todo
     def pause(self):
         pass
-        # todo
 
 
 
