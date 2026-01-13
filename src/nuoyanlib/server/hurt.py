@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-10
+#   Date  : 2026-1-13
 #  ⠀
 # =================================================
 
@@ -41,20 +41,18 @@ def ignore_dmg_cd(restore_cd=10):
 
     用于忽略生物受击后的 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 。
 
-    -----
+    示例
+    ----
 
-    【示例】
-
-    ::
-
-        import myScripts.nuoyanlib.server as nyl
-
-        with nyl.ignore_dmg_cd():
-            # 在with范围内伤害免疫时间会被设为0
-            comp = nyl.CF(entity_id).Hurt
-            comp.Hurt(10, "entity_attack")
-            comp.Hurt(10, "entity_attack")
-        # 上下文管理器退出
+    >>> from mod.common.minecraftEnum import ActorDamageCause
+    >>> with nyl.ignore_dmg_cd():
+    ...     # 在 with 范围内伤害免疫时间会被设为0
+    ...     comp = nyl.CF(entity_id).Hurt
+    ...     # 在同一帧内造成两次伤害，总伤害为20
+    ...     comp.Hurt(10, ActorDamageCause.EntityAttack)
+    ...     comp.Hurt(10, ActorDamageCause.EntityAttack)
+    ... # 上下文管理器退出
+    ...
 
     -----
 

@@ -16,7 +16,4 @@
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />
   </component>
-  <component name="PyDocumentationSettings">
-    <option name="analyzeDoctest" value="false" />
-  </component>
 </module>

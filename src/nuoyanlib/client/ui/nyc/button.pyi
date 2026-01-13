@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-13
 #  ⠀
 # =================================================
 
@@ -87,7 +87,6 @@ class NyButton(InteractableControl, NyControl):
         self: Self,
         screen_node_ex: ScreenNodeExtension,
         btn_control: ButtonUIControl,
-        /,
         *,
         touch_event_params: Optional[dict] = None,
     ) -> None: ...

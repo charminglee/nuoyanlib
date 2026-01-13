@@ -1,20 +1,47 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-11
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
 
+import threading
 import traceback
 from types import MethodType
 from functools import wraps
 from ._doc import signature, get_signature
 from ._sys import is_client
+
+
+VOID = object()
+
+
+class DefaultLocal(object):
+    def __init__(self, default_factory=lambda: None):
+        object.__setattr__(self, '_default_factory', default_factory)
+        object.__setattr__(self, '_local', threading.local())
+
+    def __getattribute__(self, name):
+        local = object.__getattribute__(self, '_local')
+        value = getattr(local, name, VOID)
+        if value is VOID:
+            factory = object.__getattribute__(self, '_default_factory')
+            value = factory()
+            local.__setattr__(name, value)
+        return value
+
+    def __setattr__(self, name, value):
+        local = object.__getattribute__(self, '_local')
+        return local.__setattr__(name, value)
+
+    def __delattr__(self, name):
+        local = object.__getattribute__(self, '_local')
+        return local.__delattr__(name)
 
 
 def get_file_path(index=-2):
@@ -432,6 +459,15 @@ def hook_method(org_method, before_hook=None, after_hook=None):
 
 
 def __test__():
+    dl = DefaultLocal(list)
+    def f():
+        dl.lst.append(1)
+        assert dl.lst == [1]
+    f()
+    t = threading.Thread(target=f)
+    t.start()
+    t.join()
+
     class A(object):
         def __init__(self):
             self.lst = []

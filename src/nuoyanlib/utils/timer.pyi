@@ -1,28 +1,25 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
 
-from typing import Callable, Any, Optional, overload, Hashable, Dict
+from typing import Callable, Any, Optional, overload, Hashable
 from threading import Timer as _Timer
-from mod.common.utils.timer import CallLater
 from ..core._types._typing import Self, F
+from ..core._utils import DefaultLocal
 
 
-_c_delay_timers: Dict[Hashable, CallLater]
-_s_delay_timers: Dict[Hashable, CallLater]
-_c_repeat_timers: Dict[Hashable, CallLater]
-_s_repeat_timers: Dict[Hashable, CallLater]
+_timers: DefaultLocal[dict]
 
 
-def _set_timer(t: float, func: Callable[[], Any], is_repeat: bool, key: Optional[Hashable]) -> None: ...
+def _add_timer(t: float, func: Callable[[], Any], is_repeat: bool, key: Optional[Hashable]) -> None: ...
 @overload
 def delay(t: float = 0, key: Optional[Hashable] = None) -> Callable[[F], F]: ...
 @overload

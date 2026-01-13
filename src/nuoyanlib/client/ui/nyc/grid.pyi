@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-10
+#   Date  : 2026-1-13
 #  ⠀
 # =================================================
 
@@ -104,7 +104,6 @@ class NyGrid(NyControl):
         self: Self,
         screen_node_ex: ScreenNodeExtension,
         grid_control: GridUIControl,
-        /,
         *,
         is_stack_grid: bool = False,
         template_name: str = "",

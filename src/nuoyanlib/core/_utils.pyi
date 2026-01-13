@@ -1,20 +1,33 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-11
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
 
+from threading import local
 import sys
 from types import MethodType
-from typing import Hashable, List, Callable, Any, Dict, Type, Union, Tuple, Optional, Generator, overload
+from typing import Generic, Hashable, List, Callable, Any, Dict, Type, Union, Tuple, Optional, Generator, overload
 from ._types._typing import Self, ITuple, T, F, TypeT
 from ._types._checker import args_type_check
+
+
+VOID: object
+
+
+class DefaultLocal(Generic[T]):
+    _default_factory: Callable[[], T]
+    _local: local
+    def __init__(self: Self, default_factory: Callable[[], T] = lambda: None) -> None: ...
+    def __getattribute__(self, name: str) -> Union[T, Any]: ...
+    def __setattr__(self, name: str, value: Any) -> None: ...
+    def __delattr__(self, name: str) -> None: ...
 
 
 def get_file_path(index: int = -2) -> str: ...
