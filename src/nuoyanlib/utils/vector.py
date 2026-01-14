@@ -551,7 +551,10 @@ class Vector(object):
         """
         return Vector(self)
 
-    __pos__ = __deepcopy__ = __copy__ = copy
+    __pos__ = __copy__ = copy
+    
+    def __deepcopy__(self, memo):
+        return Vector(self)
 
     def __repr__(self):
         if self._dim == 2:
