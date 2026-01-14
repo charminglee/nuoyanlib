@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -29,8 +29,8 @@ class NyPaperDoll(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 纸娃娃所在UI类的实例（需继承ScreenNodeExtension）
-    :param NeteasePaperDollUIControl paper_doll_control: 通过asNeteasePaperDoll()等方式获取的NeteasePaperDollUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 纸娃娃所在UI类的实例（需继承 ScreenNodeExtension）
+    :param NeteasePaperDollUIControl paper_doll_control: 通过 asNeteasePaperDoll() 等方式获取的 NeteasePaperDollUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.NETEASE_PAPER_DOLL

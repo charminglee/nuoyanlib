@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-12
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -40,9 +40,9 @@ class NyButton(InteractableControl, NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 按钮所在UI类的实例（需继承ScreenNodeExtension）
-    :param ButtonUIControl btn_control: 通过asButton()等方式获取的ButtonUIControl实例
-    :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为None，详细说明见AddTouchEventParams
+    :param ScreenNodeExtension screen_node_ex: 按钮所在UI类的实例（需继承 ScreenNodeExtension）
+    :param ButtonUIControl btn_control: 通过 asButton() 等方式获取的 ButtonUIControl 实例
+    :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为 None，详细说明见 AddTouchEventParams
     """
 
     CONTROL_TYPE = ControlType.BUTTON
@@ -197,9 +197,12 @@ class NyButton(InteractableControl, NyControl):
         """
         设置按钮回调函数。
 
+        说明
+        ----
+
         支持对同一个按钮设置多个同类型的回调，按设置顺序依次触发。
 
-        注意：调用本方法后请勿再调用ModSDK的设置按钮回调的接口（如 ``.SetButtonTouchUpCallback()``），
+        调用本方法后请勿再调用 ModSDK 的设置按钮回调的接口（如 ``.SetButtonTouchUpCallback()`` ），
         否则所有通过本方法设置的回调函数将无效。
 
         -----
@@ -285,7 +288,10 @@ class NyButton(InteractableControl, NyControl):
         """
         开启按钮拖动。
 
-        开启拖动后，如需对该按钮设置回调函数，请使用 ``.set_callback()`` ，不要使用ModSDK中的接口。
+        说明
+        ----
+
+        开启拖动后，如需对该按钮设置回调函数，请使用 ``.set_callback()`` ，不要使用 ModSDK 中的接口。
 
         -----
 
@@ -303,7 +309,10 @@ class NyButton(InteractableControl, NyControl):
         """
         开启按钮长按拖动（长按后才能拖动）。
 
-        设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``.set_callback()`` ，不要使用ModSDK中的接口。
+        说明
+        ----
+
+        设置可拖动后，如果需要对该按钮设置回调函数，请使用 ``.set_callback()`` ，不要使用 ModSDK 中的接口。
 
         -----
 
@@ -401,6 +410,9 @@ class NyButton(InteractableControl, NyControl):
     def save_pos_data(self):
         """
         保存按钮位置数据。
+
+        说明
+        ----
 
         关联拖动的其他控件的位置数据也会一并保存，下次进入游戏（创建界面）时自动恢复位置。
         为保证安全，当控件超出屏幕边界时，将保存失败。

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-4
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -35,7 +35,7 @@ __all__ = [
 
 def pop_to_hud():
     """
-    依次弹出栈顶UI直到HUD界面。
+    依次弹出栈顶UI直到 HUD 界面。
 
     -----
 
@@ -88,16 +88,16 @@ def create_ui(namespace, ui_key, cls_path, screen_def="", register=True, param=N
 
     -----
 
-    :param str namespace: 命名空间，建议为mod名字
-    :param str ui_key: UI唯一标识，建议为UI json中的"namespace"的值
+    :param str namespace: 命名空间，建议为 mod 名字
+    :param str ui_key: UI唯一标识，建议为 UI json 中的 "namespace" 的值
     :param str cls_path: UI类路径
-    :param str screen_def: UI画布路径，格式为"<namespace>.<screen_name>"，<namespace>为UI json中"namespace"的值，<screen_name>为想要创建的画布名称；默认为"<ui_key>.main"
-    :param bool register: 创建前是否注册UI；默认为True
-    :param dict|None param: UI参数字典；不通过堆栈管理的方式创建UI时，该参数默认为{'isHud': 1}
-    :param bool push: 是否通过堆栈管理（PushScreen）的方式创建UI；默认为False
-    :param ClientSystem|None client_system: 客户端类实例；默认为None；若指定，可在UI类中通过param字典的 '__cs__' 键获取到该实例
+    :param str screen_def: UI画布路径，格式为 "<namespace>.<screen_name>"，<namespace> 为 UI json 中 "namespace" 的值，<screen_name> 为想要创建的画布名称；默认为 "<ui_key>.main"
+    :param bool register: 创建前是否注册UI；默认为 True
+    :param dict|None param: UI参数字典；不通过堆栈管理的方式创建UI时，该参数默认为 {'isHud': 1}
+    :param bool push: 是否通过堆栈管理（PushScreen）的方式创建UI；默认为 False
+    :param ClientSystem|None client_system: 客户端类实例；默认为 None；若指定，可在UI类中通过 param 字典的 '__cs__' 键获取到该实例
 
-    :return: UI类实例，创建失败时返回None
+    :return: UI类实例，创建失败时返回 None
     :rtype: ScreenNode|None
     """
     if not screen_def:
@@ -142,9 +142,9 @@ def to_control(screen_node, path, control_type=ControlType.BASE_CONTROL):
 
     :param ScreenNode screen_node: 控件所在UI类的实例
     :param str|BaseUIControl path: 控件路径
-    :param ControlType control_type: 控件类型，返回该类型对应的实例，请使用ControlType枚举值；默认为ControlType.BASE_CONTROL
+    :param ControlType control_type: 控件类型，返回该类型对应的实例，请使用 ControlType 枚举值；默认为 ControlType.BASE_CONTROL
 
-    :return: 控件实例，获取不到时返回None
+    :return: 控件实例，获取不到时返回 None
     :rtype: BaseUIControl|None
     """
     control = screen_node.GetBaseUIControl(path) if isinstance(path, str) else path
@@ -160,7 +160,7 @@ def is_out_of_screen(control, screen_node=None):
     -----
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
-    :param ScreenNode|None screen_node: 当control参数传入控件路径时，需要指定控件所在UI类的实例；默认为None
+    :param ScreenNode|None screen_node: 当 control 参数传入控件路径时，需要指定控件所在UI类的实例；默认为 None
 
     :return: 是否超出屏幕范围
     :rtype: bool
@@ -186,7 +186,7 @@ def get_children_path_by_level(control, screen_node, level=1):
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层次；默认为1，传入0或负值时，获取所有层次
+    :param int level: 子控件层次；默认为 1，传入 0 或负值时，获取所有层次
 
     :return: 指定层次的所有子控件路径的列表，获取不到时返回空列表
     :rtype: list[str]
@@ -219,7 +219,7 @@ def get_children_by_level(control, screen_node, level=1):
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层次；默认为1，传入0或负值时，获取所有层次
+    :param int level: 子控件层次；默认为 1，传入 0 或负值时，获取所有层次
 
     :return: 指定层次的所有子控件实例的列表，获取不到时返回空列表
     :rtype: list[BaseUIControl]
@@ -238,7 +238,7 @@ def get_parent_path(control):
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
 
-    :return: 父控件路径，获取不到返回None
+    :return: 父控件路径，获取不到返回 None
     :rtype: str|None
     """
     path = to_path(control)
@@ -254,7 +254,7 @@ def get_parent(control, screen_node):
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
 
-    :return: 父控件实例，获取不到返回None
+    :return: 父控件实例，获取不到返回 None
     :rtype: BaseUIControl|None
     """
     return screen_node.GetBaseUIControl(get_parent_path(control))

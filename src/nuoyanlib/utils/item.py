@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-10
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -29,9 +29,12 @@ def deepcopy_item_dict(item_dict):
     """
     对物品信息字典进行深拷贝。
 
+    说明
+    ----
+
     比标准库的 ``deepcopy`` 效率更高。
 
-    注：该函数进行的深拷贝为伪深拷贝，只会对字典中的字典、列表进行递归深拷贝，其他不可变对象（如元组、字符串等）仍保留原引用。
+    该函数进行的深拷贝为伪深拷贝，只会对字典中的字典、列表进行递归深拷贝，其他不可变对象（如元组、字符串等）仍保留原引用。
 
     -----
 
@@ -72,22 +75,25 @@ def gen_item_dict(
     """
     构造物品信息字典。
 
+    说明
+    ----
+
     该函数返回的物品信息字典可直接传入接口使用。
 
     -----
 
-    :param str newItemName: 必须设置，物品的identifier，即"命名空间:物品名"
-    :param int newAuxValue: 可选，物品附加值；默认为0
-    :param int count: 可选，物品数量，设置为0时为空物品；默认为1
-    :param bool showInHand: 可选，是否显示在手上；默认为True
+    :param str newItemName: 必须设置，物品的 identifier，即 "命名空间:物品名"
+    :param int newAuxValue: 可选，物品附加值；默认为 0
+    :param int count: 可选，物品数量，设置为 0 时为空物品；默认为 1
+    :param bool showInHand: 可选，是否显示在手上；默认为 True
     :param list[tuple[int,int]]|None enchantData: 可选，附魔数据，类型为列表，列表中每个元素为元组：( `附魔类型 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EnchantType.html>`_, 附魔等级)
     :param list[tuple[str,int]]|None modEnchantData: 可选，自定义附魔数据，类型为列表，列表中每个元素为元组：(自定义附魔id, 自定义附魔等级)
     :param str customTips: 可选，物品的自定义tips，修改该内容后会覆盖实例的组件 `netease:customtips <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/1-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%89%A9%E5%93%81/1-%E8%87%AA%E5%AE%9A%E4%B9%89%E5%9F%BA%E7%A1%80%E7%89%A9%E5%93%81.html?key=netease%3Acustomtips&docindex=1&type=0>`_ 的内容
     :param str extraId: 可选，物品自定义标识符，可以用于保存数据，区分物品
-    :param dict|None userData: 可选，物品userData，用于灾厄旗帜、旗帜等物品，请勿随意设置该值
-    :param int durability: 可选，物品耐久度，不存在耐久概念的物品默认值为0
-    :param str itemName: （废弃）1.22及以前版本的旧identifier，详见 `1.23版本物品id变更 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/13-%E6%A8%A1%E7%BB%84SDK%E7%BC%96%E7%A8%8B/2-Python%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91/99-1.23%E7%89%88%E6%9C%AC%E7%89%A9%E5%93%81id%E5%8F%98%E6%9B%B4.html>`_
-    :param str auxValue: （废弃）1.22及以前版本的旧物品附加值，详见 `1.23版本物品id变更 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/13-%E6%A8%A1%E7%BB%84SDK%E7%BC%96%E7%A8%8B/2-Python%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91/99-1.23%E7%89%88%E6%9C%AC%E7%89%A9%E5%93%81id%E5%8F%98%E6%9B%B4.html>`_
+    :param dict|None userData: 可选，物品 userData，用于灾厄旗帜、旗帜等物品，请勿随意设置该值
+    :param int durability: 可选，物品耐久度，不存在耐久概念的物品默认值为 0
+    :param str itemName: （废弃）1.22 及以前版本的旧 identifier，详见 `1.23版本物品id变更 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/13-%E6%A8%A1%E7%BB%84SDK%E7%BC%96%E7%A8%8B/2-Python%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91/99-1.23%E7%89%88%E6%9C%AC%E7%89%A9%E5%93%81id%E5%8F%98%E6%9B%B4.html>`_
+    :param str auxValue: （废弃）1.22 及以前版本的旧物品附加值，详见 `1.23版本物品id变更 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/13-%E6%A8%A1%E7%BB%84SDK%E7%BC%96%E7%A8%8B/2-Python%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91/99-1.23%E7%89%88%E6%9C%AC%E7%89%A9%E5%93%81id%E5%8F%98%E6%9B%B4.html>`_
 
     :return: 物品信息字典
     :rtype: dict
@@ -111,7 +117,7 @@ def get_item_count(player_id, name, aux=-1):
 
     :param str player_id: 玩家的实体ID
     :param str name: 物品名称
-    :param int aux: 物品特殊值（-1表示任意特殊值）；默认为-1
+    :param int aux: 物品特殊值（-1 表示任意特殊值）；默认为 -1
 
     :return: 指定物品在背包中的总数
     :rtype: int
@@ -133,7 +139,7 @@ def set_namespace(name, namespace="minecraft"):
     -----
 
     :param str name: 物品名称
-    :param str namespace: 命名空间；默认为"minecraft"
+    :param str namespace: 命名空间；默认为 "minecraft"
 
     :return: 新的物品名称
     :rtype: str
@@ -178,9 +184,9 @@ def is_same_item(item_dict, *more):
     -----
 
     :param dict item_dict: 物品信息字典
-    :param dict more: [变长位置参数] 可传入1个或多个需要对比的物品信息字典
+    :param dict more: [变长位置参数] 可传入一个或多个需要对比的物品信息字典
 
-    :return: 相同则返回True，否则返回False
+    :return: 相同则返回 True，否则返回 False
     :rtype: bool
     """
     return all(_is_same_item(item_dict, i) for i in more)
@@ -196,9 +202,9 @@ def is_empty_item(item, zero_is_emp=True):
     -----
 
     :param dict item: 物品信息字典
-    :param bool zero_is_emp: 是否把数量为0的物品视为空物品；默认为True
+    :param bool zero_is_emp: 是否把数量为 0 的物品视为空物品；默认为 True
 
-    :return: 空物品则返回True，否则返回False
+    :return: 空物品则返回 True，否则返回 False
     :rtype: bool
     """
     return (
@@ -218,7 +224,7 @@ def get_max_stack(item):
 
     :param dict item: 物品信息字典
 
-    :return: 最大堆叠数量，获取不到返回-1
+    :return: 最大堆叠数量，获取不到返回 -1
     :rtype: int
     """
     name = item['newItemName']

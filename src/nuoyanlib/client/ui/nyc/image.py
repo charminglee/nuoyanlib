@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -31,8 +31,8 @@ class NyImage(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 图片所在UI类的实例（需继承ScreenNodeExtension）
-    :param ImageUIControl image_control: 通过asImage()等方式获取的ImageUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 图片所在UI类的实例（需继承 ScreenNodeExtension）
+    :param ImageUIControl image_control: 通过 asImage() 等方式获取的 ImageUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.IMAGE
@@ -71,7 +71,7 @@ class NyImage(NyControl):
         """
         [只写属性]
 
-        图片颜色rgb，取值[0, 1]。
+        图片颜色 rgb，取值 [0, 1]。
 
         :rtype: None
         """
@@ -82,7 +82,7 @@ class NyImage(NyControl):
         """
         [只写属性]
 
-        图片颜色rgb，取值[0, 1]。
+        图片颜色 rgb，取值 [0, 1]。
 
         :type val: tuple[float,float,float]
         """
@@ -93,9 +93,9 @@ class NyImage(NyControl):
         """
         [只写属性]
 
-        图片的起始uv。
+        图片的起始 uv。
 
-        与json中的 ``"uv"`` 属性作用一致。
+        与 json 中的 ``"uv"`` 属性作用一致。
 
         :rtype: None
         """
@@ -106,9 +106,9 @@ class NyImage(NyControl):
         """
         [只写属性]
 
-        图片的起始uv。
+        图片的起始 uv。
 
-        与json中的 ``"uv"`` 属性作用一致。
+        与 json 中的 ``"uv"`` 属性作用一致。
 
         :type val: tuple[float,float]
         """
@@ -119,9 +119,9 @@ class NyImage(NyControl):
         """
         [只写属性]
 
-        图片的uv大小。
+        图片的 uv 大小。
 
-        与json中的 ``"uv_size"`` 属性作用一致。
+        与 json 中的 ``"uv_size"`` 属性作用一致。
 
         :rtype: None
         """
@@ -132,9 +132,9 @@ class NyImage(NyControl):
         """
         [只写属性]
 
-        图片的uv大小。
+        图片的 uv 大小。
 
-        与json中的 ``"uv_size"`` 属性作用一致。
+        与 json 中的 ``"uv_size"`` 属性作用一致。
 
         :type val: tuple[float,float]
         """
@@ -251,6 +251,9 @@ class NyImage(NyControl):
 
         图片控件相对自身的旋转锚点。
 
+        说明
+        ----
+
         自身的旋转锚点是一个相对坐标，它是根据图片当前所在位置和大小进行计算的，所以一旦设置后，就会每帧都进行位置的计算。
         如果不调用该函数，默认状态下图片的旋转锚点是 ``(0.5,0.5)`` 。
 
@@ -264,6 +267,9 @@ class NyImage(NyControl):
         [可读写属性]
 
         图片控件相对自身的旋转锚点。
+
+        说明
+        ----
 
         自身的旋转锚点是一个相对坐标，它是根据图片当前所在位置和大小进行计算的，所以一旦设置后，就会每帧都进行位置的计算。
         如果不调用该函数，默认状态下图片的旋转锚点是 ``(0.5,0.5)`` 。
@@ -374,11 +380,11 @@ class NyImage(NyControl):
         :param str tex_path: 序列帧贴图路径，请使用%d作为数字占位符，该接口将会按顺序播放 tex_path % 0 到 tex_path % (frame_count - 1) 的贴图
         :param int frame_count: 帧数（一共有多少帧）
         :param int frame_rate: 帧率（每秒播放多少帧）
-        :param int stop_frame: 播放结束后停留在哪一帧，仅loop参数设为False时有效；0为第一帧，1为第二帧，-1为最后一帧，以此类推；默认为-1
-        :param bool loop: 是否循环播放；默认为False
-        :param function|None callback: 播放结束后触发的回调函数，仅loop参数设为False时有效；默认为None
-        :param tuple|None args: 回调函数位置参数元组；默认为None
-        :param dict[str,Any]|None kwargs: 回调函数关键字参数字典；默认为None
+        :param int stop_frame: 播放结束后停留在哪一帧，仅 loop 参数设为 False 时有效；0 为第一帧，1 为第二帧，-1 为最后一帧，以此类推；默认为 -1
+        :param bool loop: 是否循环播放；默认为 False
+        :param function|None callback: 播放结束后触发的回调函数，仅 loop 参数设为 False 时有效；默认为 None
+        :param tuple|None args: 回调函数位置参数元组；默认为 None
+        :param dict[str,Any]|None kwargs: 回调函数关键字参数字典；默认为 None
 
         :return: 无
         :rtype: None

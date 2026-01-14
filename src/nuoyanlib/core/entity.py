@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-10
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -47,7 +47,7 @@ class Entity(object):
         """
         [只读属性]
 
-        实体identifier（TypeStr）。
+        实体 identifier（TypeStr）。
 
         :rtype: str
         """
@@ -81,7 +81,7 @@ class Entity(object):
         """
         [只读属性] [服务端]
 
-        实体NBT数据。
+        实体 NBT 数据。
 
         :rtype: dict[str,Any]|None
         """
@@ -93,7 +93,7 @@ class Entity(object):
         """
         [只读属性] [客户端]
 
-        实体身体y轴旋转角度，如果没有身体，返回0。
+        实体身体y轴旋转角度，如果没有身体，返回 0。
 
         :rtype: float
         """

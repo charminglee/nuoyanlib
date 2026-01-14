@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-12
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -87,10 +87,10 @@ class NyControl(object):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例（需继承ScreenNodeExtension）
-    :param BaseUIControl control: 通过GetBaseUIControl()等方式获取的BaseUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例（需继承 ScreenNodeExtension）
+    :param BaseUIControl control: 通过 GetBaseUIControl() 等方式获取的 BaseUIControl 实例
 
-    :raise TypeError: 控件所在的UI类必须继承ScreenNodeExtension，否则抛出该异常
+    :raise TypeError: 控件所在的UI类必须继承 ScreenNodeExtension，否则抛出该异常
     """
 
     CONTROL_TYPE = ControlType.BASE_CONTROL
@@ -170,7 +170,7 @@ class NyControl(object):
         """
         [只读属性]
 
-        父控件路径，没有父控件时返回None，若父控件为根画布（main），返回空字符串。
+        父控件路径，没有父控件时返回 None，若父控件为根画布（main），返回空字符串。
 
         :rtype: str
         """
@@ -565,7 +565,7 @@ class NyControl(object):
         """
         [可读写属性]
 
-        获取PropertyBag。
+        获取 PropertyBag。
 
         :rtype: dict|None
         """
@@ -576,7 +576,7 @@ class NyControl(object):
         """
         [可读写属性]
 
-        设置PropertyBag，将使用字典中的每个值来覆盖原本PropertyBag中的值。
+        设置 PropertyBag，将使用字典中的每个值来覆盖原本 PropertyBag 中的值。
 
         :type val: dict
         """
@@ -595,7 +595,7 @@ class NyControl(object):
 
         :param str other: 相对路径
 
-        :return: 子控件的NyControl实例
+        :return: 子控件的 NyControl 实例
         :rtype: NyControl
         """
         if not other.startswith("/"):
@@ -612,7 +612,7 @@ class NyControl(object):
 
         :param str attr: 需要设置的属性名
         :param Any value: 需要设置的值
-        :param int level: 子控件所在层次；默认为1，传入0或负值表示所有层次
+        :param int level: 子控件所在层次；默认为 1，传入 0 或负值表示所有层次
 
         :return: 无
         :rtype: None
@@ -628,11 +628,11 @@ class NyControl(object):
 
         -----
 
-        :param str def_name: 控件定义名称，格式为"<namespace>.<control_name>"；<namespace>对应UI json文件中"namespace"对应的值，UI编辑器生成的UI json文件该值等于文件名；<control_name>对应想创建的控件的名称，该控件需要置于UI json文件顶层（即与main画布同级，不能是任何一个控件的子控件），或在UI编辑器中将该控件添加至自定义控件库
+        :param str def_name: 控件定义名称，格式为 "<namespace>.<control_name>"；<namespace> 对应 UI json 文件中 "namespace" 对应的值，UI编辑器生成的 UI json 文件该值等于文件名；<control_name> 对应想创建的控件的名称，该控件需要置于 UI json 文件顶层（即与 main 画布同级，不能是任何一个控件的子控件），或在UI编辑器中将该控件添加至自定义控件库
         :param str child_name: 控件名称
-        :param bool force_update: 是否需要强制刷新；默认为True；设为True则进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量新建子控件操作且在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新；默认为 True；设为 True 则进行同一帧或者下一帧刷新，设为 False 则当前帧和下一帧均不刷新，需要手动调用 UpdateScreen 进行刷新；如有大量新建子控件操作且在同一帧执行，建议设为 False，需要更新时再调用 UpdateScreen 接口刷新界面及相关控件数据
 
-        :return: 新控件的NyControl实例；若当前控件已存在同名子控件，则返回其NyControl实例；创建失败时返回None
+        :return: 新控件的 NyControl 实例；若当前控件已存在同名子控件，则返回其 NyControl 实例；创建失败时返回 None
         :rtype: NyControl|None
         """
         path = self.path + "/" + child_name
@@ -650,10 +650,10 @@ class NyControl(object):
 
         :param str|BaseUIControl|NyControl parent: 父控件路径或实例
         :param str name: 新控件的名称；默认为当前控件的名称
-        :param bool sync_refresh: 是否需要同步刷新；默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
-        :param bool force_update: 是否需要强制刷新；默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+        :param bool sync_refresh: 是否需要同步刷新；默认为 True；设为 True 时游戏在同一帧计算该控件的 size 等相关数据，设为 False 则在下一帧进行计算；如同一帧有大量 clone 操作建议设为 False，操作结束后调用一次 UpdateScreen 接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新；默认为 True；设为 True 则按照 sync_refresh 逻辑进行同一帧或者下一帧刷新，设为 False 则当前帧和下一帧均不刷新，需要手动调用 UpdateScreen 进行刷新；如有大量 clone 操作且非在同一帧执行，建议设为 False，需要更新时再调用 UpdateScreen 接口刷新界面及相关控件数据
 
-        :return: 新控件的Ny控件实例，类型与当前控件相同；若父控件已存在同名子控件，则返回其NyControl实例；克隆失败时返回None
+        :return: 新控件的Ny控件实例，类型与当前控件相同；若父控件已存在同名子控件，则返回其 NyControl 实例；克隆失败时返回 None
         :rtype: NyControl|None
         """
         parent_path = to_path(parent)
@@ -673,10 +673,10 @@ class NyControl(object):
 
         :param str|BaseUIControl|NyControl control: 被克隆控件的路径或实例
         :param str name: 新控件的名称；默认为被克隆控件的名称
-        :param bool sync_refresh: 是否需要同步刷新；默认为True；设为True时游戏在同一帧计算该控件的size等相关数据，设为False则在下一帧进行计算；如同一帧有大量clone操作建议设为False，操作结束后调用一次UpdateScreen接口刷新界面及相关控件数据
-        :param bool force_update: 是否需要强制刷新；默认为True；设为True则按照sync_refresh逻辑进行同一帧或者下一帧刷新，设为False则当前帧和下一帧均不刷新，需要手动调用UpdateScreen进行刷新；如有大量clone操作且非在同一帧执行，建议设为False，需要更新时再调用UpdateScreen接口刷新界面及相关控件数据
+        :param bool sync_refresh: 是否需要同步刷新；默认为 True；设为 True 时游戏在同一帧计算该控件的 size 等相关数据，设为 False 则在下一帧进行计算；如同一帧有大量 clone 操作建议设为 False，操作结束后调用一次 UpdateScreen 接口刷新界面及相关控件数据
+        :param bool force_update: 是否需要强制刷新；默认为 True；设为 True 则按照 sync_refresh 逻辑进行同一帧或者下一帧刷新，设为 False 则当前帧和下一帧均不刷新，需要手动调用 UpdateScreen 进行刷新；如有大量 clone 操作且非在同一帧执行，建议设为 False，需要更新时再调用 UpdateScreen 接口刷新界面及相关控件数据
 
-        :return: 新控件的NyControl实例；若当前控件已存在同名子控件，则返回其NyControl实例；克隆失败时返回None
+        :return: 新控件的 NyControl 实例；若当前控件已存在同名子控件，则返回其 NyControl 实例；克隆失败时返回 None
         :rtype: NyControl|None
         """
         control_path = to_path(control)
@@ -694,9 +694,9 @@ class NyControl(object):
 
         -----
 
-        :param int level: 子控件层次；默认为1，传入0或负值表示所有层次
+        :param int level: 子控件层次；默认为 1，传入 0 或负值表示所有层次
 
-        :return: 指定层次所有子控件的NyControl列表
+        :return: 指定层次所有子控件的 NyControl 列表
         :rtype: list[NyControl]
         """
         return [
@@ -710,7 +710,7 @@ class NyControl(object):
 
         -----
 
-        :param int level: 子控件层次；默认为1，传入0或负值表示所有层次
+        :param int level: 子控件层次；默认为 1，传入 0 或负值表示所有层次
 
         :return: 指定层次所有子控件的路径列表
         :rtype: list[str]
@@ -726,7 +726,7 @@ class NyControl(object):
 
         -----
 
-        :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例（需继承ScreenNodeExtension）
+        :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例（需继承 ScreenNodeExtension）
         :param str path: 控件路径
 
         :return: Ny控件实例
@@ -743,7 +743,7 @@ class NyControl(object):
 
         -----
 
-        :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例（需继承ScreenNodeExtension）
+        :param ScreenNodeExtension screen_node_ex: 控件所在UI类的实例（需继承 ScreenNodeExtension）
         :param BaseUIControl control: BaseUIControl实例
 
         :return: Ny控件实例
@@ -784,9 +784,9 @@ class NyControl(object):
 
         -----
 
-        :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为None，详细说明见AddTouchEventParams
+        :param dict[str,Any]|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为 None，详细说明见 AddTouchEventParams
 
-        :return: NyButton实例
+        :return: NyButton 实例
         :rtype: NyButton|None
         """
         from . import NyButton
@@ -800,7 +800,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyImage实例
+        :return: NyImage 实例
         :rtype: NyImage|None
         """
         from . import NyImage
@@ -814,7 +814,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyLabel实例
+        :return: NyLabel 实例
         :rtype: NyLabel|None
         """
         from . import NyLabel
@@ -828,7 +828,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyInputPanel实例
+        :return: NyInputPanel 实例
         :rtype: NyInputPanel|None
         """
         from . import NyInputPanel
@@ -842,7 +842,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyStackPanel实例
+        :return: NyStackPanel 实例
         :rtype: NyStackPanel|None
         """
         from . import NyStackPanel
@@ -856,7 +856,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyEditBox实例
+        :return: NyEditBox 实例
         :rtype: NyEditBox|None
         """
         from . import NyEditBox
@@ -870,7 +870,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyPaperDoll实例
+        :return: NyPaperDoll 实例
         :rtype: NyPaperDoll|None
         """
         from . import NyPaperDoll
@@ -884,7 +884,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyItemRenderer实例
+        :return: NyItemRenderer 实例
         :rtype: NyItemRenderer|None
         """
         from . import NyItemRenderer
@@ -898,7 +898,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyScrollView实例
+        :return: NyScrollView 实例
         :rtype: NyScrollView|None
         """
         from . import NyScrollView
@@ -915,7 +915,7 @@ class NyControl(object):
         关于 ``cell_visible_binding`` 与 ``collection_name`` 参数的说明：
 
         - 该参数用于 ``.grid_size`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
-        - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``cell_visible_binding`` 参数 。
+        - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的 json 中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``cell_visible_binding`` 参数 。
         ::
 
             "bindings": [
@@ -927,12 +927,12 @@ class NyControl(object):
                     "binding_condition": "always"
                 }
             ]
-        - 最后，将 **网格** json中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
+        - 最后，将 **网格** json 中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
 
         -----
 
-        :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid；默认为False
-        :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
+        :param bool is_stack_grid: [仅关键字参数] 是否是 StackGrid；默认为 False
+        :param str template_name: [仅关键字参数] 网格模板控件名称，即 "grid_item_template" 字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
         :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
         :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
 
@@ -950,7 +950,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyProgressBar实例
+        :return: NyProgressBar 实例
         :rtype: NyProgressBar|None
         """
         from . import NyProgressBar
@@ -964,7 +964,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyToggle实例
+        :return: NyToggle 实例
         :rtype: NyToggle|None
         """
         from . import NyToggle
@@ -978,7 +978,7 @@ class NyControl(object):
 
         -----
 
-        :return: NySlider实例
+        :return: NySlider 实例
         :rtype: NySlider|None
         """
         from . import NySlider
@@ -992,7 +992,7 @@ class NyControl(object):
 
         -----
 
-        :return: NySelectionWheel实例
+        :return: NySelectionWheel 实例
         :rtype: NySelectionWheel|None
         """
         from . import NySelectionWheel
@@ -1006,7 +1006,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyComboBox实例
+        :return: NyComboBox 实例
         :rtype: NyComboBox|None
         """
         from . import NyComboBox
@@ -1020,7 +1020,7 @@ class NyControl(object):
 
         -----
 
-        :return: NyMiniMap实例
+        :return: NyMiniMap 实例
         :rtype: NyMiniMap|None
         """
         from . import NyMiniMap

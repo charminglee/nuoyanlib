@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-12
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -67,6 +67,9 @@ Enum = IntEnum = StrEnum = Flag = IntFlag = None # noqa
 class auto(object):
     """
     用于自动生成枚举值。
+
+    说明
+    ----
 
     你可以在枚举类中定义 ``_generate_next_value_()`` 静态方法以自定义 ``auto()`` 的值生成逻辑。
     如果定义了 ``_generate_next_value_()`` 方法， ``auto()`` 会调用该方法以生成枚举值，否则使用默认的生成逻辑。
@@ -215,6 +218,7 @@ class EnumMeta(type):
             _member_names_.append(k)
             # 将成员对象更新到枚举类上
             _set_enum_attr(cls, k, member, cls_dict)
+
             count += 1
             last_values.append(v)
 
@@ -274,7 +278,8 @@ class EnumMeta(type):
 
         :return: 枚举成员迭代器
         """
-        return (cls._member_map_[name] for name in cls._member_names_)
+        for name in cls._member_names_:
+            yield cls._member_map_[name]
 
     @property
     def __members__(cls):
@@ -295,7 +300,7 @@ class EnumMeta(type):
 
         :param Any value: 要判断的值
 
-        :return: 值在枚举范围内返回True，否则返回False
+        :return: 值在枚举范围内返回 True，否则返回 False
         :rtype: bool
         """
         try:
@@ -303,11 +308,6 @@ class EnumMeta(type):
             return True
         except ValueError:
             return False
-
-    def __bool__(cls):
-        return True
-
-    __nonzero__ = __bool__
 
     def __repr__(cls):
         if issubclass(cls, Flag):
@@ -503,10 +503,27 @@ class Enum(object): # noqa
             return 1
         return max(last_values) + 1
 
+    # todo
+    @classmethod
+    def _missing_(cls, value):
+        """
+        [类方法]
+
+        -----
+
+        :param str value: 枚举成员名称
+
+        :return: 返回值将作为枚举值
+        :rtype: Any
+        """
+
 
 class IntEnum(int, Enum): # noqa
     """
     整数类型枚举类。
+
+    说明
+    ----
 
     ``IntEnum`` 拥有 ``Enum`` 的全部特性，且其枚举成员同时也是 ``int`` 类型，支持所有整数运算。
 
@@ -528,6 +545,9 @@ class IntEnum(int, Enum): # noqa
 class StrEnum(str, Enum): # noqa
     """
     字符串类型枚举类。
+
+    说明
+    ----
 
     ``StrEnum`` 拥有 ``Enum`` 的全部特性，且其枚举成员同时也是 ``str`` 类型，支持所有字符串运算。
 
@@ -1120,11 +1140,11 @@ class ControlType(StrEnum):
 
 class Mob(StrEnum):
     """
-    生物identifier枚举。
+    生物 identifier 枚举。
 
     -----
 
-    | 资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    | 资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
     | 截至版本：1.21.100
     """
 
@@ -1345,11 +1365,11 @@ class Feature(StrEnum):
 
 class UiContainer(StrEnum):
     """
-    原版UI容器identifier（即仅存在容器UI，不能真正存储物品的容器）枚举（包括容器方块和容器实体）。
+    原版UI容器 identifier（即仅存在容器UI，不能真正存储物品的容器）枚举（包括容器方块和容器实体）。
 
     -----
 
-    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
     _generate_next_value_ = gen_minecraft_lower_name
@@ -1386,11 +1406,11 @@ class UiContainer(StrEnum):
 
 class Container(StrEnum):
     """
-    原版容器identifier枚举（包括容器方块和容器实体）。
+    原版容器 identifier 枚举（包括容器方块和容器实体）。
 
     -----
 
-    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
     _generate_next_value_ = gen_minecraft_lower_name
@@ -1564,7 +1584,7 @@ class Biome(StrEnum):
 
     -----
 
-    资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
     _generate_next_value_ = gen_lower_name
@@ -1992,7 +2012,7 @@ BIOME_NAME_MAP = {
     
 -----
 
-资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
 """
 
 
@@ -2024,7 +2044,7 @@ STRUCTURE_NAME_MAP = {
 
 -----
 
-资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
 """
 
 
@@ -2076,7 +2096,7 @@ EFFECT_NAME_MAP = {
 
 -----
 
-资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
 """
 
 
@@ -2133,7 +2153,7 @@ ENCHANT_NAME_MAP = {
 
 -----
 
-资料来源： `中文Minecraft Wiki <https://zh.minecraft.wiki/>`_
+资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
 """
 
 

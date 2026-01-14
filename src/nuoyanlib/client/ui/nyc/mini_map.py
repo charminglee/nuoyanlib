@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -30,8 +30,8 @@ class NyMiniMap(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 小地图所在UI类的实例（需继承ScreenNodeExtension）
-    :param MiniMapUIControl mini_map_control: 通过asMiniMap()等方式获取的MiniMapUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 小地图所在UI类的实例（需继承 ScreenNodeExtension）
+    :param MiniMapUIControl mini_map_control: 通过 asMiniMap() 等方式获取的 MiniMapUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.MINI_MAP

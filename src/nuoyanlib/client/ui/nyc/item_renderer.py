@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -30,8 +30,8 @@ class NyItemRenderer(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 物品渲染器所在UI类的实例（需继承ScreenNodeExtension）
-    :param ItemRendererUIControl item_renderer_control: 通过asItemRenderer()等方式获取的ItemRendererUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 物品渲染器所在UI类的实例（需继承 ScreenNodeExtension）
+    :param ItemRendererUIControl item_renderer_control: 通过 asItemRenderer() 等方式获取的 ItemRendererUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.ITEM_RENDERER
@@ -49,7 +49,7 @@ class NyItemRenderer(NyControl):
         """
         [可读写属性]
 
-        ItemRenderer显示的物品的identifier。
+        ItemRenderer 显示的物品的 identifier。
 
         :rtype: str
         """
@@ -60,7 +60,7 @@ class NyItemRenderer(NyControl):
         """
         [可读写属性]
 
-        ItemRenderer显示的物品的identifier。
+        ItemRenderer 显示的物品的 identifier。
 
         :type val: str
         """
@@ -71,7 +71,7 @@ class NyItemRenderer(NyControl):
         """
         [可读写属性]
 
-        ItemRenderer显示的物品的特殊值。
+        ItemRenderer 显示的物品的特殊值。
 
         :rtype: int
         """
@@ -82,7 +82,7 @@ class NyItemRenderer(NyControl):
         """
         [可读写属性]
 
-        ItemRenderer显示的物品的特殊值。
+        ItemRenderer 显示的物品的特殊值。
 
         :type val: int
         """
@@ -93,7 +93,7 @@ class NyItemRenderer(NyControl):
         """
         [可读写属性]
 
-        ItemRenderer显示的物品是否附魔。
+        ItemRenderer 显示的物品是否附魔。
 
         :rtype: bool
         """
@@ -104,7 +104,7 @@ class NyItemRenderer(NyControl):
         """
         [可读写属性]
 
-        ItemRenderer显示的物品是否附魔。
+        ItemRenderer 显示的物品是否附魔。
 
         :type val: bool
         """
@@ -115,7 +115,7 @@ class NyItemRenderer(NyControl):
         """
         [只写属性]
 
-        设置ItemRenderer显示的物品的UserData。
+        设置 ItemRenderer 显示的物品的 UserData。
 
         :rtype: None
         """
@@ -126,7 +126,7 @@ class NyItemRenderer(NyControl):
         """
         [只写属性]
 
-        设置ItemRenderer显示的物品的UserData。
+        设置 ItemRenderer 显示的物品的 UserData。
 
         :type val: dict|None
         """

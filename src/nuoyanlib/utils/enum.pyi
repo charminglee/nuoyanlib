@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-6
+#   Date  : 2026-1-13
 #  ⠀
 # =================================================
 
@@ -14,7 +14,7 @@ from collections import OrderedDict
 from itertools import count
 import sys
 from typing import Optional, ClassVar, Dict, Hashable, Sequence, Tuple, Any, Iterator, Type, List, NoReturn
-from ..core._types._typing import Self, STuple, TimeEaseFuncType, T
+from ..core._types._typing import Self, STuple, TimeEaseFuncType, T, SlotsType
 from ..core._utils import MappingProxy
 
 
@@ -46,11 +46,13 @@ class EnumMeta(type):
     @property
     def __members__(cls: Type[T]) -> MappingProxy[str, T]: ...
     def __contains__(cls, value: Any) -> bool: ...
+    def __repr__(cls) -> str: ...
 
 
 if sys.version_info >= (3, 4):
     from enum import Enum as _Enum
     class Enum(_Enum):
+        __slots__: SlotsType
         _member_map_: ClassVar[OrderedDict[str, Enum]]
         _value2member_map_: ClassVar[Dict[Hashable, Enum]]
         _unhashable_values_: ClassVar[List[Any]]
@@ -75,8 +77,11 @@ if sys.version_info >= (3, 4):
         def value(self) -> Any: ...
         @staticmethod
         def _generate_next_value_(name: str, count: int, last_values: List[Any]) -> Any: ... # noqa
+        @classmethod
+        def _missing_(cls, value: Any) -> Any: ...
 else:
     class Enum(metaclass=EnumMeta):
+        __slots__: SlotsType
         _name_: str
         _value_: Any
         _hash_: int

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-10
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -199,7 +199,7 @@ def distance2line(target, line_pos1, line_pos2):
 
     :param tuple[float,float,float]|str target: 坐标或实体ID
     :param tuple[float,float,float] line_pos1: 直线上任意一点的坐标
-    :param tuple[float,float,float] line_pos2: 直线上另一点的坐标，不能与line_pos1一致
+    :param tuple[float,float,float] line_pos2: 直线上另一点的坐标，不能与 line_pos1 一致
 
     :return: 与指定直线的距离；若任一坐标为 None，返回 float('inf')
     :rtype: float
@@ -382,6 +382,9 @@ def screen_pos(pos, world_basis, screen_basis=(0, 0), scale=1, offset=(0, 0), ro
     """
     将世界坐标转换为屏幕坐标。
 
+    说明
+    ----
+
     在屏幕坐标系中，向右为X轴正方向，向下为Y轴正方向。在默认情况下，屏幕坐标系原点位于屏幕左上角。
 
     -----
@@ -389,10 +392,10 @@ def screen_pos(pos, world_basis, screen_basis=(0, 0), scale=1, offset=(0, 0), ro
     :param tuple[float,float,float] pos: 世界坐标
     :param tuple[float,float,float] world_basis: 屏幕坐标系原点对应的世界坐标
     :param tuple[float,float] screen_basis: 屏幕坐标系原点；默认为 (0, 0)
-    :param float scale: 屏幕上1像素所对应的世界距离；默认为1
-    :param tuple[float,float] offset: 屏幕坐标xy偏移量；默认为 (0, 0)
-    :param float rotation: 绕坐标原点的旋转角度；默认为0
-    :param bool rad: 旋转角是否使用弧度制；默认为False
+    :param float scale: 屏幕上1像素所对应的世界距离；默认为 1
+    :param tuple[float,float] offset: 屏幕坐标 xy 偏移量；默认为 (0, 0)
+    :param float rotation: 绕坐标原点的旋转角度；默认为 0
+    :param bool rad: 旋转角是否使用弧度制；默认为 False
 
     :return: 屏幕坐标；传入的任一坐标为 None 时，返回 None
     :rtype: tuple[float,float]|None
@@ -420,14 +423,14 @@ def screen_pos(pos, world_basis, screen_basis=(0, 0), scale=1, offset=(0, 0), ro
 
 def box_vertices(pos1, pos2):
     """
-    根据任意两个对角坐标，计算以这两点为顶点的AABB包围盒的所有顶点的坐标。
+    根据任意两个对角坐标，计算以这两点为顶点的 AABB 包围盒的所有顶点的坐标。
 
     -----
 
     :param tuple[float,float,float]|tuple[float,float] pos1: 对角坐标1
     :param tuple[float,float,float]|tuple[float,float] pos2: 对角坐标2
 
-    :return: 所有顶点坐标的列表；二维坐标返回4个顶点，三维坐标返回8个顶点；传入的任一坐标为 None 时，返回空列表
+    :return: 所有顶点坐标的列表；二维坐标返回 4 个顶点，三维坐标返回 8 个顶点；传入的任一坐标为 None 时，返回空列表
     :rtype: list[tuple[float,float,float]|tuple[float,float]]
     """
     if not pos1 or not pos2:
@@ -459,7 +462,7 @@ def box_vertices(pos1, pos2):
 
 def box_min_max(pos1, pos2):
     """
-    根据任意两个对角坐标，计算以这两点为顶点的AABB包围盒的最小和最大坐标。
+    根据任意两个对角坐标，计算以这两点为顶点的 AABB 包围盒的最小和最大坐标。
 
     -----
 
@@ -495,19 +498,23 @@ def pos_entity_facing(entity_id, dist, use_0yaw=False, height_offset=0):
     """
     计算实体视角方向上、给定距离上的位置的坐标。
 
+    说明
+    ----
+
     计算将以实体 FootPos 作为起点，沿实体视角方向前进指定距离后的位置即为最终结果。
     可通过 ``height_offset`` 参数调整起点的高度偏移量，最终的起点坐标即为：
     ::
 
         (FootPos[0], FootPos[1] + height_offset, FootPos[2])
+
     若实体为玩家，将 ``height_offset`` 设为 ``1.62`` 即可使起点位于玩家眼睛（准星）位置。
 
     -----
 
     :param str entity_id: 实体ID
     :param float dist: 距离，可为负数
-    :param bool use_0yaw: 是否将实体竖直方向上的视角视为0；默认为False
-    :param float height_offset: 高度偏移量；默认为0
+    :param bool use_0yaw: 是否将实体竖直方向上的视角视为 0；默认为 False
+    :param float height_offset: 高度偏移量；默认为 0
 
     :return: 坐标；若实体不存在，返回 None
     :rtype: tuple[float,float,float]|None
@@ -534,7 +541,7 @@ def pos_block_facing(pos, face=Facing.North, dist=1.0):
 
     :param tuple[float,float,float] pos: 起始坐标
     :param int face: 方块朝向，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_；默认为 Facing.North
-    :param float dist: 距离；默认为1.0
+    :param float dist: 距离；默认为 1.0
 
     :return: 坐标；传入的起始坐标为 None 时，返回 None
     :rtype: tuple[float,float,float]|None
@@ -600,7 +607,7 @@ def pos_rotate(pos, angle, basis=(0, 0), rad=False):
     :param tuple[float,float] pos: 二维坐标
     :param float angle: 旋转角
     :param tuple[float,float] basis: 旋转中心坐标；默认为 (0, 0)
-    :param bool rad: 旋转角是否使用弧度制；默认为False
+    :param bool rad: 旋转角是否使用弧度制；默认为 False
 
     :return: 旋转后的坐标
     :rtype: tuple[float,float]|None
@@ -657,9 +664,9 @@ def ray_box_intersection(start_pos, ray_dir, length, aabb_center, aabb_size, han
 
     :param tuple[float,float,float] start_pos: 射线起点坐标
     :param tuple[float,float,float] ray_dir: 射线方向向量
-    :param float length: 射线长度，传入-1表示无限长
+    :param float length: 射线长度，传入 -1 表示无限长
     :param tuple[float,float,float] aabb_center: 包围盒中心坐标
-    :param tuple[float,float,float] aabb_size: 包围盒边长元组，分别对应xyz上的边长
+    :param tuple[float,float,float] aabb_size: 包围盒边长元组，分别对应 xyz 上的边长
     :param str handle_inside: 当射线起点在包围盒内部时的处理方式，可选值为 "none"（返回 None），"start"（返回射线起点坐标） 或 "exit"（返回射线穿出包围盒时的位置）；默认为 "none"
 
     :return: 射线与包围盒的第一个交点的坐标，未相交时返回 None
@@ -811,14 +818,14 @@ def is_in_sector(target, r, h, angle, center, direction):
 
 def is_in_box(target, pos1, pos2, ignore_y=False):
     """
-    判断坐标或实体是否在AABB包围盒内。
+    判断坐标或实体是否在 AABB 包围盒内。
 
     -----
 
     :param tuple[float,float,float]|tuple[float,float]|str target: 坐标或实体ID
     :param tuple[float,float,float]|tuple[float,float] pos1: 包围盒对角顶点坐标1
     :param tuple[float,float,float]|tuple[float,float] pos2: 包围盒对角顶点坐标2
-    :param bool ignore_y: 是否忽略Y轴；默认为False
+    :param bool ignore_y: 是否忽略Y轴；默认为 False
 
     :return: 是否在包围盒内
     :rtype: bool
@@ -924,7 +931,10 @@ def bezier_curve(control_points, t):
     """
     通用贝塞尔曲线（支持任意阶数）。
 
-    控制点越多，计算越慢，通常不超过4个点。
+    说明
+    ----
+
+    控制点越多，计算越慢，通常不超过 4 个点。
 
     -----
 
@@ -953,7 +963,10 @@ def bezier_curve(control_points, t):
 
 def catmull_rom(p0, p1, p2, p3, t, alpha=0.5):
     """
-    Catmull-Rom样条曲线。
+    Catmull-Rom 样条曲线。
+
+    说明
+    ----
 
     曲线会经过 ``p1`` 和 ``p2`` ， ``p0`` 和 ``p3`` 用于确定切线方向。
 
@@ -1011,6 +1024,9 @@ def median(*args):
     """
     计算一组数据的中位数。
 
+    说明
+    ----
+
     可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
     ::
 
@@ -1035,6 +1051,9 @@ def var(*args):
     """
     计算一组数据的方差（总体方差）。
 
+    说明
+    ----
+
     可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
     ::
 
@@ -1056,6 +1075,9 @@ def std(*args):
     """
     计算一组数据的标准差（总体标准差）。
 
+    说明
+    ----
+
     可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
     ::
 
@@ -1073,6 +1095,9 @@ def std(*args):
 def mean(*args):
     """
     计算一组数据的算术平均数。
+
+    说明
+    ----
 
     可传入一个可迭代对象（元组、字典等），或展开传入多个数据。
     ::
@@ -1097,7 +1122,7 @@ def sign(x):
 
     :param float x: 数值
 
-    :return: 符号；正数返回1，负数返回-1，零值返回0
+    :return: 符号；正数返回 1，负数返回 -1，零值返回 0
     :rtype: int
     """
     if x > 0:
@@ -1150,6 +1175,9 @@ def clamp(x, min_value, max_value):
     """
     将数值限制在指定范围内。
 
+    说明
+    ----
+
     小于 ``min_value`` 的值将被限制为 ``min_value`` ，大于 ``max_value`` 的值将被限制为 ``max_value`` 。
 
     -----
@@ -1166,7 +1194,7 @@ def clamp(x, min_value, max_value):
 
 def box_max_edge_len(pos1, pos2):
     """
-    计算AABB包围盒的最大棱长。
+    计算 AABB 包围盒的最大棱长。
         
     -----
     

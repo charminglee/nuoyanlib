@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-01-09
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -31,7 +31,7 @@ def save_setting(name, data, is_global=True):
     
     :param str name: 数据名，只能包含字母、数字和下划线字符
     :param Any data: 数据
-    :param bool is_global: 是否为全局数据；默认为True
+    :param bool is_global: 是否为全局数据；默认为 True
     
     :return: 是否保存成功
     :rtype: bool
@@ -51,7 +51,7 @@ def read_setting(name, default=None, is_global=True):
 
     :param str name: 数据名，只能包含字母、数字和下划线字符
     :param Any|None default: 数据默认值；默认为 None
-    :param bool is_global: 是否为全局数据；默认为True
+    :param bool is_global: 是否为全局数据；默认为 True
     
     :return: 数据字典
     :rtype: dict

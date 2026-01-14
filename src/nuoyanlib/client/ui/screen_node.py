@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -31,9 +31,12 @@ __all__ = [
 
 class ScreenNodeExtension(object):
     """
-    ScreenNode扩展类，提供更多UI界面功能。
+    ``ScreenNode`` 扩展类，提供更多UI界面功能。
 
-    注意：继承 ``ScreenNodeExtension`` 时，必须将其放在继承序列的首位，例如：
+    说明
+    ----
+
+    继承 ``ScreenNodeExtension`` 时，必须将其放在继承序列的首位，例如：
 
     ::
 
@@ -47,8 +50,8 @@ class ScreenNodeExtension(object):
 
     -----
 
-    :raise ScreenNodeNotFoundError: 找不到当前UI的ScreenNode实例时抛出，请确保UI类正确继承了ScreenNode或CustomUIScreenProxy
-    :raise PathMatchError: @ScreenNodeExtension.button_callback装饰器的按钮路径存在错误时抛出
+    :raise ScreenNodeNotFoundError: 找不到当前UI的 ScreenNode 实例时抛出，请确保UI类正确继承了 ScreenNode 或 CustomUIScreenProxy
+    :raise PathMatchError: @ScreenNodeExtension.button_callback 装饰器的按钮路径存在错误时抛出
     """
 
     ROOT_PANEL_PATH = "/variables_button_mappings_and_controls/safezone_screen_matrix/inner_matrix/safezone_screen_panel/root_screen_panel"
@@ -116,8 +119,8 @@ class ScreenNodeExtension(object):
         -----
 
         :param function func: 绑定函数，支持普通函数与实例方法
-        :param int flag: 绑定标志，参考ViewBinder中的枚举值
-        :param str binding_name: 绑定名称；默认为"#<namespace>.<func_name>"，<namespace>为UI json文件中"namespace"对应的值，<func_name>为函数名
+        :param int flag: 绑定标志，参考 ViewBinder 中的枚举值
+        :param str binding_name: 绑定名称；默认为 "#<namespace>.<func_name>"，<namespace> 为 UI json 文件中 "namespace" 对应的值，<func_name> 为函数名
         :param str collection_name: 集合名称；若非集合绑定，忽略该参数即可；默认为空字符串
 
         :return: 是否成功
@@ -186,13 +189,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyControl`` 通用控件实例。
 
-        兼容ModSDK ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyControl控件实例，创建失败返回None
+        :return: NyControl 控件实例，创建失败返回 None
         :rtype: NyControl|None
         """
         return self._create_nyc(path_or_control, NyControl, **kwargs)
@@ -201,15 +207,18 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyButton`` 按钮控件实例。
 
-        兼容ModSDK ``ButtonUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``ButtonUIControl`` 和 ``BaseUIControl`` 的相关接口。
         创建后无需再调用 ``.AddTouchEventParams()`` 或 ``.AddHoverEventParams()`` 接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为None，详细说明见AddTouchEventParams
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
+        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为 None，详细说明见 AddTouchEventParams
 
-        :return: NyButton按钮实例，创建失败返回None
+        :return: NyButton 按钮实例，创建失败返回 None
         :rtype: NyButton|None
         """
         return self._create_nyc(path_or_control, NyButton, **kwargs)
@@ -218,13 +227,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyComboBox`` 下拉框控件实例。
 
-        兼容ModSDK ``NeteaseComboBoxUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``NeteaseComboBoxUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyComboBox下拉框实例，创建失败返回None
+        :return: NyComboBox 下拉框实例，创建失败返回 None
         :rtype: NyComboBox|None
         """
         return self._create_nyc(path_or_control, NyComboBox, **kwargs)
@@ -233,13 +245,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyEditBox`` 文本编辑框控件实例。
 
+        说明
+        ----
+
         兼容ModSDK ``TextEditBoxUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyEditBox文本编辑框实例，创建失败返回None
+        :return: NyEditBox 文本编辑框实例，创建失败返回 None
         :rtype: NyEditBox|None
         """
         return self._create_nyc(path_or_control, NyEditBox, **kwargs)
@@ -248,9 +263,10 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyGrid`` 网格控件实例。
 
-        兼容ModSDK ``GridUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
 
-        -----
+        兼容 ModSDK ``GridUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         关于 ``cell_visible_binding`` 与 ``collection_name`` 参数的说明：
 
@@ -267,13 +283,13 @@ class ScreenNodeExtension(object):
                     "binding_condition": "always"
                 }
             ]
-        - 最后，将 **网格** json中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
+        - 最后，将 **网格** json 中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
-        :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid；默认为False
-        :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
+        :param bool is_stack_grid: [仅关键字参数] 是否是 StackGrid；默认为 False
+        :param str template_name: [仅关键字参数] 网格模板控件名称，即 "grid_item_template" 字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
         :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素显隐性的绑定名称，详见上方说明
         :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
 
@@ -286,13 +302,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyImage`` 图片控件实例。
 
-        兼容ModSDK ``ImageUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``ImageUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyImage图片实例，创建失败返回None
+        :return: NyImage 图片实例，创建失败返回 None
         :rtype: NyImage|None
         """
         return self._create_nyc(path_or_control, NyImage, **kwargs)
@@ -301,13 +320,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyInputPanel`` 输入面板控件实例。
 
+        说明
+        ----
+
         兼容ModSDK ``InputPanelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyInputPanel输入面板实例，创建失败返回None
+        :return: NyInputPanel 输入面板实例，创建失败返回 None
         :rtype: NyInputPanel|None
         """
         return self._create_nyc(path_or_control, NyInputPanel, **kwargs)
@@ -316,13 +338,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyItemRenderer`` 物品渲染器控件实例。
 
-        兼容ModSDK ``ItemRendererUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``ItemRendererUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyItemRenderer物品渲染器实例，创建失败返回None
+        :return: NyItemRenderer 物品渲染器实例，创建失败返回 None
         :rtype: NyItemRenderer|None
         """
         return self._create_nyc(path_or_control, NyItemRenderer, **kwargs)
@@ -331,13 +356,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyLabel`` 文本控件实例。
 
-        兼容ModSDK ``LabelUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``LabelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyLabel文本实例，创建失败返回None
+        :return: NyLabel 文本实例，创建失败返回 None
         :rtype: NyLabel|None
         """
         return self._create_nyc(path_or_control, NyLabel, **kwargs)
@@ -346,13 +374,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyMiniMap`` 小地图控件实例。
 
-        兼容ModSDK ``MiniMapUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``MiniMapUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyMiniMap小地图实例，创建失败返回None
+        :return: NyMiniMap 小地图实例，创建失败返回 None
         :rtype: NyMiniMap|None
         """
         return self._create_nyc(path_or_control, NyMiniMap, **kwargs)
@@ -361,13 +392,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyPaperDoll`` 纸娃娃控件实例。
 
-        兼容ModSDK ``NeteasePaperDollUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``NeteasePaperDollUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyPaperDoll纸娃娃实例，创建失败返回None
+        :return: NyPaperDoll 纸娃娃实例，创建失败返回 None
         :rtype: NyPaperDoll|None
         """
         return self._create_nyc(path_or_control, NyPaperDoll, **kwargs)
@@ -376,13 +410,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyProgressBar`` 进度条控件实例。
 
-        兼容ModSDK ``ProgressBarUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``ProgressBarUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyProgressBar进度条实例，创建失败返回None
+        :return: NyProgressBar 进度条实例，创建失败返回 None
         :rtype: NyProgressBar|None
         """
         return self._create_nyc(path_or_control, NyProgressBar, **kwargs)
@@ -391,13 +428,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyScrollView`` 滚动视图控件实例。
 
-        兼容ModSDK ``ScrollViewUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``ScrollViewUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyScrollView滚动视图实例，创建失败返回None
+        :return: NyScrollView 滚动视图实例，创建失败返回 None
         :rtype: NyScrollView|None
         """
         return self._create_nyc(path_or_control, NyScrollView, **kwargs)
@@ -406,13 +446,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NySelectionWheel`` 轮盘控件实例。
 
-        兼容ModSDK ``SelectionWheelUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``SelectionWheelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NySelectionWheel轮盘实例，创建失败返回None
+        :return: NySelectionWheel 轮盘实例，创建失败返回 None
         :rtype: NySelectionWheel|None
         """
         return self._create_nyc(path_or_control, NySelectionWheel, **kwargs)
@@ -421,13 +464,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NySlider`` 滑动条控件实例。
 
-        兼容ModSDK ``SliderUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``SliderUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NySlider滑动条实例，创建失败返回None
+        :return: NySlider 滑动条实例，创建失败返回 None
         :rtype: NySlider|None
         """
         return self._create_nyc(path_or_control, NySlider, **kwargs)
@@ -436,13 +482,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyStackPanel`` 栈面板控件实例。
 
-        兼容ModSDK ``StackPanelUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``StackPanelUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyStackPanel栈面板实例，创建失败返回None
+        :return: NyStackPanel 栈面板实例，创建失败返回 None
         :rtype: NyStackPanel|None
         """
         return self._create_nyc(path_or_control, NyStackPanel, **kwargs)
@@ -451,13 +500,16 @@ class ScreenNodeExtension(object):
         """
         创建 ``NyToggle`` 开关控件实例。
 
-        兼容ModSDK ``SwitchToggleUIControl`` 和 ``BaseUIControl`` 的相关接口。
+        说明
+        ----
+
+        兼容 ModSDK ``SwitchToggleUIControl`` 和 ``BaseUIControl`` 的相关接口。
 
         -----
 
-        :param str|BaseUIControl path_or_control: 控件路径或BaseUIControl实例
+        :param str|BaseUIControl path_or_control: 控件路径或 BaseUIControl 实例
 
-        :return: NyToggle开关实例，创建失败返回None
+        :return: NyToggle 开关实例，创建失败返回 None
         :rtype: NyToggle|None
         """
         return self._create_nyc(path_or_control, NyToggle, **kwargs)
@@ -516,13 +568,16 @@ class ScreenNodeExtension(object):
 
         将函数设置为按钮回调函数。
 
-        注意：UI类需继承 ``ScreenNodeExtension`` 。
+        说明
+        ----
+
+        UI类需继承 ``ScreenNodeExtension`` 。
 
         -----
 
-        :param str btn_path: 按钮路径，支持使用通配符"*"（目前仅支持最后一级控件名称使用通配符）
-        :param ButtonCallbackType callback_types: [变长位置参数] 按钮回调类型，支持同时设置多种回调，请使用ButtonCallbackType枚举值；默认为ButtonCallbackType.UP
-        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为None，详细说明见AddTouchEventParams
+        :param str btn_path: 按钮路径，支持使用通配符 "*"（目前仅支持最后一级控件名称使用通配符）
+        :param ButtonCallbackType callback_types: [变长位置参数] 按钮回调类型，支持同时设置多种回调，请使用 ButtonCallbackType 枚举值；默认为 ButtonCallbackType.UP
+        :param dict|None touch_event_params: [仅关键字参数] 按钮参数字典；默认为 None，详细说明见 AddTouchEventParams
         """
         if not callback_types:
             callback_types = (ButtonCallbackType.UP,)
@@ -587,6 +642,9 @@ class ScreenNodeExtension(object):
     def save_all_pos_data(self):
         """
         保存所有通过 ``.set_movable()`` 或 ``.set_movable_by_long_click()`` 设置了可拖动的控件的位置数据，下次进入游戏时自动恢复。
+
+        说明
+        ----
 
         为保证安全，超出屏幕边界的控件不会被保存。
 

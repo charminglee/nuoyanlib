@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-30
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -57,6 +57,9 @@ class _PosGenerator(object):
 class gen_random_even_pos(_PosGenerator):
     """
     在指定坐标周围，生成随机的均匀分布的多个坐标。
+
+    说明
+    ----
 
     返回一个坐标序列，支持循环遍历、根据索引（下标或切片）获取坐标、使用 ``len()`` 获取序列长度（坐标数量）。
 
@@ -142,6 +145,9 @@ class gen_line_pos(_PosGenerator):
     """
     生成线段上各点的坐标（包括起点和终点），每个坐标均匀分布。
 
+    说明
+    ----
+
     返回一个坐标序列，支持循环遍历、根据索引（下标或切片）获取坐标、使用 ``len()`` 获取序列长度（坐标数量）。
 
     -----
@@ -179,6 +185,9 @@ class gen_line_pos(_PosGenerator):
 class gen_ring_pos(_PosGenerator):
     """
     生成圆环上各点的坐标，每个坐标均匀分布。
+
+    说明
+    ----
 
     返回一个坐标序列，支持循环遍历、根据索引（下标或切片）获取坐标、使用 ``len()`` 获取序列长度（坐标数量）。
 
@@ -229,6 +238,9 @@ _GOLDEN_RATIO = (sqrt(5) + 1) / 2
 class gen_sphere_pos(_PosGenerator):
     """
     生成球面上各点的坐标，每个坐标均匀分布。
+
+    说明
+    ----
 
     仅支持三维坐标。
     返回一个坐标序列，支持循环遍历、根据索引（下标或切片）获取坐标、使用 ``len()`` 获取序列长度（坐标数量）。
@@ -342,6 +354,9 @@ class gen_box_pos(_PosGenerator):
     """
     生成包围盒（立方体/矩形）内各点的坐标，每个坐标均匀分布。
 
+    说明
+    ----
+
     返回一个坐标序列，支持循环遍历、根据索引（下标或切片）获取坐标、使用 ``len()`` 获取序列长度（坐标数量）。
 
     -----
@@ -411,6 +426,9 @@ class gen_box_surface_pos(_PosGenerator):
     """
     生成包围盒（立方体）表面上各点的坐标，每个坐标均匀分布。
 
+    说明
+    ----
+
     仅支持三维坐标。
     返回一个坐标序列，支持循环遍历、根据索引（下标或切片）获取坐标、使用 ``len()`` 获取序列长度（坐标数量）。
 
@@ -469,15 +487,18 @@ class gen_box_frame_pos(_PosGenerator):
     """
     生成包围盒（立方体/矩形）框架上各点的坐标，每个坐标均匀分布。
 
+    说明
+    ----
+
     返回一个坐标序列，支持循环遍历、根据索引（下标或切片）获取坐标、使用 ``len()`` 获取序列长度（坐标数量）。
 
     -----
 
     :param tuple[float,float,float]|tuple[float,float] pos1: 包围盒对角坐标1
     :param tuple[float,float,float]|tuple[float,float] pos2: 包围盒对角坐标2
-    :param int count_x: x轴方向上单条边的坐标数量，需大于等于2；默认为2
-    :param int count_y: y轴方向上单条边的坐标数量，需大于等于2；默认为2
-    :param int count_z: z轴方向上单条边的坐标数量，需大于等于2，使用二维坐标时可忽略该参数；默认为2
+    :param int count_x: x轴方向上单条边的坐标数量，需大于等于 2；默认为 2
+    :param int count_y: y轴方向上单条边的坐标数量，需大于等于 2；默认为 2
+    :param int count_z: z轴方向上单条边的坐标数量，需大于等于 2，使用二维坐标时可忽略该参数；默认为 2
     """
 
     __slots__ = (

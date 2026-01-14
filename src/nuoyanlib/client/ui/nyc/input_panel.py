@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -29,8 +29,8 @@ class NyInputPanel(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 输入面板所在UI类的实例（需继承ScreenNodeExtension）
-    :param InputPanelUIControl input_panel_control: 通过asInputPanel()等方式获取的InputPanelUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 输入面板所在UI类的实例（需继承 ScreenNodeExtension）
+    :param InputPanelUIControl input_panel_control: 通过 asInputPanel() 等方式获取的 InputPanelUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.INPUT_PANEL
@@ -74,6 +74,9 @@ class NyInputPanel(NyControl):
 
         当前面板输入是否会吞噬事件。
 
+        说明
+        ----
+
         为 ``True`` 时，点击事件不会穿透到世界，如破坏方块、镜头转向不会被响应。
 
         :rtype: bool
@@ -86,6 +89,9 @@ class NyInputPanel(NyControl):
         [可读写属性]
 
         当前面板输入是否会吞噬事件。
+
+        说明
+        ----
 
         为 ``True`` 时，点击事件不会穿透到世界，如破坏方块、镜头转向不会被响应。
 

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-10
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -45,18 +45,18 @@ __all__ = [
 
 def rgb_to_hex(rgb_color, with_sign=True, upper=True):
     """
-    将 ``(R,⠀G,⠀B)`` 元组转换为16进制颜色代码 ``#RRGGBB`` 。
+    将 ``(R,⠀G,⠀B)`` 元组转换为 16 进制颜色代码 ``#RRGGBB`` 。
 
     -----
 
-    :param tuple[float,float,float]|tuple[int,int,int] rgb_color: RGB元组，支持Minecraft RGB格式（取值范围为0-1）
-    :param bool with_sign: 返回的16进制颜色代码是否包含"#"前缀；默认为True
-    :param bool upper: 返回的16进制颜色代码是否大写；默认为True
+    :param tuple[float,float,float]|tuple[int,int,int] rgb_color: RGB 元组，支持 Minecraft RGB 格式（取值范围为 0-1）
+    :param bool with_sign: 返回的 16 进制颜色代码是否包含 "#" 前缀；默认为 True
+    :param bool upper: 返回的 16 进制颜色代码是否大写；默认为 True
 
-    :return: 16进制颜色代码
+    :return: 16 进制颜色代码
     :rtype: str
 
-    :raise ValueError: RGB元组格式有误时抛出
+    :raise ValueError: RGB 元组格式有误时抛出
     """
     if len(rgb_color) != 3:
         raise ValueError("'rgb_color' must be of 3 elements.")
@@ -78,17 +78,17 @@ def rgb_to_hex(rgb_color, with_sign=True, upper=True):
 
 def hex_to_rgb(hex_color, mc_rgb=True):
     """
-    将16进制颜色代码 ``#RRGGBB`` 转换为 ``(R,⠀G,⠀B)`` 元组。
+    将 16 进制颜色代码 ``#RRGGBB`` 转换为 ``(R,⠀G,⠀B)`` 元组。
 
     -----
 
-    :param str hex_color: 16进制颜色代码，可不包含"#"前缀
-    :param bool mc_rgb: 是否转换为Minecraft RGB格式（取值范围为0-1）；默认为True
+    :param str hex_color: 16 进制颜色代码，可不包含 "#" 前缀
+    :param bool mc_rgb: 是否转换为 Minecraft RGB 格式（取值范围为 0-1）；默认为 True
 
-    :return: RGB元组
+    :return: RGB 元组
     :rtype: tuple[float,float,float]|tuple[int,int,int]
 
-    :raise ValueError: hex_color格式有误时抛出
+    :raise ValueError: hex_color 格式有误时抛出
     """
     if hex_color[0] == "#":
         hex_color = hex_color[1:]
@@ -112,7 +112,10 @@ def get_time():
     """
     获取当前时间。
 
-    仅用于计时，PC端返回 ``time.clock()`` （精度更高，非真实时间），移动端返回 ``time.time()`` 。
+    说明
+    ----
+
+    仅用于计时，PC 端返回 ``time.clock()`` （精度更高，非真实时间），移动端返回 ``time.time()`` 。
 
     -----
 
@@ -135,12 +138,12 @@ def timeit(func, n=100000, print_res=False, args=None, kwargs=None):
     -----
 
     :param function func: 函数
-    :param int n: 执行次数；默认为100000
-    :param bool print_res: 是否打印计算结果；默认为False
-    :param Any args: 函数位置参数元组；默认为None
-    :param Any kwargs: 函数关键字参数字典；默认为None
+    :param int n: 执行次数；默认为 100000
+    :param bool print_res: 是否打印计算结果；默认为 False
+    :param Any args: 函数位置参数元组；默认为 None
+    :param Any kwargs: 函数关键字参数字典；默认为 None
 
-    :return: 返回一个元组，元素分别为总耗时和平均耗时，单位为ms
+    :return: 返回一个元组，元素分别为总耗时和平均耗时，单位为 ms
     :rtype: tuple[float,float]
     """
     args = args or ()
@@ -210,11 +213,11 @@ def add_condition_to_func(cond, func, freq=1):
 
     -----
 
-    :param function cond: 条件函数，无参数，需要返回一个bool，当返回的bool（即条件）发生变化时，自动执行一次func
-    :param function func: 条件发生变化时执行的函数，该函数需要接受一个类型为bool的参数，即当前的条件状态（cond的返回值）
-    :param int freq: 条件判断频率，单位为tick；默认为1，即每1tick判断一次，小于1的值会被视为1
+    :param function cond: 条件函数，无参数，需要返回一个 bool，当返回的 bool（即条件）发生变化时，自动执行一次 func
+    :param function func: 条件发生变化时执行的函数，该函数需要接受一个类型为 bool 的参数，即当前的条件状态（cond 的返回值）
+    :param int freq: 条件判断频率，单位为 tick；默认为 1，即每 tick 判断一次，小于 1 的值会被视为 1
 
-    :return: 返回一个int型ID，后续可用该ID移除添加的条件和函数，添加失败时返回-1
+    :return: 返回一个 int 型ID，后续可用该ID移除添加的条件和函数，添加失败时返回 -1
     :rtype: int
     """
     freq = max(1, int(freq))
@@ -230,7 +233,7 @@ def rm_condition_to_func(cond_id):
 
     -----
 
-    :param int cond_id: 由add_condition_to_func返回的ID
+    :param int cond_id: 由 add_condition_to_func() 返回的ID
 
     :return: 是否成功
     :rtype: bool
@@ -263,9 +266,9 @@ def check_string(string, *check):
     -----
 
     :param str string: 字符串
-    :param str check: 检测元素，可用"0-9"表示所有数字，"a-z"表示所有小写字母，"A-Z"表示所有大写字母
+    :param str check: 检测元素，可用 "0-9" 表示所有数字，"a-z" 表示所有小写字母，"A-Z" 表示所有大写字母
 
-    :return: 只含有指定字符则返回True, 否则返回False
+    :return: 只含有指定字符则返回 True, 否则返回 False
     :rtype: bool
     """
     for i in string:
@@ -288,7 +291,7 @@ def check_string2(string, *check):
     -----
 
     :param str string: 字符串
-    :param str check: 检测元素，可用"0-9"表示所有数字，"a-z"表示所有小写字母，"A-Z"表示所有大写字母
+    :param str check: 检测元素，可用 "0-9" 表示所有数字，"a-z" 表示所有小写字母，"A-Z" 表示所有大写字母
 
     :return: 指定字符之外的字符的列表
     :rtype: list[str]
@@ -353,7 +356,7 @@ def is_method_overridden(subclass, father, method):
     :param Any father: 父类
     :param str method: 方法名
 
-    :return: 方法被重写返回True，否则返回False
+    :return: 方法被重写返回 True，否则返回 False
     :rtype: bool
     """
     subclass_method = getattr(subclass, method)
@@ -363,16 +366,16 @@ def is_method_overridden(subclass, father, method):
 
 def translate_time(sec, separator="", unit=("h", "m", "s"), zfill=False):
     """
-    将秒数转换成h/m/s的格式字符串。
+    将秒数转换成 h/m/s 的格式字符串。
 
     -----
 
     :param int sec: 秒数
     :param str separator: 分隔符；默认为空字符串
-    :param tuple[str,str,str] unit: 时间单位，三元组，对应时分秒，传入None则表示不带单位；默认为("h", "m", "s")
-    :param bool zfill: 是否在数字前补零；默认为False
+    :param tuple[str,str,str] unit: 时间单位，三元组，对应时分秒，传入 None 则表示不带单位；默认为 ("h", "m", "s")
+    :param bool zfill: 是否在数字前补零；默认为 False
 
-    :return: h/m/s格式字符串
+    :return: h/m/s 格式字符串
     :rtype: str
     """
     sec = int(sec)

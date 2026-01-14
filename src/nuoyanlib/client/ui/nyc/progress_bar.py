@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -30,8 +30,8 @@ class NyProgressBar(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 进度条所在UI类的实例（需继承ScreenNodeExtension）
-    :param ProgressBarUIControl progress_bar_control: 通过asProgressBar()等方式获取的ProgressBarUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 进度条所在UI类的实例（需继承 ScreenNodeExtension）
+    :param ProgressBarUIControl progress_bar_control: 通过 asProgressBar() 等方式获取的 ProgressBarUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.PROGRESS_BAR
@@ -49,7 +49,7 @@ class NyProgressBar(NyControl):
         """
         [只写属性]
 
-        进度条进度，范围为[0, 1]。
+        进度条进度，范围为 [0, 1]。
 
         :rtype: None
         """
@@ -60,7 +60,7 @@ class NyProgressBar(NyControl):
         """
         [只写属性]
 
-        进度条进度，范围为[0, 1]。
+        进度条进度，范围为 [0, 1]。
 
         :type val: float
         """

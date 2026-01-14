@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-12
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -155,7 +155,10 @@ class SyncData(object):
         """
         设置数据值。
 
-        注意：由 ``.from_client()`` 或 ``.from_server()`` 创建的 ``SyncData`` 对象不支持设置。
+        说明
+        ----
+
+        由 ``.from_client()`` 或 ``.from_server()`` 创建的 ``SyncData`` 对象不支持设置。
 
         -----
 
@@ -193,7 +196,10 @@ class SyncData(object):
         """
         立即将数据同步至另一端。
 
-        注意：由 ``.from_client()`` 或 ``.from_server()`` 创建的 ``SyncData`` 对象不支持同步。
+        说明
+        ----
+
+        由 ``.from_client()`` 或 ``.from_server()`` 创建的 ``SyncData`` 对象不支持同步。
 
         -----
 
@@ -254,7 +260,10 @@ def broadcast_to_all_systems(event_name, event_args, from_system):
     """
     广播事件到所有系统，包括服务端和所有玩家的客户端。
 
-    注：监听该事件时使用 ``from_system`` 的命名空间和系统名称即可。
+    说明
+    ----
+
+    监听该事件时使用 ``from_system`` 的命名空间和系统名称即可。
 
     -----
 
@@ -359,11 +368,11 @@ def call(ns, sys_name, method, args=None, kwargs=None, player_id=None, callback=
     :param str ns: 被调用函数所在系统的命名空间
     :param str sys_name: 被调用函数所在系统的名称
     :param str method: 被调用函数名
-    :param tuple args: 位置参数元组，展开后传入被调用函数；默认为None
-    :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数；默认为None
-    :param str|list[str]|None player_id: 调用客户端时，需指定玩家实体ID；传入玩家实体ID/玩家实体ID列表表示单个/多个玩家，传入"*"（星号）表示所有玩家；调用服务端时忽略该参数即可
-    :param function|None callback: 回调函数，参数说明见上方；默认为None
-    :param float delay_ret: 延迟返回时间，单位为秒；若设置了该值，则callback触发前会延迟给定时间；由于跨端调用本身存在不可避免的网络延迟，因此实际的延迟时间会大于此处给定的值；默认为-1，即无延迟
+    :param tuple args: 位置参数元组，展开后传入被调用函数；默认为 None
+    :param dict[str,Any] kwargs: 关键字参数字典，展开后传入被调用函数；默认为 None
+    :param str|list[str]|None player_id: 调用客户端时，需指定玩家实体ID；传入玩家实体ID/玩家实体ID列表表示单个/多个玩家，传入 "*"（星号）表示所有玩家；调用服务端时忽略该参数即可
+    :param function|None callback: 回调函数，参数说明见上方；默认为 None
+    :param float delay_ret: 延迟返回时间，单位为秒；若设置了该值，则 callback 触发前会延迟给定时间；由于跨端调用本身存在不可避免的网络延迟，因此实际的延迟时间会大于此处给定的值；默认为 -1，即无延迟
 
     :return: 无
     :rtype: None

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-7
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -87,17 +87,27 @@ class Vector(object):
     """
     向量类，支持三维向量与二维向量。
 
-    用法：
+    示例
+    ----
 
-    - 构造向量
+    构造向量：
+
     >>> Vector(1, 2, 3) # 三维向量
-    >>> Vector(1, 2)    # 二维向量
-    >>> Vector()        # 三维零向量
+    Vector(1.0, 2.0, 3.0)
 
-    - 从可迭代对象构造（如列表、元组、生成器等）
+    >>> Vector(1, 2) # 二维向量
+    Vector(1.0, 2.0)
+
+    >>> Vector() # 三维零向量
+    Vector(0.0, 0.0, 0.0)
+
+    从可迭代对象构造（如列表、元组、生成器等）：
+
     >>> vec = [1, 2, 3]
     >>> Vector(vec)
+    Vector(1.0, 2.0, 3.0)
     >>> Vector(v * 2 for v in vec)
+    Vector(2.0, 4.0, 6.0)
 
     -----
 
@@ -160,7 +170,7 @@ class Vector(object):
 
         :param bool is_3d: 是否创建三维向量；默认为 True
 
-        :return: 所有分量均为1.0的向量
+        :return: 所有分量均为 1.0 的向量
         :rtype: Vector
         """
         return Vector(VEC_ONE) if is_3d else Vector(VEC_ONE[:2])
@@ -176,7 +186,7 @@ class Vector(object):
 
         :param bool is_3d: 是否创建三维向量
 
-        :return: x分量为1.0，其余分量为0.0的向量
+        :return: x分量为 1.0，其余分量为 0.0 的向量
         :rtype: Vector
         """
         return Vector(VEC_LEFT) if is_3d else Vector(VEC_LEFT[:2])
@@ -192,7 +202,7 @@ class Vector(object):
 
         :param bool is_3d: 是否创建三维向量；默认为 True
 
-        :return: x分量为-1.0，其余分量为0.0的向量
+        :return: x分量为 -1.0，其余分量为 0.0 的向量
         :rtype: Vector
         """
         return Vector(VEC_RIGHT) if is_3d else Vector(VEC_RIGHT[:2])
@@ -208,7 +218,7 @@ class Vector(object):
 
         :param bool is_3d: 是否创建三维向量；默认为 True
 
-        :return: y分量为1.0，其余分量为0.0的向量
+        :return: y分量为 1.0，其余分量为 0.0 的向量
         :rtype: Vector
         """
         return Vector(VEC_UP) if is_3d else Vector(VEC_UP[:2])
@@ -224,7 +234,7 @@ class Vector(object):
 
         :param bool is_3d: 是否创建三维向量；默认为 True
 
-        :return: y分量为1.0，其余分量为0.0的向量
+        :return: y分量为 1.0，其余分量为 0.0 的向量
         :rtype: Vector
         """
         return Vector(VEC_DOWN) if is_3d else Vector(VEC_DOWN[:2])
@@ -238,7 +248,7 @@ class Vector(object):
 
         -----
 
-        :return: z分量为1.0，其余分量为0.0的向量
+        :return: z分量为 1.0，其余分量为 0.0 的向量
         :rtype: Vector
         """
         return Vector(VEC_FORWARD)
@@ -252,7 +262,7 @@ class Vector(object):
 
         -----
 
-        :return: z分量为-1.0，其余分量为0.0的向量
+        :return: z分量为 -1.0，其余分量为 0.0 的向量
         :rtype: Vector
         """
         return Vector(VEC_BACKWARD)
@@ -396,6 +406,9 @@ class Vector(object):
 
         向量转置。
 
+        说明
+        ----
+
         以列表返回当前向量的列向量形式，例如：
 
         >>> vec = Vector(1, 2, 3)
@@ -466,9 +479,9 @@ class Vector(object):
 
         -----
 
-        :param bool inplace: 是否就地修改；默认为True
+        :param bool inplace: 是否就地修改；默认为 True
 
-        :return: 标准化向量，长度为1；就地修改时，返回向量自身
+        :return: 标准化向量，长度为 1；就地修改时，返回向量自身
         :rtype: Vector
 
         :raise VectorError: 对零向量调用时抛出
@@ -502,7 +515,7 @@ class Vector(object):
 
         -----
 
-        :param bool inplace: 是否就地修改；默认为True
+        :param bool inplace: 是否就地修改；默认为 True
 
         :return: 相反向量；就地修改时，返回向量自身
         :rtype: Vector
@@ -911,12 +924,15 @@ class Vector(object):
         """
         向量叉积。
 
+        说明
+        ----
+
         仅支持三维向量。
 
         -----
 
         :param Vector|tuple[float,float,float] vec: 另一向量（Vector、tuple）
-        :param bool inplace: 是否就地修改；默认为True
+        :param bool inplace: 是否就地修改；默认为 True
 
         :return: 向量叉积；就地修改时，返回向量自身
         :rtype: Vector
@@ -943,7 +959,7 @@ class Vector(object):
         -----
 
         :param Vector|tuple[float] basis: 另一向量
-        :param bool inplace: 是否就地修改；默认为True
+        :param bool inplace: 是否就地修改；默认为 True
 
         :return: 投影向量；就地修改时，返回向量自身
         :rtype: Vector
@@ -1025,6 +1041,9 @@ class Vector(object):
         """
         对向量应用欧拉旋转。
 
+        说明
+        ----
+
         仅支持三维向量。
 
         -----
@@ -1032,7 +1051,7 @@ class Vector(object):
         :param float angle: 旋转角度
         :param str axis: 旋转轴，可选值为 "x"、"y"、"z"
         :param bool rad: 旋转角度是否使用弧度制；默认为 False
-        :param bool inplace: 是否就地修改；默认为True
+        :param bool inplace: 是否就地修改；默认为 True
 
         :return: 旋转后的向量；就地修改时，返回向量自身
         :rtype: Vector
@@ -1071,6 +1090,9 @@ class Vector(object):
         """
         将当前向量绕另一向量旋转。
 
+        说明
+        ----
+
         仅支持三维向量。
 
         -----
@@ -1078,7 +1100,7 @@ class Vector(object):
         :param Vector|tuple[float,float,float] u: 旋转轴向量
         :param float angle: 旋转角度
         :param bool rad: 旋转角度是否使用弧度制；默认为 False
-        :param bool inplace: 是否就地修改；默认为True
+        :param bool inplace: 是否就地修改；默认为 True
 
         :return: 旋转后的向量；就地修改时，返回向量自身
         :rtype: Vector
@@ -1187,6 +1209,9 @@ def _is_scalar(val):
 def vec_length2(vec):
     """
     计算向量长度的平方。
+
+    说明
+    ----
 
     相比于直接计算长度，速度更快。
 
@@ -1456,6 +1481,9 @@ def vec_euler_rotate(vec, x_angle=0.0, y_angle=0.0, z_angle=0.0, order="zyx", ra
     """
     对向量应用欧拉旋转。
 
+    说明
+    ----
+
     仅支持三维向量。
 
     -----
@@ -1512,6 +1540,9 @@ def vec_rotate_around(v, u, angle, rad=False):
     """
     将向量v绕着向量u旋转。
 
+    说明
+    ----
+
     仅支持三维向量。
 
     -----
@@ -1548,9 +1579,9 @@ def vec_entity_up(entity_id, ignore_rot_x=False):
     -----
 
     :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0；默认为False
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为 True 时x轴视角将视为 0；默认为 False
 
-    :return: 实体局部坐标系中朝上的单位向量，获取失败时返回None
+    :return: 实体局部坐标系中朝上的单位向量，获取失败时返回 None
     :rtype: tuple[float,float,float]|None
     """
     if ignore_rot_x:
@@ -1571,9 +1602,9 @@ def vec_entity_down(entity_id, ignore_rot_x=False):
     -----
 
     :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0；默认为False
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为 True 时x轴视角将视为 0；默认为 False
 
-    :return: 实体局部坐标系中朝下的单位向量，获取失败时返回None
+    :return: 实体局部坐标系中朝下的单位向量，获取失败时返回 None
     :rtype: tuple[float,float,float]|None
     """
     if ignore_rot_x:
@@ -1594,7 +1625,7 @@ def vec_entity_left(entity_id):
 
     :param str entity_id: 实体ID
 
-    :return: 实体局部坐标系中朝左的单位向量，获取失败时返回None
+    :return: 实体局部坐标系中朝左的单位向量，获取失败时返回 None
     :rtype: tuple[float,float,float]|None
     """
     f = vec_entity_forward(entity_id)
@@ -1612,7 +1643,7 @@ def vec_entity_right(entity_id):
 
     :param str entity_id: 实体ID
 
-    :return: 实体局部坐标系中朝右的单位向量，获取失败时返回None
+    :return: 实体局部坐标系中朝右的单位向量，获取失败时返回 None
     :rtype: tuple[float,float,float]|None
     """
     l = vec_entity_left(entity_id)
@@ -1629,9 +1660,9 @@ def vec_entity_forward(entity_id, ignore_rot_x=False):
     -----
 
     :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0；默认为False
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为 True 时x轴视角将视为 0；默认为 False
 
-    :return: 实体局部坐标系中朝前的单位向量，获取失败时返回None
+    :return: 实体局部坐标系中朝前的单位向量，获取失败时返回 None
     :rtype: tuple[float,float,float]|None
     """
     rot = get_cf(entity_id).Rot.GetRot()
@@ -1650,9 +1681,9 @@ def vec_entity_backward(entity_id, ignore_rot_x=False):
     -----
 
     :param str entity_id: 实体ID
-    :param bool ignore_rot_x: 是否忽略x轴视角，设为True时x轴视角将视为0；默认为False
+    :param bool ignore_rot_x: 是否忽略x轴视角，设为 True 时x轴视角将视为 0；默认为 False
 
-    :return: 实体局部坐标系中朝后的单位向量，获取失败时返回None
+    :return: 实体局部坐标系中朝后的单位向量，获取失败时返回 None
     :rtype: tuple[float,float,float]|None
     """
     f = vec_entity_forward(entity_id, ignore_rot_x)

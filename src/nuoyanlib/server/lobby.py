@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -35,9 +35,6 @@ class LobbyDataMgr(ServerEventProxy):
     - 便捷管理联机大厅云端数据，自动完成数据更新上传/数据获取/数据冲突等情况的处理。
     - 设置订单发货。
     - 在单机环境中模拟联机大厅环境。
-
-    -----
-
     """
 
     def __init__(self):
@@ -67,13 +64,13 @@ class LobbyDataMgr(ServerEventProxy):
         -----
 
         :param str key: 数据键
-        :param str|int|float|bool|list|dict|None default: 数据默认值；需传入一个函数，无参数，返回值即为数据默认值；默认为None
-        :param bool is_global: 是否为全局数据（即不依赖玩家uid）；默认为False
+        :param str|int|float|bool|list|dict|None default: 数据默认值；需传入一个函数，无参数，返回值即为数据默认值；默认为 None
+        :param bool is_global: 是否为全局数据（即不依赖玩家 uid）；默认为 False
 
         :return: 无
         :rtype: None
 
-        :raise TypeError: 数据键必须为str类型，否则抛出此异常
+        :raise TypeError: 数据键必须为 str 类型，否则抛出此异常
         :raise KeyError: 数据键已注册
         """
         if type(key) is not str:
@@ -121,14 +118,17 @@ class LobbyDataMgr(ServerEventProxy):
         """
         从云端获取数据并缓存。
 
+        说明
+        ----
+
         请先用 ``.register()`` 注册数据再调用本调接口。
 
         -----
 
-        :param int|str player: 玩家UID或实体ID，传入0表示全局数据；默认为0
+        :param int|str player: 玩家 UID 或实体ID，传入 0 表示全局数据；默认为 0
         :param str keys: [变长位置参数] 需要获取的数据键，省略该参数将获取所有已注册的数据
-        :param function|None callback: [仅关键字参数] 获取结果回调函数；默认为None
-        :param dict[str,int|str|dict]|None simulate: [仅关键字参数] 联机大厅模拟数据，传入该参数后获取结果将使用该数据，正式服环境会忽略该参数；默认为None
+        :param function|None callback: [仅关键字参数] 获取结果回调函数；默认为 None
+        :param dict[str,int|str|dict]|None simulate: [仅关键字参数] 联机大厅模拟数据，传入该参数后获取结果将使用该数据，正式服环境会忽略该参数；默认为 None
 
         :return: 无
         :rtype: None
@@ -191,10 +191,10 @@ class LobbyDataMgr(ServerEventProxy):
         -----
 
         :param str key: 数据键
-        :param function exp: 更新表达式函数，接受当前数据值作为唯一参数，返回更新后的数据值；如lambda x: x + 1，表述数据自增1
-        :param int|str player: 玩家UID或实体ID，传入0表示全局数据；默认为0
-        :param int|None order_id: [仅关键字参数] 需要标记为发货的订单ID；默认为None
-        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为None
+        :param function exp: 更新表达式函数，接受当前数据值作为唯一参数，返回更新后的数据值；如 lambda x: x + 1，表述数据自增 1
+        :param int|str player: 玩家 UID 或实体ID，传入 0 表示全局数据；默认为 0
+        :param int|None order_id: [仅关键字参数] 需要标记为发货的订单ID；默认为 None
+        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为 None
 
         :return: 无
         :rtype: None
@@ -221,15 +221,18 @@ class LobbyDataMgr(ServerEventProxy):
         """
         强制设置云端某个数据的值。
 
-        注意：若出现数据冲突，本接口将 **强制** 覆盖数据的值，请谨慎使用。
+        说明
+        ----
+
+        若出现数据冲突，本接口将 **强制** 覆盖数据的值，请谨慎使用。
 
         -----
 
         :param str key: 数据键
         :param str|int|float|bool|list|dict|None value: 数据值
-        :param int|str player: 玩家UID或实体ID，传入0表示全局数据；默认为0
-        :param int|None order_id: [仅关键字参数] 需要标记为发货的订单ID；默认为None
-        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为None
+        :param int|str player: 玩家 UID 或实体ID，传入 0 表示全局数据；默认为 0
+        :param int|None order_id: [仅关键字参数] 需要标记为发货的订单ID；默认为 None
+        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为 None
 
         :return: 无
         :rtype: None
@@ -254,12 +257,15 @@ class LobbyDataMgr(ServerEventProxy):
         """
         从服务端本地缓存中获取数据。
 
+        说明
+        ----
+
         请先用 ``.register()`` 注册数据再调用本调接口。
 
         -----
 
         :param str key: 数据键
-        :param int|str player: 玩家UID或实体ID，传入0表示全局数据；默认为0
+        :param int|str player: 玩家 UID 或实体ID，传入 0 表示全局数据；默认为 0
 
         :return: 数据值
         :rtype: str|int|float|bool|list|dict|None
@@ -273,13 +279,16 @@ class LobbyDataMgr(ServerEventProxy):
         """
         设置订单发货。
 
+        说明
+        ----
+
         如需同时设置数据和发货，建议使用 ``.update()`` 或 ``.set()`` 接口。
 
         -----
 
         :param int order_id: 订单ID
-        :param int|str player: 玩家UID或实体ID
-        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为None
+        :param int|str player: 玩家 UID 或实体ID
+        :param function|None callback: [仅关键字参数] 设置结果回调函数；默认为 None
 
         :return: 无
         :rtype: None
@@ -306,9 +315,9 @@ class LobbyDataMgr(ServerEventProxy):
 
         -----
 
-        :param int|str player: 玩家UID或实体ID
-        :param function|None callback: [仅关键字参数] 查询结果回调函数；默认为None
-        :param dict[int,dict[str,int|str]]|None simulate: [仅关键字参数] 联机大厅模拟数据，传入该参数后查询结果将使用该数据，正式服环境会忽略该参数；默认为None
+        :param int|str player: 玩家 UID 或实体ID
+        :param function|None callback: [仅关键字参数] 查询结果回调函数；默认为 None
+        :param dict[int,dict[str,int|str]]|None simulate: [仅关键字参数] 联机大厅模拟数据，传入该参数后查询结果将使用该数据，正式服环境会忽略该参数；默认为 None
 
         :return: 无
         :rtype: None

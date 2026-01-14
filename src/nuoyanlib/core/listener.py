@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -176,63 +176,62 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
 
     基于事件池机制的事件监听器，在高频监听/反监听场景下性能更好。
 
+    说明
+    ----
+
     适用于普通函数与实例方法，若用于普通函数，需将 ``is_method`` 参数设为 ``False`` 。
     事件名与函数名相同时，可省略 ``event_name`` 参数。监听ModSDK事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
 
-    注意：在类中使用时，需在 ``__init__()`` 方法中调用一次 ``listen_all_events()`` 方可生效，详见示例。
+    在类中使用时，需在 ``__init__()`` 方法中调用一次 ``listen_all_events()`` 方可生效，详见示例。
 
-    -----
+    示例
+    ----
 
-    【示例】
+    >>> import mod.client.extraClientApi as client_api
 
-    ::
-
-        import mod.client.extraClientApi as client_api
-        import <scripts_root>.nuoyanlib.client as nyl
-
-        class MyClientSystem(client_api.GetClientSystemCls()):
-            def __init__(self, namespace, system_name):
-                # 对当前类中所有被@event装饰的方法执行事件监听
-                nyl.listen_all_events(self)
-                # 调用以下函数可监听特定事件
-                nyl.listen_event(self.MyCustomEvent)
-
-            # 监听MyCustomEvent事件，事件来源为MyMod:MyServerSystem
-            @nyl.event("MyCustomEvent", "MyMod", "MyServerSystem")
-            def EventCallback(self, args):
-                ...
-
-            # 事件名与函数名相同时，可省略event_name参数
-            @nyl.event(ns="MyMod", sys_name="MyServerSystem")
-            def MyCustomEvent(self, args):
-                ...
-
-            # 监听ModSDK事件且事件名与函数名相同时，可省略所有参数
-            @nyl.event
-            def UiInitFinished(self, args):
-                ...
-
-            def Destroy(self):
-                # 必要时，调用以下函数可取消当前类中所有被@event装饰的方法的事件监听
-                nyl.unlisten_all_events(self)
-                # 调用以下函数可取消监听特定事件
-                nyl.unlisten_event(self.MyCustomEvent)
+    >>> class MyClientSystem(client_api.GetClientSystemCls()):
+    ...     def __init__(self, namespace, system_name):
+    ...         # 对当前类中所有被 @event 装饰的方法执行事件监听
+    ...         nyl.listen_all_events(self)
+    ...         # 调用以下函数可监听特定事件
+    ...         # nyl.listen_event(self.MyCustomEvent)
+    ...
+    ...     # 监听 MyCustomEvent 事件，事件来源为 MyMod:MyServerSystem
+    ...     @nyl.event("MyCustomEvent", "MyMod", "MyServerSystem")
+    ...     def EventCallback(self, args):
+    ...         pass
+    ...
+    ...    # 事件名与函数名相同时，可省略 event_name 参数
+    ...    @nyl.event(ns="MyMod", sys_name="MyServerSystem")
+    ...    def MyCustomEvent(self, args):
+    ...        pass
+    ...
+    ...     # 监听 ModSDK 事件且事件名与函数名相同时，可省略所有参数
+    ...     @nyl.event
+    ...     def UiInitFinished(self, args):
+    ...         pass
+    ...
+    ...     def Destroy(self):
+    ...         # 必要时，调用以下函数可取消当前类中所有被 @event 装饰的方法的事件监听
+    ...         nyl.unlisten_all_events(self)
+    ...         # 调用以下函数可取消监听特定事件
+    ...         # nyl.unlisten_event(self.MyCustomEvent)
+    ...
 
     对静态函数使用时，事件将被立即监听，无需手动调用 ``listen_all_events()`` 或 ``listen_event()``。
 
-    ::
-
-        @nyl.event(ns="MyMod", sys_name="MyServerSystem", is_method=False)
-        def MyCustomEvent(args):
-            ...
+    >>> @nyl.event(ns="MyMod", sys_name="MyServerSystem", is_method=False)
+    ... def MyCustomEvent(args):
+    ...     pass
+    ...
 
     -----
 
     :param str|function event_name: 事件名称；默认为被装饰函数名
     :param str ns: 事件来源命名空间
     :param str sys_name: 事件来源系统名称
-    :param int priority: 优先级，值越大优先级越高；默认为0
-    :param bool is_method: 被装饰函数是否是实例方法；默认为True
+    :param int priority: 优先级，值越大优先级越高；默认为 0
+    :param bool is_method: 被装饰函数是否是实例方法；默认为 True
     """
     def add_listener(func):
         # 解析事件参数
@@ -267,10 +266,10 @@ def listen_event(func, event_name="", ns="", sys_name="", priority=0, use_decora
 
     :param function func: 事件回调函数，支持普通函数与实例方法
     :param str event_name: 事件名称；事件名与函数名相同时，可省略该参数
-    :param str ns: 事件来源命名空间；监听ModSDK事件时，可省略该参数
-    :param str sys_name: 事件来源系统名称；监听ModSDK事件时，可省略该参数
-    :param int priority: 优先级，值越大优先级越高；默认为0
-    :param bool use_decorator: 是否使用从 @event 装饰器传入的参数，设为True时，忽略event_name、ns、sys_name和priority参数；默认为False
+    :param str ns: 事件来源命名空间；监听 ModSDK 事件时，可省略该参数
+    :param str sys_name: 事件来源系统名称；监听 ModSDK 事件时，可省略该参数
+    :param int priority: 优先级，值越大优先级越高；默认为 0
+    :param bool use_decorator: 是否使用从 @event 装饰器传入的参数，设为 True 时，忽略 event_name、ns、sys_name 和 priority 参数；默认为 False
 
     :return: 无
     :rtype: None
@@ -292,10 +291,10 @@ def unlisten_event(func, event_name="", ns="", sys_name="", priority=0, use_deco
 
     :param function func: 事件回调函数，支持普通函数与实例方法
     :param str event_name: 事件名称；事件名与函数名相同时，可省略该参数
-    :param str ns: 事件来源命名空间；监听ModSDK事件时，可省略该参数
-    :param str sys_name: 事件来源系统名称；监听ModSDK事件时，可省略该参数
-    :param int priority: 优先级，值越大优先级越高；默认为0
-    :param bool use_decorator: 是否使用从 @event 装饰器传入的参数，设为True时，忽略event_name、ns、sys_name和priority参数；默认为False
+    :param str ns: 事件来源命名空间；监听 ModSDK 事件时，可省略该参数
+    :param str sys_name: 事件来源系统名称；监听 ModSDK 事件时，可省略该参数
+    :param int priority: 优先级，值越大优先级越高；默认为 0
+    :param bool use_decorator: 是否使用从 @event 装饰器传入的参数，设为 True 时，忽略 event_name、ns、sys_name 和 priority 参数；默认为 False
 
     :return: 无
     :rtype: None
@@ -320,6 +319,9 @@ def listen_all_events(ins):
     """
     对实例中所有被 ``@event`` 装饰的方法进行事件监听。
 
+    说明
+    ----
+
     基于事件池机制，在高频监听/反监听场景下性能更好。
 
     -----
@@ -337,6 +339,9 @@ def listen_all_events(ins):
 def unlisten_all_events(ins):
     """
     反监听实例中所有被 ``@event`` 装饰的方法的事件监听。
+
+    说明
+    ----
 
     基于事件池机制，在高频监听/反监听场景下性能较好。
 
@@ -360,11 +365,11 @@ def is_listened(func, event_name="", ns="", sys_name="", priority=0):
 
     :param function func: 事件回调函数，支持普通函数与实例方法
     :param str event_name: 事件名称；事件名与函数名相同时，可省略该参数
-    :param str ns: 事件来源命名空间；监听ModSDK事件时，可省略该参数
-    :param str sys_name: 事件来源系统名称；监听ModSDK事件时，可省略该参数
-    :param int priority: 优先级，值越大优先级越高；默认为0
+    :param str ns: 事件来源命名空间；监听 ModSDK 事件时，可省略该参数
+    :param str sys_name: 事件来源系统名称；监听 ModSDK 事件时，可省略该参数
+    :param int priority: 优先级，值越大优先级越高；默认为 0
 
-    :return: 已监听返回True，否则返回False
+    :return: 已监听返回 True，否则返回 False
     :rtype: bool
     """
     args = _parse_listen_args(func, event_name, ns, sys_name)
@@ -447,7 +452,10 @@ class ClientEventProxy(BaseEventProxy):
     """
     客户端事件代理类。
 
-    继承 ``ClientEventProxy`` 后，所有ModSDK客户端事件无需监听，编写一个与事件同名的方法即可使用，
+    说明
+    ----
+
+    继承 ``ClientEventProxy`` 后，所有 ModSDK 客户端事件无需监听，编写一个与事件同名的方法即可使用，
     且事件参数采用对象形式，支持参数名补全。
 
     对于使用 ``@event`` 装饰器监听事件，无需在 ``__init__()`` 方法手动调用 ``listen_all_events()``。
@@ -458,7 +466,10 @@ class ServerEventProxy(BaseEventProxy):
     """
     服务端事件代理类。
 
-    继承 ``ServerEventProxy`` 后，所有ModSDK服务端事件无需监听，编写一个与事件同名的方法即可使用，
+    说明
+    ----
+
+    继承 ``ServerEventProxy`` 后，所有 ModSDK 服务端事件无需监听，编写一个与事件同名的方法即可使用，
     且事件参数采用对象形式，支持参数名补全。
 
     对于使用 ``@event`` 装饰器监听事件，无需在 ``__init__()`` 方法手动调用 ``listen_all_events()``。

@@ -43,14 +43,14 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
     :param int dim: 维度ID
     :param float r: 生成半径
     :param int num: 裂地方块数量
-    :param float time: [仅关键字参数] 裂地效果持续时间，包括上浮和下沉阶段，单位为秒；默认为3.0
-    :param float tilt_angle: [仅关键字参数] 裂地方块最大倾斜角度；默认为22.0
-    :param float min_height: [仅关键字参数] 裂地方块最小高度；默认为0.0
-    :param float max_height: [仅关键字参数] 裂地方块最大高度；默认为0.3
-    :param float in_time: [仅关键字参数] 上浮阶段持续时间；默认为0.2
-    :param float out_time: [仅关键字参数] 下沉阶段持续时间；默认为0.5
-    :param float in_dist: [仅关键字参数] 上浮距离；默认为0.5
-    :param float out_dist: [仅关键字参数] 下沉距离；默认为0.5
+    :param float time: [仅关键字参数] 裂地效果持续时间，包括上浮和下沉阶段，单位为秒；默认为 3.0
+    :param float tilt_angle: [仅关键字参数] 裂地方块最大倾斜角度；默认为 22.0
+    :param float min_height: [仅关键字参数] 裂地方块最小高度；默认为 0.0
+    :param float max_height: [仅关键字参数] 裂地方块最大高度；默认为 0.3
+    :param float in_time: [仅关键字参数] 上浮阶段持续时间；默认为 0.2
+    :param float out_time: [仅关键字参数] 下沉阶段持续时间；默认为 0.5
+    :param float in_dist: [仅关键字参数] 上浮距离；默认为 0.5
+    :param float out_dist: [仅关键字参数] 下沉距离；默认为 0.5
 
     :return: 生成的裂地方块的实体ID列表
     :rtype: list[str]

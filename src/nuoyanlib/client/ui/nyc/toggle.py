@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -30,8 +30,8 @@ class NyToggle(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 开关所在UI类的实例（需继承ScreenNodeExtension）
-    :param SwitchToggleUIControl toggle_control: 通过asSwitchToggle()等方式获取的SwitchToggleUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 开关所在UI类的实例（需继承 ScreenNodeExtension）
+    :param SwitchToggleUIControl toggle_control: 通过 asSwitchToggle() 等方式获取的 SwitchToggleUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.TOGGLE
@@ -76,8 +76,11 @@ class NyToggle(NyControl):
         """
         设置开关状态改变时触发的回调函数。
 
-        需要将UI json中开关的 ``"$toggle_name"`` 字段的值设置为 ``"#<namespace>.<func_name>"`` 方可生效，
-        ``<namespace>`` 即为UI json中 ``"namespace"`` 对应的值， ``<func_name>`` 为回调函数名。
+        说明
+        ----
+
+        需要将 UI json 中开关的 ``"$toggle_name"`` 字段的值设置为 ``"#<namespace>.<func_name>"`` 方可生效，
+        ``<namespace>`` 即为 UI json 中 ``"namespace"`` 对应的值， ``<func_name>`` 为回调函数名。
 
         -----
 

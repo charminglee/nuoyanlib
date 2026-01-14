@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -30,8 +30,8 @@ class NySelectionWheel(InteractableControl, NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 轮盘所在UI类的实例（需继承ScreenNodeExtension）
-    :param SelectionWheelUIControl selection_wheel_control: 通过asSelectionWheel()等方式获取的SelectionWheelUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 轮盘所在UI类的实例（需继承 ScreenNodeExtension）
+    :param SelectionWheelUIControl selection_wheel_control: 通过 asSelectionWheel() 等方式获取的 SelectionWheelUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.SELECTION_WHEEL
@@ -94,15 +94,18 @@ class NySelectionWheel(InteractableControl, NyControl):
         """
         设置轮盘回调函数。
 
+        说明
+        ----
+
         支持同时设置多个同类型的回调，按设置顺序依次触发。
 
-        注意：调用本方法后请勿再调用ModSDK的设置轮盘回调的接口（如 ``.SetTouchUpCallback()``），
+        调用本方法后请勿再调用 ModSDK 的设置轮盘回调的接口（如 ``.SetTouchUpCallback()``），
         否则所有通过本方法设置的回调函数将无效。
 
         -----
 
         :param function func: 回调函数
-        :param WheelCallbackType cb_type: 回调类型，请使用WheelCallbackType枚举值；默认为WheelCallbackType.CLICK
+        :param WheelCallbackType cb_type: 回调类型，请使用 WheelCallbackType 枚举值；默认为 WheelCallbackType.CLICK
 
         :return: 是否成功
         :rtype: bool
@@ -118,7 +121,7 @@ class NySelectionWheel(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param WheelCallbackType cb_type: 回调类型，请使用WheelCallbackType枚举值；默认为WheelCallbackType.CLICK
+        :param WheelCallbackType cb_type: 回调类型，请使用 WheelCallbackType 枚举值；默认为 WheelCallbackType.CLICK
 
         :return: 是否成功
         :rtype: bool

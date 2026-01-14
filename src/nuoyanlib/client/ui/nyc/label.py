@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -30,8 +30,8 @@ class NyLabel(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 文本所在UI类的实例（需继承ScreenNodeExtension）
-    :param LabelUIControl label_control: 通过asLabel()获取等方式的LabelUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 文本所在UI类的实例（需继承 ScreenNodeExtension）
+    :param LabelUIControl label_control: 通过 asLabel() 获取等方式的 LabelUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.LABEL
@@ -105,7 +105,7 @@ class NyLabel(NyControl):
         """
         [可读写属性]
 
-        文本颜色，(r, g, b)，取值[0, 1]。
+        文本颜色，(r, g, b)，取值 [0, 1]。
 
         :rtype: tuple[float,float,float]
         """
@@ -116,7 +116,7 @@ class NyLabel(NyControl):
         """
         [可读写属性]
 
-        文本颜色，(r, g, b)，取值[0, 1]。
+        文本颜色，(r, g, b)，取值 [0, 1]。
 
         :type val: tuple[float,float,float]
         """
@@ -151,6 +151,9 @@ class NyLabel(NyControl):
 
         文本字体大小缩放值。
 
+        说明
+        ----
+
         默认字体大小，取值有限为 ``"small"`` 、``"normal"`` 、``"large"`` ，
         ``font_scale`` 是在这个默认字体的基础上进行字体大小缩放；默认为 ``1.0`` 。
 
@@ -164,6 +167,9 @@ class NyLabel(NyControl):
         [只写属性]
 
         文本字体大小缩放值。
+
+        说明
+        ----
 
         默认字体大小，取值有限为 ``"small"`` 、``"normal"`` 、``"large"`` ，
         ``font_scale`` 是在这个默认字体的基础上进行字体大小缩放；默认为 ``1.0`` 。

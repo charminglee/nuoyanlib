@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -31,8 +31,8 @@ class NyComboBox(InteractableControl, NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 下拉框所在UI类的实例（需继承ScreenNodeExtension）
-    :param NeteaseComboBoxUIControl combo_box_control: 通过asNeteaseComboBox()等方式获取的NeteaseComboBoxUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 下拉框所在UI类的实例（需继承 ScreenNodeExtension）
+    :param NeteaseComboBoxUIControl combo_box_control: 通过 asNeteaseComboBox() 等方式获取的 NeteaseComboBoxUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.COMBO_BOX
@@ -186,7 +186,7 @@ class NyComboBox(InteractableControl, NyControl):
 
         -----
 
-        :param list[tuple[str,str|None,Any|None]] data: 数据列表，列表元素为元组：(显示名称, 图标贴图路径, 自定义数据) ，若无需图标或绑定数据，可填None
+        :param list[tuple[str,str|None,Any|None]] data: 数据列表，列表元素为元组：(显示名称, 图标贴图路径, 自定义数据) ，若无需图标或绑定数据，可填 None
 
         :return: 无
         :rtype: None
@@ -205,15 +205,18 @@ class NyComboBox(InteractableControl, NyControl):
         """
         设置下拉框回调函数。
 
+        说明
+        ----
+
         支持同时设置多个同类型的回调，按设置顺序依次触发。
 
-        注意：调用本方法后请勿再调用ModSDK的注册下拉框回调的接口（如 ``.RegisterSelectItemCallback()``），
+        调用本方法后请勿再调用 ModSDK 的注册下拉框回调的接口（如 ``.RegisterSelectItemCallback()`` ），
         否则所有通过本方法设置的回调函数将无效。
 
         -----
 
         :param function func: 回调函数
-        :param ComboBoxCallbackType cb_type: 回调类型，请使用ComboBoxCallbackType枚举值；默认为ComboBoxCallbackType.SELECT
+        :param ComboBoxCallbackType cb_type: 回调类型，请使用 ComboBoxCallbackType 枚举值；默认为 ComboBoxCallbackType.SELECT
 
         :return: 是否成功
         :rtype: bool
@@ -229,7 +232,7 @@ class NyComboBox(InteractableControl, NyControl):
         -----
 
         :param function func: 回调函数
-        :param ComboBoxCallbackType cb_type: 回调类型，请使用ComboBoxCallbackType枚举值；默认为ComboBoxCallbackType.SELECT
+        :param ComboBoxCallbackType cb_type: 回调类型，请使用 ComboBoxCallbackType 枚举值；默认为 ComboBoxCallbackType.SELECT
 
         :return: 是否成功
         :rtype: bool

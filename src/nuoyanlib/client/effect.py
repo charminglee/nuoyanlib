@@ -121,19 +121,22 @@ class NeteaseParticle(object):
     """
     网易粒子特效管理器。
 
+    说明
+    ----
+
     切换维度后会自动隐藏非本维度创建的而且没有绑定实体的粒子，回到该维度后会自动重新显示。
 
     粒子创建之后需要调用 ``.Play()`` 方法才会播放，如果播放非本维度创建的粒子，会同时修改该粒子的创建维度为当前维度。
 
     -----
 
-    :param str json_path: 粒子特效json文件路径，包含后缀名.json，如"effects/my_effect.json"
-    :param tuple[float,float,float]|None pos: 粒子的世界坐标位置，绑定实体或骨骼时可忽略该参数；默认为(0, 0, 0)
-    :param dict[str,str|tuple[float,float,float]|bool]|None bind_entity: 实体绑定参数字典；默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
-    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典；默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
+    :param str json_path: 粒子特效 json 文件路径，包含后缀名 .json，如 "effects/my_effect.json"
+    :param tuple[float,float,float]|None pos: 粒子的世界坐标位置，绑定实体或骨骼时可忽略该参数；默认为 (0, 0, 0)
+    :param dict[str,str|tuple[float,float,float]|bool]|None bind_entity: 实体绑定参数字典；默认为 None，不能同时绑定实体和骨骼模型，具体参数详见 BindEntity 方法
+    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典；默认为 None，不能同时绑定实体和骨骼模型，具体参数详见 BindSkeleton 方法
 
     :raise RuntimeError: 粒子创建失败/绑定粒子到实体或骨骼时出现问题
-    :raise ValueError: 同时传入bind_entity和bind_skeleton参数时抛出
+    :raise ValueError: 同时传入 bind_entity 和 bind_skeleton 参数时抛出
     """
 
     def __init__(self, json_path, pos=(0, 0, 0), bind_entity=None, bind_skeleton=None):
@@ -359,8 +362,11 @@ class NeteaseParticle(object):
 
         粒子发射器每帧发射粒子的频率。
 
-        对应粒子特效json文件中 ``"emissionrate"`` 的值。
-        数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
+        说明
+        ----
+
+        对应粒子特效 json 文件中 ``"emissionrate"`` 的值。
+        数据类型为元组：(min, max)，其中 min 表示每帧发射粒子频率的最小值，max 表示每帧发射粒子频率的最大值。
 
         :rtype: tuple[float,float]
         """
@@ -373,10 +379,13 @@ class NeteaseParticle(object):
 
         设置粒子发射器每帧发射粒子的频率。
 
-        对应粒子特效json文件中 ``"emissionrate"`` 的值。
-        数据类型为元组：(min, max)，其中min表示每帧发射粒子频率的最小值，max表示每帧发射粒子频率的最大值。
+        说明
+        ----
 
-        频率越大则每帧发射的粒子数量越多，但粒子数量不会超过粒子发射器的粒子容量，同时由于性能考虑，每帧发射的粒子数量也不会超过100个。
+        对应粒子特效 json 文件中 ``"emissionrate"`` 的值。
+        数据类型为元组：(min, max)，其中 min 表示每帧发射粒子频率的最小值，max 表示每帧发射粒子频率的最大值。
+
+        频率越大则每帧发射的粒子数量越多，但粒子数量不会超过粒子发射器的粒子容量，同时由于性能考虑，每帧发射的粒子数量也不会超过 100 个。
         每帧发射粒子的频率将在频率最小值和频率最大值之间取随机数进行插值。当值设置为负值时设置将会失败。
 
         :type value: tuple[float,float]
@@ -390,7 +399,10 @@ class NeteaseParticle(object):
 
         粒子发射器包含的最大粒子数量。
 
-        对应粒子特效json文件中 ``"numparticles"`` 的值。
+        说明
+        ----
+
+        对应粒子特效 json 文件中 ``"numparticles"`` 的值。
 
         :rtype: int
         """
@@ -403,10 +415,13 @@ class NeteaseParticle(object):
 
         设置粒子发射器的粒子容量。
 
-        即粒子发射器所包含的最大粒子数量，不能为负值，粒子的数量最大值不超过100000。
+        说明
+        ----
+
+        即粒子发射器所包含的最大粒子数量，不能为负值，粒子的数量最大值不超过 100000。
         该数量并不代表目前粒子发射器所发射的粒子数量，如需要增加发射的粒子数量，需同时改变粒子的发射频率。
 
-        对应粒子特效json文件中 ``"numparticles"`` 的值。
+        对应粒子特效 json 文件中 ``"numparticles"`` 的值。
 
         :type value: int
         """
@@ -419,10 +434,13 @@ class NeteaseParticle(object):
 
         粒子大小的最小值和最大值。
 
-        数据类型为元组：((min_x, min_y), (max_x, max_y))，其中min_x为粒子x轴大小的最小值，min_y为粒子y轴大小的最小值，
-        max_x为粒子x轴大小的最大值，max_y为粒子y轴大小的最大值。
+        说明
+        ----
 
-        对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
+        数据类型为元组：((min_x, min_y), (max_x, max_y))，其中 min_x 为粒子x轴大小的最小值，min_y 为粒子y轴大小的最小值，
+        max_x 为粒子x轴大小的最大值，max_y 为粒子y轴大小的最大值。
+
+        对应粒子特效 json 文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
 
         :rtype: tuple[tuple[float,float],tuple[float,float]]
         """
@@ -435,11 +453,14 @@ class NeteaseParticle(object):
 
         设置粒子大小的最小值及最大值。
 
-        数据类型为元组：((min_x, min_y), (max_x, max_y))，其中min_x为粒子x轴大小的最小值，min_y为粒子y轴大小的最小值，
-        max_x为粒子x轴大小的最大值，max_y为粒子y轴大小的最大值。
+        说明
+        ----
+
+        数据类型为元组：((min_x, min_y), (max_x, max_y))，其中 min_x 为粒子x轴大小的最小值，min_y 为粒子y轴大小的最小值，
+        max_x 为粒子x轴大小的最大值，max_y 为粒子y轴大小的最大值。
         粒子大小会在最小值和最大值当中取随机值进行决定，当该值设置为负值时设置将会失败。
 
-        对应粒子特效json文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
+        对应粒子特效 json 文件中 ``"particlesize"`` 的 ``"min"`` 和 ``"max"`` 值。
 
         :type value: tuple[tuple[float,float],tuple[float,float]]
         """
@@ -451,6 +472,9 @@ class NeteaseParticle(object):
         [可读写属性]
 
         粒子发射器的体积大小缩放值。
+
+        说明
+        ----
 
         数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
 
@@ -464,6 +488,9 @@ class NeteaseParticle(object):
         [可读写属性]
 
         设置粒子发射器的体积大小缩放。
+
+        说明
+        ----
 
         数据类型为元组：(x, y, z)，其中x、y、z分别为各个坐标轴方向的缩放值。
         不影响单个粒子的尺寸，粒子发射器的体积越大，则粒子的发射范围越大。
@@ -503,6 +530,9 @@ class NeteaseParticle(object):
 
         粒子发射器的旋转角度。
 
+        说明
+        ----
+
         旋转顺序：zxy。
 
         :rtype: tuple[float,float,float]
@@ -515,6 +545,9 @@ class NeteaseParticle(object):
         [可读写属性]
 
         粒子发射器的旋转角度。
+
+        说明
+        ----
 
         旋转顺序：zxy。
 
@@ -551,9 +584,9 @@ class NeteaseParticle(object):
         -----
 
         :param str ent_id: 特效绑定的实体ID
-        :param tuple[float,float,float] offset: 绑定的偏移量；默认为(0, 0, 0)
-        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为(0, 0, 0)
-        :param bool correction: 是否开启特效旋转角度修正，开启后可以使特效的旋转角度准确设置为参照玩家的相对角度；默认为False
+        :param tuple[float,float,float] offset: 绑定的偏移量；默认为 (0, 0, 0)
+        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为 (0, 0, 0)
+        :param bool correction: 是否开启特效旋转角度修正，开启后可以使特效的旋转角度准确设置为参照玩家的相对角度；默认为 False
 
         :return: 是否成功
         :rtype: bool
@@ -576,10 +609,10 @@ class NeteaseParticle(object):
 
         -----
 
-        :param int model_id: 绑定的骨骼模型的ID（使用Model组件的GetModelId获取）
+        :param int model_id: 绑定的骨骼模型的ID（使用 Model 组件的 GetModelId 获取）
         :param str bone_name: 绑定具体骨骼的名称
-        :param tuple[float,float,float] offset: 绑定的偏移量；默认为(0, 0, 0)
-        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为(0, 0, 0)
+        :param tuple[float,float,float] offset: 绑定的偏移量；默认为 (0, 0, 0)
+        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为 (0, 0, 0)
 
         :return: 是否成功
         :rtype: bool
@@ -656,6 +689,9 @@ class NeteaseParticle(object):
         """
         设置粒子开始自动调整透明度的距离。
 
+        说明
+        ----
+
         粒子与摄像机之间的距离小于该值时会自动调整粒子的透明度，距离摄像机越近，粒子越透明。
 
         -----
@@ -671,12 +707,15 @@ class NeteaseParticle(object):
         """
         设置粒子渲染层级。
 
-        粒子默认层级为1，当层级不为1时表示该特效开启特效分层渲染功能。
+        说明
+        ----
+
+        粒子默认层级为 1，当层级不为 1 时表示该特效开启特效分层渲染功能。
         分层渲染时，层级越高渲染越靠后，层级大的会遮挡层级低的，且同一层级的特效会根据特效的相对位置产生正确的相互遮挡关系。
 
         -----
 
-        :param int layer: 粒子渲染层级，总共包含0-15的层级
+        :param int layer: 粒子渲染层级，总共包含 0-15 的层级
 
         :return: 是否成功
         :rtype: bool
@@ -687,11 +726,14 @@ class NeteaseParticle(object):
         """
         设置当粒子绑定了实体或骨骼模型时，发射出的粒子使用相对坐标系还是世界坐标系。
 
-        与mcstudio特效编辑器中粒子的“相对挂点运动”选项功能相同。
+        说明
+        ----
+
+        与 mcstudio 特效编辑器中粒子的“相对挂点运动”选项功能相同。
 
         -----
 
-        :param bool relative: True表示相对坐标系，False表示世界坐标系
+        :param bool relative: True 表示相对坐标系，False 表示世界坐标系
 
         :return: 是否成功
         :rtype: bool
@@ -704,7 +746,7 @@ class NeteaseParticle(object):
 
         -----
 
-        :param bool use: True为使用点滤波方法，False为使用默认的双线性滤波
+        :param bool use: True 为使用点滤波方法，False 为使用默认的双线性滤波
 
         :return: 是否成功
         :rtype: bool
@@ -716,21 +758,24 @@ class NeteaseFrameAnim(object):
     """
     网易序列帧特效管理器。
 
+    说明
+    ----
+
     切换维度后会自动隐藏非本维度创建的而且没有绑定实体的序列帧，回到该维度后会自动重新显示。
 
     需要注意，序列帧创建之后需要调用 ``.Play()`` 方法才会播放，如果播放非本维度创建的序列帧，会同时修改该序列帧的创建维度为当前维度。
 
     -----
 
-    :param str json_path: 特效json配置路径，如"effects/xxx.json"；json_path与tex_path选择其中一个参数传入即可，两个参数都传入时以json_path为准；默认为空字符串
-    :param str tex_path: 特效贴图路径，如"textures/xxx"，不用后缀名；json_path与tex_path选择其中一个参数传入即可，两个参数都传入时以json_path为准；默认为空字符串
-    :param tuple[float,float,float] pos: 创建位置；默认为None，绑定实体或骨骼时可忽略该参数
-    :param tuple[float,float,float] rot: 角度；默认为None，绑定实体或骨骼时可忽略该参数
-    :param tuple[float,float,float] scale: 缩放系数；默认为None
-    :param dict[str,str|tuple[float,float,float]]|None bind_entity: 实体绑定参数字典；默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindEntity方法
-    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典；默认为None，不能同时绑定实体和骨骼模型，具体参数详见BindSkeleton方法
+    :param str json_path: 特效 json 配置路径，如 "effects/xxx.json"；json_path 与 tex_path 选择其中一个参数传入即可，两个参数都传入时以 json_path 为准；默认为空字符串
+    :param str tex_path: 特效贴图路径，如 "textures/xxx"，不用后缀名；json_path 与 tex_path 选择其中一个参数传入即可，两个参数都传入时以 json_path 为准；默认为空字符串
+    :param tuple[float,float,float] pos: 创建位置；默认为 None，绑定实体或骨骼时可忽略该参数
+    :param tuple[float,float,float] rot: 角度；默认为 None，绑定实体或骨骼时可忽略该参数
+    :param tuple[float,float,float] scale: 缩放系数；默认为 None
+    :param dict[str,str|tuple[float,float,float]]|None bind_entity: 实体绑定参数字典；默认为 None，不能同时绑定实体和骨骼模型，具体参数详见 BindEntity 方法
+    :param dict[str,int|str|tuple[float,float,float]]|None bind_skeleton: 骨骼模型绑定参数字典；默认为 None，不能同时绑定实体和骨骼模型，具体参数详见 BindSkeleton 方法
 
-    :raise ValueError: 同时传入json_path和tex_path，或bind_entity和bind_skeleton参数时抛出
+    :raise ValueError: 同时传入 json_path 和 tex_path，或 bind_entity 和 bind_skeleton 参数时抛出
     :raise RuntimeError: 创建序列帧失败/将序列帧绑定到实体或骨骼时出现问题
     """
 
@@ -970,6 +1015,9 @@ class NeteaseFrameAnim(object):
 
         序列帧的旋转角度。
 
+        说明
+        ----
+
         旋转顺序：zxy。
 
         :rtype: tuple[float,float,float]
@@ -983,6 +1031,9 @@ class NeteaseFrameAnim(object):
 
         序列帧的旋转角度。
 
+        说明
+        ----
+
         旋转顺序：zxy。
 
         :type value: tuple[float,float,float]
@@ -995,6 +1046,9 @@ class NeteaseFrameAnim(object):
         [可读写属性]
 
         序列帧的缩放值。
+
+        说明
+        ----
 
         数据类型为元组：(x, y, z)。
         对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
@@ -1010,6 +1064,9 @@ class NeteaseFrameAnim(object):
         [可读写属性]
 
         序列帧的缩放值。
+
+        说明
+        ----
 
         数据类型为元组：(x, y, z)。
         对于平面序列帧，第一个参数为贴图横向上的缩放，第二个参数为纵向上的缩放，第三个参数无用。
@@ -1048,8 +1105,8 @@ class NeteaseFrameAnim(object):
         -----
 
         :param str bind_entity_id: 特效绑定的实体ID
-        :param tuple[float,float,float] offset: 绑定的偏移量；默认为(0, 0, 0)
-        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为(0, 0, 0)
+        :param tuple[float,float,float] offset: 绑定的偏移量；默认为 (0, 0, 0)
+        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为 (0, 0, 0)
 
         :return: 是否成功
         :rtype: bool
@@ -1071,10 +1128,10 @@ class NeteaseFrameAnim(object):
 
         -----
 
-        :param int model_id: 绑定的骨骼模型的ID（使用Model组件的GetModelId获取）
+        :param int model_id: 绑定的骨骼模型的ID（使用 Model 组件的 GetModelId 获取）
         :param str bone_name: 绑定具体骨骼的名称
-        :param tuple[float,float,float] offset: 绑定的偏移量；默认为(0, 0, 0)
-        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为(0, 0, 0)
+        :param tuple[float,float,float] offset: 绑定的偏移量；默认为 (0, 0, 0)
+        :param tuple[float,float,float] rot: 绑定的旋转角度；默认为 (0, 0, 0)
 
         :return: 是否成功
         :rtype: bool
@@ -1175,6 +1232,9 @@ class NeteaseFrameAnim(object):
         """
         设置序列帧开始自动调整透明度的距离。
 
+        说明
+        ----
+
         序列帧与摄像机之间的距离小于该值时会自动调整序列帧的透明度，距离摄像机越近，序列帧越透明。
 
         -----
@@ -1190,7 +1250,10 @@ class NeteaseFrameAnim(object):
         """
         设置序列帧渲染层级。
 
-        序列帧默认层级为1，当层级不为1时表示该特效开启特效分层渲染功能。
+        说明
+        ----
+
+        序列帧默认层级为 1，当层级不为 1 时表示该特效开启特效分层渲染功能。
         分层渲染时，层级越高渲染越靠后，层级大的会遮挡层级低的，且同一层级的特效会根据特效的相对位置产生正确的相互遮挡关系。
 
         -----
@@ -1221,7 +1284,7 @@ class NeteaseFrameAnim(object):
 
         -----
 
-        :param bool use: True为使用点滤波方法，False为使用默认的双线性滤波
+        :param bool use: True 为使用点滤波方法，False 为使用默认的双线性滤波
 
         :return: 是否成功
         :rtype: bool
@@ -1232,11 +1295,14 @@ class NeteaseFrameAnim(object):
         """
         设置序列帧是否是全局的。
 
+        说明
+        ----
+
         全局时，不会因摄像机的视野范围而被裁剪。
 
         -----
 
-        :param bool isGlobal: True为全局，False为非全局；默认为False
+        :param bool isGlobal: True 为全局，False 为非全局；默认为 False
 
         :return: 是否成功
         :rtype: bool

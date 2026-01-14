@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -36,13 +36,17 @@ class GridData(list):
     网格数据对象，用于实现网格元素与数据的自动管理。
 
     借助网格数据对象，开发者只需关注数据本身，而无需关心网格的刷新等繁琐细节。
+
+    说明
+    ----
+
     网格数据对象继承于列表，因此，你可以像操作列表一样操作网格数据对象。
 
     -----
 
     :param list src: 网格数据源
-    :param function op_func: 网格数据操作函数，用于实现数据的操作逻辑；接受三个参数，分别为网格元素索引、元素的NyControl实例、元素对应的数据；网格刷新时会自动对每个元素调用一次该函数，并传入上述三个参数，实现网格元素与数据的自动管理
-    :param Any default: 默认数据；当网格元素索引超出数据源范围（越界）时，将使用默认数据；默认为None
+    :param function op_func: 网格数据操作函数，用于实现数据的操作逻辑；接受三个参数，分别为网格元素索引、元素的 NyControl 实例、元素对应的数据；网格刷新时会自动对每个元素调用一次该函数，并传入上述三个参数，实现网格元素与数据的自动管理
+    :param Any default: 默认数据；当网格元素索引超出数据源范围（越界）时，将使用默认数据；默认为 None
     """
 
     def __init__(self, src, op_func, default=None):
@@ -58,7 +62,7 @@ class GridData(list):
 
         -----
 
-        :param NyGrid grid: 网格NyGrid实例
+        :param NyGrid grid: 网格 NyGrid 实例
 
         :return: 无
         :rtype: None
@@ -260,7 +264,7 @@ class NyGrid(NyControl):
     关于 ``cell_visible_binding`` 与 ``collection_name`` 参数的说明：
 
     - 该参数用于 ``.grid_size`` 、 ``.dimension`` 等接口，实现动态设置网格元素的数量（多余元素将通过设置 ``visible`` 为 ``False`` 的方式隐藏），不使用该接口可忽略这两个参数。
-    - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的json中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``cell_visible_binding`` 参数 。
+    - 由于网格控件的特性，设置元素的 ``visible`` 需要使用绑定，请在你的 **网格模板控件** 的 json 中添加以下绑定，然后将 ``"binding_name"`` 的值设置给 ``cell_visible_binding`` 参数 。
     ::
 
         "bindings": [
@@ -272,15 +276,15 @@ class NyGrid(NyControl):
                 "binding_condition": "always"
             }
         ]
-    - 最后，将 **网格** json中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
+    - 最后，将 **网格** json 中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 网格所在UI类的实例（需继承ScreenNodeExtension）
-    :param GridUIControl grid_control: 通过asGrid()等方式获取的GridUIControl实例
-    :param bool is_stack_grid: [仅关键字参数] 是否是StackGrid；默认为False
-    :param str template_name: [仅关键字参数] 网格模板控件名称，即"grid_item_template"字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
-    :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素visible的绑定名称，详见上方说明
+    :param ScreenNodeExtension screen_node_ex: 网格所在UI类的实例（需继承 ScreenNodeExtension）
+    :param GridUIControl grid_control: 通过 asGrid() 等方式获取的 GridUIControl 实例
+    :param bool is_stack_grid: [仅关键字参数] 是否是 StackGrid；默认为 False
+    :param str template_name: [仅关键字参数] 网格模板控件名称，即 "grid_item_template" 字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
+    :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素 visible 的绑定名称，详见上方说明
     :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
     """
 
@@ -366,9 +370,12 @@ class NyGrid(NyControl):
 
         网格的容量，即元素数量。
 
+        说明
+        ----
+
         对于非StackGrid网格，设置 ``grid_size`` 不会改变网格的列数。
-        例如一个3x3（3行3列）网格，设置 ``grid_size=5`` 后将变成2x3，且最末尾元素会被隐藏。
-        同理，若设置 ``grid_size=13``，则网格变成5x3，末尾2个元素会被隐藏。
+        例如一个 3x3（3 行 3 列）网格，设置 ``grid_size=5`` 后将变成 2x3，且最末尾元素会被隐藏。
+        同理，若设置 ``grid_size=13``，则网格变成 5x3，末尾 2 个元素会被隐藏。
 
         :rtype: int
         """
@@ -385,9 +392,12 @@ class NyGrid(NyControl):
 
         网格的容量，即元素数量。
 
-        对于非StackGrid网格，设置 ``grid_size`` 不会改变网格的列数。
-        例如一个3x3（3行3列）网格，设置 ``grid_size=5`` 后将变成2x3，且最末尾元素会被隐藏。
-        同理，若设置 ``grid_size=13``，则网格变成5x3，末尾2个元素会被隐藏。
+        说明
+        ----
+
+        对于非 StackGrid 网格，设置 ``grid_size`` 不会改变网格的列数。
+        例如一个 3x3（3 行 3 列）网格，设置 ``grid_size=5`` 后将变成 2x3，且最末尾元素会被隐藏。
+        同理，若设置 ``grid_size=13``，则网格变成 5x3，末尾 2 个元素会被隐藏。
 
         :type val: int
         """
@@ -409,9 +419,9 @@ class NyGrid(NyControl):
         """
         [可读写属性]
 
-        获取网格的xy大小。
+        获取网格的 xy 大小。
 
-        当网格为StackGrid时，y值固定为0。
+        当网格为 StackGrid 时，y值固定为 0。
 
         :rtype: tuple[int,int]
         """
@@ -422,9 +432,9 @@ class NyGrid(NyControl):
         """
         [可读写属性]
 
-        设置网格的xy大小。
+        设置网格的 xy 大小。
 
-        当网格为StackGrid时，忽略传入的y值。
+        当网格为 StackGrid 时，忽略传入的y值。
 
         :type val: tuple[int,int]
         """
@@ -454,21 +464,21 @@ class NyGrid(NyControl):
 
         获取指定位置的元素：
 
-        - ``grid[i]`` -- 按从左到右从上到下的顺序（下同）获取索引为i的元素，支持负数索引。
-        - ``grid[x,⠀y]`` -- 获取坐标为 (x, y) 的元素，坐标从0开始，向右为X轴正方向，向下为Y轴正方向（下同）。
+        - ``grid[i]`` -- 按从左到右从上到下的顺序（下同）获取索引为 i 的元素，支持负数索引。
+        - ``grid[x,⠀y]`` -- 获取坐标为 (x, y) 的元素，坐标从 0 开始，向右为X轴正方向，向下为Y轴正方向（下同）。
 
         利用切片获取多个元素：
 
-        - ``grid[start:stop]`` -- 与列表切片类似，获取索引为start到stop的元素（不包括stop，下同）。
-        - ``grid[x,⠀start:stop]`` -- 获取指定x坐标上，y坐标为start到stop的元素。
-        - ``grid[start:stop,⠀y]`` -- 获取指定y坐标上，x坐标为start到stop的元素。
-        - ``grid[start1:stop1,⠀start2:stop2]`` -- 获取x坐标为start1到stop1，y坐标为start2到stop2的元素。
+        - ``grid[start:stop]`` -- 与列表切片类似，获取索引为 start 到 stop 的元素（不包括 stop，下同）。
+        - ``grid[x,⠀start:stop]`` -- 获取指定x坐标上，y坐标为 start 到 stop 的元素。
+        - ``grid[start:stop,⠀y]`` -- 获取指定y坐标上，x坐标为 start 到 stop 的元素。
+        - ``grid[start1:stop1,⠀start2:stop2]`` -- 获取x坐标为 start1 到 stop1，y坐标为 start2 到 stop2 的元素。
 
         -----
 
         :param int|slice|tuple[int|slice,int|slice] item: 详见上方说明
 
-        :return: 获取单个元素时，返回该元素的NyControl实例；获取多个元素时，返回ElemGroup对象；获取不到元素时返回None
+        :return: 获取单个元素时，返回该元素的 NyControl 实例；获取多个元素时，返回 ElemGroup 对象；获取不到元素时返回 None
         :rtype: NyControl|ElemGroup|None
         """
         dx, dy = self.dimension
@@ -531,7 +541,7 @@ class NyGrid(NyControl):
 
         :param int index: 索引
 
-        :return: 元素的NyControl实例，获取不到时返回None
+        :return: 元素的 NyControl 实例，获取不到时返回 None
         :rtype: NyControl|None
         """
         return self / (self.template_name + str(index + 1))
@@ -542,7 +552,7 @@ class NyGrid(NyControl):
 
         -----
 
-        :return: 网格所有元素的NyControl实例列表
+        :return: 网格所有元素的 NyControl 实例列表
         :rtype: list[NyControl]
         """
         return [self.get_cell(i) for i in xrange(self.grid_size)]
@@ -554,7 +564,7 @@ class NyGrid(NyControl):
         -----
 
         :param function func: 回调函数
-        :param GridCallbackType cb_type: 回调类型，请使用GridCallbackType枚举值；默认为GridCallbackType.UPDATE
+        :param GridCallbackType cb_type: 回调类型，请使用 GridCallbackType 枚举值；默认为 GridCallbackType.UPDATE
 
         :return: 是否成功
         :rtype: bool
@@ -574,7 +584,7 @@ class NyGrid(NyControl):
         -----
 
         :param function func: 回调函数
-        :param GridCallbackType cb_type: 回调类型，请使用GridCallbackType枚举值；默认为GridCallbackType.UPDATE
+        :param GridCallbackType cb_type: 回调类型，请使用 GridCallbackType 枚举值；默认为 GridCallbackType.UPDATE
 
         :return: 是否成功
         :rtype: bool

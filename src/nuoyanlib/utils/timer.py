@@ -51,8 +51,8 @@ def delay(t=0, key=None):
 
     -----
 
-    :param float t: 延迟时间，单位秒；默认为0，表示下一帧执行
-    :param Any key: 定时器键名，用于标识定时器，可传入str、int、tuple等可哈希对象；传入该参数时，若存在相同键名且尚未触发的定时器，则旧的定时器会被取消；默认为None
+    :param float t: 延迟时间，单位秒；默认为 0，表示下一帧执行
+    :param Any key: 定时器键名，用于标识定时器，可传入 str、int、tuple 等可哈希对象；传入该参数时，若存在相同键名且尚未触发的定时器，则旧的定时器会被取消；默认为 None
     """
     def decorator(func):
         _add_timer(_t, func, False, key)
@@ -73,8 +73,8 @@ def repeat(t=0, key=None):
 
     -----
 
-    :param float t: 执行间隔时间，单位秒；默认为0，表示每帧执行
-    :param Any key: 定时器键名，用于标识定时器，可传入str、int、tuple等可哈希对象；传入该参数时，若存在相同键名的定时器，则旧的定时器会被取消；默认为None
+    :param float t: 执行间隔时间，单位秒；默认为 0，表示每帧执行
+    :param Any key: 定时器键名，用于标识定时器，可传入 str、int、tuple 等可哈希对象；传入该参数时，若存在相同键名的定时器，则旧的定时器会被取消；默认为 None
     """
     def decorator(func):
         _add_timer(_t, func, True, key)
@@ -91,16 +91,19 @@ class Timer(object):
     """
     客户端函数定时器。
 
+    说明
+    ----
+
     非重复执行的定时器在执行完毕后会自动销毁。
-    与官方的定时器不同的是，该定时器使用threading标准库实现，比官方的定时器计时更精准。
+    与官方的定时器不同的是，该定时器使用 ``threading`` 标准库实现，比官方的定时器计时更精准。
 
     -----
 
-    :param str ttype: 定时器类型，可选值为"d"和"r"，分别表示普通定时器和重复定时器
+    :param str ttype: 定时器类型，可选值为 "d" 和 "r"，分别表示普通定时器和重复定时器
     :param float sec: 延迟秒数
     :param function func: 延迟函数
-    :param Any args: [变长位置参数] 调用func时传入
-    :param Any kwargs: [变长关键字参数] 调用func时传入
+    :param Any args: [变长位置参数] 调用 func 时传入
+    :param Any kwargs: [变长关键字参数] 调用 func 时传入
     """
 
     def __init__(self, ttype, sec, func, *args, **kwargs):
@@ -164,7 +167,7 @@ class Timer(object):
 
         -----
 
-        :param float|None sec: 暂停秒数；默认为None，表示无限期暂停
+        :param float|None sec: 暂停秒数；默认为 None，表示无限期暂停
 
         :return: 定时器自身
         :rtype: Timer
@@ -204,7 +207,7 @@ class Timer(object):
 
         -----
 
-        :return: 定时器正在运行时返回True，定时器已取消或执行完毕时返回False
+        :return: 定时器正在运行时返回 True，定时器已取消或执行完毕时返回 False
         :rtype: bool
         """
         return self._cancel

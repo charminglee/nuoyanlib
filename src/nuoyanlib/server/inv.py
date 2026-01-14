@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -92,8 +92,8 @@ def clear_items(player_id, item_pos_type, pos=0):
     -----
 
     :param str player_id: 玩家的实体ID
-    :param int item_pos_type: 槽位类型，ItemPosType枚举
-    :param int pos: 槽位索引；默认为0
+    :param int item_pos_type: 槽位类型，ItemPosType 枚举
+    :param int pos: 槽位索引；默认为 0
 
     :return: 该位置被清除前的物品信息字典
     :rtype: dict
@@ -114,10 +114,10 @@ def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     -----
 
     :param str entity_id: 生物的实体ID
-    :param int pos_type: ItemPosType枚举
+    :param int pos_type: ItemPosType 枚举
     :param str item_id: 物品ID
-    :param int item_aux: 物品特殊值；默认为-1，表示任意特殊值
-    :param int count: 返回数量，比如1表示只返回第一个搜索到的物品的槽位；默认为1
+    :param int item_aux: 物品特殊值；默认为 -1，表示任意特殊值
+    :param int count: 返回数量，比如 1 表示只返回第一个搜索到的物品的槽位；默认为 1
 
     :return: 物品所在槽位的列表，获取不到返回空列表
     :rtype: list[int]
@@ -148,9 +148,9 @@ def change_item_count(player_id, pos_type=ItemPosType.CARRIED, pos=0, change=-1)
     -----
 
     :param str player_id: 玩家实体ID
-    :param int pos_type: 槽位类型；默认为ItemPosType.CARRIED
-    :param int pos: 槽位；默认为0
-    :param int change: 改变量；默认为-1
+    :param int pos_type: 槽位类型；默认为 ItemPosType.CARRIED
+    :param int pos: 槽位；默认为 0
+    :param int change: 改变量；默认为 -1
 
     :return: 无
     :rtype: None
@@ -169,17 +169,20 @@ def deduct_inv_item(player_id, name, aux=-1, count=1, include_creative=False):
     """
     从玩家背包中扣除指定数量的物品。
 
+    说明
+    ----
+
     该函数无需传入物品所在位置，而是自动从背包中寻找指定物品，找到了则扣除指定数量。
 
     -----
 
     :param str player_id: 玩家的实体ID
     :param str name: 物品名称
-    :param int aux: 物品特殊值；默认为-1，表示任意特殊值
-    :param int count: 扣除数量；默认为1
-    :param bool include_creative: 创造模式下是否扣除；默认为False
+    :param int aux: 物品特殊值；默认为 -1，表示任意特殊值
+    :param int count: 扣除数量；默认为 1
+    :param bool include_creative: 创造模式下是否扣除；默认为 False
 
-    :return: 扣除成功返回True，扣除失败（如物品数量不足）返回False
+    :return: 扣除成功返回 True，扣除失败（如物品数量不足）返回 False
     :rtype: bool
     """
     if not include_creative and LvComp.Game.GetPlayerGameType(player_id) == GameType.Creative:

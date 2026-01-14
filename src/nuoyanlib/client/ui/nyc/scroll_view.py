@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -29,8 +29,8 @@ class NyScrollView(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 滚动视图所在UI类的实例（需继承ScreenNodeExtension）
-    :param ScrollViewUIControl scroll_view_control: 通过asScrollView()等方式获取的ScrollViewUIControl实例
+    :param ScreenNodeExtension screen_node_ex: 滚动视图所在UI类的实例（需继承 ScreenNodeExtension）
+    :param ScrollViewUIControl scroll_view_control: 通过 asScrollView() 等方式获取的 ScrollViewUIControl 实例
     """
 
     CONTROL_TYPE = ControlType.SCROLL_VIEW
@@ -48,7 +48,7 @@ class NyScrollView(NyControl):
         """
         [可读写属性]
 
-        当前ScrollView最上方内容的位置。
+        当前 ScrollView 最上方内容的位置。
 
         :rtype: float
         """
@@ -59,7 +59,7 @@ class NyScrollView(NyControl):
         """
         [可读写属性]
 
-        当前ScrollView最上方内容的位置。
+        当前 ScrollView 最上方内容的位置。
 
         :type val: float
         """
@@ -70,7 +70,7 @@ class NyScrollView(NyControl):
         """
         [可读写属性]
 
-        当前ScrollView内容的百分比位置。
+        当前 ScrollView 内容的百分比位置。
 
         :rtype: int
         """
@@ -81,7 +81,7 @@ class NyScrollView(NyControl):
         """
         [可读写属性]
 
-        当前ScrollView内容的百分比位置。
+        当前 ScrollView 内容的百分比位置。
 
         :type val: int
         """
@@ -92,7 +92,7 @@ class NyScrollView(NyControl):
         """
         [只读属性]
 
-        ScrollView内容控件的路径。
+        ScrollView 内容控件的路径。
 
         :rtype: str
         """
@@ -103,7 +103,7 @@ class NyScrollView(NyControl):
         """
         [只读属性]
 
-        ScrollView内容控件的 ``NyControl`` 实例。
+        ScrollView 内容控件的 ``NyControl`` 实例。
 
         :rtype: NyControl
         """
