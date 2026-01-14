@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-9
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -30,11 +30,8 @@ del __C
 # INV36 = "_inv36"
 
 
-class TypeStr:
-    GROUND_SHATTER_EFFECT = "nuoyanlib:ground_shatter_effect"
-
-
-GSE_ATTR = "nuoyanlib:ground_shatter_effect_args"
+GSE_IDENTIFIER = "nuoyanlib:ground_shatter_effect"
+GSE_ARGS = "nuoyanlib:ground_shatter_effect_args"
 
 
 

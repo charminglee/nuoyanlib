@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-11
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
 
+import itertools
 import random
 import mod.client.extraClientApi as c_api
 from ... import config
@@ -26,7 +27,8 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
         self.callback_data = {}
-        self._ground_shatter_data = {}
+        self.gse_data = {}
+        self.gse_counter = itertools.count()
         if not config.ENABLED_MODSDK_LOG:
             _logging.disable_modsdk_loggers()
         if config.ENABLED_MCP_MOD_LOG_DUMPING:
@@ -36,10 +38,10 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     # region Events ====================================================================================================
 
     def AddEntityClientEvent(self, args):
-        if args.engineTypeStr == _const.TypeStr.GROUND_SHATTER_EFFECT:
+        if args.engineTypeStr == _const.GSE_IDENTIFIER:
             entity_id = args.id
             cf = CF(entity_id)
-            self._ground_shatter_data[entity_id] = {
+            self.gse_data[entity_id] = {
                 'inited': False,
                 'attr_comp': cf.ModAttr,
                 'render_comp': cf.ActorRender,
@@ -52,19 +54,19 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         entity_id = args.id
         if entity_id in CF._cache:
             del CF._cache[entity_id]
-        if entity_id in self._ground_shatter_data:
-            del self._ground_shatter_data[entity_id]
+        if entity_id in self.gse_data:
+            del self.gse_data[entity_id]
 
     def UiInitFinished(self, args):
         self.NotifyToServer("UiInitFinished", {})
 
     if config.GSE_USE_RENDER_TICK:
         def GameRenderTickEvent(self, args):
-            self._update_ground_shatter_effect()
+            self._on_gse_update()
     else:
         def Update(self):
             NuoyanLibBaseSystem.Update(self)
-            self._update_ground_shatter_effect()
+            self._on_gse_update()
 
     # def LoadClientAddonScriptsAfter(self, args):
     #     load_extensions()
@@ -183,7 +185,30 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
 
     # region spawn_ground_shatter_effect ===============================================================================
 
-    def _init_ground_shatter_effect(self, data):
+    def spawn_one_gse(self, pos, block, args):
+        entity_id = self.CreateClientEntityByTypeStr(_const.GSE_IDENTIFIER, pos, (0, 0))
+        if entity_id:
+            cf = CF(entity_id)
+            cf.Model.SetEntityShadowShow(False)
+            data = {
+                'inited': False,
+                'attr_comp': None,
+                'render_comp': cf.ActorRender,
+                'te': None,
+                'geo_name': None,
+                'pos': pos,
+                'block': block,
+            }
+            data.update(args)
+            self.gse_data[entity_id] = data
+            self._init_gse(data)
+        return entity_id
+
+    def destroy_one_gse(self, entity_id):
+        self.DestroyClientEntity(entity_id)
+        self.gse_data.pop(entity_id, None)
+
+    def _init_gse(self, data):
         palette = LvComp.Block.GetBlankBlockPalette()
         palette.DeserializeBlockPalette(
             {
@@ -195,7 +220,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
                 'eliminateAir': True,
             }
         )
-        geo_name = str(id(palette))
+        geo_name = "nyl_gse_%d" % next(self.gse_counter)
         LvComp.BlockGeometry.CombineBlockPaletteToGeometry(palette, geo_name)
         tilt_angle = data['tilt_angle']
         rot = tuple(random.uniform(-tilt_angle, tilt_angle) for _ in range(3))
@@ -208,10 +233,9 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
             final_height - data['out_dist'],
             data['out_time'],
             hold_on_last_frame=True,
-            ease_func=config.GSE_OUT_FUNC,
+            ease_func=data.get('out_ease', config.GSE_OUT_FUNC),
         )
-        keep_te = TimeEase(
-            final_height,
+        static_te = TimeEase.static(
             final_height,
             data['time'] - data['in_time'] - data['out_time'],
             next_te=out_te,
@@ -220,24 +244,29 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
             final_height - data['in_dist'],
             final_height,
             data['in_time'],
-            ease_func=config.GSE_IN_FUNC,
-            next_te=keep_te,
+            ease_func=data.get('in_ease', config.GSE_IN_FUNC),
+            next_te=static_te,
         )
         data['te'] = in_te
 
-    def _update_ground_shatter_effect(self):
-        if not self._ground_shatter_data:
+        data['inited'] = True
+        self._update_gse_offset(data)
+
+    def _update_gse_offset(self, data):
+        y = next(data['te'])
+        data['render_comp'].SetActorBlockGeometryOffset(data['geo_name'], (0, -1.01 + y, 0))
+
+    def _on_gse_update(self):
+        if not self.gse_data:
             return
-        for data in self._ground_shatter_data.values():
-            if not data['inited']:
-                args = data['attr_comp'].GetAttr(_const.GSE_ATTR)
+        for data in self.gse_data.values():
+            if data['inited']:
+                self._update_gse_offset(data)
+            elif data['attr_comp']:
+                args = data['attr_comp'].GetAttr(_const.GSE_ARGS)
                 if args:
                     data.update(args)
-                    self._init_ground_shatter_effect(data)
-                    data['inited'] = True
-            if data['inited']:
-                n = next(data['te'])
-                data['render_comp'].SetActorBlockGeometryOffset(data['geo_name'], (0, -1.01 + n, 0))
+                    self._init_gse(data)
 
     # endregion
 

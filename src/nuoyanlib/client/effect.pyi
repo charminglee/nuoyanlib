@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
 
-from typing import Tuple, Union, Dict, Optional
+from typing import Tuple, Union, Dict, Optional, List
 from mod.client.component.particleControlComp import ParticleControlComp
 from mod.client.component.particleTransComp import ParticleTransComp
 from mod.client.component.particleEntityBindComp import ParticleEntityBindComp
@@ -20,9 +20,26 @@ from mod.client.component.frameAniTransComp import FrameAniTransComp
 from mod.client.component.frameAniEntityBindComp import FrameAniEntityBindComp
 from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindComp
 from ..core.client._lib_client import NuoyanLibClientSystem
-from ..core._types._typing import Self, FTuple3, FTuple2
+from ..core._types._typing import Self, FTuple3, FTuple2, TimeEaseFuncType
+from ..utils.enum import TimeEaseFunc
 
 
+def spawn_ground_shatter_effect(
+    pos: FTuple3,
+    r: float,
+    num: int,
+    *,
+    time: float = 3.0,
+    tilt_angle: float = 22.0,
+    min_height: float = 0.0,
+    max_height: float = 0.3,
+    in_time: float = 0.2,
+    out_time: float = 0.5,
+    in_dist: float = 0.5,
+    out_dist: float = 0.5,
+    in_ease: TimeEaseFuncType = TimeEaseFunc.OUT_EXPO,
+    out_ease: TimeEaseFuncType = TimeEaseFunc.IN_SINE,
+) -> List[str]: ...
 def spawn_particle(
     name: str,
     pos: FTuple3,
@@ -33,7 +50,7 @@ def spawn_particle(
 
 
 class NeteaseParticle(object):
-    __lib_sys: NuoyanLibClientSystem
+    _lib_sys: NuoyanLibClientSystem
     _id: Optional[int]
     _ctrl: Optional[ParticleControlComp]
     _trans: Optional[ParticleTransComp]
@@ -142,7 +159,7 @@ class NeteaseParticle(object):
 
 
 class NeteaseFrameAnim(object):
-    __lib_sys: NuoyanLibClientSystem
+    _lib_sys: NuoyanLibClientSystem
     _id: Optional[int]
     _ctrl: Optional[FrameAniControlComp]
     _trans: Optional[FrameAniTransComp]

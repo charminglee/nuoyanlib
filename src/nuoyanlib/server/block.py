@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -55,22 +55,21 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
     :return: 生成的裂地方块的实体ID列表
     :rtype: list[str]
     """
-    lib_sys = get_lib_system(False)
+    lib_sys = get_lib_system()
     eid_list = []
     for p in gen_random_even_pos(pos, r, num, fixed_y=True):
-        block = LvComp.BlockInfo.GetBlockNew(pos_floor(p), dim)
-        if not block or block['name'] == "minecraft:air":
+        sample_block = LvComp.BlockInfo.GetBlockNew(pos_floor(p), dim)
+        if not sample_block or sample_block['name'] == "minecraft:air":
             continue
-        kwargs['block'] = (block['name'], block['aux'])
+        args = kwargs.copy()
+        args['block'] = (sample_block['name'], sample_block['aux'])
 
         spawn_pos = (p[0], p[1] + 1.01, p[2])
         block = LvComp.BlockInfo.GetBlockNew(pos_floor(spawn_pos), dim)
         if not block or block['name'] != "minecraft:air":
             continue
 
-        entity_id = lib_sys.CreateEngineEntityByTypeStr(
-            _const.TypeStr.GROUND_SHATTER_EFFECT, spawn_pos, (0, 0), dim
-        )
+        entity_id = lib_sys.CreateEngineEntityByTypeStr(_const.GSE_IDENTIFIER, spawn_pos, (0, 0), dim, True)
         if not entity_id:
             continue
 
@@ -86,7 +85,32 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
                 }
             }""" % kwargs['time']
         )
-        cf.ModAttr.SetAttr(_const.GSE_ATTR, kwargs, True)
+        cf.ModAttr.SetAttr(_const.GSE_ARGS, args, True)
 
         eid_list.append(entity_id)
     return eid_list
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

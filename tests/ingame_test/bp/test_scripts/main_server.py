@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-26
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -52,19 +52,21 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
         if screenName != "hud_screen" or not isDown:
             return
         pos = CF(playerId).Pos.GetFootPos()
+
         if key == KeyBoardType.KEY_L:
             center = (pos[0], pos[1] - 1, pos[2])
-            nyl.spawn_ground_shatter_effect(center, 0, 3, 20)
+            # nyl.spawn_ground_shatter_effect(center, 0, 2, 20)
 
     # ============================================== Basic Function ====================================================
 
     def run_benchmark(self):
         self.player_id = s_api.GetHostPlayerId()
-        # run_benchmark("nuoyanlib.core.listener", self.player_id, 10000)
-        # run_benchmark("nuoyanlib.core.server.comp", self.player_id)
-        # run_benchmark("nuoyanlib.utils.vector", self.player_id, 1000000)
-        # run_benchmark("nuoyanlib.utils.mc_math", self.player_id)
-        # self.communicate_benchmark()
+        return
+        run_benchmark("nuoyanlib.core.listener", self.player_id, 10000)
+        run_benchmark("nuoyanlib.core.server.comp", self.player_id)
+        run_benchmark("nuoyanlib.utils.vector", self.player_id, 1000000)
+        run_benchmark("nuoyanlib.utils.mc_math", self.player_id)
+        self.communicate_benchmark()
 
     def communicate_benchmark(self):
         def callback(success, ret, player_id):

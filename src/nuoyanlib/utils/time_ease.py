@@ -46,8 +46,8 @@ class TimeEase(object):
     :param bool hold_on_last_frame: 是否停止在最后一帧；若设为 True，TimeEase 可无限迭代，变化结束后将始终返回最后一帧的值；若设为 False，变化结束后继续迭代将抛出 StopIteration 异常；默认为 False
     :param function ease_func: 时间缓动函数，可使用 TimeEaseFunc 提供的预设函数或自定义函数，如线性缓动 lambda x: x ，参数 x 表示经过的时间比例，取值范围为 [0,⠀1]；默认为 TimeEaseFunc.LINEAR
     :param TimeEase|None next_te: 下一个时间缓动对象；若提供，则当前缓动迭代结束后自动切换到下一个缓动对象继续迭代；默认为 None
-    :param function|None on_start: 变化开始时触发的回调函数；默认为None
-    :param function|None on_end: 变化结束时触发的回调函数；默认为None
+    :param function|None on_start: 变化开始时触发的回调函数；默认为 None
+    :param function|None on_end: 变化结束时触发的回调函数；默认为 None
     """
 
     def __init__(
@@ -90,8 +90,8 @@ class TimeEase(object):
         :param float total_tm: 变化总时间，单位为秒
         :param bool hold_on_last_frame: 是否停止在最后一帧；若设为 True，TimeEase 可无限迭代，变化结束后将始终返回最后一帧的值；若设为 False，变化结束后继续迭代将抛出 StopIteration 异常；默认为 False
         :param TimeEase|None next_te: 下一个时间缓动对象；若提供，则当前缓动迭代结束后自动切换到下一个缓动对象继续迭代；默认为 None
-        :param function|None on_start: 变化开始时触发的回调函数；默认为None
-        :param function|None on_end: 变化结束时触发的回调函数；默认为None
+        :param function|None on_start: 变化开始时触发的回调函数；默认为 None
+        :param function|None on_end: 变化结束时触发的回调函数；默认为 None
 
         :return: 时间缓动对象
         :rtype: TimeEase
@@ -158,14 +158,18 @@ class TimeEase(object):
         else:
             if self._init_tm == 0:
                 self._init_tm = time.time()
-            x = min((time.time() - self._init_tm) / self.total_tm, 1)
+            t = time.time()
+            p = t - self._init_tm
+            x = min(p / self.total_tm, 1)
 
-        if not self._is_static:
-            self._val = self.start_val + self.ease_func(x) * self._diff_val
+        if self._is_static:
+            val = self.start_val
+        else:
+            val = self._val = self.start_val + self.ease_func(x) * self._diff_val
 
         if x >= 1:
             self._on_end()
-        return self._val
+        return val
 
     next = __next__
 

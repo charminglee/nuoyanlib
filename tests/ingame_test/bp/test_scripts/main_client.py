@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-30
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
@@ -43,6 +43,7 @@ class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
         if screenName != "hud_screen" or not isDown:
             return
         pos = PlrComp.Pos.GetFootPos()
+
         if key == KeyBoardType.KEY_K:
             n = 0
             center = (pos[0], pos[1] + 1.5, pos[2])
@@ -57,24 +58,27 @@ class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
             for p in nyl.gen_box_frame_pos(pos1, pos2, 8, 4, 8):
                 if not p:
                     continue
-                pid = nyl.spawn_particle("minecraft:basic_flame_particle", p, rm_delay=1)
-                # pid = nyl.spawn_particle("minecraft:basic_flame_particle", (p[0], pos[1] + 1, p[1]), rm_delay=1)
-                LvComp.ParticleSystem.EmitManually(pid)
+                nyl.spawn_particle("minecraft:basic_flame_particle", p, rm_delay=1)
+                # nyl.spawn_particle("minecraft:basic_flame_particle", (p[0], pos[1] + 1, p[1]), rm_delay=1)
                 n += 1
             print(n)
+
+        elif key == KeyBoardType.KEY_L:
+            center = (pos[0], pos[1] - 1, pos[2])
+            nyl.spawn_ground_shatter_effect(center, 2, 20)
 
     # =========================================== Custom Event Callback ================================================
 
     # ============================================== Basic Function ====================================================
 
     def run_benchmark(self):
-        pass
-        # self.communicate_benchmark()
-        # nyl.create_ui(
-        #     MOD_NAME, UI_NAME_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST, UI_DEF_NUOYANLIB_TEST,
-        #     push=True,
-        #     client_system=self,
-        # )
+        return
+        self.communicate_benchmark()
+        nyl.create_ui(
+            MOD_NAME, UI_NAME_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST, UI_DEF_NUOYANLIB_TEST,
+            push=True,
+            client_system=self,
+        )
 
     def communicate_benchmark(self):
         def callback(success, ret):

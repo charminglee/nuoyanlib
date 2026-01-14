@@ -1,24 +1,95 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-1-14
 #  ⠀
 # =================================================
 
 
+from ..core._utils import kwargs_defaults
 from ..core.client.comp import CF, LvComp
 from ..core.client import _lib_client
+from ..utils.pos_gen import gen_random_even_pos
+from ..utils.mc_math import pos_floor
+from ..utils.timer import delay
+from ..utils.enum import TimeEaseFunc
 
 
 __all__ = [
+    "spawn_ground_shatter_effect",
     "spawn_particle",
     "NeteaseParticle",
     "NeteaseFrameAnim",
 ]
+
+
+@kwargs_defaults(
+    time=3.0,
+    tilt_angle=22.0,
+    min_height=0.0,
+    max_height=0.3,
+    in_time=0.2,
+    out_time=0.5,
+    in_dist=0.5,
+    out_dist=0.5,
+    in_ease=TimeEaseFunc.OUT_EXPO,
+    out_ease=TimeEaseFunc.IN_SINE,
+)
+def spawn_ground_shatter_effect(pos, r, num, **kwargs):
+    """
+    在指定位置生成裂地效果。
+
+    说明
+    ----
+
+    该版本使用 **客户端实体** 实现，与旧版本（使用普通实体）相比性能更好。
+    裂地效果仅本地玩家可见。
+
+    -----
+
+    :param tuple[float,float,float] pos: 生成位置
+    :param float r: 生成半径
+    :param int num: 裂地方块数量
+    :param float time: [仅关键字参数] 裂地效果持续时间，包括上浮和下沉阶段，单位为秒；默认为 3.0
+    :param float tilt_angle: [仅关键字参数] 裂地方块最大倾斜角度；默认为 22.0
+    :param float min_height: [仅关键字参数] 裂地方块最小高度；默认为 0.0
+    :param float max_height: [仅关键字参数] 裂地方块最大高度；默认为 0.3
+    :param float in_time: [仅关键字参数] 上浮动画持续时间；默认为 0.2
+    :param float out_time: [仅关键字参数] 下沉动画持续时间；默认为 0.5
+    :param float in_dist: [仅关键字参数] 上浮距离；默认为 0.5
+    :param float out_dist: [仅关键字参数] 下沉距离；默认为 0.5
+    :param function in_ease: [仅关键字参数] 上浮动画使用的缓动函数；默认为 TimeEaseFunc.OUT_EXPO
+    :param function out_ease: [仅关键字参数] 下沉动画使用的缓动函数；默认为 TimeEaseFunc.IN_SINE
+
+    :return: 生成的裂地方块的实体ID（客户端实体）列表
+    :rtype: list[str]
+    """
+    lib_sys = _lib_client.instance()
+    eid_list = []
+    for p in gen_random_even_pos(pos, r, num, fixed_y=True):
+        sample_block = LvComp.BlockInfo.GetBlock(pos_floor(p))
+        if not sample_block or sample_block[0] == "minecraft:air":
+            continue
+
+        spawn_pos = (p[0], p[1] + 1.01, p[2])
+        block = LvComp.BlockInfo.GetBlock(pos_floor(spawn_pos))
+        if not block or block[0] != "minecraft:air":
+            continue
+
+        entity_id = lib_sys.spawn_one_gse(spawn_pos, sample_block, kwargs)
+        if entity_id:
+            eid_list.append(entity_id)
+
+    @delay(kwargs['time'])
+    def destroy():
+        for eid in eid_list:
+            lib_sys.destroy_one_gse(eid)
+
+    return eid_list[:] # 返回副本，防止外部修改
 
 
 def spawn_particle(name, pos, rot=(0, 0, 0), var_dict=None, rm_delay=0):
@@ -29,7 +100,7 @@ def spawn_particle(name, pos, rot=(0, 0, 0), var_dict=None, rm_delay=0):
 
     :param str name: 粒子名称
     :param tuple[float,float,float] pos: 生成坐标
-    :param tuple[float,float,float] rot: 粒子发射器创建后使用的三维旋转（使用角度制，按照ZYX顺序旋转）；默认为(0, 0, 0)
+    :param tuple[float,float,float] rot: 粒子发射器创建后使用的三维旋转（使用角度制，按照 ZYX 顺序旋转）；默认为 (0, 0, 0)
     :param dict[str,float]|None var_dict: 粒子参数字典
     :param float rm_delay: 延迟多长时间后自动销毁粒子发射器，单位为秒；默认为0，不自动销毁
 
@@ -66,8 +137,8 @@ class NeteaseParticle(object):
     """
 
     def __init__(self, json_path, pos=(0, 0, 0), bind_entity=None, bind_skeleton=None):
-        self.__lib_sys = _lib_client.instance()
-        self._id = self.__lib_sys.CreateEngineParticle(json_path, pos)
+        self._lib_sys = _lib_client.instance()
+        self._id = self._lib_sys.CreateEngineParticle(json_path, pos)
         if not self._id:
             raise RuntimeError("create particle failed, json_path='%s'" % json_path)
         cf = CF(self._id)
@@ -562,7 +633,7 @@ class NeteaseParticle(object):
         :return: 是否成功
         :rtype: bool
         """
-        res = self.__lib_sys.DestroyEntity(self._id)
+        res = self._lib_sys.DestroyEntity(self._id)
         if res:
             self._destroyed = True
             self._bind_ent_id = ""
@@ -673,11 +744,11 @@ class NeteaseFrameAnim(object):
             bind_entity=None,
             bind_skeleton=None,
     ):
-        self.__lib_sys = _lib_client.instance()
+        self._lib_sys = _lib_client.instance()
         if json_path:
-            self._id = self.__lib_sys.CreateEngineSfxFromEditor(json_path, pos, rot, scale)
+            self._id = self._lib_sys.CreateEngineSfxFromEditor(json_path, pos, rot, scale)
         elif tex_path:
-            self._id = self.__lib_sys.CreateEngineSfx(tex_path, pos, rot, scale)
+            self._id = self._lib_sys.CreateEngineSfx(tex_path, pos, rot, scale)
         else:
             raise ValueError("parameter 'json_path' or 'tex_path' must be given")
         if not self._id:
@@ -1056,7 +1127,7 @@ class NeteaseFrameAnim(object):
         :return: 是否成功
         :rtype: bool
         """
-        res = self.__lib_sys.DestroyEntity(self._id)
+        res = self._lib_sys.DestroyEntity(self._id)
         if res:
             self._destroyed = True
             self._bind_ent_id = ""
