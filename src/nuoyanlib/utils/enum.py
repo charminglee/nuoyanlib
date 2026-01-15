@@ -149,8 +149,7 @@ class EnumMeta(type):
     ``Enum`` 的元类。
     """
 
-    # 给参数加默认值None以绕过机审
-    def __new__(metacls, cls_name=None, bases=None, cls_dict=None):
+    def __new__(metacls, cls_name=None, bases=None, cls_dict=None): # 给参数加默认值None以绕过机审
         # 往cls_dict添加属性而不是cls.xxx = xxx，避免触发__setattr__
         _member_map_        = cls_dict['_member_map_']        = OrderedDict()
         _value2member_map_  = cls_dict['_value2member_map_']  = {}

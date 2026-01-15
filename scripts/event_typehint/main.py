@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-6
+#   Date  : 2026-1-16
 #  ⠀
 # =================================================
 
@@ -28,9 +28,9 @@ def extract_events(cls):
             continue
         args = []
         doc = func.__doc__
-        for line in doc[doc.index("【事件参数】"):].splitlines():
+        for line in doc[doc.index("事件参数"):].splitlines():
             line = line.strip()
-            if line.startswith("-"):
+            if line.startswith("- "):
                 try:
                     # 提取参数名
                     param_name = line[line.index("``") + 2: line.rindex("``")]
