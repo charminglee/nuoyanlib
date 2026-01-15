@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-16
 #  ⠀
 # =================================================
 
@@ -16,6 +16,30 @@ from types import MethodType
 from functools import wraps
 from ._doc import signature, get_signature
 from ._sys import is_client
+
+
+# def get_obj_size(obj, seen=None):
+#     if seen is None:
+#         seen = set()
+#     import sys
+#     size = sys.getsizeof(obj)
+#
+#     obj_id = id(obj)
+#     if obj_id in seen:
+#         return 0
+#     seen.add(obj_id)
+#
+#     if hasattr(obj, 'keys') and type(obj.keys) is MethodType:
+#         size += sum(
+#             get_obj_size(k, seen) + get_obj_size(obj[k], seen)
+#             for k in obj.keys()
+#         )
+#     elif hasattr(obj, '__iter__') and type(obj.__iter__) is MethodType and not isinstance(obj, (str, unicode)):
+#         size += sum(get_obj_size(i, seen) for i in obj)
+#     elif hasattr(obj, '__dict__'):
+#         size += get_obj_size(obj.__dict__, seen)
+#
+#     return size
 
 
 VOID = object()

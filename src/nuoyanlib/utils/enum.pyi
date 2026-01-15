@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-13
+#   Date  : 2026-1-15
 #  ⠀
 # =================================================
 
@@ -78,7 +78,7 @@ if sys.version_info >= (3, 4):
         @staticmethod
         def _generate_next_value_(name: str, count: int, last_values: List[Any]) -> Any: ... # noqa
         @classmethod
-        def _missing_(cls, value: Any) -> Any: ...
+        def _missing_(cls: Type[T], value: Any) -> Optional[T]: ...
 else:
     class Enum(metaclass=EnumMeta):
         __slots__: SlotsType
@@ -99,6 +99,8 @@ else:
         def value(self) -> Any: ...
         @staticmethod
         def _generate_next_value_(name: str, count: int, last_values: List[Any]) -> Any: ...
+        @classmethod
+        def _missing_(cls: Type[T], value: Any) -> Optional[T]: ...
 
 
 class IntEnum(int, Enum):

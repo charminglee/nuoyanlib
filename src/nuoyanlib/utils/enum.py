@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-16
 #  ⠀
 # =================================================
 
@@ -357,14 +357,23 @@ class Enum(object): # noqa
     >>> Color.ALL
     (1, 2, 3)
 
-    不允许动态插入/修改/删除枚举成员，否则将会抛出 ``AttributeError`` 。
-
-    >>> Color.RED = 4 # 抛出AttributeError
-    >>> del Color.RED # 抛出AttributeError
-
-    值查找：通过值查找对应的枚举成员，如果值不存在，则抛出 ``ValueError`` 。
+    值查找：通过值查找对应的枚举成员。默认情况下，如果值不存在，将抛出 ``ValueError`` 。
 
     >>> Color(1)
+    <Color.RED: 1>
+
+    你也可以通过重写 ``_missing_()`` 方法来自定义值不存在时的行为。更多信息详见 ``_missing_()`` 的说明文档。
+
+    >>> class Color(Enum):
+    ...     @classmethod
+    ...     def _missing_(cls, value):
+    ...         if value == 4:
+    ...             return cls.RED
+    ...     RED = 1
+    ...     GREEN = 2
+    ...     BLUE = 3
+    ...
+    >>> Color(4)
     <Color.RED: 1>
 
     名称查找：通过字符串名称查找对应的枚举成员，如果名称不存在，则抛出 ``KeyError`` 。
@@ -377,7 +386,7 @@ class Enum(object): # noqa
     >>> len(Color)
     3
 
-    可通过 ``for`` 循环等方式遍历枚举成员，或通过枚举类的 ``.__members__`` 属性获取成员字典，该字典的 key 和 value 对应成员名称和成员对象。
+    可通过 ``for`` 循环等方式遍历枚举成员，或通过枚举类的 ``.__members__`` 属性获取成员字典，该字典的键值对应成员名称和成员对象。
 
     >>> for member in Color:
     ...     print member.name, member.value
@@ -422,19 +431,29 @@ class Enum(object): # noqa
 
     def __new__(cls, value):
         # 值查找
-        if isinstance(value, cls):
+        if type(value) is cls:
             # Color(Color.RED)
             return value
         try:
             # Color(1)
             return cls._value2member_map_[value]
         except KeyError:
+            # 值不存在
             pass
         except TypeError:
             # 对不可哈希值采用线性查找
             for member in cls._member_map_.values():
                 if member._value_ == value:
                     return member
+        # 尝试调用_missing_
+        res = cls._missing_(value)
+        if isinstance(res, cls):
+            return res
+        elif res is not None:
+            raise TypeError(
+                "error in %s._missing_: returned %r instead of None or a valid member"
+                % (cls.__name__, res)
+            )
         raise ValueError("%r is not a valid %s" % (value, cls.__name__))
 
     def __init__(self, *args, **kwargs):
@@ -503,17 +522,20 @@ class Enum(object): # noqa
             return 1
         return max(last_values) + 1
 
-    # todo
     @classmethod
     def _missing_(cls, value):
         """
         [类方法]
 
+        查找枚举类中不存在的枚举值时调用该方法。
+
+        默认情况下它不执行任何操作，但可以重写以实现自定义查找行为。
+
         -----
 
-        :param str value: 枚举成员名称
+        :param str value: 要查找的枚举值
 
-        :return: 返回值将作为枚举值
+        :return: 返回值需要为枚举类的实例或 None；若返回 None，则视为查找失败
         :rtype: Any
         """
 
@@ -610,7 +632,7 @@ gen_minecraft_lower_name = lambda name, _, __: "minecraft:" + name.lower()
 
 class ClientEvent(StrEnum):
     """
-    ModSDK客户端事件名枚举。
+    ModSDK 客户端事件名枚举。
     """
 
     PhysxTouchClientEvent = auto()
@@ -733,7 +755,7 @@ class ClientEvent(StrEnum):
 
 class ServerEvent(StrEnum):
     """
-    ModSDK服务端事件名枚举。
+    ModSDK 服务端事件名枚举。
     """
 
     PhysxTouchServerEvent = auto()
@@ -2169,6 +2191,13 @@ def __test__():
 
     def test_enum(_IntEnum=IntEnum, _StrEnum=StrEnum):
         class E(Enum):
+            @classmethod
+            def _missing_(cls, value):
+                if value == 33:
+                    return cls.A
+                if value == 44:
+                    return 44
+
             A = 0
             B = "1"
             C = [2]
@@ -2189,6 +2218,8 @@ def __test__():
         assert E([2]) is E.C
         assert E['A'] is E.A
         assert len(E) == 3
+        assert E(33) is E.A
+        assert_error(E, (44,), exc=TypeError)
 
         for member in E:
             assert isinstance(member, E)
