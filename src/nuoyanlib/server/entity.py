@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-17
 #  ⠀
 # =================================================
 
@@ -19,7 +19,6 @@ from ..utils.vector import dir_from_to, vec_add
 
 
 __all__ = [
-    "set_query_mod_var",
     "clear_effects",
     "bounce_entities",
     "attract_entities",
@@ -43,28 +42,6 @@ __all__ = [
     "has_effect",
     "get_entities_by_ray",
 ]
-
-
-def set_query_mod_var(entity_id, name, value):
-    """
-    设置指定实体 ``query.mod`` 变量的值，全局同步。
-
-    说明
-    ----
-
-    若设置的变量未注册，则自动进行注册。
-
-    -----
-
-    :param str entity_id: 实体ID
-    :param str name: 变量名，仅支持 query.mod 开头的变量
-    :param float value: 设置的值
-
-    :return: 无
-    :rtype: None
-    """
-    lib_sys = _lib_server.instance()
-    lib_sys._SetQueryVar({'entity_id': entity_id, 'name': name, 'value': value})
 
 
 def clear_effects(entity_id):

@@ -10,14 +10,4 @@
 # =================================================
 
 
-from .mc_math import *
-from .enum import *
-from .item import *
-from .mc_random import *
-from .timer import *
-from .utils import *
-from .vector import *
-from .time_ease import *
-from .communicate import *
-from .pos_gen import *
-from .molang import *
+def set_query_mod_var(entity_id: str, name: str, value: float, sync: bool = True) -> None: ...

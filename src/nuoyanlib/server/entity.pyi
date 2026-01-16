@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-17
 #  ⠀
 # =================================================
 
@@ -14,7 +14,6 @@ from typing import Dict, List, Tuple, Optional, Union, Set, Callable
 from ..core._types._typing import FTuple3, FTuple2
 
 
-def set_query_mod_var(entity_id: str, name: str, value: float) -> None: ...
 def clear_effects(entity_id: str) -> None: ...
 def bounce_entities(
     pos: FTuple3,
