@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -35,7 +35,7 @@ class NyComboBox(InteractableControl, NyControl):
         screen_node_ex: ScreenNodeExtension,
         combo_box_control: NeteaseComboBoxUIControl,
     ) -> None: ...
-    @args_type_check(str, is_method=True)
+    @args_type_check(str)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
     @property
@@ -50,9 +50,9 @@ class NyComboBox(InteractableControl, NyControl):
     def selected_opt_name(self, val: Optional[str]) -> None: ...
     def _item_to_indices(self, item: Union[int, str, slice]) -> List[int]: ...
     def _get_opt_path(self, index: int) -> str: ...
-    @args_type_check((int, str, slice), is_method=True)
+    @args_type_check((int, str, slice))
     def __getitem__(self, item: Union[int, str, slice]) -> Union[NyControl, List[NyControl]]: ...
-    @args_type_check((int, str, slice), is_method=True)
+    @args_type_check((int, str, slice))
     def __delitem__(self, item: Union[int, str, slice]) -> None: ...
     def bind_data(self, data: List[Tuple[str, Optional[str], Optional[Any]]]) -> None: ...
     BindData = bind_data

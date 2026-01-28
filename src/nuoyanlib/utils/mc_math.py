@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-24
 #  ⠀
 # =================================================
 
@@ -68,7 +68,6 @@ __all__ = [
 
 
 if 0:
-    # 绕过机审专用
     distance2nearest_entity = lambda *_, **__: UNIVERSAL_OBJECT
     distance2nearest_player = lambda *_, **__: UNIVERSAL_OBJECT
 
@@ -498,14 +497,14 @@ def pos_entity_facing(entity_id, dist, use_0yaw=False, height_offset=0):
     """
     计算实体视角方向上、给定距离上的位置的坐标。
 
-    说明
-    ----
-
     计算将以实体 FootPos 作为起点，沿实体视角方向前进指定距离后的位置即为最终结果。
     可通过 ``height_offset`` 参数调整起点的高度偏移量，最终的起点坐标即为：
     ::
 
         (FootPos[0], FootPos[1] + height_offset, FootPos[2])
+
+    说明
+    ----
 
     若实体为玩家，将 ``height_offset`` 设为 ``1.62`` 即可使起点位于玩家眼睛（准星）位置。
 
@@ -1217,39 +1216,39 @@ def __test__():
 def __benchmark__(n, timer, pid, info, **kwargs):
     timer.start("distance2nearest_entity")
     for _ in xrange(n):
-        distance2nearest_entity._org_func(False, pid)
+        distance2nearest_entity._nyl__inject_is_client[2](False, pid)
     timer.end("distance2nearest_entity")
 
     from mod.server.extraServerApi import GetEngineActor
     eid = GetEngineActor().keys()[0]
     timer.start("distance")
     for _ in xrange(n):
-        distance._org_func(False, pid, eid) # noqa
+        distance._nyl__inject_is_client[2](False, pid, eid) # noqa
     timer.end("distance")
 
     timer.start("pos_entity_facing")
     for _ in xrange(n):
-        pos_entity_facing._org_func(False, pid, 1)
+        pos_entity_facing._nyl__inject_is_client[2](False, pid, 1)
     timer.end("pos_entity_facing")
 
     timer.start("is_in_sphere")
     for _ in xrange(n):
-        is_in_sphere._org_func(False, pid, 1, (0, 0, 0))
+        is_in_sphere._nyl__inject_is_client[2](False, pid, 1, (0, 0, 0))
     timer.end("is_in_sphere")
 
     timer.start("is_in_cylinder")
     for _ in xrange(n):
-        is_in_cylinder._org_func(False, pid, 1, (0, 0, 0), (0, 1, 0))
+        is_in_cylinder._nyl__inject_is_client[2](False, pid, 1, (0, 0, 0), (0, 1, 0))
     timer.end("is_in_cylinder")
 
     timer.start("is_in_sector")
     for _ in xrange(n):
-        is_in_sector._org_func(False, pid, 1, 1, 30, (0, 0, 0), (1, 0, 0))
+        is_in_sector._nyl__inject_is_client[2](False, pid, 1, 1, 30, (0, 0, 0), (1, 0, 0))
     timer.end("is_in_sector")
 
     timer.start("is_in_box")
     for _ in xrange(n):
-        is_in_box._org_func(False, pid, (0, 0, 0), (1, 1, 1)) # noqa
+        is_in_box._nyl__inject_is_client[2](False, pid, (0, 0, 0), (1, 1, 1)) # noqa
     timer.end("is_in_box")
 
     timer.start("catmull_rom")

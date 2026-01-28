@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-17
 #  ⠀
 # =================================================
 
@@ -184,7 +184,7 @@ def is_same_item(item_dict, *more):
     -----
 
     :param dict item_dict: 物品信息字典
-    :param dict more: [变长位置参数] 可传入一个或多个需要对比的物品信息字典
+    :param dict more: [变长位置参数] 继续传入一个或多个需要对比的物品信息字典
 
     :return: 相同则返回 True，否则返回 False
     :rtype: bool

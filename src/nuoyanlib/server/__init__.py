@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-9
+#   Date  : 2026-1-19
 #  ⠀
 # =================================================
 
@@ -42,9 +42,14 @@ from ..utils import *
 from .. import config, __version__, __author__, __author_qq__, __author_email__
 
 
-for k, v in globals().items():
-    if hasattr(v, '_inject_is_client'):
-        globals()[k] = v._inject_is_client[1]
+def __do_inject_is_client(dct):
+    for k, v in dct.items():
+        if type(v) is type:
+            __do_inject_is_client(v.__dict__)
+        elif hasattr(v, '_nyl__inject_is_client'):
+            dct[k] = v._nyl__inject_is_client[1]
+
+__do_inject_is_client(globals())
 
 
 if _clock:
@@ -55,3 +60,4 @@ if _clock:
 
 del _logging, _sys, _NuoyanLibServerSystem
 del _clock, _t
+del __do_inject_is_client

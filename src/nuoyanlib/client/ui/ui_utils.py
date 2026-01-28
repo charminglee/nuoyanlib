@@ -120,6 +120,9 @@ def to_path(control):
     """
     获取控件路径。
 
+    说明
+    ----
+
     若传入的已经是路径，则返回其本身。
 
     -----
@@ -135,6 +138,9 @@ def to_path(control):
 def to_control(screen_node, path, control_type=ControlType.BASE_CONTROL):
     """
     根据路径获取控件实例。
+
+    说明
+    ----
 
     若传入的已经是实例，则返回其本身。
 
@@ -180,15 +186,48 @@ def is_out_of_screen(control, screen_node=None):
 
 def get_children_path_by_level(control, screen_node, level=1):
     """
-    获取控件指定层次的所有子控件的路径。
+    获取控件指定层级上的子控件的路径。
+
+    说明
+    ----
+
+    此处的“层级”指的是子控件层级，而非渲染层级（layer），详见示例。
+
+    示例
+    ----
+
+    假设有以下控件结构：
+    ::
+
+        panel
+        ├─ button1
+        │  ├─ default
+        │  ├─ pressed
+        │  ├─ hover
+        │  └─ button_label
+        └─ button2
+           ├─ default
+           ├─ pressed
+           ├─ hover
+           └─ button_label
+
+    >>> nyl.get_children_path_by_level("/panel", screen_node, 1)
+    ['/panel/button1', '/panel/button2']
+
+    >>> nyl.get_children_path_by_level("/panel", screen_node, 2)
+    ['/panel/button1/default', '/panel/button1/pressed', '/panel/button1/hover', '/panel/button1/button_label',
+     '/panel/button2/default', '/panel/button2/pressed', '/panel/button2/hover', '/panel/button2/button_label']
+
+    >>> nyl.get_children_path_by_level("/panel/button1", screen_node, 1)
+    ['/panel/button1/default', '/panel/button1/pressed', '/panel/button1/hover', '/panel/button1/button_label']
 
     -----
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层次；默认为 1，传入 0 或负值时，获取所有层次
+    :param int level: 子控件层级；默认为 1，传入 0 或负值时，获取所有层级的子控件
 
-    :return: 指定层次的所有子控件路径的列表，获取不到时返回空列表
+    :return: 指定层级的所有子控件路径的列表，获取不到时返回空列表
     :rtype: list[str]
     """
     path = to_path(control)
@@ -197,6 +236,8 @@ def get_children_path_by_level(control, screen_node, level=1):
             path + "/" + n
             for n in screen_node.GetChildrenName(path)
         ]
+    elif level <= 0:
+        return screen_node.GetAllChildrenPath(path) or []
     else:
         res = []
         control_level = path.count("/")
@@ -205,23 +246,30 @@ def get_children_path_by_level(control, screen_node, level=1):
         target_level = control_level + level
         for p in screen_node.GetAllChildrenPath(path):
             if p.startswith("/safezone_screen_matrix"):
+                # 在base_screen中，接口获取的子控件路径会错误地丢失/variables_button_mappings_and_controls
                 p = "/variables_button_mappings_and_controls" + p
-            if level <= 0 or p.count("/") == target_level:
+            this_level = p.count("/")
+            if this_level == target_level:
                 res.append(p)
         return res
 
 
 def get_children_by_level(control, screen_node, level=1):
     """
-    获取控件指定层次的所有子控件的 ``BaseUIControl`` 实例。
+    获取控件指定层级上的子控件的 ``BaseUIControl`` 实例。
+
+    说明
+    ----
+
+    此处的“层级”指的是子控件层级，而非渲染层级（layer），详见 ``get_children_path_by_level`` 的文档。
 
     -----
 
     :param str|BaseUIControl|NyControl control: 控件路径或实例
     :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层次；默认为 1，传入 0 或负值时，获取所有层次
+    :param int level: 子控件层级；默认为 1，传入 0 或负值时，获取所有层级
 
-    :return: 指定层次的所有子控件实例的列表，获取不到时返回空列表
+    :return: 指定层级上的子控件实例的列表，获取不到时返回空列表
     :rtype: list[BaseUIControl]
     """
     return [

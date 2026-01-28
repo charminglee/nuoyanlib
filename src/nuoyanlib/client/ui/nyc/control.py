@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -586,7 +586,7 @@ class NyControl(object):
 
     # region Common ====================================================================================================
 
-    @args_type_check(str, is_method=True)
+    @args_type_check(str)
     def __truediv__(self, other):
         """
         根据相对路径返回子控件的 ``NyControl`` 实例。

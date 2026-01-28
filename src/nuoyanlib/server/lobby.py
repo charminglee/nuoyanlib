@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -22,8 +22,8 @@ __all__ = [
 
 
 _IS_LOBBY = (s_api.GetPlatform() == -1)
-_UID_DATA_KEY = "_nyl_lobby_uid_data"
-_GLOBAL_DATA_KEY = "_nyl_lobby_global_data"
+_UID_DATA_KEY = "_nyl__lobby_uid_data"
+_GLOBAL_DATA_KEY = "_nyl__lobby_global_data"
 
 
 class LobbyDataMgr(ServerEventProxy):

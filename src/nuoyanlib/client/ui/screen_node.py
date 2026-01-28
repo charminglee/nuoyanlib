@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -151,7 +151,7 @@ class ScreenNodeExtension(object):
         else:
             binding = ViewBinder.binding(flag, binding_name)
         proxy = binding(lambda *a: func(*a))
-        name = "_nyl_binding_%s_%s" % (func.__name__, id(func))
+        name = "_nyl__binding_%s_%s" % (func.__name__, id(func))
         proxy.__name__ = name
         setattr(self._screen_node, name, proxy)
         return proxy
@@ -583,21 +583,21 @@ class ScreenNodeExtension(object):
             callback_types = (ButtonCallbackType.UP,)
         touch_event_params = kwargs['touch_event_params']
         def decorator(func):
-            func._nyl_callback_types = callback_types
-            func._nyl_btn_path = btn_path
-            func._nyl_touch_event_params = touch_event_params
+            func._nyl__callback_types = callback_types
+            func._nyl__btn_path = btn_path
+            func._nyl__touch_event_params = touch_event_params
             return func
         return decorator
 
     def _process_button_callback(self):
         for attr in iter_obj_attrs(self):
-            if not hasattr(attr, "_nyl_callback_types"):
+            if not hasattr(attr, "_nyl__callback_types"):
                 continue
-            path = attr._nyl_btn_path
+            path = attr._nyl__btn_path
             path_lst = self._expend_path(path)
             for p in path_lst:
-                nyb = self._create_nyc(p, NyButton, touch_event_params=attr._nyl_touch_event_params)
-                for t in attr._nyl_callback_types:
+                nyb = self._create_nyc(p, NyButton, touch_event_params=attr._nyl__touch_event_params)
+                for t in attr._nyl__callback_types:
                     nyb.set_callback(attr, t)
 
     def _expend_path(self, path):

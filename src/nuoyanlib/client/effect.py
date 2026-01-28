@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-17
 #  ⠀
 # =================================================
 
@@ -102,9 +102,9 @@ def spawn_particle(name, pos, rot=(0, 0, 0), var_dict=None, rm_delay=0):
     :param tuple[float,float,float] pos: 生成坐标
     :param tuple[float,float,float] rot: 粒子发射器创建后使用的三维旋转（使用角度制，按照 ZYX 顺序旋转）；默认为 (0, 0, 0)
     :param dict[str,float]|None var_dict: 粒子参数字典
-    :param float rm_delay: 延迟多长时间后自动销毁粒子发射器，单位为秒；默认为0，不自动销毁
+    :param float rm_delay: 延迟多长时间后自动销毁粒子发射器，单位为秒；默认为 0，不自动销毁
 
-    :return: 若生成成功，返回粒子发射器ID，否则返回0
+    :return: 若生成成功，返回粒子发射器ID，否则返回 0
     :rtype: int
     """
     comp = LvComp.ParticleSystem
@@ -112,6 +112,7 @@ def spawn_particle(name, pos, rot=(0, 0, 0), var_dict=None, rm_delay=0):
     if var_dict:
         for k, v in var_dict.items():
             comp.SetVariable(par_id, k, v)
+    comp.EmitManually(par_id)
     if rm_delay > 0:
         LvComp.Game.AddTimer(rm_delay, comp.Remove, par_id)
     return par_id

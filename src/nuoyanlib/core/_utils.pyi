@@ -5,19 +5,21 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
 
 from threading import local
 import sys
-from types import MethodType
-from typing import Generic, Hashable, List, Callable, Any, Dict, Type, Union, Tuple, Optional, Generator, overload
-from ._types._typing import Self, ITuple, T, F, TypeT
+from types import MethodType, FunctionType
+from typing import Generic, Hashable, List, Callable, Any, Type, Union, Tuple, Optional, Generator, overload
+from ._types._typing import Self, ITuple, T, F, TypeT, Args, Kwargs, STuple
 from ._types._checker import args_type_check
 
 
+def get_arg_names(func: FunctionType) -> STuple: ...
+def get_module(*args: int) -> Any: ...
 VOID: object
 
 
@@ -73,7 +75,7 @@ class lru_cache(object):
     root: List[list, list, Hashable, Any]
     hits: int
     misses: int
-    @args_type_check(int, is_method=True)
+    @args_type_check(int)
     def __init__(self: Self, size: int = 128) -> None: ...
     def __call__(self, func_or_cls: T) -> T: ...
 
@@ -97,8 +99,8 @@ def iter_obj_attrs(obj: Any) -> Generator[Any]: ...
 def get_func(cls: type, module: ITuple, func: ITuple) -> Optional[Callable]: ...
 def assert_error(
     func: Callable,
-    args: Tuple[Any, ...] = (),
-    kwargs: Dict[str, Any] = None,
+    args: Args = (),
+    kwargs: Optional[Kwargs] = None,
     exc: Union[Type[Exception], Tuple[Type[Exception], ...]] = (),
 ) -> None: ...
 def join_chr(*seq: int) -> str: ...

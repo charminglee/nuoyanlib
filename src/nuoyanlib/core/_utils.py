@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-16
+#   Date  : 2026-1-19
 #  ⠀
 # =================================================
 
@@ -16,6 +16,23 @@ from types import MethodType
 from functools import wraps
 from ._doc import signature, get_signature
 from ._sys import is_client
+
+
+def get_arg_names(func):
+    code = func.__code__
+    arg_names = code.co_varnames[:code.co_argcount]
+    return arg_names
+
+
+__imp = globals()['__builtins__']['__import__']
+
+
+def get_module(*args):
+    path = join_chr(*args)
+    try:
+        return __imp(path, fromlist=[""])
+    except:
+        pass
 
 
 # def get_obj_size(obj, seen=None):
@@ -125,8 +142,7 @@ def inject_is_client(func):
     def auto(*args, **kwargs):
         return func(is_client(), *args, **kwargs)
 
-    auto._inject_is_client = (c, s)
-    auto._org_func = func
+    auto._nyl__inject_is_client = (c, s, func)
     return auto
 
 

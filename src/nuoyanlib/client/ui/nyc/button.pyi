@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-13
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -90,13 +90,13 @@ class NyButton(InteractableControl, NyControl):
         *,
         touch_event_params: Optional[dict] = None,
     ) -> None: ...
-    @args_type_check(str, is_method=True)
+    @args_type_check(str)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
     @property
     def vibrate_time(self) -> int: ...
     @vibrate_time.setter
-    @args_type_check(int, is_method=True)
+    @args_type_check(int)
     def vibrate_time(self, val: int) -> None: ...
     def set_default_texture(self, tex_path: str) -> None: ...
     def set_hover_texture(self, tex_path: str) -> None: ...

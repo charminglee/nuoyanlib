@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -29,7 +29,7 @@ class NySelectionWheel(InteractableControl, NyControl):
         screen_node_ex: ScreenNodeExtension,
         selection_wheel_control: SelectionWheelUIControl,
     ) -> None: ...
-    @args_type_check(str, is_method=True)
+    @args_type_check(str)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
     def set_callback(

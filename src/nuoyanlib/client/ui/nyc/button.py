@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -117,7 +117,7 @@ class NyButton(InteractableControl, NyControl):
         return self._vibrate_time
 
     @vibrate_time.setter
-    @args_type_check(int, is_method=True)
+    @args_type_check(int)
     def vibrate_time(self, val):
         """
         [可读写属性]

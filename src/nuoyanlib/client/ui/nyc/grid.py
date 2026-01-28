@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -224,7 +224,7 @@ class ElemGroup(object):
     def __len__(self):
         return self._len
 
-    @args_type_check((int, slice), is_method=True)
+    @args_type_check((int, slice))
     def __getitem__(self, item):
         return self.cell_list[item]
 
@@ -457,7 +457,7 @@ class NyGrid(NyControl):
 
     # region Common ====================================================================================================
 
-    @args_type_check((int, slice, tuple), is_method=True)
+    @args_type_check((int, slice, tuple))
     def __getitem__(self, item):
         """
         根据特定规则获取网格单个或多个元素。
@@ -518,7 +518,7 @@ class NyGrid(NyControl):
         if not self.gd_obj:
             return
 
-    @args_type_check(GridData, is_method=True)
+    @args_type_check(GridData)
     def bind_data(self, gd):
         """
         绑定网格数据。

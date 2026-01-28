@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -139,7 +139,7 @@ class NyComboBox(InteractableControl, NyControl):
     def _get_opt_path(self, index):
         return self._base_control.comboBox.uiControlPathList[index] # noqa
 
-    @args_type_check((int, str, slice), is_method=True)
+    @args_type_check((int, str, slice))
     def __getitem__(self, item):
         """
         按索引或显示名称获取下拉框项的 ``NyControl`` 实例。
@@ -161,7 +161,7 @@ class NyComboBox(InteractableControl, NyControl):
         ]
         return controls[0] if len(controls) == 1 else controls
 
-    @args_type_check((int, str, slice), is_method=True)
+    @args_type_check((int, str, slice))
     def __delitem__(self, item):
         """
         删除指定索引或显示名称的下拉框项。

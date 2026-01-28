@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-20
 #  ⠀
 # =================================================
 
@@ -180,7 +180,7 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
     ----
 
     适用于普通函数与实例方法，若用于普通函数，需将 ``is_method`` 参数设为 ``False`` 。
-    事件名与函数名相同时，可省略 ``event_name`` 参数。监听ModSDK事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
+    事件名与函数名相同时，可省略 ``event_name`` 参数。监听 ModSDK 事件时，可省略 ``ns`` 和 ``sys_name`` 参数。
 
     在类中使用时，需在 ``__init__()`` 方法中调用一次 ``listen_all_events()`` 方可生效，详见示例。
 
@@ -188,31 +188,31 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
     ----
 
     >>> import mod.client.extraClientApi as client_api
-
     >>> class MyClientSystem(client_api.GetClientSystemCls()):
     ...     def __init__(self, namespace, system_name):
-    ...         # 对当前类中所有被 @event 装饰的方法执行事件监听
+    ...         super(MyClientSystem, self).__init__(namespace, system_name)
+    ...         # 对当前类中所有被@event装饰的方法执行事件监听
     ...         nyl.listen_all_events(self)
     ...         # 调用以下函数可监听特定事件
     ...         # nyl.listen_event(self.MyCustomEvent)
     ...
-    ...     # 监听 MyCustomEvent 事件，事件来源为 MyMod:MyServerSystem
+    ...     # 监听MyCustomEvent事件，事件来源为MyMod:MyServerSystem
     ...     @nyl.event("MyCustomEvent", "MyMod", "MyServerSystem")
     ...     def EventCallback(self, args):
     ...         pass
     ...
-    ...    # 事件名与函数名相同时，可省略 event_name 参数
+    ...    # 事件名与函数名相同时，可省略event_name参数
     ...    @nyl.event(ns="MyMod", sys_name="MyServerSystem")
     ...    def MyCustomEvent(self, args):
     ...        pass
     ...
-    ...     # 监听 ModSDK 事件且事件名与函数名相同时，可省略所有参数
+    ...     # 监听ModSDK事件且事件名与函数名相同时，可省略所有参数
     ...     @nyl.event
     ...     def UiInitFinished(self, args):
     ...         pass
     ...
     ...     def Destroy(self):
-    ...         # 必要时，调用以下函数可取消当前类中所有被 @event 装饰的方法的事件监听
+    ...         # 必要时，调用以下函数可取消当前类中所有被@event装饰的方法的事件监听
     ...         nyl.unlisten_all_events(self)
     ...         # 调用以下函数可取消监听特定事件
     ...         # nyl.unlisten_event(self.MyCustomEvent)
@@ -237,9 +237,9 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
         # 解析事件参数
         args = _parse_listen_args(func, event_name, ns, sys_name)
         # 插入标记
-        if not hasattr(func, '_nyl_listen_args'):
-            func._nyl_listen_args = []
-        func._nyl_listen_args.append((args[0], args[1], args[2], priority))
+        if not hasattr(func, '_nyl__listen_args'):
+            func._nyl__listen_args = []
+        func._nyl__listen_args.append((args[0], args[1], args[2], priority))
         # 非实例方法，立即执行监听
         if not is_method:
             _EventPool.listen_event(func, *args, priority=priority)
@@ -255,7 +255,7 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
 def _get_listen_args(func):
     if isinstance(func, MethodType):
         func = func.__func__
-    return getattr(func, '_nyl_listen_args', None)
+    return getattr(func, '_nyl__listen_args', None)
 
 
 def listen_event(func, event_name="", ns="", sys_name="", priority=0, use_decorator=False):
@@ -430,7 +430,7 @@ class BaseEventProxy(object):
         super(BaseEventProxy, self).__init__(*args, **kwargs)
         is_client = isinstance(self, ClientEventProxy)
         for attr in iter_obj_attrs(self):
-            if not isinstance(attr, MethodType) or hasattr(attr, '_nyl_listen_args'):
+            if not isinstance(attr, MethodType) or hasattr(attr, '_nyl__listen_args'):
                 # 跳过属性和已被@event装饰的方法
                 continue
             event_name = attr.__name__
@@ -443,7 +443,7 @@ class BaseEventProxy(object):
         @event(event_name, ns, sys_name)
         def proxy(args):
             method(EventArgsWrap(args, event_name) if args else None)
-        name = "_nyl_proxy_" + event_name
+        name = "_nyl__proxy_" + event_name
         proxy.__name__ = name
         setattr(self, name, proxy)
 
@@ -451,9 +451,6 @@ class BaseEventProxy(object):
 class ClientEventProxy(BaseEventProxy):
     """
     客户端事件代理类。
-
-    说明
-    ----
 
     继承 ``ClientEventProxy`` 后，所有 ModSDK 客户端事件无需监听，编写一个与事件同名的方法即可使用，
     且事件参数采用对象形式，支持参数名补全。
@@ -465,9 +462,6 @@ class ClientEventProxy(BaseEventProxy):
 class ServerEventProxy(BaseEventProxy):
     """
     服务端事件代理类。
-
-    说明
-    ----
 
     继承 ``ServerEventProxy`` 后，所有 ModSDK 服务端事件无需监听，编写一个与事件同名的方法即可使用，
     且事件参数采用对象形式，支持参数名补全。
@@ -542,7 +536,7 @@ def __test__():
     call("Minecraft", "Engine", "LoadClientAddonScriptsAfter", a)
     LoadClientAddonScriptsAfter(a)
     assert LoadClientAddonScriptsAfter.__name__ == "LoadClientAddonScriptsAfter"
-    assert LoadClientAddonScriptsAfter._nyl_listen_args == [
+    assert LoadClientAddonScriptsAfter._nyl__listen_args == [
         ("event", "mihoyo", "StarRail", 6),
         ("LoadClientAddonScriptsAfter", "Minecraft", "Engine", 0),
         ("LoadClientAddonScriptsAfter", "abc", "system", 0),
@@ -565,7 +559,7 @@ def __test__():
     t = T()
     t2 = T()
     tl = [t, t2]
-    assert t.CustomEvent._nyl_listen_args == [
+    assert t.CustomEvent._nyl__listen_args == [
         ("CustomEvent", "a", "b", 0),
         ("LoadClientAddonScriptsAfter", "Minecraft", "Engine", 0),
     ]

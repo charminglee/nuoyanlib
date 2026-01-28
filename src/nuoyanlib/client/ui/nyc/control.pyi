@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-21
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -198,7 +198,7 @@ class NyControl(object):
     def property_bag(self) -> Optional[Dict[str, Any]]: ...
     @property_bag.setter
     def property_bag(self, val: Dict[str, Any]) -> None: ...
-    @args_type_check(str, is_method=True)
+    @args_type_check(str)
     def __truediv__(self, other: str) -> Optional[NyControl]: ...
     __div__ = __truediv__
     def apply_attr(self, attr: __AllowedApplyAttrs, value: Any, level: int = 1) -> None: ...

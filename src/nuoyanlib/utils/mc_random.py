@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -29,7 +29,6 @@ __all__ = [
 
 
 if 0:
-    # 绕过机审专用
     random_pos = lambda *_, **__: UNIVERSAL_OBJECT
 
 
@@ -122,8 +121,7 @@ def random_string(length, lower=True, upper=True, num=True, seed=None, generate_
         return [_gen_str(rand.choice, s, length) for _ in xrange(generate_num)]
 
 
-def __test__():
-    return
+if __name__ == "__main__":
     print(random_string(20, lower=False))
     print(random_string(20, upper=False))
     print(random_string(20, num=False))
