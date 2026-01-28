@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-1-23
 #  ⠀
 # =================================================
 
@@ -23,7 +23,7 @@ ENABLED_MODSDK_LOG = True
 """
 [需要重载] [实验性]
 
-是否关闭ModSDK日志输出。
+是否关闭 ModSDK 日志输出。
 """
 
 ENABLED_TYPE_CHECKING = True
@@ -31,13 +31,6 @@ ENABLED_TYPE_CHECKING = True
 [需要重载]
 
 是否启用「nuoyanlib」对某些函数的参数类型的运行时检查（关闭可获得少许性能提升）。
-"""
-
-ENABLED_MCP_MOD_LOG_DUMPING = False
-"""
-[需要重载]
-
-是否将当前Mod的错误信息输出到McpModLog日志（目前正式服已阉割该功能）。
 """
 
 # endregion
