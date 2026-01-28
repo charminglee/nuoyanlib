@@ -5,11 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-23
 #  ⠀
 # =================================================
 
 
+from collections import defaultdict
 import itertools
 import random
 import mod.client.extraClientApi as c_api
@@ -26,13 +27,12 @@ from .comp import ClientSystem, CF, LvComp
 class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
+        self.unsync_query = []
         self.callback_data = {}
         self.gse_data = {}
         self.gse_counter = itertools.count()
         if not config.ENABLED_MODSDK_LOG:
             _logging.disable_modsdk_loggers()
-        if config.ENABLED_MCP_MOD_LOG_DUMPING:
-            c_api.SetMcpModLogCanPostDump(True)
         _logging.info("NuoyanLibClientSystem inited")
 
     # region Events ====================================================================================================
@@ -65,7 +65,6 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
             self._on_gse_update()
     else:
         def Update(self):
-            NuoyanLibBaseSystem.Update(self)
             self._on_gse_update()
 
     # def LoadClientAddonScriptsAfter(self, args):
@@ -128,23 +127,32 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     # region set_query_mod_var =========================================================================================
 
     @_lib_sys_event
-    def _SetQueryCache(self, args):
-        for entity_id, queries in args.items():
+    def _SetQueryVar(self, args):
+        for entity_id, query_list in args.items():
             comp = CF(entity_id).QueryVariable
-            for name, value in queries.items():
+            for name, value in query_list:
                 if comp.Get(name) == -1.0:
                     comp.Register(name, 0.0)
                 comp.Set(name, value)
 
-    @_lib_sys_event
-    def _SetQueryVar(self, args):
-        entity_id = args['entity_id']
-        name = args['name']
-        value = args['value']
+    def set_query_mod_var(self, entity_id, name, value, sync):
+        self.unsync_query.append((entity_id, name, value))
+
         comp = CF(entity_id).QueryVariable
         if comp.Get(name) == -1.0:
             comp.Register(name, 0.0)
         comp.Set(name, value)
+
+        if sync:
+            self.sync_query_mod_var()
+
+    def sync_query_mod_var(self):
+        args = defaultdict(list)
+        while self.unsync_query:
+            entity_id, name, value = self.unsync_query.pop()
+            args[entity_id].append((name, value))
+        if args:
+            self.NotifyToServer("_SetQueryVar", args)
 
     # endregion
 

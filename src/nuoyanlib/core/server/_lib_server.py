@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-12
+#   Date  : 2026-1-23
 #  ⠀
 # =================================================
 
 
+from collections import defaultdict
 import mod.server.extraServerApi as s_api
-from ... import config
 from .. import _const, _logging
 from .._utils import singleton
 from .._sys import NuoyanLibBaseSystem, load_extensions
@@ -23,10 +23,9 @@ from .comp import ServerSystem, CF
 class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem):
     def __init__(self, namespace, system_name):
         super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
-        self.query_cache = {}
+        self.query_cache = defaultdict(dict)
+        self.unsync_query = []
         self.callback_data = {}
-        if config.ENABLED_MCP_MOD_LOG_DUMPING:
-            s_api.SetMcpModLogCanPostDump(True)
         _logging.info("NuoyanLibServerSystem inited")
 
     # region Events ====================================================================================================
@@ -39,7 +38,11 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
     def UiInitFinished(self, args):
         player_id = args.__id__
         if self.query_cache:
-            self.NotifyToClient(player_id, "_SetQueryCache", self.query_cache)
+            query_args = {
+                eid: query_dict.items()
+                for eid, query_dict in self.query_cache.items()
+            }
+            self.NotifyToClient(player_id, "_SetQueryVar", query_args)
         self.sync_all(player_id)
 
     # def LoadServerAddonScriptsAfter(self, args):
@@ -87,15 +90,30 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
 
     @_lib_sys_event
     def _SetQueryVar(self, args):
-        player_id = args.get('__id__')
-        entity_id = args['entity_id']
-        name = args['name']
-        value = args['value']
-        self.query_cache.setdefault(entity_id, {})[name] = value
-        player_lst = s_api.GetPlayerList()
-        if player_id:
-            player_lst.remove(player_id)
-        self.NotifyToMultiClients(player_lst, "_SetQueryVar", args)
+        player_id = args['__id__']
+        del args['__id__']
+
+        for entity_id, query_list in args.items():
+            for name, value in query_list:
+                self.query_cache[entity_id][name] = value
+
+        players = s_api.GetPlayerList()
+        players.remove(player_id)
+        self.NotifyToMultiClients(players, "_SetQueryVar", args)
+
+    def set_query_mod_var(self, entity_id, name, value, sync):
+        self.unsync_query.append((entity_id, name, value))
+        if sync:
+            self.sync_query_mod_var()
+
+    def sync_query_mod_var(self):
+        args = defaultdict(list)
+        while self.unsync_query:
+            entity_id, name, value = self.unsync_query.pop()
+            args[entity_id].append((name, value))
+            self.query_cache[entity_id][name] = value
+        if args:
+            self.BroadcastToAllClient("_SetQueryVar", args)
 
     # endregion
 
