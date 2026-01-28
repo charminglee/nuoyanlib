@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-17
+#   Date  : 2026-1-19
 #  ⠀
 # =================================================
 
@@ -21,3 +21,4 @@ from .time_ease import *
 from .communicate import *
 from .pos_gen import *
 from .molang import *
+from .block import *
