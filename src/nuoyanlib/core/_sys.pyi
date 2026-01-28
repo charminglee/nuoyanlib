@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-12
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -37,17 +37,13 @@ LEVEL_ID: str
 
 
 class NuoyanLibBaseSystem(object):
-    __tick: int
-    cond_func: Dict[int, Tuple[Callable[[], bool], Callable[[bool], Any], int]]
-    cond_state: Dict[int, bool]
     all_sd: defaultdict[str, List[SyncData]]
     unregister_sd_data: Dict[str, Any]
     is_client: bool
-    def __init__(self: Self, *args, **kwargs) -> None: ...
+    def __init__(self: Self, namespace: str, system_name: str) -> None: ...
     @classmethod
     def register(cls) -> bool: ...
     def Destroy(self) -> None: ...
-    def Update(self) -> None: ...
     def native_listen(
         self,
         ns: str,
@@ -64,8 +60,6 @@ class NuoyanLibBaseSystem(object):
         method: Union[MethodType, Callable[[Dict[str, Any]], Any]],
         priority: int = 0
     ) -> None: ...
-    def add_condition_to_func(self, cond: Callable[[], bool], func: Callable[[bool], Any], freq: int) -> int: ...
-    def rm_condition_to_func(self, cond_id: int) -> bool: ...
     def _NuoyanLibSyncData(self, all_data: Dict[str, Any]) -> None: ...
     def register_sd(self, sd: SyncData) -> None: ...
     def sync(self, key: str) -> None: ...

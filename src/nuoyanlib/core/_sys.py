@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-12
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -114,19 +114,16 @@ LEVEL_ID = get_api().GetLevelId()
 
 
 class NuoyanLibBaseSystem(object):
-    def __init__(self, *args, **kwargs):
-        super(NuoyanLibBaseSystem, self).__init__(*args, **kwargs)
-        self.__tick = 0
-        self.cond_func = {}
-        self.cond_state = {}
+    def __init__(self, namespace, system_name):
+        super(NuoyanLibBaseSystem, self).__init__(namespace, system_name)
         self.all_sd = defaultdict(list)
         self.unregister_sd_data = {}
         self.is_client = is_client()
         if self.is_client:
-            sys_name = _const.LIB_SERVER_NAME
+            lib_sys_name = _const.LIB_SERVER_NAME
         else:
-            sys_name = _const.LIB_CLIENT_NAME
-        self.native_listen(_const.LIB_NAME, sys_name, "_NuoyanLibSyncData", self._NuoyanLibSyncData)
+            lib_sys_name = _const.LIB_CLIENT_NAME
+        self.native_listen(_const.LIB_NAME, lib_sys_name, "_NuoyanLibSyncData", self._NuoyanLibSyncData)
 
     @classmethod
     def register(cls):
@@ -145,39 +142,12 @@ class NuoyanLibBaseSystem(object):
 
     def Destroy(self):
         self.UnListenAllEvents() # noqa
-        self.cond_func.clear()
-        self.cond_state.clear()
-
-    def Update(self):
-        self.__tick += 1
-        for cond_id, (cond, func, freq) in self.cond_func.items():
-            if self.__tick % freq or cond_id not in self.cond_state:
-                continue
-            curr_state = cond()
-            old_state = self.cond_state[cond_id]
-            if curr_state != old_state:
-                func(curr_state)
-                self.cond_state[cond_id] = curr_state
 
     def native_listen(self, ns, sys_name, event_name, method, priority=0):
         self.ListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # noqa
 
     def native_unlisten(self, ns, sys_name, event_name, method, priority=0):
         self.UnListenForEvent(ns, sys_name, event_name, method.__self__, method, priority) # noqa
-
-    def add_condition_to_func(self, cond, func, freq):
-        cond_id = max(self.cond_func.iterkeys()) + 1 if self.cond_func else 0
-        self.cond_func[cond_id] = (cond, func, freq)
-        self.cond_state[cond_id] = False
-        func(cond())
-        return cond_id
-
-    def rm_condition_to_func(self, cond_id):
-        if cond_id in self.cond_func:
-            del self.cond_func[cond_id]
-            del self.cond_state[cond_id]
-            return True
-        return False
 
     # region SyncData ==================================================================================================
 
