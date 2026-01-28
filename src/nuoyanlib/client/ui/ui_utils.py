@@ -5,9 +5,15 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-1-17
 #  ⠀
 # =================================================
+
+
+import mod.client.extraClientApi as c_api
+from ...core._utils import get_module
+from ...core.client.comp import LvComp
+from ...utils.enum import ControlType
 
 
 if 0:
@@ -16,14 +22,10 @@ if 0:
     from .nyc import NyControl
 
 
-import mod.client.extraClientApi as c_api
-from ...core.client.comp import LvComp
-from ...utils.enum import ControlType
-
-
 __all__ = [
     "pop_to_hud",
     "create_ui",
+    "push_ui",
     "to_path",
     "to_control",
     "get_children_path_by_level",
@@ -82,20 +84,63 @@ class _UIControlType:
     UNKNOWN = 31
 
 
-def create_ui(namespace, ui_key, cls_path, screen_def="", register=True, param=None, push=False, client_system=None):
+__ui_mgr = get_module(109, 111, 100, 46, 99, 108, 105, 101, 110, 116, 46, 117, 105, 46, 117, 105, 77, 97, 110, 97, 103, 101, 114)
+
+
+def _is_ui_registered(namespace, ui_key):
+    key = namespace + ":" + ui_key
+    return key in __ui_mgr.instance().screen_def
+
+
+def create_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_system=None):
     """
     创建UI界面。
+
+    说明
+    ----
+
+    使用此函数创建的UI无需调用 ``RegisterUI()`` 接口进行注册。
 
     -----
 
     :param str namespace: 命名空间，建议为 mod 名字
-    :param str ui_key: UI唯一标识，建议为 UI json 中的 "namespace" 的值
+    :param str ui_key: UI唯一标识，一般为 UI json 中 "namespace" 的值
     :param str cls_path: UI类路径
     :param str screen_def: UI画布路径，格式为 "<namespace>.<screen_name>"，<namespace> 为 UI json 中 "namespace" 的值，<screen_name> 为想要创建的画布名称；默认为 "<ui_key>.main"
-    :param bool register: 创建前是否注册UI；默认为 True
-    :param dict|None param: UI参数字典；不通过堆栈管理的方式创建UI时，该参数默认为 {'isHud': 1}
-    :param bool push: 是否通过堆栈管理（PushScreen）的方式创建UI；默认为 False
-    :param ClientSystem|None client_system: 客户端类实例；默认为 None；若指定，可在UI类中通过 param 字典的 '__cs__' 键获取到该实例
+    :param dict|None param: UI参数字典；默认为 {'isHud': 1}
+    :param ClientSystem|None client_system: 客户端类实例；默认为 None；若指定，可在UI类中通过 param 字典的 '__cs__' 键获取该实例
+
+    :return: UI类实例，创建失败时返回 None
+    :rtype: ScreenNode|None
+    """
+    if not screen_def:
+        screen_def = ui_key + ".main"
+    if param is None:
+        param = {'isHud': 1}
+    param['__cs__'] = client_system
+    if not _is_ui_registered(namespace, ui_key):
+        c_api.RegisterUI(namespace, ui_key, cls_path, screen_def)
+    node = c_api.CreateUI(namespace, ui_key, param)
+    return node
+
+
+def push_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_system=None):
+    """
+    通过堆栈管理（Push）的方式创建UI界面。
+
+    说明
+    ----
+
+    使用此函数创建的UI无需调用 ``RegisterUI()`` 接口进行注册。
+
+    -----
+
+    :param str namespace: 命名空间，建议为 mod 名字
+    :param str ui_key: UI唯一标识，一般为 UI json 中 "namespace" 的值
+    :param str cls_path: UI类路径
+    :param str screen_def: UI画布路径，格式为 "<namespace>.<screen_name>"，<namespace> 为 UI json 中 "namespace" 的值，<screen_name> 为想要创建的画布名称；默认为 "<ui_key>.main"
+    :param dict|None param: UI参数字典；默认为空字典
+    :param ClientSystem|None client_system: 客户端类实例；默认为 None；若指定，可在UI类中通过 param 字典的 '__cs__' 键获取该实例
 
     :return: UI类实例，创建失败时返回 None
     :rtype: ScreenNode|None
@@ -104,15 +149,10 @@ def create_ui(namespace, ui_key, cls_path, screen_def="", register=True, param=N
         screen_def = ui_key + ".main"
     if param is None:
         param = {}
-    if not push and 'isHud' not in param:
-        param['isHud'] = 1
     param['__cs__'] = client_system
-    if register:
+    if not _is_ui_registered(namespace, ui_key):
         c_api.RegisterUI(namespace, ui_key, cls_path, screen_def)
-    if push:
-        node = c_api.PushScreen(namespace, ui_key, param)
-    else:
-        node = c_api.CreateUI(namespace, ui_key, param)
+    node = c_api.PushScreen(namespace, ui_key, param)
     return node
 
 

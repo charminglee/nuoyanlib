@@ -5,12 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-4
+#   Date  : 2026-1-16
 #  ⠀
 # =================================================
 
 
-from typing import Optional, Union, List, Any, overload, Literal
+from typing import Dict, Optional, Union, List, Any, overload, Literal
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
@@ -73,14 +73,21 @@ class _UIControlType:
     UNKNOWN: int
 
 
+def _is_ui_registered(namespace: str, ui_key: str) -> bool: ...
 def create_ui(
     namespace: str,
     ui_key: str,
     cls_path: str,
     screen_def: str = "",
-    register: bool = True,
+    param: Optional[Dict[str, Any]] = None,
+    client_system: Optional[ClientSystem] = None
+) -> Union[ScreenNode, Any]: ...
+def push_ui(
+    namespace: str,
+    ui_key: str,
+    cls_path: str,
+    screen_def: str = "",
     param: Optional[dict] = None,
-    push: bool = False,
     client_system: Optional[ClientSystem] = None
 ) -> Union[ScreenNode, Any]: ...
 def to_path(control: UiPathOrNyControl) -> str: ...
