@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-20
+#   Date  : 2026-2-9
 #  ⠀
 # =================================================
 
@@ -147,13 +147,17 @@ def _get_event_source(is_client, event_name):
     if is_client:
         if event_name in ALL_CLIENT_LIB_EVENTS:
             return _const.LIB_NAME, ALL_CLIENT_LIB_EVENTS[event_name]
-        elif event_name in ClientEvent:
+        if event_name in ClientEvent:
             return c_api.GetEngineNamespace(), c_api.GetEngineSystemName()
+        if event_name in ServerEvent:
+            return s_api.GetEngineNamespace(), s_api.GetEngineSystemName()
     else:
         if event_name in ALL_SERVER_LIB_EVENTS:
             return _const.LIB_NAME, ALL_SERVER_LIB_EVENTS[event_name]
-        elif event_name in ServerEvent:
+        if event_name in ServerEvent:
             return s_api.GetEngineNamespace(), s_api.GetEngineSystemName()
+        if event_name in ClientEvent:
+            return c_api.GetEngineNamespace(), c_api.GetEngineSystemName()
 
 
 def _parse_listen_args(func, event_name, ns, sys_name):
@@ -167,7 +171,9 @@ def _parse_listen_args(func, event_name, ns, sys_name):
         source = _get_event_source(_sys.is_client(), event_name)
         if source:
             return event_name, source[0], source[1]
-        raise error.EventSourceError(event_name, ns, sys_name)
+        # raise error.EventSourceError(event_name, ns, sys_name)
+        import warnings
+        warnings.warn(str(error.EventSourceError(event_name, ns, sys_name)))
 
 
 def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
@@ -236,6 +242,8 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
     def add_listener(func):
         # 解析事件参数
         args = _parse_listen_args(func, event_name, ns, sys_name)
+        if not args:
+            return func
         # 插入标记
         if not hasattr(func, '_nyl__listen_args'):
             func._nyl__listen_args = []
@@ -280,6 +288,8 @@ def listen_event(func, event_name="", ns="", sys_name="", priority=0, use_decora
             _EventPool.listen_event(func, *args)
     else:
         args = _parse_listen_args(func, event_name, ns, sys_name)
+        if not args:
+            return
         _EventPool.listen_event(func, *args, priority=priority)
 
 
@@ -305,6 +315,8 @@ def unlisten_event(func, event_name="", ns="", sys_name="", priority=0, use_deco
             _EventPool.unlisten_event(func, *args)
     else:
         args = _parse_listen_args(func, event_name, ns, sys_name)
+        if not args:
+            return
         _EventPool.unlisten_event(func, *args, priority=priority)
 
 
@@ -373,6 +385,8 @@ def is_listened(func, event_name="", ns="", sys_name="", priority=0):
     :rtype: bool
     """
     args = _parse_listen_args(func, event_name, ns, sys_name)
+    if not args:
+        return
     return _EventPool.is_listened(func, *args, priority=priority)
 
 
@@ -385,6 +399,8 @@ class EventArgsWrap(object):
 
     def __getattr__(self, key):
         # 事件参数获取
+        if key == "from_":
+            key = "from"
         if key in self._arg_dict:
             return self._arg_dict[key]
         raise error.EventParameterError(self._event_name, key)

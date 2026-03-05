@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-16
+#   Date  : 2026-2-7
 #  ⠀
 # =================================================
 
@@ -4260,9 +4260,9 @@ class ServerEvent(StrEnum):
     --------
 
     - ``entityId`` -- str，实体ID
-    - ``from`` -- str，变化前的生命值（请使用event['from']获取该参数）
-    - ``to`` -- str，变化后的生命值
-    - ``byScript`` -- str，是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
+    - ``from`` -- float，变化前的生命值（请使用args.from_或args['from']获取该参数）
+    - ``to`` -- float，变化后的生命值
+    - ``byScript`` -- bool，是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
     """
     EntityTickServerEvent = ...
     """

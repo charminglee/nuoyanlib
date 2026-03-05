@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-20
+#   Date  : 2026-2-10
 #  ⠀
 # =================================================
 
@@ -23,13 +23,13 @@ __BasicPos = Literal["foot_pos", "center"]
 def ignore_dmg_cd(restore_cd: int = 10) -> ContextManager: ...
 
 
-class EntityFilter:
-    @staticmethod
-    def non_mob(eid: str) -> bool: ...
-    @staticmethod
-    def mob(eid: str) -> bool: ...
-    @staticmethod
-    def has_health(eid: str) -> bool: ...
+# class EntityFilter:
+#     @staticmethod
+#     def non_mob(eid: str) -> bool: ...
+#     @staticmethod
+#     def mob(eid: str) -> bool: ...
+#     @staticmethod
+#     def has_health(eid: str) -> bool: ...
 
 
 def hurt(

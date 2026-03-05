@@ -5,12 +5,12 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-28
+#   Date  : 2026-3-5
 #  ⠀
 # =================================================
 
 
-from ..core._utils import inject_is_client
+from ..core._utils import inject_is_client, UNIVERSAL_OBJECT
 from ..core._sys import get_lv_comp
 
 

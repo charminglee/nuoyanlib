@@ -5,20 +5,21 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-5
+#   Date  : 2026-1-16
 #  ⠀
 # =================================================
 
 
-# todo：spawn_ground_shatter_effect()改用客户端实体
-# todo：Entity类、Player类，对事件返回的entityId、playerId进行封装
+# todo：库函数精简
+# todo：完善接口的异常处理
 # todo：完善Ny控件
 # todo：UI动画框架
+# todo：Entity类、Player类，对事件返回的entityId、playerId进行封装
 # todo：event热更新
-# todo：完善接口的异常处理
-# todo：@async
-# todo：容器UI
 # todo：nbt
+# todo：@async
+# todo：运镜框架
+# todo：容器UI
 
 
 __version__ = "1.0.0-beta.1"

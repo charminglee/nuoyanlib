@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-19
+#   Date  : 2026-2-10
 #  ⠀
 # =================================================
 
@@ -14,15 +14,25 @@ import traceback
 from functools import wraps
 import time
 import re
-from ..core._sys import get_lv_comp, is_client
-from ..core._utils import singleton, lru_cache, cached_property, try_exec, iter_obj_attrs
+from ..core._sys import get_lv_comp, is_client, get_cf
+from ..core._utils import (
+    singleton,
+    lru_cache,
+    cached_property,
+    try_exec,
+    iter_obj_attrs,
+    inject_is_client,
+    UNIVERSAL_OBJECT,
+)
 
 
 if 0:
     from typing import Any
+    is_on_ground = lambda *_, **__: UNIVERSAL_OBJECT
 
 
 __all__ = [
+    "is_on_ground",
     "rgb2hex",
     "hex2rgb",
     "get_time",
@@ -39,6 +49,27 @@ __all__ = [
     "try_exec",
     "iter_obj_attrs",
 ]
+
+
+@inject_is_client
+def is_on_ground(__is_client__, entity_id):
+    """
+    判断实体是否在地面上。
+
+    -----
+
+    :param str entity_id: 实体ID
+
+    :return: 是否在地面上
+    :rtype: bool
+    """
+    if __is_client__:
+        return get_cf(entity_id).Attr.isEntityOnGround()
+    else:
+        res = get_cf(entity_id).QueryVariable.EvalMolangExpression("q.is_on_ground")
+        if 'value' in res:
+            return bool(res['value'])
+    return False
 
 
 def rgb2hex(rgb_color, mc_rgb=True, with_sign=True, upper=True):
@@ -187,20 +218,47 @@ def call_interval(interval):
 
     限制函数调用的最小时间间隔。
 
+    调用函数时，若距离上一次调用的时间小于最小时间间隔，则本次调用不会执行任何代码，函数返回 ``None`` 。
+    可通过 ``func.reset_call_time()`` 重置上次调用时间，从而允许函数立即被调用，详见示例。
+
+    示例
+    ----
+
+    >>> import mod.server.extraServerApi as server_api
+    >>> @nyl.call_interval(5)
+    ... def set_pos(entity_id, pos):
+    ...     print pos
+    ...     nyl.CF(entity_id).Pos.SetFootPos(pos)
+    ...
+    >>> host_player = server_api.GetHostPlayerId()
+    >>> set_pos(host_player, (1, 2, 3))
+    (1, 2, 3)
+    >>> set_pos(host_player, (1, 2, 3)) # 距离上次调用时间小于5秒，此次调用不执行代码，返回None
+
+    使用 ``set_pos.reset_call_time()`` 重置上次调用时间。
+
+    >>> set_pos.reset_call_time()
+    >>> set_pos(host_player, (0, 0, 0)) # 允许函数在间隔时间内被调用
+    (0, 0, 0)
+
     -----
 
     :param float interval: 最小时间间隔，单位为秒
     """
     def decorator(func):
-        func._nyl__last_call_time = 0
+        func._nyl__call_time = 0
+
+        def reset_call_time():
+            func._nyl__call_time = 0
 
         @wraps(func)
         def wrapper(*args, **kwargs):
             now = time.time()
-            if now - func._nyl__last_call_time >= interval:
-                func._nyl__last_call_time = now
+            if now - func._nyl__call_time >= interval:
+                func._nyl__call_time = now
                 return func(*args, **kwargs)
 
+        wrapper.reset_call_time = reset_call_time
         return wrapper
     return decorator
 

@@ -5,17 +5,19 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-19
+#   Date  : 2026-2-10
 #  ⠀
 # =================================================
 
 
 from typing import Literal, TypeVar, Union, Any, Callable, Tuple, Optional, overload
-from ..core._types._typing import FTuple2, ITuple3, FTuple3
+from ..core._types._typing import FTuple2, ITuple3, FTuple3, F
 from ..core._utils import singleton, lru_cache, cached_property, try_exec, iter_obj_attrs
 
 
 __DictT = TypeVar("__DictT", bound=dict)
+class __Callable(Callable):
+    reset_call_time: Callable[[], None]
 
 
 singleton = singleton
@@ -25,6 +27,7 @@ try_exec = try_exec
 iter_obj_attrs = iter_obj_attrs
 
 
+def is_on_ground(entity_id: str) -> bool: ...
 def rgb2hex(
     rgb_color: Union[FTuple3, ITuple3],
     mc_rgb: bool = True ,
@@ -48,7 +51,7 @@ def timeit(
     kwargs: Optional[Any] = None,
 ) -> FTuple2: ...
 def notify_error(player_id: Optional[str] = None) -> None: ...
-def call_interval(interval: float) -> Callable: ...
+def call_interval(interval: float) -> Callable[[Callable], __Callable]: ...
 def check_string(string: str, *check: str) -> bool: ...
 def convert_dict_value_to_tuple(dct: __DictT) -> __DictT: ...
 def convert_list_to_tuple(lst: list) -> tuple: ...

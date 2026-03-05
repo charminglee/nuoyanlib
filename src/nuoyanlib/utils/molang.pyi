@@ -5,9 +5,10 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-17
+#   Date  : 2026-2-9
 #  ⠀
 # =================================================
 
 
 def set_query_mod_var(entity_id: str, name: str, value: float, sync: bool = True) -> None: ...
+def sync_query_mod_var() -> None: ...

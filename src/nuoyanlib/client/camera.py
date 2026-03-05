@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-2-10
 #  ⠀
 # =================================================
 
@@ -43,7 +43,7 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=math.pi 
 
     :param float world_dist: 世界中实体距离准星的最大距离，超出该距离的实体不会被获取；默认为 50
     :param float screen_dist: 屏幕上实体距离准星的最大距离，超出该距离的实体不会被获取；默认为 100
-    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器 EntityFilter；默认为 None
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
 
     :return: 实体ID列表
     :rtype: list[str]

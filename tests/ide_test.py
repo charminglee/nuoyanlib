@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-26
+#   Date  : 2026-1-18
 #  ⠀
 # =================================================
 
@@ -49,17 +49,16 @@ def test(path):
 
 
 test("utils.enum")
+test("utils.vector")
+test("utils.mc_math")
+test("utils.utils")
+test("utils.item")
 test("core._types._checker")
 test("core._utils")
 test("core.server.comp")
 test("core.listener")
 test("client.ui.screen_node")
 test("client.ui.nyc.control")
-test("utils.vector")
-test("utils.mc_math")
-test("utils.mc_random")
-test("utils.utils")
-test("utils.item")
 
 
 print("\n\033[33mAll tests passed.")

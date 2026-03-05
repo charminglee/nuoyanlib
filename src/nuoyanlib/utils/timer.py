@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-16
+#   Date  : 2026-2-11
 #  ⠀
 # =================================================
 
@@ -63,7 +63,7 @@ def delay(t=0, key=None):
         return decorator
 
 
-def repeat(t=0, key=None):
+def repeat(t=0, key=None, exec_now=False):
     """
     [装饰器]
 
@@ -73,8 +73,11 @@ def repeat(t=0, key=None):
 
     :param float t: 执行间隔时间，单位秒；默认为 0，表示每帧执行
     :param Any key: 定时器键名，用于标识定时器，可传入 str、int、tuple 等可哈希对象；传入该参数时，若存在相同键名的定时器，则旧的定时器会被取消；默认为 None
+    :param bool exec_now: 是否立即执行一次函数；默认为 False
     """
     def decorator(func):
+        if exec_now:
+            func()
         _add_timer(_t, func, True, key)
         return func
     if callable(t):

@@ -22,7 +22,7 @@ from .entity import get_all_entities
 
 __all__ = [
     "ignore_dmg_cd",
-    "EntityFilter",
+    # "EntityFilter",
     "hurt",
     "hurt_mobs",
     "explode_damage",
@@ -67,73 +67,73 @@ def ignore_dmg_cd(restore_cd=10):
     LvComp.Game.SetHurtCD(restore_cd)
 
 
-class EntityFilter:
-    """
-    实体过滤器，预设了一些常用的过滤条件。
-
-    说明
-    ----
-
-    过滤器接受一个实体ID作为参数，且返回一个 ``bool`` 值，返回 ``True`` 时表示该实体符合条件。
-    """
-
-    @staticmethod
-    def mob(eid):
-        """
-        [静态方法]
-
-        过滤生物实体。
-
-        说明
-        ----
-
-        判定标准为是否具有 ``minecraft:health`` 组件。
-
-        -----
-
-        :param str eid: 实体ID
-
-        :return: 返回 True 时表示该实体为生物实体
-        :rtype: bool
-        """
-        return CF(eid).EntityComponent.HasComponent(EntityComponentType.health)
-
-    @staticmethod
-    def non_mob(eid):
-        """
-        [静态方法]
-
-        过滤非生物实体。
-
-        说明
-        ----
-
-        判定标准为是否具有 ``minecraft:health`` 组件。
-
-        -----
-
-        :param str eid: 实体ID
-
-        :return: 返回 True 时表示该实体为非生物实体
-        :rtype: bool
-        """
-        return not EntityFilter.mob(eid)
-
-    @staticmethod
-    def has_health(eid):
-        """
-        [静态方法]
-
-        过滤当前生命值大于 0 的实体。
-
-        -----
-
-        :param str eid: 实体ID
-
-        :return: 返回 True 时表示该实体当前生命值大于 0
-        :rtype: bool
-        """
-        return CF(eid).Attr.GetAttrValue(AttrType.HEALTH) > 0
+# class EntityFilter:
+#     """
+#     实体过滤器，预设了一些常用的过滤条件。
+#
+#     说明
+#     ----
+#
+#     过滤器接受一个实体ID作为参数，且返回一个 ``bool`` 值，返回 ``True`` 时表示该实体符合条件。
+#     """
+#
+#     @staticmethod
+#     def mob(eid):
+#         """
+#         [静态方法]
+#
+#         过滤生物实体。
+#
+#         说明
+#         ----
+#
+#         判定标准为是否具有 ``minecraft:health`` 组件。
+#
+#         -----
+#
+#         :param str eid: 实体ID
+#
+#         :return: 返回 True 时表示该实体为生物实体
+#         :rtype: bool
+#         """
+#         return CF(eid).EntityComponent.HasComponent(EntityComponentType.health)
+#
+#     @staticmethod
+#     def non_mob(eid):
+#         """
+#         [静态方法]
+#
+#         过滤非生物实体。
+#
+#         说明
+#         ----
+#
+#         判定标准为是否具有 ``minecraft:health`` 组件。
+#
+#         -----
+#
+#         :param str eid: 实体ID
+#
+#         :return: 返回 True 时表示该实体为非生物实体
+#         :rtype: bool
+#         """
+#         return not EntityFilter.mob(eid)
+#
+#     @staticmethod
+#     def has_health(eid):
+#         """
+#         [静态方法]
+#
+#         过滤当前生命值大于 0 的实体。
+#
+#         -----
+#
+#         :param str eid: 实体ID
+#
+#         :return: 返回 True 时表示该实体当前生命值大于 0
+#         :rtype: bool
+#         """
+#         return CF(eid).Attr.GetAttrValue(AttrType.HEALTH) > 0
 
 
 _SDK_DAMAGE_CAUSE = [
@@ -210,7 +210,7 @@ def hurt_mobs(
     :param bool force: 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害；默认为 False
     :param bool hurt_attacker: 是否对攻击者造成伤害；默认为 False
     :param bool hurt_child: 是否对子实体造成伤害；默认为 False
-    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器 EntityFilter；默认为 None
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为即将受伤的实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；若无返回值，则不转移伤害；若返回字符串 "-1"，则本次伤害跳过该实体；默认为 None
     :param function|None on_hurt_after: 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
 
@@ -351,7 +351,7 @@ def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害；默认为 False
     :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害；默认为 False
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害；默认为 False
-    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器 EntityFilter；默认为 None
+    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为 None
     :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
     :param bool visualize: [仅关键字参数] 是否可视化伤害区域；默认为 False
@@ -402,7 +402,7 @@ def sphere_damage(damage, r, pos, dim, **kwargs):
     :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害；默认为 False
     :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害；默认为 False
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害；默认为 False
-    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器 EntityFilter；默认为 None
+    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为 None
     :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
     :param bool visualize: [仅关键字参数] 是否可视化伤害区域；默认为 False
@@ -457,7 +457,7 @@ def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
     :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害；默认为 False
     :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害；默认为 False
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害；默认为 False
-    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器 EntityFilter；默认为 None
+    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为 None
     :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
     :param bool visualize: [仅关键字参数] 是否可视化伤害区域；默认为 False
@@ -508,7 +508,7 @@ def rectangle_damage(damage, pos1, pos2, dim, **kwargs):
     :param bool force: [仅关键字参数] 是否无视 `伤害免疫时间 <https://zh.minecraft.wiki/w/%E5%8F%97%E5%87%BB%E5%90%8E%E4%BC%A4%E5%AE%B3%E5%85%8D%E7%96%AB>`_ 强制造成伤害；默认为 False
     :param bool hurt_attacker: [仅关键字参数] 是否对攻击者造成伤害；默认为 False
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害；默认为 False
-    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害，可以使用「nuoyanlib」预设的过滤器 EntityFilter；默认为 None
+    :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为 None
     :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
     :param bool visualize: [仅关键字参数] 是否可视化伤害区域；默认为 False
