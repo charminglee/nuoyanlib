@@ -20,7 +20,7 @@ import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
 from . import _const, error, _sys
 from ._utils import iter_obj_attrs, try_exec
-from ..utils.enum import ClientEvent, ServerEvent
+from ..common.enum import ClientEvent, ServerEvent
 
 
 __all__ = [

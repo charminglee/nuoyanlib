@@ -14,7 +14,7 @@ if 0:
     from ..screen_node import ScreenNodeExtension
 
 
-from ....utils.enum import ControlType
+from ....common.enum import ControlType
 from ....core import error
 from .control import NyControl
 

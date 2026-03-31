@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-23
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
@@ -135,14 +135,14 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
                 self.NotifyToClient(player_id, "_NuoyanLibCallReturn", ret_args)
         else:
             callback = None
-        from ...utils.communicate import _call_local
+        from ...common.communicate import _call_local
         _call_local(ns, sys_name, method, callback, delay_ret, call_args, call_kwargs)
 
     @_lib_sys_event
     def _NuoyanLibCallReturn(self, args):
         uuid = args['uuid']
         cb_args = args['cb_args']
-        from ...utils.communicate import _call_callback
+        from ...common.communicate import _call_callback
         _call_callback(uuid, -1, cb_args)
 
     # endregion

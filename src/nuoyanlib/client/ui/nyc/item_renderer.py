@@ -15,7 +15,7 @@ if 0:
 
 
 from ....core import error
-from ....utils.enum import ControlType
+from ....common.enum import ControlType
 from .control import NyControl
 
 

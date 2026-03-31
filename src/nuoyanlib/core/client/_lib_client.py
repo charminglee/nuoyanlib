@@ -15,7 +15,7 @@ import itertools
 import random
 import mod.client.extraClientApi as c_api
 from ... import config
-from ...utils.time_ease import TimeEase
+from ...common.time_ease import TimeEase
 from .. import _const, _logging
 from .._utils import singleton
 from .._sys import NuoyanLibBaseSystem, load_extensions
@@ -178,7 +178,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
                     self.NotifyToServer("_NuoyanLibCallReturn", ret_args)
         else:
             callback = None
-        from ...utils.communicate import _call_local
+        from ...common.communicate import _call_local
         _call_local(ns, sys_name, method, callback, delay_ret, call_args, call_kwargs)
 
     @_lib_sys_event(from_client=True)
@@ -186,7 +186,7 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     def _NuoyanLibCallReturn(self, args):
         uuid = args['uuid']
         cb_args = args['cb_args']
-        from ...utils.communicate import _call_callback
+        from ...common.communicate import _call_callback
         _call_callback(uuid, -1, cb_args)
 
     # endregion

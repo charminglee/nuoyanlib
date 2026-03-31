@@ -5,17 +5,18 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
 
 from __future__ import division
+import random
 import operator
-from math import degrees, sin, cos, acos, sqrt, radians, atan2
+from math import degrees, sin, cos, acos, sqrt, radians, atan2, pi
 from mod.common.utils.mcmath import Matrix
-from ..core._sys import get_cf
-from ..core.error import VectorError
+from ...core._sys import get_cf
+from ...core.error import VectorError
 
 
 __all__ = [
@@ -28,6 +29,7 @@ __all__ = [
     "VEC_FORWARD",
     "VEC_BACKWARD",
     "Vector",
+    "random_vec",
     "dir2rot",
     "rot2dir",
     "dir_from_to",
@@ -266,6 +268,31 @@ class Vector(object):
         :rtype: Vector
         """
         return Vector(VEC_BACKWARD)
+
+    @staticmethod
+    def random(is_3d=True):
+        """
+        生成一个随机的单位向量。
+
+        -----
+
+        :param bool is_3d: 是否生成三维向量；默认为 True
+
+        :return: 单位向量
+        :rtype: Vector
+        """
+        if is_3d:
+            phi = random.uniform(0, 2 * pi)
+            z = random.uniform(-1, 1)
+            r = sqrt(1 - z ** 2)
+            x = r * cos(phi)
+            y = r * sin(phi)
+            return Vector(x, y, z)
+        else:
+            theta = random.uniform(0, 2 * pi)
+            x = cos(theta)
+            y = sin(theta)
+            return Vector(x, y)
 
     @property
     def dim(self):
@@ -620,6 +647,9 @@ class Vector(object):
 
     def __len__(self):
         return self._dim
+
+    def __contains__(self, item):
+        return item == self._x or item == self._y or (self._dim == 3 and item == self._z)
 
     def _op(self, other, operator, scalar_only=False):
         op = _OP_MAP[operator]
@@ -1146,6 +1176,31 @@ class Vector(object):
 
 
 # region Functional APIs ===============================================================================================
+
+
+def random_vec(is_3d=True):
+    """
+    生成一个随机的单位向量。
+
+    -----
+
+    :param bool is_3d: 是否生成三维向量；默认为 True
+
+    :return: 单位向量
+    :rtype: tuple[float]
+    """
+    if is_3d:
+        phi = random.uniform(0, 2 * pi)
+        z = random.uniform(-1, 1)
+        r = sqrt(1 - z**2)
+        x = r * cos(phi)
+        y = r * sin(phi)
+        return x, y, z
+    else:
+        theta = random.uniform(0, 2 * pi)
+        x = cos(theta)
+        y = sin(theta)
+        return x, y
 
 
 def dir2rot(direction):
@@ -1718,7 +1773,7 @@ def outgoing_vec(vec, normal):
 
 
 def __test__():
-    from ..core._utils import assert_error
+    from ...core._utils import assert_error
     v1 = Vector(1, 2, 3)
     v2 = Vector(4, 5, 6)
 

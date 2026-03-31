@@ -16,7 +16,7 @@ from .control import NyControl, InteractableControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
 from ....core._types._typing import Self
-from ....utils.enum import WheelCallbackType
+from ....common.enum import WheelCallbackType
 
 
 __WheelCallbackType = Callable[[], Any]

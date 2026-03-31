@@ -19,7 +19,7 @@ import math
 from ....core._utils import get_func, kwargs_defaults, try_exec, cached_property
 from ....core._types._checker import args_type_check
 from ....core.client.comp import ScreenNode, ViewBinder
-from ....utils.enum import ControlType, GridCallbackType
+from ....common.enum import ControlType, GridCallbackType
 from .control import NyControl
 from ..ui_utils import to_path
 

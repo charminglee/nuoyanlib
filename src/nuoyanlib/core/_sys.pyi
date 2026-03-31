@@ -21,7 +21,7 @@ from .client._lib_client import NuoyanLibClientSystem
 from .server._lib_server import NuoyanLibServerSystem
 from .client.comp import CF as CCF
 from .server.comp import CF as SCF
-from ..utils.communicate import SyncData
+from ..common.communicate import SyncData
 
 
 def load_extensions() -> None: ...

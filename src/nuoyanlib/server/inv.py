@@ -12,7 +12,7 @@
 
 from mod.common.minecraftEnum import ItemPosType, GameType
 from ..core.server.comp import CF, LvComp
-from ..utils.item import is_empty_item
+from ..common.item import is_empty_item
 
 
 __all__ = [

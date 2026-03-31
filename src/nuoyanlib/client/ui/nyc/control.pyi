@@ -19,7 +19,7 @@ from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ..screen_node import ScreenNodeExtension
 from . import *
-from ....utils.enum import Enum, ControlType
+from ....common.enum import Enum, ControlType
 
 
 __Anchor = Literal[

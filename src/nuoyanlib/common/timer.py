@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-2-11
+#   Date  : 2026-03-25
 #  ⠀
 # =================================================
 
@@ -27,17 +27,17 @@ __all__ = [
 _timers = DefaultLocal(dict)
 
 
-def _add_timer(t, func, is_repeat, key):
+def _add_timer(t, is_repeat, key, func, *args, **kwargs):
     timer_dct = _timers.repeat if is_repeat else _timers.delay
     comp = get_lv_comp().Game
     if key is not None and key in timer_dct:
         comp.CancelTimer(timer_dct[key])
     if is_repeat:
-        timer_dct[key] = comp.AddRepeatedTimer(t, func)
+        timer_dct[key] = comp.AddRepeatedTimer(t, func, *args, **kwargs)
     else:
         def timeout():
             timer_dct.pop(key, None)
-            func()
+            func(*args, **kwargs)
         timer_dct[key] = comp.AddTimer(t, timeout)
 
 
@@ -53,7 +53,7 @@ def delay(t=0, key=None):
     :param Any key: 定时器键名，用于标识定时器，可传入 str、int、tuple 等可哈希对象；传入该参数时，若存在相同键名且尚未触发的定时器，则旧的定时器会被取消；默认为 None
     """
     def decorator(func):
-        _add_timer(_t, func, False, key)
+        _add_timer(_t, False, key, func)
         return func
     if callable(t):
         _t = 0
@@ -78,7 +78,7 @@ def repeat(t=0, key=None, exec_now=False):
     def decorator(func):
         if exec_now:
             func()
-        _add_timer(_t, func, True, key)
+        _add_timer(_t, True, key, func)
         return func
     if callable(t):
         _t = 0

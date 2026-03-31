@@ -15,7 +15,7 @@ from mod.client.ui.controls.gridUIControl import GridUIControl
 from ....core._types._typing import Self, ITuple2, STuple, UiPathOrNyControl, T, T2, SlotsType
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
-from ....utils.enum import GridCallbackType
+from ....common.enum import GridCallbackType
 from ..screen_node import ScreenNodeExtension
 from .control import NyControl
 

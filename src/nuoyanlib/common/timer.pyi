@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-2-11
+#   Date  : 2026-03-25
 #  ⠀
 # =================================================
 
@@ -18,7 +18,14 @@ from ..core._utils import DefaultLocal
 _timers: DefaultLocal[dict]
 
 
-def _add_timer(t: float, func: Callable[[], Any], is_repeat: bool, key: Optional[Hashable]) -> None: ...
+def _add_timer(
+    t: float,
+    is_repeat: bool,
+    key: Optional[Hashable],
+    func: Callable,
+    *args: Any,
+    **kwargs: Any,
+) -> None: ...
 @overload
 def delay(t: float = 0, key: Optional[Hashable] = None) -> Callable[[F], F]: ...
 @overload

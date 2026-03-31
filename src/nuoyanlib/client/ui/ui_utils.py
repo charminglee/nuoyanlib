@@ -13,7 +13,7 @@
 import mod.client.extraClientApi as c_api
 from ...core._utils import get_module
 from ...core.client.comp import LvComp
-from ...utils.enum import ControlType
+from ...common.enum import ControlType
 
 
 if 0:

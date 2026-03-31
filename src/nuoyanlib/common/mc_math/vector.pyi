@@ -5,13 +5,13 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-10
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
 
-from typing import List, Optional, Any, Iterable, Iterator, Callable, Literal, Union, overload, Dict
-from ..core._types._typing import SlotsType, FTuple3, FTuple2, Self, VectorLike, Scalar, GeneralVector
+from typing import List, Optional, Any, Iterable, Iterator, Callable, Literal, Union, overload, Dict, Collection
+from ...core._types._typing import SlotsType, FTuple3, FTuple2, Self, VectorLike, Scalar, GeneralVector
 
 
 _ZERO_EPS: float
@@ -26,7 +26,7 @@ VEC_BACKWARD: FTuple3
 _OP_MAP = Dict[str, Callable[[Any, Any], Any]]
 
 
-class Vector(object):
+class Vector(Collection[float]):
     __slots__: SlotsType
     _x: float
     _y: float
@@ -56,6 +56,8 @@ class Vector(object):
     def forward() -> Vector: ...
     @staticmethod
     def backward() -> Vector: ...
+    @staticmethod
+    def random(is_3d: bool = True) -> Vector: ...
     @property
     def dim(self) -> int: ...
     @property
@@ -100,6 +102,7 @@ class Vector(object):
     def __setitem__(self, i: int, value: Scalar) -> None: ...
     def __iter__(self) -> Iterator[float]: ...
     def __len__(self) -> int: ...
+    def __contains__(self, item: Any) -> bool: ...
     def _op(
         self,
         other: Union[VectorLike, Scalar],
@@ -136,6 +139,12 @@ class Vector(object):
     def rotate_around(self, u: VectorLike, angle: float, rad: bool = False, inplace: bool = True) -> Vector: ...
 
 
+@overload
+def random_vec(is_3d: Literal[True]) -> FTuple3: ...
+@overload
+def random_vec(is_3d: Literal[False]) -> FTuple2: ...
+@overload
+def random_vec(is_3d: bool = True) -> GeneralVector: ...
 def dir2rot(direction: FTuple3) -> Optional[FTuple2]: ...
 def rot2dir(rot: FTuple2) -> Optional[FTuple3]: ...
 def dir_from_to(start: VectorLike, end: VectorLike) -> GeneralVector: ...

@@ -20,7 +20,7 @@ from ....core.client.comp import LvComp
 from ....core._types._checker import args_type_check
 from ....core.listener import listen_event, unlisten_event, is_listened
 from ....core._utils import kwargs_defaults
-from ....utils.enum import ButtonCallbackType, ControlType, ClientEvent
+from ....common.enum import ButtonCallbackType, ControlType, ClientEvent
 from ..ui_utils import is_out_of_screen
 from .control import NyControl, InteractableControl
 

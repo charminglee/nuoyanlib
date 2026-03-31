@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-17
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
@@ -13,9 +13,8 @@
 import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import EntityType
 from ..core.server.comp import CF, LvComp
-from ..core.server import _lib_server
-from ..utils.mc_math import distance, ray_box_intersection, pos_floor
-from ..utils.vector import dir_from_to, vec_add
+from ..common.mc_math.mc_math import distance, ray_box_intersection, pos_floor
+from ..common.mc_math.vector import dir_from_to, vec_add
 
 
 __all__ = [
@@ -445,7 +444,7 @@ def get_all_entities(ent_filter=None):
 
     -----
 
-    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否获取该实体，可以使用「nuoyanlib」预设的过滤器 EntityFilter；默认为 None
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否获取该实体；默认为 None
 
     :return: 实体ID列表
     :rtype: list[str]

@@ -16,7 +16,7 @@ if 0:
 
 
 from ....core._types._checker import args_type_check
-from ....utils.enum import ControlType, ComboBoxCallbackType
+from ....common.enum import ControlType, ComboBoxCallbackType
 from .control import NyControl, InteractableControl
 
 

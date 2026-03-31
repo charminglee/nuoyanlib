@@ -19,7 +19,7 @@ from ...core import error
 from ...core.listener import listen_event, unlisten_event
 from ...core._utils import hook_method, iter_obj_attrs, kwargs_defaults, try_exec, get_func
 from .ui_utils import to_control, to_path, _UIControlType
-from ...utils.enum import ButtonCallbackType, ClientEvent
+from ...common.enum import ButtonCallbackType, ClientEvent
 from .nyc import *
 from ..setting import read_setting, save_setting
 

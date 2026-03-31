@@ -15,7 +15,7 @@ if 0:
     from ..screen_node import ScreenNodeExtension
 
 
-from ....utils.enum import ControlType, WheelCallbackType
+from ....common.enum import ControlType, WheelCallbackType
 from .control import NyControl, InteractableControl
 
 

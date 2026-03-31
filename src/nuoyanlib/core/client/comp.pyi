@@ -5,12 +5,13 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-3-25
 #  ⠀
 # =================================================
 
 
 from typing import Type, ClassVar, Dict, Union
+from mod.client.component.physxCompClient import PhysxComponentClient
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.viewBinder import ViewBinder
@@ -19,6 +20,7 @@ from mod.client.ui.CustomUIScreenProxy import CustomUIScreenProxy
 from mod.client.ui.CustomUIControlProxy import CustomUIControlProxy
 from mod.client.ui.NativeScreenManager import NativeScreenManager
 from mod.client.ui.miniMapBaseScreen import MiniMapBaseScreen
+from mod.client.component.fishingLineCompClient import FishingLineCompClient
 from mod.client.component.engineCompFactoryClient import EngineCompFactoryClient
 from mod.client.component.skyRenderCompClient import SkyRenderCompClient
 from mod.client.component.frameAniTransComp import FrameAniTransComp
@@ -102,6 +104,7 @@ class CF(object):
     def __new__(cls: Type[T], target: Union[str, int]) -> T: ...
     def __init__(self: Self, target: Union[str, int]) -> None: ...
     def __getattr__(self, name: str) -> BaseComponent: ...
+    FishingLine: FishingLineCompClient
     Drawing: DrawingCompClient
     Achievement: AchievementCompClient
     Action: ActionCompClient
@@ -159,6 +162,7 @@ class CF(object):
     TextNotifyClient: TextNotifyComponet
     Time: TimeComponentClient
     VirtualWorld: VirtualWorldCompClient
+    Physx: PhysxComponentClient
 
 
 PlrComp: CF

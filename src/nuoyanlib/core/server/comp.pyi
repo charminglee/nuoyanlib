@@ -5,13 +5,15 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-23
+#   Date  : 2026-03-25
 #  ⠀
 # =================================================
 
 
 from typing import Type, ClassVar, Dict, Union
+from mod.server.component.physxCompServer import PhysxComponentServer
 from mod.server.system.serverSystem import ServerSystem
+from mod.server.component.fishingLineCompServer import FishingLineCompServer
 from mod.server.component.domainGameCompServer import DomainGameCompServer
 from mod.server.component.engineCompFactoryServer import EngineCompFactoryServer
 from mod.server.component.effectCompServer import EffectComponentServer
@@ -99,6 +101,7 @@ class CF(object):
     def __new__(cls: Type[T], target: Union[str, int]) -> T: ...
     def __init__(self: Self, target: Union[str, int]) -> None: ...
     def __getattr__(self, name: str) -> BaseComponent: ...
+    FishingLine: FishingLineCompServer
     DomainGame: DomainGameCompServer
     Achievement: AchievementCompServer
     Action: ActionCompServer
@@ -168,6 +171,7 @@ class CF(object):
     Tame: TameComponentServer
     Time: TimeComponentServer
     Weather: WeatherComponentServer
+    Physx: PhysxComponentServer
 
 
 LvComp: CF

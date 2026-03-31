@@ -38,7 +38,7 @@ from .block import *
 from .lobby import *
 
 
-from ..utils import *
+from ..common import *
 from .. import config, __version__, __author__, __author_qq__, __author_email__
 
 

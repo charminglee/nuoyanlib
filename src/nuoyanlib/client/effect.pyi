@@ -21,7 +21,7 @@ from mod.client.component.frameAniEntityBindComp import FrameAniEntityBindComp
 from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindComp
 from ..core.client._lib_client import NuoyanLibClientSystem
 from ..core._types._typing import Self, FTuple3, FTuple2, TimeEaseFuncType
-from ..utils.enum import TimeEaseFunc
+from ..common.enum import TimeEaseFunc
 
 
 def spawn_ground_shatter_effect(

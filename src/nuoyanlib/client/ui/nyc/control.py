@@ -20,7 +20,7 @@ from ....core import error
 from ....core._utils import kwargs_defaults, try_exec, cached_property, UNIVERSAL_OBJECT
 from ....core._types._checker import args_type_check
 from ....client.ui.ui_utils import get_children_path_by_level, get_parent_path, to_path
-from ....utils.enum import ControlType
+from ....common.enum import ControlType
 
 
 __all__ = [

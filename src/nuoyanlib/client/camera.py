@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-2-10
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
@@ -14,8 +14,8 @@ import math
 import mod.client.extraClientApi as c_api
 from mod.common.minecraftEnum import RayFilterType
 from ..core.client.comp import LvComp, PLAYER_ID, CF
-from ..utils.vector import dir_from_to, vec_angle_between
-from ..utils.mc_math import distance
+from ..common.mc_math.vector import dir_from_to, vec_angle_between
+from ..common.mc_math.mc_math import distance
 
 
 __all__ = [

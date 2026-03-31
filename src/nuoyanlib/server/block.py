@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
@@ -14,8 +14,8 @@ from ..core._sys import get_lib_system
 from ..core.server.comp import LvComp, CF
 from ..core._utils import kwargs_defaults
 from ..core import _const
-from ..utils.pos_gen import gen_random_even_pos
-from ..utils.mc_math import pos_floor
+from ..common.pos_gen import gen_random_even_pos
+from ..common.mc_math.mc_math import pos_floor
 
 
 __all__ = [

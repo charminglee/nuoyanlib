@@ -5,18 +5,18 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
 
 from contextlib import contextmanager
 import mod.server.extraServerApi as s_api
-from mod.common.minecraftEnum import AttrType, ActorDamageCause, EntityComponentType
+from mod.common.minecraftEnum import AttrType, ActorDamageCause
 from ..core._sys import get_lib_system
 from ..core.server.comp import CF, LvComp
 from ..core._utils import kwargs_defaults
-from ..utils.mc_math import is_in_sector, distance_square, is_in_box, is_in_cylinder
+from ..common.mc_math.mc_math import is_in_sector, distance_square, is_in_box, is_in_cylinder
 from .entity import get_all_entities
 
 
@@ -45,7 +45,6 @@ def ignore_dmg_cd(restore_cd=10):
     ----
 
     >>> from mod.common.minecraftEnum import ActorDamageCause
-
     >>> with nyl.ignore_dmg_cd():
     ...     # 在 with 范围内伤害免疫时间会被设为0
     ...     comp = nyl.CF(entity_id).Hurt

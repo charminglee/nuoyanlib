@@ -31,7 +31,7 @@ from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
 from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
 from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
 from ...core._types._typing import UiPathOrNyControl
-from ...utils.enum import ControlType
+from ...common.enum import ControlType
 
 
 def pop_to_hud() -> None: ...

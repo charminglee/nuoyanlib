@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-18
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
@@ -18,7 +18,7 @@ import random
 import string
 from ..core._sys import get_lv_comp
 from ..core._utils import inject_is_client, UNIVERSAL_OBJECT
-from .mc_math import pos_floor
+from .mc_math.mc_math import pos_floor
 
 
 __all__ = [
@@ -40,7 +40,7 @@ def chance(p):
 
     :param float p: 概率，范围为 [0, 1]
 
-    :return: 以 p 的概率返回 True，否则返回 False
+    :return: 以 p 的概率返回 True，1-p 的概率返回 False
     :rtype: bool
     """
     return p > random.random()

@@ -19,7 +19,7 @@ from .control import NyControl, InteractableControl
 from .image import NyImage
 from .label import NyLabel
 from ..screen_node import ScreenNodeExtension
-from ....utils.enum import ButtonCallbackType
+from ....common.enum import ButtonCallbackType
 
 
 __BtnCallbackType = Callable[[dict], Any]

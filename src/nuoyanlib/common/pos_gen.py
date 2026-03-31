@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-3-27
 #  ⠀
 # =================================================
 
@@ -14,7 +14,7 @@ from __future__ import division
 from math import sin, cos, pi, acos, sqrt
 from random import uniform, random, Random
 from ..core._utils import parse_indices_generator
-from .mc_math import cartesian_coord, box_min_max
+from .mc_math.mc_math import cartesian_coord, box_min_max
 
 
 if 0:
