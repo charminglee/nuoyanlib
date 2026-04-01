@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-2-7
+#   Date  : 2026-4-1
 #  ⠀
 # =================================================
 
@@ -126,6 +126,118 @@ def gen_minecraft_lower_name(name: str, count: int, last_values: List[str]) -> s
 
 
 class ClientEvent(StrEnum):
+    PhysxTriggerClientEvent = ...
+    """
+    [事件]
+
+    给自定义刚体添加的触发器，与其他碰撞体或原版实体进入/离开触发器时触发。需要在触发器创建时使用 ``PxEventMask.Client`` 才会触发。
+
+    说明
+    ----
+
+    ``found`` 列表每个元素的内容：
+    ::
+
+        {
+            "entityId0": str,     # 触发器所属实体的entityId
+            "identifier0": str,   # 触发器所属实体的identifier
+            "shape0": dict | None, # 触发器的userData (NeEvent::Object)
+            "entityId1": str,     # 另一方实体的entityId
+            "identifier1": str,   # 另一方实体的identifier
+            "shape1": dict | None  # 另一方碰撞体的userData (NeEvent::Object)
+        }
+
+    ``lost`` 列表每个元素的内容：
+    ::
+
+        {
+            "entityId0": str,     # 触发器所属实体的entityId
+            "identifier0": str,   # 触发器所属实体的identifier
+            "shape0": dict | None, # 触发器的userData (NeEvent::Object)
+            "entityId1": str,     # 另一方实体的entityId
+            "identifier1": str,   # 另一方实体的identifier
+            "shape1": dict | None  # 另一方碰撞体的userData (NeEvent::Object)
+        }
+
+    事件参数
+    --------
+
+    - ``found`` -- list[dict]，进入触发器的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Found，它与其他碰撞体/原版实体进入触发器时，会出现在列表中
+    - ``lost`` -- list[dict]，离开触发器的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Lost，它与其他碰撞体/原版实体离开触发器时，会出现在列表中
+    """
+    LiquidClippedClientEvent = ...
+    """
+    [事件]
+
+    玩家客户端点击流体时触发（支持原版流体与自定义流体）。
+
+    说明
+    ----
+
+    需要在物品中添加 ``netease:liquid_clipped:true`` 组件才能触发。
+
+    事件参数
+    --------
+
+    - ``playerId`` -- str，玩家实体ID
+    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
+    - ``aux`` -- int，方块附加值
+    - ``blockPos`` -- tuple[int, int, int]，方块坐标(x,y,z)
+    - ``dimensionId`` -- int，维度ID
+    - ``floatPos`` -- tuple[float, float, float]，点击的精准坐标(x,y,z)
+    """
+    PlayerAddCustomContainerItemClientEvent = ...
+    """
+    [事件]
+
+    玩家成功将物品添加到自定义容器时触发该事件。
+
+    说明
+    ----
+
+    该事件仅在目标容器为 ``netease_container`` 或 ``netease_ui_container`` 时触发。
+    该事件在物品成功添加后触发，无 ``cancel`` 参数，无法取消操作。
+    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
+
+    事件参数
+    --------
+
+    - ``beforeItemDict`` -- dict，操作前目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``changedItemDict`` -- dict，实际添加的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``afterItemDict`` -- dict，操作后目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``collectionName`` -- str，容器名称，对应容器json中"custom_description"字段
+    - ``collectionType`` -- str，容器类型，目前仅支持netease_container和netease_ui_container
+    - ``collectionIndex`` -- int，容器槽位索引
+    - ``x`` -- int，容器方块x坐标
+    - ``y`` -- int，容器方块y坐标
+    - ``z`` -- int，容器方块z坐标
+    """
+    PlayerRemoveCustomContainerItemClientEvent = ...
+    """
+    [事件]
+
+    玩家成功从自定义容器中移除物品时触发该事件。
+
+    说明
+    ----
+
+    该事件仅在目标容器为 ``netease_container`` 或 ``netease_ui_container`` 时触发。
+    该事件在物品成功添加后触发，无 ``cancel`` 参数，无法取消操作。
+    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
+
+    事件参数
+    --------
+
+    - ``beforeItemDict`` -- dict，操作前目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``changedItemDict`` -- dict，实际移除的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``afterItemDict`` -- dict，操作后目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``collectionName`` -- str，容器名称，对应容器json中"custom_description"字段
+    - ``collectionType`` -- str，容器类型，目前仅支持netease_container和netease_ui_container
+    - ``collectionIndex`` -- int，容器槽位索引
+    - ``x`` -- int，容器方块x坐标
+    - ``y`` -- int，容器方块y坐标
+    - ``z`` -- int，容器方块z坐标
+    """
     PhysxTouchClientEvent = ...
     """
     [事件]
@@ -2090,6 +2202,180 @@ class ClientEvent(StrEnum):
 
 
 class ServerEvent(StrEnum):
+    PlayerStartFishingServerEvent = ...
+    """
+    [事件]
+
+    玩家开始钓鱼，生成鱼钩时在服务端触发。
+
+    说明
+    ----
+
+    此事件在鱼钩实体生成后触发，设置 ``cancel`` 为 ``True`` 可取消本次抛竿操作。
+
+    事件参数
+    --------
+
+    - ``playerId`` -- str，钓鱼的玩家实体ID
+    - ``hookEntity`` -- str，鱼钩实体ID
+    - ``itemDict`` -- dict，玩家手持鱼竿的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``cancel`` -- bool，是否取消，设置为True时会取消生成鱼漂
+    """
+    PlayerFishingAfterServerEvent = ...
+    """
+    [事件]
+
+    玩家钓鱼成功收杆后触发，在钓鱼掉落物生成后触发。
+
+    说明
+    ----
+
+    此事件在掉落物实体生成后触发，可通过 ``itemEntityIdList`` 获取生成的掉落物实体ID进行后续操作。
+
+    事件参数
+    --------
+
+    - ``playerId`` -- str，钓鱼的玩家实体ID
+    - ``hookEntity`` -- str，鱼钩实体ID
+    - ``itemDict`` -- dict，玩家手持鱼竿的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``itemList`` -- list[dict]，钓鱼获得的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_ 列表（只读）
+    - ``itemEntityIdList`` -- list[str]，钓鱼生成的掉落物实体ID列表，与itemList一一对应
+    """
+    PlayerFishingServerEvent = ...
+    """
+    [事件]
+
+    玩家钓鱼成功收杆时触发，在钓鱼掉落物生成前触发。
+
+    说明
+    ----
+
+    设置 ``cancel`` 为 ``True`` 时，不会生成掉落物，也不会触发 ``PlayerFishingAfterServerEvent`` 事件。
+    修改 ``itemList`` 后必须设置 ``itemChange`` 为 ``True`` ，否则修改不会生效。
+
+    事件参数
+    --------
+
+    - ``playerId`` -- str，钓鱼的玩家实体ID
+    - ``hookEntity`` -- str，鱼钩实体ID
+    - ``itemDict`` -- dict，玩家手持鱼竿的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``itemList`` -- list[dict]，钓鱼获得的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_ 列表，支持修改。修改后需将itemChange设置为True
+    - ``itemChange`` -- bool，是否修改了itemList，默认为False。当修改了itemList时需要设置为True才能生效
+    - ``cancel`` -- bool，是否取消钓鱼成功，设置为True时不会生成掉落物
+    """
+    PhysxTriggerServerEvent = ...
+    """
+    [事件]
+
+    给自定义刚体添加的触发器，与其他碰撞体或原版实体发生进入触发器/离开触发器时触发。需要在触发器创建时使用 ``PxEventMask.Server`` 才会触发。
+
+    说明
+    ----
+
+    ``found`` 列表每个元素的内容：
+    ::
+
+        {
+            "entityId0": str,     # 触发器所属实体的entityId
+            "identifier0": str,   # 触发器所属实体的identifier
+            "shape0": str | None, # 触发器的userData (NeEvent::Object)
+            "entityId1": str,     # 进入触发器的碰撞体所属实体的entityId
+            "identifier1": str,   # 进入触发器的碰撞体所属实体的identifier
+            "shape1": str | None  # 入触发器的碰撞体的userData (NeEvent::Object)
+        }
+
+    ``lost`` 列表每个元素的内容：
+    ::
+
+        {
+            "entityId0": str,     # 触发器所属实体的entityId
+            "identifier0": str,   # 触发器所属实体的identifier
+            "shape0": str | None, # 触发器的userData (NeEvent::Object)
+            "entityId1": str,     # 离开触发器的碰撞体所属实体的entityId
+            "identifier1": str,   # 离开触发器的碰撞体所属实体的identifier
+            "shape1": str | None  # 离开触发器的碰撞体的userData (NeEvent::Object)
+        }
+
+    列表中的碰撞对不分先后，每个碰撞对中的碰撞体0与碰撞体1的具体角色取决于底层触发逻辑。
+
+    事件参数
+    --------
+
+    - ``found`` -- list[dict]，进入触发器的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Found，它与其他碰撞体/原版实体进入触发器时，会出现在列表中
+    - ``lost`` -- list[dict]，离开触发器的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Lost，它与其他碰撞体/原版实体离开触发器时，会出现在列表中
+    """
+    LiquidClippedServerEvent = ...
+    """
+    [事件]
+
+    玩家服务端点击流体时触发（支持原版流体与自定义流体）。
+
+    说明
+    ----
+
+    需要在物品中添加 ``netease:liquid_clipped:true`` 组件才能触发。
+
+    事件参数
+    --------
+
+    - ``playerId`` -- str，玩家实体ID
+    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
+    - ``aux`` -- int，方块附加值
+    - ``blockPos`` -- tuple[int, int, int]，方块坐标(x,y,z)
+    - ``dimensionId`` -- int，维度ID
+    - ``floatPos`` -- tuple[float, float, float]，点击的精准坐标(x,y,z)
+    """
+    PlayerAddCustomContainerItemServerEvent = ...
+    """
+    [事件]
+
+    玩家向自定义容器中添加物品成功后触发该事件。该事件不可取消，仅用于通知物品添加操作已完成。
+
+    说明
+    ----
+
+    该事件仅在操作成功后触发，且不可取消。事件提供三个物品字典：操作前状态、实际变化的物品、操作后状态，便于精确追踪物品变化。
+    当目标槽位接近满仓时，实际添加的数量可能小于请求添加的数量， ``changedItemDict`` 反映实际添加的物品信息。
+
+    事件参数
+    --------
+
+    - ``beforeItemDict`` -- dict，操作前目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``changedItemDict`` -- dict，实际添加的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``afterItemDict`` -- dict，操作后目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``collectionName`` -- str，容器名称，对应容器json中"custom_description"字段
+    - ``collectionType`` -- str，容器类型，目前仅支持netease_container和netease_ui_container
+    - ``collectionIndex`` -- int，目标容器索引
+    - ``playerId`` -- str，玩家实体ID
+    - ``x`` -- int，容器方块x坐标
+    - ``y`` -- int，容器方块y坐标
+    - ``z`` -- int，容器方块z坐标
+    """
+    PlayerRemoveCustomContainerItemServerEvent = ...
+    """
+    [事件]
+
+    玩家从自定义容器中移除物品成功后触发该事件。该事件不可取消，仅用于通知物品移除操作已完成。
+
+    说明
+    ----
+
+    该事件仅在操作成功后触发，且不可取消。事件提供三个物品字典：操作前状态、实际变化的物品、操作后状态，便于精确追踪物品变化。
+
+    事件参数
+    --------
+
+    - ``beforeItemDict`` -- dict，操作前目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``changedItemDict`` -- dict，实际移除的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``afterItemDict`` -- dict，操作后目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
+    - ``collectionName`` -- str，容器名称，对应容器json中"custom_description"字段
+    - ``collectionType`` -- str，容器类型，目前仅支持netease_container和netease_ui_container
+    - ``collectionIndex`` -- int，目标容器索引
+    - ``playerId`` -- str，玩家实体ID
+    - ``x`` -- int，容器方块x坐标
+    - ``y`` -- int，容器方块y坐标
+    - ``z`` -- int，容器方块z坐标
+    """
     PhysxTouchServerEvent = ...
     """
     [事件]
