@@ -8,10 +8,13 @@ studio.json
 !/scripts/event_typehint/main.py
 /docs/source/api/apis/
 /tests/ingame_test/.idea/
+/tests/ingame_test/.mcs/
 /tests/ingame_test/bp/test_scripts/nuoyanlib/
 /tests/ingame_test/bp/test_scripts/nuoyanlib
 /tests/ingame_test/mcdk.exe
 /tests/ingame_test/.mcdev.json
+/tests/ingame_test/world_behavior_packs.json
+/tests/ingame_test/world_resource_packs.json
 /src/nuoyanlib/extensions/*
 !/src/nuoyanlib/extensions/__init__.py
 

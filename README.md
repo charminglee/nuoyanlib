@@ -23,7 +23,7 @@
 「nuoyanlib」是基于网易我的世界（我的世界中国版）[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
 您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
 
-> ✅ 已支持 **ModSDK 3.6**  
+> ✅ 已支持 **ModSDK 3.8**  
 > 📌 适合**个人**或**团队**项目，可自由用于**商业**和**非商业**用途
 
 <br>
@@ -36,10 +36,7 @@
 - [`nuoyanlib.server`](/docs/source/api/server.rst)：服务端工具包，提供了实体工具、伤害工具等实用工具。
 
 
-- [`nuoyanlib.utils`](/docs/source/api/utils.rst)：通用工具包，提供了事件监听框架、多种与MC密切相关的数学计算函数、向量工具、双端通信工具、随机数工具等实用工具。
-
-
-- [`nuoyanlib.extensions`](/docs/source/api/extensions.rst)：「nuoyanlib」扩展功能，供开发者按需选择。
+- [`nuoyanlib.common`](/docs/source/api/utils.rst)：通用工具包，提供了事件监听框架、多种与MC密切相关的数学计算函数、向量工具、双端通信工具、随机数工具等实用工具。
 
 <br>
 
@@ -62,7 +59,7 @@
     │   │   ├── _core/  
     │   │   ├── client/  
     │   │   ├── server/  
-    │   │   ├── utils/  
+    │   │   ├── common/  
     │   │   ├── __init__.py  
     │   │   ├── config.py  
     │   │   └── LICENSE  
@@ -102,7 +99,7 @@
             client_api.RegisterSystem("MyMod", "MyClientSystem", "myScripts.myClientSystem.MyClientSystem")
     ```
 
-3. 之后，在你的业务代码中导入「nuoyanlib」即可使用，推荐使用以下方式进行导入，其中`<scripts_root>`是你的Python脚本根目录名称：
+3. 在业务代码中导入「nuoyanlib」，其中`<scripts_root>`是你的Python脚本根目录名称：
     #### 导入客户端库
 
     ```python
@@ -131,11 +128,15 @@
     )
     ```
    
-    #### 调用「nuoyanlib」函数
+    #### 调用示例
+   
+    假设你已经按照以上方法导入了「nuoyanlib」，对于所有「nuoyanlib」中的公开函数，都可通过`nyl.<func_name>`进行调用，例如：
 
     ```python
-    nyl.pos_distance(pos1, pos2)
+    entity_list = nyl.get_all_entities()
     ```
+   
+    需要注意的是，`nuoyanlib.client`为客户端工具包，其中的函数只能在客户端环境使用；`nuoyanlib.server`同理，只能在服务端环境使用；`nuoyanlib.common`则无环境限制，双端均可使用。
 
 > [!WARNING]  
 > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。

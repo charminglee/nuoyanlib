@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-18
+#   Date  : 2026-4-13
 #  ⠀
 # =================================================
 
@@ -48,11 +48,11 @@ def test(path):
     )
 
 
-test("utils.enum")
-test("utils.vector")
-test("utils.mc_math")
-test("utils.utils")
-test("utils.item")
+test("common.enum")
+test("common.vector")
+test("common.mc_math")
+test("common.utils")
+test("common.item")
 test("core._types._checker")
 test("core._utils")
 test("core.server.comp")

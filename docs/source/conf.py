@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-17
+#   Date  : 2026-4-13
 #  ⠀
 # =================================================
 
@@ -115,7 +115,7 @@ def builder_inited(app: Sphinx):
     def shorten_name(s):
         if isinstance(s, BeautifulSoup):
             for tag in s.find_all("a", class_="reference internal"):
-                tag.string = re.sub(r"nuoyanlib\.(client|server|utils)\.", "", tag.string)
+                tag.string = re.sub(r"nuoyanlib\.(client|server|common)\.", "", tag.string)
             # global a
             # if a == 0:
             #     print(s)
@@ -149,7 +149,7 @@ def html_page_context(app: Sphinx, page_name: str, template_name: str, context: 
         context['body'] = re.sub(
             r'<span class=\"sig-prename descclassname\">'
             r'<span class=\"pre\">'
-            r'nuoyanlib\.(client|server|utils)\.'
+            r'nuoyanlib\.(client|server|common)\.'
             r'</span></span>',
             "",
             context['body'],
