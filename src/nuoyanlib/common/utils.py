@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-2-10
+#   Date  : 2026-5-13
 #  ⠀
 # =================================================
 
@@ -32,6 +32,7 @@ if 0:
 
 
 __all__ = [
+    "event_filter",
     "is_on_ground",
     "rgb2hex",
     "hex2rgb",
@@ -49,6 +50,40 @@ __all__ = [
     "try_exec",
     "iter_obj_attrs",
 ]
+
+
+def event_filter(filter_func):
+    """
+    [装饰器]
+
+    事件过滤器。用于装饰事件回调函数，使其符合特定条件时才被执行。
+
+    示例
+    ----
+
+    >>> import mod.client.extraClientApi as client_api
+    >>> class MyClientSystem(client_api.GetClientSystemCls()):
+    ...     def __init__(self, namespace, system_name):
+    ...         super(MyClientSystem, self).__init__(namespace, system_name)
+    ...         nyl.listen_all_events(self)
+    ...
+    ...     @nyl.event
+    ...     @nyl.event_filter(lambda self, args: args['blockName'] == "minecraft:stone")
+    ...     def ClientBlockUseEvent(self, args):
+    ...         pass
+    ...
+
+    -----
+
+    :param function filter_func: 过滤器函数，参数与被装饰函数相同，需返回一个 bool，为 True 时事件回调函数将被执行
+    """
+    def decorator(func):
+        @wraps(func)
+        def warpper(*args, **kwargs):
+            if filter_func(*args, **kwargs):
+                return func(*args, **kwargs)
+        return warpper
+    return decorator
 
 
 @inject_is_client

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # =================================================
 #  ⠀
-#   Copyright (c) 2025 Nuoyan
+#   Copyright (c) 2026 Nuoyan
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2025-12-22
+#   Date  : 2026-7-15
 #  ⠀
 # =================================================
 
@@ -22,7 +22,7 @@ from ..nuoyanlib.client import (
     event,
     ScreenNodeExtension,
 )
-from ..nuoyanlib.utils.enum import (
+from ..nuoyanlib.common.enum import (
     ControlType,
     ButtonCallbackType,
     ComboBoxCallbackType,

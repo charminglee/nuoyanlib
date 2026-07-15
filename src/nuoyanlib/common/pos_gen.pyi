@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-10
+#   Date  : 2026-4-24
 #  ⠀
 # =================================================
 
@@ -73,7 +73,13 @@ class gen_ring_pos(_PosGenerator[PosT]):
     radius: float
     count: int
     axis_dir: Literal["x", "y", "z"]
-    def __init__(self: Self, center: PosT, radius: float, count: int, axis_dir: Literal["x", "y", "z"]) -> None: ...
+    def __init__(
+        self: Self, 
+        center: PosT,
+        radius: float, 
+        count: int, 
+        axis_dir: Literal["x", "y", "z"] = "y",
+    ) -> None: ...
     def __gen_pos__(self, i: int) -> PosT: ...
 
 

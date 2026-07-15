@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-2-9
+#   Date  : 2026-4-20
 #  ⠀
 # =================================================
 
@@ -112,8 +112,6 @@ class _EventPool(object):
     def _get(event_name, ns, sys_name, new=True):
         event_id = "%s_%s_%s" % (ns, sys_name, event_name)
         lib_sys = _sys.get_lib_system()
-        if not lib_sys:
-            return
         ep = getattr(lib_sys, event_id, None)
         if new and ep is None:
             ep = _EventPool(event_id)

@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-18
+#   Date  : 2026-4-16
 #  ⠀
 # =================================================
 
@@ -126,7 +126,7 @@ class NuoyanLibBaseSystem(object):
         self.native_listen(_const.LIB_NAME, lib_sys_name, "_NuoyanLibSyncData", self._NuoyanLibSyncData)
 
     @classmethod
-    def register(cls):
+    def run(cls):
         if is_client():
             sys_name = _const.LIB_CLIENT_NAME
             api = c_api

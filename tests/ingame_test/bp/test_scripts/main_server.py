@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-7-16
 #  ⠀
 # =================================================
 
@@ -31,17 +31,20 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
         self.player_id = None
         LvComp.Game.AddTimer(6, self.run_benchmark)
 
-    # =========================================== Engine Event Callback ================================================
-
-    def BlockRemoveServerEvent(self, args):
-        print_msg(args)
-
-    @event
-    @event
-    def PlayerAttackEntityEvent(self, args):
-        print_msg(1)
-
-    # =========================================== Custom Event Callback ================================================
+    def run_benchmark(self):
+        # from .nuoyanlib.core._doc import get_signature
+        # for attr in dir(LvComp.Physx):
+        #     m = getattr(LvComp.Physx, attr)
+        #     if callable(m) and not attr.startswith("__"):
+        #         print(attr + "(" + get_signature(m) + ")")
+        self.player_id = s_api.GetHostPlayerId()
+        run_benchmark("nuoyanlib.common.mc_math.vector", self.player_id, 1000000)
+        run_benchmark("nuoyanlib.common.mc_math.mc_math", self.player_id)
+        run_benchmark("nuoyanlib.common.filter", self.player_id)
+        run_benchmark("nuoyanlib.core.listener", self.player_id, 10000)
+        run_benchmark("nuoyanlib.core.server.comp", self.player_id)
+        self.communicate_benchmark()
+        print("server benchmark over")
 
     @nyl.event(ns=MOD_NAME, sys_name=CLIENT_SYSTEM_NAME)
     def OnKeyPressInGame(self, args):
@@ -57,16 +60,24 @@ class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
             center = (pos[0], pos[1] - 1, pos[2])
             # nyl.spawn_ground_shatter_effect(center, 0, 2, 20)
 
-    # ============================================== Basic Function ====================================================
+        elif key == KeyBoardType.KEY_M:
+            all_entities = s_api.GetEngineActor().keys() + s_api.GetPlayerList()
+            ef = nyl.EntityFilter(all_entities)
+            assert self.player_id in ef[ef.identifier == "minecraft:player"]
+            assert self.player_id in ef[ef.health > 0]
+            assert self.player_id not in ef[ef.in_water]
+            assert self.player_id in ef[ef.in_lava]
+            assert self.player_id in ef[ef.on_fire]
+            assert self.player_id in ef[ef.family == "player"]
+            print("assert passed")
 
-    def run_benchmark(self):
-        self.player_id = s_api.GetHostPlayerId()
-        return
-        run_benchmark("nuoyanlib.core.listener", self.player_id, 10000)
-        run_benchmark("nuoyanlib.core.server.comp", self.player_id)
-        run_benchmark("nuoyanlib.utils.vector", self.player_id, 1000000)
-        run_benchmark("nuoyanlib.utils.mc_math", self.player_id)
-        self.communicate_benchmark()
+    def BlockRemoveServerEvent(self, args):
+        print_msg(args)
+
+    @event
+    @event
+    def PlayerAttackEntityEvent(self, args):
+        print_msg(1)
 
     def communicate_benchmark(self):
         def callback(success, ret, player_id):

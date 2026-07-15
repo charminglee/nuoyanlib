@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-14
+#   Date  : 2026-7-15
 #  ⠀
 # =================================================
 
@@ -33,7 +33,14 @@ class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
         super(MainClientSystem, self).__init__(namespace, systemName)
         LvComp.Game.AddTimer(6, self.run_benchmark)
 
-    # =========================================== Engine Event Callback ================================================
+    def run_benchmark(self):
+        # run_benchmark("nuoyanlib.common.filter", PLAYER_ID)
+        self.communicate_benchmark()
+        # nyl.push_ui(
+        #     MOD_NAME, UI_NAME_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST, UI_DEF_NUOYANLIB_TEST,
+        #     client_system=self,
+        # )
+        print("client benchmark over")
 
     def OnKeyPressInGame(self, args):
         screenName = args['screenName']
@@ -67,18 +74,16 @@ class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
             center = (pos[0], pos[1] - 1, pos[2])
             nyl.spawn_ground_shatter_effect(center, 2, 20)
 
-    # =========================================== Custom Event Callback ================================================
-
-    # ============================================== Basic Function ====================================================
-
-    def run_benchmark(self):
-        return
-        self.communicate_benchmark()
-        nyl.create_ui(
-            MOD_NAME, UI_NAME_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST, UI_DEF_NUOYANLIB_TEST,
-            push=True,
-            client_system=self,
-        )
+        elif key == KeyBoardType.KEY_M:
+            all_entities = c_api.GetEngineActor().keys() + c_api.GetPlayerList()
+            ef = nyl.EntityFilter(all_entities)
+            assert PLAYER_ID in ef[ef.identifier == "minecraft:player"]
+            assert PLAYER_ID in ef[ef.health > 0]
+            assert PLAYER_ID not in ef[ef.in_water]
+            assert PLAYER_ID in ef[ef.in_lava]
+            assert PLAYER_ID in ef[ef.on_fire]
+            assert PLAYER_ID in ef[ef.family == "player"]
+            print("assert passed")
 
     def communicate_benchmark(self):
         def callback(success, ret):

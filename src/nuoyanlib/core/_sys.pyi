@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-18
+#   Date  : 2026-4-16
 #  ⠀
 # =================================================
 
@@ -42,7 +42,7 @@ class NuoyanLibBaseSystem(object):
     is_client: bool
     def __init__(self: Self, namespace: str, system_name: str) -> None: ...
     @classmethod
-    def register(cls) -> bool: ...
+    def run(cls) -> bool: ...
     def Destroy(self) -> None: ...
     def native_listen(
         self,

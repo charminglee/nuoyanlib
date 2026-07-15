@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-3-27
+#   Date  : 2026-7-15
 #  ⠀
 # =================================================
 
@@ -1214,41 +1214,42 @@ def __test__():
 
 
 def __benchmark__(n, timer, pid, info, **kwargs):
+    f = distance2nearest_entity._nyl__inject_is_client[2]
     timer.start("distance2nearest_entity")
     for _ in xrange(n):
-        distance2nearest_entity._nyl__inject_is_client[2](False, pid)
+        f(False, pid)
     timer.end("distance2nearest_entity")
 
     from mod.server.extraServerApi import GetEngineActor
     eid = GetEngineActor().keys()[0]
     timer.start("distance")
     for _ in xrange(n):
-        distance._nyl__inject_is_client[2](False, pid, eid) # noqa
+        distance(pid, eid)
     timer.end("distance")
 
     timer.start("pos_entity_facing")
     for _ in xrange(n):
-        pos_entity_facing._nyl__inject_is_client[2](False, pid, 1)
+        pos_entity_facing(pid, 1)
     timer.end("pos_entity_facing")
 
     timer.start("is_in_sphere")
     for _ in xrange(n):
-        is_in_sphere._nyl__inject_is_client[2](False, pid, 1, (0, 0, 0))
+        is_in_sphere(pid, 1, (0, 0, 0))
     timer.end("is_in_sphere")
 
     timer.start("is_in_cylinder")
     for _ in xrange(n):
-        is_in_cylinder._nyl__inject_is_client[2](False, pid, 1, (0, 0, 0), (0, 1, 0))
+        is_in_cylinder(pid, 1, (0, 0, 0), (0, 1, 0))
     timer.end("is_in_cylinder")
 
     timer.start("is_in_sector")
     for _ in xrange(n):
-        is_in_sector._nyl__inject_is_client[2](False, pid, 1, 1, 30, (0, 0, 0), (1, 0, 0))
+        is_in_sector(pid, 1, 1, 30, (0, 0, 0), (1, 0, 0))
     timer.end("is_in_sector")
 
     timer.start("is_in_box")
     for _ in xrange(n):
-        is_in_box._nyl__inject_is_client[2](False, pid, (0, 0, 0), (1, 1, 1)) # noqa
+        is_in_box(pid, (0, 0, 0), (1, 1, 1)) # noqa
     timer.end("is_in_box")
 
     timer.start("catmull_rom")

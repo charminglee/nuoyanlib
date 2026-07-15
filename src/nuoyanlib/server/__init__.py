@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-19
+#   Date  : 2026-4-16
 #  ⠀
 # =================================================
 
@@ -21,8 +21,8 @@ from ..core.server._lib_server import NuoyanLibServerSystem as _NuoyanLibServerS
 
 
 _sys.check_env("server")
-if not _NuoyanLibServerSystem.register():
-    _logging.error("NuoyanLibServerSystem register failed!")
+if not _NuoyanLibServerSystem.run():
+    _logging.error("NuoyanLibServerSystem run failed!")
 
 
 from ..core._const import *

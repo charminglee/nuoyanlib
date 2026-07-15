@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-4-1
+#   Date  : 2026-7-16
 #  ⠀
 # =================================================
 
@@ -634,6 +634,7 @@ class ClientEvent(StrEnum):
     ModSDK 客户端事件名枚举。
     """
 
+    OnSimTickClientEvent = auto()
     PhysxTriggerClientEvent = auto()
     LiquidClippedClientEvent = auto()
     PlayerAddCustomContainerItemClientEvent = auto()
@@ -761,6 +762,7 @@ class ServerEvent(StrEnum):
     ModSDK 服务端事件名枚举。
     """
 
+    OnSimTickServerEvent = auto()
     PlayerStartFishingServerEvent = auto()
     PlayerFishingAfterServerEvent = auto()
     PlayerFishingServerEvent = auto()

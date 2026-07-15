@@ -5,12 +5,23 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-4-1
+#   Date  : 2026-7-16
 #  ⠀
 # =================================================
 
 
 class ClientEvent:
+    def OnSimTickClientEvent(self, args):
+        """
+        [事件]
+
+        20 tick/s。
+
+        事件参数
+        --------
+
+        无
+        """
     def PhysxTriggerClientEvent(self, args):
         """
         [事件]
@@ -342,6 +353,9 @@ class ClientEvent:
 
         玩家权限变更事件。
 
+        说明
+        ----
+
         具体权限说明：
 
         - ``build`` -- bool，放置方块
@@ -353,14 +367,13 @@ class ClientEvent:
         - ``op`` -- bool，操作员命令
         - ``teleport`` -- bool，使用传送
 
-        说明
-        ----
-
         当 ``PlayerPermissionChangeServerEvent`` 事件返回 ``cancel`` 为 ``True`` 时，权限变动被取消，该事件不会触发。
+        如果进入游戏的玩家权限为“成员”，不会触发此事件。
 
         事件参数
         --------
 
+        - ``causePlayerId`` -- str，发起者实体ID
         - ``playerId`` -- str，玩家实体ID
         - ``oldPermission`` -- dict，变化前的权限字典
         - ``newPermission`` -- dict，变化后的权限字典
@@ -1024,6 +1037,10 @@ class ClientEvent:
         - ``x`` -- int，箱子x坐标
         - ``y`` -- int，箱子y坐标
         - ``z`` -- int，箱子z坐标
+        - ``fullName`` -- str，方块名称，如minecraft:chest
+        - ``auxData`` -- int，方块附加值
+        - ``dimensionid`` -- int，维度ID
+        - ``isLargeChest`` -- bool，是否是大箱子，仅箱子(chest)时存在该参数，末影箱/木桶/潜影盒不存在该参数
         """
     def ClientChestCloseEvent(self, args):
         """
@@ -1031,10 +1048,22 @@ class ClientEvent:
 
         关闭箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
 
+        说明
+        ----
+
+        注：关闭时若容器管理器已提前释放，参数可能为空
+
         事件参数
         --------
 
-        无
+        - ``playerId`` -- str，玩家的实体ID
+        - ``x`` -- int，箱子x坐标
+        - ``y`` -- int，箱子y坐标
+        - ``z`` -- int，箱子z坐标
+        - ``fullName`` -- str，方块名称，如minecraft:chest
+        - ``auxData`` -- int，方块附加值
+        - ``dimensionid`` -- int，维度ID
+        - ``isLargeChest`` -- bool，是否是大箱子，仅箱子(chest)时存在该参数，末影箱/木桶/潜影盒不存在该参数
         """
     def WalkAnimEndClientEvent(self, args):
         """
@@ -2087,6 +2116,17 @@ class ClientEvent:
 
 
 class ServerEvent:
+    def OnSimTickServerEvent(self, args):
+        """
+        [事件]
+
+        20 tick/s。
+
+        事件参数
+        --------
+
+        无
+        """
     def PlayerStartFishingServerEvent(self, args):
         """
         [事件]
@@ -4002,6 +4042,12 @@ class ServerEvent:
         --------
 
         - ``playerId`` -- str，玩家的实体ID
+        - ``fullName`` -- str，方块ID
+        - ``auxData`` -- int，方块附加值
+        - ``dimensionid`` -- int，维度ID
+        - ``x`` -- int，方块x坐标
+        - ``y`` -- int，方块y坐标
+        - ``z`` -- int，方块z坐标
         """
     def PlayerSleepServerEvent(self, args):
         """
@@ -4013,6 +4059,12 @@ class ServerEvent:
         --------
 
         - ``playerId`` -- str，玩家的实体ID
+        - ``fullName`` -- str，方块ID
+        - ``auxData`` -- int，方块附加值
+        - ``dimensionid`` -- int，维度ID
+        - ``x`` -- int，方块x坐标
+        - ``y`` -- int，方块y坐标
+        - ``z`` -- int，方块z坐标
         """
     def PlayerRespawnFinishServerEvent(self, args):
         """

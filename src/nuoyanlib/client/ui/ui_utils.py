@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-17
+#   Date  : 2026-5-18
 #  ⠀
 # =================================================
 
@@ -73,15 +73,16 @@ class _UIControlType:
     IMAGE_CYCLER = 20
     LABEL_CYCLER = 21
     GRID_PAGE_INDICATOR = 22
-    COMBOX = 23
-    LAYOUT = 24
-    STACK_GRID = 25
-    JOYSTICK = 26
-    RICH_TEXT = 27
-    SIXTEEN_NINE_LAYOUT = 28
-    MUL_LINES_EDIT = 29
-    AMIN_PROCESS_BAR = 30
-    UNKNOWN = 31
+    TOOLTIP_TRIGGER = 23
+    COMBOX = 24
+    LAYOUT = 25
+    STACK_GRID = 26
+    JOYSTICK = 27
+    RICH_TEXT = 28
+    SIXTEEN_NINE_LAYOUT = 29
+    MUL_LINES_EDIT = 30
+    AMIN_PROCESS_BAR = 31
+    UNKNOWN = 32
 
 
 __ui_mgr = get_module(109, 111, 100, 46, 99, 108, 105, 101, 110, 116, 46, 117, 105, 46, 117, 105, 77, 97, 110, 97, 103, 101, 114)

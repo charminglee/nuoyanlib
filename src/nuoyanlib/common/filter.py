@@ -5,7 +5,7 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-3-27
+#   Date  : 2026-7-15
 #  ⠀
 # =================================================
 
@@ -342,8 +342,8 @@ class EntityFilter(object):
 
 
 def __benchmark__(n, timer, **kwargs):
-    import mod.client.extraClientApi as api
-    # import mod.server.extraServerApi as api
+    from ..core._sys import get_api
+    api = get_api()
     from .mc_math.mc_math import distance
 
     all_entities = api.GetEngineActor()

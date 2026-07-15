@@ -5,20 +5,32 @@
 #  ⠀
 #   Author: Nuoyan <https://github.com/charminglee>
 #   Email : 1279735247@qq.com
-#   Date  : 2026-1-16
+#   Date  : 2026-7-16
 #  ⠀
 # =================================================
 
 
 import os
-import shutil
-import re
-from all_events import ClientEvent, ServerEvent
 
 
 root = os.getcwd()
 event_dir = f"{root}\\src\\nuoyanlib\\core"
 script_dir = f"{root}\\scripts\\event_typehint"
+
+
+clean = [
+    f"{script_dir}\\_event_typing.pyi",
+    f"{script_dir}\\enum.py",
+    f"{script_dir}\\enum.pyi",
+]
+for p in clean:
+    if os.path.exists(p):
+        os.remove(p)
+
+
+import shutil
+import re
+from all_events import ClientEvent, ServerEvent
 
 
 def extract_events(cls):

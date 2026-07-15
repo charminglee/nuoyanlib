@@ -350,6 +350,7 @@ def _calc_axis_counts(min_pos, max_pos, count):
         return count_x, count_y, count_z
 
 
+# todo
 class gen_box_pos(_PosGenerator):
     """
     生成包围盒（立方体/矩形）内各点的坐标，每个坐标均匀分布。
