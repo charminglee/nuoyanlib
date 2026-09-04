@@ -17,6 +17,9 @@ studio.json
 /tests/ingame_test/world_resource_packs.json
 /src/nuoyanlib/extensions/*
 !/src/nuoyanlib/extensions/__init__.py
+.mcdev.json
+.mcdev/*
+.vecode/*
 
 
 ### Python template
@@ -175,3 +178,4 @@ http-client.private.env.json
 /.idea/git_toolbox_prj.xml
 /.idea/copilot.*.xml
 /.idea/copilot*.xml
+/.vscode/

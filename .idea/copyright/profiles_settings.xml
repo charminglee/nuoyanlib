@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="nuoyanlib">
+  <settings default="nuoyan">
     <module2copyright>
-      <element module="Project Files" copyright="nuoyanlib" />
+      <element module="Project Files" copyright="nuoyan" />
     </module2copyright>
     <LanguageOptions name="DTD">
       <option name="fileTypeOverride" value="1" />
@@ -22,10 +22,7 @@
     </LanguageOptions>
     <LanguageOptions name="Python">
       <option name="fileTypeOverride" value="3" />
-      <option name="addBlankAfter" value="false" />
       <option name="block" value="false" />
-      <option name="separateBefore" value="true" />
-      <option name="separateAfter" value="true" />
       <option name="lenBefore" value="51" />
       <option name="lenAfter" value="51" />
       <option name="filler" value="=" />
