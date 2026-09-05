@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 try:
@@ -16,11 +16,11 @@ try:
 except ImportError:
     _clock = None
     _t = 0
-from ..core import _logging, _sys
+from ..core import _logging, _env
 from ..core.client._lib_client import NuoyanLibClientSystem as _NuoyanLibClientSystem
 
 
-_sys.check_env("client")
+_env.check_env("client")
 if not _NuoyanLibClientSystem.run():
     _logging.error("NuoyanLibClientSystem run failed!")
 
@@ -49,14 +49,21 @@ def __do_inject_is_client(dct):
         elif hasattr(v, '_nyl__inject_is_client'):
             dct[k] = v._nyl__inject_is_client[0]
 
+
 __do_inject_is_client(globals())
 
 
 if _clock:
-    _consume = (_clock() - _t) * 1000
+    _consume = (_clock() - _t) * 1000 # noqa
     _logging.info("Loaded in %.3fms", _consume)
     del _consume
 
 
-del _logging, _sys, _NuoyanLibClientSystem
-del _clock, _t
+del (
+    _logging,
+    _env,
+    _NuoyanLibClientSystem,
+    _clock,
+    _t,
+    __do_inject_is_client,
+)

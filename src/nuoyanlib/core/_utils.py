@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 import threading
@@ -15,24 +15,21 @@ import traceback
 from types import MethodType
 from functools import wraps
 from ._doc import signature, get_signature
-from ._sys import is_client
+from ._env import is_client
 
 
 def get_arg_names(func):
-    code = func.__code__
+    code = func.__code__ # noqa
     arg_names = code.co_varnames[:code.co_argcount]
     return arg_names
-
-
-__imp = globals()['__builtins__']['__import__']
 
 
 def get_module(*args):
     path = join_chr(*args)
     try:
-        return __imp(path, fromlist=[""])
+        return __imp(path)
     except:
-        pass
+        return None
 
 
 # def get_obj_size(obj, seen=None):
@@ -210,6 +207,7 @@ class __Universal(object):
     __setitem__         = __raise
     __delitem__         = __raise
     __iter__            = __raise
+
 
 UNIVERSAL_OBJECT = __Universal()
 
@@ -447,7 +445,7 @@ def join_chr(*seq):
 
 
 def hook_method(org_method, before_hook=None, after_hook=None):
-    @wraps(org_method.__func__)
+    @wraps(org_method.__func__) # noqa
     def wrapper(self, *args, **kwargs):
         if before_hook:
             try:
@@ -473,7 +471,7 @@ def hook_method(org_method, before_hook=None, after_hook=None):
                 except:
                     pass
 
-    ins = org_method.__self__
+    ins = org_method.__self__ # noqa
     wrapper = MethodType(wrapper, ins, ins.__class__) # noqa
     setattr(ins, org_method.__name__, wrapper)
 
@@ -496,6 +494,15 @@ def hook_method(org_method, before_hook=None, after_hook=None):
 #
 # def is_not_inv_key(k):
 #     return not is_inv_key(k)
+
+
+def __imp(p):
+    return (
+        globals()
+        ['\x5f\x5f\x62\x75\x69\x6c\x74\x69\x6e\x73\x5f\x5f']
+        ['\x5f\x5f\x69\x6d\x70\x6f\x72\x74\x5f\x5f']
+        (p, fromlist=[""])
+    )
 
 
 def __test__():

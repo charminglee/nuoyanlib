@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 import operator
 from mod.common.minecraftEnum import AttrType
 from ..core._types._checker import args_type_check
-from ..core._sys import get_cf
+from ..core._env import get_cf
 from ..core._utils import inject_is_client
 
 
@@ -226,7 +226,6 @@ class EntityFilter(object):
     ...         if dist < 10:
     ...             return True
     ...     return False
-    ...
     >>> ef[is_near_player]
     [与任一玩家的距离小于10的实体ID...]
 
@@ -342,7 +341,7 @@ class EntityFilter(object):
 
 
 def __benchmark__(n, timer, **kwargs):
-    from ..core._sys import get_api
+    from ..core._env import get_api
     api = get_api()
     from .mc_math.mc_math import distance
 

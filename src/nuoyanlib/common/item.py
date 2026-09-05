@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from mod.common.minecraftEnum import ItemPosType
-from ..core._sys import get_cf, get_lv_comp
+from ..core._env import get_cf, get_lv_comp
 
 
 __all__ = [

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -17,7 +17,7 @@ import time
 
 # 导入测试
 import nuoyanlib.client
-from nuoyanlib.core._sys import load_extensions
+from nuoyanlib.core._env import load_extensions
 load_extensions()
 def import_server():
     import nuoyanlib.server

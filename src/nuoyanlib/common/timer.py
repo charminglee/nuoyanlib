@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
-from ..core._sys import get_lv_comp
+from ..core._env import get_lv_comp
 from ..core._utils import DefaultLocal
 
 
-if 0:
+if 1 > 0:
     from typing import Any
 
 

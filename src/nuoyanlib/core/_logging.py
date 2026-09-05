@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from .. import config
@@ -26,7 +26,7 @@ if config.ENABLED_LOG and logging:
 
         def log(self, msg, *args, **kwargs):
             if kwargs.get('show_env', False):
-                from ..core._sys import get_env
+                from ..core._env import get_env
                 print("[%s] [nuoyanlib] (%s) %s" % (self.level, get_env(), msg % args))
             else:
                 print("[%s] [nuoyanlib] %s" % (self.level, msg % args))

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from __future__ import division
@@ -15,7 +15,7 @@ import random
 import operator
 from math import degrees, sin, cos, acos, sqrt, radians, atan2, pi
 from mod.common.utils.mcmath import Matrix
-from ...core._sys import get_cf
+from ...core._env import get_cf
 from ...core.error import VectorError
 
 

@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 import traceback
 from uuid import uuid4
 import mod.client.extraClientApi as c_api
-from ..core._sys import get_api, is_client, get_lv_comp, get_lib_system
+from ..core._env import get_api, is_client, get_lv_comp, get_lib_system
 from ..core._utils import try_exec
 from ..core.error import SystemNotFoundError
 
 
-if 0:
+if 1 > 0:
     from typing import Any
     from mod.client.system.clientSystem import ClientSystem
     from mod.server.system.serverSystem import ServerSystem

@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 import traceback
 from functools import wraps
 import time
 import re
-from ..core._sys import get_lv_comp, is_client, get_cf
+from ..core._env import get_lv_comp, is_client, get_cf
 from ..core._utils import (
     singleton,
     lru_cache,
@@ -26,7 +26,7 @@ from ..core._utils import (
 )
 
 
-if 0:
+if 1 > 0:
     from typing import Any
     is_on_ground = lambda *_, **__: UNIVERSAL_OBJECT
 
@@ -71,7 +71,6 @@ def event_filter(filter_func):
     ...     @nyl.event_filter(lambda self, args: args['blockName'] == "minecraft:stone")
     ...     def ClientBlockUseEvent(self, args):
     ...         pass
-    ...
 
     -----
 
@@ -262,7 +261,7 @@ def call_interval(interval):
     >>> import mod.server.extraServerApi as server_api
     >>> @nyl.call_interval(5)
     ... def set_pos(entity_id, pos):
-    ...     print pos
+    ...     print(pos)
     ...     nyl.CF(entity_id).Pos.SetFootPos(pos)
     ...
     >>> host_player = server_api.GetHostPlayerId()

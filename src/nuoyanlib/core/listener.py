@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
-if 0:
+if 1 > 0:
     from typing import Any
 
 
@@ -18,7 +18,7 @@ import bisect
 from types import MethodType
 import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
-from . import _const, error, _sys
+from . import _const, error, _env
 from ._utils import iter_obj_attrs, try_exec
 from ..common.enum import ClientEvent, ServerEvent
 
@@ -111,7 +111,7 @@ class _EventPool(object):
     @staticmethod
     def _get(event_name, ns, sys_name, new=True):
         event_id = "%s_%s_%s" % (ns, sys_name, event_name)
-        lib_sys = _sys.get_lib_system()
+        lib_sys = _env.get_lib_system()
         ep = getattr(lib_sys, event_id, None)
         if new and ep is None:
             ep = _EventPool(event_id)
@@ -166,7 +166,7 @@ def _parse_listen_args(func, event_name, ns, sys_name):
     if ns and sys_name:
         return event_name, ns, sys_name
     else:
-        source = _get_event_source(_sys.is_client(), event_name)
+        source = _get_event_source(_env.is_client(), event_name)
         if source:
             return event_name, source[0], source[1]
         # raise error.EventSourceError(event_name, ns, sys_name)
@@ -220,14 +220,12 @@ def event(event_name="", ns="", sys_name="", priority=0, is_method=True):
     ...         nyl.unlisten_all_events(self)
     ...         # 调用以下函数可取消监听特定事件
     ...         # nyl.unlisten_event(self.MyCustomEvent)
-    ...
 
     对静态函数使用时，事件将被立即监听，无需手动调用 ``listen_all_events()`` 或 ``listen_event()``。
 
     >>> @nyl.event(ns="MyMod", sys_name="MyServerSystem", is_method=False)
     ... def MyCustomEvent(args):
     ...     pass
-    ...
 
     -----
 
@@ -486,7 +484,7 @@ class ServerEventProxy(BaseEventProxy):
 
 def _lib_sys_event(name="", from_client=None):
     if from_client is None:
-        from_client = not _sys.is_client()
+        from_client = not _env.is_client()
     return event(
         name,
         _const.LIB_NAME,
@@ -534,7 +532,7 @@ def __test__():
             pass
     assert_error(f, exc=error.EventSourceError)
 
-    lib_sys = _sys.get_lib_system()
+    lib_sys = _env.get_lib_system()
     def call(ns, sys_name, event_name, args):
         # 模拟引擎触发回调函数
         func = getattr(lib_sys, "_".join([ns, sys_name, event_name]))

@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from ._utils import cached_property, client_api, server_api
-from ._sys import is_client, get_cf
+from ._env import is_client, get_cf
 
 
 __all__ = [

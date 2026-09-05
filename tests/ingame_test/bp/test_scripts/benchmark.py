@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -13,7 +13,7 @@
 from collections import OrderedDict
 import mod.server.extraServerApi as s_api
 from .nuoyanlib.server import get_time
-from .nuoyanlib.core._sys import get_lv_comp, is_client
+from .nuoyanlib.core._env import get_lv_comp, is_client
 
 
 imp = globals()['__builtins__']['__import__']('importlib').import_module

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from contextlib import contextmanager
 import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import AttrType, ActorDamageCause
-from ..core._sys import get_lib_system
+from ..core._env import get_lib_system
 from ..core.server.comp import CF, LvComp
 from ..core._utils import kwargs_defaults
 from ..common.mc_math.mc_math import is_in_sector, distance_square, is_in_box, is_in_cylinder
@@ -45,14 +45,13 @@ def ignore_dmg_cd(restore_cd=10):
     ----
 
     >>> from mod.common.minecraftEnum import ActorDamageCause
-    >>> with nyl.ignore_dmg_cd():
+    >>> with nyl.ignore_dmg_cd(): # 进入上下文管理器
     ...     # 在 with 范围内伤害免疫时间会被设为0
     ...     comp = nyl.CF(entity_id).Hurt
     ...     # 在同一帧内造成两次伤害，总伤害为20
     ...     comp.Hurt(10, ActorDamageCause.EntityAttack)
     ...     comp.Hurt(10, ActorDamageCause.EntityAttack)
-    ... # 上下文管理器退出
-    ...
+    ... # 退出上下文管理器
 
     -----
 

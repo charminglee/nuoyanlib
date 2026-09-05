@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import EntityType
-from ..core._sys import get_lib_system
+from ..core._env import get_lib_system
 from ..core.server.comp import CF
 from ..common.enum import TimeEaseFunc
 from ..common.mc_math.vector import vec_normalize
