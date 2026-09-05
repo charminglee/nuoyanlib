@@ -33,9 +33,6 @@ __all__ = [
     "unlisten_all_events",
     "is_listened",
     "EventArgsWrap",
-    "BaseEventProxy",
-    "ClientEventProxy",
-    "ServerEventProxy",
 ]
 
 
@@ -133,12 +130,14 @@ class _EventPool(object):
         ep._remove(func, priority)
 
     @staticmethod
-    def is_listened(func, event_name, ns, sys_name, priority=0):
-        p = -priority
+    def is_listened(func, event_name, ns, sys_name):
         ep = _EventPool._get(event_name, ns, sys_name, False)
-        if ep is None or p not in ep.pool:
+        if ep is None:
             return False
-        return func in ep.pool[p]
+        for funcs in ep.pool.values():
+            if func in funcs:
+                return True
+        return False
 
 
 def _get_event_source(is_client, event_name):
@@ -365,7 +364,7 @@ def unlisten_all_events(ins):
             _EventPool.unlisten_event(method, *args)
 
 
-def is_listened(func, event_name="", ns="", sys_name="", priority=0):
+def is_listened(func, event_name="", ns="", sys_name=""):
     """
     判断函数是否已监听某事件。
 
@@ -375,7 +374,6 @@ def is_listened(func, event_name="", ns="", sys_name="", priority=0):
     :param str event_name: 事件名称；事件名与函数名相同时，可省略该参数
     :param str ns: 事件来源命名空间；监听 ModSDK 事件时，可省略该参数
     :param str sys_name: 事件来源系统名称；监听 ModSDK 事件时，可省略该参数
-    :param int priority: 优先级，值越大优先级越高；默认为 0
 
     :return: 已监听返回 True，否则返回 False
     :rtype: bool
@@ -383,7 +381,7 @@ def is_listened(func, event_name="", ns="", sys_name="", priority=0):
     args = _parse_listen_args(func, event_name, ns, sys_name)
     if not args:
         return
-    return _EventPool.is_listened(func, *args, priority=priority)
+    return _EventPool.is_listened(func, *args)
 
 
 class EventArgsWrap(object):
@@ -435,51 +433,6 @@ class EventArgsWrap(object):
     iteritems       = lambda self, *args: self._arg_dict.iteritems()
     get             = lambda self, *args: self._arg_dict.get(*args)
     copy            = lambda self, *args: self._arg_dict.copy()
-
-
-class BaseEventProxy(object):
-    def __init__(self, *args, **kwargs):
-        super(BaseEventProxy, self).__init__(*args, **kwargs)
-        is_client = isinstance(self, ClientEventProxy)
-        for attr in iter_obj_attrs(self):
-            if not isinstance(attr, MethodType) or hasattr(attr, '_nyl__listen_args'):
-                # 跳过属性和已被@event装饰的方法
-                continue
-            event_name = attr.__name__
-            source = _get_event_source(is_client, event_name)
-            if source:
-                self._create_proxy(attr, event_name, *source)
-        listen_all_events(self)
-
-    def _create_proxy(self, method, event_name, ns, sys_name):
-        @event(event_name, ns, sys_name)
-        def proxy(args):
-            method(EventArgsWrap(args, event_name) if args else None)
-        name = "_nyl__proxy_" + event_name
-        proxy.__name__ = name
-        setattr(self, name, proxy)
-
-
-class ClientEventProxy(BaseEventProxy):
-    """
-    客户端事件代理类。
-
-    继承 ``ClientEventProxy`` 后，所有 ModSDK 客户端事件无需监听，编写一个与事件同名的方法即可使用，
-    且事件参数采用对象形式，支持参数名补全。
-
-    对于使用 ``@event`` 装饰器监听事件，无需在 ``__init__()`` 方法手动调用 ``listen_all_events()``。
-    """
-
-
-class ServerEventProxy(BaseEventProxy):
-    """
-    服务端事件代理类。
-
-    继承 ``ServerEventProxy`` 后，所有 ModSDK 服务端事件无需监听，编写一个与事件同名的方法即可使用，
-    且事件参数采用对象形式，支持参数名补全。
-
-    对于使用 ``@event`` 装饰器监听事件，无需在 ``__init__()`` 方法手动调用 ``listen_all_events()``。
-    """
 
 
 def _lib_sys_event(name="", from_client=None):
@@ -586,7 +539,7 @@ def __test__():
 
 
 def __benchmark__(n, timer, **kwargs):
-    class C(ServerEventProxy, s_api.GetServerSystemCls()):
+    class C(s_api.GetServerSystemCls()):
         def __init__(self, namespace, system_name):
             super(C, self).__init__(namespace, system_name)
             listen_event(self.OnMobHitBlockServerEvent)

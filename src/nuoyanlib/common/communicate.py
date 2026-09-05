@@ -51,7 +51,7 @@ class SyncData(object):
 
     服务端使用 ``SyncData()`` 定义一个同步数据对象，并设置默认值 ``IsRaining()`` 。
 
-    >>> class MyServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
+    >>> class MyServerSystem(nyl.NyServerSystem):
     ...     def __init__(self, namespace, system_name):
     ...         super(MyServerSystem, self).__init__(namespace, system_name)
     ...         self.is_raining = nyl.SyncData("is_raining", nyl.LvComp.Weather.IsRaining())
@@ -65,7 +65,7 @@ class SyncData(object):
 
     客户端使用 ``SyncData.from_server()`` 定义一个绑定到服务端的同步数据对象，服务端设置数据值时，客户端会实时收到更新。
 
-    >>> class MyClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
+    >>> class MyClientSystem(nyl.NyClientSystem):
     ...     def __init__(self, namespace, system_name):
     ...         super(MyClientSystem, self).__init__(namespace, system_name)
     ...         self.is_raining = nyl.SyncData.from_server("is_raining", False, self.on_is_raining_update)
@@ -74,7 +74,7 @@ class SyncData(object):
     ...
     ...     def on_is_raining_update(self, key, old_value, new_value):
     ...         # 收到服务端数据更新时触发
-    ...         print "is_raining: %s -> %s" % (old_value, new_value)
+    ...         print("is_raining: %s -> %s" % (old_value, new_value))
 
     客户端/服务端获取 ``is_raining`` 的值。
 

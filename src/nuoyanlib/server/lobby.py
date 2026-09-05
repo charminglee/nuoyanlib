@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 import mod.server.extraServerApi as s_api
 from ..core.server.comp import LvComp
 from ..core._utils import kwargs_defaults
-from ..core.listener import event, ServerEventProxy
+from ..core.listener import event, listen_all_events
 
 
 __all__ = [
@@ -26,7 +26,7 @@ _UID_DATA_KEY = "_nyl__lobby_uid_data"
 _GLOBAL_DATA_KEY = "_nyl__lobby_global_data"
 
 
-class LobbyDataMgr(ServerEventProxy):
+class LobbyDataMgr(object):
     """
     联机大厅管理器。
 
@@ -43,6 +43,7 @@ class LobbyDataMgr(ServerEventProxy):
         self._uid = {}
         self.global_data = {}
         self.uid_data = {}
+        listen_all_events(self)
 
     @event("UiInitFinished")
     def _on_player_join(self, args):

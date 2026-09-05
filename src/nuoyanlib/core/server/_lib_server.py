@@ -1,32 +1,43 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from collections import defaultdict
 import mod.server.extraServerApi as s_api
 from .. import _const, _logging
 from .._utils import singleton
-from .._sys import NuoyanLibBaseSystem, load_extensions
-from ..listener import ServerEventProxy, _lib_sys_event
+from ..system import _get_nss_cls, NuoyanLibBaseSystem
+from ..listener import _lib_sys_event, unlisten_all_events
 from .comp import ServerSystem, CF
 
 
-@singleton
-class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem):
+_NSS = _get_nss_cls()
+
+
+class NuoyanLibServerSystem(NuoyanLibBaseSystem, _NSS):
+    _instance = None
+
     def __init__(self, namespace, system_name):
-        super(NuoyanLibServerSystem, self).__init__(namespace, system_name)
+        _NSS.__init__(self, namespace, system_name)
+        NuoyanLibBaseSystem.__init__(self)
+        NuoyanLibServerSystem._instance = self
         self.query_cache = defaultdict(dict)
         self.unsync_query = []
         self.callback_data = {}
         _logging.info("NuoyanLibServerSystem inited")
+
+    def Destroy(self):
+        NuoyanLibBaseSystem.Destroy(self)
+        for _, system in _const.SERVER_SYSTEMS.items():
+            unlisten_all_events(system)
 
     # region Events ====================================================================================================
 
@@ -44,9 +55,6 @@ class NuoyanLibServerSystem(ServerEventProxy, NuoyanLibBaseSystem, ServerSystem)
             }
             self.NotifyToClient(player_id, "_SetQueryVar", query_args)
         self.sync_all(player_id)
-
-    # def LoadServerAddonScriptsAfter(self, args):
-    #     load_extensions()
 
     # endregion
 

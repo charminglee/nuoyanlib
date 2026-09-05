@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from .. import __version__
@@ -18,6 +18,13 @@ LIB_VERSION_UL = __version__.replace(".", "_").replace("-", "_")
 LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
 LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
 LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
+
+
+MOD_NAME = None
+CLIENT_MODULES = {}
+SERVER_MODULES = {}
+CLIENT_SYSTEMS = {}
+SERVER_SYSTEMS = {}
 
 
 class __C: pass

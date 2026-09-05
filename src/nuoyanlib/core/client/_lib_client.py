@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from collections import defaultdict
@@ -18,15 +18,21 @@ from ... import config
 from ...common.time_ease import TimeEase
 from .. import _const, _logging
 from .._utils import singleton
-from .._sys import NuoyanLibBaseSystem, load_extensions
-from ..listener import ClientEventProxy, _lib_sys_event
-from .comp import ClientSystem, CF, LvComp
+from ..system import _get_ncs_cls, NuoyanLibBaseSystem
+from ..listener import _lib_sys_event, unlisten_all_events
+from .comp import CF, LvComp
 
 
-@singleton
-class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem):
+_NCS = _get_ncs_cls()
+
+
+class NuoyanLibClientSystem(NuoyanLibBaseSystem, _NCS):
+    _instance = None
+
     def __init__(self, namespace, system_name):
-        super(NuoyanLibClientSystem, self).__init__(namespace, system_name)
+        _NCS.__init__(self, namespace, system_name)
+        NuoyanLibBaseSystem.__init__(self)
+        NuoyanLibClientSystem._instance = self
         self.unsync_query = []
         self.callback_data = {}
         self.gse_data = {}
@@ -34,6 +40,11 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
         if not config.ENABLED_MODSDK_LOG:
             _logging.disable_modsdk_loggers()
         _logging.info("NuoyanLibClientSystem inited")
+
+    def Destroy(self):
+        NuoyanLibBaseSystem.Destroy(self)
+        for _, system in _const.CLIENT_SYSTEMS.items():
+            unlisten_all_events(system)
 
     # region Events ====================================================================================================
 
@@ -66,9 +77,6 @@ class NuoyanLibClientSystem(ClientEventProxy, NuoyanLibBaseSystem, ClientSystem)
     else:
         def Update(self):
             self._on_gse_update()
-
-    # def LoadClientAddonScriptsAfter(self, args):
-    #     load_extensions()
 
     # endregion
 

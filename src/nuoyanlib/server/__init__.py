@@ -42,6 +42,10 @@ from ..common import *
 from .. import config, __version__, __author__, __author_qq__, __author_email__
 
 
+from ..core.system import _get_nss_cls
+NyServerSystem = _get_nss_cls() # noqa
+
+
 def __do_inject_is_client(dct):
     for k, v in dct.items():
         if type(v) is type:
@@ -66,4 +70,5 @@ del (
     _clock,
     _t,
     __do_inject_is_client,
+    _get_nss_cls,
 )

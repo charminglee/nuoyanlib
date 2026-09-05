@@ -11,8 +11,8 @@
 
 
 from typing import Dict, Any, Optional, Callable, Union, TypedDict, List
-from ..core.listener import event, ServerEventProxy
 from ..core._types._typing import ArgsDict, STuple
+from ..core.listener import event
 
 
 __DataType = Union[str, int, float, bool, list, dict, None]
@@ -53,7 +53,7 @@ _UID_DATA_KEY: str
 _GLOBAL_DATA_KEY: str
 
 
-class LobbyDataMgr(ServerEventProxy):
+class LobbyDataMgr(object):
     _default: Dict[str, Callable[[], __DataType]]
     _uid: Dict[str, int]
     global_data: __SimpleDataDict

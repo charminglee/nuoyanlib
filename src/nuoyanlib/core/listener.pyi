@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 from typing import Callable, Optional, Tuple, Generator, List, Any, Dict, Set, overload
 from types import MethodType
-from ._types._event_typing import ClientEvent, ServerEvent
 from ._types._typing import ArgsDict, PyBasicTypes, SlotsType, F
 
 
@@ -45,7 +44,7 @@ class _EventPool(object):
     @staticmethod
     def unlisten_event(func: Callable, event_name: str, ns: str, sys_name: str, priority: int = 0) -> None: ...
     @staticmethod
-    def is_listened(func: Callable, event_name: str, ns: str, sys_name: str, priority: int = 0) -> bool: ...
+    def is_listened(func: Callable, event_name: str, ns: str, sys_name: str) -> bool: ...
 
 
 def _get_event_source(is_client: bool, event_name: str) -> Optional[Tuple[str, str]]: ...
@@ -86,13 +85,7 @@ def unlisten_event(
 def _iter_all_events(ins: Any) -> Generator[Tuple[MethodType, List[Tuple[str, str, str, int]]]]: ...
 def listen_all_events(ins: Any) -> None: ...
 def unlisten_all_events(ins: Any) -> None: ...
-def is_listened(
-    func: Callable,
-    event_name: str = "",
-    ns: str = "",
-    sys_name: str = "",
-    priority: int = 0,
-) -> bool: ...
+def is_listened(func: Callable, event_name: str = "", ns: str = "", sys_name: str = "") -> bool: ...
 
 
 class EventArgsWrap(object):
@@ -116,19 +109,6 @@ class EventArgsWrap(object):
     iteritems = dict.iteritems
     get = dict.get
     copy = dict.copy
-
-
-class BaseEventProxy(object):
-    def __init__(self: Self, *args, **kwargs) -> None: ...
-    def _create_proxy(
-        self,
-        method: MethodType,
-        event_name: str,
-        ns: str,
-        sys_name: str,
-    ) -> None: ...
-class ClientEventProxy(ClientEvent, BaseEventProxy): ...
-class ServerEventProxy(ServerEvent, BaseEventProxy): ...
 
 
 def _lib_sys_event(name: str = "", from_client: Optional[bool] = None) -> Callable: ...
