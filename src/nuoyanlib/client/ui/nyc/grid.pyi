@@ -5,14 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
 from typing import Dict, Union, Tuple, Callable, TypeVar, Optional, Any, List, Iterator, overload, Iterable, Generic, ClassVar
 from mod.client.ui.controls.gridUIControl import GridUIControl
-from ....core._types._typing import Self, ITuple2, STuple, UiPathOrNyControl, T, T2, SlotsType
+from ....core._types._typing import ITuple2, STuple, UiPathOrNyControl, T, T2, SlotsType, ArgsDict
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ....common.enum import GridCallbackType
@@ -26,9 +26,7 @@ __GridCallbackType = Callable[[], Any]
 
 class GridData(list, Generic[T, T2]):
     src: List[T]
-    """
-    网格数据源。
-    """
+    """ 网格数据源。 """
     op_func: Callable[[int, NyControl, T], Any]
     """
     网格数据操作函数，用于实现数据的操作逻辑。
@@ -36,15 +34,11 @@ class GridData(list, Generic[T, T2]):
     接受三个参数，分别为网格元素索引、元素的NyControl实例、元素对应的数据。网格刷新时会自动对每个元素调用一次该函数，并传入上述三个参数，实现网格元素与数据的自动管理。
     """
     default: Optional[T2]
-    """
-    网格元素索引超出数据源范围（越界）时使用的默认数据。
-    """
+    """ 网格元素索引超出数据源范围（越界）时使用的默认数据。 """
     grid: Optional[NyGrid]
-    """
-    当前网格数据对象所属的网格的 ``NyGrid`` 实例。
-    """
+    """ 当前网格数据对象所属的网格的 ``NyGrid`` 实例。 """
     def __init__(
-        self: Self,
+        self,
         src: List[T],
         op_func: Callable[[int, NyControl, T], Any],
         default: Optional[T2] = None,
@@ -67,7 +61,7 @@ class ElemGroup(Iterable[__NyControlT]):
     grid: NyGrid
     cell_list: List[__NyControlT]
     _len: int
-    def __init__(self: Self, grid: NyGrid, cell_list: List[__NyControlT]) -> None: ...
+    def __init__(self, grid: NyGrid, cell_list: List[__NyControlT]) -> None: ...
     def __iter__(self) -> Iterator[__NyControlT]: ...
     def __len__(self) -> int: ...
     @overload
@@ -85,25 +79,17 @@ class NyGrid(NyControl):
     _loaded: bool
     _base_control: GridUIControl
     is_stack_grid: bool
-    """
-    是否是StackGrid。
-    """
+    """ 是否是 StackGrid 。 """
     cell_visible_binding: str
-    """
-    用于控制网格元素visible的绑定名称。
-    """
+    """ 用于控制网格元素 ``visible`` 的绑定名称。 """
     collection_name_: str
-    """
-    网格集合名称。
-    """
+    """ 网格集合名称。 """
     gd_obj: Optional[GridData]
-    """
-    绑定到当前网格的网格数据对象。
-    """
+    """ 绑定到当前网格的网格数据对象。 """
     def __init__(
-        self: Self,
         screen_node_ex: ScreenNodeExtension,
         grid_control: GridUIControl,
+        self,
         *,
         is_stack_grid: bool = False,
         template_name: str = "",
@@ -111,7 +97,7 @@ class NyGrid(NyControl):
         collection_name: str = "",
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> NyControl: ...
     __div__ = __truediv__
     def __grid_update__(self) -> None: ...
     @cached_property
@@ -149,13 +135,6 @@ class NyGrid(NyControl):
         func: __GridCallbackType,
         cb_type: GridCallbackType = GridCallbackType.UPDATE,
     ) -> bool: ...
-    GetCellIndex = get_cell_index
-    UpdateGridData = update_grid_data
-    BindData = bind_data
-    GetCell = get_cell
-    GetAllCells = get_all_cells
-    SetCallback = set_callback
-    RemoveCallback = remove_callback
     def _return_cell_visible(self, index: int) -> bool: ...
     SetGridDimension = GridUIControl.SetGridDimension
     GetGridItem = GridUIControl.GetGridItem

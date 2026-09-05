@@ -10,9 +10,9 @@
 #  ================================================
 
 
-from typing import Literal, TypeVar, Union, Any, Callable, Tuple, Optional, overload
-from ..core._types._typing import FTuple2, ITuple3, FTuple3, F
 from ..core._utils import singleton, lru_cache, cached_property, try_exec, iter_obj_attrs
+from typing import Literal, TypeVar, Union, Callable, Tuple, Optional, overload
+from ..core._types._typing import FTuple2, ITuple3, FTuple3, Args, Kwargs
 
 
 __DictT = TypeVar("__DictT", bound=dict)
@@ -47,8 +47,8 @@ def timeit(
     func: Callable,
     n: int = 100000,
     print_res: bool = False,
-    args: Optional[Any] = None,
-    kwargs: Optional[Any] = None,
+    args: Optional[Args] = None,
+    kwargs: Optional[Kwargs] = None,
 ) -> FTuple2: ...
 def notify_error(player_id: Optional[str] = None) -> None: ...
 def call_interval(interval: float) -> Callable[[Callable], __Callable]: ...

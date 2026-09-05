@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#  =================================================
+#  ================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
@@ -7,7 +7,7 @@
 #    Email : 1279735247@qq.com
 #    Date  : 2026-9-6
 #  ⠀
-#  =================================================
+#  ================================================
 
 
 import traceback
@@ -18,7 +18,7 @@ from ..core._utils import try_exec
 from ..core.error import SystemNotFoundError
 
 
-if 1 > 0:
+if bool(0):
     from typing import Any
     from mod.client.system.clientSystem import ClientSystem
     from mod.server.system.serverSystem import ServerSystem
@@ -62,7 +62,6 @@ class SyncData(object):
     ...         # 下雨等级变化时，设置同步数据的值，并同步至客户端
     ...         # args.newLevel > 0 表示正在下雨
     ...         self.is_raining.set(args.newLevel > 0, True)
-    ...
 
     客户端使用 ``SyncData.from_server()`` 定义一个绑定到服务端的同步数据对象，服务端设置数据值时，客户端会实时收到更新。
 
@@ -76,7 +75,6 @@ class SyncData(object):
     ...     def on_is_raining_update(self, key, old_value, new_value):
     ...         # 收到服务端数据更新时触发
     ...         print "is_raining: %s -> %s" % (old_value, new_value)
-    ...
 
     客户端/服务端获取 ``is_raining`` 的值。
 

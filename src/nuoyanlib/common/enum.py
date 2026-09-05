@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -23,7 +23,7 @@ from mod.common.minecraftEnum import (
 from ..core._utils import MappingProxy
 
 
-if 0:
+if bool(0):
     from typing import Any
 
 

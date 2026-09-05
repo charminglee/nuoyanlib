@@ -5,12 +5,12 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-if 0:
+if bool(0):
     from typing import Any
     from ..screen_node import ScreenNodeExtension
 
@@ -195,8 +195,6 @@ class NyComboBox(InteractableControl, NyControl):
         for d in data:
             self._base_control.AddOption(*d)
 
-    BindData = bind_data
-
     # endregion
 
     # region Callback ==================================================================================================
@@ -245,10 +243,15 @@ class NyComboBox(InteractableControl, NyControl):
     _on_close   = lambda self, *args: self._exec_callbacks(ComboBoxCallbackType.CLOSE, *args)
     _on_select  = lambda self, *args: self._exec_callbacks(ComboBoxCallbackType.SELECT, *args)
 
-    SetCallback = set_callback
-    RemoveCallback = remove_callback
-
     # endregion
+
+    add_option                      = lambda self, *args, **kwargs: self._base_control.AddOption(*args, **kwargs)
+    clear_options                   = lambda self, *args, **kwargs: self._base_control.ClearOptions(*args, **kwargs)
+    clear_selection                 = lambda self, *args, **kwargs: self._base_control.ClearSelection(*args, **kwargs)
+    get_option_index_by_show_name   = lambda self, *args, **kwargs: self._base_control.GetOptionIndexByShowName(*args, **kwargs)
+    get_option_show_name_by_index   = lambda self, *args, **kwargs: self._base_control.GetOptionShowNameByIndex(*args, **kwargs)
+    remove_option_by_show_name      = lambda self, *args, **kwargs: self._base_control.RemoveOptionByShowName(*args, **kwargs)
+    remove_option_by_index          = lambda self, *args, **kwargs: self._base_control.RemoveOptionByIndex(*args, **kwargs)
 
 
 

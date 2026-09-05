@@ -5,12 +5,12 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-if 0:
+if bool(0):
     from typing import Any
     from ..screen_node import ScreenNodeExtension
 
@@ -184,11 +184,6 @@ class NyButton(InteractableControl, NyControl):
         """
         self.btn_label.text = text
 
-    SetDefaultTexture = set_default_texture
-    SetHoverTexture = set_hover_texture
-    SetPressedTexture = set_pressed_texture
-    SetText = set_text
-
     # endregion
 
     # region Callback ==================================================================================================
@@ -276,9 +271,6 @@ class NyButton(InteractableControl, NyControl):
     def _cancel_long_click(self, args):
         LvComp.Game.CancelTimer(self._long_click_timer)
         self._long_click_timer = None
-
-    SetCallback = set_callback
-    RemoveCallback = remove_callback
 
     # endregion
 
@@ -432,12 +424,6 @@ class NyButton(InteractableControl, NyControl):
                 return False
         data[self.path] = pos_lst
         return self.ui_node._save_ui_pos_data(data)
-
-    SetMovable = set_movable
-    SetMovableByLongClick = set_movable_by_long_click
-    CancelMovable = cancel_movable
-    ClearPosData = clear_pos_data
-    SavePosData = save_pos_data
 
     # endregion
 

@@ -5,14 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-if 0:
     from typing import Any, TypeVar
     from ..screen_node import ScreenNodeExtension
+if bool(0):
     from . import *
 
 

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -20,7 +20,7 @@ from .client.comp import CF as CCF
 #     entity_id: str
 #     _is_client: bool
 #     _cf: Union[SCF, CCF]
-#     def __init__(self: Self, entity_id: str) -> None: ...
+#     def __init__(self, entity_id: str) -> None: ...
 
 
 

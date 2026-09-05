@@ -5,17 +5,17 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-from typing import Callable, Optional, Tuple, NoReturn, Literal
+from typing import Callable, Optional, Tuple, NoReturn, Literal, Union
 from mod.client.ui.controls.imageUIControl import ImageUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
-from ....core._types._typing import Self, FTuple2, FTuple3, Args, Kwargs
+from ....core._types._typing import FTuple2, FTuple3, Args, Kwargs
 
 
 __ClipDirection = Literal[
@@ -36,12 +36,12 @@ __ImageAdaption = Literal[
 class NyImage(NyControl):
     _base_control: ImageUIControl
     def __init__(
-        self: Self,
         screen_node_ex: ScreenNodeExtension,
         image_control: ImageUIControl,
+        self,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> NyControl: ...
     __div__ = __truediv__
     @property
     def texture(self) -> NoReturn: ...
@@ -106,9 +106,6 @@ class NyImage(NyControl):
     ) -> None: ...
     def pause_frame_anim(self) -> None: ...
     def stop_frame_anim(self) -> None: ...
-    PlayFrameAnim = play_frame_anim
-    PauseFrameAnim = pause_frame_anim
-    StopFrameAnim = stop_frame_anim
     SetSprite = ImageUIControl.SetSprite
     SetSpriteColor = ImageUIControl.SetSpriteColor
     SetSpriteGray = ImageUIControl.SetSpriteGray
@@ -128,3 +125,6 @@ class NyImage(NyControl):
     GetGlobalRotateAngle = ImageUIControl.GetGlobalRotateAngle
     GetGlobalRotatePoint = ImageUIControl.GetGlobalRotatePoint
     GetRotateRect = ImageUIControl.GetRotateRect
+    set_sprite_platform_head = ImageUIControl.SetSpritePlatformHead
+    set_sprite_platform_frame = ImageUIControl.SetSpritePlatformFrame
+    set_image_adaption_type = ImageUIControl.SetImageAdaptionType

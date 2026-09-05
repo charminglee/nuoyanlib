@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -80,7 +80,7 @@ from mod.client.component.playerAnimCompClient import PlayerAnimCompClient
 from mod.client.component.achievementCompClient import AchievementCompClient
 from mod.client.component.dimensionCompClient import DimensionCompClient
 from mod.common.component.baseComponent import BaseComponent
-from .._types._typing import Self, T
+from .._types._typing import T
 
 
 ENGINE_NAMESPACE: str
@@ -102,7 +102,7 @@ class CF(object):
     _cache: ClassVar[Dict[str, CF]]
     _target: Union[str, int]
     def __new__(cls: Type[T], target: Union[str, int]) -> T: ...
-    def __init__(self: Self, target: Union[str, int]) -> None: ...
+    def __init__(self, target: Union[str, int]) -> None: ...
     def __getattr__(self, name: str) -> BaseComponent: ...
     FishingLine: FishingLineCompClient
     Drawing: DrawingCompClient

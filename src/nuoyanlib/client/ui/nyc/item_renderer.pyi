@@ -5,17 +5,17 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-from typing import Optional, TypedDict, NoReturn
+from typing import Optional, TypedDict, NoReturn, Union
 from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
-from ....core._types._typing import Self, UserData
+from ....core._types._typing import UserData
 
 
 class __UiItemDict(TypedDict):
@@ -27,12 +27,12 @@ class __UiItemDict(TypedDict):
 class NyItemRenderer(NyControl):
     _base_control: ItemRendererUIControl
     def __init__(
-        self: Self,
         screen_node_ex: ScreenNodeExtension,
         item_renderer_control: ItemRendererUIControl,
+        self,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> NyControl: ...
     __div__ = __truediv__
     @property
     def item_name(self) -> str: ...

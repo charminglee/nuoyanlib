@@ -5,13 +5,13 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-if 0:
-    from ..screen_node import ScreenNodeExtension
+if bool(0):
+    from ..screen_node import NyScreenNode, NyScreenProxy
 
 
 from ....core.client.comp import ViewBinder
@@ -103,9 +103,6 @@ class NyToggle(NyControl):
         :rtype: bool
         """
         return self.ui_node.unbuild_binding(func)
-
-    SetCallback = set_callback
-    RemoveCallback = remove_callback
 
     # endregion
 

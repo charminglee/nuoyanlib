@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#  ================================================
+#  =================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
-#  ================================================
+#  =================================================
 
 
 import mod.client.extraClientApi as c_api
@@ -16,7 +16,7 @@ from ...core.client.comp import LvComp
 from ...common.enum import ControlType
 
 
-if 0:
+if bool(0):
     from mod.client.ui.screenNode import ScreenNode
     from mod.client.system.clientSystem import ClientSystem
     from .nyc import NyControl

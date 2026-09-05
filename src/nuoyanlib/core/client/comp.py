@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -75,7 +75,7 @@ PlrComp = CF(PLAYER_ID)
 """
 LvComp = CF(LEVEL_ID)
 """
-使用 Level Id 创建的组件工厂。
+使用 Level ID 创建的组件工厂。
 """
 
 

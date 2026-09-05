@@ -5,14 +5,13 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-if 0:
-    from typing import Any
-    from ..screen_node import ScreenNodeExtension
+if bool(0):
+    from ..screen_node import NyScreenNode, NyScreenProxy
 
 
 from ....common.enum import ControlType, WheelCallbackType
@@ -132,9 +131,6 @@ class NySelectionWheel(InteractableControl, NyControl):
 
     _on_click = lambda self, *args: self._exec_callbacks(WheelCallbackType.CLICK, *args)
     _on_hover = lambda self, *args: self._exec_callbacks(WheelCallbackType.HOVER, *args)
-
-    SetCallback = set_callback
-    RemoveCallback = remove_callback
 
     # endregion
 

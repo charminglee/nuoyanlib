@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -85,7 +85,7 @@ from mod.server.component.shareableCompServer import ShareableComponentServer
 from mod.server.component.blockUseEventWhiteListCompServer import BlockUseEventWhiteListComponentServer
 from mod.server.component.actorLootCompServer import ActorLootComponentServer
 from mod.common.component.baseComponent import BaseComponent
-from .._types._typing import Self, T
+from .._types._typing import T
 
 
 ENGINE_NAMESPACE: str
@@ -99,7 +99,7 @@ class CF(object):
     _cache: ClassVar[Dict[str, CF]]
     _target: Union[str, int]
     def __new__(cls: Type[T], target: Union[str, int]) -> T: ...
-    def __init__(self: Self, target: Union[str, int]) -> None: ...
+    def __init__(self, target: Union[str, int]) -> None: ...
     def __getattr__(self, name: str) -> BaseComponent: ...
     FishingLine: FishingLineCompServer
     DomainGame: DomainGameCompServer

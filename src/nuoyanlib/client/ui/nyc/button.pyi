@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -13,7 +13,7 @@
 from typing import Callable, ClassVar, Optional, Union, List, Any
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.common.utils.timer import CallLater
-from ....core._types._typing import Self, ArgsDict, FTuple2, UiPathOrNyControl
+from ....core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl
 from ....core._types._checker import args_type_check
 from .control import NyControl, InteractableControl
 from .image import NyImage
@@ -30,21 +30,13 @@ def _vibrate(t: int) -> bool: ...
 
 class NyButton(InteractableControl, NyControl):
     DEFAULT_IMG_PATH: ClassVar[str]
-    """
-    按钮默认图片控件相对路径。
-    """
+    """ 按钮默认图片控件相对路径。 """
     HOVER_IMG_PATH: ClassVar[str]
-    """
-    按钮悬浮图片控件相对路径。
-    """
+    """ 按钮悬浮图片控件相对路径。 """
     PRESSED_IMG_PATH: ClassVar[str]
-    """
-    按钮按下图片控件相对路径。
-    """
+    """ 按钮按下图片控件相对路径。 """
     BTN_LABEL_PATH: ClassVar[str]
-    """
-    按钮文本控件相对路径。
-    """
+    """ 按钮文本控件相对路径。 """
     _vibrate_time: int
     _double_click_time: float
     _long_click_timer: Optional[CallLater]
@@ -52,46 +44,30 @@ class NyButton(InteractableControl, NyControl):
     _finger_pos: Optional[FTuple2]
     _base_control: ButtonUIControl
     is_movable: bool
-    """
-    按钮是否可拖动。
-    """
+    """ 按钮是否可拖动。 """
     auto_save_pos: bool
-    """
-    是否自动保存按钮位置。
-    """
+    """ 是否自动保存按钮位置。 """
     has_long_clicked: bool
-    """
-    按钮最近一次的按下中是否触发了长按。
-    """
+    """ 按钮最近一次的按下中是否触发了长按。 """
     touch_event_params: Optional[dict]
-    """
-    按钮TouchEvent参数。
-    """
+    """ 按钮 TouchEvent 参数。 """
     default_img: Optional[NyImage]
-    """
-    按钮默认（default）图片控件的 ``NyImage`` 实例。
-    """
+    """ 按钮默认（default）图片控件的 ``NyImage`` 实例。 """
     hover_img: Optional[NyImage]
-    """
-    按钮悬浮（hover）图片控件的 ``NyImage`` 实例。
-    """
+    """ 按钮悬浮（hover）图片控件的 ``NyImage`` 实例。 """
     pressed_img: Optional[NyImage]
-    """
-    按钮按下（pressed）图片控件的 ``NyImage`` 实例。
-    """
+    """ 按钮按下（pressed）图片控件的 ``NyImage`` 实例。 """
     btn_label: Optional[NyLabel]
-    """
-    按钮文本控件的 ``NyLabel`` 实例。
-    """
+    """ 按钮文本控件的 ``NyLabel`` 实例。 """
     def __init__(
-        self: Self,
         screen_node_ex: ScreenNodeExtension,
         btn_control: ButtonUIControl,
+        self,
         *,
         touch_event_params: Optional[dict] = None,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> NyControl: ...
     __div__ = __truediv__
     @property
     def vibrate_time(self) -> int: ...
@@ -102,10 +78,6 @@ class NyButton(InteractableControl, NyControl):
     def set_hover_texture(self, tex_path: str) -> None: ...
     def set_pressed_texture(self, tex_path: str) -> None: ...
     def set_text(self, text: str) -> None: ...
-    SetDefaultTexture = set_default_texture
-    SetHoverTexture = set_hover_texture
-    SetPressedTexture = set_pressed_texture
-    SetText = set_text
     def set_callback(
         self,
         func: __BtnCallbackType,
@@ -132,8 +104,6 @@ class NyButton(InteractableControl, NyControl):
     def _on_touch_up_dc(self, args: ArgsDict) -> None: ...
     def _on_touch_down_lc(self, args: ArgsDict) -> None: ...
     def _cancel_long_click(self, args: ArgsDict) -> None: ...
-    SetCallback = set_callback
-    RemoveCallback = remove_callback
     def set_movable(
         self,
         move_parent: bool = False,
@@ -160,11 +130,6 @@ class NyButton(InteractableControl, NyControl):
     def _on_touch_down_mov(self, args: ArgsDict) -> None: ...
     def clear_pos_data(self) -> bool: ...
     def save_pos_data(self) -> bool: ...
-    SetMovable = set_movable
-    SetMovableByLongClick = set_movable_by_long_click
-    CancelMovable = cancel_movable
-    ClearPosData = clear_pos_data
-    SavePosData = save_pos_data
     AddTouchEventParams = ButtonUIControl.AddTouchEventParams
     AddHoverEventParams = ButtonUIControl.AddHoverEventParams
     SetButtonTouchDownCallback = ButtonUIControl.SetButtonTouchDownCallback

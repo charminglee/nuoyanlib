@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -13,7 +13,7 @@
 from typing import Any, Callable, ClassVar, Literal, Union, List, Optional, Dict, Tuple, Generic
 from mod.client.system.clientSystem import ClientSystem
 from mod.server.system.serverSystem import ServerSystem
-from ..core._types._typing import Self, SlotsType, T
+from ..core._types._typing import SlotsType, T, Args, Kwargs
 
 
 __CallbackType = Union[Callable[[bool, Any], Any], Callable[[bool, Any, str], Any], None]
@@ -34,7 +34,7 @@ class SyncData(Generic[T]):
     ]
     _player_id: Optional[str]
     _is_dirty: bool
-    def __init__(self: Self, key: str, default: Optional[T] = None) -> None: ...
+    def __init__(self, key: str, default: Optional[T] = None) -> None: ...
     @classmethod
     def from_client(
         cls,
@@ -63,11 +63,11 @@ class Caller(object):
     ns: str
     sys_name: str
     method: str
-    def __init__(self: Self, ns: str, sys_name: str, method: str = "") -> None: ...
+    def __init__(self, ns: str, sys_name: str, method: str = "") -> None: ...
     def __call__(
         self,
-        args: Optional[Tuple[Any, ...]] = None,
-        kwargs: Optional[Dict[str, Any]] = None,
+        args: Optional[Args] = None,
+        kwargs: Optional[Kwargs] = None,
         method: str = "",
         player_id: Optional[Union[str, List[str]]] = None,
         callback: __CallbackType = None,
@@ -77,8 +77,8 @@ class Caller(object):
 
 def call_func(
     func_path: str,
-    args: Optional[Tuple[Any, ...]] = None,
-    kwargs: Optional[Dict[str, Any]] = None,
+    args: Optional[Args] = None,
+    kwargs: Optional[Kwargs] = None,
     callback: __CallbackType = None,
     delay_ret: float = -1,
 ) -> None: ...
@@ -98,8 +98,8 @@ def _call_local(
     method: str,
     cb_or_uuid: Union[__CallbackType, str],
     delay_ret: float,
-    args: Optional[Tuple[Any, ...]],
-    kwargs: Optional[Dict[str, Any]],
+    args: Optional[Args],
+    kwargs: Optional[Kwargs],
 ) -> None: ...
 def _call_remote(
     ns: str,
@@ -108,15 +108,15 @@ def _call_remote(
     player_id: Optional[List[str]],
     callback: Callable,
     delay_ret: float,
-    args: Any,
-    kwargs: Any,
+    args: Args,
+    kwargs: Kwargs,
 ) -> None: ...
 def call(
     ns: str,
     sys_name: str,
     method: str,
-    args: Optional[Tuple[Any, ...]] = None,
-    kwargs: Optional[Dict[str, Any]] = None,
+    args: Optional[Args] = None,
+    kwargs: Optional[Kwargs] = None,
     player_id: Optional[Union[str, List[str]]] = None,
     callback: __CallbackType = None,
     delay_ret: float = -1,

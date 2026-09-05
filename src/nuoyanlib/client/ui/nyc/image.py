@@ -5,12 +5,12 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-if 0:
+if bool(0):
     from typing import Any
     from ..screen_node import ScreenNodeExtension
 
@@ -425,13 +425,11 @@ class NyImage(NyControl):
         """
         self.ui_node._stop_frame_anim(self)
 
-    PlayFrameAnim = play_frame_anim
-    PauseFrameAnim = pause_frame_anim
-    StopFrameAnim = stop_frame_anim
-
     # endregion
 
-
+    set_sprite_platform_head  = lambda self, *args, **kwargs: self._base_control.SetSpritePlatformHead(*args, **kwargs)
+    set_sprite_platform_frame = lambda self, *args, **kwargs: self._base_control.SetSpritePlatformFrame(*args, **kwargs)
+    set_image_adaption_type   = lambda self, *args, **kwargs: self._base_control.SetImageAdaptionType(*args, **kwargs)
 
 
 

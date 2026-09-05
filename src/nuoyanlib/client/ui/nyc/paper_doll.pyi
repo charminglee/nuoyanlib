@@ -5,28 +5,27 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-from typing import Optional
+from typing import Union
 from mod.client.ui.controls.neteasePaperDollUIControl import NeteasePaperDollUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
-from ....core._types._typing import Self
 
 
 class NyPaperDoll(NyControl):
     _base_control: NeteasePaperDollUIControl
     def __init__(
-        self: Self,
         screen_node_ex: ScreenNodeExtension,
         paper_doll_control: NeteasePaperDollUIControl,
+        self,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> NyControl: ...
     __div__ = __truediv__
     @property
     def model_id(self) -> int: ...

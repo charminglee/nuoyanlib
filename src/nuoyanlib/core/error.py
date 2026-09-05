@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -52,7 +52,7 @@ class PathMatchError(RuntimeError):
 
 class AcrossImportError(ImportError):
     def __str__(self):
-        from ._sys import is_client
+        from ._env import is_client
         if is_client():
             return "cannot import 'nuoyanlib.server' in client environment"
         else:

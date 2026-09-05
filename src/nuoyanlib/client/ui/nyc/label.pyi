@@ -5,17 +5,17 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-from typing import Optional, NoReturn, Literal
+from typing import Optional, NoReturn, Literal, Union
 from mod.client.ui.controls.labelUIControl import LabelUIControl
 from .control import NyControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
-from ....core._types._typing import Self, FTuple3
+from ....core._types._typing import FTuple3
 
 
 __TextFont = Literal[
@@ -34,12 +34,12 @@ __TextAlignment = Literal[
 class NyLabel(NyControl):
     _base_control: LabelUIControl
     def __init__(
-        self: Self,
         screen_node_ex: ScreenNodeExtension,
         label_control: LabelUIControl,
+        self,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> NyControl: ...
     __div__ = __truediv__
     @property
     def text(self) -> Optional[str]: ...

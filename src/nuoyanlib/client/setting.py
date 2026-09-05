@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -13,7 +13,7 @@
 from ..core.client.comp import LvComp
 
 
-if 0:
+if bool(0):
     from typing import Any
 
 
@@ -57,7 +57,7 @@ def read_setting(name, default=None, is_global=True):
     :rtype: dict
     """
     data_dict = LvComp.ConfigClient.GetConfigData(name, is_global)
-    if not data_dict:
+    if data_dict is None:
         return default
     data = data_dict.get('__nyl_setting_data__', data_dict)
     if isinstance(data, dict):

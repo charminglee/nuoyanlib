@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -15,7 +15,6 @@ from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUICon
 from .control import NyControl, InteractableControl
 from ..screen_node import ScreenNodeExtension
 from ....core._types._checker import args_type_check
-from ....core._types._typing import Self
 from ....common.enum import ComboBoxCallbackType
 
 
@@ -27,16 +26,14 @@ __ComboBoxCallbackType = Union[__OnOpenOrCloseCallbackType, __OnSelectCallbackTy
 class NyComboBox(InteractableControl, NyControl):
     _base_control: NeteaseComboBoxUIControl
     data: List[Tuple[str, Optional[str], Optional[Any]]]
-    """
-    下拉框项数据。
-    """
+    """ 下拉框项数据。 """
     def __init__(
-        self: Self,
         screen_node_ex: ScreenNodeExtension,
         combo_box_control: NeteaseComboBoxUIControl,
+        self,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> Optional[NyControl]: ...
+    def __truediv__(self, other: str) -> NyControl: ...
     __div__ = __truediv__
     @property
     def opt_count(self) -> int: ...
@@ -55,7 +52,6 @@ class NyComboBox(InteractableControl, NyControl):
     @args_type_check((int, str, slice))
     def __delitem__(self, item: Union[int, str, slice]) -> None: ...
     def bind_data(self, data: List[Tuple[str, Optional[str], Optional[Any]]]) -> None: ...
-    BindData = bind_data
     def set_callback(
         self,
         func: __ComboBoxCallbackType,
@@ -69,8 +65,6 @@ class NyComboBox(InteractableControl, NyControl):
     def _on_open(self, *args: Any) -> None: ...
     def _on_close(self, *args: Any) -> None: ...
     def _on_select(self, *args: Any) -> None: ...
-    SetCallback = set_callback
-    RemoveCallback = remove_callback
     AddOption = NeteaseComboBoxUIControl.AddOption
     ClearOptions = NeteaseComboBoxUIControl.ClearOptions
     ClearSelection = NeteaseComboBoxUIControl.ClearSelection
@@ -86,3 +80,10 @@ class NyComboBox(InteractableControl, NyControl):
     RegisterOpenComboBoxCallback = NeteaseComboBoxUIControl.RegisterOpenComboBoxCallback
     RegisterCloseComboBoxCallback = NeteaseComboBoxUIControl.RegisterCloseComboBoxCallback
     RegisterSelectItemCallback = NeteaseComboBoxUIControl.RegisterSelectItemCallback
+    add_option = NeteaseComboBoxUIControl.AddOption
+    clear_options = NeteaseComboBoxUIControl.ClearOptions
+    clear_selection = NeteaseComboBoxUIControl.ClearSelection
+    get_option_index_by_show_name = NeteaseComboBoxUIControl.GetOptionIndexByShowName
+    get_option_show_name_by_index = NeteaseComboBoxUIControl.GetOptionShowNameByIndex
+    remove_option_by_show_name = NeteaseComboBoxUIControl.RemoveOptionByShowName
+    remove_option_by_index = NeteaseComboBoxUIControl.RemoveOptionByIndex

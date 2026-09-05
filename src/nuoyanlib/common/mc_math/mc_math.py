@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#  =================================================
+#  ================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
@@ -7,7 +7,7 @@
 #    Email : 1279735247@qq.com
 #    Date  : 2026-9-6
 #  ⠀
-#  =================================================
+#  ================================================
 
 
 from __future__ import division
@@ -18,7 +18,7 @@ from ...core._utils import inject_is_client, UNIVERSAL_OBJECT
 from .vector import Vector, dir2rot, rot2dir
 
 
-if 1 > 0:
+if bool(0):
     from typing import Iterable
 
 
@@ -67,7 +67,7 @@ __all__ = [
 ]
 
 
-if 1 > 0:
+if bool(0):
     distance2nearest_entity = lambda *_, **__: UNIVERSAL_OBJECT
     distance2nearest_player = lambda *_, **__: UNIVERSAL_OBJECT
 

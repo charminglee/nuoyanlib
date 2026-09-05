@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#  =================================================
+#  ================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
@@ -7,7 +7,7 @@
 #    Email : 1279735247@qq.com
 #    Date  : 2026-9-6
 #  ⠀
-#  =================================================
+#  ================================================
 
 
 from __future__ import division
@@ -17,7 +17,7 @@ from ..core._utils import parse_indices_generator
 from .mc_math.mc_math import cartesian_coord, box_min_max
 
 
-if 1 > 0:
+if bool(0):
     from typing import Any
 
 

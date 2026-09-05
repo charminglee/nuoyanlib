@@ -5,13 +5,13 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
 from typing import List, Optional, Any, Iterable, Iterator, Callable, Literal, Union, overload, Dict, Collection
-from ...core._types._typing import SlotsType, FTuple3, FTuple2, Self, VectorLike, Scalar, GeneralVector
+from ...core._types._typing import SlotsType, FTuple3, FTuple2, VectorLike, Scalar, GeneralVector
 
 
 _ZERO_EPS: float
@@ -33,13 +33,13 @@ class Vector(Collection[float]):
     _z: float
     _dim: int
     @overload
-    def __init__(self: Self, x: Scalar, y: Scalar, z: Scalar, /) -> None: ...
+    def __init__(self, x: Scalar, y: Scalar, z: Scalar, /) -> None: ...
     @overload
-    def __init__(self: Self, x: Scalar, y: Scalar, /) -> None: ...
+    def __init__(self, x: Scalar, y: Scalar, /) -> None: ...
     @overload
-    def __init__(self: Self, x: Iterable[Scalar], /) -> None: ...
+    def __init__(self, x: Iterable[Scalar], /) -> None: ...
     @overload
-    def __init__(self: Self) -> None: ...
+    def __init__(self) -> None: ...
     @staticmethod
     def zero(is_3d: bool = True) -> Vector: ...
     @staticmethod

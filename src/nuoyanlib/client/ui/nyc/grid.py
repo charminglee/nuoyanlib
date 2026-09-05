@@ -5,12 +5,12 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-if 0:
+if bool(0):
     from typing import Any
     from ..screen_node import ScreenNodeExtension
 
@@ -230,7 +230,7 @@ class ElemGroup(object):
 
     def __setattr__(self, key, value):
         if key in ElemGroup.__slots__:
-            return object.__setattr__(self, key, value)
+            object.__setattr__(self, key, value)
         if key not in ElemGroup._ALLOWED_SET_ATTRS:
             raise AttributeError("can't set attribute '%s' to ElemGroup object" % key)
         # 批量设置属性
@@ -421,7 +421,7 @@ class NyGrid(NyControl):
 
         获取网格的 xy 大小。
 
-        当网格为 StackGrid 时，y值固定为 0。
+        当网格为 StackGrid 时， y 值固定为 0。
 
         :rtype: tuple[int,int]
         """
@@ -434,7 +434,7 @@ class NyGrid(NyControl):
 
         设置网格的 xy 大小。
 
-        当网格为 StackGrid 时，忽略传入的y值。
+        当网格为 StackGrid 时，忽略传入的 y 值。
 
         :type val: tuple[int,int]
         """
@@ -596,14 +596,6 @@ class NyGrid(NyControl):
             return False
         lst.remove(func)
         return True
-
-    GetCellIndex = get_cell_index
-    UpdateGridData = update_grid_data
-    BindData = bind_data
-    GetCell = get_cell
-    GetAllCells = get_all_cells
-    SetCallback = set_callback
-    RemoveCallback = remove_callback
 
     # endregion
 

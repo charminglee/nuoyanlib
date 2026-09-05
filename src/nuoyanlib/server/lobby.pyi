@@ -5,14 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
 from typing import Dict, Any, Optional, Callable, Union, TypedDict, List
-from ..core._types._typing import ArgsDict, STuple, Self
 from ..core.listener import event, ServerEventProxy
+from ..core._types._typing import ArgsDict, STuple
 
 
 __DataType = Union[str, int, float, bool, list, dict, None]
@@ -64,7 +64,7 @@ class LobbyDataMgr(ServerEventProxy):
     """
     玩家数据字典。
     """
-    def __init__(self: Self) -> None: ...
+    def __init__(self) -> None: ...
     @event("UiInitFinished")
     def _on_player_join(self, args: ArgsDict) -> None: ...
     def _to_uid(self, player_id: str) -> int: ...

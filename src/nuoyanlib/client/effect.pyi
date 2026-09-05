@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
@@ -20,8 +20,8 @@ from mod.client.component.frameAniTransComp import FrameAniTransComp
 from mod.client.component.frameAniEntityBindComp import FrameAniEntityBindComp
 from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindComp
 from ..core.client._lib_client import NuoyanLibClientSystem
-from ..core._types._typing import Self, FTuple3, FTuple2, TimeEaseFuncType
 from ..common.enum import TimeEaseFunc
+from ..core._types._typing import FTuple3, FTuple2, CurveFuncType
 
 
 def spawn_ground_shatter_effect(
@@ -67,7 +67,7 @@ class NeteaseParticle(object):
     _playing: bool
     _destroyed: bool
     def __init__(
-        self: Self,
+        self,
         json_path: str,
         pos: Optional[FTuple3] = None,
         bind_entity: Optional[Dict[str, Union[str, FTuple3, bool]]] = None,
@@ -175,7 +175,7 @@ class NeteaseFrameAnim(object):
     _playing: bool
     _destroyed: bool
     def __init__(
-        self: Self,
+        self,
         json_path: str = "",
         tex_path: str = "",
         pos: Optional[FTuple3] = None,
