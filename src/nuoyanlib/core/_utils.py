@@ -56,7 +56,7 @@ def get_module(*args):
 #     return size
 
 
-VOID = object()
+_VOID = object()
 
 
 class DefaultLocal(object):
@@ -66,8 +66,8 @@ class DefaultLocal(object):
 
     def __getattribute__(self, name):
         local = object.__getattribute__(self, '_local')
-        value = getattr(local, name, VOID)
-        if value is VOID:
+        value = getattr(local, name, _VOID)
+        if value is _VOID:
             factory = object.__getattribute__(self, '_default_factory')
             value = factory()
             local.__setattr__(name, value)
@@ -143,38 +143,62 @@ def inject_is_client(func):
     return auto
 
 
-def singleton(init_once=True):
-    def decorator(cls):
+class SingletonMeta(type):
+    def __new__(metacls, name, bases, dct):
+        cls = type.__new__(metacls, name, bases, dct)
         cls._instance = None
-        cls._inited = False
-        org_new = cls.__new__
-        org_init = cls.__init__
-
-        @staticmethod # noqa
-        def new_new(*args, **kwargs):
-            return cls._instance or org_new(*args, **kwargs)
-
-        def new_init(self, *args, **kwargs):
-            if cls._instance is None:
-                cls._instance = self
-            # 如果init_once为True，则__init__方法只会被执行一次
-            if not cls._inited or not _init_once:
-                org_init(self, *args, **kwargs)
-                cls._inited = True
-
-        cls.__new__ = new_new
-        cls.__init__ = new_init
         return cls
 
-    if isinstance(init_once, bool):
-        _init_once = init_once
-        return decorator
-    else:
-        _init_once = True
-        return decorator(init_once) # noqa
+    def __call__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = type.__call__(cls, *args, **kwargs)
+        return cls._instance
 
 
-@singleton
+class Singleton(object):
+    __metaclass__ = SingletonMeta
+    _instance = None
+
+
+_KWARGS_MARK = (object(),)
+
+
+def _singleton_key(args, kwargs):
+    if not kwargs:
+        return args
+    return args + _KWARGS_MARK + tuple(sorted(kwargs.items()))
+
+
+class ArgsSingletonMeta(type):
+    def __new__(metacls, name, bases, dct):
+        cls = type.__new__(metacls, name, bases, dct)
+        cls._instances = {}
+        cls._unhashable_instances = []
+        return cls
+
+    def __call__(cls, *args, **kwargs):
+        key = _singleton_key(args, kwargs)
+        try:
+            inst = cls._instances.get(key)
+        except TypeError:
+            for cached_key, cached_inst in cls._unhashable_instances:
+                if cached_key == key:
+                    return cached_inst
+            inst = type.__call__(cls, *args, **kwargs)
+            cls._unhashable_instances.append((key, inst))
+            return inst
+        if inst is None:
+            inst = type.__call__(cls, *args, **kwargs)
+            cls._instances[key] = inst
+        return inst
+
+
+class ArgsSingleton(object):
+    __metaclass__ = ArgsSingletonMeta
+    _instances = {}
+    _unhashable_instances = []
+
+
 class __Universal(object):
     """
     万用对象，仅用于绕过机审检查。
@@ -253,9 +277,6 @@ class MappingProxy(object):
     update      = __raise
     __setitem__ = __raise
     __delitem__ = __raise
-
-
-_KWARGS_MARK = (object(),)
 
 
 def _lru_key(args, kwargs):
@@ -534,20 +555,47 @@ def __test__():
     assert ins.lst == [1, 2, 3, 3]
 
     n = [0]
-    @singleton(False)
-    class A(object):
+    class A(Singleton):
         def __init__(self):
             n[0] += 1
-    a1 = A()
-    a2 = A()
-    assert a1 == a2
+    assert A() is A()
+    assert n[0] == 1
+    nn = [0]
+    class B(A):
+        def __init__(self):
+            A.__init__(self)
+            nn[0] += 1
+    assert B() is not A()
+    assert B() is B()
     assert n[0] == 2
-    @singleton
-    class A(object):
-        def __init__(self):
+    assert nn[0] == 1
+
+    n = [0]
+    class C(ArgsSingleton):
+        def __init__(self, a, b=""):
             n[0] += 1
-    A()
-    A()
+    c1 = C(1, b="a")
+    c2 = C(1, b="a")
+    c3 = C(1, b="b")
+    c4 = C(2, b="a")
+    assert c1 is c2
+    assert c1 is not c3
+    assert c1 is not c4
+    assert C(2, b="a") is c4
+    assert n[0] == 3
+
+    n = [0]
+    class D(ArgsSingleton):
+        def __init__(self, a, b=None):
+            n[0] += 1
+    d1 = D([1, 2], b={'xxx': [0]})
+    d2 = D([1, 2], b={'xxx': [0]})
+    d3 = D([1, 3], b={'xxx': [0]})
+    d4 = D([1, 2], b={'xxx': [1]})
+    assert d1 is d2
+    assert d1 is not d3
+    assert d1 is not d4
+    assert D([1, 2], b={'xxx': [1]}) is d4
     assert n[0] == 3
 
     a = [0]
@@ -576,10 +624,6 @@ def __test__():
     assert func(1, c=6) == (1, 2, 6, 4)
     assert func.__doc__ == "func(a, b=2, *, c=3, d=4)"
     assert_error(func, (1,), {'e': 1}, TypeError)
-
-
-
-
 
 
 

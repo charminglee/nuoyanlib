@@ -12,8 +12,8 @@
 
 from threading import local
 import sys
-from typing import Generic, Hashable, List, Callable, Any, Type, Union, Tuple, Optional, Generator, overload
-from ._types._typing import ITuple, T, F, TypeT, Args, Kwargs, STuple
+from typing import Generic, Hashable, List, Callable, Any, Type, Union, Tuple, Optional, Generator, overload, Dict
+from ._types._typing import ITuple, T, F, Args, Kwargs, STuple
 from ._types._checker import args_type_check
 
 
@@ -21,7 +21,6 @@ def get_arg_names(func: Callable) -> STuple: ...
 def get_module(*args: int) -> Any: ...
 
 
-VOID: object
 class DefaultLocal(Generic[T]):
     _default_factory: Callable[[], T]
     _local: local
@@ -64,7 +63,6 @@ else:
     MappingProxy = MappingProxyType
 
 
-_KWARGS_MARK: Tuple[object]
 def _lru_key(args: Args, kwargs: Kwargs) -> Hashable: ...
 class lru_cache(object):
     size: int
@@ -77,10 +75,30 @@ class lru_cache(object):
     def __call__(self, func_or_cls: T) -> T: ...
 
 
-@overload
-def singleton(init_once: bool = True) -> Callable[[TypeT], TypeT]: ...
-@overload
-def singleton(init_once: TypeT) -> TypeT: ...
+class SingletonMeta(type):
+    _instance: Optional[Any]
+    def __new__(metacls: Type[T], name: str, bases: Tuple[type, ...], dct: Dict[str, Any]) -> T: ...
+    def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T: ...
+if sys.version_info <= (2, 7):
+    class Singleton(object):
+        __metaclass__ = SingletonMeta
+        _instance: Optional[Any]
+else:
+    class Singleton(metaclass=SingletonMeta):
+        _instance: Optional[Any]
+class ArgsSingletonMeta(type):
+    _instances: Dict[tuple, Any]
+    _unhashable_instances: List[Tuple[tuple, Any]]
+    def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T: ...
+if sys.version_info <= (2, 7):
+    class ArgsSingleton(object):
+        __metaclass__ = ArgsSingletonMeta
+        _instances: Dict[tuple, Any]
+        _unhashable_instances: List[Tuple[tuple, Any]]
+else:
+    class ArgsSingleton(metaclass=ArgsSingletonMeta):
+        _instances: Dict[tuple, Any]
+        _unhashable_instances: List[Tuple[tuple, Any]]
 
 
 class cached_property(object):

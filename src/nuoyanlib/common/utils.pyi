@@ -5,14 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-6
 #  ⠀
 #  ================================================
 
 
-from ..core._utils import singleton, lru_cache, cached_property, try_exec, iter_obj_attrs
 from typing import Literal, TypeVar, Union, Callable, Tuple, Optional, overload
 from ..core._types._typing import FTuple2, ITuple3, FTuple3, Args, Kwargs
+from ..core._utils import Singleton, ArgsSingleton, lru_cache, cached_property, try_exec, iter_obj_attrs
 
 
 __DictT = TypeVar("__DictT", bound=dict)
@@ -20,7 +20,8 @@ class __Callable(Callable):
     reset_call_time: Callable[[], None]
 
 
-singleton = singleton
+Singleton = Singleton
+ArgsSingleton = ArgsSingleton
 lru_cache = lru_cache
 cached_property = cached_property
 try_exec = try_exec

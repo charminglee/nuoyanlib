@@ -168,9 +168,9 @@ def _parse_listen_args(func, event_name, ns, sys_name):
         source = _get_event_source(_env.is_client(), event_name)
         if source:
             return event_name, source[0], source[1]
-        # raise error.EventSourceError(event_name, ns, sys_name)
-        import warnings
-        warnings.warn(str(error.EventSourceError(event_name, ns, sys_name)))
+        raise error.EventSourceError(event_name, ns, sys_name)
+        # import warnings
+        # warnings.warn(str(error.EventSourceError(event_name, ns, sys_name)))
 
 
 def event(event_name="", ns="", sys_name="", priority=0, is_method=True):

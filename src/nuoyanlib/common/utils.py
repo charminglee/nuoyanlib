@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#  =================================================
+#  ================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
@@ -7,7 +7,7 @@
 #    Email : 1279735247@qq.com
 #    Date  : 2026-9-6
 #  ⠀
-#  =================================================
+#  ================================================
 
 
 import traceback
@@ -16,7 +16,8 @@ import time
 import re
 from ..core._env import get_lv_comp, is_client, get_cf
 from ..core._utils import (
-    singleton,
+    Singleton,
+    ArgsSingleton,
     lru_cache,
     cached_property,
     try_exec,
@@ -26,7 +27,7 @@ from ..core._utils import (
 )
 
 
-if 1 > 0:
+if bool(0):
     from typing import Any
     is_on_ground = lambda *_, **__: UNIVERSAL_OBJECT
 
@@ -44,7 +45,8 @@ __all__ = [
     "convert_dict_value_to_tuple",
     "convert_list_to_tuple",
     "translate_time",
-    "singleton",
+    "Singleton",
+    "ArgsSingleton",
     "lru_cache",
     "cached_property",
     "try_exec",
@@ -441,7 +443,6 @@ def __test__():
     assert translate_time(60) == "1m"
     assert translate_time(1) == "1s"
     assert translate_time(0) == "0s"
-
 
 
 

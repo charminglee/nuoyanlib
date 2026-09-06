@@ -18,8 +18,8 @@ studio.json
 /src/nuoyanlib/extensions/*
 !/src/nuoyanlib/extensions/__init__.py
 .mcdev.json
-.mcdev/*
-.vecode/*
+.mcdev/
+.vscode/
 
 
 ### Python template
