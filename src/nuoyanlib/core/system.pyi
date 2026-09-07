@@ -5,30 +5,34 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
 
-from typing import Type, List, Optional, Dict, Callable, Any, Union
+import sys
+from typing import Type, List, Optional, Dict, Callable, Any, Union, Tuple
 from collections import defaultdict
 from types import MethodType
 from mod.client.system.clientSystem import ClientSystem
 from mod.server.system.serverSystem import ServerSystem
 from ..core._types._event_typing import ClientEvent, ServerEvent
+from ..core._types._typing import T
 from ..common.communicate import SyncData
 
 
-class NySystem(object):
-    def __init__(self) -> None: ...
+class NySystemMeta(type):
+    def __new__(metacls: Type[T], cls_name: str, bases: Tuple[type, ...], cls_dict: Dict[str, Any]) -> T: ...
 
 
-class __NyClientSystem(ClientEvent, NySystem, ClientSystem):
-    def __init__(self, namespace: str, system_name: str) -> None: ...
-
-
-class __NyServerSystem(ServerEvent, NySystem, ServerSystem):
-    def __init__(self, namespace: str, system_name: str) -> None: ...
+if sys.version_info <= (2, 7):
+    class __NyClientSystem(ClientEvent, ClientSystem):
+        __metaclass__ = NySystemMeta
+    class __NyServerSystem(ServerEvent, ServerSystem):
+        __metaclass__ = NySystemMeta
+else:
+    class __NyClientSystem(ClientEvent, ClientSystem, metaclass=NySystemMeta): ...
+    class __NyServerSystem(ServerEvent, ServerSystem, metaclass=NySystemMeta): ...
 
 
 def _get_ncs_cls() -> Type[__NyClientSystem]: ...

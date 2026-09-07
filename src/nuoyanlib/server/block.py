@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
@@ -35,6 +35,8 @@ __all__ = [
 )
 def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
     """
+    [已废弃]
+
     在指定位置生成裂地效果。
 
     -----

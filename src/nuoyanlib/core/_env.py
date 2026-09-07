@@ -5,14 +5,16 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
 
 import threading
-import mod.client.extraClientApi as c_api
-import mod.server.extraServerApi as s_api
+
+
+def get_cls_path(cls):
+    return cls.__module__ + "." + cls.__name__
 
 
 def get_env():
@@ -29,13 +31,15 @@ _THREAD_LOCAL = threading.local()
 
 
 def get_lib_system():
-    if not hasattr(_THREAD_LOCAL, 'lib_sys'):
+    try:
+        return _THREAD_LOCAL.LIB_SYS
+    except AttributeError:
         if is_client():
             from .client._lib_client import instance
         else:
             from .server._lib_server import instance
-        _THREAD_LOCAL.lib_sys = instance()
-    return _THREAD_LOCAL.lib_sys
+        inst = _THREAD_LOCAL.LIB_SYS = instance()
+        return inst
 
 
 def is_client():
@@ -44,36 +48,50 @@ def is_client():
 
     -----
 
-    :return: 是则返回True，否则返回False
+    :return: 当前环境是否是客户端
     :rtype: bool
     """
-    return threading.current_thread().name == "MainThread"
+    try:
+        return _THREAD_LOCAL.IS_CLIENT
+    except AttributeError:
+        ic = _THREAD_LOCAL.IS_CLIENT = (threading.current_thread().name == "MainThread")
+        return ic
 
 
 def get_api():
-    if not hasattr(_THREAD_LOCAL, 'api'):
-        _THREAD_LOCAL.api = c_api if is_client() else s_api
-    return _THREAD_LOCAL.api
+    try:
+        return _THREAD_LOCAL.API
+    except AttributeError:
+        if is_client():
+            import mod.client.extraClientApi as api
+        else:
+            import mod.server.extraServerApi as api
+        _THREAD_LOCAL.API = api
+        return api
 
 
 def get_lv_comp():
-    if not hasattr(_THREAD_LOCAL, 'LvComp'):
+    try:
+        return _THREAD_LOCAL.LV_COMP
+    except AttributeError:
         if is_client():
             from .client.comp import LvComp
         else:
             from .server.comp import LvComp
-        _THREAD_LOCAL.LvComp = LvComp
-    return _THREAD_LOCAL.LvComp
+        _THREAD_LOCAL.LV_COMP = LvComp
+        return LvComp
 
 
 def get_cf(entity_id):
-    if not hasattr(_THREAD_LOCAL, 'CF'):
+    try:
+        return _THREAD_LOCAL.CF(entity_id)
+    except AttributeError:
         if is_client():
             from .client.comp import CF
         else:
             from .server.comp import CF
         _THREAD_LOCAL.CF = CF
-    return _THREAD_LOCAL.CF(entity_id)
+        return CF(entity_id)
 
 
 LEVEL_ID = get_api().GetLevelId()

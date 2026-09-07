@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -30,82 +30,33 @@ __author_email__ = "1279735247@qq.com"
 
 
 import traceback
-from .core._utils import kwargs_defaults
+from mod.common.mod import Mod
 from .core import _const, _logging
 
 
-_mod_clients = None
-_mod_servers = None
-
-
-def _load_modules(is_client):
-    if is_client:
-        import mod.client.extraClientApi as api
-        system_cls = api.GetClientSystemCls()
-        modules = _mod_clients
-        registed_modules = _const.CLIENT_MODULES
-        registed_systems = _const.CLIENT_SYSTEMS
-    else:
-        import mod.server.extraServerApi as api
-        system_cls = api.GetServerSystemCls()
-        modules = _mod_servers
-        registed_modules = _const.SERVER_MODULES
-        registed_systems = _const.SERVER_SYSTEMS
-    if not modules:
-        return
-
-    from .core.listener import listen_all_events
-
-    for name, path in modules: # noqa
-        if name in registed_modules:
-            _logging.error("Module already exists; skip loading: (%s) %s", name, path)
-            continue
-
-        try:
-            module = __imp(path)
-            registed_modules[name] = module
-            _logging.info("Module loaded: (%s) %s", name, path)
-
-            for k, v in module.__dict__.items():
-                if type(v) is not type or not issubclass(v, system_cls):
-                    continue
-                cls_path = path + "." + k
-                if api.GetSystem(_const.MOD_NAME, k):
-                    _logging.error(
-                        "%sSystem already exists; skip registration: (%s) %s",
-                        "Client" if is_client else "Server", k, cls_path
-                    )
-                else:
-                    system = api.RegisterSystem(_const.MOD_NAME, k, cls_path)
-                    listen_all_events(system)
-                    registed_systems[(name, k)] = system
-                    _logging.info(
-                        "%sSystem registered: (%s) %s",
-                        "Client" if is_client else "Server", k, cls_path
-                    )
-        except:
-            traceback.print_exc()
+_mod_clients = []
+_mod_servers = []
 
 
 def _load_extensions(is_client):
     if _const.ROOT == "nuoyanlib":
-        module_path = "nuoyanlib.extensions"
+        ext_module_path = "nuoyanlib.extensions"
     else:
-        module_path = _const.ROOT + ".nuoyanlib.extensions"
+        ext_module_path = _const.ROOT + ".nuoyanlib.extensions"
     try:
-        ext_module = __imp(module_path)
+        ext_module = __imp(ext_module_path)
         ext_list = ext_module.EXTENSION_LOADING_LIST
     except (ImportError, AttributeError):
         return []
 
     loaded_ext = []
     for name in ext_list:
-        full_name = name + "." + ("client" if is_client else "server")
+        path = "%s.%s.%s" % (ext_module_path, name, "client" if is_client else "server")
         try:
-            module = __imp("%s.%s" % (ext_module, full_name))
-            module.init()
+            __imp(path).init()
         except:
             traceback.print_exc()
+            _logging.error("Extension loading failed: %s", path)
             continue
         loaded_ext.append(name)
 
@@ -113,7 +64,60 @@ def _load_extensions(is_client):
     return loaded_ext
 
 
-@kwargs_defaults(clients=None, servers=None)
+def _load_modules(is_client):
+    if is_client:
+        modules = _mod_clients
+        registered_modules = _const.CLIENT_MODULES
+    else:
+        modules = _mod_servers
+        registered_modules = _const.SERVER_MODULES
+    if not modules:
+        return
+
+    for name, path in modules: # noqa
+        if name in registered_modules:
+            _logging.warning("Module already exists; skip loading: (%s) %s", name, path)
+            continue
+
+        try:
+            module = __imp(path)
+            registered_modules[name] = module
+            _logging.info("Module loaded: (%s) %s", name, path)
+        except:
+            traceback.print_exc()
+
+
+def _load_systems(is_client):
+    if is_client:
+        import mod.client.extraClientApi as api
+        system_cls = api.GetClientSystemCls()
+        registered_modules = _const.CLIENT_MODULES
+        registered_systems = _const.CLIENT_SYSTEMS
+    else:
+        import mod.server.extraServerApi as api
+        system_cls = api.GetServerSystemCls()
+        registered_modules = _const.SERVER_MODULES
+        registered_systems = _const.SERVER_SYSTEMS
+
+    for module in registered_modules.values():
+        for k, v in module.__dict__.items():
+            if not isinstance(v, type) or not issubclass(v, system_cls):
+                continue
+            cls_path = module.__name__ + "." + k
+            if api.GetSystem(_const.MOD_NAME, k):
+                _logging.warning(
+                    "%sSystem already exists; skip registration: (%s) %s",
+                    "Client" if is_client else "Server", k, cls_path
+                )
+            else:
+                system = api.RegisterSystem(_const.MOD_NAME, k, cls_path)
+                registered_systems[(module.__name__, k)] = system
+                _logging.info(
+                    "%sSystem registered: (%s) %s",
+                    "Client" if is_client else "Server", k, cls_path
+                )
+
+
 def run(mod_name, **kwargs):
     """
     启动「nuoyanlib」和模组客户端/服务端。
@@ -124,11 +128,10 @@ def run(mod_name, **kwargs):
     请在 ``modMain.py`` 中调用本函数。
 
     客户端/服务端将按列表顺序加载。
-    默认情况下，「nuoyanlib」会扫描各模块中的下列类，将其注册到运行环境。
+    默认情况下，「nuoyanlib」会扫描各模块中的下列类，将其注册到运行环境并初始化。
 
     - 继承了 ``ClientSystem`` 或 ``NyClientSystem`` 的客户端类
     - 继承了 ``ServerSystem`` 或 ``NyServerSystem`` 的服务端类
-    - 带有 ``@ui`` 装饰器的UI类
 
     示例
     ----
@@ -149,39 +152,71 @@ def run(mod_name, **kwargs):
     -----
 
     :param str mod_name: 模组名称
-    :param list[tuple[str,str]]|None clients: [仅关键字参数] 模组客户端模块列表；每个元素为一个元组，包含客户端名称（请确保在当前模组环境下唯一）和模块路径
-    :param list[tuple[str,str]]|None servers: [仅关键字参数] 模组服务端模块列表；每个元素为一个元组，包含服务端名称（请确保在当前模组环境下唯一）和模块路径
+    :param list[tuple[str,str]]|None clients: [仅关键字参数] 模组客户端模块列表；每个元素为一个元组，包含客户端名称（请确保在当前模组环境下唯一）和模块路径；默认为 None
+    :param list[tuple[str,str]]|None servers: [仅关键字参数] 模组服务端模块列表；每个元素为一个元组，包含服务端名称（请确保在当前模组环境下唯一）和模块路径；默认为 None
+    :param dict|None globals: [仅关键字参数] 一般情况下无需传入，若抛出了 RuntimeError 导致模组加载失败，请尝试传入 globals()
 
     :return: 无
     :rtype: None
+
+    :raise TypeError: 如果调用了多次 nuoyanlib.run() ，则传入的 mod_name 必须相同，否则抛出此异常
+    :raise RuntimeError: 找不到 modMain.py 的 globals 字典时抛出，此时请通过 globals 参数手动传入
     """
     _logging.info("Start loading, version: %s, script: %s" % (__version__, _const.ROOT), show_env=False)
 
+    if _const.MOD_NAME and _const.MOD_NAME != mod_name:
+        raise TypeError(
+            "cannot set the same mod_name to two different names '%s' and '%s'"
+            % (_const.MOD_NAME, mod_name)
+        )
     _const.MOD_NAME = mod_name
-    global _mod_clients, _mod_servers
-    _mod_clients = kwargs['clients']
-    _mod_servers = kwargs['servers']
+    if 'clients' in kwargs:
+        _mod_clients.extend(kwargs['clients'])
+    if 'servers' in kwargs:
+        _mod_servers.extend(kwargs['servers'])
 
-    from mod.common.mod import Mod
+    if 'globals' in kwargs:
+        globals_ = kwargs['globals']
+    else:
+        import builtin_modules._inspect as _inspect # noqa
+        for stack in _inspect.stack():
+            if stack[1].endswith((".modMain", "modMain.py")):
+                globals_ = stack[0].f_globals
+                break
+        else:
+            raise RuntimeError(
+                "FATAL ERROR!!! Stop loading mod because the globals of modMain.py not be found, "
+                "please try manually passing the 'globals' parameter when calling nuoyanlib.run()"
+            )
+    if 'NuoyanLibMain' in globals_:
+        return
 
     @Mod.Binding(_const.LIB_NAME, _const.LIB_VERSION)
     class NuoyanLibMain(object):
         @Mod.InitServer()
         def init_server(self):
+            from .core._env import _THREAD_LOCAL
+            _THREAD_LOCAL.IS_CLIENT = False
             from .core.server._lib_server import NuoyanLibServerSystem
             NuoyanLibServerSystem.run()
             _load_extensions(False)
             _load_modules(False)
+            from .core.listener import _process_event_listen
+            _process_event_listen()
+            _load_systems(False)
 
         @Mod.InitClient()
         def init_client(self):
+            from .core._env import _THREAD_LOCAL
+            _THREAD_LOCAL.IS_CLIENT = True
             from .core.client._lib_client import NuoyanLibClientSystem
             NuoyanLibClientSystem.run()
             _load_extensions(True)
             _load_modules(True)
+            from .core.listener import _process_event_listen
+            _process_event_listen()
+            _load_systems(True)
 
-    import builtin_modules._inspect as _inspect # noqa
-    globals_ = _inspect.stack()[2][0].f_globals
     globals_['NuoyanLibMain'] = NuoyanLibMain
 
 

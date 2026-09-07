@@ -1,53 +1,64 @@
 # -*- coding: utf-8 -*-
-#  =================================================
+#  ================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-7
 #  ⠀
-#  =================================================
+#  ================================================
 
 
 from collections import defaultdict
 import mod.server.extraServerApi as s_api
+from mod.server.system.serverSystem import ServerSystem
 from .. import _const, _logging
-from .._utils import singleton
-from ..system import _get_nss_cls, NuoyanLibBaseSystem
-from ..listener import _lib_sys_event, unlisten_all_events
+from ..system import NuoyanLibBaseSystem
 from .comp import ServerSystem, CF
 
 
-_NSS = _get_nss_cls()
-
-
-class NuoyanLibServerSystem(NuoyanLibBaseSystem, _NSS):
+class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
     _instance = None
 
     def __init__(self, namespace, system_name):
-        _NSS.__init__(self, namespace, system_name)
+        ServerSystem.__init__(self, namespace, system_name)
         NuoyanLibBaseSystem.__init__(self)
         NuoyanLibServerSystem._instance = self
         self.query_cache = defaultdict(dict)
         self.unsync_query = []
         self.callback_data = {}
+        self.move_entity_data = {}
+
+        ns, sys_name = s_api.GetEngineNamespace(), s_api.GetEngineSystemName()
+        self.native_listen(ns, sys_name, "EntityRemoveEvent", self.EntityRemoveEvent)
+
+        ns, sys_name_c, sys_name_s = _const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_SERVER_NAME
+        self.native_listen(ns, sys_name_c, "UiInitFinished", self.UiInitFinished)
+        self.native_listen(ns, sys_name_c, "_BroadcastToAllClient", self._BroadcastToAllClient)
+        self.native_listen(ns, sys_name_c, "_NotifyToMultiClients", self._NotifyToMultiClients)
+        self.native_listen(ns, sys_name_c, "_NotifyToClient", self._NotifyToClient)
+        self.native_listen(ns, sys_name_c, "_SetQueryVar", self._SetQueryVar)
+        self.native_listen(ns, sys_name_c, "_NuoyanLibCall", self._NuoyanLibCall)
+        self.native_listen(ns, sys_name_c, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
+
         _logging.info("NuoyanLibServerSystem inited")
 
     def Destroy(self):
         NuoyanLibBaseSystem.Destroy(self)
+        from ..listener import unlisten_all_events
         for _, system in _const.SERVER_SYSTEMS.items():
             unlisten_all_events(system)
 
     # region Events ====================================================================================================
 
     def EntityRemoveEvent(self, args):
-        entity_id = args.id
+        entity_id = args['id']
         if entity_id in CF._cache:
             del CF._cache[entity_id]
 
     def UiInitFinished(self, args):
-        player_id = args.__id__
+        player_id = args['__id__']
         if self.query_cache:
             query_args = {
                 eid: query_dict.items()
@@ -60,7 +71,6 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, _NSS):
 
     # region Broadcast =================================================================================================
 
-    @_lib_sys_event
     def _BroadcastToAllClient(self, args):
         event_name = args['event_name']
         event_data = args['event_data']
@@ -70,7 +80,6 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, _NSS):
             event_data['__id__'] = args['__id__']
         ServerSystem(ns, sys_name).BroadcastToAllClient(event_name, event_data)
 
-    @_lib_sys_event
     def _NotifyToMultiClients(self, args):
         player_ids = args['player_ids']
         event_name = args['event_name']
@@ -81,7 +90,6 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, _NSS):
             event_data['__id__'] = args['__id__']
         ServerSystem(ns, sys_name).NotifyToMultiClients(player_ids, event_name, event_data)
 
-    @_lib_sys_event
     def _NotifyToClient(self, args):
         player_id = args['player_id']
         event_name = args['event_name']
@@ -96,7 +104,6 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, _NSS):
 
     # region set_query_mod_var =========================================================================================
 
-    @_lib_sys_event
     def _SetQueryVar(self, args):
         player_id = args['__id__']
         del args['__id__']
@@ -127,7 +134,6 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, _NSS):
 
     # region call ======================================================================================================
 
-    @_lib_sys_event
     def _NuoyanLibCall(self, args):
         ns = args['ns']
         sys_name = args['sys_name']
@@ -146,7 +152,6 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, _NSS):
         from ...common.communicate import _call_local
         _call_local(ns, sys_name, method, callback, delay_ret, call_args, call_kwargs)
 
-    @_lib_sys_event
     def _NuoyanLibCallReturn(self, args):
         uuid = args['uuid']
         cb_args = args['cb_args']

@@ -1,56 +1,69 @@
 # -*- coding: utf-8 -*-
-#  =================================================
+#  ================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-7
 #  ⠀
-#  =================================================
+#  ================================================
 
 
 from collections import defaultdict
 import itertools
 import random
 import mod.client.extraClientApi as c_api
+from mod.client.system.clientSystem import ClientSystem
 from ... import config
 from ...common.time_ease import TimeEase
 from .. import _const, _logging
-from .._utils import singleton
-from ..system import _get_ncs_cls, NuoyanLibBaseSystem
-from ..listener import _lib_sys_event, unlisten_all_events
+from ..system import NuoyanLibBaseSystem
 from .comp import CF, LvComp
 
 
-_NCS = _get_ncs_cls()
-
-
-class NuoyanLibClientSystem(NuoyanLibBaseSystem, _NCS):
+class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     _instance = None
 
     def __init__(self, namespace, system_name):
-        _NCS.__init__(self, namespace, system_name)
+        ClientSystem.__init__(self, namespace, system_name)
         NuoyanLibBaseSystem.__init__(self)
         NuoyanLibClientSystem._instance = self
         self.unsync_query = []
         self.callback_data = {}
         self.gse_data = {}
         self.gse_counter = itertools.count()
+
+        ns, sys_name = c_api.GetEngineNamespace(), c_api.GetEngineSystemName()
+        self.native_listen(ns, sys_name, "AddEntityClientEvent", self.AddEntityClientEvent)
+        self.native_listen(ns, sys_name, "RemoveEntityClientEvent", self.RemoveEntityClientEvent)
+        self.native_listen(ns, sys_name, "UiInitFinished", self.UiInitFinished)
+        if config.GSE_USE_RENDER_TICK:
+            self.native_listen(ns, sys_name, "GameRenderTickEvent", self.GameRenderTickEvent)
+
+        ns, sys_name_c, sys_name_s = _const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_SERVER_NAME
+        self.native_listen(ns, sys_name_s, "_SetQueryVar", self._SetQueryVar)
+        self.native_listen(ns, sys_name_c, "_NuoyanLibCall", self._NuoyanLibCall)
+        self.native_listen(ns, sys_name_s, "_NuoyanLibCall", self._NuoyanLibCall)
+        self.native_listen(ns, sys_name_c, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
+        self.native_listen(ns, sys_name_s, "_NuoyanLibCallReturn", self._NuoyanLibCallReturn)
+        self.native_listen(ns, sys_name_s, "_NuoyanLibVisualizeArea", self._NuoyanLibVisualizeArea)
+
         if not config.ENABLED_MODSDK_LOG:
             _logging.disable_modsdk_loggers()
         _logging.info("NuoyanLibClientSystem inited")
 
     def Destroy(self):
         NuoyanLibBaseSystem.Destroy(self)
+        from ..listener import unlisten_all_events
         for _, system in _const.CLIENT_SYSTEMS.items():
             unlisten_all_events(system)
 
     # region Events ====================================================================================================
 
     def AddEntityClientEvent(self, args):
-        if args.engineTypeStr == _const.GSE_IDENTIFIER:
-            entity_id = args.id
+        if args['engineTypeStr'] == _const.GSE_IDENTIFIER:
+            entity_id = args['id']
             cf = CF(entity_id)
             self.gse_data[entity_id] = {
                 'inited': False,
@@ -58,11 +71,11 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, _NCS):
                 'render_comp': cf.ActorRender,
                 'te': None,
                 'geo_name': None,
-                'pos': (args.posX, args.posY, args.posZ),
+                'pos': (args['posX'], args['posY'], args['posZ']),
             }
 
     def RemoveEntityClientEvent(self, args):
-        entity_id = args.id
+        entity_id = args['id']
         if entity_id in CF._cache:
             del CF._cache[entity_id]
         if entity_id in self.gse_data:
@@ -134,7 +147,6 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, _NCS):
 
     # region set_query_mod_var =========================================================================================
 
-    @_lib_sys_event
     def _SetQueryVar(self, args):
         for entity_id, query_list in args.items():
             comp = CF(entity_id).QueryVariable
@@ -166,8 +178,6 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, _NCS):
 
     # region call ======================================================================================================
 
-    @_lib_sys_event(from_client=True)
-    @_lib_sys_event(from_client=False)
     def _NuoyanLibCall(self, args):
         ns = args['ns']
         sys_name = args['sys_name']
@@ -189,8 +199,6 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, _NCS):
         from ...common.communicate import _call_local
         _call_local(ns, sys_name, method, callback, delay_ret, call_args, call_kwargs)
 
-    @_lib_sys_event(from_client=True)
-    @_lib_sys_event(from_client=False)
     def _NuoyanLibCallReturn(self, args):
         uuid = args['uuid']
         cb_args = args['cb_args']
@@ -288,7 +296,6 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, _NCS):
 
     # region _visualize_area ===========================================================================================
 
-    @_lib_sys_event
     def _NuoyanLibVisualizeArea(self, args):
         # todo
         area_type = args['area_type']

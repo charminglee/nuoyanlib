@@ -5,37 +5,31 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
 
-from types import MethodType
 from collections import defaultdict
 import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
-from .listener import _get_event_source, event, EventArgsWrap
-from ._utils import iter_obj_attrs
-from ._env import is_client
+from .listener import _get_event_source, event
+from ._env import get_cls_path, is_client
 from . import _const
 
 
-class NySystem(object):
-    def __init__(self):
-        isc = is_client()
-        for attr in iter_obj_attrs(self):
-            if not isinstance(attr, MethodType) or hasattr(attr, '_nyl__listen_args'):
-                # 跳过属性和已被@event装饰的方法
-                continue
-            event_name = attr.__name__
-            source = _get_event_source(isc, event_name)
-            if source:
-                @event(event_name, *source)
-                def proxy(args):
-                    attr(EventArgsWrap(args, event_name) if args else None)
-                name = "_nyl__proxy_" + event_name
-                proxy.__name__ = name
-                setattr(self, name, proxy)
+class NySystemMeta(type):
+    def __new__(metacls, cls_name, bases, cls_dict):
+        if cls_name not in ("NyClientSystem", "NyServerSystem"):
+            ic = is_client()
+            for k, v in cls_dict.items():
+                if not callable(v) or hasattr(v, '_nyl__listen_args'):
+                    # 跳过属性和已被@event装饰的方法
+                    continue
+                source = _get_event_source(ic, k)
+                if source:
+                    cls_dict[k] = event(k, *source)(v)
+        return type.__new__(metacls, cls_name, bases, cls_dict)
 
 
 __NCS = None
@@ -47,12 +41,8 @@ def _get_ncs_cls():
     if not __NCS:
         import mod.client.extraClientApi as api
         CS = api.GetClientSystemCls()
-
-        class NyClientSystem(NySystem, CS):
-            def __init__(self, namespace, system_name): # noqa
-                NySystem.__init__(self)
-                CS.__init__(self, namespace, system_name)
-
+        class NyClientSystem(CS, object):
+            __metaclass__ = NySystemMeta
         __NCS = NyClientSystem
     return __NCS
 
@@ -62,12 +52,8 @@ def _get_nss_cls():
     if not __NSS:
         import mod.server.extraServerApi as api
         SS = api.GetServerSystemCls()
-
-        class NyServerSystem(NySystem, SS):
-            def __init__(self, namespace, system_name): # noqa
-                NySystem.__init__(self)
-                SS.__init__(self, namespace, system_name)
-
+        class NyServerSystem(SS, object):
+            __metaclass__ = NySystemMeta
         __NSS = NyServerSystem
     return __NSS
 
@@ -95,7 +81,7 @@ class NuoyanLibBaseSystem(object):
         if system:
             res = True
         else:
-            path = cls.__module__ + "." + cls.__name__
+            path = get_cls_path(cls)
             res = bool(api.RegisterSystem(_const.LIB_NAME, sys_name, path))
 
         return res

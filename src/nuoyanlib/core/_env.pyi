@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
@@ -20,6 +20,7 @@ from .client.comp import CF as CCF
 from .server.comp import CF as SCF
 
 
+def get_cls_path(cls: type) -> str: ...
 def get_env() -> Literal["client", "server"]: ...
 def check_env(target: Literal["client", "server"]) -> None: ...
 _THREAD_LOCAL: threading.local

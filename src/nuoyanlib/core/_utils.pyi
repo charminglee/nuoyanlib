@@ -13,7 +13,7 @@
 from threading import local
 import sys
 from typing import Generic, Hashable, List, Callable, Any, Type, Union, Tuple, Optional, Generator, overload, Dict
-from ._types._typing import ITuple, T, F, Args, Kwargs, STuple
+from ._types._typing import ITuple, T, F, Args, Kwargs, STuple, T_co
 from ._types._checker import args_type_check
 
 
@@ -101,11 +101,22 @@ else:
         _unhashable_instances: List[Tuple[tuple, Any]]
 
 
-class cached_property(object):
-    __doc__: Optional[str]
-    getter: Callable[[Any], Any]
-    def __init__(self, getter: Callable[[Any], Any]) -> None: ...
-    def __get__(self, ins: Any, cls: type) -> Any: ...
+if sys.version_info >= (3, 8):
+    from functools import cached_property
+    cached_property = cached_property
+else:
+    class cached_property(Generic[T_co]):
+        func: Callable[[Any], T_co]
+        attrname: str
+        __doc__: Optional[str]
+        def __init__(self, func: Callable[[Any], T_co]) -> None: ...
+        @overload
+        def __get__(self: T, instance: None, owner: Optional[type] = None) -> T: ...
+        @overload
+        def __get__(self, instance: object, owner: Optional[type] = None) -> T_co: ...
+        def __set__(self, instance: object, value: T_co) -> None: ...
+
+
 def kwargs_defaults(**kwargs: Any) -> Callable[[F], F]: ...
 def try_exec(func: Callable, *args: Any, **kwargs: Any) -> Union[Any, Exception]: ...
 def iter_obj_attrs(obj: Any) -> Generator[Any]: ...

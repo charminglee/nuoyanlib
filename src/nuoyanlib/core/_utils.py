@@ -56,7 +56,7 @@ def get_module(*args):
 #     return size
 
 
-_VOID = object()
+_NOT_FOUND = object()
 
 
 class DefaultLocal(object):
@@ -66,8 +66,8 @@ class DefaultLocal(object):
 
     def __getattribute__(self, name):
         local = object.__getattribute__(self, '_local')
-        value = getattr(local, name, _VOID)
-        if value is _VOID:
+        value = getattr(local, name, _NOT_FOUND)
+        if value is _NOT_FOUND:
             factory = object.__getattribute__(self, '_default_factory')
             value = factory()
             local.__setattr__(name, value)
@@ -375,16 +375,77 @@ class lru_cache(object):
 
 
 class cached_property(object):
-    def __init__(self, getter):
-        super(cached_property, self).__init__()
-        self.getter = getter
-        self.__doc__ = getattr(getter, '__doc__', None)
+    def __init__(self, func):
+        self.func = func
+        self.attrname = func.__name__
+        self.__doc__ = func.__doc__
 
-    def __get__(self, ins, cls):
-        value = self.getter(ins)
-        if value is not None:
-            setattr(ins, self.getter.__name__, value)
-        return value
+    def __get__(self, instance, owner=None):
+        if instance is None:
+            return self
+        try:
+            cache = instance.__dict__
+        except AttributeError:
+            raise TypeError(
+                "no '__dict__' attribute on %s instance to cache %s property"
+                % (type(instance).__name__, self.attrname)
+            )
+        val = cache.get(self.attrname, _NOT_FOUND)
+        if val is _NOT_FOUND:
+            val = self.func(instance)
+            try:
+                cache[self.attrname] = val
+            except TypeError:
+                raise TypeError(
+                    "the '__dict__' attribute on %s instance does not support item assignment for caching %s property"
+                    % (type(instance).__name__, self.attrname)
+                )
+        return val
+
+
+# class cached_property:
+#     def __init__(self, func):
+#         self.func = func
+#         self.attrname = None
+#         self.__doc__ = func.__doc__
+#
+#     def __set_name__(self, owner, name):
+#         if self.attrname is None:
+#             self.attrname = name
+#         elif name != self.attrname:
+#             raise TypeError(
+#                 "Cannot assign the same cached_property to two different names "
+#                 f"({self.attrname!r} and {name!r})."
+#             )
+#
+#     def __get__(self, instance, owner=None):
+#         if instance is None:
+#             return self
+#         if self.attrname is None:
+#             raise TypeError(
+#                 "Cannot use cached_property instance without calling __set_name__ on it.")
+#         try:
+#             cache = instance.__dict__
+#         except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
+#             msg = (
+#                 f"No '__dict__' attribute on {type(instance).__name__!r} "
+#                 f"instance to cache {self.attrname!r} property."
+#             )
+#             raise TypeError(msg) from None
+#         val = cache.get(self.attrname, _NOT_FOUND)
+#         if val is _NOT_FOUND:
+#             val = self.func(instance)
+#             try:
+#                 cache[self.attrname] = val
+#             except TypeError:
+#                 msg = (
+#                     f"The '__dict__' attribute on {type(instance).__name__!r} instance "
+#                     f"does not support item assignment for caching {self.attrname!r} property."
+#                 )
+#                 raise TypeError(msg) from None
+#         return val
+#
+#     __class_getitem__ = classmethod(GenericAlias)
 
 
 def kwargs_defaults(**kwargs):

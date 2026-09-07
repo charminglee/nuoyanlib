@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
@@ -103,7 +103,7 @@ _event_typing += "\n"
 n = 0
 for data in c_events, s_events:
     for event_name, (args, doc) in data.items():
-        _event_typing += f"\n# {event_name}\nclass EventArgs{n}(EventArgsWrap):\n"
+        _event_typing += f"\n# {event_name}\nclass EventArgs{n}(EventArgsWrapper):\n"
         if args:
             for param_name, typ, param_doc in args:
                 if param_name == "from":

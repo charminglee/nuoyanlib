@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
@@ -14,17 +14,37 @@ import sys
 from typing import ClassVar, Protocol, Iterator, TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ...client.ui.nyc import *
+from ...client.ui.nyc import (
+    NyButton,
+    NyComboBox,
+    NyControl,
+    NyEditBox,
+    NyGrid,
+    NyImage,
+    NyInputPanel,
+    NyItemRenderer,
+    NyLabel,
+    NyMiniMap,
+    NyPaperDoll,
+    NyProgressBar,
+    NyScrollView,
+    NySelectionWheel,
+    NySlider,
+    NyStackPanel,
+    NyToggle,
+)
 
 
 T = TypeVar("T")
+T_co = TypeVar("T_co", covariant=True)
+T_contra = TypeVar("T_contra", contravariant=True)
 T2 = TypeVar("T2")
 P = ParamSpec("P")
 F = TypeVar("F", bound=Callable[..., Any])
 TypeT = TypeVar("TypeT", bound=type)
 if sys.version_info >= (3, 11):
-    from typing_extensions import Self as _Self
-    Self = _Self
+    from typing_extensions import Self
+    Self = Self
 else:
     Self = T
 

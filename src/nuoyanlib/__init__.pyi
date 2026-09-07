@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -24,4 +24,5 @@ def run(
     *,
     clients: Optional[List[Tuple[str, str]]] = None,
     servers: Optional[List[Tuple[str, str]]] = None,
+    globals: Optional[dict] = None,
 ) -> None: ...

@@ -5,14 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
 
 import mod.server.extraServerApi as s_api
 from mod.common.minecraftEnum import *
-from .common.mod_config import *
+from .common.constant import *
 from .nuoyanlib import server as nyl
 from .nuoyanlib.server import (
     LvComp,
@@ -22,7 +22,7 @@ from .nuoyanlib.server import (
 from .benchmark import print_msg, run_benchmark, print_res
 
 
-class MainServerSystem(nyl.ServerEventProxy, nyl.ServerSystem):
+class MainServerSystem(nyl.NyServerSystem):
     def __init__(self, namespace, systemName):
         super(MainServerSystem, self).__init__(namespace, systemName)
         self.c = 0

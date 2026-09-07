@@ -5,14 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
 
 import mod.client.extraClientApi as c_api
 from mod.common.minecraftEnum import *
-from .common.mod_config import *
+from .common.constant import *
 from .nuoyanlib import client as nyl
 from .nuoyanlib.client import (
     LvComp,
@@ -28,7 +28,7 @@ clientEvent = event(ns=MOD_NAME, sys_name=CLIENT_SYSTEM_NAME)
 serverEvent = event(ns=MOD_NAME, sys_name=SERVER_SYSTEM_NAME)
 
 
-class MainClientSystem(nyl.ClientEventProxy, nyl.ClientSystem):
+class MainClientSystem(nyl.NyClientSystem):
     def __init__(self, namespace, systemName):
         super(MainClientSystem, self).__init__(namespace, systemName)
         LvComp.Game.AddTimer(6, self.run_benchmark)
