@@ -5,31 +5,29 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
 
-from mod.common.mod import Mod
-import mod.client.extraClientApi as c_api
-import mod.server.extraServerApi as s_api
-from common.constant import (
-    MOD_NAME, MOD_VERSION,
+from .common.constant import (
+    MOD_NAME,
     SERVER_SYSTEM_NAME, SERVER_SYSTEM_CLASS_PATH,
-    CLIENT_SYSTEM_NAME, CLIENT_SYSTEM_CLASS_PATH
+    CLIENT_SYSTEM_NAME, CLIENT_SYSTEM_CLASS_PATH,
+    UI_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST,
 )
 
 
 import nuoyanlib
-nuoyanlib.run(globals())
-
-
-@Mod.Binding(MOD_NAME, MOD_VERSION)
-class ModMain(object):
-    @Mod.InitServer()
-    def modServerInit(self):
-        s_api.RegisterSystem(MOD_NAME, SERVER_SYSTEM_NAME, SERVER_SYSTEM_CLASS_PATH)
-
-    @Mod.InitClient()
-    def modClientInit(self):
-        c_api.RegisterSystem(MOD_NAME, CLIENT_SYSTEM_NAME, CLIENT_SYSTEM_CLASS_PATH)
+nuoyanlib.run(
+    MOD_NAME,
+    clients=[
+        (CLIENT_SYSTEM_NAME, CLIENT_SYSTEM_CLASS_PATH),
+        (UI_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST),
+        # (xxx, MODULES_PATH + ".xxx.client"),
+    ],
+    servers=[
+        (SERVER_SYSTEM_NAME, SERVER_SYSTEM_CLASS_PATH),
+        # (xxx, MODULES_PATH + ".xxx.server"),
+    ]
+)

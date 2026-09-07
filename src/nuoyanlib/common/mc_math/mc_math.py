@@ -1209,10 +1209,6 @@ def box_max_edge_len(pos1, pos2):
 # endregion
 
 
-def __test__():
-    pass
-
-
 def __benchmark__(n, timer, pid, info, **kwargs):
     f = distance2nearest_entity._nyl__inject_is_client[2]
     timer.start("distance2nearest_entity")
@@ -1258,7 +1254,6 @@ def __benchmark__(n, timer, pid, info, **kwargs):
     timer.end("catmull_rom")
 
     info.append("entity count: %d" % len(GetEngineActor()))
-
 
 
 

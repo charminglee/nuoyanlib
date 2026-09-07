@@ -5,51 +5,27 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
 
 import mod.client.extraClientApi as c_api
 from mod.common.minecraftEnum import *
-from ..common.mod_config import *
+from ..common.constant import *
 from ..nuoyanlib import client as nyl
-from ..nuoyanlib.client import (
-    LvComp,
-    PlrComp,
-    CF,
-    PLAYER_ID,
-    event,
-    ScreenNodeExtension,
+
+
+@nyl.screen(
+    "nuoyanlib_test",
+    "screen",
+    auto_show=True,
+    enabled_deferred_init=True,
+    push_to_ui_stack=True,
 )
-from ..nuoyanlib.common.enum import (
-    ControlType,
-    ButtonCallbackType,
-    ComboBoxCallbackType,
-)
-
-
-clientEvent = event(ns=MOD_NAME, sys_name=CLIENT_SYSTEM_NAME)
-serverEvent = event(ns=MOD_NAME, sys_name=SERVER_SYSTEM_NAME)
-
-
-class NuoyanlibTest(nyl.ClientEventProxy, ScreenNodeExtension, nyl.ScreenNode):
+class NuoyanlibTest(nyl.NyScreenNode):
     def __init__(self, namespace, name, param):
         super(NuoyanlibTest, self).__init__(namespace, name, param)
-        self.grid = None            # type: nyl.NyGrid | None
-        self.stack_panel = None     # type: nyl.NyStackPanel | None
-        self.scroll_view = None     # type: nyl.NyScrollView | None
-        self.label = None           # type: nyl.NyLabel | None
-        self.button = None          # type: nyl.NyButton | None
-        self.image = None           # type: nyl.NyImage | None
-        self.switch_toggle = None   # type: nyl.NyToggle | None
-        self.progress_bar = None    # type: nyl.NyProgressBar | None
-        self.edit_box = None        # type: nyl.NyEditBox | None
-        self.combo_box = None       # type: nyl.NyComboBox | None
-        self.a = False
-        self.move_parent = False
-
-    def Create(self):
         self.grid = (self.root_panel / "grid").to_grid()
         self.stack_panel = (self.root_panel / "stack_panel").to_stack_panel()
         self.scroll_view = (self.root_panel / "scroll_view").to_scroll_view()
@@ -63,55 +39,57 @@ class NuoyanlibTest(nyl.ClientEventProxy, ScreenNodeExtension, nyl.ScreenNode):
 
         self.build_binding(self.label_binding, nyl.ViewBinder.BF_BindString)
 
-        self.button.set_callback(self.OnButtonUp, ButtonCallbackType.UP)
-        self.button.set_callback(self.OnButtonDown, ButtonCallbackType.DOWN)
-        self.button.set_callback(self.OnButtonLongClick, ButtonCallbackType.LONG_CLICK)
-        self.button.set_callback(self.OnButtonDoubleClick, ButtonCallbackType.DOUBLE_CLICK)
-        (self.button / "toggle").to_toggle().set_callback(self.OnToggleChanged)
+        self.button.set_callback(self.on_button_up, nyl.NyButton.UP)
+        self.button.set_callback(self.on_button_down, nyl.NyButton.DOWN)
+        self.button.set_callback(self.on_button_long_click, nyl.NyButton.LONG_CLICK)
+        self.button.set_callback(self.on_button_double_click, nyl.NyButton.DOUBLE_CLICK)
+        (self.button / "toggle").to_toggle().set_callback(self.on_toggle_changed)
 
-        self.switch_toggle.set_callback(self.OnToggleChanged1)
+        self.switch_toggle.set_callback(self.on_toggle_changed_1)
 
-        self.combo_box.set_callback(self.OnComboBoxOpen, ComboBoxCallbackType.OPEN)
-        self.combo_box.set_callback(self.OnComboBoxClose, ComboBoxCallbackType.CLOSE)
-        self.combo_box.set_callback(self.OnComboBoxSelect, ComboBoxCallbackType.SELECT)
+        self.combo_box.set_callback(self.on_combo_box_open, nyl.NyComboBox.OPEN)
+        self.combo_box.set_callback(self.on_combo_box_close, nyl.NyComboBox.CLOSE)
+        self.combo_box.set_callback(self.on_combo_box_select, nyl.NyComboBox.SELECT)
         self.combo_box.bind_data(("选项%d" % i, None, i) for i in range(6))
+
+        self.move_parent = False
 
     def label_binding(self):
         return "动态绑定测试"
 
-    def OnButtonUp(self, args):
+    def on_button_up(self, args):
         if self.button.has_long_clicked:
             self.button.cancel_movable()
             return
         print("button_up")
         c_api.PopScreen()
 
-    def OnButtonDown(self, args):
+    def on_button_down(self, args):
         print("button_down")
 
-    def OnButtonLongClick(self, args):
+    def on_button_long_click(self, args):
         print("button_long_click")
         self.button.set_movable(self.move_parent, auto_save=True)
 
-    def OnButtonDoubleClick(self, args):
+    def on_button_double_click(self, args):
         print("button_double_click")
 
-    def OnToggleChanged(self, args):
+    def on_toggle_changed(self, args):
         print(1, args)
         self.move_parent = args['state']
         return nyl.ViewRequest.Refresh
 
-    def OnToggleChanged1(self, args):
+    def on_toggle_changed_1(self, args):
         print(2, args)
         return nyl.ViewRequest.Refresh
 
-    def OnComboBoxOpen(self):
+    def on_combo_box_open(self):
         print("combo_box_open")
 
-    def OnComboBoxClose(self):
+    def on_combo_box_close(self):
         print("combo_box_close")
 
-    def OnComboBoxSelect(self, index, name, user_data):
+    def on_combo_box_select(self, index, name, user_data):
         if index == -1:
             return
         print("combo_box_select")

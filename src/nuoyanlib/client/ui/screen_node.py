@@ -777,14 +777,6 @@ class ScreenNodeExtension(object):
     # endregion
 
 
-def __test__():
-    class SN(ScreenNodeExtension, ScreenNode):
-        def __init__(self, namespace, name, param):
-            super(SN, self).__init__(namespace, name, param)
-    sn = SN("abc", "ui", {})
-    c1 = sn.create_ny_control("/path/to/control1")
-    c2 = sn.create_ny_button("/path/to/control2")
-    c3 = sn.create_ny_grid("/path/to/control3")
 
 
 

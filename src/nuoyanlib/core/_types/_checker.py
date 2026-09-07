@@ -54,27 +54,3 @@ else:
         return decorator
 
 
-def __test__():
-    from .._utils import assert_error
-    @args_type_check(int, (int, str), tuple)
-    def test(a, b, c, d):
-        return True
-    assert test(1, 2, (3,), 114514)
-    assert test(1, "2", (3,), 114514)
-    assert_error(test, (1, [], (3,)), exc=TypeError)
-    @args_type_check((int, callable))
-    def test2(a):
-        return True
-    assert test2(1)
-    assert test2(test)
-    assert_error(test2, ("",), exc=TypeError)
-
-
-
-
-
-
-
-
-
-

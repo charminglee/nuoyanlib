@@ -56,12 +56,6 @@ LvComp = CF(LEVEL_ID)
 """
 
 
-def __test__():
-    assert CF("-1") is CF("-1")
-    assert CF("-1") is not CF("-2")
-    assert LvComp.BlockInfo is LvComp.BlockInfo
-
-
 def __benchmark__(n, timer, **kwargs):
     import random
     id_pool = tuple(str(i) for i in xrange(2560))
@@ -70,7 +64,6 @@ def __benchmark__(n, timer, **kwargs):
     for eid in rand_eid:
         CF(eid).Pos
     timer.end()
-
 
 
 

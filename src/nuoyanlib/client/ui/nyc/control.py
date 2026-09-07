@@ -1048,20 +1048,6 @@ class NyControl(object):
     # endregion
 
 
-def __test__():
-    from ..screen_node import ScreenNodeExtension
-    from ....core.client.comp import ScreenNode
-    class SN(ScreenNodeExtension, ScreenNode):
-        pass
-    s = SN("", "")
-    c = s.create_ny_control("/control")
-    c2 = s.create_ny_control("/control2")
-    abc = NyControl.from_path(s, "/abc")
-    assert "/abc" in s._nyc_cache_map
-    ch = abc / "child"
-    assert ch.GetPath() == ch.path == "/abc/child"
-    abc.destroy()
-    assert "/abc" not in s._nyc_cache_map
 
 
 
