@@ -13,6 +13,9 @@
 import threading
 
 
+DEBUG = False
+
+
 def get_cls_path(cls):
     return cls.__module__ + "." + cls.__name__
 

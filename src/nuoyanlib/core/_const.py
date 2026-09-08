@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -25,9 +25,6 @@ CLIENT_MODULES = {}
 SERVER_MODULES = {}
 CLIENT_SYSTEMS = {}
 SERVER_SYSTEMS = {}
-
-
-DEBUG = False
 
 
 class __C: pass

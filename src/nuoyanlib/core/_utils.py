@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -15,7 +15,7 @@ import traceback
 from types import MethodType
 from functools import wraps
 from ._doc import signature, get_signature
-from ._env import is_client
+from ._env import is_client, DEBUG
 
 
 def get_arg_names(func):
@@ -214,23 +214,24 @@ class __Universal(object):
     def __raise(self, *args, **kwargs):
         raise RuntimeError("you can't do anything to the UNIVERSAL_OBJECT")
 
-    __getattribute__    = __raise
-    __setattr__         = __raise
-    __delattr__         = __raise
-    __eq__              = __raise
-    __ne__              = __raise
-    __str__             = __raise
-    __repr__            = __raise
-    __hash__            = None
-    __format__          = __raise
-    __reduce__          = __raise
-    __reduce_ex__       = __raise
-    __call__            = __raise
-    __contains__        = __raise
-    __getitem__         = __raise
-    __setitem__         = __raise
-    __delitem__         = __raise
-    __iter__            = __raise
+    if not DEBUG:
+        __getattribute__    = __raise
+        __setattr__         = __raise
+        __delattr__         = __raise
+        __eq__              = __raise
+        __ne__              = __raise
+        __str__             = __raise
+        __repr__            = __raise
+        __hash__            = None
+        __format__          = __raise
+        __reduce__          = __raise
+        __reduce_ex__       = __raise
+        __call__            = __raise
+        __contains__        = __raise
+        __getitem__         = __raise
+        __setitem__         = __raise
+        __delitem__         = __raise
+        __iter__            = __raise
 
 
 UNIVERSAL_OBJECT = __Universal()
@@ -268,7 +269,7 @@ class MappingProxy(object):
     __contains__    = lambda self, *args: self.__mapping.__contains__(*args)
 
     def __raise(self, *args, **kwargs):
-        raise TypeError("MappingProxy is read-only")
+        raise TypeError("MappingProxy object is read-only")
 
     clear       = __raise
     pop         = __raise

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -18,6 +18,9 @@ from .client._lib_client import NuoyanLibClientSystem
 from .server._lib_server import NuoyanLibServerSystem
 from .client.comp import CF as CCF
 from .server.comp import CF as SCF
+
+
+DEBUG: bool
 
 
 def get_cls_path(cls: type) -> str: ...

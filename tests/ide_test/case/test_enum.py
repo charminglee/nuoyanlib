@@ -10,7 +10,15 @@
 #  ================================================
 
 
-from nuoyanlib.common.enum import Enum, IntEnum, StrEnum, Mob, auto
+from nuoyanlib.common.enum import (
+    Entity,
+    Enum,
+    IntEnum,
+    StrEnum,
+    ClientEvent,
+    ServerEvent,
+    auto,
+)
 from nuoyanlib.core._utils import assert_error
 
 
@@ -162,4 +170,6 @@ def f():
 assert_error(f, exc=TypeError)
 
 
-assert Mob.WITHER == "minecraft:wither"
+assert Entity.AGENT == "minecraft:agent"
+assert ClientEvent.OnKeyPressInGame == "OnKeyPressInGame"
+assert ServerEvent.ServerItemUseOnEvent == "ServerItemUseOnEvent"
