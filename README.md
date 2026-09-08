@@ -20,11 +20,11 @@
 
 ## 📖 简介
 
-「nuoyanlib」是基于网易我的世界（我的世界中国版）[ModSDK](https://mc.163.com/dev/index.html)的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
+「nuoyanlib」是基于网易我的世界（我的世界中国版） [ModSDK](https://mc.163.com/dev/index.html) 的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
 您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
 
-> ✅ 已支持 **ModSDK 3.8**  
-> 📌 适合**个人**或**团队**项目，可自由用于**商业**和**非商业**用途
+> ✅ 已支持 **ModSDK 3.9**  
+> 📌 开源协议宽松，可自由用于**商业**或**非商业**用途
 
 <br>
 
@@ -49,7 +49,7 @@
 
 ## 🚀 快速上手
 
-1. 解压下载的压缩包，将`nuoyanlib`文件夹放至行为包Python脚本根目录下（即`modMain.py`文件所在位置）。安装好后，你的行为包结构应为： 
+1. 解压下载的压缩包，将 `nuoyanlib` 文件夹放至行为包 Python 脚本根目录下（即 `modMain.py` 文件所在位置）。安装好后，你的行为包结构应为： 
 
     ```
     行为包/  
@@ -69,14 +69,7 @@
     ...
     ```
 
-2. 在`modMain.py`中添加以下代码以启动「nuoyanlib」：
-
-    ```python
-    import nuoyanlib
-    nuoyanlib.run(globals())
-    ```
-
-    例如：
+2. 在 `modMain.py` 中添加模组启动逻辑：
 
     ```python
     from mod.common.mod import Mod
@@ -85,28 +78,46 @@
    
    
     import nuoyanlib
-    nuoyanlib.run(globals())
-
-
-    @Mod.Binding(name="MyMod", version="1.0.0")
-    class ModMain(object):
-        @Mod.InitServer()
-        def init_server(self):
-            server_api.RegisterSystem("MyMod", "MyServerSystem", "myScripts.myServerSystem.MyServerSystem")
-    
-        @Mod.InitClient()
-        def init_client(self):
-            client_api.RegisterSystem("MyMod", "MyClientSystem", "myScripts.myClientSystem.MyClientSystem")
+    nuoyanlib.run(
+        "MyMod"
+        clients=[
+            ("MyClientSystem", "myScripts.myClientSystem"),
+        ],
+        servers=[
+            ("MyServerSystem", "myScripts.myServerSystem"),
+        ]
+    )
     ```
+   
+   `nuoyanlib.run()` 的第一个参数为模组名称； `clients` / `servers` 参数需通过关键字形式传入，请在这两个参数中列出所有需要加载的客户端/服务端模块的名称（需保证在当前模组中唯一）和路径（注意是模块路径，无需写到类名）。
+   
+   模块按列表顺序加载。一般情况下，不需要列出每一个模块的路径，只需列出客户端/服务端的入口模块和其他需要主动加载的模块。
 
-3. 在业务代码中导入「nuoyanlib」，其中`<scripts_root>`是你的Python脚本根目录名称：
+3. 「nuoyanlib」导入和调用示例， `<scripts_root>` 替换成你具体的 Python 脚本根目录名称：
     #### 导入客户端库
 
     ```python
     import <scripts_root>.nuoyanlib.client as nyl
+    ```
+
+    #### 导入服务端库
+
+    ```python
+    import <scripts_root>.nuoyanlib.server as nyl
+    ```
    
-    # 导入常用工具
-    from <scripts_root>.nuoyanlib.client import (
+    #### 调用示例
+   
+    假设你已经按照以上方法导入了「nuoyanlib」，对于所有「nuoyanlib」中的公开接口，都可通过 `nyl.<func_name>` 进行调用，例如：
+
+    ```python
+    entity_list = nyl.get_all_entities()
+    ```
+   
+   如果你不想每次都编写 `nyl.` 前缀，也可以直接导入你需要的接口：
+   
+    ```python
+   from <scripts_root>.nuoyanlib.client import (
         PLAYER_ID,   
         CF,          
         PlrComp,     
@@ -114,32 +125,11 @@
         event,       
     )
     ```
-
-    #### 导入服务端库
-
-    ```python
-    import <scripts_root>.nuoyanlib.server as nyl
    
-    # 导入常用工具
-    from <scripts_root>.nuoyanlib.server import (
-        CF,          
-        LvComp,      
-        event,       
-    )
-    ```
-   
-    #### 调用示例
-   
-    假设你已经按照以上方法导入了「nuoyanlib」，对于所有「nuoyanlib」中的公开函数，都可通过`nyl.<func_name>`进行调用，例如：
+    需要注意的是， `nuoyanlib.client` 为客户端工具包，其中的函数只能在客户端环境使用； `nuoyanlib.server` 同理，只能在服务端环境使用； `nuoyanlib.common` 则无环境限制，双端均可使用。
 
-    ```python
-    entity_list = nyl.get_all_entities()
-    ```
-   
-    需要注意的是，`nuoyanlib.client`为客户端工具包，其中的函数只能在客户端环境使用；`nuoyanlib.server`同理，只能在服务端环境使用；`nuoyanlib.common`则无环境限制，双端均可使用。
-
-> [!WARNING]  
-> 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库），如果你强制这么做，「nuoyanlib」将抛出`AcrossImportError`。
+   > [!WARNING]  
+   > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库）。如果你强制这么做，「nuoyanlib」将抛出 `AcrossImportError` 。
 
 4. 更多信息详见[入门指南](/docs/source/getting_started.rst)。
 
@@ -170,13 +160,13 @@
 
 ## 👑 贡献
 
-如果您有更好的算法或修改建议，欢迎通过Issue或PR的方式提交，为MC Mod社区的健康发展助一份力！
+如果您有更好的算法或修改建议，欢迎通过 Issue 或 PR 的方式提交，为 MC Mod 社区的健康发展助一份力！
 
 <br>
 
 ## 🌹 特别鸣谢
 
-1. [创新工坊-小坊](https://github.com/cxgf666)：发现了[`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41)的一个bug；「nuoyanlib」内测用户。
+1. [创新工坊-小坊](https://github.com/cxgf666)：发现了 [`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41) 的一个bug；「nuoyanlib」内测用户。
 2. [xiaoweii](https://github.com/645359132)：「nuoyanlib」内测用户。
 3. [幻尘](https://github.com/HuanChen19)：「nuoyanlib」内测用户。
 
@@ -184,7 +174,7 @@
 
 ## 🔗 作者的其他项目
 
-- [网易我的世界ModSDK补全库修正版](https://github.com/charminglee/mc-netease-sdk-nyrev)
+- [网易我的世界 ModSDK 补全库修正版](https://github.com/charminglee/mc-netease-sdk-nyrev)
 
 <br>
 
