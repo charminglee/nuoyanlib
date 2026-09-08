@@ -17,6 +17,11 @@ ENABLED_LOG = True
 是否开启「nuoyanlib」日志输出。
 """
 
+LOG_LEVEL = "DEBUG"
+"""
+「nuoyanlib」输出的日志等级，可选值为 ``DEBUG`` 、 ``INFO`` 、 ``WARNING`` 、 ``ERROR`` 。
+"""
+
 ENABLED_MODSDK_LOG = True
 """
 [实验性]
