@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -15,6 +15,7 @@ from itertools import count
 import sys
 from typing import Optional, ClassVar, Dict, Hashable, Sequence, Tuple, Any, Iterator, Type, List, NoReturn
 from ..core._types._typing import T
+from ..core._types._event_typing import *
 from ..core._utils import MappingProxy
 
 
@@ -25,8 +26,6 @@ class auto(object):
 
 
 def _get_member_type(cls_name: str, bases: Tuple[type, ...]) -> type: ...
-def _set_enum_attr(cls: Type[Enum], k: str, v: Any, cls_dict: Dict[str, Any]) -> None: ...
-_new_enum = type.__new__
 
 
 class EnumMeta(type):
@@ -80,6 +79,7 @@ if sys.version_info >= (3, 4):
         def _missing_(cls: Type[T], value: Any) -> Optional[T]: ...
 else:
     class Enum(metaclass=EnumMeta):
+        __metaclass__ = EnumMeta
         _name_: str
         _value_: Any
         _hash_: int
@@ -117,6 +117,27 @@ class StrEnum(str, Enum):
     def _generate_next_value_(name: str, count: int, last_values: List[str]) -> str: ...
 
 
+class LazyEnumMeta(type):
+    def __new__(
+        metacls: Type[T],
+        cls_name: str,
+        bases: Tuple[type, ...],
+        cls_dict: Dict[str, Any],
+    ) -> T: ...
+    def __getattr__(cls, name: str) -> Any: ...
+
+
+if sys.version_info <= (2, 7):
+    class LazyEnum(object):
+        __metaclass__ = LazyEnumMeta
+        @staticmethod
+        def _gen_enum_value_(name: str) -> Any: ...
+else:
+    class LazyEnum(metaclass=LazyEnumMeta):
+        @staticmethod
+        def _gen_enum_value_(name: str) -> Any: ...
+
+
 class Flag(Enum):
     pass
 
@@ -125,5807 +146,4896 @@ def gen_lower_name(name: str, count: int, last_values: List[str]) -> str: ...
 def gen_minecraft_lower_name(name: str, count: int, last_values: List[str]) -> str: ...
 
 
-class ClientEvent(StrEnum):
-    OnSimTickClientEvent = ...
-    """
-    [事件]
-
-    20 tick/s。
-
-    事件参数
-    --------
-
-    无
-    """
-    PhysxTriggerClientEvent = ...
-    """
-    [事件]
-
-    给自定义刚体添加的触发器，与其他碰撞体或原版实体进入/离开触发器时触发。需要在触发器创建时使用 ``PxEventMask.Client`` 才会触发。
-
-    说明
-    ----
-
-    ``found`` 列表每个元素的内容：
-    ::
-
-        {
-            "entityId0": str,     # 触发器所属实体的entityId
-            "identifier0": str,   # 触发器所属实体的identifier
-            "shape0": dict | None, # 触发器的userData (NeEvent::Object)
-            "entityId1": str,     # 另一方实体的entityId
-            "identifier1": str,   # 另一方实体的identifier
-            "shape1": dict | None  # 另一方碰撞体的userData (NeEvent::Object)
-        }
-
-    ``lost`` 列表每个元素的内容：
-    ::
-
-        {
-            "entityId0": str,     # 触发器所属实体的entityId
-            "identifier0": str,   # 触发器所属实体的identifier
-            "shape0": dict | None, # 触发器的userData (NeEvent::Object)
-            "entityId1": str,     # 另一方实体的entityId
-            "identifier1": str,   # 另一方实体的identifier
-            "shape1": dict | None  # 另一方碰撞体的userData (NeEvent::Object)
-        }
-
-    事件参数
-    --------
-
-    - ``found`` -- list[dict]，进入触发器的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Found，它与其他碰撞体/原版实体进入触发器时，会出现在列表中
-    - ``lost`` -- list[dict]，离开触发器的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Lost，它与其他碰撞体/原版实体离开触发器时，会出现在列表中
-    """
-    LiquidClippedClientEvent = ...
-    """
-    [事件]
-
-    玩家客户端点击流体时触发（支持原版流体与自定义流体）。
-
-    说明
-    ----
-
-    需要在物品中添加 ``netease:liquid_clipped:true`` 组件才能触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``aux`` -- int，方块附加值
-    - ``blockPos`` -- tuple[int, int, int]，方块坐标(x,y,z)
-    - ``dimensionId`` -- int，维度ID
-    - ``floatPos`` -- tuple[float, float, float]，点击的精准坐标(x,y,z)
-    """
-    PlayerAddCustomContainerItemClientEvent = ...
-    """
-    [事件]
-
-    玩家成功将物品添加到自定义容器时触发该事件。
-
-    说明
-    ----
-
-    该事件仅在目标容器为 ``netease_container`` 或 ``netease_ui_container`` 时触发。
-    该事件在物品成功添加后触发，无 ``cancel`` 参数，无法取消操作。
-    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    事件参数
-    --------
-
-    - ``beforeItemDict`` -- dict，操作前目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``changedItemDict`` -- dict，实际添加的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``afterItemDict`` -- dict，操作后目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，容器槽位索引
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    """
-    PlayerRemoveCustomContainerItemClientEvent = ...
-    """
-    [事件]
-
-    玩家成功从自定义容器中移除物品时触发该事件。
-
-    说明
-    ----
-
-    该事件仅在目标容器为 ``netease_container`` 或 ``netease_ui_container`` 时触发。
-    该事件在物品成功添加后触发，无 ``cancel`` 参数，无法取消操作。
-    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    事件参数
-    --------
-
-    - ``beforeItemDict`` -- dict，操作前目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``changedItemDict`` -- dict，实际移除的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``afterItemDict`` -- dict，操作后目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，容器槽位索引
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    """
-    PhysxTouchClientEvent = ...
-    """
-    [事件]
-
-    给自定义刚体添加的碰撞体，与其他碰撞体或原版实体发生碰撞/结束碰撞时触发。
-
-    说明
-    ----
-
-    需要在碰撞体创建时使用 ``PxEventMask.Client`` 才会触发。
-
-    ``found`` 列表每个元素的内容：
-    ::
-
-        {
-            "entityId0": str,                    # 一个碰撞体所属实体的entityId
-            "identifier0": str,                  # 一个碰撞体所属实体的identifier
-            "shape0": str | None,                # 一个碰撞体的userData
-            "entityId1": str,                    # 另一个碰撞体所属实体的entityId
-            "identifier1": str,                  # 另一个碰撞体所属实体的identifier
-            "shape1": str | None,                # 另一个碰撞体的userData
-            "pos": tuple[float, float, float],   # 碰撞点的世界坐标。其中一个碰撞体在创建时使用了PxEventMask.Found_Detail才有该字段
-            "normal": tuple[float, float, float] # 碰撞产生的力的方向，由碰撞体1指向碰撞体0。其中一个碰撞体在创建时使用了PxEventMask.Found_Detail才有该字段
-        }
-
-    ``lost`` 列表每个元素的内容：
-    ::
-
-        {
-            "entityId0": str,     # 一个碰撞体所属实体的entityId
-            "identifier0": str,   # 一个碰撞体所属实体的identifier
-            "shape0": str | None, # 一个碰撞体的userData
-            "entityId1": str,     # 另一个碰撞体所属实体的entityId
-            "identifier1": str,   # 另一个碰撞体所属实体的identifier
-            "shape1": str | None  # 另一个碰撞体的userData
-        }
-
-    列表中的碰撞对不分先后，每个碰撞对中的碰撞体0与碰撞体1也不分先后。
-
-    事件参数
-    --------
-
-    - ``found`` -- list[dict]，开始接触的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Found，他与其他碰撞体/原版实体开始接触时，会出现在列表中
-    - ``lost`` -- list[dict]，结束接触的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Lost，他与其他碰撞体/原版实体结束接触时，会出现在列表中
-    """
-    OnCustomGamepadChangedEvent = ...
-    """
-    [事件]
-
-    当自定义手柄按键绑定发生改变时触发。
-
-    事件参数
-    --------
-
-    - ``name`` -- str，按键名称
-    - ``oldKey`` -- str，旧的键码
-    - ``newKey`` -- str，新的键码
-    """
-    OnCustomGamepadPressInGame = ...
-    """
-    [事件]
-
-    当玩家按下自定义手柄按键时触发。
-
-    事件参数
-    --------
-
-    - ``name`` -- str，按键名称
-    - ``key`` -- str，键码
-    - ``category`` -- str，按键分类
-    - ``isDown`` -- str，按下状态 ("1"为按下, "0"为抬起)
-    - ``magnitude`` -- float，扳机力度 (0.0~1.0)，仅扳机键有效
-    - ``x`` -- float，摇杆X轴偏移 (-1.0~1.0)，仅摇杆键有效
-    - ``y`` -- float，摇杆Y轴偏移 (-1.0~1.0)，仅摇杆键有效
-    - ``screenName`` -- str，当前屏幕名称
-    """
-    OnCustomKeyChangedEvent = ...
-    """
-    [事件]
-
-    当自定义按键绑定发生改变时触发。
-
-    事件参数
-    --------
-
-    - ``name`` -- str，按键名称
-    - ``oldKey`` -- str，旧的键码
-    - ``newKey`` -- str，新的键码
-    """
-    OnCustomKeyPressInGame = ...
-    """
-    [事件]
-
-    当玩家按下自定义按键时触发。
-
-    事件参数
-    --------
-
-    - ``name`` -- str，按键名称
-    - ``key`` -- str，键码
-    - ``category`` -- str，按键分类
-    - ``isDown`` -- str，按下状态 ("1"为按下, "0"为抬起)
-    - ``screenName`` -- str，当前屏幕名称
-    """
-    UIDefReloadSceneStackAfter = ...
-    """
-    [事件]
-
-    UI热重载（Ctrl+R）完成后触发。
-
-    事件参数
-    --------
-
-    无
-    """
-    UpdatePlayerSkinClientEvent = ...
-    """
-    [事件]
-
-    玩家加入游戏或通过更衣室局内换肤后，同步皮肤信息至客户端后触发。
-
-    说明
-    ----
-
-    此事件配合 ``IsOfficialSkin`` ``IsHighLevelOfficialSkin`` ``IsHighLevelMultiJointOfficialSkin`` 接口，
-    用于获取玩家的皮肤信息。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，更换皮肤的玩家实体ID
-    """
-    PlayerTryRemoveCustomContainerItemClientEvent = ...
-    """
-    [事件]
-
-    玩家尝试从自定义容器中移除物品时触发该事件。
-
-    说明
-    ----
-
-    该事件在关闭容器物品自动返回背包时也会触发，此时如果取消操作物品将会被留在容器中，容器被破坏物品也不会掉落（因为实际存储于玩家身上），
-    当再次打开 ``netease_ui_container`` 容器时会显示。
-
-    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    cancel取消本次操作后不会触发对应服务端事件。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict，尝试移除物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，目标容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，目标容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，目标容器索引
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次操作
-    """
-    PlayerTryAddCustomContainerItemClientEvent = ...
-    """
-    [事件]
-
-    玩家尝试将物品添加到自定义容器时触发该事件。
-
-    说明
-    ----
-
-    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    cancel取消本次操作后不会触发对应服务端事件。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict，尝试添加物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，目标容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，目标容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，目标容器索引
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次添加到自定义容器的操作
-    """
-    PlayerTryPutCustomContainerItemClientEvent = ...
-    """
-    [事件]
-
-    玩家尝试将物品放入自定义容器时触发该事件。
-
-    说明
-    ----
-
-    该事件只有目标槽位为空或交换物品时触发，如果目标槽位有相同物品时只会触发 ``PlayerTryAddCustomContainerItemServerEvent`` 事件。
-    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    PC存在shift键移动全部物品，放入同种物品时，可能会触发tryadd和tryput，请开发者注意适配。
-
-    cancel取消本次操作后不会触发对应服务端事件。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict，尝试放入物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，放入容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，放入容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，放入容器索引
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次放入自定义容器的操作
-    """
-    PlayerPermissionChangeClientEvent = ...
-    """
-    [事件]
-
-    玩家权限变更事件。
-
-    说明
-    ----
-
-    具体权限说明：
-
-    - ``build`` -- bool，放置方块
-    - ``mine`` -- bool，采集方块
-    - ``doorsandswitches`` -- bool，使用门和开关
-    - ``opencontainers`` -- bool，打开容器
-    - ``attackplayers`` -- bool，攻击玩家
-    - ``attackmobs`` -- bool，攻击生物
-    - ``op`` -- bool，操作员命令
-    - ``teleport`` -- bool，使用传送
-
-    当 ``PlayerPermissionChangeServerEvent`` 事件返回 ``cancel`` 为 ``True`` 时，权限变动被取消，该事件不会触发。
-    如果进入游戏的玩家权限为“成员”，不会触发此事件。
-
-    事件参数
-    --------
-
-    - ``causePlayerId`` -- str，发起者实体ID
-    - ``playerId`` -- str，玩家实体ID
-    - ``oldPermission`` -- dict，变化前的权限字典
-    - ``newPermission`` -- dict，变化后的权限字典
-    - ``changeCause`` -- int，变化原因，详见Minecraft枚举值文档的 `PermissionChangeCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PermissionChangeCause.html>`_
-    """
-    HudButtonChangedClientEvent = ...
-    """
-    [事件]
-
-    当原生HUD按钮位置或大小发生改变时触发，例如玩家使用了自定义控件功能会触发，可在该事件中修改mod按钮的位置防止重叠。
-
-    修改后的按钮列表中，每个按钮的字段如下：
-
-    - ``areaEnum`` -- str，`HUD原生UI枚举值 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/OriginGUIName.html>`_
-    - ``beforeSize`` -- tuple[float, float, float, float]，(xMin, yMin, xMax, yMax)，修改前原生UI的Area
-    - ``afterSize`` -- tuple[float, float, float, float]，(xMin, yMin, xMax, yMax)，修改后原生UI的Area
-
-    事件参数
-    --------
-
-    - ``changedList`` -- tuple[dict]，修改后的按钮列表
-    """
-    BlockAnimateRandomTickEvent = ...
-    """
-    [事件]
-
-    以摄像机为中心，随机选取周围的方块触发Tick，触发的数量取决于设备性能。
-
-    只有添加了 ``netease:block_animate_random_tick`` 的自定义方块才会触发此事件。
-
-    事件参数
-    --------
-
-    - ``blockPos`` -- tuple[float, float, float]，方块坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxData`` -- int，方块附加值
-    """
-    PlayerAttackEntityEvent = ...
-    """
-    [事件]
-
-    当本地玩家攻击时触发该事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``victimId`` -- str，受击者的实体ID
-    - ``damage`` -- float，客户端收到的是真实伤害值，且修改无效
-    - ``isCrit`` -- bool，本次攻击是否产生暴击，不支持修改
-    """
-    OnLocalPlayerActionClientEvent = ...
-    """
-    [事件]
-
-    玩家动作事件，当本地玩家开始/停止某些动作时触发该事件。
-
-    事件参数
-    --------
-
-    - ``actionType`` -- int，动作事件枚举，详见Minecraft枚举值文档的 `PlayerActionType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerActionType.html>`_
-    """
-    OnLocalPlayerStartJumpClientEvent = ...
-    """
-    [事件]
-
-    本地玩家开始跳跃时触发。
-
-    事件参数
-    --------
-
-    无
-    """
-    GameRenderTickEvent = ...
-    """
-    [事件]
-
-    客户端渲染帧开始时触发该事件，一秒触发次数为当前的帧数。
-
-    事件参数
-    --------
-
-    无
-    """
-    GyroSensorChangedClientEvent = ...
-    """
-    [事件]
-
-    陀螺仪传感器姿态发生变化时触发。
-
-    说明
-    ----
-
-    该事件只适用于移动端。
-
-    事件参数
-    --------
-
-    - ``xDiff`` -- float，x轴角速度，单位为弧度/s
-    - ``yDiff`` -- float，y轴角速度，单位为弧度/s
-    - ``zDiff`` -- float，z轴角速度，单位为弧度/s
-    - ``orientation`` -- int，当前屏幕朝向，0竖屏正向，1横屏向左，2竖屏倒置，3横屏向右
-    - ``timestamp`` -- float，触发时间戳，秒
-    """
-    ModBlockEntityTickClientEvent = ...
-    """
-    [事件]
-
-    客户端自定义方块实体tick事件。
-
-    说明
-    ----
-
-    只有 ``client_tick`` 字段为 ``true`` 的自定义方块实体才能触发该事件（见 `自定义方块实体 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93.html>`_）。
-
-    目前客户端实体tick范围为硬编码，范围为玩家为中心的等腰等斜边八边形，其中斜边长度为5，非斜边长度为3。
-
-    事件参数
-    --------
-
-    - ``posX`` -- int，自定义方块实体的位置X
-    - ``posY`` -- int，自定义方块实体的位置Y
-    - ``posZ`` -- int，自定义方块实体的位置Z
-    - ``dimensionId`` -- int，维度ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    """
-    ModBlockEntityRemoveClientEvent = ...
-    """
-    [事件]
-
-    客户端自定义方块实体卸载时触发。
-
-    事件参数
-    --------
-
-    - ``posX`` -- int，自定义方块实体的位置X
-    - ``posY`` -- int，自定义方块实体的位置Y
-    - ``posZ`` -- int，自定义方块实体的位置Z
-    - ``dimensionId`` -- int，维度ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    """
-    AchievementButtonMovedClientEvent = ...
-    """
-    [事件]
-
-    使用自定义成就系统的时，拖动成就入口结束时触发。
-
-    事件参数
-    --------
-
-    - ``oldPosition`` -- tuple[float, float]，移动前该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
-    - ``newPosition`` -- tuple[float, float]，移动后该控件相对父节点的坐标信息，第一项为横轴，第二项为纵轴
-    """
-    OnKeyboardControllerLayoutChangeClientEvent = ...
-    """
-    [事件]
-
-    键盘按键映射改变事件。
-
-    事件参数
-    --------
-
-    - ``action`` -- str，行为
-    - ``newKey`` -- int，修改后的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
-    - ``oldKey`` -- int，修改前的键码，详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
-    """
-    OnGamepadControllerLayoutChangeClientEvent = ...
-    """
-    [事件]
-
-    游戏手柄按键映射改变事件。
-
-    事件参数
-    --------
-
-    - ``action`` -- str，行为
-    - ``newKey`` -- int，修改后的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-    - ``oldKey`` -- int，修改前的键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-    """
-    OnGamepadTriggerClientEvent = ...
-    """
-    [事件]
-
-    游戏手柄扳机事件。当扣动扳机的力度发生改变时触发。
-
-    事件参数
-    --------
-
-    - ``key`` -- int，键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-    - ``magnitude`` -- float，扣动扳机的力度，取值为 0 ~ 1.0
-    """
-    OnGamepadStickClientEvent = ...
-    """
-    [事件]
-
-    游戏手柄摇杆事件。当摇杆摇动位置发生改变时触发。
-
-    事件参数
-    --------
-
-    - ``key`` -- int，键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-    - ``x`` -- float，摇杆水平方向的值，从左到右取值为 -1.0 ~ 1.0
-    - ``y`` -- float，摇杆竖直方向的值，从下到上取值为 -1.0 ~ 1.0
-    """
-    OnGamepadKeyPressClientEvent = ...
-    """
-    [事件]
-
-    游戏手柄按键事件。
-
-    事件参数
-    --------
-
-    - ``screenName`` -- str，当前screenName
-    - ``key`` -- int，键码，详见 `GamepadKeyType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/GamepadKeyType.html?key=GamepadKeyType&docindex=1&type=0>`_
-    - ``isDown`` -- str，是否按下，按下为1，弹起为0
-    """
-    ModBlockEntityLoadedClientEvent = ...
-    """
-    [事件]
-
-    客户端自定义方块实体加载完成后第一次出现在玩家视野中时触发。
-
-    说明
-    ----
-
-    只有在客户端自定义方块实体加载完成后，第一次出现在玩家视野中时才会触发该事件。注意：只有添加了自定义方块实体扩展功能的自定义方块实体才能触发该事件（见 `自定义方块实体外观 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/4.1-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97%E5%AE%9E%E4%BD%93%E5%A4%96%E8%A7%82.html>`_ ）；出生点是常加载区域，来回传送不会重复触发此事件。
-
-    事件参数
-    --------
-
-    - ``posX`` -- int，自定义方块实体的位置X
-    - ``posY`` -- int，自定义方块实体的位置Y
-    - ``posZ`` -- int，自定义方块实体的位置Z
-    - ``dimensionId`` -- int，维度ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    """
-    CloseNeteaseShopEvent = ...
-    """
-    [事件]
-
-    关闭商城界面时触发，包括脚本商城和Apollo插件商城。
-
-    事件参数
-    --------
-
-    无
-    """
-    PopScreenAfterClientEvent = ...
-    """
-    [事件]
-
-    screen移除触发。
-
-    说明
-    ----
-
-    与 ``PopScreenEvent`` 不同， ``PopScreenAfterClientEvent`` 触发时机是在完全把UI弹出后，
-    返回的 ``screenName`` 是弹出后最顶层UI的Screen名。
-
-    事件参数
-    --------
-
-    - ``screenName`` -- str，UI名字
-    - ``screenDef`` -- str，包含命名空间的UI名字，格式为namespace.screenName
-    """
-    TapOrHoldReleaseClientEvent = ...
-    """
-    [事件]
-
-    玩家点击屏幕后松手时触发。
-
-    说明
-    ----
-
-    仅在移动端或pc的F11模式下触发，pc的非F11模式可以使用 ``LeftClickReleaseClientEvent``
-    与 ``RightClickReleaseClientEvent`` 事件监听鼠标松开。
-
-    短按及长按后松手都会触发该事件。
-
-    事件参数
-    --------
-
-    无
-    """
-    TapBeforeClientEvent = ...
-    """
-    [事件]
-
-    玩家点击屏幕并松手，即将响应到游戏内时触发。
-
-    说明
-    ----
-
-    仅在移动端或pc的F11模式下触发。
-
-    pc的非F11模式可以使用 ``LeftClickBeforeClientEvent`` 事件监听鼠标左键。
-
-    玩家点击屏幕的处理顺序为：
-
-    | 1、玩家点击屏幕，没有进行拖动，并在短按判定时间（250毫秒）内松手；
-    | 2、触发该事件；
-    | 3、若事件没有cancel，则根据准心处的物体类型以及与玩家的距离，进行攻击或放置等操作。
-
-    与 ``GetEntityByCoordEvent`` 事件不同的是，被ui层捕获，没有穿透到世界的点击不会触发该事件，例如：
-
-    | 1、点击原版的移动/跳跃等按钮。
-    | 2、通过 ``SetIsHud(0)`` 屏蔽了游戏操作。
-    | 3、对按钮使用 ``AddTouchEventHandler`` 接口时 ``isSwallow`` 参数设置为 ``True`` 。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，设置为True可拦截原版的攻击或放置响应
-    """
-    RightClickReleaseClientEvent = ...
-    """
-    [事件]
-
-    玩家松开鼠标右键时触发。
-
-    说明
-    ----
-
-    仅在pc的普通控制模式（即非F11模式）下触发。
-    在F11下右键，按下会触发 ``RightClickBeforeClientEvent`` ，松开时会触发 ``TapOrHoldReleaseClientEvent`` 。
-
-    pc的普通控制模式下的鼠标点击流程见 ``TapOrHoldReleaseClientEvent`` 备注中的 `配图 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%8E%A7%E5%88%B6.html?key=TapOrHoldReleaseClientEvent&docindex=6&type=0>`_。
-
-    事件参数
-    --------
-
-    无
-    """
-    RightClickBeforeClientEvent = ...
-    """
-    [事件]
-
-    玩家按下鼠标右键时触发。仅在pc下触发（普通控制模式及F11模式都会触发）。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，设置为True可拦截原版的物品使用/实体交互响应
-    """
-    OnMouseMiddleDownClientEvent = ...
-    """
-    [事件]
-
-    鼠标按下中键时触发。
-
-    说明
-    ----
-
-    仅通过 ``PushScreen`` 创建的界面能够正常返回坐标，开启F11模式的时候，返回最后点击屏幕时的坐标。
-
-    事件参数
-    --------
-
-    - ``isDown`` -- str，是否按下，按下为1，弹起为0
-    - ``mousePositionX`` -- float，按下时的x坐标
-    - ``mousePositionY`` -- float，按下时的y坐标
-    """
-    OnKeyPressInGame = ...
-    """
-    [事件]
-
-    按键按下或按键释放时触发。
-
-    事件参数
-    --------
-
-    - ``screenName`` -- str，当前screenName
-    - ``key`` -- str，键码（注：这里的int型被转成了str型，比如"1"对应的就是枚举值文档中的1），详见 `KeyBoardType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/KeyBoardType.html?key=KeyBoardType&docindex=1&type=0>`_
-    - ``isDown`` -- str，是否按下，按下为1，弹起为0
-    """
-    OnClientPlayerStopMove = ...
-    """
-    [事件]
-
-    移动按钮按下释放时触发事件，同时按下多个方向键，需要释放所有的方向键才会触发事件。
-
-    事件参数
-    --------
-
-    无
-    """
-    OnClientPlayerStartMove = ...
-    """
-    [事件]
-
-    移动按钮按下触发事件，在按住一个方向键的同时，去按另外一个方向键，不会触发第二次。
-
-    事件参数
-    --------
-
-    无
-    """
-    OnBackButtonReleaseClientEvent = ...
-    """
-    [事件]
-
-    返回按钮（目前特指安卓系统导航中的返回按钮）松开时触发。
-
-    事件参数
-    --------
-
-    无
-    """
-    MouseWheelClientEvent = ...
-    """
-    [事件]
-
-    鼠标滚轮滚动时触发。
-
-    事件参数
-    --------
-
-    - ``direction`` -- int，1为向上滚动，0为向下滚动
-    """
-    LeftClickReleaseClientEvent = ...
-    """
-    [事件]
-
-    玩家松开鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
-
-    事件参数
-    --------
-
-    无
-    """
-    LeftClickBeforeClientEvent = ...
-    """
-    [事件]
-
-    玩家按下鼠标左键时触发。仅在pc的普通控制模式（即非F11模式）下触发。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，设置为True可拦截原版的挖方块或攻击响应
-    """
-    HoldBeforeClientEvent = ...
-    """
-    [事件]
-
-    玩家长按屏幕，即将响应到游戏内时触发。
-
-    说明
-    ----
-
-    仅在移动端或pc的F11模式下触发。pc的非F11模式可以使用 ``RightClickBeforeClientEvent`` 事件监听鼠标右键。
-
-    玩家长按屏幕的处理顺序为：
-
-    | 1、玩家点击屏幕，在长按判定时间内（默认为400毫秒，可通过 ``SetHoldTimeThreshold`` 接口修改）一直没有进行拖动或松手；
-    | 2、触发该事件；
-    | 3、若事件没有cancel，则根据主手上的物品，准心处的物体类型以及与玩家的距离，进行挖方块/使用物品/与实体交互等操作。
-
-    即该事件只会在到达长按判定时间的瞬间触发一次，后面一直按住不会连续触发，可以使用 ``TapOrHoldReleaseClientEvent`` 监听长按后松手。
-
-    与 ``TapBeforeClientEvent`` 事件类似，被ui层捕获，没有穿透到世界的点击不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，设置为True可拦截原版的挖方块/使用物品/与实体交互响应
-    """
-    GetEntityByCoordReleaseClientEvent = ...
-    """
-    [事件]
-
-    玩家点击屏幕后松开时触发，多个手指点在屏幕上时，只有最后一个手指松开时触发。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，手指点击位置x坐标
-    - ``y`` -- int，手指点击位置y坐标
-    """
-    GetEntityByCoordEvent = ...
-    """
-    [事件]
-
-    玩家点击屏幕时触发，多个手指点在屏幕上时，只有第一个会触发。
-
-    事件参数
-    --------
-
-    无
-    """
-    ClientJumpButtonReleaseEvent = ...
-    """
-    [事件]
-
-    跳跃按钮按下释放事件。
-
-    事件参数
-    --------
-
-    无
-    """
-    ClientJumpButtonPressDownEvent = ...
-    """
-    [事件]
-
-    跳跃按钮按下事件，返回值设置参数只对当次按下事件起作用。
-
-    事件参数
-    --------
-
-    - ``continueJump`` -- bool，设置是否执行跳跃逻辑
-    """
-    PlaySoundClientEvent = ...
-    """
-    [事件]
-
-    播放场景音效或UI音效时触发。
-
-    事件参数
-    --------
-
-    - ``name`` -- str，即资源包中sounds/sound_definitions.json中的key
-    - ``pos`` -- tuple[float, float, float]，音效播放的位置，UI音效为(0,0,0)
-    - ``volume`` -- float，音量，范围为0-1
-    - ``pitch`` -- float，播放速度，正常速度为1
-    - ``cancel`` -- bool，设为True可屏蔽该次音效播放
-    """
-    PlayMusicClientEvent = ...
-    """
-    [事件]
-
-    播放背景音乐时触发。
-
-    事件参数
-    --------
-
-    - ``name`` -- str，即资源包中sounds/music_definitions.json中的event_name，并且对应sounds/sound_definitions.json中的key
-    - ``cancel`` -- bool，设为True可屏蔽该次音效播放
-    """
-    OnMusicStopClientEvent = ...
-    """
-    [事件]
-
-    音乐停止时，当玩家调用 ``StopCustomMusic`` 来停止自定义背景音乐时，会触发该事件。
-
-    事件参数
-    --------
-
-    - ``musicName`` -- str，音乐名称
-    """
-    ScreenSizeChangedClientEvent = ...
-    """
-    [事件]
-
-    改变屏幕大小时会触发的事件。该事件仅支持PC。
-
-    事件参数
-    --------
-
-    - ``beforeX`` -- float，屏幕大小改变前的宽度
-    - ``beforeY`` -- float，屏幕大小改变前的高度
-    - ``afterX`` -- float，屏幕大小改变后的宽度
-    - ``afterY`` -- float，屏幕大小改变后的高度
-    """
-    PushScreenEvent = ...
-    """
-    [事件]
-
-    screen创建触发。
-
-    事件参数
-    --------
-
-    - ``screenName`` -- str，UI名字
-    - ``screenDef`` -- str，包含命名空间的UI名字，格式为namespace.screenName
-    """
-    PopScreenEvent = ...
-    """
-    [事件]
-
-    screen移除触发。
-
-    说明
-    ----
-
-    ``screenName`` 为正在弹出的Screen名，如果需要获取下一个Screen可使用 ``PopScreenAfterClientEvent`` 。
-
-    事件参数
-    --------
-
-    - ``screenName`` -- str，UI名字
-    - ``screenDef`` -- str，包含命名空间的UI名字，格式为"namespace.screenName"
-    """
-    PlayerChatButtonClickClientEvent = ...
-    """
-    [事件]
-
-    玩家点击聊天按钮或回车键触发呼出聊天窗口时客户端抛出的事件。
-
-    事件参数
-    --------
-
-    无
-    """
-    OnItemSlotButtonClickedEvent = ...
-    """
-    [事件]
-
-    点击快捷栏、背包栏、盔甲栏、副手栏的物品槽时触发。
-
-    事件参数
-    --------
-
-    - ``slotIndex`` -- int，点击的物品槽的编号，编号对应位置详见 `物品栏 <https://minecraft.fandom.com/zh/wiki/%E7%89%A9%E5%93%81%E6%A0%8F>`_
-    """
-    GridComponentSizeChangedClientEvent = ...
-    """
-    [事件]
-
-    UI grid组件里格子数目发生变化时触发。
-
-    事件参数
-    --------
-
-    - ``path`` -- str，grid网格所在的路径（从UI根节点算起）
-    """
-    ClientPlayerInventoryOpenEvent = ...
-    """
-    [事件]
-
-    打开物品背包界面时触发。
-
-    事件参数
-    --------
-
-    - ``isCreative`` -- bool，是否是创造模式背包界面
-    - ``cancel`` -- bool，是否取消打开物品背包界面。
-    """
-    ClientPlayerInventoryCloseEvent = ...
-    """
-    [事件]
-
-    关闭物品背包界面时触发。
-
-    事件参数
-    --------
-
-    无
-    """
-    ClientChestOpenEvent = ...
-    """
-    [事件]
-
-    打开箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``x`` -- int，箱子x坐标
-    - ``y`` -- int，箱子y坐标
-    - ``z`` -- int，箱子z坐标
-    - ``fullName`` -- str，方块名称，如minecraft:chest
-    - ``auxData`` -- int，方块附加值
-    - ``dimensionid`` -- int，维度ID
-    - ``isLargeChest`` -- bool，是否是大箱子，仅箱子(chest)时存在该参数，末影箱/木桶/潜影盒不存在该参数
-    """
-    ClientChestCloseEvent = ...
-    """
-    [事件]
-
-    关闭箱子界面时触发，包括小箱子，合并后大箱子和末影龙箱子。
-
-    说明
-    ----
-
-    注：关闭时若容器管理器已提前释放，参数可能为空
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``x`` -- int，箱子x坐标
-    - ``y`` -- int，箱子y坐标
-    - ``z`` -- int，箱子z坐标
-    - ``fullName`` -- str，方块名称，如minecraft:chest
-    - ``auxData`` -- int，方块附加值
-    - ``dimensionid`` -- int，维度ID
-    - ``isLargeChest`` -- bool，是否是大箱子，仅箱子(chest)时存在该参数，末影箱/木桶/潜影盒不存在该参数
-    """
-    WalkAnimEndClientEvent = ...
-    """
-    [事件]
-
-    走路动作结束时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    WalkAnimBeginClientEvent = ...
-    """
-    [事件]
-
-    走路动作开始时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    AttackAnimEndClientEvent = ...
-    """
-    [事件]
-
-    攻击动作结束时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    AttackAnimBeginClientEvent = ...
-    """
-    [事件]
-
-    攻击动作开始时触发。使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    StopUsingItemClientEvent = ...
-    """
-    [事件]
-
-    玩家停止使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    StartUsingItemClientEvent = ...
-    """
-    [事件]
-
-    玩家使用物品（目前仅支持Bucket、Trident、RangedWeapon、Medicine、Food、Potion、Crossbow、ChemistryStick）时抛出。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    PlayerTryDropItemClientEvent = ...
-    """
-    [事件]
-
-    玩家丢弃物品时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict，`物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``cancel`` -- bool，是否取消此次操作
-    """
-    OnCarriedNewItemChangedClientEvent = ...
-    """
-    [事件]
-
-    手持物品发生变化时，触发该事件；数量改变不会触发。
-
-    说明
-    ----
-
-    该事件在进入游戏时会触发一次，且触发时机比UiInitFinished更早。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict | None，切换后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    ItemReleaseUsingClientEvent = ...
-    """
-    [事件]
-
-    释放正在使用的物品时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``durationLeft`` -- float，蓄力剩余时间（当物品缺少"minecraft:maxduration"组件时，蓄力剩余时间为负数）
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``maxUseDuration`` -- int，最大蓄力时长
-    - ``cancel`` -- bool，设置为True可以取消，需要同时取消服务端事件ItemReleaseUsingServerEvent
-    """
-    InventoryItemChangedClientEvent = ...
-    """
-    [事件]
-
-    玩家背包物品变化时客户端抛出的事件。
-
-    说明
-    ----
-
-    如果槽位变空，变化后槽位中物品为空气。
-
-    触发时槽位物品仍为变化前物品。
-
-    背包内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``slot`` -- int，背包槽位
-    - ``oldItemDict`` -- dict | None，变化前槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``newItemDict`` -- dict | None，变化后槽位中的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    GrindStoneRemovedEnchantClientEvent = ...
-    """
-    [事件]
-
-    玩家点击砂轮合成得到的物品时抛出的事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``oldItemDict`` -- dict，合成前的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（砂轮内第一个物品）
-    - ``additionalItemDict`` -- dict，作为合成材料的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（砂轮内第二个物品）
-    - ``newItemDict`` -- dict，合成后的物品 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``exp`` -- int，本次合成返还的经验
-    """
-    ClientShapedRecipeTriggeredEvent = ...
-    """
-    [事件]
-
-    玩家合成物品时触发。
-
-    事件参数
-    --------
-
-    - ``recipeId`` -- str，配方ID，对应配方json文件中的identifier字段
-    """
-    ClientItemUseOnEvent = ...
-    """
-    [事件] [tick]
-
-    玩家在对方块使用物品时客户端抛出的事件。
-
-    说明
-    ----
-
-    如果需要取消物品的使用需要同时在 ``ClientItemUseOnEvent`` 和 ``ServerItemUseOnEvent`` 中将 ``ret`` 设置为 ``True`` 
-    才能正确取消。
-
-    该事件仅在鼠标模式下为帧事件。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，玩家实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``blockAuxValue`` -- int，方块的附加值
-    - ``face`` -- int，点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``clickX`` -- float，点击点的x比例位置
-    - ``clickY`` -- float，点击点的y比例位置
-    - ``clickZ`` -- float，点击点的z比例位置
-    - ``ret`` -- bool，设为True可取消物品的使用
-    """
-    ClientItemTryUseEvent = ...
-    """
-    [事件]
-
-    玩家点击右键尝试使用物品时客户端抛出的事件，可以通过设置 ``cancel`` 为 ``True`` 取消使用物品。
-
-    说明
-    ----
-
-    如果需要取消物品的使用需要同时在 ``ClientItemTryUseEvent`` 和 ``ServerItemTryUseEvent`` 中将 ``cancel`` 设置为 ``True``
-    才能正确取消。
-
-    ``ServerItemTryUseEvent`` / ``ClientItemTryUseEvent`` 不能取消对方块使用物品的行为，如使用生物蛋，使用桶倒出/收集，
-    使用打火石点燃草等；如果想要取消这种行为，请使用 ``ClientItemUseOnEvent`` 和 ``ServerItemUseOnEvent`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``cancel`` -- bool，是否取消使用物品
-    """
-    AnvilCreateResultItemAfterClientEvent = ...
-    """
-    [事件]
-
-    玩家点击铁砧合成得到的物品时抛出的事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemShowName`` -- str，合成后的物品显示名称
-    - ``itemDict`` -- dict，合成后的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``oldItemDict`` -- dict，合成前的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第一个物品）
-    - ``materialItemDict`` -- dict，合成所使用材料的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_（铁砧内第二个物品）
-    """
-    ActorUseItemClientEvent = ...
-    """
-    [事件]
-
-    玩家使用物品时客户端抛出的事件（比较特殊不走该事件的例子：1.喝牛奶；2.染料对有水的炼药锅使用；3.盔甲架装备盔甲）。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``useMethod`` -- int，使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
-    """
-    ActorAcquiredItemClientEvent = ...
-    """
-    [事件]
-
-    玩家获得物品时客户端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
-
-    事件参数
-    --------
-
-    - ``actor`` -- str，获得物品玩家实体ID
-    - ``secondaryActor`` -- str，物品给予者玩家实体ID，如果不存在给予者的话，这里为空字符串
-    - ``itemDict`` -- dict，获取到的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``acquireMethod`` -- int，获得物品的方法，详见 `ItemAcquisitionMethod <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
-    """
-    StepOnBlockClientEvent = ...
-    """
-    [事件]
-
-    实体刚移动至一个新实心方块时触发。
-
-    说明
-    ----
-
-    在合并微软更新之后，本事件触发时机与微软molang实验性玩法组件 ``minecraft:on_step_on`` 一致。
-
-    压力板与绊线钩在过去的版本的事件是可以触发的，但在更新后这种非实心方块并不会触发，有需要的可以使用 
-    ``OnEntityInsideBlockClientEvent`` 事件。
-
-    不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），
-    原版方块需要先通过 ``RegisterOnStepOn`` 接口注册才能触发。原版的红石矿默认注册了，但深层红石矿没有默认注册。
-
-    如果需要修改 ``cancel`` ，强烈建议配合服务端事件同步修改，避免出现被服务端矫正等非预期现象。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，是否允许触发，默认为False，若设为True，可阻止触发后续原版逻辑
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``entityId`` -- str，实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，维度ID
-
-    相关接口
-    --------
-
-    - `RegisterOnStepOn <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnStepOn&docindex=2&type=0>`_
-    - `UnRegisterOnStepOn <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnStepOn&docindex=1&type=0>`_
-    """
-    StartDestroyBlockClientEvent = ...
-    """
-    [事件]
-
-    玩家开始挖方块时触发。创造模式下不触发。
-
-    说明
-    ----
-
-    如果是隔着火焰挖方块，即使将该事件cancel掉，火焰也会被扑灭。如果要阻止火焰扑灭，需要配合 ``ExtinguishFireClientEvent`` 使用。
-
-    事件参数
-    --------
-
-    - ``pos`` -- tuple[float, float, float]，方块的坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxValue`` -- int，方块的附加值
-    - ``playerId`` -- str，玩家的实体ID
-    - ``cancel`` -- bool，修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockServerEvent一起修改。
-    - ``face`` -- int，方块被敲击面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
-    """
-    StepOffBlockClientEvent = ...
-    """
-    [事件]
-
-    实体移动离开一个实心方块时触发。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），
-    原版方块需要先通过 ``RegisterOnStepOff`` 接口注册才能触发。压力板与绊线钩这种非实心方块不会触发。
-
-    事件参数
-    --------
-
-    - ``blockX`` -- int，方块位置x
-    - ``blockY`` -- int，方块位置y
-    - ``blockZ`` -- int，方块位置z
-    - ``entityId`` -- str，实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，维度ID
-
-    相关接口
-    --------
-
-    - `RegisterOnStepOff <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnStepOff&docindex=2&type=0>`_
-    - `UnRegisterOnStepOff <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnStepOff&docindex=2&type=0>`_
-    """
-    ShearsDestoryBlockBeforeClientEvent = ...
-    """
-    [事件]
-
-    玩家手持剪刀破坏方块时，有剪刀特殊效果的方块会在客户端线程触发该事件。
-
-    说明
-    ----
-
-    目前仅绊线会触发，需要取消剪刀效果得配合 ``ShearsDestoryBlockBeforeServerEvent`` 同时使用。
-
-    事件参数
-    --------
-
-    - ``blockX`` -- int，方块位置x
-    - ``blockY`` -- int，方块位置y
-    - ``blockZ`` -- int，方块位置z
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxData`` -- int，方块附加值
-    - ``dropName`` -- str，触发剪刀效果的掉落物identifier，包含命名空间及名称
-    - ``dropCount`` -- int，触发剪刀效果的掉落物数量
-    - ``playerId`` -- str，触发剪刀效果的玩家实体ID
-    - ``dimensionId`` -- int，玩家触发时的维度ID
-    - ``cancelShears`` -- bool，是否取消剪刀效果
-    """
-    PlayerTryDestroyBlockClientEvent = ...
-    """
-    [事件]
-
-    当玩家即将破坏方块时，客户端线程触发该事件。
-
-    说明
-    ----
-
-    主要用于床，旗帜，箱子这些根据方块实体数据进行渲染的方块，一般情况下请使用 ``ServerPlayerTryDestroyBlockEvent`` 。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``face`` -- int，方块被敲击的面向ID，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxData`` -- int，方块附加值
-    - ``playerId`` -- str，试图破坏方块的玩家的实体ID
-    - ``cancel`` -- bool，默认为False，在脚本层设置为True就能取消该方块的破坏
-    """
-    OnStandOnBlockClientEvent = ...
-    """
-    [事件] [tick]
-
-    当实体站立到方块上时客户端持续触发。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），
-    原版方块需要先通过 ``RegisterOnStandOn`` 接口注册才能触发。
-
-    如果要在脚本层修改 ``motion`` / ``cancel`` ，强烈建议配合 ``OnStandOnBlockServerEvent`` 服务端事件同步修改，
-    避免出现被服务端矫正等非预期现象。
-
-    如果要在脚本层修改 ``motion`` ，回传的一定要是浮点型，例如需要赋值 ``0.0`` 而不是 ``0`` 。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``dimensionId`` -- int，实体所在维度ID
-    - ``posX`` -- float，实体位置x
-    - ``posY`` -- float，实体位置y
-    - ``posZ`` -- float，实体位置z
-    - ``motionX`` -- float，瞬时移动x方向的力
-    - ``motionY`` -- float，瞬时移动y方向的力
-    - ``motionZ`` -- float，瞬时移动z方向的力
-    - ``blockX`` -- int，方块位置x
-    - ``blockY`` -- int，方块位置y
-    - ``blockZ`` -- int，方块位置z
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``cancel`` -- bool，可由脚本层回传True给引擎，阻止触发后续原版逻辑
-
-    相关接口
-    --------
-
-    - `RegisterOnStandOn <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnStandOn&docindex=2&type=0>`_
-    - `UnRegisterOnStandOn <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnStandOn&docindex=2&type=0>`_
-    """
-    OnModBlockNeteaseEffectCreatedClientEvent = ...
-    """
-    [事件]
-
-    自定义方块实体绑定的特效创建成功事件。
-
-    说明
-    ----
-
-    使用接口 ``CreateFrameEffectForBlockEntity`` 或 ``CreateParticleEffectForBlockEntity``
-    为自定义方块实体添加特效成功时也会触发。
-
-    事件参数
-    --------
-
-    - ``effectName`` -- str，创建成功的特效的自定义键值名称
-    - ``id`` -- int，该特效的ID
-    - ``effectType`` -- int，该特效的类型，0为粒子特效，1为序列帧特效
-    - ``blockPos`` -- tuple[float, float, float]，该特效绑定的自定义方块实体的世界坐标
-    """
-    OnEntityInsideBlockClientEvent = ...
-    """
-    [事件] [tick]
-
-    当实体碰撞盒所在区域有方块时，客户端持续触发。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），
-    原版方块需要先通过 ``RegisterOnEntityInside`` 接口注册才能触发。
-
-    如果需要修改 ``slowdownMulti`` / ``cancel`` ，强烈建议与服务端事件同步修改，避免出现被服务端矫正等非预期现象。
-
-    如果要在脚本层修改 ``slowdownMulti`` ，回传的一定要是浮点型，例如需要赋值 ``1.0`` 而不是 ``1`` 。
-
-    有任意 ``slowdownMulti`` 参数被传回非 ``0`` 值时生效减速比例。
-    ``slowdownMulti`` 参数更像是一个Buff，并不是立刻计算，而是先保存在实体属性里延后计算、
-    在已经有 ``slowdownMulti`` 属性的情况下会取最低的值、免疫掉落伤害等，与原版蜘蛛网逻辑基本一致。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``dimensionId`` -- int，实体所在维度ID
-    - ``slowdownMultiX`` -- float，实体移速x方向的减速比例
-    - ``slowdownMultiY`` -- float，实体移速y方向的减速比例
-    - ``slowdownMultiZ`` -- float，实体移速z方向的减速比例
-    - ``blockX`` -- int，方块位置x
-    - ``blockY`` -- int，方块位置y
-    - ``blockZ`` -- int，方块位置z
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``cancel`` -- bool，可由脚本层回传True给引擎，阻止触发后续原版逻辑
-
-    相关接口
-    --------
-
-    - `RegisterOnEntityInside <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnEntityInside&docindex=2&type=0>`_
-    - `UnRegisterOnEntityInside <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnEntityInside&docindex=2&type=0>`_
-    """
-    OnAfterFallOnBlockClientEvent = ...
-    """
-    [事件] [tick]
-
-    当实体降落到方块后客户端触发，主要用于力的计算。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
-
-    如果要在脚本层修改 ``motion`` ，回传的需要是浮点型，例如需要赋值 ``0.0`` 而不是 ``0`` 。
-
-    如果需要修改实体的力，最好配合服务端事件同步修改，避免产生非预期现象。
-
-    因为引擎最后一定会按照原版方块规则计算力（普通方块置 ``0`` ，床、粘液块等反弹），所以脚本层如果想直接修改当前力需要将
-    ``calculate`` 设为 ``True`` 取消原版计算，按照传回值计算。
-
-    引擎在落地之后 ``OnAfterFallOnBlockClientEvent`` 会一直触发，因此请在脚本层中做对应的逻辑判断。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``posX`` -- float，实体位置x
-    - ``posY`` -- float，实体位置y
-    - ``posZ`` -- float，实体位置z
-    - ``motionX`` -- float，瞬时移动x方向的力
-    - ``motionY`` -- float，瞬时移动y方向的力
-    - ``motionZ`` -- float，瞬时移动z方向的力
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``calculate`` -- bool，是否按脚本层传值计算力
-    """
-    FallingBlockCauseDamageBeforeClientEvent = ...
-    """
-    [事件]
-
-    当下落的方块开始计算砸到实体的伤害时，客户端触发该事件。
-
-    说明
-    ----
-
-    不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
-
-    当该事件的参数数据与服务端事件 ``FallingBlockCauseDamageBeforeServerEvent`` 数据有差异时，请以服务端事件数据为准。
-
-    事件参数
-    --------
-
-    - ``fallingBlockId`` -- str，下落的方块实体ID
-    - ``fallingBlockX`` -- float，下落的方块实体位置x
-    - ``fallingBlockY`` -- float，下落的方块实体位置y
-    - ``fallingBlockZ`` -- float，下落的方块实体位置z
-    - ``blockName`` -- str，重力方块的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，下落的方块实体维度ID
-    - ``collidingEntitys`` -- list[str] | None，当前碰撞到的实体ID列表（客户端只能获取到玩家），如果没有的话是None
-    - ``fallTickAmount`` -- int，下落的方块实体持续下落了多少tick
-    - ``fallDistance`` -- float，下落的方块实体持续下落了多少距离
-    - ``isHarmful`` -- bool，客户端始终为false，因为客户端不会计算伤害值
-    - ``fallDamage`` -- int，对实体的伤害
-    """
-    ClientBlockUseEvent = ...
-    """
-    [事件] [tick]
-
-    玩家右键点击新版自定义方块（或者通过接口 ``AddBlockItemListenForUseEvent`` 增加监听的MC原生游戏方块）时客户端抛出该事件。
-
-    说明
-    ----
-
-    有的方块是在 ``ServerBlockUseEvent`` 中设置 ``cancel`` 生效，但是有部分方块是在 ``ClientBlockUseEvent`` 中设置
-    ``cancel`` 才生效，如有需求建议在两个事件中同时设置 ``cancel`` 以保证生效。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``aux`` -- int，方块附加值
-    - ``cancel`` -- bool，设置为True可拦截与方块交互的逻辑
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``clickX`` -- float，点击点的x比例位置
-    - ``clickY`` -- float，点击点的y比例位置
-    - ``clickZ`` -- float，点击点的z比例位置
-    """
-    PerspChangeClientEvent = ...
-    """
-    [事件]
-
-    视角切换时会触发的事件。
-
-    说明
-    ----
-
-    视角数字代表含义 0`` -- 第一人称 1`` -- 第三人称背面 2`` -- 第三人称正面。
-
-    事件参数
-    --------
-
-    - ``from`` -- int，切换前的视角（请使用event['from']获取该参数）
-    - ``to`` -- int，切换后的视角
-    """
-    OnPlayerHitBlockClientEvent = ...
-    """
-    [事件]
-
-    通过 ``OpenPlayerHitBlockDetection`` 打开方块碰撞检测后，当玩家碰撞到方块时触发该事件。
-
-    说明
-    ----
-
-    玩家着地时会触发 ``OnGroundClientEvent`` ，而不是该事件。
-
-    客户端和服务端分别作碰撞检测，可能两个事件返回的结果略有差异。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``posX`` -- int，碰撞方块x坐标
-    - ``posY`` -- int，碰撞方块y坐标
-    - ``posZ`` -- int，碰撞方块z坐标
-    - ``blockId`` -- str，碰撞方块的identifier
-    - ``auxValue`` -- int，碰撞方块的附加值
-
-    相关接口
-    --------
-
-    - `OpenPlayerHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=OpenPlayerHitBlockDetection&docindex=4&type=0>`_
-    - `ClosePlayerHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=ClosePlayerHitBlockDetection&docindex=1&type=0>`_
-    """
-    GameTypeChangedClientEvent = ...
-    """
-    [事件]
-
-    个人游戏模式发生变化时客户端触发。
-
-    说明
-    ----
-
-    游戏模式：生存，创造，冒险分别为0~2。
-
-    默认游戏模式发生变化时最后反映在个人游戏模式之上。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``oldGameType`` -- int，切换前的游戏模式
-    - ``newGameType`` -- int，切换后的游戏模式
-    """
-    ExtinguishFireClientEvent = ...
-    """
-    [事件]
-
-    玩家扑灭火焰时触发。下雨，倒水等方式熄灭火焰不会触发。
-
-    事件参数
-    --------
-
-    - ``pos`` -- tuple[float, float, float]，火焰方块的坐标
-    - ``playerId`` -- str，玩家的实体ID
-    - ``cancel`` -- bool，修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireServerEvent一起修改。
-    """
-    DimensionChangeFinishClientEvent = ...
-    """
-    [事件]
-
-    玩家维度改变完成后触发。
-
-    说明
-    ----
-
-    当通过传送门从末地回到主世界时， ``toPos`` 的y值为 ``32767`` ，其他情况一般会比设置值高 ``1.62`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``fromDimensionId`` -- int，维度改变前的维度
-    - ``toDimensionId`` -- int，维度改变后的维度
-    - ``toPos`` -- tuple[float, float, float]，改变后的位置(x,y,z)，其中y值为脚底加上角色的身高值
-    """
-    DimensionChangeClientEvent = ...
-    """
-    [事件]
-
-    玩家维度改变时触发。
-
-    说明
-    ----
-
-    当通过传送门从末地回到主世界时， ``toY`` 值为 ``32767`` ，其他情况一般会比设置值高 ``1.62`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``fromDimensionId`` -- int，维度改变前的维度
-    - ``toDimensionId`` -- int，维度改变后的维度
-    - ``fromX`` -- float，改变前的位置x
-    - ``fromY`` -- float，改变前的位置y
-    - ``fromZ`` -- float，改变前的位置z
-    - ``toX`` -- float，改变后的位置x
-    - ``toY`` -- float，改变后的位置y
-    - ``toZ`` -- float，改变后的位置z
-    """
-    CameraMotionStopClientEvent = ...
-    """
-    [事件]
-
-    相机运动器停止事件。相机添加运动器并开始运行后，运动器自动停止时触发。
-
-    说明
-    ----
-
-    该事件触发表示运动器播放顺利完成，手动调用的 ``StopCameraMotion`` 、 ``RemoveCameraMotion`` 不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``motionId`` -- int，运动器ID
-    - ``remove`` -- bool，是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除
-    """
-    CameraMotionStartClientEvent = ...
-    """
-    [事件]
-
-    相机运动器开始事件。相机添加运动器后，运动器开始运行时触发。
-
-    事件参数
-    --------
-
-    - ``motionId`` -- int，运动器ID
-    """
-    LeaveEntityClientEvent = ...
-    """
-    [事件]
-
-    玩家远离生物时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``entityId`` -- str，远离的生物的实体ID
-    """
-    StartRidingClientEvent = ...
-    """
-    [事件]
-
-    一个实体即将骑乘另外一个实体时触发。
-
-    说明
-    ----
-
-    如果需要修改 ``cancel`` ，请通过服务端事件 ``StartRidingServerEvent`` 修改，客户端触发该事件时，实体已经骑乘成功。
-
-    事件参数
-    --------
-
-    - ``actorId`` -- str，骑乘者的实体ID
-    - ``victimId`` -- str，被骑乘者的实体ID
-    """
-    OnMobHitMobClientEvent = ...
-    """
-    [事件]
-
-    通过 ``OpenPlayerHitMobDetection`` 打开生物碰撞检测后，当生物间（包含玩家）碰撞时触发该事件。
-
-    说明
-    ----
-
-    客户端和服务端分别作碰撞检测，可能两个事件返回的略有差异。
-
-    本事件代替原有的 ``OnPlayerHitMobClientEvent`` 事件。
-
-    事件参数
-    --------
-
-    - ``mobId`` -- str，当前生物的实体ID
-    - ``hittedMobList`` -- list[str]，当前生物碰撞到的其他所有生物的实体ID的list
-
-    相关接口
-    --------
-
-    - `OpenPlayerHitMobDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=OpenPlayerHitMobDetection&docindex=4&type=0>`_
-    - `ClosePlayerHitMobDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=ClosePlayerHitMobDetection&docindex=1&type=0>`_
-    """
-    OnGroundClientEvent = ...
-    """
-    [事件]
-
-    实体着地事件。玩家，沙子，铁砧，掉落的物品，点燃的TNT掉落地面时触发，其余实体着地不触发。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    HealthChangeClientEvent = ...
-    """
-    [事件]
-
-    生物生命值发生变化时触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``from`` -- float，变化前的生命值（请使用event['from']获取该参数）
-    - ``to`` -- float，变化后的生命值
-    """
-    EntityStopRidingEvent = ...
-    """
-    [事件]
-
-    当实体停止骑乘时触发。
-
-    说明
-    ----
-
-    以下情况不允许取消：
-
-    - 玩家传送时；
-    - 坐骑死亡时；
-    - 玩家睡觉时；
-    - 玩家死亡时；
-    - 未驯服的马；
-    - 怕水的生物坐骑进入水里；
-    - 切换维度；
-    - ride组件 ``StopEntityRiding`` 接口。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    - ``rideId`` -- str，坐骑的实体ID
-    - ``exitFromRider`` -- bool，是否下坐骑
-    - ``entityIsBeingDestroyed`` -- bool，坐骑是否将要销毁
-    - ``switchingRides`` -- bool，是否换乘坐骑
-    - ``cancel`` -- bool，设置为True可以取消（需要与服务端事件一同取消）
-    """
-    EntityModelChangedClientEvent = ...
-    """
-    [事件]
-
-    实体模型切换时触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``newModel`` -- str，新的模型名字
-    - ``oldModel`` -- str，旧的模型名字
-    """
-    ApproachEntityClientEvent = ...
-    """
-    [事件]
-
-    玩家靠近生物时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``entityId`` -- str，靠近的生物的实体ID
-    """
-    UnLoadClientAddonScriptsBefore = ...
-    """
-    [事件]
-
-    客户端卸载mod之前触发。
-
-    事件参数
-    --------
-
-    无
-    """
-    RemovePlayerAOIClientEvent = ...
-    """
-    [事件]
-
-    玩家离开当前玩家同一个区块时触发AOI事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    RemoveEntityClientEvent = ...
-    """
-    [事件]
-
-    客户端侧实体被移除时触发。
-
-    说明
-    ----
-
-    客户端接收服务端AOI事件时触发，原事件名 ``RemoveEntityPacketEvent`` 。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，移除的实体ID
-    """
-    OnLocalPlayerStopLoading = ...
-    """
-    [事件]
-
-    玩家进入存档，出生点地形加载完成时触发。该事件触发时可以进行切换维度的操作。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    OnCommandOutputClientEvent = ...
-    """
-    [事件]
-
-    当command命令有成功消息输出时触发。
-
-    说明
-    ----
-
-    部分命令在返回的时候没有命令名称，命令组件需要 ``showOutput`` 参数为 ``True`` 时才会有返回。
-
-    事件参数
-    --------
-
-    - ``command`` -- str，命令名称
-    - ``message`` -- str，命令返回的消息
-    """
-    LoadClientAddonScriptsAfter = ...
-    """
-    [事件]
-
-    客户端加载mod完成事件。
-
-    事件参数
-    --------
-
-    无
-    """
-    ChunkLoadedClientEvent = ...
-    """
-    [事件]
-
-    客户端区块加载完成时触发。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，区块所在维度
-    - ``chunkPosX`` -- int，区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
-    - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
-    """
-    ChunkAcquireDiscardedClientEvent = ...
-    """
-    [事件]
-
-    客户端区块即将被卸载时触发。
-
-    说明
-    ----
-
-    区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载，参考 `区块介绍 <https://minecraft.fandom.com/zh/wiki/%E5%8C%BA%E5%9D%97>`_。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，区块所在维度
-    - ``chunkPosX`` -- int，区块的x坐标，对应方块x坐标区间为[x*16, x*16 + 15]
-    - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[z*16, z*16 + 15]
-    """
-    AddPlayerCreatedClientEvent = ...
-    """
-    [事件]
-
-    玩家进入当前玩家所在的区块AOI后，玩家皮肤数据异步加载完成后触发的事件。
-
-    说明
-    ----
-
-    由于玩家皮肤是异步加载的原因，该事件触发时机比 ``AddPlayerAOIClientEvent`` 晚，触发该事件后可以对该玩家调用相关玩家渲染接口。
-
-    当前客户端每加载好一个玩家的皮肤，就会触发一次该事件，比如刚进入世界时，本地玩家加载好会触发一次，
-    周围的所有玩家加载好后也会分别触发一次。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    AddPlayerAOIClientEvent = ...
-    """
-    [事件]
-
-    玩家加入游戏或者其余玩家进入当前玩家所在的区块时触发的AOI事件，替换 ``AddPlayerEvent`` 。
-
-    说明
-    ----
-
-    该事件触发只表明在服务端数据中接收到了新玩家，并不能代表此时玩家在客户端中可见，若想在玩家进入AOI后立马调用玩家渲染相关接口，
-    建议使用 ``AddPlayerCreatedClientEvent`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    AddEntityClientEvent = ...
-    """
-    [事件]
-
-    客户端侧创建新实体时触发。创建玩家时不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    - ``posX`` -- float，位置x
-    - ``posY`` -- float，位置y
-    - ``posZ`` -- float，位置z
-    - ``dimensionId`` -- int，实体维度
-    - ``isBaby`` -- bool，是否为幼儿
-    - ``engineTypeStr`` -- str，实体类型
-    - ``itemName`` -- str，物品identifier（仅当物品实体时存在该字段）
-    - ``auxValue`` -- int，物品附加值（仅当物品实体时存在该字段）
-    """
-    OnScriptTickClient = ...
-    """
-    [事件] [tick]
-
-    客户端tick事件，1秒30次。
-
-    事件参数
-    --------
-
-    无
-    """
-    UiInitFinished = ...
-    """
-    [事件]
-
-    UI初始化框架完成，此时可以创建UI。
-
-    说明
-    ----
-
-    切换维度后会重新初始化UI并触发该事件。
-
-    事件参数
-    --------
-
-    无
-    """
-
-
-class ServerEvent(StrEnum):
-    OnSimTickServerEvent = ...
-    """
-    [事件]
-
-    20 tick/s。
-
-    事件参数
-    --------
-
-    无
-    """
-    PlayerStartFishingServerEvent = ...
-    """
-    [事件]
-
-    玩家开始钓鱼，生成鱼钩时在服务端触发。
-
-    说明
-    ----
-
-    此事件在鱼钩实体生成后触发，设置 ``cancel`` 为 ``True`` 可取消本次抛竿操作。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，钓鱼的玩家实体ID
-    - ``hookEntity`` -- str，鱼钩实体ID
-    - ``itemDict`` -- dict，玩家手持鱼竿的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``cancel`` -- bool，是否取消，设置为True时会取消生成鱼漂
-    """
-    PlayerFishingAfterServerEvent = ...
-    """
-    [事件]
-
-    玩家钓鱼成功收杆后触发，在钓鱼掉落物生成后触发。
-
-    说明
-    ----
-
-    此事件在掉落物实体生成后触发，可通过 ``itemEntityIdList`` 获取生成的掉落物实体ID进行后续操作。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，钓鱼的玩家实体ID
-    - ``hookEntity`` -- str，鱼钩实体ID
-    - ``itemDict`` -- dict，玩家手持鱼竿的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``itemList`` -- list[dict]，钓鱼获得的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_ 列表（只读）
-    - ``itemEntityIdList`` -- list[str]，钓鱼生成的掉落物实体ID列表，与itemList一一对应
-    """
-    PlayerFishingServerEvent = ...
-    """
-    [事件]
-
-    玩家钓鱼成功收杆时触发，在钓鱼掉落物生成前触发。
-
-    说明
-    ----
-
-    设置 ``cancel`` 为 ``True`` 时，不会生成掉落物，也不会触发 ``PlayerFishingAfterServerEvent`` 事件。
-    修改 ``itemList`` 后必须设置 ``itemChange`` 为 ``True`` ，否则修改不会生效。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，钓鱼的玩家实体ID
-    - ``hookEntity`` -- str，鱼钩实体ID
-    - ``itemDict`` -- dict，玩家手持鱼竿的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``itemList`` -- list[dict]，钓鱼获得的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_ 列表，支持修改。修改后需将itemChange设置为True
-    - ``itemChange`` -- bool，是否修改了itemList，默认为False。当修改了itemList时需要设置为True才能生效
-    - ``cancel`` -- bool，是否取消钓鱼成功，设置为True时不会生成掉落物
-    """
-    PhysxTriggerServerEvent = ...
-    """
-    [事件]
-
-    给自定义刚体添加的触发器，与其他碰撞体或原版实体发生进入触发器/离开触发器时触发。需要在触发器创建时使用 ``PxEventMask.Server`` 才会触发。
-
-    说明
-    ----
-
-    ``found`` 列表每个元素的内容：
-    ::
-
-        {
-            "entityId0": str,     # 触发器所属实体的entityId
-            "identifier0": str,   # 触发器所属实体的identifier
-            "shape0": str | None, # 触发器的userData (NeEvent::Object)
-            "entityId1": str,     # 进入触发器的碰撞体所属实体的entityId
-            "identifier1": str,   # 进入触发器的碰撞体所属实体的identifier
-            "shape1": str | None  # 入触发器的碰撞体的userData (NeEvent::Object)
-        }
-
-    ``lost`` 列表每个元素的内容：
-    ::
-
-        {
-            "entityId0": str,     # 触发器所属实体的entityId
-            "identifier0": str,   # 触发器所属实体的identifier
-            "shape0": str | None, # 触发器的userData (NeEvent::Object)
-            "entityId1": str,     # 离开触发器的碰撞体所属实体的entityId
-            "identifier1": str,   # 离开触发器的碰撞体所属实体的identifier
-            "shape1": str | None  # 离开触发器的碰撞体的userData (NeEvent::Object)
-        }
-
-    列表中的碰撞对不分先后，每个碰撞对中的碰撞体0与碰撞体1的具体角色取决于底层触发逻辑。
-
-    事件参数
-    --------
-
-    - ``found`` -- list[dict]，进入触发器的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Found，它与其他碰撞体/原版实体进入触发器时，会出现在列表中
-    - ``lost`` -- list[dict]，离开触发器的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Lost，它与其他碰撞体/原版实体离开触发器时，会出现在列表中
-    """
-    LiquidClippedServerEvent = ...
-    """
-    [事件]
-
-    玩家服务端点击流体时触发（支持原版流体与自定义流体）。
-
-    说明
-    ----
-
-    需要在物品中添加 ``netease:liquid_clipped:true`` 组件才能触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``aux`` -- int，方块附加值
-    - ``blockPos`` -- tuple[int, int, int]，方块坐标(x,y,z)
-    - ``dimensionId`` -- int，维度ID
-    - ``floatPos`` -- tuple[float, float, float]，点击的精准坐标(x,y,z)
-    """
-    PlayerAddCustomContainerItemServerEvent = ...
-    """
-    [事件]
-
-    玩家向自定义容器中添加物品成功后触发该事件。该事件不可取消，仅用于通知物品添加操作已完成。
-
-    说明
-    ----
-
-    该事件仅在操作成功后触发，且不可取消。事件提供三个物品字典：操作前状态、实际变化的物品、操作后状态，便于精确追踪物品变化。
-    当目标槽位接近满仓时，实际添加的数量可能小于请求添加的数量， ``changedItemDict`` 反映实际添加的物品信息。
-
-    事件参数
-    --------
-
-    - ``beforeItemDict`` -- dict，操作前目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``changedItemDict`` -- dict，实际添加的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``afterItemDict`` -- dict，操作后目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，目标容器索引
-    - ``playerId`` -- str，玩家实体ID
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    """
-    PlayerRemoveCustomContainerItemServerEvent = ...
-    """
-    [事件]
-
-    玩家从自定义容器中移除物品成功后触发该事件。该事件不可取消，仅用于通知物品移除操作已完成。
-
-    说明
-    ----
-
-    该事件仅在操作成功后触发，且不可取消。事件提供三个物品字典：操作前状态、实际变化的物品、操作后状态，便于精确追踪物品变化。
-
-    事件参数
-    --------
-
-    - ``beforeItemDict`` -- dict，操作前目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``changedItemDict`` -- dict，实际移除的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``afterItemDict`` -- dict，操作后目标槽位的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，目标容器索引
-    - ``playerId`` -- str，玩家实体ID
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    """
-    PhysxTouchServerEvent = ...
-    """
-    [事件]
-
-    给自定义刚体添加的碰撞体，与其他碰撞体或原版实体发生碰撞/结束碰撞时触发。
-
-    说明
-    ----
-
-    需要在碰撞体创建时使用 ``PxEventMask.Server`` 才会触发。
-
-    ``found`` 列表每个元素的内容：
-    ::
-
-        {
-            "entityId0": str,                    # 一个碰撞体所属实体的entityId
-            "identifier0": str,                  # 一个碰撞体所属实体的identifier
-            "shape0": str | None,                # 一个碰撞体的userData
-            "entityId1": str,                    # 另一个碰撞体所属实体的entityId
-            "identifier1": str,                  # 另一个碰撞体所属实体的identifier
-            "shape1": str | None,                # 另一个碰撞体的userData
-            "pos": tuple[float, float, float],   # 碰撞点的世界坐标。其中一个碰撞体在创建时使用了PxEventMask.Found_Detail才有该字段
-            "normal": tuple[float, float, float] # 碰撞产生的力的方向，由碰撞体1指向碰撞体0。其中一个碰撞体在创建时使用了PxEventMask.Found_Detail才有该字段
-        }
-
-    ``lost`` 列表每个元素的内容：
-    ::
-
-        {
-            "entityId0": str,     # 一个碰撞体所属实体的entityId
-            "identifier0": str,   # 一个碰撞体所属实体的identifier
-            "shape0": str | None, # 一个碰撞体的userData
-            "entityId1": str,     # 另一个碰撞体所属实体的entityId
-            "identifier1": str,   # 另一个碰撞体所属实体的identifier
-            "shape1": str | None  # 另一个碰撞体的userData
-        }
-
-    列表中的碰撞对不分先后，每个碰撞对中的碰撞体0与碰撞体1也不分先后。
-
-    事件参数
-    --------
-
-    - ``found`` -- list[dict]，开始接触的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Found，他与其他碰撞体/原版实体开始接触时，会出现在列表中
-    - ``lost`` -- list[dict]，结束接触的碰撞体对的信息。一个碰撞体在创建时使用了PxEventMask.Lost，他与其他碰撞体/原版实体结束接触时，会出现在列表中
-    """
-    ItemPullOutCustomContainerServerEvent = ...
-    """
-    [事件]
-
-    漏出物品到漏斗时触发该事件。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict，漏斗漏出物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，漏出物品的容器名称，目前仅支持netease_container
-    - ``collectionIndex`` -- int，漏出物品的容器索引
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    - ``dimension`` -- int，容器方块所在的维度ID
-    - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次漏出物品的操作
-    """
-    ItemPushInCustomContainerServerEvent = ...
-    """
-    [事件]
-
-    漏斗漏入物品时触发该事件。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict，漏斗漏入物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，目标容器名称，目前仅支持netease_container
-    - ``collectionIndex`` -- int，目标容器索引
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    - ``dimension`` -- int，容器方块所在的维度ID
-    - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次漏入物品的操作
-    """
-    PlayerPermissionChangeServerEvent = ...
-    """
-    [事件]
-
-    玩家权限变更事件。
-
-    说明
-    ----
-
-    具体权限说明：
-
-    - ``build`` -- bool，放置方块
-    - ``mine`` -- bool，采集方块
-    - ``doorsandswitches`` -- bool，使用门和开关
-    - ``opencontainers`` -- bool，打开容器
-    - ``attackplayers`` -- bool，攻击玩家
-    - ``attackmobs`` -- bool，攻击生物
-    - ``op`` -- bool，操作员命令
-    - ``teleport`` -- bool，使用传送
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家实体ID
-    - ``oldPermission`` -- dict，变化前的权限字典
-    - ``newPermission`` -- dict，变化后的权限字典
-    - ``changeCause`` -- int，变化原因，详见Minecraft枚举值文档的 `PermissionChangeCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PermissionChangeCause.html>`_
-    - ``cancel`` -- bool，为True时，取消本次权限变更
-    """
-    PlayerTryRemoveCustomContainerItemServerEvent = ...
-    """
-    [事件]
-
-    玩家尝试从自定义容器中移除物品时触发该事件。
-
-    说明
-    ----
-
-    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict，尝试移除物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，目标容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，目标容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，目标容器索引
-    - ``playerId`` -- str，玩家实体ID
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    """
-    PlayerTryAddCustomContainerItemServerEvent = ...
-    """
-    [事件]
-
-    玩家尝试将物品添加到自定义容器时触发该事件。
-
-    说明
-    ----
-
-    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    PC存在shift键移动全部物品，放入同种物品时，可能会触发tryadd和tryput，请开发者注意适配。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict，尝试添加物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，目标容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，目标容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，目标容器索引
-    - ``playerId`` -- str，玩家实体ID
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    """
-    PlayerTryPutCustomContainerItemServerEvent = ...
-    """
-    [事件]
-
-    玩家尝试将物品放入自定义容器时触发该事件。
-
-    说明
-    ----
-
-    容器内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    PC存在shift键移动全部物品，放入同种物品时，可能会触发tryadd和tryput，请开发者注意适配。
-
-    事件参数
-    --------
-
-    - ``itemDict`` -- dict，尝试放入物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``collectionName`` -- str，放入容器名称，对应容器json中"custom_description"字段
-    - ``collectionType`` -- str，放入容器类型，目前仅支持netease_container和netease_ui_container
-    - ``collectionIndex`` -- int，放入容器索引
-    - ``playerId`` -- str，玩家实体ID
-    - ``x`` -- int，容器方块x坐标
-    - ``y`` -- int，容器方块y坐标
-    - ``z`` -- int，容器方块z坐标
-    - ``cancel`` -- bool，是否取消该操作，默认为False，事件中改为True时拒绝此次放入自定义容器的操作
-    """
-    MountTamingEvent = ...
-    """
-    [事件]
-
-    玩家通过骑乘驯服生物后触发该事件。
-
-    说明
-    ----
-
-    该事件是检测 ``minecraft:tamemount`` 行为包组件，即玩家通过不断骑乘生物，使其冒出爱心时触发。
-
-    事件参数
-    --------
-
-    - ``eid`` -- str，生物实体ID
-    - ``pid`` -- str，玩家实体ID
-    """
-    OnPlayerActionServerEvent = ...
-    """
-    [事件]
-
-    玩家动作事件，当玩家开始/停止某些动作时触发该事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家实体ID
-    - ``actionType`` -- int，动作事件枚举，详见Minecraft枚举值文档的 `PlayerActionType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerActionType.html>`_
-    """
-    CustomCommandTriggerServerEvent = ...
-    """
-    [事件]
-
-    自定义命令触发事件。
-
-    说明
-    ----
-
-    ``args`` 中的某个dict参数说明如下：
-
-    - ``name`` -- str，参数名称，对应json中的name字段
-    - ``type`` -- str，参数类型，对应json中的type字段
-    - ``value`` -- 参数的值，若玩家没传，则采用json中填写的default的值，但会转为python变量格式。如null转为None，array转为tuple
-
-    当 ``type`` 为 ``"pos"`` 、 ``"entity"`` 、 ``"item"`` 时， ``value`` 的格式如下：
-
-    - ``pos`` -- tuple，一个含有三个float的坐标，如 (-0.93, 81.25, -5.67)
-    - ``entity`` -- dict，一个含有entityType的字典，如 {'entityType': 'minecraft:cow'}
-    - ``item`` -- dict，一个含有itemName的字典，如 {'itemName': 'minecraft:apple'}
-
-    ``origin`` 参数说明如下：
-
-    - ``entityId`` -- str，触发指令的实体ID，若由命令方块触发，则不会含有此字段
-    - ``dimension`` -- int，指令触发的维度ID，0-主世界; 1-下界; 2-末地; 或其他自定义维度
-    - ``blockPos`` -- tuple，触发指令的实体或命令方块的整数坐标
-
-    事件参数
-    --------
-
-    - ``command`` -- str，自定义命令名称，对应json中的name字段
-    - ``args`` -- list[dict]，自定义命令参数，详情见上方
-    - ``variant`` -- int，表示是哪条变体，范围[0, 9]，对应json中args键中的数字，未配置变体则为0
-    - ``origin`` -- dict，触发源的信息，详情见上方
-    - ``return_failed`` -- bool，设置自定义命令是否执行失败，默认为False，如果执行失败，返回信息以红色字体显示
-    - ``return_msg_key`` -- str，设置返回给玩家或命令方块的信息，支持在语言文件（.lang）中定义，默认值为commands.custom.success（自定义命令执行成功）
-    """
-    GlobalCommandServerEvent = ...
-    """
-    [事件]
-
-    服务端全局命令事件。包括聊天输入指令、 ``SetCommand`` 接口、命令方块、命令方块矿车执行指令时触发、行为包动画执行指令。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，执行命令的实体ID，命令方块执行时没有该参数
-    - ``command`` -- str，命令
-    - ``blockPos`` -- tuple[int, int, int]，执行命令的实体或方块的方块坐标
-    - ``dimension`` -- int，执行命令的实体或方块所在维度ID
-    - ``cancel`` -- bool，设置为True可以取消命令执行
-    """
-    PlayerPickupArrowServerEvent = ...
-    """
-    [事件]
-
-    玩家即将捡起抛射物时触发，包括使用 ``netease:pick_up`` 的自定义抛射物。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家实体ID
-    - ``arrowId`` -- str，抛射物实体ID
-    - ``itemDict`` -- dict，触碰的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``cancel`` -- bool，设置为True时将取消本次拾取
-    - ``pickupDelay`` -- int，取消拾取后重新设置该物品的拾取cd，小于15帧将视作15帧，大于等于97813帧将视作无法拾取，每秒30帧
-    """
-    EntityDieLoottableAfterServerEvent = ...
-    """
-    [事件]
-
-    生物死亡掉落物品之后触发。
-
-    说明
-    ----
-
-    该事件为生物死亡掉落物品生成后触发，可以得到掉落物的id列表，如果需要更改掉落物，请使用 ``EntityDieLoottableServerEvent`` 。
-
-    该事件在生物死亡后会触发，无论是否掉落物品，因此掉落物品列表可能存在为空的情况。
-
-    掉落物不包含玩家或生物携带以及背包内的物品，若要获取死亡后由背包扔出的物品请参考 ``EntityDroppedItemServerEvent`` 事件。
-
-    事件参数
-    --------
-
-    - ``dieEntityId`` -- str，死亡实体ID
-    - ``attacker`` -- str，伤害来源实体ID
-    - ``itemList`` -- list[dict]，掉落物品列表，每个元素为一个itemDict，格式可参考 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``itemEntityIdList`` -- list[str]，掉落物品的实体ID列表
-    """
-    PlayerHungerChangeServerEvent = ...
-    """
-    [事件]
-
-    玩家饥饿度变化时触发该事件。
-
-    说明
-    ----
-
-    当通过 ``SetPlayerHunger`` 接口设置饥饿度时，不会触发服务端对应的事件。
-
-    当通过 ``/hunger`` 等指令设置饥饿度设置时， ``hunger`` 字段值可能会超过最大饥饿度。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家实体ID
-    - ``hungerBefore`` -- float，变化前的饥饿度
-    - ``hunger`` -- float，变化后的饥饿度
-    - ``cancel`` -- bool，是否取消饥饿度变化
-    """
-    ItemDurabilityChangedServerEvent = ...
-    """
-    [事件]
-
-    物品耐久度变化事件。
-
-    说明
-    ----
-
-    目前只有存在耐久的物品，并且有物主的物品才会触发该事件，存在发射器中发射导致的物品耐久变化不会触发该事件。
-
-    目前铁砧修复、经验修补魔咒、 ``SetItemDurability`` 接口触发的耐久度变化中 ``canChange`` 为 ``False`` ，
-    并且不支持修改变化后耐久度。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，物品拥有者的实体ID
-    - ``itemDict`` -- dict，物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``durabilityBefore`` -- int，变化前耐久度
-    - ``durability`` -- int，变化后耐久度，支持修改。但是请注意修改范围，支持范围为[-32768,32767)
-    - ``canChange`` -- bool，是否支持修改，为True时支持通过durability修改，为False时不支持
-    """
-    PlaceNeteaseLargeFeatureServerEvent = ...
-    """
-    [事件]
-
-    网易版大型结构即将生成时服务端抛出该事件。
-
-    事件参数
-    --------
-
-    - ``dimensionId`` -- int，维度ID
-    - ``pos`` -- tuple[int, int]，中心结构放置坐标(x, z)
-    - ``rot`` -- int，中心结构顺时针旋转角度
-    - ``depth`` -- int，大型结构递归深度
-    - ``centerPool`` -- str，中心池的identifier
-    - ``ignoreFitInContext`` -- bool，是否允许生成过结构的地方继续生成结构
-    - ``cancel`` -- bool，设置为True时可阻止该大型结构的放置
-    """
-    PlayerNamedEntityServerEvent = ...
-    """
-    [事件]
-
-    玩家用命名牌重命名实体时触发，例如玩家手持命名牌对羊修改名字、玩家手持命名牌对盔甲架修改名字。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，主动命名生物的玩家的实体ID
-    - ``entityId`` -- str，被命名生物的实体ID
-    - ``preName`` -- str，实体当前的名字
-    - ``afterName`` -- str，实体重命名后的名字
-    - ``cancel`` -- bool，是否取消触发，默认为False，若设为True，可阻止触发后续的实体命名逻辑
-    """
-    PlayerFeedEntityServerEvent = ...
-    """
-    [事件]
-
-    玩家喂养生物时触发，例如玩家手持小麦喂养牛、玩家手持胡萝卜喂养幼年猪。
-
-    说明
-    ----
-
-    对于幼年生物，用对应的物品喂养后就可以触发事件，例如用小麦喂养幼年牛、用生鲑鱼喂养幼年猫；对于成年生物，用对应的物品喂养后，
-    该生物要进入“求爱模式”（持续散发红心粒子），才可以触发事件。
-
-    特殊的成年生物列举如下：
-
-    - 可骑乘生物，例如马，玩家要驯服马后，再给它喂养食物（例如金苹果、金萝卜），才可以触发事件；已驯服的马受伤后，用金苹果喂养时会治疗马，不触发事件，马的血量回满时，再喂养金苹果，才会触发事件；
-    - 可驯服生物，例如狼，玩家要用骨头驯服狼后，再给它喂养肉类物品（例如熟猪排），才可以触发事件；
-    - 需要在特定环境下才能繁殖的生物，例如熊猫，玩家用竹子喂养熊猫时，熊猫的5格内至少要有8根竹子，喂养后才可以触发事件。
-
-    该事件中如需调用使用手持物相关的接口，如 ``PlayerUseItemToEntity`` 或其他设置物品数量的接口，
-    会导致接口正常调用但是物品数量计算异常，建议通过timer延迟调用。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，主动喂养生物的玩家的实体ID
-    - ``entityId`` -- str，被喂养生物的实体ID
-    - ``itemDict`` -- dict，当前玩家手持物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``cancel`` -- bool，是否取消触发，默认为False，若设为True，可阻止触发后续的生物喂养逻辑
-    """
-    lobbyGoodBuySucServerEvent = ...
-    """
-    [事件]
-
-    玩家登录联机大厅服务器，或者联机大厅游戏内购买商品时触发。如果是玩家登录，触发时玩家客户端已经触发了 ``UiInitFinished`` 事件。
-
-    事件参数
-    --------
-
-    - ``eid`` -- str，玩家的实体ID
-    - ``buyItem`` -- bool，玩家登录时为False，玩家购买了商品时为True
-    """
-    UrgeShipEvent = ...
-    """
-    [事件]
-
-    玩家点击商城催促发货按钮时触发该事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    PlayerInventoryOpenScriptServerEvent = ...
-    """
-    [事件]
-
-    某个客户端打开物品背包界面时触发。可以监听此事件判定客户端是否打开了创造背包。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``isCreative`` -- str，是否是创造模式背包界面
-    """
-    WalkAnimEndServerEvent = ...
-    """
-    [事件]
-
-    当走路动作结束时触发。
-
-    说明
-    ----
-
-    使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    WalkAnimBeginServerEvent = ...
-    """
-    [事件]
-
-    当走路动作开始时触发。
-
-    说明
-    ----
-
-    使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    JumpAnimBeginServerEvent = ...
-    """
-    [事件]
-
-    当跳跃动作开始时触发。
-
-    说明
-    ----
-
-    使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    AttackAnimEndServerEvent = ...
-    """
-    [事件]
-
-    当攻击动作结束时触发。
-
-    说明
-    ----
-
-    使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    AttackAnimBeginServerEvent = ...
-    """
-    [事件]
-
-    当攻击动作开始时触发。
-
-    说明
-    ----
-
-    使用 ``SetModel`` 替换骨骼模型后，该事件才生效。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    UIContainerItemChangedServerEvent = ...
-    """
-    [事件]
-
-    合成容器物品发生变化时触发。
-
-    说明
-    ----
-
-    合成容器包括工作台、铁砧、附魔台、织布机、砂轮、切石机、制图台、锻造台，输入物品发生变化时会触发本事件。
-
-    可通过容器槽位区分不同的生成容器类型。
-
-    合成容器的生成槽位生成物品时不触发本事件，生成物品可通过 ``CraftItemOutputChangeServerEvent`` 监听。
-    储物容器（箱子，潜影箱），熔炉，酿造台，发射器，投掷器，漏斗，炼药锅，唱片机，高炉，烟熏炉中物品发生变化不会触发此事件，
-    此类容器可通过 ``ContainerItemChangedServerEvent`` 监听。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``slot`` -- int，容器槽位，含义见： `PlayerUISlot枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/PlayerUISlot.html?key=PlayerUISlot&docindex=1&type=0>`_
-    - ``oldItemDict`` -- dict，旧 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``newItemDict`` -- dict，生成的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    ShearsUseToBlockBeforeServerEvent = ...
-    """
-    [事件] [tick]
-
-    实体手持剪刀对方块使用时，有剪刀特殊效果的方块会在服务端线程触发该事件。
-
-    说明
-    ----
-
-    目前会触发该事件的方块：南瓜、蜂巢。
-
-    该事件触发在 ``ServerItemUseOnEvent`` 之后，如果 ``ServerItemUseOnEvent`` 中取消了物品使用，该事件无法被触发。
-
-    和 ``ServerItemUseOnEvent`` 一样该事件判定在tick执行，意味着如果取消剪刀效果该事件可能会多次触发（取决于玩家按下使用键时长）。
-
-    事件参数
-    --------
-
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxData`` -- str，方块附加值
-    - ``dropName`` -- str，触发剪刀效果的掉落物identifier，包含命名空间及名称
-    - ``dropCount`` -- str，触发剪刀效果的掉落物数量
-    - ``entityId`` -- str，触发剪刀效果的实体ID，目前仅玩家会触发
-    - ``dimensionId`` -- int，维度ID
-    - ``cancelShears`` -- int，是否取消剪刀效果
-    """
-    ServerPlayerTryTouchEvent = ...
-    """
-    [事件]
-
-    玩家即将捡起物品时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``entityId`` -- str，物品的实体ID
-    - ``itemDict`` -- dict，`物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``cancel`` -- bool，设置为True时将取消本次拾取
-    - ``pickupDelay`` -- int，取消拾取后重新设置该物品的拾取cd，小于15帧将视作15帧，大于等于97813帧将视作无法拾取
-    """
-    ServerItemTryUseEvent = ...
-    """
-    [事件]
-
-    玩家点击右键尝试使用物品时服务端抛出的事件。
-
-    说明
-    ----
-
-    如果需要取消物品的使用需要同时在 ``ClientItemTryUseEvent`` 和 ``ServerItemTryUseEvent`` 中将 ``cancel`` 设置为 ``True``
-    才能正确取消。
-
-     ``ServerItemTryUseEvent`` / ``ClientItemTryUseEvent`` 不能取消对方块使用物品的行为，如使用生物蛋，使用桶倒出/收集，
-     使用打火石点燃草等；如果想要取消这种行为，请使用 ``ClientItemUseOnEvent`` 和 ``ServerItemUseOnEvent`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``cancel`` -- bool，设为True可取消物品的使用
-    """
-    PlayerDropItemServerEvent = ...
-    """
-    [事件]
-
-    玩家丢弃物品时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemEntityId`` -- str，物品的实体ID
-    """
-    OnPlayerBlockedByShieldBeforeServerEvent = ...
-    """
-    [事件]
-
-    玩家使用盾牌抵挡伤害之前触发。
-
-    说明
-    ----
-
-    盾牌抵挡了所有伤害时，才会触发事件；部分抛射物造成的伤害无法全部抵挡，无法触发事件，例如带有穿透魔咒的弩。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``sourceId`` -- str，伤害来源实体ID，没有实体返回"-1"
-    - ``itemDict`` -- dict，盾牌 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``damage`` -- float，抵挡的伤害数值
-    """
-    OnPlayerBlockedByShieldAfterServerEvent = ...
-    """
-    [事件]
-
-    玩家使用盾牌抵挡伤害之后触发.
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``sourceId`` -- str，伤害来源实体ID，没有实体返回"-1"
-    - ``itemDict`` -- dict，盾牌 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``damage`` -- float，抵挡的伤害数值
-    """
-    OnPlayerActiveShieldServerEvent = ...
-    """
-    [事件]
-
-    玩家激活/取消激活盾牌触发的事件。包括玩家持盾进入潜行状态，以及在潜行状态切换盾牌（切换耐久度不同的相同盾牌不会触发）。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``isActive`` -- str，True:尝试激活，False:尝试取消激活
-    - ``itemDict`` -- dict，盾牌 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``cancelable`` -- bool，是否可以取消。如果玩家在潜行状态切换盾牌，则无法取消
-    - ``cancel`` -- bool，是否取消这次激活
-    """
-    OnOffhandItemChangedServerEvent = ...
-    """
-    [事件]
-
-    玩家切换副手物品时触发该事件。
-
-    说明
-    ----
-
-    当原有的物品槽内容为空时， ``oldItemName`` 值为 ``"minecraft:air"`` ，且 ``oldItem`` 其余字段不存在。
-    当切换原有物品，且新物品为空时，参数值同理。
-
-    事件参数
-    --------
-
-    - ``oldArmorDict`` -- dict | None，旧物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当旧物品为空时，此项属性为None
-    - ``newArmorDict`` -- dict | None，新物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当新物品为空时，此项属性为None
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    OnNewArmorExchangeServerEvent = ...
-    """
-    [事件]
-
-    玩家切换盔甲时触发该事件。
-
-    说明
-    ----
-
-    当玩家登录时，每个盔甲槽位会触发两次该事件，第一次为 ``None`` 切换到身上的装备，第二次的 ``oldArmorDict`` 和 ``newArmorDict``
-    都为身上装备。如果槽位为空，则是触发两次从 ``None`` 切换到 ``None`` 的事件。
-
-    注意：避免在该事件回调中对玩家修改盔甲栏装备，如 `SetEntityItem <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%83%8C%E5%8C%85.html?key=SetEntityItem&docindex=1&type=0>`_
-    接口，会导致事件循环触发造成堆栈溢出。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``slot`` -- int，槽位ID
-    - ``oldArmorDict`` -- dict | None，旧装备的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当旧装备为空时，此项属性为None
-    - ``newArmorDict`` -- dict | None，新装备的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当新装备为空时，此项属性为None
-    """
-    OnItemPutInEnchantingModelServerEvent = ...
-    """
-    [事件]
-
-    玩家将可附魔物品放到附魔台上时触发。
-
-    说明
-    ----
-
-    ``options`` 为包含三个 ``dict`` 的 ``list`` ，单个 ``dict`` 的格式如下：
-    ::
-
-        {
-          'cost': 1,
-          'enchantData': [(1, 1)],
-          'modEnchantData': [("custom_enchant", 1)],
-        }
-
-    其中 ``cost`` 为解锁该选项所需的玩家等级， ``enchantData`` 为该附魔选项包含的原版附魔数据， ``modEnchantData``
-    为该选项包含的自定义附魔数据。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``slotType`` -- int，玩家放入物品的EnchantSlotType
-    - ``options`` -- list[dict]，附魔台选项
-    - ``change`` -- bool，传入True时，附魔台选项会被新传入的options覆盖
-    """
-    ItemUseOnAfterServerEvent = ...
-    """
-    [事件]
-
-    玩家在对方块使用物品之后服务端抛出的事件。
-
-    说明
-    ----
-
-    在 ``ServerItemUseOnEvent`` 和原版物品使用事件（例如 ``StartUsingItemClientEvent`` ）之后触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``face`` -- int，点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``clickX`` -- float，点击点的x比例位置
-    - ``clickY`` -- float，点击点的y比例位置
-    - ``clickZ`` -- float，点击点的z比例位置
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``blockAuxValue`` -- int，方块的附加值
-    - ``dimensionId`` -- int，维度ID
-    """
-    ItemUseAfterServerEvent = ...
-    """
-    [事件]
-
-    玩家在使用物品之后服务端抛出的事件。
-
-    说明
-    ----
-
-    做出使用物品这个动作之后触发，一些需要蓄力的物品使用事件（ ``ActorUseItemServerEvent`` ）会在之后触发。
-    如投掷三叉戟，先触发本事件，投出去之后再触发 ``ActorUseItemServerEvent`` 。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    ItemReleaseUsingServerEvent = ...
-    """
-    [事件]
-
-    释放正在使用的物品时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``durationLeft`` -- float，蓄力剩余时间(当物品缺少"minecraft:maxduration"组件时,蓄力剩余时间为负数)
-    - ``itemDict`` -- dict，使用的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``maxUseDuration`` -- int，最大蓄力时长
-    - ``cancel`` -- bool，设置为True可以取消，需要同时取消客户端事件ItemReleaseUsingClientEvent
-    - ``changeItem`` -- bool，如果要在该事件的回调中修改当前使用槽位的物品，需设置这个参数为True，否则将修改物品失败，例如修改耐久度或者替换成新物品
-    """
-    InventoryItemChangedServerEvent = ...
-    """
-    [事件]
-
-    玩家背包物品变化时服务端抛出的事件。
-
-    说明
-    ----
-
-    如果槽位变空，变化后槽位中物品为空气。
-
-    触发时槽位物品仍为变化前物品。
-
-    玩家进入游戏时，身上的物品会触发该事件。
-
-    背包内物品移动，合堆，分堆的操作会分多次事件触发并且顺序不定，编写逻辑时请勿依赖事件触发顺序。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``slot`` -- int，背包槽位
-    - ``oldItemDict`` -- dict | None，变化前的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``newItemDict`` -- dict | None，变化后的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    FurnaceBurnFinishedServerEvent = ...
-    """
-    [事件]
-
-    服务端熔炉烧制触发事件。熔炉、高炉、烟熏炉烧出物品时触发。
-
-    事件参数
-    --------
-
-    - ``dimensionId`` -- int，维度ID
-    - ``posX`` -- float，位置x
-    - ``posY`` -- float，位置y
-    - ``posZ`` -- float，位置z
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    CraftItemOutputChangeServerEvent = ...
-    """
-    [事件]
-
-    玩家从容器拿出生成物品时触发。支持工作台，铁砧，砂轮等工作方块。
-
-    说明
-    ----
-
-    当 ``screenContainerType`` 为 ``ContainerType.INVENTORY`` 时，表示从创造模式物品栏中拿出物品，或者从合成栏中拿出合成物品。
-
-    通过 ``cancel`` 参数取消生成物品，可用于禁止外挂刷物品。
-
-    ``cancel=True`` 时无法从创造模式物品栏拿物品。``cancel=True`` 时铁砧无法修复或重命名物品，但仍会扣除经验值。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict，`物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``screenContainerType`` -- int，当前界面类型，类型含义见： `ContainerType枚举枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ContainerType.html?key=ContainerType&docindex=1&type=0>`_
-    - ``cancel`` -- bool，是否取消生成物品
-    """
-    ContainerItemChangedServerEvent = ...
-    """
-    [事件]
-
-    容器物品变化事件。
-
-    说明
-    ----
-
-    储物容器（箱子，潜影箱），熔炉，酿造台，发射器，投掷器，漏斗，炼药锅，唱片机，高炉，烟熏炉中物品发生变化会触发此事件。
-
-    工作台、铁砧、附魔台、织布机、砂轮、切石机、制图台、锻造台为合成容器，不会触发此事件，
-    此类容器可通过 ``UIContainerItemChangedServerEvent`` 监听具体生成容器物品变化。
-
-    炼药锅只在使用染料时触发本事件，且 ``slot`` 为 ``2`` 。
-
-    唱片机只在从漏斗放入唱片触发此事件。
-
-    事件参数
-    --------
-
-    - ``pos`` -- tuple[int, int, int]，容器坐标
-    - ``containerType`` -- int，容器类型，类型含义见： `ContainerType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ContainerType.html?key=ContainerType&docindex=1&type=0>`_
-    - ``slot`` -- int，容器槽位
-    - ``dimensionId`` -- int，维度ID
-    - ``oldItemDict`` -- dict | None，旧 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``newItemDict`` -- dict | None，新 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    """
-    StepOnBlockServerEvent = ...
-    """
-    [事件]
-
-    实体刚移动至一个新实心方块时触发。
-
-    说明
-    ----
-
-    在合并微软更新之后，本事件触发时机与微软molang实验性玩法组件 ``"minecraft:on_step_on"`` 一致。
-
-    压力板与绊线钩在过去的版本的事件是可以触发的，但在更新后这种非实心方块并不会触发，
-    有需要的可以使用 ``OnEntityInsideBlockServerEvent`` 事件。
-
-    不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），
-    原版方块需要先通过 ``RegisterOnStepOn`` 接口注册才能触发。原版的红石矿默认注册了，但深层红石矿没有默认注册。
-
-    如果需要修改 ``cancel`` ，强烈建议配合客户端事件同步修改，避免出现客户端表现不一致等非预期现象。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，是否允许触发，默认为False，若设为True，可阻止触发后续物理交互事件
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``entityId`` -- str，实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，维度ID
-    """
-    StepOffBlockServerEvent = ...
-    """
-    [事件]
-
-    实体移动离开一个实心方块时触发。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，自定义方块需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），
-    原版方块需要先通过 ``RegisterOnStepOff`` 接口注册才能触发。
-
-    压力板与绊线钩这种非实心方块不会触发。
-
-    事件参数
-    --------
-
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``entityId`` -- str，实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，维度ID
-
-    相关接口
-    --------
-
-    - `RegisterOnStepOff <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnStepOff&docindex=2&type=0>`_
-    - `UnRegisterOnStepOff <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnStepOff&docindex=2&type=0>`_
-    """
-    StartDestroyBlockServerEvent = ...
-    """
-    [事件]
-
-    玩家开始挖方块时触发。创造模式下不触发。
-
-    说明
-    ----
-
-    如果是隔着火焰挖方块，即使将该事件 ``cancel`` 掉，火焰也会被扑灭。如果要阻止火焰扑灭，
-    需要配合 ``ExtinguishFireServerEvent`` 使用。
-
-    该服务端事件触发于服务端收到玩家破坏操作时，当方块为秒破方块时（破坏方块所需时间为0或未设置破坏时间），
-    ``ServerPlayerTryDestroyBlockEvent`` 事件触发在本事件之前；
-    当方块为非秒破方块时， ``ServerPlayerTryDestroyBlockEvent`` 事件触发在本事件之后。
-
-    秒破方块在本事件触发前已经被服务端删除，此时本事件获取到的 ``blockName`` 为 ``"minecraft:air"`` ，
-    且无法通过本事件进行取消操作，以下是两个解决方法：
-
-    | 1、用 ``ServerPlayerTryDestroyBlockEvent`` 获取到正确的方块信息或取消操作。
-    | 2、通过 `minecraft:destroy_time <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html#minecraft_destroy_time>`_
-      方块组件来修改方块的破坏时间。
-
-    事件参数
-    --------
-
-    - ``pos`` -- tuple[float, float, float]，方块坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxValue`` -- int，方块的附加值
-    - ``playerId`` -- str，玩家的实体ID
-    - ``dimensionId`` -- int，维度ID
-    - ``cancel`` -- bool，修改为True时，可阻止玩家进入挖方块的状态。需要与StartDestroyBlockClientEvent一起修改
-    - ``face`` -- int，方块被敲击面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html>`_
-    """
-    ShearsDestoryBlockBeforeServerEvent = ...
-    """
-    [事件]
-
-    玩家手持剪刀破坏方块时，有剪刀特殊效果的方块会在服务端线程触发该事件。
-
-    说明
-    ----
-
-    该事件触发在 ``ServerPlayerTryDestroyBlockEvent`` 之后，如果在 ``ServerPlayerTryDestroyBlockEvent``
-    事件中设置了取消Destroy或取消掉落物会导致该事件不触发。
-
-    取消剪刀效果后不掉落任何东西的方块类型：蜘蛛网、枯萎的灌木、草丛、下界苗、树叶、海草、藤蔓。
-
-    绊线取消剪刀效果需要配合 ``ShearsDestoryBlockBeforeClientEvent`` 同时使用，否则在表现上可能展现出来的还是剪刀剪断后的效果。
-    绊线取消剪刀效果后依然会掉落成线。
-
-    事件参数
-    --------
-
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxData`` -- int，方块附加值
-    - ``dropName`` -- str，触发剪刀效果的掉落物identifier，包含命名空间及名称
-    - ``dropCount`` -- int，触发剪刀效果的掉落物数量
-    - ``playerId`` -- str，玩家的实体ID
-    - ``dimensionId`` -- int，维度ID
-    - ``cancelShears`` -- bool，是否取消剪刀效果
-    """
-    ServerPlayerTryDestroyBlockEvent = ...
-    """
-    [事件]
-
-    当玩家即将破坏方块时，服务端线程触发该事件。
-
-    说明
-    ----
-
-    若需要禁止某些特殊方块的破坏，需要配合 ``PlayerTryDestroyBlockClientEvent`` 一起使用，
-    例如床，旗帜，箱子这些根据方块实体数据进行渲染的方块。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``face`` -- int，方块被敲击的面向id，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``fullName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxData`` -- int，方块附加值
-    - ``playerId`` -- str，试图破坏方块的玩家的实体ID
-    - ``dimensionId`` -- int，维度ID
-    - ``cancel`` -- bool，默认为False，在脚本层设置为True就能取消该方块的破坏
-    - ``spawnResources`` -- bool，是否生成掉落物，默认为True，在脚本层设置为False就能取消生成掉落物
-    """
-    ServerPlaceBlockEntityEvent = ...
-    """
-    [事件]
-
-    手动放置或通过接口创建含自定义方块实体的方块时触发，此时可向该方块实体中存放数据。
-
-    事件参数
-    --------
-
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``dimension`` -- int，维度ID
-    - ``posX`` -- int，方块x坐标
-    - ``posY`` -- int，方块y坐标
-    - ``posZ`` -- int，方块z坐标
-    """
-    ServerEntityTryPlaceBlockEvent = ...
-    """
-    [事件]
-
-    当生物试图放置方块时触发该事件。
-
-    说明
-    ----
-
-    部分放置后会产生实体的方块、可操作的方块、带有特殊逻辑的方块，不会触发该事件，
-    包括但不限于床、门、告示牌、花盆、红石中继器、船、炼药锅、头部模型、蛋糕、酿造台、盔甲架等。
-
-    修改放置方块信息只对一般方块有效，对一些特殊方块无效，会导致放置取消，
-    特殊方块包括：钟、蜡烛、管珊瑚扇、台阶、青蛙卵、脚手架、海泡菜、顶层雪、睡莲。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，方块x坐标，支持修改
-    - ``y`` -- int，方块y坐标，支持修改
-    - ``z`` -- int，方块z坐标，支持修改
-    - ``fullName`` -- str，方块的identifier，包含命名空间及名称，支持修改
-    - ``auxData`` -- int，方块附加值，支持修改
-    - ``entityId`` -- str，试图放置方块的生物的实体ID
-    - ``dimensionId`` -- int，维度ID
-    - ``face`` -- int，点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``cancel`` -- bool，默认为False，在脚本层设置为True就能取消该方块的放置
-    - ``clickX`` -- float，点击点的x比例位置
-    - ``clickY`` -- float，点击点的y比例位置
-    - ``clickZ`` -- float，点击点的z比例位置
-    """
-    ServerBlockEntityTickEvent = ...
-    """
-    [事件] [tick]
-
-    自定义方块配置了 ``"netease:block_entity"`` 组件并设 ``tick`` 为 ``true`` ，
-    方块在玩家的模拟距离（新建存档时可以设置，默认为4个区块）内，或者在tickingarea内的时候触发。
-
-    说明
-    ----
-
-    方块实体的tick事件频率为每秒钟20次。
-
-    触发本事件时，若正在退出游戏，将无法获取到抛出本事件的方块实体数据（ ``GetBlockEntityData`` 函数返回 ``None`` ），
-    也无法对其进行操作。
-
-    事件参数
-    --------
-
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``dimension`` -- int，维度ID
-    - ``posX`` -- int，方块x坐标
-    - ``posY`` -- int，方块y坐标
-    - ``posZ`` -- int，方块z坐标
-    """
-    PistonActionServerEvent = ...
-    """
-    [事件]
-
-    活塞或者粘性活塞推送/缩回影响附近方块时触发。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，是否允许触发，默认为False，若设为True，可阻止触发后续的事件
-    - ``action`` -- str，推送时=expanding；缩回时=retracting
-    - ``pistonFacing`` -- int，活塞的朝向，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``pistonMoveFacing`` -- int，活塞的运动方向，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``dimensionId`` -- int，维度ID
-    - ``pistonX`` -- int，活塞方块的x坐标
-    - ``pistonY`` -- int，活塞方块的y坐标
-    - ``pistonZ`` -- int，活塞方块的z坐标
-    - ``blockList`` -- list[tuple[int, int, int]]，活塞运动影响到产生被移动效果的方块坐标(x,y,z)，均为int类型
-    - ``breakBlockList`` -- list[tuple[int, int, int]]，活塞运动影响到产生被破坏效果的方块坐标(x,y,z)，均为int类型
-    - ``entityList`` -- list[str]，活塞运动影响到产生被移动或被破坏效果的实体ID列表
-    """
-    OnStandOnBlockServerEvent = ...
-    """
-    [事件] [tick]
-
-    当实体站立到方块上时服务端持续触发。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），
-    原版方块需要先通过 ``RegisterOnStandOn`` 接口注册才能触发。
-
-    如果需要修改 ``motion`` / ``cancel`` ，强烈建议配合客户端事件同步修改，避免出现客户端表现不一致等现象。
-
-    如果要在脚本层修改 ``motion`` ，回传的一定要是浮点型，例如需要赋值 ``0.0`` 而不是 ``0`` 。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``dimensionId`` -- int，维度ID
-    - ``posX`` -- float，实体位置x
-    - ``posY`` -- float，实体位置y
-    - ``posZ`` -- float，实体位置z
-    - ``motionX`` -- float，瞬时移动x方向的力
-    - ``motionY`` -- float，瞬时移动y方向的力
-    - ``motionZ`` -- float，瞬时移动z方向的力
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``cancel`` -- bool，可由脚本层回传True给引擎，阻止触发后续原版逻辑
-    """
-    OnBeforeFallOnBlockServerEvent = ...
-    """
-    [事件]
-
-    当实体刚降落到方块上时服务端触发，主要用于伤害计算。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
-
-    如果要在脚本层修改 ``fallDistance`` ，回传的一定要是浮点型，例如需要赋值 ``0.0`` 而不是 ``0`` 。
-
-    可能会因为轻微的反弹触发多次，可在脚本层针对 ``fallDistance`` 的值进行判断。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``fallDistance`` -- float，实体下降距离，可在脚本层传给引擎
-    - ``cancel`` -- bool，是否取消引擎对实体下降伤害的计算
-    """
-    OnAfterFallOnBlockServerEvent = ...
-    """
-    [事件] [tick]
-
-    当实体降落到方块后服务端触发，主要用于力的计算。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ）。
-
-    如果要在脚本层修改 ``motion`` ，回传的需要是浮点型，例如需要赋值 ``0.0`` 而不是 ``0`` 。
-
-    如果需要修改实体的力，最好配合客户端事件同步修改，避免产生非预期现象。
-
-    因为引擎最后一定会按照原版方块规则计算力（普通方块置0，床、粘液块等反弹），所以脚本层如果想直接修改当前力需要将 ``calculate``
-    设为 ``True`` 取消原版计算，按照传回值计算。
-
-    引擎在落地之后， ``OnAfterFallOnBlockServerEvent`` 会一直触发，因此请在脚本层中做对应的逻辑判断。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``posX`` -- float，实体位置x
-    - ``posY`` -- float，实体位置y
-    - ``posZ`` -- float，实体位置z
-    - ``motionX`` -- float，瞬时移动x方向的力
-    - ``motionY`` -- float，瞬时移动y方向的力
-    - ``motionZ`` -- float，瞬时移动z方向的力
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``calculate`` -- bool，是否按脚本层传值计算力
-    """
-    HopperTryPullOutServerEvent = ...
-    """
-    [事件]
-
-    当漏斗以毗邻的方式连接容器时，即从旁边连接容器时，漏斗向容器开始输出物品时触发，事件仅触发一次。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，漏斗x坐标
-    - ``y`` -- int，漏斗y坐标
-    - ``z`` -- int，漏斗z坐标
-    - ``attachedPosX`` -- int，交互的容器的x坐标
-    - ``attachedPosY`` -- int，交互的容器的y坐标
-    - ``attachedPosZ`` -- int，交互的容器的z坐标
-    - ``dimensionId`` -- int，维度ID
-    - ``canHopper`` -- bool，是否允许容器往漏斗加东西(要关闭此交互，需先监听此事件再放置容器)
-    """
-    HopperTryPullInServerEvent = ...
-    """
-    [事件]
-
-    当漏斗上方连接容器后，容器往漏斗开始输入物品时触发，事件仅触发一次。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，漏斗x坐标
-    - ``y`` -- int，漏斗y坐标
-    - ``z`` -- int，漏斗z坐标
-    - ``abovePosX`` -- int，交互的容器位置x
-    - ``abovePosY`` -- int，交互的容器位置y
-    - ``abovePosZ`` -- int，交互的容器位置z
-    - ``dimensionId`` -- int，维度ID
-    - ``canHopper`` -- bool，是否允许容器往漏斗加东西(要关闭此交互，需先监听此事件再放置容器)
-    """
-    HeavyBlockStartFallingServerEvent = ...
-    """
-    [事件]
-
-    当重力方块变为下落的方块实体后，服务端触发该事件。
-
-    说明
-    ----
-
-    不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
-
-    事件参数
-    --------
-
-    - ``fallingBlockId`` -- str，下落的方块实体ID
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，维度ID
-    """
-    GrassBlockToDirtBlockServerEvent = ...
-    """
-    [事件]
-
-    草方块变成泥土方块时触发。
-
-    说明
-    ----
-
-    指令或者接口的设置不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    """
-    FarmBlockToDirtBlockServerEvent = ...
-    """
-    [事件]
-
-    耕地退化为泥土时触发。
-
-    说明
-    ----
-
-    指令或者接口的设置不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``setBlockType`` -- int，耕地退化为泥土的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
-    """
-    FallingBlockReturnHeavyBlockServerEvent = ...
-    """
-    [事件]
-
-    当下落的方块实体变回普通重力方块时，服务端触发该事件。
-
-    说明
-    ----
-
-    不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
-
-    事件参数
-    --------
-
-    - ``fallingBlockId`` -- str，下落的方块实体ID
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``heavyBlockName`` -- int，重力方块的identifier，包含命名空间及名称
-    - ``prevHereBlockName`` -- int，变回重力方块时，原本方块位置的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，维度ID
-    - ``fallTickAmount`` -- int，下落的方块实体持续下落了多少tick
-    """
-    FallingBlockCauseDamageBeforeServerEvent = ...
-    """
-    [事件]
-
-    当下落的方块开始计算砸到实体的伤害时，服务端触发该事件。
-
-    说明
-    ----
-
-    不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
-
-    服务端通常触发在客户端之后，而且有时会相差一个tick，这就意味着可能发生以下现象：
-    服务端 ``fallTickAmount`` 比配置强制破坏时间多1tick，下落的距离、下落的伤害计算出来比客户端时间多1tick的误差。
-
-    事件参数
-    --------
-
-    - ``fallingBlockId`` -- str，下落的方块实体ID
-    - ``fallingBlockX`` -- float，下落的方块实体位置x
-    - ``fallingBlockY`` -- float，下落的方块实体位置y
-    - ``fallingBlockZ`` -- float，下落的方块实体位置z
-    - ``blockName`` -- str，重力方块的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，维度ID
-    - ``collidingEntitys`` -- list[str] | None，当前碰撞到的实体ID的列表，如果没有的话是None
-    - ``fallTickAmount`` -- int，下落的方块实体持续下落了多少tick
-    - ``fallDistance`` -- float，下落的方块实体持续下落了多少距离
-    - ``isHarmful`` -- bool，是否计算对实体的伤害，引擎传来的值由json配置和伤害是否大于0决定，可在脚本层修改传回引擎
-    - ``fallDamage`` -- int，对实体的伤害，引擎传来的值距离和json配置决定，可在脚本层修改传回引擎
-    """
-    FallingBlockBreakServerEvent = ...
-    """
-    [事件]
-
-    当下落的方块实体被破坏时，服务端触发该事件。
-
-    说明
-    ----
-
-    不是所有下落的方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义重力方块 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/3-%E7%89%B9%E6%AE%8A%E6%96%B9%E5%9D%97/6-%E8%87%AA%E5%AE%9A%E4%B9%89%E9%87%8D%E5%8A%9B%E6%96%B9%E5%9D%97.html>`_ ）。
-
-    事件参数
-    --------
-
-    - ``fallingBlockId`` -- str，下落的方块实体ID
-    - ``fallingBlockX`` -- float，下落的方块实体位置x
-    - ``fallingBlockY`` -- float，下落的方块实体位置y
-    - ``fallingBlockZ`` -- float，下落的方块实体位置z
-    - ``blockName`` -- str，重力方块的identifier，包含命名空间及名称
-    - ``fallTickAmount`` -- int，下落的方块实体持续下落了多少tick
-    - ``dimensionId`` -- int，维度ID
-    - ``cancelDrop`` -- bool，是否取消方块物品掉落，可以在脚本层中设置
-    """
-    EntityPlaceBlockAfterServerEvent = ...
-    """
-    [事件]
-
-    当生物成功放置方块后触发。
-
-    说明
-    ----
-
-    部分放置后会产生实体的方块、可操作的方块、带有特殊逻辑的方块，不会触发该事件，
-    包括但不限于床、门、告示牌、花盆、红石中继器、船、炼药锅、头部模型、蛋糕、酿造台、盔甲架等。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``fullName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxData`` -- int，方块附加值
-    - ``entityId`` -- str，实体ID
-    - ``dimensionId`` -- int，维度ID
-    - ``face`` -- int，点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    """
-    DirtBlockToGrassBlockServerEvent = ...
-    """
-    [事件]
-
-    泥土方块变成草方块时触发。
-
-    说明
-    ----
-
-    指令或者接口的设置不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    """
-    CommandBlockUpdateEvent = ...
-    """
-    [事件]
-
-    玩家尝试修改命令方块的内置命令时。
-
-    说明
-    ----
-
-    当修改的目标为命令方块矿车时（此时 ``isBlock`` 为 ``False`` ），设置 ``cancel`` 为 ``True`` ，
-    依旧可以阻止修改命令方块矿车的内部指令，但是从客户端能够看到命令方块矿车的内部指令变化了，
-    不过这仅仅是假象，重新登录或者其他客户端打开命令方块矿车的设置界面，就会发现其实内部指令没有变化。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``playerUid`` -- long，玩家的uid
-    - ``command`` -- str，企图修改的命令方块中的命令内容字符串
-    - ``isBlock`` -- bool，是否以方块坐标的形式定位命令方块，当为True时下述的blockX/blockY/blockZ有意义，当为False时，下述的victimId有意义
-    - ``blockX`` -- int，命令方块位置x，当isBlock为True时有效
-    - ``blockY`` -- int，命令方块位置y，当isBlock为True时有效
-    - ``blockZ`` -- int，命令方块位置z，当isBlock为True时有效
-    - ``victimId`` -- str，命令方块对应的逻辑实体的实体ID，当isBlock为False时有效
-    - ``cancel`` -- bool，修改为True时，可以阻止玩家修改命令方块的内置命令
-    """
-    CommandBlockContainerOpenEvent = ...
-    """
-    [事件]
-
-    玩家点击命令方块，尝试打开命令方块的设置界面。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``isBlock`` -- bool，是否以方块坐标的形式定位命令方块，当为True时下述的blockX/blockY/blockZ有意义，当为False时，下述的victimId有意义
-    - ``blockX`` -- int，命令方块位置x，当isBlock为True时有效
-    - ``blockY`` -- int，命令方块位置y，当isBlock为True时有效
-    - ``blockZ`` -- int，命令方块位置z，当isBlock为True时有效
-    - ``victimId`` -- str，命令方块对应的逻辑实体的实体ID，当isBlock为False时有效
-    - ``cancel`` -- bool，修改为True时，可以阻止玩家打开命令方块的设置界面
-    """
-    ChestBlockTryPairWithServerEvent = ...
-    """
-    [事件]
-
-    两个并排的小箱子方块准备组合为一个大箱子方块时触发。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，是否允许触发，默认为False，若设为True，可阻止小箱子组合成为一个大箱子
-    - ``blockX`` -- int，小箱子方块x坐标
-    - ``blockY`` -- int，小箱子方块y坐标
-    - ``blockZ`` -- int，小箱子方块z坐标
-    - ``otherBlockX`` -- int，将要与之组合的另外一个小箱子方块x坐标
-    - ``otherBlockY`` -- int，将要与之组合的另外一个小箱子方块y坐标
-    - ``otherBlockZ`` -- int，将要与之组合的另外一个小箱子方块z坐标
-    - ``dimensionId`` -- int，维度ID
-    """
-    BlockStrengthChangedServerEvent = ...
-    """
-    [事件]
-
-    自定义机械元件方块红石信号量发生变化时触发。
-
-    事件参数
-    --------
-
-    - ``posX`` -- int，方块x坐标
-    - ``posY`` -- int，方块y坐标
-    - ``posZ`` -- int，方块z坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxValue`` -- int，方块的附加值
-    - ``newStrength`` -- int，变化后的红石信号量
-    - ``oldStrength`` -- int，变化前的红石信号量
-    - ``dimensionId`` -- int，维度ID
-    """
-    BlockSnowStateChangeServerEvent = ...
-    """
-    [事件]
-
-    方块转为含雪或者脱离含雪前触发。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``turnSnow`` -- bool，是否转为含雪，true则转为含雪，false则脱离含雪
-    - ``setBlockType`` -- int，方块进入脱离含雪的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
-    """
-    BlockSnowStateChangeAfterServerEvent = ...
-    """
-    [事件]
-
-    方块转为含雪或者脱离含雪后触发。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``turnSnow`` -- bool，是否转为含雪，true则转为含雪，false则脱离含雪
-    - ``setBlockType`` -- int，方块进入脱离含雪的原因，参考 `SetBlockType枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/SetBlockType.html?key=SetBlockType&docindex=1&type=0>`_
-    """
-    BlockRemoveServerEvent = ...
-    """
-    [事件]
-
-    监听该事件的方块在销毁时触发.
-
-    说明
-    ----
-
-    可以通过 `ListenOnBlockRemoveEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=ListenOnBlockRemoveEvent&docindex=3&type=0>`_
-    方法进行监听，或者通过json组件 `netease:listen_block_remove <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html#netease-listen-block-remove>`_
-    进行配置。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``fullName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxValue`` -- int，方块的附加值
-    - ``dimension`` -- int，维度ID
-
-    相关接口
-    --------
-
-    - `ListenOnBlockRemoveEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=ListenOnBlockRemoveEvent&docindex=3&type=0>`_
-    """
-    BlockRandomTickServerEvent = ...
-    """
-    [事件]
-
-    自定义方块配置 ``"netease:random_tick"`` 随机tick时触发。
-
-    事件参数
-    --------
-
-    - ``dimensionId`` -- int，维度ID
-    - ``posX`` -- int，方块x坐标
-    - ``posY`` -- int，方块y坐标
-    - ``posZ`` -- int，方块z坐标
-    - ``blockName`` -- str，方块名称
-    - ``fullName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxValue`` -- int，方块的附加值
-    """
-    BlockNeighborChangedServerEvent = ...
-    """
-    [事件]
-
-    自定义方块周围的方块发生变化时，需要配置 ``"netease:neighborchanged_sendto_script"`` 。
-
-    事件参数
-    --------
-
-    - ``dimensionId`` -- int，维度ID
-    - ``posX`` -- int，方块x坐标
-    - ``posY`` -- int，方块y坐标
-    - ``posZ`` -- int，方块z坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``neighborPosX`` -- int，变化方块x坐标
-    - ``neighborPosY`` -- int，变化方块y坐标
-    - ``neighborPosZ`` -- int，变化方块z坐标
-    - ``fromBlockName`` -- str，方块变化前的identifier，包含命名空间及名称
-    - ``fromBlockAuxValue`` -- int，方块变化前附加值
-    - ``toBlockName`` -- str，方块变化后的identifier，包含命名空间及名称
-    - ``toAuxValue`` -- int，方块变化后附加值
-    """
-    BlockLiquidStateChangeServerEvent = ...
-    """
-    [事件]
-
-    方块转为含水或者脱离含水(流体)前触发。
-
-    事件参数
-    --------
-
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxValue`` -- int，方块的附加值
-    - ``dimension`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``turnLiquid`` -- bool，是否转为含水，True则转为含水，False则脱离含水
-    """
-    BlockLiquidStateChangeAfterServerEvent = ...
-    """
-    [事件]
-
-    方块转为含水或者脱离含水(流体)后触发。
-
-    事件参数
-    --------
-
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxValue`` -- int，方块的附加值
-    - ``dimension`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``turnLiquid`` -- bool，是否转为含水，True则转为含水，False则脱离含水
-    """
-    BlockDestroyByLiquidServerEvent = ...
-    """
-    [事件]
-
-    方块被水流破坏的事件。
-
-    说明
-    ----
-
-    指令或者接口的设置不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``liquidName`` -- str，流体方块identifier
-    - ``blockName`` -- str，方块的identifier
-    - ``auxValue`` -- int，方块的附加值
-    - ``dimensionId`` -- int，方块所在维度ID
-    """
-    StoreBuySuccServerEvent = ...
-    """
-    [事件]
-
-    玩家游戏内购买商品时服务端抛出的事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    ServerPlayerGetExperienceOrbEvent = ...
-    """
-    [事件]
-
-    玩家获取经验球时触发的事件。
-
-    说明
-    ----
-
-    ``cancel`` 值设为 ``True`` 时，捡起的经验球不会增加经验值，但是经验球一样会消失。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``experienceValue`` -- int，经验球经验值
-    - ``cancel`` -- bool，是否取消
-    """
-    PlayerTrySleepServerEvent = ...
-    """
-    [事件]
-
-    玩家尝试使用床睡觉时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``cancel`` -- bool，是否取消
-    """
-    PlayerTeleportEvent = ...
-    """
-    [事件]
-
-    当玩家传送时触发该事件，如：玩家使用末影珍珠或tp指令时。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    """
-    PlayerStopSleepServerEvent = ...
-    """
-    [事件]
-
-    玩家停止睡觉时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``fullName`` -- str，方块ID
-    - ``auxData`` -- int，方块附加值
-    - ``dimensionid`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    """
-    PlayerSleepServerEvent = ...
-    """
-    [事件]
-
-    玩家使用床睡觉成功时触发。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``fullName`` -- str，方块ID
-    - ``auxData`` -- int，方块附加值
-    - ``dimensionid`` -- int，维度ID
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    """
-    PlayerRespawnFinishServerEvent = ...
-    """
-    [事件]
-
-    玩家复活完毕时触发。
-
-    说明
-    ----
-
-    该事件触发时玩家已重生完毕，可以安全使用切维度等操作。
-    通过末地传送门回到主世界时也算重生，同样也会触发该事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    PlayerRespawnEvent = ...
-    """
-    [事件]
-
-    玩家复活时触发该事件。
-
-    说明
-    ----
-
-    该事件为玩家点击重生按钮时触发，但是触发时玩家可能尚未完成复活，此时请勿对玩家进行切维度或设置生命值等操作，
-    一般情况下推荐使用 ``PlayerRespawnFinishServerEvent`` 。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    """
-    PlayerHurtEvent = ...
-    """
-    [事件]
-
-    当玩家受伤害前触发该事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    - ``attacker`` -- str，伤害来源实体ID，若没有实体攻击，例如高空坠落，该值为"-1"
-    - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
-    - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
-    """
-    PlayerEatFoodServerEvent = ...
-    """
-    [事件]
-
-    玩家吃下食物时触发。
-
-    说明
-    ----
-
-    由于牛奶本身并没有饱食度的概念，因此，当喝牛奶触发该事件时，饥饿度、营养价值字段无效并始终为 ``0`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict，食物的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``hunger`` -- int，食物增加的饥饿值，可修改
-    - ``nutrition`` -- float，食物的营养价值，回复饱和度 = 食物增加的饥饿值 * 食物的营养价值 * 2，饱和度最大不超过当前饥饿值，可修改
-    """
-    PlayerDieEvent = ...
-    """
-    [事件]
-
-    当玩家死亡时触发该事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    - ``attacker`` -- str，伤害来源的实体ID
-    - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
-    - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
-    """
-    OnPlayerHitBlockServerEvent = ...
-    """
-    [事件]
-
-    通过 ``OpenPlayerHitBlockDetection`` 打开方块碰撞检测后，当玩家碰撞到方块时触发该事件。
-
-    说明
-    ----
-
-    监听玩家着地请使用客户端的 ``OnGroundClientEvent`` 。
-
-    客户端和服务端分别作碰撞检测，可能两个事件返回的略有差异。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``posX`` -- int，碰撞方块x坐标
-    - ``posY`` -- int，碰撞方块y坐标
-    - ``posY`` -- int，碰撞方块z坐标
-    - ``blockId`` -- float，碰撞方块的identifier
-    - ``auxValue`` -- int，碰撞方块的附加值
-    - ``dimensionId`` -- int，维度ID
-
-    相关接口
-    --------
-
-    - `OpenPlayerHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=OpenPlayerHitBlockDetection&docindex=4&type=0>`_
-    - `ClosePlayerHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=ClosePlayerHitBlockDetection&docindex=1&type=0>`_
-    """
-    GameTypeChangedServerEvent = ...
-    """
-    [事件]
-
-    个人游戏模式发生变化时服务端触发。
-
-    说明
-    ----
-
-    游戏模式：生存、创造、冒险分别为0、1、2。
-
-    默认游戏模式发生变化时最后反映在个人游戏模式之上。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID， `SetDefaultGameType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E4%B8%96%E7%95%8C/%E6%B8%B8%E6%88%8F%E8%A7%84%E5%88%99.html?key=SetDefaultGameType&docindex=2&type=0>`_ 接口改变游戏模式时该参数为空字符串
-    - ``oldGameType`` -- int，切换前的游戏模式
-    - ``newGameType`` -- int，切换后的游戏模式
-    """
-    ExtinguishFireServerEvent = ...
-    """
-    [事件]
-
-    玩家扑灭火焰时触发。
-
-    说明
-    ----
-
-    下雨，倒水等方式熄灭火焰不会触发。
-
-    事件参数
-    --------
-
-    - ``pos`` -- tuple[float, float, float]，火焰方块的坐标
-    - ``playerId`` -- str，玩家的实体ID
-    - ``cancel`` -- bool，修改为True时，可阻止玩家扑灭火焰。需要与ExtinguishFireClientEvent一起修改
-    """
-    DimensionChangeServerEvent = ...
-    """
-    [事件]
-
-    玩家维度改变时服务端抛出。
-
-    说明
-    ----
-
-    当通过传送门从末地回到主世界时， ``toY`` 值为 ``32767`` ，其他情况一般会比设置值高 ``1.62`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``fromDimensionId`` -- int，维度改变前的维度ID
-    - ``toDimensionId`` -- int，维度改变前的维度ID
-    - ``fromX`` -- float，改变前的位置x
-    - ``fromY`` -- float，改变前的位置y
-    - ``fromZ`` -- float，改变前的位置z
-    - ``toX`` -- float，改变后的位置x
-    - ``toY`` -- float，改变后的位置y
-    - ``toZ`` -- float，改变后的位置z
-    """
-    ChangeLevelUpCostServerEvent = ...
-    """
-    [事件]
-
-    获取玩家下一个等级升级经验时触发，用于重载玩家的升级经验，每个等级在重置之前都只会触发一次。
-
-    事件参数
-    --------
-
-    - ``level`` -- int，玩家当前等级
-    - ``levelUpCostExp`` -- int，当前等级升级到下个等级需要的经验值，当设置升级经验小于1时会被强制调整到1
-    - ``changed`` -- bool，设置为True，重载玩家升级经验才会生效
-
-    相关接口
-    --------
-
-    - `ClearDefinedLevelUpCost <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=ClearDefinedLevelUpCost&docindex=1&type=0>`_
-    """
-    AddLevelEvent = ...
-    """
-    [事件]
-
-    当玩家升级时触发该事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    - ``addLevel`` -- int，增加的等级值
-    - ``newLevel`` -- int，新的等级
-    """
-    AddExpEvent = ...
-    """
-    [事件]
-
-    当玩家增加经验时触发该事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    - ``addExp`` -- int，增加的经验值
-    """
-    WillTeleportToServerEvent = ...
-    """
-    [事件]
-
-    实体即将传送或切换维度时触发。
-
-    说明
-    ----
-
-    假如目标维度尚未在内存中创建（即服务器启动之后，到传送之前，没有玩家进入过这个维度），那么此时事件中返回的目标地点坐标是算法生成的，
-    不能保证正确。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，是否允许触发，默认为False，若设为True，可阻止触发后续的传送
-    - ``entityId`` -- str，实体ID
-    - ``fromDimensionId`` -- int，传送前所在的维度
-    - ``toDimensionId`` -- int，传送后的目标维度
-    - ``fromX`` -- float，传送前的位置x
-    - ``fromY`` -- float，传送前的位置y
-    - ``fromZ`` -- float，传送前的位置z
-    - ``toX`` -- float，传送后的位置x
-    - ``toY`` -- float，传送后的位置y
-    - ``toZ`` -- float，传送后的位置z
-    - ``cause`` -- str，传送理由，详情见EntityTeleportCause枚举
-    """
-    WillAddEffectServerEvent = ...
-    """
-    [事件]
-
-    实体即将获得状态效果前触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``effectName`` -- str，状态效果的名字
-    - ``effectDuration`` -- int，状态效果的持续时间，单位秒
-    - ``effectAmplifier`` -- int，状态效果等级
-    - ``cancel`` -- bool，设置为True可以取消
-    - ``damage`` -- float，状态将会造成的伤害值，如药水；需要注意，该值不一定是最终的伤害值，例如被伤害吸收效果扣除。只有持续时间为0时有用
-    """
-    StartRidingServerEvent = ...
-    """
-    [事件]
-
-    一个实体即将骑乘另外一个实体时触发。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，是否允许触发，默认为False，若设为True，可阻止触发后续的实体交互事件
-    - ``actorId`` -- str，骑乘者的实体ID
-    - ``victimId`` -- str，被骑乘的实体ID
-    """
-    RemoveEffectServerEvent = ...
-    """
-    [事件]
-
-    实体身上状态效果被移除时触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``effectName`` -- str，被移除状态效果的名字
-    - ``effectDuration`` -- int，被移除状态效果的剩余持续时间，单位秒
-    - ``effectAmplifier`` -- int，被移除状态效果等级
-    """
-    RefreshEffectServerEvent = ...
-    """
-    [事件]
-
-    实体身上状态效果更新时触发。
-
-    说明
-    ----
-
-    更新条件：
-
-    | 1、新增状态等级较高，更新状态等级及时间；
-    | 2、新增状态等级不变，时间较长，更新状态持续时间。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``effectName`` -- str，更新状态效果的名字
-    - ``effectDuration`` -- int，更新后状态效果剩余持续时间，单位秒
-    - ``effectAmplifier`` -- int，更新后的状态效果放大倍数
-    - ``damage`` -- float，状态造成的伤害值，如药水
-    """
-    ProjectileCritHitEvent = ...
-    """
-    [事件]
-
-    当抛射物与头部碰撞时触发该事件。
-
-    说明
-    ----
-
-    需调用 ``OpenPlayerCritBox`` 开启玩家爆头后才能触发。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，抛射物的实体ID
-    - ``targetId`` -- str，碰撞目标的实体ID
-
-    相关接口
-    --------
-
-    - `OpenPlayerCritBox <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=OpenPlayerCritBox&docindex=3&type=0>`_
-    - `ClosePlayerCritBox <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=ClosePlayerCritBox&docindex=1&type=0>`_
-    """
-    OnMobHitMobServerEvent = ...
-    """
-    [事件]
-
-    通过 ``OpenPlayerHitMobDetection`` 打开生物碰撞检测后，当生物间（包含玩家）碰撞时触发该事件。
-
-    说明
-    ----
-
-    客户端和服务端分别作碰撞检测，可能两个事件返回的略有差异。
-
-    本事件代替原有的 ``OnPlayerHitMobServerEvent`` 事件。
-
-    事件参数
-    --------
-
-    - ``mobId`` -- str，当前生物的实体ID
-    - ``hittedMobList`` -- list[str]，当前生物碰撞到的其他所有生物实体ID的list
-
-    相关接口
-    --------
-
-    - `OpenPlayerHitMobDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=OpenPlayerHitMobDetection&docindex=4&type=0>`_
-    - `ClosePlayerHitMobDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=ClosePlayerHitMobDetection&docindex=1&type=0>`_
-    """
-    OnKnockBackServerEvent = ...
-    """
-    [事件]
-
-    实体被击退时触发。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    OnFireHurtEvent = ...
-    """
-    [事件]
-
-    生物受到火焰伤害时触发。
-
-    事件参数
-    --------
-
-    - ``victim`` -- str，受伤实体ID
-    - ``src`` -- str，火焰创建者的实体ID
-    - ``fireTime`` -- float，着火时间，单位秒，不支持修改
-    - ``cancel`` -- bool，是否取消此处火焰伤害
-    - ``cancelIgnite`` -- bool，是否取消点燃效果
-    """
-    MobGriefingBlockServerEvent = ...
-    """
-    [事件]
-
-    环境生物改变方块时触发，触发的时机与 ``mobgriefing`` 游戏规则影响的行为相同。
-
-    说明
-    ----
-
-    触发的时机包括：
-    生物踩踏耕地、破坏单个方块、破门、火矢点燃方块、凋灵boss破坏方块、末影龙破坏方块、末影人捡起方块、蠹虫破坏被虫蚀的方块、
-    蠹虫把方块变成被虫蚀的方块、凋零杀死生物生成凋零玫瑰、生物踩坏海龟蛋。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，是否允许触发，默认为False，若设为True，可阻止触发后续物理交互事件
-    - ``blockX`` -- int，方块x坐标
-    - ``blockY`` -- int，方块y坐标
-    - ``blockZ`` -- int，方块z坐标
-    - ``entityId`` -- str，实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``dimensionId`` -- int，维度ID
-    """
-    HealthChangeServerEvent = ...
-    """
-    [事件]
-
-    生物生命值发生变化时触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``from`` -- float，变化前的生命值（请使用args.from_或args['from']获取该参数）
-    - ``to`` -- float，变化后的生命值
-    - ``byScript`` -- bool，是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
-    """
-    EntityTickServerEvent = ...
-    """
-    [事件] [tick]
-
-    实体tick时触发。
-
-    说明
-    ----
-
-    该事件为20帧每秒。
-
-    需要使用 ``AddEntityTickEventWhiteList`` 添加触发该事件的实体类型白名单。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``identifier`` -- str，实体identifier
-
-    相关接口
-    --------
-
-    - `AddEntityTickEventWhiteList <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=AddEntityTickEventWhiteList&docindex=3&type=0>`_
-    """
-    EntityPickupItemServerEvent = ...
-    """
-    [事件]
-
-    有 ``"minecraft:behavior.pickup_items"`` 行为的生物拾取物品时触发该事件，例如村民拾取面包、猪灵拾取金锭。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``secondaryActor`` -- str，物品给予者的实体ID（一般是玩家），如果不存在给予者的话，这里为空字符串
-    """
-    EntityMotionStopServerEvent = ...
-    """
-    [事件]
-
-    实体运动器停止事件。实体（包含玩家）添加运动器并开始运行后，运动器自动停止时触发。
-
-    说明
-    ----
-
-    该事件触发表示运动器播放顺利完成，手动调用的 ``StopEntityMotion`` 、 ``RemoveEntityMotion``
-    以及实体被销毁导致的运动器停止不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``motionId`` -- int，运动器ID
-    - ``entityId`` -- str，实体ID
-    - ``remove`` -- bool，是否移除该运动器，设置为False则保留，默认为True，即运动器停止后自动移除，该参数设置只对非玩家实体有效
-    """
-    EntityMotionStartServerEvent = ...
-    """
-    [事件]
-
-    实体运动器开始事件。实体（包含玩家）添加运动器后，运动器开始运行时触发。
-
-    事件参数
-    --------
-
-    - ``motionId`` -- int，运动器ID
-    - ``entityId`` -- str，实体ID
-    """
-    EntityLoadScriptEvent = ...
-    """
-    [事件]
-
-    数据库加载实体自定义数据时触发。
-
-    说明
-    ----
-
-    只有使用过extraData组件的 ``SetExtraData`` 接口的实体才有此事件，触发时可以通过extraData组件的 ``GetExtraData``
-    或 ``GetWholeExtraData`` 接口获取该实体的自定义数据。
-
-    事件参数
-    --------
-
-    - ``args`` -- list，该事件的参数为长度为2的list，而非dict，其中list的第一个元素为实体ID
-    """
-    EntityEffectDamageServerEvent = ...
-    """
-    [事件]
-
-    生物受到状态伤害/回复事件。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``damage`` -- float，伤害值（伤害吸收后实际扣血量），负数表示生命回复量
-    - ``attributeBuffType`` -- int，状态类型，参考 `AttributeBuffType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/AttributeBuffType.html?key=AttributeBuffType&docindex=1&type=0>`_
-    - ``duration`` -- float，状态持续时间，单位秒
-    - ``lifeTimer`` -- float，状态生命时间，单位秒
-    - ``isInstantaneous`` -- bool，是否为立即生效状态
-    - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
-    """
-    EntityDroppedItemServerEvent = ...
-    """
-    [事件]
-
-    生物扔出物品时触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，生物的实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``itemEntityId`` -- str，物品的实体ID
-    """
-    EntityChangeDimensionServerEvent = ...
-    """
-    [事件]
-
-    实体维度改变时服务端抛出。
-
-    说明
-    ----
-
-    实体转移维度时，如果对应维度的对应位置的区块尚未加载，实体会缓存在维度自身的缓冲区中，直到对应区块被加载时才会创建对应的实体，
-    此事件的抛出只代表实体从原维度消失，不代表必定会在对应维度出现。
-
-    玩家维度改变时不触发该事件，而是会触发 ``DimensionChangeServerEvent`` 事件。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``fromDimensionId`` -- int，维度改变前的维度ID
-    - ``toDimensionId`` -- int，维度改变后的维度ID
-    - ``fromX`` -- float，改变前的位置x
-    - ``fromY`` -- float，改变前的位置y
-    - ``fromZ`` -- float，改变前的位置z
-    - ``toX`` -- float，改变后的位置x
-    - ``toY`` -- float，改变后的位置y
-    - ``toZ`` -- float，改变后的位置z
-    """
-    ChangeSwimStateServerEvent = ...
-    """
-    [事件]
-
-    实体开始或者结束游泳时触发。
-
-    说明
-    ----
-
-    当实体的状态没有变化时，不会触发此事件，即 ``formState`` 和 ``toState`` 必定一真一假。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``formState`` -- bool，事件触发前，实体是否在游泳状态
-    - ``toState`` -- bool，事件触发后，实体是否在游泳状态
-    """
-    AddEffectServerEvent = ...
-    """
-    [事件]
-
-    实体获得状态效果时触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``effectName`` -- str，实体获得状态效果的名字
-    - ``effectDuration`` -- int，状态效果的持续时间，单位秒
-    - ``effectAmplifier`` -- int，状态效果的等级
-    - ``damage`` -- float，状态造成的伤害值（真实扣除生命值的量）。只有持续时间为0时有用
-    """
-    ActorHurtServerEvent = ...
-    """
-    [事件]
-
-    生物（包括玩家）受伤时触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_
-    - ``damage`` -- float，伤害值（被伤害吸收后的值），不可修改
-    - ``absorbedDamage`` -- int，被伤害吸收效果吸收的伤害值
-    - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
-    """
-    ServerSpawnMobEvent = ...
-    """
-    [事件]
-
-    游戏内自动生成生物，以及使用api生成生物时触发。
-
-    说明
-    ----
-
-    如果通过MOD API生成， ``identifier`` 命名空间为 ``custom`` 。
-
-    如果需要屏蔽原版的生物生成，可以判断 ``identifier`` 命名空间不为 ``custom`` 时设置 ``cancel`` 为 ``True`` 。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``identifier`` -- str，生成实体的命名空间
-    - ``type`` -- str，生成实体的类型，参考 `EntityType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/EntityType.html?key=EntityType&docindex=1&type=0>`_
-    - ``baby`` -- str，生成怪物是否是幼年怪
-    - ``x`` -- str，生成实体坐标x
-    - ``y`` -- str，生成实体坐标y
-    - ``z`` -- str，生成实体坐标z
-    - ``dimensionId`` -- int，生成实体的维度ID，默认值为0（0为主世界，1为地狱，2为末地）
-    - ``realIdentifier`` -- int，生成实体的命名空间，通过MOD API生成的生物在这个参数也能获取到真正的命名空间，而不是以custom开头的
-    - ``cancel`` -- bool，是否取消生成该实体
-    """
-    ServerPreBlockPatternEvent = ...
-    """
-    [事件]
-
-    用方块组合生成生物，在放置最后一个组成方块时触发该事件。
-
-    事件参数
-    --------
-
-    - ``enable`` -- bool，是否允许继续生成。若设为False，可阻止生成生物
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``dimensionId`` -- int，维度ID
-    - ``entityWillBeGenerated`` -- str，即将生成生物的名字，如"minecraft:pig"
-    """
-    ServerPostBlockPatternEvent = ...
-    """
-    [事件]
-
-    用方块组合生成生物，生成生物之后触发该事件。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，生成生物的实体ID
-    - ``entityGenerated`` -- str，生成生物的名字，如"minecraft:pig"
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``dimensionId`` -- int，维度ID
-    """
-    ServerChatEvent = ...
-    """
-    [事件]
-
-    玩家发送聊天信息时触发。
-
-    事件参数
-    --------
-
-    - ``username`` -- str，玩家名称
-    - ``playerId`` -- str，玩家的实体ID
-    - ``message`` -- str，玩家发送的聊天消息内容
-    - ``cancel`` -- bool，是否取消这个聊天事件，若取消可以设置为True
-    - ``bChatById`` -- bool，是否把聊天消息发送给指定在线玩家，而不是广播给所有在线玩家，若只发送某些玩家可以设置为True
-    - ``bForbid`` -- bool，是否禁言，仅apollo可用。True：被禁言，玩家聊天会提示“你已被管理员禁言”
-    - ``toPlayerIds`` -- list[str]，接收聊天消息的玩家实体ID的列表，bChatById为True时生效
-    - ``gameChatPrefix`` -- str，设置当前玩家在网易聊天界面中的前缀，字数限制4，从字符串头部开始取。前缀文本输入非字符串格式时会被置为空。若cancel为True，会取消掉本次的前缀修改
-    - ``gameChatPrefixColorR`` -- float，设置当前玩家在网易聊天界面中前缀颜色rgb的r值，范围为[0,1]。颜色数值输入其他格式时会被置为0。若cancel为True，会取消掉本次的颜色修改
-    - ``gameChatPrefixColorG`` -- float，设置当前玩家在网易聊天界面中前缀颜色rgb的g值，范围为[0,1]。颜色数值输入其他格式时会被置为0。若cancel为True，会取消掉本次的颜色修改
-    - ``gameChatPrefixColorB`` -- float，设置当前玩家在网易聊天界面中前缀颜色rgb的b值，范围为[0,1]。颜色数值输入其他格式时会被置为0。若cancel为True，会取消掉本次的颜色修改
-    """
-    PlayerLeftMessageServerEvent = ...
-    """
-    [事件]
-
-    准备显示“xxx离开游戏”的玩家离开提示文字时服务端抛出的事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    - ``name`` -- str，玩家昵称
-    - ``cancel`` -- bool，是否显示提示文字，允许修改。True：不显示提示
-    - ``message`` -- str，玩家离开游戏的提示文字，允许修改
-    """
-    PlayerJoinMessageEvent = ...
-    """
-    [事件]
-
-    准备显示“xxx加入游戏”的玩家登录提示文字时服务端抛出的事件。
-
-    说明
-    ----
-
-    对于联机类游戏（如联机大厅、网络游戏等），请勿在此事件的回调函数中使用 ``SetFootPos`` 接口修改玩家的位置，
-    否则可能会因为触发服务端反作弊机制而传送失败。
-    如需要在进入游戏时使用 ``SetFootPos`` 接口，建议监听 ``AddServerPlayerEvent`` 并设置位置。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    - ``name`` -- str，玩家昵称
-    - ``cancel`` -- bool，是否显示提示文字，允许修改。True：不显示提示
-    - ``message`` -- str，玩家加入游戏的提示文字，允许修改
-    """
-    PlayerIntendLeaveServerEvent = ...
-    """
-    [事件]
-
-    即将删除玩家时触发该事件。
-
-    说明
-    ----
-
-    与 ``DelServerPlayerEvent`` 事件不同，此时可以通过各种API获取玩家的当前状态。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    PlaceNeteaseStructureFeatureEvent = ...
-    """
-    [事件]
-
-    首次生成地形时，结构特征即将生成时服务端抛出该事件。
-
-    说明
-    ----
-
-    需要配合 ``AddNeteaseFeatureWhiteList`` 接口一同使用。
-
-    若在本监听事件中调用其他modSDK接口将无法生效，强烈建议本事件仅用于设置结构放置与否。
-
-    事件只会在网易版结构放置时抛出， ``structureName`` 参数修改为不存在结构或者原生结构时，开发包会出现断言。
-
-    事件参数
-    --------
-
-    - ``structureName`` -- str，结构名称
-    - ``x`` -- int，结构坐标最小方块所在的x坐标
-    - ``y`` -- int，结构坐标最小方块所在的y坐标
-    - ``z`` -- int，结构坐标最小方块所在的z坐标
-    - ``biomeType`` -- int，该feature所放置区块的生物群系类型
-    - ``biomeName`` -- int，该feature所放置区块的生物群系名称
-    - ``dimensionId`` -- int，维度ID
-    - ``cancel`` -- bool，设置为True时可阻止该结构的放置
-
-    相关接口
-    --------
-
-    - `AddNeteaseFeatureWhiteList <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=AddNeteaseFeatureWhiteList&docindex=2&type=0>`_
-    - `RemoveNeteaseFeatureWhiteList <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=RemoveNeteaseFeatureWhiteList&docindex=1&type=0>`_
-    - `ClearAllNeteaseFeatureWhiteList <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=ClearAllNeteaseFeatureWhiteList&docindex=1&type=0>`_
-    """
-    OnRainLevelChangeServerEvent = ...
-    """
-    [事件]
-
-    下雨强度发生改变时触发。
-
-    事件参数
-    --------
-
-    - ``oldLevel`` -- float，改变前的下雨强度
-    - ``newLevel`` -- float，改变后的下雨强度
-    """
-    OnLocalRainLevelChangeServerEvent = ...
-    """
-    [事件]
-
-    独立维度天气下雨强度发生改变时触发。
-
-    事件参数
-    --------
-
-    - ``oldLevel`` -- float，改变前的下雨强度
-    - ``newLevel`` -- float，改变后的下雨强度
-    - ``dimensionId`` -- int，维度ID
-    """
-    OnLocalLightningLevelChangeServerEvent = ...
-    """
-    [事件]
-
-    独立维度天气打雷强度发生改变时触发。
-
-    事件参数
-    --------
-
-    - ``oldLevel`` -- float，改变前的打雷强度
-    - ``newLevel`` -- float，改变后的打雷强度
-    - ``dimensionId`` -- int，维度ID
-    """
-    OnLightningLevelChangeServerEvent = ...
-    """
-    [事件]
-
-    打雷强度发生改变时触发。
-
-    事件参数
-    --------
-
-    - ``oldLevel`` -- float，改变前的打雷强度
-    - ``newLevel`` -- float，改变后的打雷强度
-    """
-    OnContainerFillLoottableServerEvent = ...
-    """
-    [事件]
-
-    随机奖励箱第一次打开根据loottable生成物品时。
-
-    说明
-    ----
-
-    只有当 ``dirty`` 为 ``True`` 时才会重新读取 ``itemList`` 并生成对应的掉落物，
-    如果不需要修改掉落结果的话请勿随意修改 ``dirty`` 值。
-
-    事件参数
-    --------
-
-    - ``loottable`` -- str，奖励箱子所读取的loottable的json路径
-    - ``playerId`` -- str，打开奖励箱子的玩家的实体ID
-    - ``itemList`` -- list[dict]，掉落物品列表，每个元素为一个itemDict，格式可参考 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``dirty`` -- bool，默认为False，如果需要修改掉落列表需将该值设为True
-    """
-    OnCommandOutputServerEvent = ...
-    """
-    [事件]
-
-    Command命令执行成功事件。
-
-    说明
-    ----
-
-    部分命令在返回的时候没有命令名称， ``SetCommand`` 接口需要 ``showOutput`` 参数为 ``True`` 时才会有返回。
-
-    事件参数
-    --------
-
-    - ``command`` -- str，命令名称
-    - ``message`` -- str，命令返回的消息
-    """
-    NewOnEntityAreaEvent = ...
-    """
-    [事件]
-
-    通过 ``RegisterEntityAOIEvent`` 注册过AOI事件后，当有实体进入或离开注册感应区域时触发该事件。
-
-    说明
-    ----
-
-    本事件代替原有的 ``OnEntityAreaEvent`` 事件。
-
-    事件参数
-    --------
-
-    - ``name`` -- str，感应区域的名称
-    - ``enteredEntities`` -- list[str]，进入该感应区域的实体ID列表
-    - ``leftEntities`` -- list[str]，离开该感应区域的实体ID列表
-
-    相关接口
-    --------
-
-    - `RegisterEntityAOIEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=RegisterEntityAOIEvent&docindex=3&type=0>`_
-    - `UnRegisterEntityAOIEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E4%B8%96%E7%95%8C.html?key=UnRegisterEntityAOIEvent&docindex=1&type=0>`_
-    """
-    LoadServerAddonScriptsAfter = ...
-    """
-    [事件]
-
-    服务器加载完mod时触发。
-
-    事件参数
-    --------
-
-    无
-    """
-    DelServerPlayerEvent = ...
-    """
-    [事件]
-
-    删除玩家时触发该事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    - ``isTransfer`` -- bool，是否是切服时退出服务器，仅用于Apollo。如果是True，则表示切服时退出服务器；若是False，则表示退出网络游戏
-    - ``uid`` -- long，玩家的netease uid，玩家的唯一标识
-    """
-    CommandEvent = ...
-    """
-    [事件]
-
-    玩家请求执行指令时触发。
-
-    说明
-    ----
-
-    该事件是玩家请求执行指令时触发的Hook，该事件不响应命令方块的指令和通过modSDK调用的指令，
-    阻止玩家的该条指令只需要将 ``cancel`` 设置为 ``True`` 。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，玩家的实体ID
-    - ``command`` -- str，指令字符串
-    - ``cancel`` -- bool，是否取消
-    """
-    ClientLoadAddonsFinishServerEvent = ...
-    """
-    [事件]
-
-    客户端mod加载完成时，服务端触发此事件。服务器可以使用此事件，往客户端发送数据给其初始化。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    ChunkLoadedServerEvent = ...
-    """
-    [事件]
-
-    服务端区块加载完成时。
-
-    说明
-    ----
-
-    服务端的自定义方块实体加载完成时对应的客户端的自定义方块实体并没有初始化完成，无法使用该事件对客户端的自定义方块实体进行相关操作。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，维度ID
-    - ``chunkPosX`` -- int，区块的x坐标，对应方块x坐标区间为[x * 16, x * 16 + 15]
-    - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[z * 16, z * 16 + 15]
-    - ``blockEntities`` -- list[dict]，随区块加载而加载进世界的自定义方块实体的坐标的列表，列表元素dict包含posX，posY，posZ三个int表示自定义方块实体的坐标，blockName表示方块的identifier，包含命名空间及名称
-    """
-    ChunkGeneratedServerEvent = ...
-    """
-    [事件]
-
-    区块创建完成时触发。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，维度ID
-    - ``chunkPosX`` -- int，区块的x坐标，对应方块x坐标区间为[chunkPosX * 16, chunkPosX * 16 + 15]
-    - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[chunkPosZ * 16, chunkPosZ * 16 + 15]
-    - ``blockEntityData`` -- list[dict] | None，该区块中的自定义方块实体列表，通常是由自定义特征生成的自定义方块，没有自定义方块实体时该值为None。列表元素dict的结构如下：{'blockName': str, 'posX': int, 'posY': int, 'posZ': int}
-    """
-    ChunkAcquireDiscardedServerEvent = ...
-    """
-    [事件]
-
-    服务端区块即将被卸载时触发。
-
-    说明
-    ----
-
-    区块卸载：游戏只会加载玩家周围的区块，玩家移动到别的区域时，原来所在区域的区块会被卸载。
-
-    事件参数
-    --------
-
-    - ``dimension`` -- int，维度ID
-    - ``chunkPosX`` -- int，区块的x坐标，对应方块x坐标区间为[x * 16, x * 16 + 15]
-    - ``chunkPosZ`` -- int，区块的z坐标，对应方块z坐标区间为[z * 16, z * 16 + 15]
-    - ``entities`` -- list[str]，随区块卸载而从世界移除的实体ID的列表。注意事件触发时已经无法获取到这些实体的信息，仅供脚本资源回收用
-    - ``blockEntities`` -- list[dict]，随区块卸载而从世界移除的自定义方块实体的坐标的列表，列表元素dict包含posX，posY，posZ三个int表示自定义方块实体的坐标。注意事件触发时已经无法获取到这些方块实体的信息，仅供脚本资源回收用
-    """
-    AddServerPlayerEvent = ...
-    """
-    [事件]
-
-    玩家加入时触发该事件。
-
-    说明
-    ----
-
-    触发此事件时，客户端mod未加载完毕，因此响应本事件时不能客户端发送事件。
-    若需要在玩家进入世界时，服务器往客户端发送事件，请使用 ``ClientLoadAddonsFinishServerEvent`` 。
-
-    触发此事件时，玩家的实体还未加载完毕，请勿在这时切换维度。
-    请在客户端监听 ``OnLocalPlayerStopLoading`` 事件并发送事件到服务端再进行维度切换。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，玩家的实体ID
-    - ``isTransfer`` -- bool，是否是切服时进入服务器，仅用于Apollo。如果是True，则表示切服时加入服务器，若是False，则表示登录进入网络游戏
-    - ``isReconnect`` -- bool，是否是断线重连，仅用于Apollo。如果是True，则表示本次登录是断线重连，若是False，则表示本次是正常登录或者转服
-    - ``isPeUser`` -- bool，是否从手机端登录，仅用于Apollo。如果是True，则表示本次登录是从手机端登录，若是False，则表示本次登录是从PC端登录
-    - ``transferParam`` -- str，切服传入参数，仅用于Apollo。调用TransferToOtherServer或TransferToOtherServerById传入的切服参数
-    - ``uid`` -- long，仅用于Apollo，玩家的netease uid，玩家的唯一标识
-    - ``proxyId`` -- int，仅用于Apollo，当前客户端连接的proxy服务器id
-    """
-    AchievementCompleteEvent = ...
-    """
-    [事件]
-
-    玩家完成自定义成就时触发该事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``rootNodeId`` -- str，所属的页面的根节点成就ID
-    - ``achievementId`` -- str，达成的成就ID
-    - ``title`` -- str，成就标题
-    - ``description`` -- str，成就描述
-    """
-    PlayerAttackEntityEvent = ...
-    """
-    [事件]
-
-    当玩家攻击时触发该事件。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``victimId`` -- str，受击者的实体ID
-    - ``damage`` -- float，伤害值，引擎传过来的值是0，允许脚本层修改为其他数
-    - ``isValid`` -- int，脚本是否设置伤害值：1表示是，0表示否
-    - ``cancel`` -- bool，是否取消该次攻击，默认不取消
-    - ``isKnockBack`` -- bool，是否支持击退效果，默认支持，当不支持时将屏蔽武器击退附魔效果
-    - ``isCrit`` -- bool，本次攻击是否产生暴击，不支持修改
-    """
-    ServerBlockUseEvent = ...
-    """
-    [事件] [tick]
-
-    玩家右键点击新版自定义方块（或者通过接口 ``AddBlockItemListenForUseEvent`` 增加监听的MC原生游戏方块）时服务端抛出该事件
-    （该事件tick执行，需要注意效率问题）。
-
-    说明
-    ----
-
-    当对原生方块进行使用时，如堆肥桶等类似有使用功能的方块使用物品时，会触发该事件，而 ``ServerItemUseOnEvent`` 则不会被触发。
-
-    有的方块是在 ``ServerBlockUseEvent`` 中设置 ``cancel`` 生效，
-    但是有部分方块是在 ``ClientBlockUseEvent`` 中设置 ``cancel`` 才生效，如有需求建议在两个事件中同时设置 ``cancel`` 以保证生效。
-
-    部分工具对方块的使用效果，如锹犁地，不一定能通过该事件cancel，还需同时使用 ``ItemUseOnServerEvent`` 进行取消，
-    目前已知有：锹犁地相关的方块：草地、泥土、砂土、菌丝体、灰化土、缠根泥土，
-    均需同时通过 ``ServerBlockUseEvent`` 和 ``ItemUseOnServerEvent`` 进行取消。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``aux`` -- int，方块附加值
-    - ``cancel`` -- bool，设置为True可拦截与方块交互的逻辑
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``clickX`` -- float，点击点的x比例位置
-    - ``clickY`` -- float，点击点的y比例位置
-    - ``clickZ`` -- float，点击点的z比例位置
-    - ``face`` -- int，点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``itemDict`` -- dict，使用的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``dimensionId`` -- int，维度ID
-
-    相关接口
-    --------
-
-    - `AddBlockItemListenForUseEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=AddBlockItemListenForUseEvent&docindex=4&type=0>`_
-    - `RemoveBlockItemListenForUseEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RemoveBlockItemListenForUseEvent&docindex=1&type=0>`_
-    - `ClearAllListenForBlockUseEventItems <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=ClearAllListenForBlockUseEventItems&docindex=1&type=0>`_
-    """
-    OnGroundServerEvent = ...
-    """
-    [事件]
-
-    实体着地事件。实体，掉落的物品，点燃的TNT掉落地面时触发。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    SpawnProjectileServerEvent = ...
-    """
-    [事件]
-
-    抛射物生成时触发。
-
-    说明
-    ----
-
-    该事件里无法获取弹射物实体的auxvalue。如有需要可以延迟一帧获取，或者在 ``ProjectileDoHitEffectEvent`` 获取。
-
-    事件参数
-    --------
-
-    - ``projectileId`` -- str，抛射物的实体ID
-    - ``projectileIdentifier`` -- str，抛射物的identifier
-    - ``spawnerId`` -- str，发射者的实体ID，没有发射者时为-1
-    """
-    EntityDieLoottableServerEvent = ...
-    """
-    [事件]
-
-    生物死亡掉落物品时触发。
-
-    说明
-    ----
-
-    只有当 ``dirty`` 为 ``True`` 时才会重新读取 ``itemList`` 并生成对应的掉落物，
-    如果不需要修改掉落结果的话请勿随意修改 ``dirty`` 值。
-
-    该事件在生物死亡后会触发，无论是否掉落物品，因此掉落物品列表可能存在为空的情况。
-
-    掉落物不包含玩家或生物携带以及背包内的物品，若要获取死亡后由背包扔出的物品请参考 ``EntityDroppedItemServerEvent`` 事件。
-
-    事件参数
-    --------
-
-    - ``dieEntityId`` -- str，死亡实体ID
-    - ``attacker`` -- str，伤害来源实体ID
-    - ``itemList`` -- list[dict]，掉落物品列表，每个元素为一个itemDict，格式可参考 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``dirty`` -- bool，默认为False，如果需要修改掉落列表需将该值设为True
-    """
-    ActuallyHurtServerEvent = ...
-    """
-    [事件]
-
-    实体实际受到伤害时触发，相比于 ``DamageEvent`` ，该伤害为经过护甲及buff计算后，实际的扣血量。
-
-    说明
-    ----
-
-    药水与状态效果造成的伤害不触发，可以使用 ``ActorHurtServerEvent`` 。
-
-    为了游戏运行效率请尽可能避免将火的伤害设置为 ``0`` ，因为这样会导致大量触发该事件。
-
-    若要修改 ``damage`` 的值，请确保修改后的值与原值不同，且支持转换为浮点型，否则引擎会忽略这次修改。
-
-    青蛙、山羊跳跃落地时也会触发此伤害事件，但它们的掉落伤害实际会有减免，青蛙减少 ``5`` ，山羊减少 ``10`` 。
-
-    在无懈可击时间内，只要实体受到高于上次受击的伤害，可以连续触发不受 ``SetHurtCD`` 影响，如实体连续受到 ``1`` 伤害，
-    如果在本事件中修改 ``damage`` 为 ``0.5`` ，则引擎会认为每次都有 ``0.5`` 的溢出伤害，
-    可以通过 ``invulnerableTime`` 和 ``lastHurt`` 来判断是否取消这次伤害。
-
-    事件参数
-    --------
-
-    - ``srcId`` -- str，伤害源实体ID
-    - ``projectileId`` -- str，抛射物实体ID
-    - ``entityId`` -- str，受伤的实体ID
-    - ``damage`` -- float，伤害值（被伤害吸收后的值），允许修改，设置为0则此次造成的伤害为0，若设置数值和原来一样则视为没有修改
-    - ``invulnerableTime`` -- int，实体受击后，剩余的无懈可击帧数，在无懈可击时间内，damage为超过上次伤害的部分
-    - ``lastHurt`` -- float，实体上次受到的伤害
-    - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_
-    - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
-    """
-    HealthChangeBeforeServerEvent = ...
-    """
-    [事件]
-
-    生物生命值发生变化之前触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``from`` -- float，变化前的生命值（请使用event['from']获取该参数）
-    - ``to`` -- float，将要变化到的生命值，cancel设置为True时可以取消该变化，但是此参数不变
-    - ``byScript`` -- bool，是否通过SetAttrValue或SetAttrMaxValue调用产生的变化
-    - ``cancel`` -- bool，是否取消该变化
-    """
-    DimensionChangeFinishServerEvent = ...
-    """
-    [事件]
-
-    玩家维度改变完成后服务端抛出。
-
-    说明
-    ----
-
-    当通过传送门从末地回到主世界时， ``toPos`` 的y值为 ``32767`` ，其他情况一般会比设置值高 ``1.62`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``fromDimensionId`` -- int，维度改变前的维度
-    - ``toDimensionId`` -- int，维度改变后的维度
-    - ``toPos`` -- tuple[float, float, float]，改变后的位置，其中y值为脚底加上角色的身高值
-    """
-    EntityDefinitionsEventServerEvent = ...
-    """
-    [事件]
-
-    生物定义json文件中设置的event触发时同时触发。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``eventName`` -- str，触发的事件名称
-    """
-    PlayerDoInteractServerEvent = ...
-    """
-    [事件]
-
-    玩家与有 ``"minecraft:interact"`` 组件的生物交互时触发该事件，例如玩家手持空桶对牛挤奶、玩家手持打火石点燃苦力怕。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``interactEntityId`` -- str，交互生物的实体ID
-    """
-    PlayerInteractServerEvent = ...
-    """
-    [事件]
-
-    玩家可以与实体交互时触发。
-
-    说明
-    ----
-
-    如果是鼠标控制模式，则当准心对着实体时触发。如果是触屏模式，则触发时机与屏幕下方的交互按钮显示的时机相同。
-
-    玩家真正与实体发生交互的事件见 `PlayerDoInteractServerEvent <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E7%8E%A9%E5%AE%B6.html?key=PlayerDoInteractServerEvent&docindex=3&type=0>`_ 。
-
-    事件参数
-    --------
-
-    - ``cancel`` -- bool，是否取消触发，默认为False，若设为True，可阻止触发后续的实体交互事件
-    - ``playerId`` -- str，玩家的实体ID
-    - ``itemDict`` -- dict，玩家手持物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``victimId`` -- str，交互生物的实体ID
-    """
-    MobDieEvent = ...
-    """
-    [事件]
-
-    生物死亡时触发。
-
-    说明
-    ----
-
-    不能在该事件回调中对攻击者手持物品进行修改，如 ``SpawnItemToPlayerCarried`` 、 ``ChangePlayerItemTipsAndExtraId`` 等接口。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    - ``attacker`` -- str，攻击者实体ID
-    - ``cause`` -- str，伤害来源，详见Minecraft枚举值文档的 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html>`_
-    - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
-    """
-    AddEntityServerEvent = ...
-    """
-    [事件]
-
-    服务端侧创建新实体，或实体从存档加载时触发。
-
-    说明
-    ----
-
-    创建玩家时不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    - ``posX`` -- float，实体位置x
-    - ``posY`` -- float，实体位置y
-    - ``posZ`` -- float，实体位置z
-    - ``dimensionId`` -- int，维度ID
-    - ``isBaby`` -- bool，是否为幼儿
-    - ``engineTypeStr`` -- str，实体类型，即实体identifier
-    - ``itemName`` -- str，物品identifier（仅当物品实体时存在该字段）
-    - ``auxValue`` -- int，物品附加值（仅当物品实体时存在该字段）
-    """
-    OnMobHitBlockServerEvent = ...
-    """
-    [事件]
-
-    通过 ``OpenMobHitBlockDetection`` 打开方块碰撞检测后，当生物（不包括玩家）碰撞到方块时触发该事件。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``posX`` -- int，碰撞方块x坐标
-    - ``posY`` -- int，碰撞方块y坐标
-    - ``posZ`` -- int，碰撞方块z坐标
-    - ``blockId`` -- str，碰撞方块的identifier
-    - ``auxValue`` -- int，碰撞方块的附加值
-    - ``dimensionId`` -- int，维度ID
-
-    相关接口
-    --------
-
-    - `OpenMobHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=OpenMobHitBlockDetection&docindex=3&type=0>`_
-    - `CloseMobHitBlockDetection <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E5%AE%9E%E4%BD%93.html?key=CloseMobHitBlockDetection&docindex=1&type=0>`_
-    """
-    OnEntityInsideBlockServerEvent = ...
-    """
-    [事件] [tick]
-
-    当实体碰撞盒所在区域有方块时，服务端持续触发。
-
-    说明
-    ----
-
-    不是所有方块都会触发该事件，需要在json中先配置触发开关（详情参考： `自定义方块JSON组件 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/15-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B8%B8%E6%88%8F%E5%86%85%E5%AE%B9/2-%E8%87%AA%E5%AE%9A%E4%B9%89%E6%96%B9%E5%9D%97/1-JSON%E7%BB%84%E4%BB%B6.html>`_ ），
-    原版方块需要先通过 ``RegisterOnEntityInside`` 接口注册才能触发。
-
-    如果需要修改 ``slowdownMulti`` / ``cancel`` ，强烈建议与客户端事件同步修改，避免出现客户端表现不一致等非预期现象。
-
-    如果要在脚本层修改 ``slowdownMulti`` ，回传的一定要是浮点型，例如需要赋值 ``1.0`` 而不是 ``1`` 。
-
-    有任意 ``slowdownMulti`` 参数被传回非 ``0`` 值时生效减速比例。
-    ``slowdownMulti`` 参数更像是一个Buff，例如并不是立刻计算，而是先保存在实体属性里延后计算。
-    在已经有 ``slowdownMulti`` 属性的情况下会取最低的值、免疫掉落伤害等，与原版蜘蛛网逻辑基本一致。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，实体ID
-    - ``slowdownMultiX`` -- float，实体移速x方向的减速比例，可在脚本层被修改
-    - ``slowdownMultiY`` -- float，实体移速y方向的减速比例，可在脚本层被修改
-    - ``slowdownMultiZ`` -- float，实体移速z方向的减速比例，可在脚本层被修改
-    - ``blockX`` -- int，方块位置x
-    - ``blockY`` -- int，方块位置y
-    - ``blockZ`` -- int，方块位置z
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``cancel`` -- bool，可由脚本层回传True给引擎，阻止触发后续原版逻辑
-
-    相关接口
-    --------
-
-    - `RegisterOnEntityInside <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=RegisterOnEntityInside&docindex=2&type=0>`_
-    - `UnRegisterOnEntityInside <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E4%BA%8B%E4%BB%B6/%E6%96%B9%E5%9D%97.html?key=UnRegisterOnEntityInside&docindex=2&type=0>`_
-    """
-    EntityStartRidingEvent = ...
-    """
-    [事件]
-
-    当实体骑乘上另一个实体时触发。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，骑乘者实体ID
-    - ``rideId`` -- str，坐骑实体ID
-    """
-    EntityStopRidingEvent = ...
-    """
-    [事件]
-
-    当实体停止骑乘时触发。
-
-    说明
-    ----
-
-    以下情况不允许取消：
-
-    - ride组件 ``StopEntityRiding`` 接口；
-    - 玩家传送时；
-    - 坐骑死亡时；
-    - 玩家睡觉时；
-    - 玩家死亡时；
-    - 未驯服的马；
-    - 怕水的生物坐骑进入水里；
-    - 切换维度。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    - ``rideId`` -- str，坐骑的实体ID
-    - ``exitFromRider`` -- bool，是否下坐骑
-    - ``entityIsBeingDestroyed`` -- bool，坐骑是否将要销毁
-    - ``switchingRides`` -- bool，是否换乘坐骑
-    - ``cancel`` -- bool，设置为True可以取消（需要与客户端事件一同取消）
-    """
-    ServerItemUseOnEvent = ...
-    """
-    [事件] [tick]
-
-    玩家在对方块使用物品之前服务端抛出的事件。
-
-    说明
-    ----
-
-    如果需要取消物品的使用需要同时在 ``ClientItemUseOnEvent`` 和 ``ServerItemUseOnEvent`` 中将 ``ret`` 设置为 ``True``
-    才能正确取消。
-
-    当对原生方块进行使用时，如堆肥桶等类似有使用功能的方块使用物品时，不会触发该事件。
-    而当原生方块加入监听后， ``ServerBlockUseEvent`` 会触发。
-
-    该事件仅在鼠标模式下为帧事件。
-
-    事件参数
-    --------
-
-    - ``entityId`` -- str，玩家实体ID
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``blockName`` -- str，方块的identifier，包含命名空间及名称
-    - ``blockAuxValue`` -- int，方块的附加值
-    - ``face`` -- int，点击方块的面，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``clickX`` -- float，点击点的x比例位置
-    - ``clickY`` -- float，点击点的y比例位置
-    - ``clickZ`` -- float，点击点的z比例位置
-    - ``ret`` -- bool，设为True可取消物品的使用
-    """
-    ActorUseItemServerEvent = ...
-    """
-    [事件]
-
-    玩家使用物品生效之前服务端抛出的事件。
-
-    说明
-    ----
-
-    比较特殊不走该事件的例子：
-
-    - 染料对有水的炼药锅使用；
-    - 盔甲架装备盔甲。
-
-    喝牛奶会触发该事件，但是不会触发 ``ActorUseItemClientEvent`` 。
-
-    事件参数
-    --------
-
-    - ``playerId`` -- str，玩家的实体id
-    - ``itemDict`` -- dict， `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``useMethod`` -- int，使用物品的方法，详见 `ItemUseMethodEnum枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemUseMethodEnum.html?key=ItemUseMethodEnum&docindex=1&type=0>`_
-    """
-    ActorAcquiredItemServerEvent = ...
-    """
-    [事件]
-
-    玩家获得物品时服务端抛出的事件（有些获取物品方式只会触发客户端事件，有些获取物品方式只会触发服务端事件，在使用时注意一点）。
-
-    事件参数
-    --------
-
-    - ``actor`` -- str，获得物品玩家实体ID
-    - ``secondaryActor`` -- str，物品给予者玩家实体ID，如果不存在给予者的话，这里为空字符串
-    - ``itemDict`` -- dict，获得的物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_
-    - ``acquireMethod`` -- int，获得物品的方法，详见 `ItemAcquisitionMethod枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ItemAcquisitionMethod.html?key=ItemAcquisitionMethod&docindex=1&type=0>`_
-    """
-    DestroyBlockEvent = ...
-    """
-    [事件]
-
-    当方块已经被玩家破坏时触发该事件。
-
-    说明
-    ----
-
-    在生存模式或创造模式下都会触发。
-
-    事件参数
-    --------
-
-    - ``x`` -- int，方块x坐标
-    - ``y`` -- int，方块y坐标
-    - ``z`` -- int，方块z坐标
-    - ``face`` -- int，方块被敲击的面向id，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``fullName`` -- str，方块的identifier，包含命名空间及名称
-    - ``auxData`` -- int，方块附加值
-    - ``playerId`` -- str，破坏方块的玩家实体ID
-    - ``dimensionId`` -- int，维度ID
-    - ``dropEntityIds`` -- list[str]，掉落物实体ID列表
-    """
-    DamageEvent = ...
-    """
-    [事件]
-
-    实体受到伤害时触发。
-
-    说明
-    ----
-
-    ``damage`` 值会被护甲和absorption等吸收，不一定是最终扣血量。
-    通过设置这个伤害值可以取消伤害，但不会取消由击退效果或者点燃效果带来的伤害。
-
-    该事件在实体受伤之前触发，由于部分伤害是在tick中处理，
-    因此持续触发受伤时（如站在火中）会每帧触发事件（可以使用 ``ActorHurtServerEvent`` 来避免）。
-
-    这里的 ``damage`` 是伤害源具有的攻击伤害值，并非实体真实的扣血量，
-    如果需要获取真实伤害，可以使用 ``ActuallyHurtServerEvent`` 事件。
-
-    当目标无法被击退时， ``knock`` 值无效。
-
-    药水与状态效果造成的伤害不触发，可以使用 ``ActorHurtServerEvent`` 。
-
-    由于点燃的实现原因，此处 ``ignite`` 设置为 ``False`` 并不能取消实体的点燃效果
-    （如果需要取消点燃效果，请通过 ``OnFireHurtEvent`` 事件实现）。
-
-    事件参数
-    --------
-
-    - ``srcId`` -- str，伤害源实体ID
-    - ``projectileId`` -- str，投射物实体ID
-    - ``entityId`` -- str，受伤实体ID
-    - ``damage`` -- int，伤害值（被伤害吸收前的值），允许修改，设置为0则此次造成的伤害为0
-    - ``damage_f`` -- float，伤害值（被伤害吸收前的值），不允许修改
-    - ``absorption`` -- int，伤害吸收生命值，详见 `AttrType <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/AttrType.html?key=AttrType&docindex=1&type=0>`_ 枚举的ABSORPTION
-    - ``cause`` -- str，伤害来源，详见 `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举
-    - ``knock`` -- bool，是否击退被攻击者，允许修改，设置该值为False则不产生击退
-    - ``ignite`` -- bool，是否点燃被伤害者，允许修改，设置该值为True产生点燃效果，反之亦然
-    - ``customTag`` -- str，使用 `Hurt接口 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E5%AE%9E%E4%BD%93/%E8%A1%8C%E4%B8%BA.html#hurt>`_ 传入的自定义伤害类型
-    """
-    ExplosionServerEvent = ...
-    """
-    [事件]
-
-    当发生爆炸时触发。
-
-    说明
-    ----
-
-    可以通过修改 ``blocks`` 取消爆炸对指定方块的影响。
-
-    某些情况下爆炸创建者实体ID为 ``None`` ，此时受伤实体ID列表也为 ``None`` ，比如爬行者所造成的爆炸。
-
-    事件参数
-    --------
-
-    - ``blocks`` -- list[list[int, int, int, bool]]，爆炸涉及到的方块列表，每个方块以一个列表表示，前三个元素分别为方块坐标xyz，第四个元素为是否取消爆炸对该方块的影响，将第四个元素设置为True即可取消。
-    - ``victims`` -- list[str] | None，受伤实体ID列表，当该爆炸创建者实体ID为None时，victims也为None
-    - ``sourceId`` -- str | None，爆炸创建者实体ID
-    - ``explodePos`` -- list[float, float, float]，爆炸位置[x, y, z]
-    - ``dimensionId`` -- int，维度ID
-    """
-    ProjectileDoHitEffectEvent = ...
-    """
-    [事件]
-
-    当抛射物碰撞时触发该事件。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，子弹的实体ID
-    - ``hitTargetType`` -- str，碰撞目标类型，"ENTITY"或"BLOCK"
-    - ``targetId`` -- str，碰撞目标的实体ID
-    - ``hitFace`` -- int，撞击在方块上的面ID，参考 `Facing枚举 <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/Facing.html?key=Facing&docindex=1&type=0>`_
-    - ``x`` -- float，碰撞x坐标
-    - ``y`` -- float，碰撞y坐标
-    - ``z`` -- float，碰撞z坐标
-    - ``blockPosX`` -- int，碰撞是方块时，方块x坐标
-    - ``blockPosY`` -- int，碰撞是方块时，方块y坐标
-    - ``blockPosZ`` -- int，碰撞是方块时，方块z坐标
-    - ``srcId`` -- str，抛射物创建者的实体ID
-    - ``cancel`` -- bool，是否取消这个碰撞事件，若取消可以设置为True
-    """
-    OnCarriedNewItemChangedServerEvent = ...
-    """
-    [事件]
-
-    玩家切换主手物品时触发该事件。
-
-    说明
-    ----
-
-    切换耐久度不同的相同物品，不会触发该事件。
-
-    事件参数
-    --------
-
-    - ``oldItemDict`` -- dict | None，旧物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当旧物品为空时，此项属性为None
-    - ``newItemDict`` -- dict | None，新物品的 `物品信息字典 <https://mc.163.com/dev/mcmanual/mc-dev/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/10-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/1-%E6%88%91%E7%9A%84%E4%B8%96%E7%95%8C%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5.html?key=%E7%89%A9%E5%93%81%E4%BF%A1%E6%81%AF%E5%AD%97%E5%85%B8&docindex=1&type=0>`_，当新物品为空时，此项属性为None
-    - ``playerId`` -- str，玩家的实体ID
-    """
-    EntityRemoveEvent = ...
-    """
-    [事件]
-
-    实体被删除时触发。
-
-    说明
-    ----
-
-    触发情景：实体从场景中被删除，例如：生物死亡，生物被 `清除 <https://minecraft.fandom.com/zh/wiki/%E7%94%9F%E6%88%90#.E6.B8.85.E9.99.A4>`_，
-    玩家退出游戏，船/盔甲架被破坏，掉落物/经验球被捡起或清除。
-
-    当生物随区块卸载时，不会触发该事件，而是 ``ChunkAcquireDiscardedServerEvent`` 事件。
-
-    关于生物的清除：当生物离玩家大于wiki所说的距离，并且还在玩家的模拟距离内时，会被清除。
-    也就是说，如果玩家瞬间传送到远处，原处的生物马上离开了模拟距离，并不会被清除。
-
-    玩家退出游戏时， ``EntityRemoveEvent`` ， ``DelServerPlayerEvent`` 按顺序依次触发。
-
-    事件参数
-    --------
-
-    - ``id`` -- str，实体ID
-    """
-    OnScriptTickServer = ...
-    """
-    [事件] [tick]
-
-    服务端tick事件，1秒30次。
-
-    事件参数
-    --------
-
-    无
-    """
-    UiInitFinished = ...
-    """
-    [nuoyanlib] [事件]
-
-    客户端玩家UI框架初始化完成时，服务端触发。
-
-    事件参数
-    --------
-
-    - ``__id__`` -- str，玩家的实体ID
-    """
-
-
-class TimeEaseFunc:
-    LINEAR: TimeEaseFuncType
-    SPRING: TimeEaseFuncType
-    IN_QUAD: TimeEaseFuncType
-    OUT_QUAD: TimeEaseFuncType
-    IN_OUT_QUAD: TimeEaseFuncType
-    IN_CUBIC: TimeEaseFuncType
-    OUT_CUBIC: TimeEaseFuncType
-    IN_OUT_CUBIC: TimeEaseFuncType
-    IN_QUART: TimeEaseFuncType
-    OUT_QUART: TimeEaseFuncType
-    IN_OUT_QUART: TimeEaseFuncType
-    IN_QUINT: TimeEaseFuncType
-    OUT_QUINT: TimeEaseFuncType
-    IN_OUT_QUINT: TimeEaseFuncType
-    IN_SINE: TimeEaseFuncType
-    OUT_SINE: TimeEaseFuncType
-    IN_OUT_SINE: TimeEaseFuncType
-    IN_EXPO: TimeEaseFuncType
-    OUT_EXPO: TimeEaseFuncType
-    IN_OUT_EXPO: TimeEaseFuncType
-    IN_CIRC: TimeEaseFuncType
-    OUT_CIRC: TimeEaseFuncType
-    IN_OUT_CIRC: TimeEaseFuncType
-    IN_BOUNCE: TimeEaseFuncType
-    OUT_BOUNCE: TimeEaseFuncType
-    IN_OUT_BOUNCE: TimeEaseFuncType
-    IN_BACK: TimeEaseFuncType
-    OUT_BACK: TimeEaseFuncType
-    IN_OUT_BACK: TimeEaseFuncType
-    IN_ELASTIC: TimeEaseFuncType
-    OUT_ELASTIC: TimeEaseFuncType
-    IN_OUT_ELASTIC: TimeEaseFuncType
-
-
-class ToggleCallbackType(StrEnum):
-    CHANGED = ...
-
-
-class WheelCallbackType(StrEnum):
-    CLICK = ...
-    HOVER = ...
-
-
-class GridCallbackType(StrEnum):
-    UPDATE = ...
-    LOADED = ...
-
-
-class ComboBoxCallbackType(StrEnum):
-    OPEN = ...
-    CLOSE = ...
-    SELECT = ...
-
-
-class ButtonCallbackType(StrEnum):
-    UP = ...
-    DOWN = ...
-    CANCEL = ...
-    MOVE = ...
-    MOVE_IN = ...
-    MOVE_OUT = ...
-    DOUBLE_CLICK = ...
-    LONG_CLICK = ...
-    HOVER_IN = ...
-    HOVER_OUT = ...
-    SCREEN_EXIT = ...
-
-
-class ControlType(StrEnum):
-    BASE_CONTROL = ...
-    BUTTON = ...
-    IMAGE = ...
-    LABEL = ...
-    PANEL = ...
-    INPUT_PANEL = ...
-    STACK_PANEL = ...
-    EDIT_BOX = ...
-    PAPER_DOLL = ...
-    NETEASE_PAPER_DOLL = ...
-    ITEM_RENDERER = ...
-    GRADIENT_RENDERER = ...
-    SCROLL_VIEW = ...
-    GRID = ...
-    PROGRESS_BAR = ...
-    TOGGLE = ...
-    SLIDER = ...
-    SELECTION_WHEEL = ...
-    COMBO_BOX = ...
-    MINI_MAP = ...
-    _AS_BASE: STuple
-
-
-class Mob(StrEnum):
+def _expand_enum(namespace: Dict[str, Any], enum: Enum) -> None: ...
+
+
+class ClientEvent(LazyEnum):
+    OnSimTickClientEvent = EventArgs0
+    PhysxTriggerClientEvent = EventArgs1
+    LiquidClippedClientEvent = EventArgs2
+    PlayerAddCustomContainerItemClientEvent = EventArgs3
+    PlayerRemoveCustomContainerItemClientEvent = EventArgs4
+    PhysxTouchClientEvent = EventArgs5
+    OnCustomGamepadChangedEvent = EventArgs6
+    OnCustomGamepadPressInGame = EventArgs7
+    OnCustomKeyChangedEvent = EventArgs8
+    OnCustomKeyPressInGame = EventArgs9
+    UIDefReloadSceneStackAfter = EventArgs10
+    UpdatePlayerSkinClientEvent = EventArgs11
+    PlayerTryRemoveCustomContainerItemClientEvent = EventArgs12
+    PlayerTryAddCustomContainerItemClientEvent = EventArgs13
+    PlayerTryPutCustomContainerItemClientEvent = EventArgs14
+    PlayerPermissionChangeClientEvent = EventArgs15
+    HudButtonChangedClientEvent = EventArgs16
+    BlockAnimateRandomTickEvent = EventArgs17
+    PlayerAttackEntityEvent = EventArgs18
+    OnLocalPlayerActionClientEvent = EventArgs19
+    OnLocalPlayerStartJumpClientEvent = EventArgs20
+    GameRenderTickEvent = EventArgs21
+    GyroSensorChangedClientEvent = EventArgs22
+    ModBlockEntityTickClientEvent = EventArgs23
+    ModBlockEntityRemoveClientEvent = EventArgs24
+    AchievementButtonMovedClientEvent = EventArgs25
+    OnKeyboardControllerLayoutChangeClientEvent = EventArgs26
+    OnGamepadControllerLayoutChangeClientEvent = EventArgs27
+    OnGamepadTriggerClientEvent = EventArgs28
+    OnGamepadStickClientEvent = EventArgs29
+    OnGamepadKeyPressClientEvent = EventArgs30
+    ModBlockEntityLoadedClientEvent = EventArgs31
+    CloseNeteaseShopEvent = EventArgs32
+    PopScreenAfterClientEvent = EventArgs33
+    TapOrHoldReleaseClientEvent = EventArgs34
+    TapBeforeClientEvent = EventArgs35
+    RightClickReleaseClientEvent = EventArgs36
+    RightClickBeforeClientEvent = EventArgs37
+    OnMouseMiddleDownClientEvent = EventArgs38
+    OnKeyPressInGame = EventArgs39
+    OnClientPlayerStopMove = EventArgs40
+    OnClientPlayerStartMove = EventArgs41
+    OnBackButtonReleaseClientEvent = EventArgs42
+    MouseWheelClientEvent = EventArgs43
+    LeftClickReleaseClientEvent = EventArgs44
+    LeftClickBeforeClientEvent = EventArgs45
+    HoldBeforeClientEvent = EventArgs46
+    GetEntityByCoordReleaseClientEvent = EventArgs47
+    GetEntityByCoordEvent = EventArgs48
+    ClientJumpButtonReleaseEvent = EventArgs49
+    ClientJumpButtonPressDownEvent = EventArgs50
+    PlaySoundClientEvent = EventArgs51
+    PlayMusicClientEvent = EventArgs52
+    OnMusicStopClientEvent = EventArgs53
+    ScreenSizeChangedClientEvent = EventArgs54
+    PushScreenEvent = EventArgs55
+    PopScreenEvent = EventArgs56
+    PlayerChatButtonClickClientEvent = EventArgs57
+    OnItemSlotButtonClickedEvent = EventArgs58
+    GridComponentSizeChangedClientEvent = EventArgs59
+    ClientPlayerInventoryOpenEvent = EventArgs60
+    ClientPlayerInventoryCloseEvent = EventArgs61
+    ClientChestOpenEvent = EventArgs62
+    ClientChestCloseEvent = EventArgs63
+    WalkAnimEndClientEvent = EventArgs64
+    WalkAnimBeginClientEvent = EventArgs65
+    AttackAnimEndClientEvent = EventArgs66
+    AttackAnimBeginClientEvent = EventArgs67
+    StopUsingItemClientEvent = EventArgs68
+    StartUsingItemClientEvent = EventArgs69
+    PlayerTryDropItemClientEvent = EventArgs70
+    OnCarriedNewItemChangedClientEvent = EventArgs71
+    ItemReleaseUsingClientEvent = EventArgs72
+    InventoryItemChangedClientEvent = EventArgs73
+    GrindStoneRemovedEnchantClientEvent = EventArgs74
+    ClientShapedRecipeTriggeredEvent = EventArgs75
+    ClientItemUseOnEvent = EventArgs76
+    ClientItemTryUseEvent = EventArgs77
+    AnvilCreateResultItemAfterClientEvent = EventArgs78
+    ActorUseItemClientEvent = EventArgs79
+    ActorAcquiredItemClientEvent = EventArgs80
+    StepOnBlockClientEvent = EventArgs81
+    StartDestroyBlockClientEvent = EventArgs82
+    StepOffBlockClientEvent = EventArgs83
+    ShearsDestoryBlockBeforeClientEvent = EventArgs84
+    PlayerTryDestroyBlockClientEvent = EventArgs85
+    OnStandOnBlockClientEvent = EventArgs86
+    OnModBlockNeteaseEffectCreatedClientEvent = EventArgs87
+    OnEntityInsideBlockClientEvent = EventArgs88
+    OnAfterFallOnBlockClientEvent = EventArgs89
+    FallingBlockCauseDamageBeforeClientEvent = EventArgs90
+    ClientBlockUseEvent = EventArgs91
+    PerspChangeClientEvent = EventArgs92
+    OnPlayerHitBlockClientEvent = EventArgs93
+    GameTypeChangedClientEvent = EventArgs94
+    ExtinguishFireClientEvent = EventArgs95
+    DimensionChangeFinishClientEvent = EventArgs96
+    DimensionChangeClientEvent = EventArgs97
+    CameraMotionStopClientEvent = EventArgs98
+    CameraMotionStartClientEvent = EventArgs99
+    LeaveEntityClientEvent = EventArgs100
+    StartRidingClientEvent = EventArgs101
+    OnMobHitMobClientEvent = EventArgs102
+    OnGroundClientEvent = EventArgs103
+    HealthChangeClientEvent = EventArgs104
+    EntityStopRidingEvent = EventArgs105
+    EntityModelChangedClientEvent = EventArgs106
+    ApproachEntityClientEvent = EventArgs107
+    UnLoadClientAddonScriptsBefore = EventArgs108
+    RemovePlayerAOIClientEvent = EventArgs109
+    RemoveEntityClientEvent = EventArgs110
+    OnLocalPlayerStopLoading = EventArgs111
+    OnCommandOutputClientEvent = EventArgs112
+    LoadClientAddonScriptsAfter = EventArgs113
+    ChunkLoadedClientEvent = EventArgs114
+    ChunkAcquireDiscardedClientEvent = EventArgs115
+    AddPlayerCreatedClientEvent = EventArgs116
+    AddPlayerAOIClientEvent = EventArgs117
+    AddEntityClientEvent = EventArgs118
+    OnScriptTickClient = EventArgs119
+    UiInitFinished = EventArgs120
+
+
+class ServerEvent(LazyEnum):
+    OnSimTickServerEvent = EventArgs121
+    PlayerStartFishingServerEvent = EventArgs122
+    PlayerFishingAfterServerEvent = EventArgs123
+    PlayerFishingServerEvent = EventArgs124
+    PhysxTriggerServerEvent = EventArgs125
+    LiquidClippedServerEvent = EventArgs126
+    PlayerAddCustomContainerItemServerEvent = EventArgs127
+    PlayerRemoveCustomContainerItemServerEvent = EventArgs128
+    PhysxTouchServerEvent = EventArgs129
+    ItemPullOutCustomContainerServerEvent = EventArgs130
+    ItemPushInCustomContainerServerEvent = EventArgs131
+    PlayerPermissionChangeServerEvent = EventArgs132
+    PlayerTryRemoveCustomContainerItemServerEvent = EventArgs133
+    PlayerTryAddCustomContainerItemServerEvent = EventArgs134
+    PlayerTryPutCustomContainerItemServerEvent = EventArgs135
+    MountTamingEvent = EventArgs136
+    OnPlayerActionServerEvent = EventArgs137
+    CustomCommandTriggerServerEvent = EventArgs138
+    GlobalCommandServerEvent = EventArgs139
+    PlayerPickupArrowServerEvent = EventArgs140
+    EntityDieLoottableAfterServerEvent = EventArgs141
+    PlayerHungerChangeServerEvent = EventArgs142
+    ItemDurabilityChangedServerEvent = EventArgs143
+    PlaceNeteaseLargeFeatureServerEvent = EventArgs144
+    PlayerNamedEntityServerEvent = EventArgs145
+    PlayerFeedEntityServerEvent = EventArgs146
+    lobbyGoodBuySucServerEvent = EventArgs147
+    UrgeShipEvent = EventArgs148
+    PlayerInventoryOpenScriptServerEvent = EventArgs149
+    WalkAnimEndServerEvent = EventArgs150
+    WalkAnimBeginServerEvent = EventArgs151
+    JumpAnimBeginServerEvent = EventArgs152
+    AttackAnimEndServerEvent = EventArgs153
+    AttackAnimBeginServerEvent = EventArgs154
+    UIContainerItemChangedServerEvent = EventArgs155
+    ShearsUseToBlockBeforeServerEvent = EventArgs156
+    ServerPlayerTryTouchEvent = EventArgs157
+    ServerItemTryUseEvent = EventArgs158
+    PlayerDropItemServerEvent = EventArgs159
+    OnPlayerBlockedByShieldBeforeServerEvent = EventArgs160
+    OnPlayerBlockedByShieldAfterServerEvent = EventArgs161
+    OnPlayerActiveShieldServerEvent = EventArgs162
+    OnOffhandItemChangedServerEvent = EventArgs163
+    OnNewArmorExchangeServerEvent = EventArgs164
+    OnItemPutInEnchantingModelServerEvent = EventArgs165
+    ItemUseOnAfterServerEvent = EventArgs166
+    ItemUseAfterServerEvent = EventArgs167
+    ItemReleaseUsingServerEvent = EventArgs168
+    InventoryItemChangedServerEvent = EventArgs169
+    FurnaceBurnFinishedServerEvent = EventArgs170
+    CraftItemOutputChangeServerEvent = EventArgs171
+    ContainerItemChangedServerEvent = EventArgs172
+    StepOnBlockServerEvent = EventArgs173
+    StepOffBlockServerEvent = EventArgs174
+    StartDestroyBlockServerEvent = EventArgs175
+    ShearsDestoryBlockBeforeServerEvent = EventArgs176
+    ServerPlayerTryDestroyBlockEvent = EventArgs177
+    ServerPlaceBlockEntityEvent = EventArgs178
+    ServerEntityTryPlaceBlockEvent = EventArgs179
+    ServerBlockEntityTickEvent = EventArgs180
+    PistonActionServerEvent = EventArgs181
+    OnStandOnBlockServerEvent = EventArgs182
+    OnBeforeFallOnBlockServerEvent = EventArgs183
+    OnAfterFallOnBlockServerEvent = EventArgs184
+    HopperTryPullOutServerEvent = EventArgs185
+    HopperTryPullInServerEvent = EventArgs186
+    HeavyBlockStartFallingServerEvent = EventArgs187
+    GrassBlockToDirtBlockServerEvent = EventArgs188
+    FarmBlockToDirtBlockServerEvent = EventArgs189
+    FallingBlockReturnHeavyBlockServerEvent = EventArgs190
+    FallingBlockCauseDamageBeforeServerEvent = EventArgs191
+    FallingBlockBreakServerEvent = EventArgs192
+    EntityPlaceBlockAfterServerEvent = EventArgs193
+    DirtBlockToGrassBlockServerEvent = EventArgs194
+    CommandBlockUpdateEvent = EventArgs195
+    CommandBlockContainerOpenEvent = EventArgs196
+    ChestBlockTryPairWithServerEvent = EventArgs197
+    BlockStrengthChangedServerEvent = EventArgs198
+    BlockSnowStateChangeServerEvent = EventArgs199
+    BlockSnowStateChangeAfterServerEvent = EventArgs200
+    BlockRemoveServerEvent = EventArgs201
+    BlockRandomTickServerEvent = EventArgs202
+    BlockNeighborChangedServerEvent = EventArgs203
+    BlockLiquidStateChangeServerEvent = EventArgs204
+    BlockLiquidStateChangeAfterServerEvent = EventArgs205
+    BlockDestroyByLiquidServerEvent = EventArgs206
+    StoreBuySuccServerEvent = EventArgs207
+    ServerPlayerGetExperienceOrbEvent = EventArgs208
+    PlayerTrySleepServerEvent = EventArgs209
+    PlayerTeleportEvent = EventArgs210
+    PlayerStopSleepServerEvent = EventArgs211
+    PlayerSleepServerEvent = EventArgs212
+    PlayerRespawnFinishServerEvent = EventArgs213
+    PlayerRespawnEvent = EventArgs214
+    PlayerHurtEvent = EventArgs215
+    PlayerEatFoodServerEvent = EventArgs216
+    PlayerDieEvent = EventArgs217
+    OnPlayerHitBlockServerEvent = EventArgs218
+    GameTypeChangedServerEvent = EventArgs219
+    ExtinguishFireServerEvent = EventArgs220
+    DimensionChangeServerEvent = EventArgs221
+    ChangeLevelUpCostServerEvent = EventArgs222
+    AddLevelEvent = EventArgs223
+    AddExpEvent = EventArgs224
+    WillTeleportToServerEvent = EventArgs225
+    WillAddEffectServerEvent = EventArgs226
+    StartRidingServerEvent = EventArgs227
+    RemoveEffectServerEvent = EventArgs228
+    RefreshEffectServerEvent = EventArgs229
+    ProjectileCritHitEvent = EventArgs230
+    OnMobHitMobServerEvent = EventArgs231
+    OnKnockBackServerEvent = EventArgs232
+    OnFireHurtEvent = EventArgs233
+    MobGriefingBlockServerEvent = EventArgs234
+    HealthChangeServerEvent = EventArgs235
+    EntityTickServerEvent = EventArgs236
+    EntityPickupItemServerEvent = EventArgs237
+    EntityMotionStopServerEvent = EventArgs238
+    EntityMotionStartServerEvent = EventArgs239
+    EntityLoadScriptEvent = EventArgs240
+    EntityEffectDamageServerEvent = EventArgs241
+    EntityDroppedItemServerEvent = EventArgs242
+    EntityChangeDimensionServerEvent = EventArgs243
+    ChangeSwimStateServerEvent = EventArgs244
+    AddEffectServerEvent = EventArgs245
+    ActorHurtServerEvent = EventArgs246
+    ServerSpawnMobEvent = EventArgs247
+    ServerPreBlockPatternEvent = EventArgs248
+    ServerPostBlockPatternEvent = EventArgs249
+    ServerChatEvent = EventArgs250
+    PlayerLeftMessageServerEvent = EventArgs251
+    PlayerJoinMessageEvent = EventArgs252
+    PlayerIntendLeaveServerEvent = EventArgs253
+    PlaceNeteaseStructureFeatureEvent = EventArgs254
+    OnRainLevelChangeServerEvent = EventArgs255
+    OnLocalRainLevelChangeServerEvent = EventArgs256
+    OnLocalLightningLevelChangeServerEvent = EventArgs257
+    OnLightningLevelChangeServerEvent = EventArgs258
+    OnContainerFillLoottableServerEvent = EventArgs259
+    OnCommandOutputServerEvent = EventArgs260
+    NewOnEntityAreaEvent = EventArgs261
+    LoadServerAddonScriptsAfter = EventArgs262
+    DelServerPlayerEvent = EventArgs263
+    CommandEvent = EventArgs264
+    ClientLoadAddonsFinishServerEvent = EventArgs265
+    ChunkLoadedServerEvent = EventArgs266
+    ChunkGeneratedServerEvent = EventArgs267
+    ChunkAcquireDiscardedServerEvent = EventArgs268
+    AddServerPlayerEvent = EventArgs269
+    AchievementCompleteEvent = EventArgs270
+    PlayerAttackEntityEvent = EventArgs271
+    ServerBlockUseEvent = EventArgs272
+    OnGroundServerEvent = EventArgs273
+    SpawnProjectileServerEvent = EventArgs274
+    EntityDieLoottableServerEvent = EventArgs275
+    ActuallyHurtServerEvent = EventArgs276
+    HealthChangeBeforeServerEvent = EventArgs277
+    DimensionChangeFinishServerEvent = EventArgs278
+    EntityDefinitionsEventServerEvent = EventArgs279
+    PlayerDoInteractServerEvent = EventArgs280
+    PlayerInteractServerEvent = EventArgs281
+    MobDieEvent = EventArgs282
+    AddEntityServerEvent = EventArgs283
+    OnMobHitBlockServerEvent = EventArgs284
+    OnEntityInsideBlockServerEvent = EventArgs285
+    EntityStartRidingEvent = EventArgs286
+    EntityStopRidingEvent = EventArgs287
+    ServerItemUseOnEvent = EventArgs288
+    ActorUseItemServerEvent = EventArgs289
+    ActorAcquiredItemServerEvent = EventArgs290
+    DestroyBlockEvent = EventArgs291
+    DamageEvent = EventArgs292
+    ExplosionServerEvent = EventArgs293
+    ProjectileDoHitEffectEvent = EventArgs294
+    OnCarriedNewItemChangedServerEvent = EventArgs295
+    EntityRemoveEvent = EventArgs296
+    OnScriptTickServer = EventArgs297
+
+
+class Block(LazyEnum):
+    STONE = "minecraft:stone"
+    """ 石头。 """
+    GRASS_BLOCK = "minecraft:grass_block"
+    """ 草地。 """
+    DIRT = "minecraft:dirt"
+    """ 泥土。 """
+    COBBLESTONE = "minecraft:cobblestone"
+    """ 碎石。 """
+    OAK_PLANKS = "minecraft:oak_planks"
+    """ 橡木板。 """
+    OAK_SAPLING = "minecraft:oak_sapling"
+    """ 橡木树苗。 """
+    BEDROCK = "minecraft:bedrock"
+    """ 基岩。 """
+    FLOWING_WATER = "minecraft:flowing_water"
+    """ 水。 """
+    WATER = "minecraft:water"
+    """ 静态水。 """
+    FLOWING_LAVA = "minecraft:flowing_lava"
+    """ 熔岩。 """
+    LAVA = "minecraft:lava"
+    """ 静态熔岩。 """
+    SAND = "minecraft:sand"
+    """ 沙。 """
+    GRAVEL = "minecraft:gravel"
+    """ 砂砾。 """
+    GOLD_ORE = "minecraft:gold_ore"
+    """ 金矿。 """
+    IRON_ORE = "minecraft:iron_ore"
+    """ 铁矿。 """
+    COAL_ORE = "minecraft:coal_ore"
+    """ 煤矿。 """
+    OAK_LOG = "minecraft:oak_log"
+    """ 橡木原木。 """
+    OAK_LEAVES = "minecraft:oak_leaves"
+    """ 橡木树叶。 """
+    SPONGE = "minecraft:sponge"
+    """ 海绵。 """
+    GLASS = "minecraft:glass"
+    """ 玻璃。 """
+    LAPIS_ORE = "minecraft:lapis_ore"
+    """ 青金石矿。 """
+    LAPIS_BLOCK = "minecraft:lapis_block"
+    """ 青金石砖。 """
+    DISPENSER = "minecraft:dispenser"
+    """ 发射器。 """
+    SANDSTONE = "minecraft:sandstone"
+    """ 砂岩。 """
+    NOTEBLOCK = "minecraft:noteblock"
+    """ 音符盒。 """
+    BED = "minecraft:bed"
+    """ 床。 """
+    GOLDEN_RAIL = "minecraft:golden_rail"
+    """ 动力路轨。 """
+    DETECTOR_RAIL = "minecraft:detector_rail"
+    """ 感压路轨。 """
+    STICKY_PISTON = "minecraft:sticky_piston"
+    """ 黏性活塞。 """
+    WEB = "minecraft:web"
+    """ 蜘蛛网。 """
+    SHORT_GRASS = "minecraft:short_grass"
+    """ 矮草丛。 """
+    DEADBUSH = "minecraft:deadbush"
+    """ 死灌木。 """
+    PISTON = "minecraft:piston"
+    """ 活塞。 """
+    PISTON_ARM_COLLISION = "minecraft:piston_arm_collision"
+    """ 活塞臂。 """
+    WHITE_WOOL = "minecraft:white_wool"
+    """ 白色羊毛。 """
+    DANDELION = "minecraft:dandelion"
+    """ 蒲公英。 """
+    POPPY = "minecraft:poppy"
+    """ 虞美人。 """
+    BROWN_MUSHROOM = "minecraft:brown_mushroom"
+    """ 啡色蘑菇。 """
+    RED_MUSHROOM = "minecraft:red_mushroom"
+    """ 红色蘑菇。 """
+    GOLD_BLOCK = "minecraft:gold_block"
+    """ 金砖。 """
+    IRON_BLOCK = "minecraft:iron_block"
+    """ 铁砖。 """
+    SMOOTH_STONE_DOUBLE_SLAB = "minecraft:smooth_stone_double_slab"
+    """ 平滑石头双半砖。 """
+    SMOOTH_STONE_SLAB = "minecraft:smooth_stone_slab"
+    """ 平滑石头半砖。 """
+    BRICK_BLOCK = "minecraft:brick_block"
+    """ 红砖。 """
+    TNT = "minecraft:tnt"
+    """ TNT。 """
+    BOOKSHELF = "minecraft:bookshelf"
+    """ 书柜。 """
+    MOSSY_COBBLESTONE = "minecraft:mossy_cobblestone"
+    """ 青苔碎石。 """
+    OBSIDIAN = "minecraft:obsidian"
+    """ 黑曜石。 """
+    TORCH = "minecraft:torch"
+    """ 火炬。 """
+    FIRE = "minecraft:fire"
+    """ 火。 """
+    MOB_SPAWNER = "minecraft:mob_spawner"
+    """ 生怪笼。 """
+    OAK_STAIRS = "minecraft:oak_stairs"
+    """ 橡木楼梯。 """
+    CHEST = "minecraft:chest"
+    """ 储物箱。 """
+    REDSTONE_WIRE = "minecraft:redstone_wire"
+    """ 红石线。 """
+    DIAMOND_ORE = "minecraft:diamond_ore"
+    """ 钻石矿。 """
+    DIAMOND_BLOCK = "minecraft:diamond_block"
+    """ 钻石砖。 """
+    CRAFTING_TABLE = "minecraft:crafting_table"
+    """ 工作台。 """
+    WHEAT = "minecraft:wheat"
+    """ 小麦。 """
+    FARMLAND = "minecraft:farmland"
+    """ 耕地。 """
+    FURNACE = "minecraft:furnace"
+    """ 熔炉。 """
+    LIT_FURNACE = "minecraft:lit_furnace"
+    """ 燃烧中的熔炉。 """
+    STANDING_SIGN = "minecraft:standing_sign"
+    """ 橡木指示牌。 """
+    WOODEN_DOOR = "minecraft:wooden_door"
+    """ 橡木门。 """
+    LADDER = "minecraft:ladder"
+    """ 梯。 """
+    RAIL = "minecraft:rail"
+    """ 路轨。 """
+    STONE_STAIRS = "minecraft:stone_stairs"
+    """ 碎石楼梯。 """
+    WALL_SIGN = "minecraft:wall_sign"
+    """ 墙上的橡木指示牌。 """
+    LEVER = "minecraft:lever"
+    """ 拉杆。 """
+    STONE_PRESSURE_PLATE = "minecraft:stone_pressure_plate"
+    """ 石压力板。 """
+    IRON_DOOR = "minecraft:iron_door"
+    """ 铁门。 """
+    WOODEN_PRESSURE_PLATE = "minecraft:wooden_pressure_plate"
+    """ 木制压力板。 """
+    REDSTONE_ORE = "minecraft:redstone_ore"
+    """ 红石矿。 """
+    LIT_REDSTONE_ORE = "minecraft:lit_redstone_ore"
+    """ 红石矿。 """
+    UNLIT_REDSTONE_TORCH = "minecraft:unlit_redstone_torch"
+    """ 熄灭的红石火炬。 """
+    REDSTONE_TORCH = "minecraft:redstone_torch"
+    """ 红石火炬。 """
+    STONE_BUTTON = "minecraft:stone_button"
+    """ 石按钮。 """
+    SNOW_LAYER = "minecraft:snow_layer"
+    """ 雪。 """
+    ICE = "minecraft:ice"
+    """ 冰。 """
+    SNOW = "minecraft:snow"
+    """ 雪块。 """
+    CACTUS = "minecraft:cactus"
+    """ 仙人掌。 """
+    CLAY = "minecraft:clay"
+    """ 黏土。 """
+    REEDS = "minecraft:reeds"
+    """ 蔗。 """
+    JUKEBOX = "minecraft:jukebox"
+    """ 唱片机。 """
+    OAK_FENCE = "minecraft:oak_fence"
+    """ 橡木栏杆。 """
+    PUMPKIN = "minecraft:pumpkin"
+    """ 南瓜。 """
+    NETHERRACK = "minecraft:netherrack"
+    """ 地狱石。 """
+    SOUL_SAND = "minecraft:soul_sand"
+    """ 灵魂砂。 """
+    GLOWSTONE = "minecraft:glowstone"
+    """ 荧光石。 """
+    PORTAL = "minecraft:portal"
+    """ 地狱传送门。 """
+    LIT_PUMPKIN = "minecraft:lit_pumpkin"
+    """ 南瓜灯。 """
+    CAKE = "minecraft:cake"
+    """ 蛋糕。 """
+    UNPOWERED_REPEATER = "minecraft:unpowered_repeater"
+    """ 红石中继器。 """
+    POWERED_REPEATER = "minecraft:powered_repeater"
+    """ 启动的红石中继器。 """
+    INVISIBLE_BEDROCK = "minecraft:invisible_bedrock"
+    """ 隐形基岩。 """
+    TRAPDOOR = "minecraft:trapdoor"
+    """ 橡木地板门。 """
+    INFESTED_STONE = "minecraft:infested_stone"
+    """ 蛀蚀的石头。 """
+    STONE_BRICKS = "minecraft:stone_bricks"
+    """ 石砖。 """
+    BROWN_MUSHROOM_BLOCK = "minecraft:brown_mushroom_block"
+    """ 啡色蘑菇方块。 """
+    RED_MUSHROOM_BLOCK = "minecraft:red_mushroom_block"
+    """ 红色蘑菇方块。 """
+    IRON_BARS = "minecraft:iron_bars"
+    """ 铁栏杆。 """
+    GLASS_PANE = "minecraft:glass_pane"
+    """ 玻璃片。 """
+    MELON_BLOCK = "minecraft:melon_block"
+    """ 西瓜。 """
+    PUMPKIN_STEM = "minecraft:pumpkin_stem"
+    """ 南瓜茎。 """
+    MELON_STEM = "minecraft:melon_stem"
+    """ 西瓜茎。 """
+    VINE = "minecraft:vine"
+    """ 藤蔓。 """
+    FENCE_GATE = "minecraft:fence_gate"
+    """ 橡木闸门。 """
+    BRICK_STAIRS = "minecraft:brick_stairs"
+    """ 红砖楼梯。 """
+    STONE_BRICK_STAIRS = "minecraft:stone_brick_stairs"
+    """ 石砖楼梯。 """
+    MYCELIUM = "minecraft:mycelium"
+    """ 菌丝土。 """
+    WATERLILY = "minecraft:waterlily"
+    """ 荷叶。 """
+    NETHER_BRICK = "minecraft:nether_brick"
+    """ 地狱砖头。 """
+    NETHER_BRICK_FENCE = "minecraft:nether_brick_fence"
+    """ 地狱砖栏杆。 """
+    NETHER_BRICK_STAIRS = "minecraft:nether_brick_stairs"
+    """ 地狱砖楼梯。 """
+    NETHER_WART = "minecraft:nether_wart"
+    """ 地狱孢子。 """
+    ENCHANTING_TABLE = "minecraft:enchanting_table"
+    """ 附魔台。 """
+    BREWING_STAND = "minecraft:brewing_stand"
+    """ 酿造台。 """
+    CAULDRON = "minecraft:cauldron"
+    """ 锅。 """
+    END_PORTAL = "minecraft:end_portal"
+    """ 终界传送门。 """
+    END_PORTAL_FRAME = "minecraft:end_portal_frame"
+    """ 终界传送门框。 """
+    END_STONE = "minecraft:end_stone"
+    """ 终界石。 """
+    DRAGON_EGG = "minecraft:dragon_egg"
+    """ 龙蛋。 """
+    REDSTONE_LAMP = "minecraft:redstone_lamp"
+    """ 红石灯。 """
+    LIT_REDSTONE_LAMP = "minecraft:lit_redstone_lamp"
+    """ 点亮的红石灯。 """
+    DROPPER = "minecraft:dropper"
+    """ 投掷器。 """
+    ACTIVATOR_RAIL = "minecraft:activator_rail"
+    """ 触发路轨。 """
+    COCOA = "minecraft:cocoa"
+    """ 可可果。 """
+    SANDSTONE_STAIRS = "minecraft:sandstone_stairs"
+    """ 砂岩楼梯。 """
+    EMERALD_ORE = "minecraft:emerald_ore"
+    """ 绿宝石矿。 """
+    ENDER_CHEST = "minecraft:ender_chest"
+    """ 终界箱。 """
+    TRIPWIRE_HOOK = "minecraft:tripwire_hook"
+    """ 撠线钩。 """
+    TRIP_WIRE = "minecraft:trip_wire"
+    """ 撠线。 """
+    EMERALD_BLOCK = "minecraft:emerald_block"
+    """ 绿宝石砖。 """
+    SPRUCE_STAIRS = "minecraft:spruce_stairs"
+    """ 杉木楼梯。 """
+    BIRCH_STAIRS = "minecraft:birch_stairs"
+    """ 桦木楼梯。 """
+    JUNGLE_STAIRS = "minecraft:jungle_stairs"
+    """ 丛林木楼梯。 """
+    COMMAND_BLOCK = "minecraft:command_block"
+    """ 脉冲型命令方块。 """
+    BEACON = "minecraft:beacon"
+    """ 灯标。 """
+    COBBLESTONE_WALL = "minecraft:cobblestone_wall"
+    """ 碎石墙。 """
+    FLOWER_POT = "minecraft:flower_pot"
+    """ 花盆。 """
+    CARROTS = "minecraft:carrots"
+    """ 红萝卜。 """
+    POTATOES = "minecraft:potatoes"
+    """ 薯仔。 """
+    WOODEN_BUTTON = "minecraft:wooden_button"
+    """ 橡木按钮。 """
+    SKELETON_SKULL = "minecraft:skeleton_skull"
+    """ 骷髅骨头颅。 """
+    ANVIL = "minecraft:anvil"
+    """ 铁砧。 """
+    TRAPPED_CHEST = "minecraft:trapped_chest"
+    """ 陷阱箱。 """
+    LIGHT_WEIGHTED_PRESSURE_PLATE = "minecraft:light_weighted_pressure_plate"
+    """ 轻质测重压力板。 """
+    HEAVY_WEIGHTED_PRESSURE_PLATE = "minecraft:heavy_weighted_pressure_plate"
+    """ 重质测重压力板。 """
+    UNPOWERED_COMPARATOR = "minecraft:unpowered_comparator"
+    """ 红石比较器。 """
+    POWERED_COMPARATOR = "minecraft:powered_comparator"
+    """ 启动的红石比较器。 """
+    DAYLIGHT_DETECTOR = "minecraft:daylight_detector"
+    """ 日光感测器。 """
+    REDSTONE_BLOCK = "minecraft:redstone_block"
+    """ 红石砖。 """
+    QUARTZ_ORE = "minecraft:quartz_ore"
+    """ 地狱石英矿。 """
+    HOPPER = "minecraft:hopper"
+    """ 漏斗。 """
+    QUARTZ_BLOCK = "minecraft:quartz_block"
+    """ 石英砖。 """
+    QUARTZ_STAIRS = "minecraft:quartz_stairs"
+    """ 石英楼梯。 """
+    OAK_DOUBLE_SLAB = "minecraft:oak_double_slab"
+    """ 橡木双半砖。 """
+    OAK_SLAB = "minecraft:oak_slab"
+    """ 橡木半砖。 """
+    WHITE_TERRACOTTA = "minecraft:white_terracotta"
+    """ 白色陶瓦。 """
+    WHITE_STAINED_GLASS_PANE = "minecraft:white_stained_glass_pane"
+    """ 白色染色玻璃片。 """
+    ACACIA_LEAVES = "minecraft:acacia_leaves"
+    """ 相思木树叶。 """
+    ACACIA_LOG = "minecraft:acacia_log"
+    """ 相思木原木。 """
+    ACACIA_STAIRS = "minecraft:acacia_stairs"
+    """ 相思木楼梯。 """
+    DARK_OAK_STAIRS = "minecraft:dark_oak_stairs"
+    """ 黑橡木楼梯。 """
+    SLIME = "minecraft:slime"
+    """ 史莱姆方块。 """
+    GLOW_STICK = "minecraft:glow_stick"
+    """ 荧光棒。 """
+    IRON_TRAPDOOR = "minecraft:iron_trapdoor"
+    """ 铁地板门。 """
+    PRISMARINE = "minecraft:prismarine"
+    """ 海磷石。 """
+    SEA_LANTERN = "minecraft:sea_lantern"
+    """ 海灯笼。 """
+    HAY_BLOCK = "minecraft:hay_block"
+    """ 干草捆。 """
+    WHITE_CARPET = "minecraft:white_carpet"
+    """ 白色地毡。 """
+    HARDENED_CLAY = "minecraft:hardened_clay"
+    """ 陶瓦。 """
+    COAL_BLOCK = "minecraft:coal_block"
+    """ 煤炭砖。 """
+    PACKED_ICE = "minecraft:packed_ice"
+    """ 冰砖。 """
+    SUNFLOWER = "minecraft:sunflower"
+    """ 向日葵。 """
+    STANDING_BANNER = "minecraft:standing_banner"
+    """ 站立的横额。 """
+    WALL_BANNER = "minecraft:wall_banner"
+    """ 墙上的横额。 """
+    DAYLIGHT_DETECTOR_INVERTED = "minecraft:daylight_detector_inverted"
+    """ 反向日光感测器。 """
+    RED_SANDSTONE = "minecraft:red_sandstone"
+    """ 红砂岩。 """
+    RED_SANDSTONE_STAIRS = "minecraft:red_sandstone_stairs"
+    """ 红砂岩楼梯。 """
+    RED_SANDSTONE_DOUBLE_SLAB = "minecraft:red_sandstone_double_slab"
+    """ 红砂岩双半砖。 """
+    RED_SANDSTONE_SLAB = "minecraft:red_sandstone_slab"
+    """ 红砂岩半砖。 """
+    SPRUCE_FENCE_GATE = "minecraft:spruce_fence_gate"
+    """ 杉木闸门。 """
+    BIRCH_FENCE_GATE = "minecraft:birch_fence_gate"
+    """ 桦木闸门。 """
+    JUNGLE_FENCE_GATE = "minecraft:jungle_fence_gate"
+    """ 丛林木闸门。 """
+    DARK_OAK_FENCE_GATE = "minecraft:dark_oak_fence_gate"
+    """ 黑橡木闸门。 """
+    ACACIA_FENCE_GATE = "minecraft:acacia_fence_gate"
+    """ 相思木闸门。 """
+    REPEATING_COMMAND_BLOCK = "minecraft:repeating_command_block"
+    """ 重复型命令方块。 """
+    CHAIN_COMMAND_BLOCK = "minecraft:chain_command_block"
+    """ 连环型命令方块。 """
+    HARD_GLASS_PANE = "minecraft:hard_glass_pane"
+    """ 强化玻璃片。 """
+    HARD_WHITE_STAINED_GLASS_PANE = "minecraft:hard_white_stained_glass_pane"
+    """ 白色强化玻璃片。 """
+    CHEMICAL_HEAT = "minecraft:chemical_heat"
+    """ 加热块。 """
+    SPRUCE_DOOR = "minecraft:spruce_door"
+    """ 杉木门。 """
+    BIRCH_DOOR = "minecraft:birch_door"
+    """ 桦木门。 """
+    JUNGLE_DOOR = "minecraft:jungle_door"
+    """ 丛林木门。 """
+    ACACIA_DOOR = "minecraft:acacia_door"
+    """ 相思木门。 """
+    DARK_OAK_DOOR = "minecraft:dark_oak_door"
+    """ 黑橡木门。 """
+    GRASS_PATH = "minecraft:grass_path"
+    """ 泥径。 """
+    FRAME = "minecraft:frame"
+    """ 物品展示框。 """
+    CHORUS_FLOWER = "minecraft:chorus_flower"
+    """ 歌莱花。 """
+    PURPUR_BLOCK = "minecraft:purpur_block"
+    """ 紫珀砖。 """
+    COLORED_TORCH_RED = "minecraft:colored_torch_red"
+    """ 红色火炬。 """
+    PURPUR_STAIRS = "minecraft:purpur_stairs"
+    """ 紫珀楼梯。 """
+    COLORED_TORCH_BLUE = "minecraft:colored_torch_blue"
+    """ 蓝色火炬。 """
+    UNDYED_SHULKER_BOX = "minecraft:undyed_shulker_box"
+    """ 未染色的界伏盒。 """
+    END_BRICKS = "minecraft:end_bricks"
+    """ 终界石砖。 """
+    FROSTED_ICE = "minecraft:frosted_ice"
+    """ 霜冰。 """
+    END_ROD = "minecraft:end_rod"
+    """ 终界烛。 """
+    END_GATEWAY = "minecraft:end_gateway"
+    """ 终界折跃门。 """
+    ALLOW = "minecraft:allow"
+    """ 允许方块。 """
+    DENY = "minecraft:deny"
+    """ 拒绝方块。 """
+    BORDER_BLOCK = "minecraft:border_block"
+    """ 边界。 """
+    MAGMA = "minecraft:magma"
+    """ 岩浆块。 """
+    NETHER_WART_BLOCK = "minecraft:nether_wart_block"
+    """ 地狱孢子块。 """
+    RED_NETHER_BRICK = "minecraft:red_nether_brick"
+    """ 红色地狱砖。 """
+    BONE_BLOCK = "minecraft:bone_block"
+    """ 骨块。 """
+    STRUCTURE_VOID = "minecraft:structure_void"
+    """ 结构空位。 """
+    WHITE_SHULKER_BOX = "minecraft:white_shulker_box"
+    """ 白色界伏盒。 """
+    PURPLE_GLAZED_TERRACOTTA = "minecraft:purple_glazed_terracotta"
+    """ 紫色釉陶。 """
+    WHITE_GLAZED_TERRACOTTA = "minecraft:white_glazed_terracotta"
+    """ 白色釉陶。 """
+    ORANGE_GLAZED_TERRACOTTA = "minecraft:orange_glazed_terracotta"
+    """ 橙色釉陶。 """
+    MAGENTA_GLAZED_TERRACOTTA = "minecraft:magenta_glazed_terracotta"
+    """ 紫红色釉陶。 """
+    LIGHT_BLUE_GLAZED_TERRACOTTA = "minecraft:light_blue_glazed_terracotta"
+    """ 浅蓝色釉陶。 """
+    YELLOW_GLAZED_TERRACOTTA = "minecraft:yellow_glazed_terracotta"
+    """ 黄色釉陶。 """
+    LIME_GLAZED_TERRACOTTA = "minecraft:lime_glazed_terracotta"
+    """ 浅绿色釉陶。 """
+    PINK_GLAZED_TERRACOTTA = "minecraft:pink_glazed_terracotta"
+    """ 粉红色釉陶。 """
+    GRAY_GLAZED_TERRACOTTA = "minecraft:gray_glazed_terracotta"
+    """ 灰色釉陶。 """
+    SILVER_GLAZED_TERRACOTTA = "minecraft:silver_glazed_terracotta"
+    """ 浅灰色釉陶。 """
+    CYAN_GLAZED_TERRACOTTA = "minecraft:cyan_glazed_terracotta"
+    """ 青蓝色釉陶。 """
+    CHALKBOARD = "minecraft:chalkboard"
+    """ 黑板。 """
+    BLUE_GLAZED_TERRACOTTA = "minecraft:blue_glazed_terracotta"
+    """ 蓝色釉陶。 """
+    BROWN_GLAZED_TERRACOTTA = "minecraft:brown_glazed_terracotta"
+    """ 啡色釉陶。 """
+    GREEN_GLAZED_TERRACOTTA = "minecraft:green_glazed_terracotta"
+    """ 绿色釉陶。 """
+    RED_GLAZED_TERRACOTTA = "minecraft:red_glazed_terracotta"
+    """ 红色釉陶。 """
+    BLACK_GLAZED_TERRACOTTA = "minecraft:black_glazed_terracotta"
+    """ 黑色釉陶。 """
+    WHITE_CONCRETE = "minecraft:white_concrete"
+    """ 白色混凝土。 """
+    WHITE_CONCRETE_POWDER = "minecraft:white_concrete_powder"
+    """ 白色混凝土粉末。 """
+    COMPOUND_CREATOR = "minecraft:compound_creator"
+    """ 化合物建立器。 """
+    UNDERWATER_TORCH = "minecraft:underwater_torch"
+    """ 水下火炬。 """
+    CHORUS_PLANT = "minecraft:chorus_plant"
+    """ 歌莱枝。 """
+    WHITE_STAINED_GLASS = "minecraft:white_stained_glass"
+    """ 白色染色玻璃。 """
+    CAMERA = "minecraft:camera"
+    """ 摄像机。 """
+    PODZOL = "minecraft:podzol"
+    """ 灰壤。 """
+    BEETROOT = "minecraft:beetroot"
+    """ 红菜头。 """
+    STONECUTTER = "minecraft:stonecutter"
+    """ 切石机（旧版）。 """
+    GLOWINGOBSIDIAN = "minecraft:glowingobsidian"
+    """ 发光的黑曜石。 """
+    NETHERREACTOR = "minecraft:netherreactor"
+    """ 地狱反应核。 """
+    INFO_UPDATE = "minecraft:info_update"
+    """ 数据更新方块（update!）。 """
+    INFO_UPDATE2 = "minecraft:info_update2"
+    """ 数据更新方块2（ate!upd）。 """
+    MOVING_BLOCK = "minecraft:moving_block"
+    """ 移动的方块/移动的活塞。 """
+    OBSERVER = "minecraft:observer"
+    """ 侦测器。 """
+    STRUCTURE_BLOCK = "minecraft:structure_block"
+    """ 结构方块。 """
+    HARD_GLASS = "minecraft:hard_glass"
+    """ 强化玻璃。 """
+    HARD_WHITE_STAINED_GLASS = "minecraft:hard_white_stained_glass"
+    """ 白色强化玻璃。 """
+    RESERVED6 = "minecraft:reserved6"
+    """ reserved6。 """
+    PRISMARINE_STAIRS = "minecraft:prismarine_stairs"
+    """ 海磷石楼梯。 """
+    DARK_PRISMARINE_STAIRS = "minecraft:dark_prismarine_stairs"
+    """ 暗海磷石楼梯。 """
+    PRISMARINE_BRICKS_STAIRS = "minecraft:prismarine_bricks_stairs"
+    """ 海磷石砖楼梯。 """
+    STRIPPED_SPRUCE_LOG = "minecraft:stripped_spruce_log"
+    """ 剥皮杉木原木。 """
+    STRIPPED_BIRCH_LOG = "minecraft:stripped_birch_log"
+    """ 剥皮桦木原木。 """
+    STRIPPED_JUNGLE_LOG = "minecraft:stripped_jungle_log"
+    """ 剥皮丛林木原木。 """
+    STRIPPED_ACACIA_LOG = "minecraft:stripped_acacia_log"
+    """ 剥皮相思木原木。 """
+    STRIPPED_DARK_OAK_LOG = "minecraft:stripped_dark_oak_log"
+    """ 剥皮黑橡木原木。 """
+    STRIPPED_OAK_LOG = "minecraft:stripped_oak_log"
+    """ 剥皮橡木原木。 """
+    BLUE_ICE = "minecraft:blue_ice"
+    """ 蓝冰。 """
+    SEAGRASS = "minecraft:seagrass"
+    """ 海草。 """
+    TUBE_CORAL = "minecraft:tube_coral"
+    """ 管珊瑚。 """
+    TUBE_CORAL_BLOCK = "minecraft:tube_coral_block"
+    """ 管珊瑚方块。 """
+    TUBE_CORAL_FAN = "minecraft:tube_coral_fan"
+    """ 扇状管珊瑚。 """
+    DEAD_TUBE_CORAL_FAN = "minecraft:dead_tube_coral_fan"
+    """ 死亡的扇状管珊瑚。 """
+    TUBE_CORAL_WALL_FAN = "minecraft:tube_coral_wall_fan"
+    """ 墙上的扇状管珊瑚。 """
+    BUBBLE_CORAL_WALL_FAN = "minecraft:bubble_coral_wall_fan"
+    """ 墙上的扇状气泡珊瑚。 """
+    HORN_CORAL_WALL_FAN = "minecraft:horn_coral_wall_fan"
+    """ 墙上的扇状角珊瑚。 """
+    KELP = "minecraft:kelp"
+    """ 海带。 """
+    DRIED_KELP_BLOCK = "minecraft:dried_kelp_block"
+    """ 干海带捆。 """
+    ACACIA_BUTTON = "minecraft:acacia_button"
+    """ 相思木按钮。 """
+    BIRCH_BUTTON = "minecraft:birch_button"
+    """ 桦木按钮。 """
+    DARK_OAK_BUTTON = "minecraft:dark_oak_button"
+    """ 黑橡木按钮。 """
+    JUNGLE_BUTTON = "minecraft:jungle_button"
+    """ 丛林木按钮。 """
+    SPRUCE_BUTTON = "minecraft:spruce_button"
+    """ 杉木按钮。 """
+    ACACIA_TRAPDOOR = "minecraft:acacia_trapdoor"
+    """ 相思木地板门。 """
+    BIRCH_TRAPDOOR = "minecraft:birch_trapdoor"
+    """ 桦木地板门。 """
+    DARK_OAK_TRAPDOOR = "minecraft:dark_oak_trapdoor"
+    """ 黑橡木地板门。 """
+    JUNGLE_TRAPDOOR = "minecraft:jungle_trapdoor"
+    """ 丛林木地板门。 """
+    SPRUCE_TRAPDOOR = "minecraft:spruce_trapdoor"
+    """ 杉木地板门。 """
+    ACACIA_PRESSURE_PLATE = "minecraft:acacia_pressure_plate"
+    """ 相思木压力板。 """
+    BIRCH_PRESSURE_PLATE = "minecraft:birch_pressure_plate"
+    """ 桦木压力板。 """
+    DARK_OAK_PRESSURE_PLATE = "minecraft:dark_oak_pressure_plate"
+    """ 黑橡木压力板。 """
+    JUNGLE_PRESSURE_PLATE = "minecraft:jungle_pressure_plate"
+    """ 丛林木压力板。 """
+    SPRUCE_PRESSURE_PLATE = "minecraft:spruce_pressure_plate"
+    """ 杉木压力板。 """
+    CARVED_PUMPKIN = "minecraft:carved_pumpkin"
+    """ 雕刻南瓜。 """
+    SEA_PICKLE = "minecraft:sea_pickle"
+    """ 海鞘。 """
+    CONDUIT = "minecraft:conduit"
+    """ 海灵核心。 """
+    AIR = "minecraft:air"
+    """ 空气。 """
+    TURTLE_EGG = "minecraft:turtle_egg"
+    """ 海龟蛋。 """
+    BUBBLE_COLUMN = "minecraft:bubble_column"
+    """ 气泡柱。 """
+    BARRIER = "minecraft:barrier"
+    """ 屏障。 """
+    END_STONE_BRICK_SLAB = "minecraft:end_stone_brick_slab"
+    """ 终界石砖半砖。 """
+    BAMBOO = "minecraft:bamboo"
+    """ 竹。 """
+    BAMBOO_SAPLING = "minecraft:bamboo_sapling"
+    """ 竹笋。 """
+    SCAFFOLDING = "minecraft:scaffolding"
+    """ 棚架。 """
+    MOSSY_STONE_BRICK_SLAB = "minecraft:mossy_stone_brick_slab"
+    """ 青苔石砖半砖。 """
+    END_STONE_BRICK_DOUBLE_SLAB = "minecraft:end_stone_brick_double_slab"
+    """ 终界石砖双半砖。 """
+    MOSSY_STONE_BRICK_DOUBLE_SLAB = "minecraft:mossy_stone_brick_double_slab"
+    """ 青苔石砖双半砖。 """
+    GRANITE_STAIRS = "minecraft:granite_stairs"
+    """ 花岗岩楼梯。 """
+    DIORITE_STAIRS = "minecraft:diorite_stairs"
+    """ 闪长岩楼梯。 """
+    ANDESITE_STAIRS = "minecraft:andesite_stairs"
+    """ 安山岩楼梯。 """
+    POLISHED_GRANITE_STAIRS = "minecraft:polished_granite_stairs"
+    """ 抛光花岗岩楼梯。 """
+    POLISHED_DIORITE_STAIRS = "minecraft:polished_diorite_stairs"
+    """ 抛光闪长岩楼梯。 """
+    POLISHED_ANDESITE_STAIRS = "minecraft:polished_andesite_stairs"
+    """ 抛光安山岩楼梯。 """
+    MOSSY_STONE_BRICK_STAIRS = "minecraft:mossy_stone_brick_stairs"
+    """ 青苔石砖楼梯。 """
+    SMOOTH_RED_SANDSTONE_STAIRS = "minecraft:smooth_red_sandstone_stairs"
+    """ 平滑红砂岩楼梯。 """
+    SMOOTH_SANDSTONE_STAIRS = "minecraft:smooth_sandstone_stairs"
+    """ 平滑砂岩楼梯。 """
+    END_BRICK_STAIRS = "minecraft:end_brick_stairs"
+    """ 终界石砖楼梯。 """
+    MOSSY_COBBLESTONE_STAIRS = "minecraft:mossy_cobblestone_stairs"
+    """ 青苔碎石楼梯。 """
+    NORMAL_STONE_STAIRS = "minecraft:normal_stone_stairs"
+    """ 石头楼梯。 """
+    SPRUCE_STANDING_SIGN = "minecraft:spruce_standing_sign"
+    """ 杉木指示牌。 """
+    SPRUCE_WALL_SIGN = "minecraft:spruce_wall_sign"
+    """ 墙上的杉木指示牌。 """
+    SMOOTH_STONE = "minecraft:smooth_stone"
+    """ 平滑石头。 """
+    RED_NETHER_BRICK_STAIRS = "minecraft:red_nether_brick_stairs"
+    """ 红色地狱砖楼梯。 """
+    SMOOTH_QUARTZ_STAIRS = "minecraft:smooth_quartz_stairs"
+    """ 平滑石英楼梯。 """
+    BIRCH_STANDING_SIGN = "minecraft:birch_standing_sign"
+    """ 桦木指示牌。 """
+    BIRCH_WALL_SIGN = "minecraft:birch_wall_sign"
+    """ 墙上的桦木指示牌。 """
+    JUNGLE_STANDING_SIGN = "minecraft:jungle_standing_sign"
+    """ 丛林木指示牌。 """
+    JUNGLE_WALL_SIGN = "minecraft:jungle_wall_sign"
+    """ 墙上的丛林木指示牌。 """
+    ACACIA_STANDING_SIGN = "minecraft:acacia_standing_sign"
+    """ 相思木指示牌。 """
+    ACACIA_WALL_SIGN = "minecraft:acacia_wall_sign"
+    """ 墙上的相思木指示牌。 """
+    DARKOAK_STANDING_SIGN = "minecraft:darkoak_standing_sign"
+    """ 黑橡木指示牌。 """
+    DARKOAK_WALL_SIGN = "minecraft:darkoak_wall_sign"
+    """ 墙上的黑橡木指示牌。 """
+    LECTERN = "minecraft:lectern"
+    """ 讲台。 """
+    GRINDSTONE = "minecraft:grindstone"
+    """ 砂轮。 """
+    BLAST_FURNACE = "minecraft:blast_furnace"
+    """ 高炉。 """
+    STONECUTTER_BLOCK = "minecraft:stonecutter_block"
+    """ 切石机。 """
+    SMOKER = "minecraft:smoker"
+    """ 烟熏炉。 """
+    LIT_SMOKER = "minecraft:lit_smoker"
+    """ 燃烧中的烟熏炉。 """
+    CARTOGRAPHY_TABLE = "minecraft:cartography_table"
+    """ 制图台。 """
+    FLETCHING_TABLE = "minecraft:fletching_table"
+    """ 制箭台。 """
+    SMITHING_TABLE = "minecraft:smithing_table"
+    """ 锻造台。 """
+    BARREL = "minecraft:barrel"
+    """ 木桶。 """
+    LOOM = "minecraft:loom"
+    """ 织布机。 """
+    BELL = "minecraft:bell"
+    """ 钟。 """
+    SWEET_BERRY_BUSH = "minecraft:sweet_berry_bush"
+    """ 甜莓灌木丛。 """
+    LANTERN = "minecraft:lantern"
+    """ 灯笼。 """
+    CAMPFIRE = "minecraft:campfire"
+    """ 营火。 """
+    LAVA_CAULDRON = "minecraft:lava_cauldron"
+    """ 装有熔岩的锅（已移除）。 """
+    JIGSAW = "minecraft:jigsaw"
+    """ 拼图方块。 """
+    OAK_WOOD = "minecraft:oak_wood"
+    """ 橡木。 """
+    COMPOSTER = "minecraft:composter"
+    """ 堆肥桶。 """
+    LIT_BLAST_FURNACE = "minecraft:lit_blast_furnace"
+    """ 燃烧中的高炉。 """
+    LIGHT_BLOCK_0 = "minecraft:light_block_0"
+    """ 光 （亮度0）。 """
+    WITHER_ROSE = "minecraft:wither_rose"
+    """ 凋零玫瑰。 """
+    STICKY_PISTON_ARM_COLLISION = "minecraft:sticky_piston_arm_collision"
+    """ 黏性活塞臂。 """
+    BEE_NEST = "minecraft:bee_nest"
+    """ 蜂巢。 """
+    BEEHIVE = "minecraft:beehive"
+    """ 蜂箱。 """
+    HONEY_BLOCK = "minecraft:honey_block"
+    """ 蜜糖块。 """
+    HONEYCOMB_BLOCK = "minecraft:honeycomb_block"
+    """ 蜂巢蜜块。 """
+    LODESTONE = "minecraft:lodestone"
+    """ 磁石。 """
+    CRIMSON_ROOTS = "minecraft:crimson_roots"
+    """ 猩红菌根。 """
+    WARPED_ROOTS = "minecraft:warped_roots"
+    """ 迷离菌根。 """
+    CRIMSON_STEM = "minecraft:crimson_stem"
+    """ 猩红菌柄。 """
+    WARPED_STEM = "minecraft:warped_stem"
+    """ 迷离菌柄。 """
+    WARPED_WART_BLOCK = "minecraft:warped_wart_block"
+    """ 迷离孢子块。 """
+    CRIMSON_FUNGUS = "minecraft:crimson_fungus"
+    """ 猩红菌菇。 """
+    WARPED_FUNGUS = "minecraft:warped_fungus"
+    """ 迷离菌菇。 """
+    SHROOMLIGHT = "minecraft:shroomlight"
+    """ 菌光体。 """
+    WEEPING_VINES = "minecraft:weeping_vines"
+    """ 哭泣藤。 """
+    CRIMSON_NYLIUM = "minecraft:crimson_nylium"
+    """ 猩红菌丝石。 """
+    WARPED_NYLIUM = "minecraft:warped_nylium"
+    """ 迷离菌丝石。 """
+    BASALT = "minecraft:basalt"
+    """ 玄武岩。 """
+    POLISHED_BASALT = "minecraft:polished_basalt"
+    """ 抛光玄武岩。 """
+    SOUL_SOIL = "minecraft:soul_soil"
+    """ 灵魂土。 """
+    SOUL_FIRE = "minecraft:soul_fire"
+    """ 灵魂火。 """
+    NETHER_SPROUTS = "minecraft:nether_sprouts"
+    """ 地狱芽。 """
+    TARGET = "minecraft:target"
+    """ 标靶。 """
+    STRIPPED_CRIMSON_STEM = "minecraft:stripped_crimson_stem"
+    """ 剥皮猩红菌柄。 """
+    STRIPPED_WARPED_STEM = "minecraft:stripped_warped_stem"
+    """ 剥皮迷离菌柄。 """
+    CRIMSON_PLANKS = "minecraft:crimson_planks"
+    """ 猩红菌木板。 """
+    WARPED_PLANKS = "minecraft:warped_planks"
+    """ 迷离菌木板。 """
+    CRIMSON_DOOR = "minecraft:crimson_door"
+    """ 猩红菌木门。 """
+    WARPED_DOOR = "minecraft:warped_door"
+    """ 迷离菌木门。 """
+    CRIMSON_TRAPDOOR = "minecraft:crimson_trapdoor"
+    """ 猩红菌木地板门。 """
+    WARPED_TRAPDOOR = "minecraft:warped_trapdoor"
+    """ 迷离菌木地板门。 """
+    CRIMSON_STANDING_SIGN = "minecraft:crimson_standing_sign"
+    """ 猩红菌木指示牌。 """
+    WARPED_STANDING_SIGN = "minecraft:warped_standing_sign"
+    """ 迷离菌木指示牌。 """
+    CRIMSON_WALL_SIGN = "minecraft:crimson_wall_sign"
+    """ 墙上的猩红菌木指示牌。 """
+    WARPED_WALL_SIGN = "minecraft:warped_wall_sign"
+    """ 墙上的迷离菌木指示牌。 """
+    CRIMSON_STAIRS = "minecraft:crimson_stairs"
+    """ 猩红菌木楼梯。 """
+    WARPED_STAIRS = "minecraft:warped_stairs"
+    """ 迷离菌木楼梯。 """
+    CRIMSON_FENCE = "minecraft:crimson_fence"
+    """ 猩红菌木栏杆。 """
+    WARPED_FENCE = "minecraft:warped_fence"
+    """ 迷离菌木栏杆。 """
+    CRIMSON_FENCE_GATE = "minecraft:crimson_fence_gate"
+    """ 猩红菌木闸门。 """
+    WARPED_FENCE_GATE = "minecraft:warped_fence_gate"
+    """ 迷离菌木闸门。 """
+    CRIMSON_BUTTON = "minecraft:crimson_button"
+    """ 猩红菌木按钮。 """
+    WARPED_BUTTON = "minecraft:warped_button"
+    """ 迷离菌木按钮。 """
+    CRIMSON_PRESSURE_PLATE = "minecraft:crimson_pressure_plate"
+    """ 猩红菌木压力板。 """
+    WARPED_PRESSURE_PLATE = "minecraft:warped_pressure_plate"
+    """ 迷离菌木压力板。 """
+    CRIMSON_SLAB = "minecraft:crimson_slab"
+    """ 猩红菌木半砖。 """
+    WARPED_SLAB = "minecraft:warped_slab"
+    """ 迷离菌木半砖。 """
+    CRIMSON_DOUBLE_SLAB = "minecraft:crimson_double_slab"
+    """ 猩红菌木双半砖。 """
+    WARPED_DOUBLE_SLAB = "minecraft:warped_double_slab"
+    """ 迷离菌木双半砖。 """
+    SOUL_TORCH = "minecraft:soul_torch"
+    """ 灵魂火炬。 """
+    SOUL_LANTERN = "minecraft:soul_lantern"
+    """ 灵魂灯笼。 """
+    NETHERITE_BLOCK = "minecraft:netherite_block"
+    """ 地狱合金砖。 """
+    ANCIENT_DEBRIS = "minecraft:ancient_debris"
+    """ 远古残骸。 """
+    RESPAWN_ANCHOR = "minecraft:respawn_anchor"
+    """ 重生锚。 """
+    BLACKSTONE = "minecraft:blackstone"
+    """ 黑石。 """
+    POLISHED_BLACKSTONE_BRICKS = "minecraft:polished_blackstone_bricks"
+    """ 抛光黑石砖。 """
+    POLISHED_BLACKSTONE_BRICK_STAIRS = "minecraft:polished_blackstone_brick_stairs"
+    """ 抛光黑石砖楼梯。 """
+    BLACKSTONE_STAIRS = "minecraft:blackstone_stairs"
+    """ 黑石楼梯。 """
+    BLACKSTONE_WALL = "minecraft:blackstone_wall"
+    """ 黑石墙。 """
+    POLISHED_BLACKSTONE_BRICK_WALL = "minecraft:polished_blackstone_brick_wall"
+    """ 抛光黑石砖墙。 """
+    CHISELED_POLISHED_BLACKSTONE = "minecraft:chiseled_polished_blackstone"
+    """ 浮雕抛光黑石。 """
+    CRACKED_POLISHED_BLACKSTONE_BRICKS = "minecraft:cracked_polished_blackstone_bricks"
+    """ 裂纹抛光黑石砖。 """
+    GILDED_BLACKSTONE = "minecraft:gilded_blackstone"
+    """ 镶金黑石。 """
+    BLACKSTONE_SLAB = "minecraft:blackstone_slab"
+    """ 黑石半砖。 """
+    BLACKSTONE_DOUBLE_SLAB = "minecraft:blackstone_double_slab"
+    """ 黑石双半砖。 """
+    POLISHED_BLACKSTONE_BRICK_SLAB = "minecraft:polished_blackstone_brick_slab"
+    """ 抛光黑石砖半砖。 """
+    POLISHED_BLACKSTONE_BRICK_DOUBLE_SLAB = "minecraft:polished_blackstone_brick_double_slab"
+    """ 抛光黑石砖双半砖。 """
+    IRON_CHAIN = "minecraft:iron_chain"
+    """ 铁链。 """
+    TWISTING_VINES = "minecraft:twisting_vines"
+    """ 扭曲藤。 """
+    NETHER_GOLD_ORE = "minecraft:nether_gold_ore"
+    """ 地狱金矿。 """
+    CRYING_OBSIDIAN = "minecraft:crying_obsidian"
+    """ 哭曜石。 """
+    SOUL_CAMPFIRE = "minecraft:soul_campfire"
+    """ 灵魂营火。 """
+    POLISHED_BLACKSTONE = "minecraft:polished_blackstone"
+    """ 抛光黑石。 """
+    POLISHED_BLACKSTONE_STAIRS = "minecraft:polished_blackstone_stairs"
+    """ 抛光黑石楼梯。 """
+    POLISHED_BLACKSTONE_SLAB = "minecraft:polished_blackstone_slab"
+    """ 抛光黑石半砖。 """
+    POLISHED_BLACKSTONE_DOUBLE_SLAB = "minecraft:polished_blackstone_double_slab"
+    """ 抛光黑石双半砖。 """
+    POLISHED_BLACKSTONE_PRESSURE_PLATE = "minecraft:polished_blackstone_pressure_plate"
+    """ 抛光黑石压力板。 """
+    POLISHED_BLACKSTONE_BUTTON = "minecraft:polished_blackstone_button"
+    """ 抛光黑石按钮。 """
+    POLISHED_BLACKSTONE_WALL = "minecraft:polished_blackstone_wall"
+    """ 抛光黑石墙。 """
+    WARPED_HYPHAE = "minecraft:warped_hyphae"
+    """ 迷离菌丝体。 """
+    CRIMSON_HYPHAE = "minecraft:crimson_hyphae"
+    """ 猩红菌丝体。 """
+    STRIPPED_CRIMSON_HYPHAE = "minecraft:stripped_crimson_hyphae"
+    """ 剥皮猩红菌丝体。 """
+    STRIPPED_WARPED_HYPHAE = "minecraft:stripped_warped_hyphae"
+    """ 剥皮迷离菌丝体。 """
+    CHISELED_NETHER_BRICKS = "minecraft:chiseled_nether_bricks"
+    """ 浮雕地狱砖。 """
+    CRACKED_NETHER_BRICKS = "minecraft:cracked_nether_bricks"
+    """ 裂纹地狱砖。 """
+    QUARTZ_BRICKS = "minecraft:quartz_bricks"
+    """ 砖纹石英砖。 """
+    UNKNOWN = "minecraft:unknown"
+    """ 未知。 """
+    POWDER_SNOW = "minecraft:powder_snow"
+    """ 幼雪。 """
+    SCULK_SENSOR = "minecraft:sculk_sensor"
+    """ 沉灵传感器。 """
+    POINTED_DRIPSTONE = "minecraft:pointed_dripstone"
+    """ 滴水石柱。 """
+    COPPER_ORE = "minecraft:copper_ore"
+    """ 铜矿。 """
+    LIGHTNING_ROD = "minecraft:lightning_rod"
+    """ 避雷针。 """
+    CRAFTER = "minecraft:crafter"
+    """ 合成器。 """
+    VAULT = "minecraft:vault"
+    """ 宝库。 """
+    TRIAL_SPAWNER = "minecraft:trial_spawner"
+    """ 试炼生怪笼。 """
+    HEAVY_CORE = "minecraft:heavy_core"
+    """ 沉重核心。 """
+    DRIPSTONE_BLOCK = "minecraft:dripstone_block"
+    """ 滴水石。 """
+    DIRT_WITH_ROOTS = "minecraft:dirt_with_roots"
+    """ 扎根泥。 """
+    HANGING_ROOTS = "minecraft:hanging_roots"
+    """ 悬根。 """
+    MOSS_BLOCK = "minecraft:moss_block"
+    """ 青苔方块。 """
+    SPORE_BLOSSOM = "minecraft:spore_blossom"
+    """ 孢子花。 """
+    CAVE_VINES = "minecraft:cave_vines"
+    """ 洞穴藤蔓。 """
+    BIG_DRIPLEAF = "minecraft:big_dripleaf"
+    """ 大悬叶草。 """
+    AZALEA_LEAVES = "minecraft:azalea_leaves"
+    """ 杜鹃树叶。 """
+    AZALEA_LEAVES_FLOWERED = "minecraft:azalea_leaves_flowered"
+    """ 盛开的杜鹃树叶。 """
+    CALCITE = "minecraft:calcite"
+    """ 方解石。 """
+    AMETHYST_BLOCK = "minecraft:amethyst_block"
+    """ 紫水晶砖。 """
+    BUDDING_AMETHYST = "minecraft:budding_amethyst"
+    """ 紫水晶母岩。 """
+    AMETHYST_CLUSTER = "minecraft:amethyst_cluster"
+    """ 紫水晶簇。 """
+    LARGE_AMETHYST_BUD = "minecraft:large_amethyst_bud"
+    """ 大型紫水晶芽。 """
+    MEDIUM_AMETHYST_BUD = "minecraft:medium_amethyst_bud"
+    """ 中型紫水晶芽。 """
+    SMALL_AMETHYST_BUD = "minecraft:small_amethyst_bud"
+    """ 小型紫水晶芽。 """
+    TUFF = "minecraft:tuff"
+    """ 凝灰岩。 """
+    TINTED_GLASS = "minecraft:tinted_glass"
+    """ 遮光玻璃。 """
+    MOSS_CARPET = "minecraft:moss_carpet"
+    """ 青苔。 """
+    SMALL_DRIPLEAF_BLOCK = "minecraft:small_dripleaf_block"
+    """ 细悬叶草。 """
+    AZALEA = "minecraft:azalea"
+    """ 杜鹃丛。 """
+    FLOWERING_AZALEA = "minecraft:flowering_azalea"
+    """ 盛开的杜鹃丛。 """
+    GLOW_FRAME = "minecraft:glow_frame"
+    """ 荧光物品展示框。 """
+    COPPER_BLOCK = "minecraft:copper_block"
+    """ 铜砖。 """
+    EXPOSED_COPPER = "minecraft:exposed_copper"
+    """ 斑驳的铜砖。 """
+    WEATHERED_COPPER = "minecraft:weathered_copper"
+    """ 生锈的铜砖。 """
+    OXIDIZED_COPPER = "minecraft:oxidized_copper"
+    """ 氧化的铜砖。 """
+    WAXED_COPPER = "minecraft:waxed_copper"
+    """ 打蜡的铜砖。 """
+    WAXED_EXPOSED_COPPER = "minecraft:waxed_exposed_copper"
+    """ 打蜡的斑驳铜砖。 """
+    WAXED_WEATHERED_COPPER = "minecraft:waxed_weathered_copper"
+    """ 打蜡的生锈铜砖。 """
+    CUT_COPPER = "minecraft:cut_copper"
+    """ 切制铜砖。 """
+    EXPOSED_CUT_COPPER = "minecraft:exposed_cut_copper"
+    """ 斑驳的切制铜砖。 """
+    WEATHERED_CUT_COPPER = "minecraft:weathered_cut_copper"
+    """ 生锈的切制铜砖。 """
+    OXIDIZED_CUT_COPPER = "minecraft:oxidized_cut_copper"
+    """ 氧化的切制铜砖。 """
+    WAXED_CUT_COPPER = "minecraft:waxed_cut_copper"
+    """ 打蜡的切制铜砖。 """
+    WAXED_EXPOSED_CUT_COPPER = "minecraft:waxed_exposed_cut_copper"
+    """ 打蜡的斑驳切制铜砖。 """
+    WAXED_WEATHERED_CUT_COPPER = "minecraft:waxed_weathered_cut_copper"
+    """ 打蜡的生锈切制铜砖。 """
+    CUT_COPPER_STAIRS = "minecraft:cut_copper_stairs"
+    """ 切制铜楼梯。 """
+    EXPOSED_CUT_COPPER_STAIRS = "minecraft:exposed_cut_copper_stairs"
+    """ 斑驳的切制铜楼梯。 """
+    WEATHERED_CUT_COPPER_STAIRS = "minecraft:weathered_cut_copper_stairs"
+    """ 生锈的切制铜楼梯。 """
+    OXIDIZED_CUT_COPPER_STAIRS = "minecraft:oxidized_cut_copper_stairs"
+    """ 氧化的切制铜楼梯。 """
+    WAXED_CUT_COPPER_STAIRS = "minecraft:waxed_cut_copper_stairs"
+    """ 打蜡的切制铜楼梯。 """
+    WAXED_EXPOSED_CUT_COPPER_STAIRS = "minecraft:waxed_exposed_cut_copper_stairs"
+    """ 打蜡的斑驳切制铜楼梯。 """
+    WAXED_WEATHERED_CUT_COPPER_STAIRS = "minecraft:waxed_weathered_cut_copper_stairs"
+    """ 打蜡的生锈切制铜楼梯。 """
+    CUT_COPPER_SLAB = "minecraft:cut_copper_slab"
+    """ 切制铜半砖。 """
+    EXPOSED_CUT_COPPER_SLAB = "minecraft:exposed_cut_copper_slab"
+    """ 斑驳的切制铜半砖。 """
+    WEATHERED_CUT_COPPER_SLAB = "minecraft:weathered_cut_copper_slab"
+    """ 生锈的切制铜半砖。 """
+    OXIDIZED_CUT_COPPER_SLAB = "minecraft:oxidized_cut_copper_slab"
+    """ 氧化的切制铜半砖。 """
+    WAXED_CUT_COPPER_SLAB = "minecraft:waxed_cut_copper_slab"
+    """ 打蜡的切制铜半砖。 """
+    WAXED_EXPOSED_CUT_COPPER_SLAB = "minecraft:waxed_exposed_cut_copper_slab"
+    """ 打蜡的斑驳切制铜半砖。 """
+    WAXED_WEATHERED_CUT_COPPER_SLAB = "minecraft:waxed_weathered_cut_copper_slab"
+    """ 打蜡的生锈切制铜半砖。 """
+    DOUBLE_CUT_COPPER_SLAB = "minecraft:double_cut_copper_slab"
+    """ 切制铜双半砖。 """
+    EXPOSED_DOUBLE_CUT_COPPER_SLAB = "minecraft:exposed_double_cut_copper_slab"
+    """ 斑驳的切制铜双半砖。 """
+    WEATHERED_DOUBLE_CUT_COPPER_SLAB = "minecraft:weathered_double_cut_copper_slab"
+    """ 生锈的切制铜双半砖。 """
+    OXIDIZED_DOUBLE_CUT_COPPER_SLAB = "minecraft:oxidized_double_cut_copper_slab"
+    """ 氧化的切制铜双半砖。 """
+    WAXED_DOUBLE_CUT_COPPER_SLAB = "minecraft:waxed_double_cut_copper_slab"
+    """ 打蜡的切制铜双半砖。 """
+    WAXED_EXPOSED_DOUBLE_CUT_COPPER_SLAB = "minecraft:waxed_exposed_double_cut_copper_slab"
+    """ 打蜡的斑驳切制铜双半砖。 """
+    WAXED_WEATHERED_DOUBLE_CUT_COPPER_SLAB = "minecraft:waxed_weathered_double_cut_copper_slab"
+    """ 打蜡的生锈切制铜双半砖。 """
+    CAVE_VINES_BODY_BERRIES = "minecraft:cave_vines_body_berries"
+    """ 洞穴藤蔓（带浆果）。 """
+    CAVE_VINES_HEAD_BERRIES = "minecraft:cave_vines_head_berries"
+    """ 洞穴藤蔓首部（带浆果）。 """
+    SMOOTH_BASALT = "minecraft:smooth_basalt"
+    """ 平滑玄武岩。 """
+    DEEPSLATE = "minecraft:deepslate"
+    """ 深板岩。 """
+    COBBLED_DEEPSLATE = "minecraft:cobbled_deepslate"
+    """ 深板岩碎石。 """
+    COBBLED_DEEPSLATE_SLAB = "minecraft:cobbled_deepslate_slab"
+    """ 深板岩碎石半砖。 """
+    COBBLED_DEEPSLATE_STAIRS = "minecraft:cobbled_deepslate_stairs"
+    """ 深板岩碎石楼梯。 """
+    COBBLED_DEEPSLATE_WALL = "minecraft:cobbled_deepslate_wall"
+    """ 深板岩碎石墙。 """
+    POLISHED_DEEPSLATE = "minecraft:polished_deepslate"
+    """ 抛光深板岩。 """
+    POLISHED_DEEPSLATE_SLAB = "minecraft:polished_deepslate_slab"
+    """ 抛光深板岩半砖。 """
+    POLISHED_DEEPSLATE_STAIRS = "minecraft:polished_deepslate_stairs"
+    """ 抛光深板岩楼梯。 """
+    POLISHED_DEEPSLATE_WALL = "minecraft:polished_deepslate_wall"
+    """ 抛光深板岩墙。 """
+    DEEPSLATE_TILES = "minecraft:deepslate_tiles"
+    """ 深板岩瓦。 """
+    DEEPSLATE_TILE_SLAB = "minecraft:deepslate_tile_slab"
+    """ 深板岩瓦半砖。 """
+    DEEPSLATE_TILE_STAIRS = "minecraft:deepslate_tile_stairs"
+    """ 深板岩瓦楼梯。 """
+    DEEPSLATE_TILE_WALL = "minecraft:deepslate_tile_wall"
+    """ 深板岩瓦墙。 """
+    DEEPSLATE_BRICKS = "minecraft:deepslate_bricks"
+    """ 深板岩砖。 """
+    DEEPSLATE_BRICK_SLAB = "minecraft:deepslate_brick_slab"
+    """ 深板岩砖半砖。 """
+    DEEPSLATE_BRICK_STAIRS = "minecraft:deepslate_brick_stairs"
+    """ 深板岩砖楼梯。 """
+    DEEPSLATE_BRICK_WALL = "minecraft:deepslate_brick_wall"
+    """ 深板岩砖墙。 """
+    CHISELED_DEEPSLATE = "minecraft:chiseled_deepslate"
+    """ 浮雕深板岩。 """
+    COBBLED_DEEPSLATE_DOUBLE_SLAB = "minecraft:cobbled_deepslate_double_slab"
+    """ 深板岩碎石双半砖。 """
+    POLISHED_DEEPSLATE_DOUBLE_SLAB = "minecraft:polished_deepslate_double_slab"
+    """ 抛光深板岩双半砖。 """
+    DEEPSLATE_TILE_DOUBLE_SLAB = "minecraft:deepslate_tile_double_slab"
+    """ 深板岩瓦双半砖。 """
+    DEEPSLATE_BRICK_DOUBLE_SLAB = "minecraft:deepslate_brick_double_slab"
+    """ 深板岩砖双半砖。 """
+    DEEPSLATE_LAPIS_ORE = "minecraft:deepslate_lapis_ore"
+    """ 深层青金石矿。 """
+    DEEPSLATE_IRON_ORE = "minecraft:deepslate_iron_ore"
+    """ 深层铁矿。 """
+    DEEPSLATE_GOLD_ORE = "minecraft:deepslate_gold_ore"
+    """ 深层金矿。 """
+    DEEPSLATE_REDSTONE_ORE = "minecraft:deepslate_redstone_ore"
+    """ 深层红石矿。 """
+    LIT_DEEPSLATE_REDSTONE_ORE = "minecraft:lit_deepslate_redstone_ore"
+    """ 发光的深层红石矿。 """
+    DEEPSLATE_DIAMOND_ORE = "minecraft:deepslate_diamond_ore"
+    """ 深层钻石矿。 """
+    DEEPSLATE_COAL_ORE = "minecraft:deepslate_coal_ore"
+    """ 深层煤矿。 """
+    DEEPSLATE_EMERALD_ORE = "minecraft:deepslate_emerald_ore"
+    """ 深层绿宝石矿。 """
+    DEEPSLATE_COPPER_ORE = "minecraft:deepslate_copper_ore"
+    """ 深层铜矿。 """
+    CRACKED_DEEPSLATE_TILES = "minecraft:cracked_deepslate_tiles"
+    """ 裂纹深板岩瓦。 """
+    CRACKED_DEEPSLATE_BRICKS = "minecraft:cracked_deepslate_bricks"
+    """ 裂纹深板岩砖。 """
+    GLOW_LICHEN = "minecraft:glow_lichen"
+    """ 发光地衣。 """
+    CANDLE = "minecraft:candle"
+    """ 蜡烛。 """
+    WHITE_CANDLE = "minecraft:white_candle"
+    """ 白色蜡烛。 """
+    ORANGE_CANDLE = "minecraft:orange_candle"
+    """ 橙色蜡烛。 """
+    MAGENTA_CANDLE = "minecraft:magenta_candle"
+    """ 紫红色蜡烛。 """
+    LIGHT_BLUE_CANDLE = "minecraft:light_blue_candle"
+    """ 浅蓝色蜡烛。 """
+    YELLOW_CANDLE = "minecraft:yellow_candle"
+    """ 黄色蜡烛。 """
+    LIME_CANDLE = "minecraft:lime_candle"
+    """ 浅绿色蜡烛。 """
+    PINK_CANDLE = "minecraft:pink_candle"
+    """ 粉红色蜡烛。 """
+    GRAY_CANDLE = "minecraft:gray_candle"
+    """ 灰色蜡烛。 """
+    LIGHT_GRAY_CANDLE = "minecraft:light_gray_candle"
+    """ 浅灰色蜡烛。 """
+    CYAN_CANDLE = "minecraft:cyan_candle"
+    """ 青蓝色蜡烛。 """
+    PURPLE_CANDLE = "minecraft:purple_candle"
+    """ 紫色蜡烛。 """
+    BLUE_CANDLE = "minecraft:blue_candle"
+    """ 蓝色蜡烛。 """
+    BROWN_CANDLE = "minecraft:brown_candle"
+    """ 啡色蜡烛。 """
+    GREEN_CANDLE = "minecraft:green_candle"
+    """ 绿色蜡烛。 """
+    RED_CANDLE = "minecraft:red_candle"
+    """ 红色蜡烛。 """
+    BLACK_CANDLE = "minecraft:black_candle"
+    """ 黑色蜡烛。 """
+    CANDLE_CAKE = "minecraft:candle_cake"
+    """ 插上蜡烛的蛋糕。 """
+    WHITE_CANDLE_CAKE = "minecraft:white_candle_cake"
+    """ 插上白色蜡烛的蛋糕。 """
+    ORANGE_CANDLE_CAKE = "minecraft:orange_candle_cake"
+    """ 插上橙色蜡烛的蛋糕。 """
+    MAGENTA_CANDLE_CAKE = "minecraft:magenta_candle_cake"
+    """ 插上紫红色蜡烛的蛋糕。 """
+    LIGHT_BLUE_CANDLE_CAKE = "minecraft:light_blue_candle_cake"
+    """ 插上浅蓝色蜡烛的蛋糕。 """
+    YELLOW_CANDLE_CAKE = "minecraft:yellow_candle_cake"
+    """ 插上黄色蜡烛的蛋糕。 """
+    LIME_CANDLE_CAKE = "minecraft:lime_candle_cake"
+    """ 插上浅绿色蜡烛的蛋糕。 """
+    PINK_CANDLE_CAKE = "minecraft:pink_candle_cake"
+    """ 插上粉红色蜡烛的蛋糕。 """
+    GRAY_CANDLE_CAKE = "minecraft:gray_candle_cake"
+    """ 插上灰色蜡烛的蛋糕。 """
+    LIGHT_GRAY_CANDLE_CAKE = "minecraft:light_gray_candle_cake"
+    """ 插上浅灰色蜡烛的蛋糕。 """
+    CYAN_CANDLE_CAKE = "minecraft:cyan_candle_cake"
+    """ 插上青蓝色蜡烛的蛋糕。 """
+    PURPLE_CANDLE_CAKE = "minecraft:purple_candle_cake"
+    """ 插上紫色蜡烛的蛋糕。 """
+    BLUE_CANDLE_CAKE = "minecraft:blue_candle_cake"
+    """ 插上蓝色蜡烛的蛋糕。 """
+    BROWN_CANDLE_CAKE = "minecraft:brown_candle_cake"
+    """ 插上啡色蜡烛的蛋糕。 """
+    GREEN_CANDLE_CAKE = "minecraft:green_candle_cake"
+    """ 插上绿色蜡烛的蛋糕。 """
+    RED_CANDLE_CAKE = "minecraft:red_candle_cake"
+    """ 插上红色蜡烛的蛋糕。 """
+    BLACK_CANDLE_CAKE = "minecraft:black_candle_cake"
+    """ 插上黑色蜡烛的蛋糕。 """
+    WAXED_OXIDIZED_COPPER = "minecraft:waxed_oxidized_copper"
+    """ 打蜡的氧化铜砖。 """
+    WAXED_OXIDIZED_CUT_COPPER = "minecraft:waxed_oxidized_cut_copper"
+    """ 打蜡的氧化切制铜砖。 """
+    WAXED_OXIDIZED_CUT_COPPER_STAIRS = "minecraft:waxed_oxidized_cut_copper_stairs"
+    """ 打蜡的氧化切制铜楼梯。 """
+    WAXED_OXIDIZED_CUT_COPPER_SLAB = "minecraft:waxed_oxidized_cut_copper_slab"
+    """ 打蜡的氧化切制铜半砖。 """
+    WAXED_OXIDIZED_DOUBLE_CUT_COPPER_SLAB = "minecraft:waxed_oxidized_double_cut_copper_slab"
+    """ 打蜡的氧化切制铜双半砖。 """
+    RAW_IRON_BLOCK = "minecraft:raw_iron_block"
+    """ 粗铁砖。 """
+    RAW_COPPER_BLOCK = "minecraft:raw_copper_block"
+    """ 粗铜砖。 """
+    RAW_GOLD_BLOCK = "minecraft:raw_gold_block"
+    """ 粗金砖。 """
+    INFESTED_DEEPSLATE = "minecraft:infested_deepslate"
+    """ 蛀蚀的深板岩。 """
+    SCULK = "minecraft:sculk"
+    """ 沉灵方块。 """
+    SCULK_VEIN = "minecraft:sculk_vein"
+    """ 沉灵脉络。 """
+    SCULK_CATALYST = "minecraft:sculk_catalyst"
+    """ 沉灵催发器。 """
+    SCULK_SHRIEKER = "minecraft:sculk_shrieker"
+    """ 沉灵尖啸器。 """
+    CLIENT_REQUEST_PLACEHOLDER_BLOCK = "minecraft:client_request_placeholder_block"
+    """ 客户端请求占位方块。 """
+    REINFORCED_DEEPSLATE = "minecraft:reinforced_deepslate"
+    """ 强化深板岩。 """
+    MYSTERIOUS_FRAME_SLOT = "minecraft:mysterious_frame_slot"
+    """ 带插栏的神秘框架（已移除）。 """
+    FROG_SPAWN = "minecraft:frog_spawn"
+    """ 青蛙卵。 """
+    PEARLESCENT_FROGLIGHT = "minecraft:pearlescent_froglight"
+    """ 珠光蛙明灯。 """
+    VERDANT_FROGLIGHT = "minecraft:verdant_froglight"
+    """ 青翠蛙明灯。 """
+    OCHRE_FROGLIGHT = "minecraft:ochre_froglight"
+    """ 赭黄蛙明灯。 """
+    MANGROVE_LEAVES = "minecraft:mangrove_leaves"
+    """ 红树树叶。 """
+    MUD = "minecraft:mud"
+    """ 泥。 """
+    MANGROVE_PROPAGULE = "minecraft:mangrove_propagule"
+    """ 红树胎生苗。 """
+    MUD_BRICKS = "minecraft:mud_bricks"
+    """ 泥砖。 """
+    MANGROVE_PROPAGULE_HANGING = "minecraft:mangrove_propagule_hanging"
+    """ 悬挂的红树胎生苗 （已移除）。 """
+    PACKED_MUD = "minecraft:packed_mud"
+    """ 泥坯。 """
+    MUD_BRICK_SLAB = "minecraft:mud_brick_slab"
+    """ 泥砖半砖。 """
+    MUD_BRICK_DOUBLE_SLAB = "minecraft:mud_brick_double_slab"
+    """ 泥砖双半砖。 """
+    MUD_BRICK_STAIRS = "minecraft:mud_brick_stairs"
+    """ 泥砖楼梯。 """
+    MUD_BRICK_WALL = "minecraft:mud_brick_wall"
+    """ 泥砖墙。 """
+    MANGROVE_ROOTS = "minecraft:mangrove_roots"
+    """ 红树根。 """
+    MUDDY_MANGROVE_ROOTS = "minecraft:muddy_mangrove_roots"
+    """ 泥泞的红树根。 """
+    MANGROVE_LOG = "minecraft:mangrove_log"
+    """ 红树原木。 """
+    STRIPPED_MANGROVE_LOG = "minecraft:stripped_mangrove_log"
+    """ 剥皮红树原木。 """
+    MANGROVE_PLANKS = "minecraft:mangrove_planks"
+    """ 红树木板。 """
+    MANGROVE_BUTTON = "minecraft:mangrove_button"
+    """ 红树木按钮。 """
+    MANGROVE_STAIRS = "minecraft:mangrove_stairs"
+    """ 红树木楼梯。 """
+    MANGROVE_SLAB = "minecraft:mangrove_slab"
+    """ 红树木半砖。 """
+    MANGROVE_PRESSURE_PLATE = "minecraft:mangrove_pressure_plate"
+    """ 红树木压力板。 """
+    MANGROVE_FENCE = "minecraft:mangrove_fence"
+    """ 红树木栏杆。 """
+    MANGROVE_FENCE_GATE = "minecraft:mangrove_fence_gate"
+    """ 红树木闸门。 """
+    MANGROVE_DOOR = "minecraft:mangrove_door"
+    """ 红树木门。 """
+    MANGROVE_STANDING_SIGN = "minecraft:mangrove_standing_sign"
+    """ 红树木指示牌。 """
+    MANGROVE_WALL_SIGN = "minecraft:mangrove_wall_sign"
+    """ 墙上的红树木指示牌。 """
+    MANGROVE_TRAPDOOR = "minecraft:mangrove_trapdoor"
+    """ 红树木地板门。 """
+    MANGROVE_WOOD = "minecraft:mangrove_wood"
+    """ 红树木。 """
+    STRIPPED_MANGROVE_WOOD = "minecraft:stripped_mangrove_wood"
+    """ 剥皮红树木。 """
+    MANGROVE_DOUBLE_SLAB = "minecraft:mangrove_double_slab"
+    """ 红树木双半砖。 """
+    OAK_HANGING_SIGN = "minecraft:oak_hanging_sign"
+    """ 橡木吊牌。 """
+    SPRUCE_HANGING_SIGN = "minecraft:spruce_hanging_sign"
+    """ 杉木吊牌。 """
+    BIRCH_HANGING_SIGN = "minecraft:birch_hanging_sign"
+    """ 桦木吊牌。 """
+    JUNGLE_HANGING_SIGN = "minecraft:jungle_hanging_sign"
+    """ 丛林木吊牌。 """
+    ACACIA_HANGING_SIGN = "minecraft:acacia_hanging_sign"
+    """ 相思木吊牌。 """
+    DARK_OAK_HANGING_SIGN = "minecraft:dark_oak_hanging_sign"
+    """ 黑橡木吊牌。 """
+    CRIMSON_HANGING_SIGN = "minecraft:crimson_hanging_sign"
+    """ 猩红菌木吊牌。 """
+    WARPED_HANGING_SIGN = "minecraft:warped_hanging_sign"
+    """ 迷离菌木吊牌。 """
+    MANGROVE_HANGING_SIGN = "minecraft:mangrove_hanging_sign"
+    """ 红树木吊牌。 """
+    BAMBOO_MOSAIC = "minecraft:bamboo_mosaic"
+    """ 竹拼块。 """
+    BAMBOO_PLANKS = "minecraft:bamboo_planks"
+    """ 竹板。 """
+    BAMBOO_BUTTON = "minecraft:bamboo_button"
+    """ 竹按钮。 """
+    BAMBOO_STAIRS = "minecraft:bamboo_stairs"
+    """ 竹楼梯。 """
+    BAMBOO_SLAB = "minecraft:bamboo_slab"
+    """ 竹半砖。 """
+    BAMBOO_PRESSURE_PLATE = "minecraft:bamboo_pressure_plate"
+    """ 竹压力板。 """
+    BAMBOO_FENCE = "minecraft:bamboo_fence"
+    """ 竹栏杆。 """
+    BAMBOO_FENCE_GATE = "minecraft:bamboo_fence_gate"
+    """ 竹闸门。 """
+    BAMBOO_DOOR = "minecraft:bamboo_door"
+    """ 竹门。 """
+    BAMBOO_STANDING_SIGN = "minecraft:bamboo_standing_sign"
+    """ 竹指示牌。 """
+    BAMBOO_WALL_SIGN = "minecraft:bamboo_wall_sign"
+    """ 墙上的竹指示牌。 """
+    BAMBOO_TRAPDOOR = "minecraft:bamboo_trapdoor"
+    """ 竹地板门。 """
+    BAMBOO_DOUBLE_SLAB = "minecraft:bamboo_double_slab"
+    """ 竹双半砖。 """
+    BAMBOO_HANGING_SIGN = "minecraft:bamboo_hanging_sign"
+    """ 竹吊牌。 """
+    BAMBOO_MOSAIC_STAIRS = "minecraft:bamboo_mosaic_stairs"
+    """ 竹拼楼梯。 """
+    BAMBOO_MOSAIC_SLAB = "minecraft:bamboo_mosaic_slab"
+    """ 竹拼半砖。 """
+    BAMBOO_MOSAIC_DOUBLE_SLAB = "minecraft:bamboo_mosaic_double_slab"
+    """ 竹拼块双半砖。 """
+    CHISELED_BOOKSHELF = "minecraft:chiseled_bookshelf"
+    """ 浮雕书柜。 """
+    BAMBOO_BLOCK = "minecraft:bamboo_block"
+    """ 竹块。 """
+    STRIPPED_BAMBOO_BLOCK = "minecraft:stripped_bamboo_block"
+    """ 剥皮竹块。 """
+    SUSPICIOUS_SAND = "minecraft:suspicious_sand"
+    """ 可疑的沙。 """
+    CHERRY_BUTTON = "minecraft:cherry_button"
+    """ 樱花木按钮。 """
+    CHERRY_DOOR = "minecraft:cherry_door"
+    """ 樱花木门。 """
+    CHERRY_FENCE = "minecraft:cherry_fence"
+    """ 樱花木栏杆。 """
+    CHERRY_FENCE_GATE = "minecraft:cherry_fence_gate"
+    """ 樱花木闸门。 """
+    CHERRY_HANGING_SIGN = "minecraft:cherry_hanging_sign"
+    """ 樱花木吊牌。 """
+    STRIPPED_CHERRY_LOG = "minecraft:stripped_cherry_log"
+    """ 剥皮樱花原木。 """
+    CHERRY_LOG = "minecraft:cherry_log"
+    """ 樱花原木。 """
+    CHERRY_PLANKS = "minecraft:cherry_planks"
+    """ 樱花木板。 """
+    CHERRY_PRESSURE_PLATE = "minecraft:cherry_pressure_plate"
+    """ 樱花木压力板。 """
+    CHERRY_SLAB = "minecraft:cherry_slab"
+    """ 樱花木半砖。 """
+    CHERRY_DOUBLE_SLAB = "minecraft:cherry_double_slab"
+    """ 樱花木双半砖。 """
+    CHERRY_STAIRS = "minecraft:cherry_stairs"
+    """ 樱花木楼梯。 """
+    CHERRY_STANDING_SIGN = "minecraft:cherry_standing_sign"
+    """ 樱花木指示牌。 """
+    CHERRY_TRAPDOOR = "minecraft:cherry_trapdoor"
+    """ 樱花木地板门。 """
+    CHERRY_WALL_SIGN = "minecraft:cherry_wall_sign"
+    """ 墙上的樱花木指示牌。 """
+    STRIPPED_CHERRY_WOOD = "minecraft:stripped_cherry_wood"
+    """ 剥皮樱花木。 """
+    CHERRY_WOOD = "minecraft:cherry_wood"
+    """ 樱花木。 """
+    CHERRY_SAPLING = "minecraft:cherry_sapling"
+    """ 樱花树苗。 """
+    CHERRY_LEAVES = "minecraft:cherry_leaves"
+    """ 樱花树叶。 """
+    PINK_PETALS = "minecraft:pink_petals"
+    """ 粉红色花簇。 """
+    DECORATED_POT = "minecraft:decorated_pot"
+    """ 装饰陶罐。 """
+    LIGHT_GRAY_WOOL = "minecraft:light_gray_wool"
+    """ 浅灰色羊毛。 """
+    GRAY_WOOL = "minecraft:gray_wool"
+    """ 灰色羊毛。 """
+    BLACK_WOOL = "minecraft:black_wool"
+    """ 黑色羊毛。 """
+    BROWN_WOOL = "minecraft:brown_wool"
+    """ 啡色羊毛。 """
+    RED_WOOL = "minecraft:red_wool"
+    """ 红色羊毛。 """
+    ORANGE_WOOL = "minecraft:orange_wool"
+    """ 橙色羊毛。 """
+    YELLOW_WOOL = "minecraft:yellow_wool"
+    """ 黄色羊毛。 """
+    LIME_WOOL = "minecraft:lime_wool"
+    """ 浅绿色羊毛。 """
+    GREEN_WOOL = "minecraft:green_wool"
+    """ 绿色羊毛。 """
+    CYAN_WOOL = "minecraft:cyan_wool"
+    """ 青蓝色羊毛。 """
+    LIGHT_BLUE_WOOL = "minecraft:light_blue_wool"
+    """ 浅蓝色羊毛。 """
+    BLUE_WOOL = "minecraft:blue_wool"
+    """ 蓝色羊毛。 """
+    PURPLE_WOOL = "minecraft:purple_wool"
+    """ 紫色羊毛。 """
+    MAGENTA_WOOL = "minecraft:magenta_wool"
+    """ 紫红色羊毛。 """
+    PINK_WOOL = "minecraft:pink_wool"
+    """ 粉红色羊毛。 """
+    TORCHFLOWER_CROP = "minecraft:torchflower_crop"
+    """ 火炬花植株。 """
+    TORCHFLOWER = "minecraft:torchflower"
+    """ 火炬花。 """
+    SPRUCE_LOG = "minecraft:spruce_log"
+    """ 杉木原木。 """
+    BIRCH_LOG = "minecraft:birch_log"
+    """ 桦木原木。 """
+    JUNGLE_LOG = "minecraft:jungle_log"
+    """ 丛林木原木。 """
+    DARK_OAK_LOG = "minecraft:dark_oak_log"
+    """ 黑橡木原木。 """
+    SUSPICIOUS_GRAVEL = "minecraft:suspicious_gravel"
+    """ 可疑的砂砾。 """
+    PITCHER_CROP = "minecraft:pitcher_crop"
+    """ 樽草植株。 """
+    ACACIA_FENCE = "minecraft:acacia_fence"
+    """ 相思木栏杆。 """
+    BIRCH_FENCE = "minecraft:birch_fence"
+    """ 桦木栏杆。 """
+    DARK_OAK_FENCE = "minecraft:dark_oak_fence"
+    """ 黑橡木栏杆。 """
+    JUNGLE_FENCE = "minecraft:jungle_fence"
+    """ 丛林木栏杆。 """
+    SPRUCE_FENCE = "minecraft:spruce_fence"
+    """ 杉木栏杆。 """
+    CALIBRATED_SCULK_SENSOR = "minecraft:calibrated_sculk_sensor"
+    """ 校准沉灵传感器。 """
+    BRAIN_CORAL = "minecraft:brain_coral"
+    """ 脑珊瑚。 """
+    BUBBLE_CORAL = "minecraft:bubble_coral"
+    """ 气泡珊瑚。 """
+    FIRE_CORAL = "minecraft:fire_coral"
+    """ 火珊瑚。 """
+    HORN_CORAL = "minecraft:horn_coral"
+    """ 角珊瑚。 """
+    DEAD_TUBE_CORAL = "minecraft:dead_tube_coral"
+    """ 死亡的管珊瑚。 """
+    DEAD_BRAIN_CORAL = "minecraft:dead_brain_coral"
+    """ 死亡的脑珊瑚。 """
+    DEAD_BUBBLE_CORAL = "minecraft:dead_bubble_coral"
+    """ 死亡的气泡珊瑚。 """
+    DEAD_FIRE_CORAL = "minecraft:dead_fire_coral"
+    """ 死亡的火珊瑚。 """
+    DEAD_HORN_CORAL = "minecraft:dead_horn_coral"
+    """ 死亡的角珊瑚。 """
+    GRANITE = "minecraft:granite"
+    """ 花岗岩。 """
+    POLISHED_GRANITE = "minecraft:polished_granite"
+    """ 抛光花岗岩。 """
+    DIORITE = "minecraft:diorite"
+    """ 闪长岩。 """
+    POLISHED_DIORITE = "minecraft:polished_diorite"
+    """ 抛光闪长岩。 """
+    ANDESITE = "minecraft:andesite"
+    """ 安山岩。 """
+    POLISHED_ANDESITE = "minecraft:polished_andesite"
+    """ 抛光安山岩。 """
+    SNIFFER_EGG = "minecraft:sniffer_egg"
+    """ 嗅探兽蛋。 """
+    ORANGE_CARPET = "minecraft:orange_carpet"
+    """ 橙色地毡。 """
+    MAGENTA_CARPET = "minecraft:magenta_carpet"
+    """ 紫红色地毡。 """
+    LIGHT_BLUE_CARPET = "minecraft:light_blue_carpet"
+    """ 浅蓝色地毡。 """
+    YELLOW_CARPET = "minecraft:yellow_carpet"
+    """ 黄色地毡。 """
+    LIME_CARPET = "minecraft:lime_carpet"
+    """ 浅绿色地毡。 """
+    PINK_CARPET = "minecraft:pink_carpet"
+    """ 粉红色地毡。 """
+    GRAY_CARPET = "minecraft:gray_carpet"
+    """ 灰色地毡。 """
+    LIGHT_GRAY_CARPET = "minecraft:light_gray_carpet"
+    """ 浅灰色地毡。 """
+    CYAN_CARPET = "minecraft:cyan_carpet"
+    """ 青蓝色地毡。 """
+    PURPLE_CARPET = "minecraft:purple_carpet"
+    """ 紫色地毡。 """
+    BLUE_CARPET = "minecraft:blue_carpet"
+    """ 蓝色地毡。 """
+    BROWN_CARPET = "minecraft:brown_carpet"
+    """ 啡色地毡。 """
+    GREEN_CARPET = "minecraft:green_carpet"
+    """ 绿色地毡。 """
+    RED_CARPET = "minecraft:red_carpet"
+    """ 红色地毡。 """
+    BLACK_CARPET = "minecraft:black_carpet"
+    """ 黑色地毡。 """
+    PITCHER_PLANT = "minecraft:pitcher_plant"
+    """ 樽草。 """
+    ORANGE_SHULKER_BOX = "minecraft:orange_shulker_box"
+    """ 橙色界伏盒。 """
+    MAGENTA_SHULKER_BOX = "minecraft:magenta_shulker_box"
+    """ 紫红色界伏盒。 """
+    LIGHT_BLUE_SHULKER_BOX = "minecraft:light_blue_shulker_box"
+    """ 浅蓝色界伏盒。 """
+    YELLOW_SHULKER_BOX = "minecraft:yellow_shulker_box"
+    """ 黄色界伏盒。 """
+    LIME_SHULKER_BOX = "minecraft:lime_shulker_box"
+    """ 浅绿色界伏盒。 """
+    PINK_SHULKER_BOX = "minecraft:pink_shulker_box"
+    """ 粉红色界伏盒。 """
+    GRAY_SHULKER_BOX = "minecraft:gray_shulker_box"
+    """ 灰色界伏盒。 """
+    LIGHT_GRAY_SHULKER_BOX = "minecraft:light_gray_shulker_box"
+    """ 浅灰色界伏盒。 """
+    CYAN_SHULKER_BOX = "minecraft:cyan_shulker_box"
+    """ 青蓝色界伏盒。 """
+    PURPLE_SHULKER_BOX = "minecraft:purple_shulker_box"
+    """ 紫色界伏盒。 """
+    BLUE_SHULKER_BOX = "minecraft:blue_shulker_box"
+    """ 蓝色界伏盒。 """
+    BROWN_SHULKER_BOX = "minecraft:brown_shulker_box"
+    """ 啡色界伏盒。 """
+    GREEN_SHULKER_BOX = "minecraft:green_shulker_box"
+    """ 绿色界伏盒。 """
+    RED_SHULKER_BOX = "minecraft:red_shulker_box"
+    """ 红色界伏盒。 """
+    BLACK_SHULKER_BOX = "minecraft:black_shulker_box"
+    """ 黑色界伏盒。 """
+    ORANGE_CONCRETE = "minecraft:orange_concrete"
+    """ 橙色混凝土。 """
+    MAGENTA_CONCRETE = "minecraft:magenta_concrete"
+    """ 紫红色混凝土。 """
+    LIGHT_BLUE_CONCRETE = "minecraft:light_blue_concrete"
+    """ 浅蓝色混凝土。 """
+    YELLOW_CONCRETE = "minecraft:yellow_concrete"
+    """ 黄色混凝土。 """
+    LIME_CONCRETE = "minecraft:lime_concrete"
+    """ 浅绿色混凝土。 """
+    PINK_CONCRETE = "minecraft:pink_concrete"
+    """ 粉红色混凝土。 """
+    GRAY_CONCRETE = "minecraft:gray_concrete"
+    """ 灰色混凝土。 """
+    LIGHT_GRAY_CONCRETE = "minecraft:light_gray_concrete"
+    """ 浅灰色混凝土。 """
+    CYAN_CONCRETE = "minecraft:cyan_concrete"
+    """ 青蓝色混凝土。 """
+    PURPLE_CONCRETE = "minecraft:purple_concrete"
+    """ 紫色混凝土。 """
+    BLUE_CONCRETE = "minecraft:blue_concrete"
+    """ 蓝色混凝土。 """
+    BROWN_CONCRETE = "minecraft:brown_concrete"
+    """ 啡色混凝土。 """
+    GREEN_CONCRETE = "minecraft:green_concrete"
+    """ 绿色混凝土。 """
+    RED_CONCRETE = "minecraft:red_concrete"
+    """ 红色混凝土。 """
+    BLACK_CONCRETE = "minecraft:black_concrete"
+    """ 黑色混凝土。 """
+    ORANGE_STAINED_GLASS_PANE = "minecraft:orange_stained_glass_pane"
+    """ 橙色染色玻璃片。 """
+    MAGENTA_STAINED_GLASS_PANE = "minecraft:magenta_stained_glass_pane"
+    """ 紫红色染色玻璃片。 """
+    LIGHT_BLUE_STAINED_GLASS_PANE = "minecraft:light_blue_stained_glass_pane"
+    """ 浅蓝色染色玻璃片。 """
+    YELLOW_STAINED_GLASS_PANE = "minecraft:yellow_stained_glass_pane"
+    """ 黄色染色玻璃片。 """
+    LIME_STAINED_GLASS_PANE = "minecraft:lime_stained_glass_pane"
+    """ 浅绿色染色玻璃片。 """
+    PINK_STAINED_GLASS_PANE = "minecraft:pink_stained_glass_pane"
+    """ 粉红色染色玻璃片。 """
+    GRAY_STAINED_GLASS_PANE = "minecraft:gray_stained_glass_pane"
+    """ 灰色染色玻璃片。 """
+    LIGHT_GRAY_STAINED_GLASS_PANE = "minecraft:light_gray_stained_glass_pane"
+    """ 浅灰色染色玻璃片。 """
+    CYAN_STAINED_GLASS_PANE = "minecraft:cyan_stained_glass_pane"
+    """ 青蓝色染色玻璃片。 """
+    PURPLE_STAINED_GLASS_PANE = "minecraft:purple_stained_glass_pane"
+    """ 紫色染色玻璃片。 """
+    BLUE_STAINED_GLASS_PANE = "minecraft:blue_stained_glass_pane"
+    """ 蓝色染色玻璃片。 """
+    BROWN_STAINED_GLASS_PANE = "minecraft:brown_stained_glass_pane"
+    """ 啡色染色玻璃片。 """
+    GREEN_STAINED_GLASS_PANE = "minecraft:green_stained_glass_pane"
+    """ 绿色染色玻璃片。 """
+    RED_STAINED_GLASS_PANE = "minecraft:red_stained_glass_pane"
+    """ 红色染色玻璃片。 """
+    BLACK_STAINED_GLASS_PANE = "minecraft:black_stained_glass_pane"
+    """ 黑色染色玻璃片。 """
+    HARD_ORANGE_STAINED_GLASS_PANE = "minecraft:hard_orange_stained_glass_pane"
+    """ 橙色强化玻璃片。 """
+    HARD_MAGENTA_STAINED_GLASS_PANE = "minecraft:hard_magenta_stained_glass_pane"
+    """ 紫红色强化玻璃片。 """
+    HARD_LIGHT_BLUE_STAINED_GLASS_PANE = "minecraft:hard_light_blue_stained_glass_pane"
+    """ 浅蓝色强化玻璃片。 """
+    HARD_YELLOW_STAINED_GLASS_PANE = "minecraft:hard_yellow_stained_glass_pane"
+    """ 黄色强化玻璃片。 """
+    HARD_LIME_STAINED_GLASS_PANE = "minecraft:hard_lime_stained_glass_pane"
+    """ 浅绿色强化玻璃片。 """
+    HARD_PINK_STAINED_GLASS_PANE = "minecraft:hard_pink_stained_glass_pane"
+    """ 粉红色强化玻璃片。 """
+    HARD_GRAY_STAINED_GLASS_PANE = "minecraft:hard_gray_stained_glass_pane"
+    """ 灰色强化玻璃片。 """
+    HARD_LIGHT_GRAY_STAINED_GLASS_PANE = "minecraft:hard_light_gray_stained_glass_pane"
+    """ 浅灰色强化玻璃片。 """
+    HARD_CYAN_STAINED_GLASS_PANE = "minecraft:hard_cyan_stained_glass_pane"
+    """ 青蓝色强化玻璃片。 """
+    HARD_PURPLE_STAINED_GLASS_PANE = "minecraft:hard_purple_stained_glass_pane"
+    """ 紫色强化玻璃片。 """
+    HARD_BLUE_STAINED_GLASS_PANE = "minecraft:hard_blue_stained_glass_pane"
+    """ 蓝色强化玻璃片。 """
+    HARD_BROWN_STAINED_GLASS_PANE = "minecraft:hard_brown_stained_glass_pane"
+    """ 啡色强化玻璃片。 """
+    HARD_GREEN_STAINED_GLASS_PANE = "minecraft:hard_green_stained_glass_pane"
+    """ 绿色强化玻璃片。 """
+    HARD_RED_STAINED_GLASS_PANE = "minecraft:hard_red_stained_glass_pane"
+    """ 红色强化玻璃片。 """
+    HARD_BLACK_STAINED_GLASS_PANE = "minecraft:hard_black_stained_glass_pane"
+    """ 黑色强化玻璃片。 """
+    ORANGE_STAINED_GLASS = "minecraft:orange_stained_glass"
+    """ 橙色染色玻璃。 """
+    MAGENTA_STAINED_GLASS = "minecraft:magenta_stained_glass"
+    """ 紫红色染色玻璃。 """
+    LIGHT_BLUE_STAINED_GLASS = "minecraft:light_blue_stained_glass"
+    """ 浅蓝色染色玻璃。 """
+    YELLOW_STAINED_GLASS = "minecraft:yellow_stained_glass"
+    """ 黄色染色玻璃。 """
+    LIME_STAINED_GLASS = "minecraft:lime_stained_glass"
+    """ 浅绿色染色玻璃。 """
+    PINK_STAINED_GLASS = "minecraft:pink_stained_glass"
+    """ 粉红色染色玻璃。 """
+    GRAY_STAINED_GLASS = "minecraft:gray_stained_glass"
+    """ 灰色染色玻璃。 """
+    LIGHT_GRAY_STAINED_GLASS = "minecraft:light_gray_stained_glass"
+    """ 浅灰色染色玻璃。 """
+    CYAN_STAINED_GLASS = "minecraft:cyan_stained_glass"
+    """ 青蓝色染色玻璃。 """
+    PURPLE_STAINED_GLASS = "minecraft:purple_stained_glass"
+    """ 紫色染色玻璃。 """
+    BLUE_STAINED_GLASS = "minecraft:blue_stained_glass"
+    """ 蓝色染色玻璃。 """
+    BROWN_STAINED_GLASS = "minecraft:brown_stained_glass"
+    """ 啡色染色玻璃。 """
+    GREEN_STAINED_GLASS = "minecraft:green_stained_glass"
+    """ 绿色染色玻璃。 """
+    RED_STAINED_GLASS = "minecraft:red_stained_glass"
+    """ 红色染色玻璃。 """
+    BLACK_STAINED_GLASS = "minecraft:black_stained_glass"
+    """ 黑色染色玻璃。 """
+    HARD_ORANGE_STAINED_GLASS = "minecraft:hard_orange_stained_glass"
+    """ 橙色强化玻璃。 """
+    HARD_MAGENTA_STAINED_GLASS = "minecraft:hard_magenta_stained_glass"
+    """ 紫红色强化玻璃。 """
+    HARD_LIGHT_BLUE_STAINED_GLASS = "minecraft:hard_light_blue_stained_glass"
+    """ 浅蓝色强化玻璃。 """
+    HARD_YELLOW_STAINED_GLASS = "minecraft:hard_yellow_stained_glass"
+    """ 黄色强化玻璃。 """
+    HARD_LIME_STAINED_GLASS = "minecraft:hard_lime_stained_glass"
+    """ 浅绿色强化玻璃。 """
+    HARD_PINK_STAINED_GLASS = "minecraft:hard_pink_stained_glass"
+    """ 粉红色强化玻璃。 """
+    HARD_GRAY_STAINED_GLASS = "minecraft:hard_gray_stained_glass"
+    """ 灰色强化玻璃。 """
+    HARD_LIGHT_GRAY_STAINED_GLASS = "minecraft:hard_light_gray_stained_glass"
+    """ 浅灰色强化玻璃。 """
+    HARD_CYAN_STAINED_GLASS = "minecraft:hard_cyan_stained_glass"
+    """ 青蓝色强化玻璃。 """
+    HARD_PURPLE_STAINED_GLASS = "minecraft:hard_purple_stained_glass"
+    """ 紫色强化玻璃。 """
+    HARD_BLUE_STAINED_GLASS = "minecraft:hard_blue_stained_glass"
+    """ 蓝色强化玻璃。 """
+    HARD_BROWN_STAINED_GLASS = "minecraft:hard_brown_stained_glass"
+    """ 啡色强化玻璃。 """
+    HARD_GREEN_STAINED_GLASS = "minecraft:hard_green_stained_glass"
+    """ 绿色强化玻璃。 """
+    HARD_RED_STAINED_GLASS = "minecraft:hard_red_stained_glass"
+    """ 红色强化玻璃。 """
+    HARD_BLACK_STAINED_GLASS = "minecraft:hard_black_stained_glass"
+    """ 黑色强化玻璃。 """
+    ORANGE_CONCRETE_POWDER = "minecraft:orange_concrete_powder"
+    """ 橙色混凝土粉末。 """
+    MAGENTA_CONCRETE_POWDER = "minecraft:magenta_concrete_powder"
+    """ 紫红色混凝土粉末。 """
+    LIGHT_BLUE_CONCRETE_POWDER = "minecraft:light_blue_concrete_powder"
+    """ 浅蓝色混凝土粉末。 """
+    YELLOW_CONCRETE_POWDER = "minecraft:yellow_concrete_powder"
+    """ 黄色混凝土粉末。 """
+    LIME_CONCRETE_POWDER = "minecraft:lime_concrete_powder"
+    """ 浅绿色混凝土粉末。 """
+    PINK_CONCRETE_POWDER = "minecraft:pink_concrete_powder"
+    """ 粉红色混凝土粉末。 """
+    GRAY_CONCRETE_POWDER = "minecraft:gray_concrete_powder"
+    """ 灰色混凝土粉末。 """
+    LIGHT_GRAY_CONCRETE_POWDER = "minecraft:light_gray_concrete_powder"
+    """ 浅灰色混凝土粉末。 """
+    CYAN_CONCRETE_POWDER = "minecraft:cyan_concrete_powder"
+    """ 青蓝色混凝土粉末。 """
+    PURPLE_CONCRETE_POWDER = "minecraft:purple_concrete_powder"
+    """ 紫色混凝土粉末。 """
+    BLUE_CONCRETE_POWDER = "minecraft:blue_concrete_powder"
+    """ 蓝色混凝土粉末。 """
+    BROWN_CONCRETE_POWDER = "minecraft:brown_concrete_powder"
+    """ 啡色混凝土粉末。 """
+    GREEN_CONCRETE_POWDER = "minecraft:green_concrete_powder"
+    """ 绿色混凝土粉末。 """
+    RED_CONCRETE_POWDER = "minecraft:red_concrete_powder"
+    """ 红色混凝土粉末。 """
+    BLACK_CONCRETE_POWDER = "minecraft:black_concrete_powder"
+    """ 黑色混凝土粉末。 """
+    ORANGE_TERRACOTTA = "minecraft:orange_terracotta"
+    """ 橙色陶瓦。 """
+    MAGENTA_TERRACOTTA = "minecraft:magenta_terracotta"
+    """ 紫红色陶瓦。 """
+    LIGHT_BLUE_TERRACOTTA = "minecraft:light_blue_terracotta"
+    """ 浅蓝色陶瓦。 """
+    YELLOW_TERRACOTTA = "minecraft:yellow_terracotta"
+    """ 黄色陶瓦。 """
+    LIME_TERRACOTTA = "minecraft:lime_terracotta"
+    """ 浅绿色陶瓦。 """
+    PINK_TERRACOTTA = "minecraft:pink_terracotta"
+    """ 粉红色陶瓦。 """
+    GRAY_TERRACOTTA = "minecraft:gray_terracotta"
+    """ 灰色陶瓦。 """
+    LIGHT_GRAY_TERRACOTTA = "minecraft:light_gray_terracotta"
+    """ 浅灰色陶瓦。 """
+    CYAN_TERRACOTTA = "minecraft:cyan_terracotta"
+    """ 青蓝色陶瓦。 """
+    PURPLE_TERRACOTTA = "minecraft:purple_terracotta"
+    """ 紫色陶瓦。 """
+    BLUE_TERRACOTTA = "minecraft:blue_terracotta"
+    """ 蓝色陶瓦。 """
+    BROWN_TERRACOTTA = "minecraft:brown_terracotta"
+    """ 啡色陶瓦。 """
+    GREEN_TERRACOTTA = "minecraft:green_terracotta"
+    """ 绿色陶瓦。 """
+    RED_TERRACOTTA = "minecraft:red_terracotta"
+    """ 红色陶瓦。 """
+    BLACK_TERRACOTTA = "minecraft:black_terracotta"
+    """ 黑色陶瓦。 """
+    SPRUCE_PLANKS = "minecraft:spruce_planks"
+    """ 杉木板。 """
+    BIRCH_PLANKS = "minecraft:birch_planks"
+    """ 桦木板。 """
+    JUNGLE_PLANKS = "minecraft:jungle_planks"
+    """ 丛林木板。 """
+    ACACIA_PLANKS = "minecraft:acacia_planks"
+    """ 相思木板。 """
+    DARK_OAK_PLANKS = "minecraft:dark_oak_planks"
+    """ 黑橡木板。 """
+    TUFF_SLAB = "minecraft:tuff_slab"
+    """ 凝灰岩半砖。 """
+    TUFF_DOUBLE_SLAB = "minecraft:tuff_double_slab"
+    """ 凝灰岩双半砖。 """
+    TUFF_STAIRS = "minecraft:tuff_stairs"
+    """ 凝灰岩楼梯。 """
+    TUFF_WALL = "minecraft:tuff_wall"
+    """ 凝灰岩墙。 """
+    POLISHED_TUFF = "minecraft:polished_tuff"
+    """ 抛光凝灰岩。 """
+    POLISHED_TUFF_SLAB = "minecraft:polished_tuff_slab"
+    """ 抛光凝灰岩半砖。 """
+    POLISHED_TUFF_DOUBLE_SLAB = "minecraft:polished_tuff_double_slab"
+    """ 抛光凝灰岩双半砖。 """
+    POLISHED_TUFF_STAIRS = "minecraft:polished_tuff_stairs"
+    """ 抛光凝灰岩楼梯。 """
+    POLISHED_TUFF_WALL = "minecraft:polished_tuff_wall"
+    """ 抛光凝灰岩墙。 """
+    CHISELED_TUFF = "minecraft:chiseled_tuff"
+    """ 浮雕凝灰岩。 """
+    TUFF_BRICKS = "minecraft:tuff_bricks"
+    """ 凝灰岩砖。 """
+    TUFF_BRICK_SLAB = "minecraft:tuff_brick_slab"
+    """ 凝灰岩砖半砖。 """
+    TUFF_BRICK_DOUBLE_SLAB = "minecraft:tuff_brick_double_slab"
+    """ 凝灰岩砖双半砖。 """
+    TUFF_BRICK_STAIRS = "minecraft:tuff_brick_stairs"
+    """ 凝灰岩砖楼梯。 """
+    TUFF_BRICK_WALL = "minecraft:tuff_brick_wall"
+    """ 凝灰岩砖墙。 """
+    CHISELED_TUFF_BRICKS = "minecraft:chiseled_tuff_bricks"
+    """ 浮雕凝灰岩砖。 """
+    CHISELED_COPPER = "minecraft:chiseled_copper"
+    """ 浮雕铜砖。 """
+    EXPOSED_CHISELED_COPPER = "minecraft:exposed_chiseled_copper"
+    """ 斑驳的浮雕铜砖。 """
+    WEATHERED_CHISELED_COPPER = "minecraft:weathered_chiseled_copper"
+    """ 生锈的浮雕铜砖。 """
+    OXIDIZED_CHISELED_COPPER = "minecraft:oxidized_chiseled_copper"
+    """ 氧化的浮雕铜砖。 """
+    WAXED_CHISELED_COPPER = "minecraft:waxed_chiseled_copper"
+    """ 打蜡的浮雕铜砖。 """
+    WAXED_EXPOSED_CHISELED_COPPER = "minecraft:waxed_exposed_chiseled_copper"
+    """ 打蜡的斑驳浮雕铜砖。 """
+    WAXED_WEATHERED_CHISELED_COPPER = "minecraft:waxed_weathered_chiseled_copper"
+    """ 打蜡的生锈浮雕铜砖。 """
+    WAXED_OXIDIZED_CHISELED_COPPER = "minecraft:waxed_oxidized_chiseled_copper"
+    """ 打蜡的氧化浮雕铜砖。 """
+    COPPER_GRATE = "minecraft:copper_grate"
+    """ 铜网格。 """
+    EXPOSED_COPPER_GRATE = "minecraft:exposed_copper_grate"
+    """ 斑驳的铜网格。 """
+    WEATHERED_COPPER_GRATE = "minecraft:weathered_copper_grate"
+    """ 生锈的铜网格。 """
+    OXIDIZED_COPPER_GRATE = "minecraft:oxidized_copper_grate"
+    """ 氧化的铜网格。 """
+    WAXED_COPPER_GRATE = "minecraft:waxed_copper_grate"
+    """ 打蜡的铜网格。 """
+    WAXED_EXPOSED_COPPER_GRATE = "minecraft:waxed_exposed_copper_grate"
+    """ 打蜡的斑驳铜网格。 """
+    WAXED_WEATHERED_COPPER_GRATE = "minecraft:waxed_weathered_copper_grate"
+    """ 打蜡的生锈铜网格。 """
+    WAXED_OXIDIZED_COPPER_GRATE = "minecraft:waxed_oxidized_copper_grate"
+    """ 打蜡的氧化铜网格。 """
+    COPPER_BULB = "minecraft:copper_bulb"
+    """ 铜灯。 """
+    EXPOSED_COPPER_BULB = "minecraft:exposed_copper_bulb"
+    """ 斑驳的铜灯。 """
+    WEATHERED_COPPER_BULB = "minecraft:weathered_copper_bulb"
+    """ 生锈的铜灯。 """
+    OXIDIZED_COPPER_BULB = "minecraft:oxidized_copper_bulb"
+    """ 氧化的铜灯。 """
+    WAXED_COPPER_BULB = "minecraft:waxed_copper_bulb"
+    """ 打蜡的铜灯。 """
+    WAXED_EXPOSED_COPPER_BULB = "minecraft:waxed_exposed_copper_bulb"
+    """ 打蜡的斑驳铜灯。 """
+    WAXED_WEATHERED_COPPER_BULB = "minecraft:waxed_weathered_copper_bulb"
+    """ 打蜡的生锈铜灯。 """
+    WAXED_OXIDIZED_COPPER_BULB = "minecraft:waxed_oxidized_copper_bulb"
+    """ 打蜡的氧化铜灯。 """
+    COPPER_DOOR = "minecraft:copper_door"
+    """ 铜门。 """
+    EXPOSED_COPPER_DOOR = "minecraft:exposed_copper_door"
+    """ 斑驳的铜门。 """
+    WEATHERED_COPPER_DOOR = "minecraft:weathered_copper_door"
+    """ 生锈的铜门。 """
+    OXIDIZED_COPPER_DOOR = "minecraft:oxidized_copper_door"
+    """ 氧化的铜门。 """
+    WAXED_COPPER_DOOR = "minecraft:waxed_copper_door"
+    """ 打蜡的铜门。 """
+    WAXED_EXPOSED_COPPER_DOOR = "minecraft:waxed_exposed_copper_door"
+    """ 打蜡的斑驳铜门。 """
+    WAXED_WEATHERED_COPPER_DOOR = "minecraft:waxed_weathered_copper_door"
+    """ 打蜡的生锈铜门。 """
+    WAXED_OXIDIZED_COPPER_DOOR = "minecraft:waxed_oxidized_copper_door"
+    """ 打蜡的氧化铜门。 """
+    COPPER_TRAPDOOR = "minecraft:copper_trapdoor"
+    """ 铜地板门。 """
+    EXPOSED_COPPER_TRAPDOOR = "minecraft:exposed_copper_trapdoor"
+    """ 斑驳的铜地板门。 """
+    WEATHERED_COPPER_TRAPDOOR = "minecraft:weathered_copper_trapdoor"
+    """ 生锈的铜地板门。 """
+    OXIDIZED_COPPER_TRAPDOOR = "minecraft:oxidized_copper_trapdoor"
+    """ 氧化的铜地板门。 """
+    WAXED_COPPER_TRAPDOOR = "minecraft:waxed_copper_trapdoor"
+    """ 打蜡的铜地板门。 """
+    WAXED_EXPOSED_COPPER_TRAPDOOR = "minecraft:waxed_exposed_copper_trapdoor"
+    """ 打蜡的斑驳铜地板门。 """
+    WAXED_WEATHERED_COPPER_TRAPDOOR = "minecraft:waxed_weathered_copper_trapdoor"
+    """ 打蜡的生锈铜地板门。 """
+    WAXED_OXIDIZED_COPPER_TRAPDOOR = "minecraft:waxed_oxidized_copper_trapdoor"
+    """ 打蜡的氧化铜地板门。 """
+    SPRUCE_LEAVES = "minecraft:spruce_leaves"
+    """ 杉木树叶。 """
+    BIRCH_LEAVES = "minecraft:birch_leaves"
+    """ 桦木树叶。 """
+    JUNGLE_LEAVES = "minecraft:jungle_leaves"
+    """ 丛林木树叶。 """
+    DARK_OAK_LEAVES = "minecraft:dark_oak_leaves"
+    """ 黑橡木树叶。 """
+    SPRUCE_SLAB = "minecraft:spruce_slab"
+    """ 杉木半砖。 """
+    BIRCH_SLAB = "minecraft:birch_slab"
+    """ 桦木半砖。 """
+    JUNGLE_SLAB = "minecraft:jungle_slab"
+    """ 丛林木半砖。 """
+    ACACIA_SLAB = "minecraft:acacia_slab"
+    """ 相思木半砖。 """
+    DARK_OAK_SLAB = "minecraft:dark_oak_slab"
+    """ 黑橡木半砖。 """
+    SPRUCE_DOUBLE_SLAB = "minecraft:spruce_double_slab"
+    """ 杉木双半砖。 """
+    BIRCH_DOUBLE_SLAB = "minecraft:birch_double_slab"
+    """ 桦木双半砖。 """
+    JUNGLE_DOUBLE_SLAB = "minecraft:jungle_double_slab"
+    """ 丛林木双半砖。 """
+    ACACIA_DOUBLE_SLAB = "minecraft:acacia_double_slab"
+    """ 相思木双半砖。 """
+    DARK_OAK_DOUBLE_SLAB = "minecraft:dark_oak_double_slab"
+    """ 黑橡木双半砖。 """
+    SPRUCE_WOOD = "minecraft:spruce_wood"
+    """ 杉木。 """
+    BIRCH_WOOD = "minecraft:birch_wood"
+    """ 桦木。 """
+    JUNGLE_WOOD = "minecraft:jungle_wood"
+    """ 丛林木。 """
+    ACACIA_WOOD = "minecraft:acacia_wood"
+    """ 相思木。 """
+    DARK_OAK_WOOD = "minecraft:dark_oak_wood"
+    """ 黑橡木。 """
+    STRIPPED_OAK_WOOD = "minecraft:stripped_oak_wood"
+    """ 剥皮橡木。 """
+    STRIPPED_SPRUCE_WOOD = "minecraft:stripped_spruce_wood"
+    """ 剥皮杉木。 """
+    STRIPPED_BIRCH_WOOD = "minecraft:stripped_birch_wood"
+    """ 剥皮桦木。 """
+    STRIPPED_JUNGLE_WOOD = "minecraft:stripped_jungle_wood"
+    """ 剥皮丛林木。 """
+    STRIPPED_ACACIA_WOOD = "minecraft:stripped_acacia_wood"
+    """ 剥皮相思木。 """
+    STRIPPED_DARK_OAK_WOOD = "minecraft:stripped_dark_oak_wood"
+    """ 剥皮黑橡木。 """
+    SPRUCE_SAPLING = "minecraft:spruce_sapling"
+    """ 杉木树苗。 """
+    BIRCH_SAPLING = "minecraft:birch_sapling"
+    """ 桦木树苗。 """
+    JUNGLE_SAPLING = "minecraft:jungle_sapling"
+    """ 丛林木树苗。 """
+    ACACIA_SAPLING = "minecraft:acacia_sapling"
+    """ 相思木树苗。 """
+    DARK_OAK_SAPLING = "minecraft:dark_oak_sapling"
+    """ 黑橡木树苗。 """
+    BLUE_ORCHID = "minecraft:blue_orchid"
+    """ 兰花。 """
+    ALLIUM = "minecraft:allium"
+    """ 绒球葱。 """
+    AZURE_BLUET = "minecraft:azure_bluet"
+    """ 蓝花美耳草。 """
+    RED_TULIP = "minecraft:red_tulip"
+    """ 红色郁金香。 """
+    ORANGE_TULIP = "minecraft:orange_tulip"
+    """ 橙色郁金香。 """
+    WHITE_TULIP = "minecraft:white_tulip"
+    """ 白色郁金香。 """
+    PINK_TULIP = "minecraft:pink_tulip"
+    """ 粉红色郁金香。 """
+    OXEYE_DAISY = "minecraft:oxeye_daisy"
+    """ 雏菊。 """
+    CORNFLOWER = "minecraft:cornflower"
+    """ 矢车菊。 """
+    LILY_OF_THE_VALLEY = "minecraft:lily_of_the_valley"
+    """ 铃兰。 """
+    BRAIN_CORAL_FAN = "minecraft:brain_coral_fan"
+    """ 扇状脑珊瑚。 """
+    BUBBLE_CORAL_FAN = "minecraft:bubble_coral_fan"
+    """ 扇状气泡珊瑚。 """
+    FIRE_CORAL_FAN = "minecraft:fire_coral_fan"
+    """ 扇状火珊瑚。 """
+    HORN_CORAL_FAN = "minecraft:horn_coral_fan"
+    """ 扇状角珊瑚。 """
+    DEAD_BRAIN_CORAL_FAN = "minecraft:dead_brain_coral_fan"
+    """ 死亡的扇状脑珊瑚。 """
+    DEAD_BUBBLE_CORAL_FAN = "minecraft:dead_bubble_coral_fan"
+    """ 死亡的扇状气泡珊瑚。 """
+    DEAD_FIRE_CORAL_FAN = "minecraft:dead_fire_coral_fan"
+    """ 死亡的扇状火珊瑚。 """
+    DEAD_HORN_CORAL_FAN = "minecraft:dead_horn_coral_fan"
+    """ 死亡的扇状角珊瑚。 """
+    FERN = "minecraft:fern"
+    """ 蕨。 """
+    BRAIN_CORAL_BLOCK = "minecraft:brain_coral_block"
+    """ 脑珊瑚方块。 """
+    BUBBLE_CORAL_BLOCK = "minecraft:bubble_coral_block"
+    """ 气泡珊瑚方块。 """
+    FIRE_CORAL_BLOCK = "minecraft:fire_coral_block"
+    """ 火珊瑚方块。 """
+    HORN_CORAL_BLOCK = "minecraft:horn_coral_block"
+    """ 角珊瑚方块。 """
+    DEAD_TUBE_CORAL_BLOCK = "minecraft:dead_tube_coral_block"
+    """ 死亡的管珊瑚方块。 """
+    DEAD_BRAIN_CORAL_BLOCK = "minecraft:dead_brain_coral_block"
+    """ 死亡的脑珊瑚方块。 """
+    DEAD_BUBBLE_CORAL_BLOCK = "minecraft:dead_bubble_coral_block"
+    """ 死亡的气泡珊瑚方块。 """
+    DEAD_FIRE_CORAL_BLOCK = "minecraft:dead_fire_coral_block"
+    """ 死亡的火珊瑚方块。 """
+    DEAD_HORN_CORAL_BLOCK = "minecraft:dead_horn_coral_block"
+    """ 死亡的角珊瑚方块。 """
+    INFESTED_COBBLESTONE = "minecraft:infested_cobblestone"
+    """ 蛀蚀的碎石。 """
+    INFESTED_STONE_BRICKS = "minecraft:infested_stone_bricks"
+    """ 蛀蚀的石砖。 """
+    INFESTED_MOSSY_STONE_BRICKS = "minecraft:infested_mossy_stone_bricks"
+    """ 蛀蚀的青苔石砖。 """
+    INFESTED_CRACKED_STONE_BRICKS = "minecraft:infested_cracked_stone_bricks"
+    """ 蛀蚀的裂纹石砖。 """
+    INFESTED_CHISELED_STONE_BRICKS = "minecraft:infested_chiseled_stone_bricks"
+    """ 蛀蚀的浮雕石砖。 """
+    LILAC = "minecraft:lilac"
+    """ 紫丁香。 """
+    TALL_GRASS = "minecraft:tall_grass"
+    """ 长草丛。 """
+    LARGE_FERN = "minecraft:large_fern"
+    """ 大型蕨。 """
+    ROSE_BUSH = "minecraft:rose_bush"
+    """ 玫瑰丛。 """
+    PEONY = "minecraft:peony"
+    """ 牡丹花。 """
+    MOSSY_STONE_BRICKS = "minecraft:mossy_stone_bricks"
+    """ 青苔石砖。 """
+    CRACKED_STONE_BRICKS = "minecraft:cracked_stone_bricks"
+    """ 裂纹石砖。 """
+    CHISELED_STONE_BRICKS = "minecraft:chiseled_stone_bricks"
+    """ 浮雕石砖。 """
+    SANDSTONE_SLAB = "minecraft:sandstone_slab"
+    """ 砂岩半砖。 """
+    COBBLESTONE_SLAB = "minecraft:cobblestone_slab"
+    """ 碎石半砖。 """
+    BRICK_SLAB = "minecraft:brick_slab"
+    """ 红砖半砖。 """
+    STONE_BRICK_SLAB = "minecraft:stone_brick_slab"
+    """ 石砖半砖。 """
+    QUARTZ_SLAB = "minecraft:quartz_slab"
+    """ 石英半砖。 """
+    NETHER_BRICK_SLAB = "minecraft:nether_brick_slab"
+    """ 地狱砖半砖。 """
+    SANDSTONE_DOUBLE_SLAB = "minecraft:sandstone_double_slab"
+    """ 砂岩双半砖。 """
+    COBBLESTONE_DOUBLE_SLAB = "minecraft:cobblestone_double_slab"
+    """ 碎石双半砖。 """
+    BRICK_DOUBLE_SLAB = "minecraft:brick_double_slab"
+    """ 红砖头双半砖。 """
+    STONE_BRICK_DOUBLE_SLAB = "minecraft:stone_brick_double_slab"
+    """ 石砖双半砖。 """
+    QUARTZ_DOUBLE_SLAB = "minecraft:quartz_double_slab"
+    """ 石英双半砖。 """
+    NETHER_BRICK_DOUBLE_SLAB = "minecraft:nether_brick_double_slab"
+    """ 地狱砖头双半砖。 """
+    PURPUR_SLAB = "minecraft:purpur_slab"
+    """ 紫珀半砖。 """
+    PRISMARINE_SLAB = "minecraft:prismarine_slab"
+    """ 海磷石半砖。 """
+    DARK_PRISMARINE_SLAB = "minecraft:dark_prismarine_slab"
+    """ 暗海磷石半砖。 """
+    PRISMARINE_BRICK_SLAB = "minecraft:prismarine_brick_slab"
+    """ 海磷石砖半砖。 """
+    MOSSY_COBBLESTONE_SLAB = "minecraft:mossy_cobblestone_slab"
+    """ 青苔碎石半砖。 """
+    SMOOTH_SANDSTONE_SLAB = "minecraft:smooth_sandstone_slab"
+    """ 平滑砂岩半砖。 """
+    RED_NETHER_BRICK_SLAB = "minecraft:red_nether_brick_slab"
+    """ 红色地狱砖半砖。 """
+    SMOOTH_RED_SANDSTONE_SLAB = "minecraft:smooth_red_sandstone_slab"
+    """ 平滑红砂岩半砖。 """
+    POLISHED_ANDESITE_SLAB = "minecraft:polished_andesite_slab"
+    """ 抛光安山岩半砖。 """
+    ANDESITE_SLAB = "minecraft:andesite_slab"
+    """ 安山岩半砖。 """
+    DIORITE_SLAB = "minecraft:diorite_slab"
+    """ 闪长岩半砖。 """
+    POLISHED_DIORITE_SLAB = "minecraft:polished_diorite_slab"
+    """ 抛光闪长岩半砖。 """
+    GRANITE_SLAB = "minecraft:granite_slab"
+    """ 花岗岩半砖。 """
+    POLISHED_GRANITE_SLAB = "minecraft:polished_granite_slab"
+    """ 抛光花岗岩半砖。 """
+    SMOOTH_QUARTZ_SLAB = "minecraft:smooth_quartz_slab"
+    """ 平滑石英半砖。 """
+    NORMAL_STONE_SLAB = "minecraft:normal_stone_slab"
+    """ 石头半砖。 """
+    CUT_SANDSTONE_SLAB = "minecraft:cut_sandstone_slab"
+    """ 切制砂岩半砖。 """
+    CUT_RED_SANDSTONE_SLAB = "minecraft:cut_red_sandstone_slab"
+    """ 切制红砂岩半砖。 """
+    PETRIFIED_SLAB = "minecraft:petrified_slab"
+    """ 石化橡木半砖。 """
+    PETRIFIED_DOUBLE_SLAB = "minecraft:petrified_double_slab"
+    """ 石化橡木双半砖。 """
+    BRAIN_CORAL_WALL_FAN = "minecraft:brain_coral_wall_fan"
+    """ 墙上的扇状脑珊瑚。 """
+    DEAD_TUBE_CORAL_WALL_FAN = "minecraft:dead_tube_coral_wall_fan"
+    """ 墙上死亡的扇状管珊瑚。 """
+    DEAD_BRAIN_CORAL_WALL_FAN = "minecraft:dead_brain_coral_wall_fan"
+    """ 墙上死亡的扇状脑珊瑚。 """
+    FIRE_CORAL_WALL_FAN = "minecraft:fire_coral_wall_fan"
+    """ 墙上的扇状火珊瑚。 """
+    DEAD_BUBBLE_CORAL_WALL_FAN = "minecraft:dead_bubble_coral_wall_fan"
+    """ 墙上死亡的扇状气泡珊瑚。 """
+    DEAD_FIRE_CORAL_WALL_FAN = "minecraft:dead_fire_coral_wall_fan"
+    """ 墙上死亡的扇状火珊瑚。 """
+    DEAD_HORN_CORAL_WALL_FAN = "minecraft:dead_horn_coral_wall_fan"
+    """ 墙上死亡的扇状角珊瑚。 """
+    PURPUR_DOUBLE_SLAB = "minecraft:purpur_double_slab"
+    """ 紫珀双半砖。 """
+    PRISMARINE_DOUBLE_SLAB = "minecraft:prismarine_double_slab"
+    """ 海磷石双半砖。 """
+    DARK_PRISMARINE_DOUBLE_SLAB = "minecraft:dark_prismarine_double_slab"
+    """ 暗海磷石双半砖。 """
+    PRISMARINE_BRICK_DOUBLE_SLAB = "minecraft:prismarine_brick_double_slab"
+    """ 海磷石砖双半砖。 """
+    MOSSY_COBBLESTONE_DOUBLE_SLAB = "minecraft:mossy_cobblestone_double_slab"
+    """ 青苔碎石双半砖。 """
+    SMOOTH_SANDSTONE_DOUBLE_SLAB = "minecraft:smooth_sandstone_double_slab"
+    """ 平滑砂岩双半砖。 """
+    RED_NETHER_BRICK_DOUBLE_SLAB = "minecraft:red_nether_brick_double_slab"
+    """ 红色地狱砖双半砖。 """
+    SMOOTH_RED_SANDSTONE_DOUBLE_SLAB = "minecraft:smooth_red_sandstone_double_slab"
+    """ 平滑红砂岩双半砖。 """
+    POLISHED_ANDESITE_DOUBLE_SLAB = "minecraft:polished_andesite_double_slab"
+    """ 抛光安山岩双半砖。 """
+    ANDESITE_DOUBLE_SLAB = "minecraft:andesite_double_slab"
+    """ 安山岩双半砖。 """
+    DIORITE_DOUBLE_SLAB = "minecraft:diorite_double_slab"
+    """ 闪长岩双半砖。 """
+    POLISHED_DIORITE_DOUBLE_SLAB = "minecraft:polished_diorite_double_slab"
+    """ 抛光闪长岩双半砖。 """
+    GRANITE_DOUBLE_SLAB = "minecraft:granite_double_slab"
+    """ 花岗岩双半砖。 """
+    POLISHED_GRANITE_DOUBLE_SLAB = "minecraft:polished_granite_double_slab"
+    """ 抛光花岗岩双半砖。 """
+    SMOOTH_QUARTZ_DOUBLE_SLAB = "minecraft:smooth_quartz_double_slab"
+    """ 平滑石英双半砖。 """
+    NORMAL_STONE_DOUBLE_SLAB = "minecraft:normal_stone_double_slab"
+    """ 石头双半砖。 """
+    CUT_SANDSTONE_DOUBLE_SLAB = "minecraft:cut_sandstone_double_slab"
+    """ 切制砂岩双半砖。 """
+    CUT_RED_SANDSTONE_DOUBLE_SLAB = "minecraft:cut_red_sandstone_double_slab"
+    """ 切制红砂岩双半砖。 """
+    LIGHT_BLOCK_1 = "minecraft:light_block_1"
+    """ 光 （亮度1）。 """
+    LIGHT_BLOCK_2 = "minecraft:light_block_2"
+    """ 光 （亮度2）。 """
+    LIGHT_BLOCK_3 = "minecraft:light_block_3"
+    """ 光 （亮度3）。 """
+    LIGHT_BLOCK_4 = "minecraft:light_block_4"
+    """ 光 （亮度4）。 """
+    LIGHT_BLOCK_5 = "minecraft:light_block_5"
+    """ 光 （亮度5）。 """
+    LIGHT_BLOCK_6 = "minecraft:light_block_6"
+    """ 光 （亮度6）。 """
+    LIGHT_BLOCK_7 = "minecraft:light_block_7"
+    """ 光 （亮度7）。 """
+    LIGHT_BLOCK_8 = "minecraft:light_block_8"
+    """ 光 （亮度8）。 """
+    LIGHT_BLOCK_9 = "minecraft:light_block_9"
+    """ 光 （亮度9）。 """
+    LIGHT_BLOCK_10 = "minecraft:light_block_10"
+    """ 光 （亮度10）。 """
+    LIGHT_BLOCK_11 = "minecraft:light_block_11"
+    """ 光 （亮度11）。 """
+    LIGHT_BLOCK_12 = "minecraft:light_block_12"
+    """ 光 （亮度12）。 """
+    LIGHT_BLOCK_13 = "minecraft:light_block_13"
+    """ 光 （亮度13）。 """
+    LIGHT_BLOCK_14 = "minecraft:light_block_14"
+    """ 光 （亮度14）。 """
+    LIGHT_BLOCK_15 = "minecraft:light_block_15"
+    """ 光 （亮度15）。 """
+    CHISELED_SANDSTONE = "minecraft:chiseled_sandstone"
+    """ 浮雕砂岩。 """
+    CUT_SANDSTONE = "minecraft:cut_sandstone"
+    """ 切制砂岩。 """
+    SMOOTH_SANDSTONE = "minecraft:smooth_sandstone"
+    """ 平滑砂岩。 """
+    DARK_PRISMARINE = "minecraft:dark_prismarine"
+    """ 暗海磷石。 """
+    PRISMARINE_BRICKS = "minecraft:prismarine_bricks"
+    """ 海磷石砖。 """
+    RED_SAND = "minecraft:red_sand"
+    """ 红沙。 """
+    DEPRECATED_PURPUR_BLOCK_1 = "minecraft:deprecated_purpur_block_1"
+    """ 浮雕紫珀砖。 """
+    PURPUR_PILLAR = "minecraft:purpur_pillar"
+    """ 紫珀柱。 """
+    DEPRECATED_PURPUR_BLOCK_2 = "minecraft:deprecated_purpur_block_2"
+    """ 平滑紫珀砖。 """
+    CHISELED_QUARTZ_BLOCK = "minecraft:chiseled_quartz_block"
+    """ 浮雕石英砖。 """
+    QUARTZ_PILLAR = "minecraft:quartz_pillar"
+    """ 石英柱。 """
+    SMOOTH_QUARTZ_BLOCK = "minecraft:smooth_quartz_block"
+    """ 平滑石英砖。 """
+    CHISELED_RED_SANDSTONE = "minecraft:chiseled_red_sandstone"
+    """ 浮雕红砂岩。 """
+    CUT_RED_SANDSTONE = "minecraft:cut_red_sandstone"
+    """ 切制红砂岩。 """
+    SMOOTH_RED_SANDSTONE = "minecraft:smooth_red_sandstone"
+    """ 平滑红砂岩。 """
+    CHIPPED_ANVIL = "minecraft:chipped_anvil"
+    """ 开裂的铁砧。 """
+    DAMAGED_ANVIL = "minecraft:damaged_anvil"
+    """ 破损的铁砧。 """
+    DEPRECATED_ANVIL = "minecraft:deprecated_anvil"
+    """ 破碎的铁砧。 """
+    COARSE_DIRT = "minecraft:coarse_dirt"
+    """ 粗泥。 """
+    COLORED_TORCH_GREEN = "minecraft:colored_torch_green"
+    """ 绿色火炬。 """
+    COLORED_TORCH_PURPLE = "minecraft:colored_torch_purple"
+    """ 紫色火炬。 """
+    WITHER_SKELETON_SKULL = "minecraft:wither_skeleton_skull"
+    """ 凋零骷髅骨头颅。 """
+    ZOMBIE_HEAD = "minecraft:zombie_head"
+    """ 丧尸头颅。 """
+    PLAYER_HEAD = "minecraft:player_head"
+    """ 玩家头颅。 """
+    CREEPER_HEAD = "minecraft:creeper_head"
+    """ Creeper头颅。 """
+    DRAGON_HEAD = "minecraft:dragon_head"
+    """ 龙头。 """
+    PIGLIN_HEAD = "minecraft:piglin_head"
+    """ 猪人头颅。 """
+    MOSSY_COBBLESTONE_WALL = "minecraft:mossy_cobblestone_wall"
+    """ 青苔碎石墙。 """
+    GRANITE_WALL = "minecraft:granite_wall"
+    """ 花岗岩墙。 """
+    DIORITE_WALL = "minecraft:diorite_wall"
+    """ 闪长岩墙。 """
+    ANDESITE_WALL = "minecraft:andesite_wall"
+    """ 安山岩墙。 """
+    SANDSTONE_WALL = "minecraft:sandstone_wall"
+    """ 砂岩墙。 """
+    BRICK_WALL = "minecraft:brick_wall"
+    """ 红砖墙。 """
+    STONE_BRICK_WALL = "minecraft:stone_brick_wall"
+    """ 石砖墙。 """
+    MOSSY_STONE_BRICK_WALL = "minecraft:mossy_stone_brick_wall"
+    """ 青苔石砖墙。 """
+    NETHER_BRICK_WALL = "minecraft:nether_brick_wall"
+    """ 地狱砖墙。 """
+    END_STONE_BRICK_WALL = "minecraft:end_stone_brick_wall"
+    """ 终界石砖墙。 """
+    PRISMARINE_WALL = "minecraft:prismarine_wall"
+    """ 海磷石墙。 """
+    RED_SANDSTONE_WALL = "minecraft:red_sandstone_wall"
+    """ 红砂岩墙。 """
+    RED_NETHER_BRICK_WALL = "minecraft:red_nether_brick_wall"
+    """ 红色地狱砖墙。 """
+    WET_SPONGE = "minecraft:wet_sponge"
+    """ 湿海绵。 """
+    UNDERWATER_TNT = "minecraft:underwater_tnt"
+    """ 水下TNT。 """
+    MATERIAL_REDUCER = "minecraft:material_reducer"
+    """ 材料分解器。 """
+    LAB_TABLE = "minecraft:lab_table"
+    """ 实验台。 """
+    PALE_OAK_BUTTON = "minecraft:pale_oak_button"
+    """ 苍白橡木按钮。 """
+    PALE_OAK_DOOR = "minecraft:pale_oak_door"
+    """ 苍白橡木门。 """
+    PALE_OAK_FENCE = "minecraft:pale_oak_fence"
+    """ 苍白橡木栏杆。 """
+    PALE_OAK_FENCE_GATE = "minecraft:pale_oak_fence_gate"
+    """ 苍白橡木闸门。 """
+    PALE_OAK_HANGING_SIGN = "minecraft:pale_oak_hanging_sign"
+    """ 苍白橡木吊牌。 """
+    STRIPPED_PALE_OAK_LOG = "minecraft:stripped_pale_oak_log"
+    """ 剥皮苍白橡木原木。 """
+    PALE_OAK_LOG = "minecraft:pale_oak_log"
+    """ 苍白橡木原木。 """
+    PALE_OAK_PLANKS = "minecraft:pale_oak_planks"
+    """ 苍白橡木板。 """
+    PALE_OAK_PRESSURE_PLATE = "minecraft:pale_oak_pressure_plate"
+    """ 苍白橡木压力板。 """
+    PALE_OAK_SLAB = "minecraft:pale_oak_slab"
+    """ 苍白橡木半砖。 """
+    PALE_OAK_DOUBLE_SLAB = "minecraft:pale_oak_double_slab"
+    """ 苍白橡木双半砖。 """
+    PALE_OAK_STAIRS = "minecraft:pale_oak_stairs"
+    """ 苍白橡木楼梯。 """
+    PALE_OAK_STANDING_SIGN = "minecraft:pale_oak_standing_sign"
+    """ 苍白橡木指示牌。 """
+    PALE_OAK_TRAPDOOR = "minecraft:pale_oak_trapdoor"
+    """ 苍白橡木地板门。 """
+    PALE_OAK_WALL_SIGN = "minecraft:pale_oak_wall_sign"
+    """ 墙上的苍白橡木指示牌。 """
+    STRIPPED_PALE_OAK_WOOD = "minecraft:stripped_pale_oak_wood"
+    """ 剥皮苍白橡木。 """
+    PALE_OAK_WOOD = "minecraft:pale_oak_wood"
+    """ 苍白橡木。 """
+    PALE_OAK_SAPLING = "minecraft:pale_oak_sapling"
+    """ 苍白橡木树苗。 """
+    PALE_OAK_LEAVES = "minecraft:pale_oak_leaves"
+    """ 苍白橡木树叶。 """
+    MUSHROOM_STEM = "minecraft:mushroom_stem"
+    """ 蘑菇柄。 """
+    PALE_MOSS_BLOCK = "minecraft:pale_moss_block"
+    """ 苍白青苔方块。 """
+    PALE_MOSS_CARPET = "minecraft:pale_moss_carpet"
+    """ 苍白青苔。 """
+    PALE_HANGING_MOSS = "minecraft:pale_hanging_moss"
+    """ 苍白垂须。 """
+    CREAKING_HEART = "minecraft:creaking_heart"
+    """ 异响之心。 """
+    RESIN_BRICKS = "minecraft:resin_bricks"
+    """ 树脂砖。 """
+    RESIN_BRICK_SLAB = "minecraft:resin_brick_slab"
+    """ 树脂砖半砖。 """
+    RESIN_BRICK_DOUBLE_SLAB = "minecraft:resin_brick_double_slab"
+    """ 树脂砖头双半砖。 """
+    RESIN_BRICK_STAIRS = "minecraft:resin_brick_stairs"
+    """ 树脂砖楼梯。 """
+    RESIN_BRICK_WALL = "minecraft:resin_brick_wall"
+    """ 树脂砖墙。 """
+    OPEN_EYEBLOSSOM = "minecraft:open_eyeblossom"
+    """ 张开的眼眸花。 """
+    CLOSED_EYEBLOSSOM = "minecraft:closed_eyeblossom"
+    """ 闭合的眼眸花。 """
+    CHISELED_RESIN_BRICKS = "minecraft:chiseled_resin_bricks"
+    """ 浮雕树脂砖。 """
+    RESIN_BLOCK = "minecraft:resin_block"
+    """ 树脂块。 """
+    RESIN_CLUMP = "minecraft:resin_clump"
+    """ 树脂团。 """
+    BUSH = "minecraft:bush"
+    """ 灌木丛。 """
+    WILDFLOWERS = "minecraft:wildflowers"
+    """ 野花簇。 """
+    FIREFLY_BUSH = "minecraft:firefly_bush"
+    """ 萤火虫灌木丛。 """
+    LEAF_LITTER = "minecraft:leaf_litter"
+    """ 枯叶。 """
+    DRIED_GHAST = "minecraft:dried_ghast"
+    """ 脱水幽灵。 """
+    SHORT_DRY_GRASS = "minecraft:short_dry_grass"
+    """ 矮枯草。 """
+    TALL_DRY_GRASS = "minecraft:tall_dry_grass"
+    """ 高枯草。 """
+    CACTUS_FLOWER = "minecraft:cactus_flower"
+    """ 仙人掌花。 """
+    COPPER_CHEST = "minecraft:copper_chest"
+    """ 铜储物箱。 """
+    EXPOSED_COPPER_CHEST = "minecraft:exposed_copper_chest"
+    """ 斑驳的铜储物箱。 """
+    WEATHERED_COPPER_CHEST = "minecraft:weathered_copper_chest"
+    """ 生锈的铜储物箱。 """
+    OXIDIZED_COPPER_CHEST = "minecraft:oxidized_copper_chest"
+    """ 氧化的铜储物箱。 """
+    WAXED_COPPER_CHEST = "minecraft:waxed_copper_chest"
+    """ 打蜡的铜储物箱。 """
+    WAXED_EXPOSED_COPPER_CHEST = "minecraft:waxed_exposed_copper_chest"
+    """ 打蜡的斑驳铜储物箱。 """
+    WAXED_WEATHERED_COPPER_CHEST = "minecraft:waxed_weathered_copper_chest"
+    """ 打蜡的生锈铜储物箱。 """
+    WAXED_OXIDIZED_COPPER_CHEST = "minecraft:waxed_oxidized_copper_chest"
+    """ 打蜡的氧化铜储物箱。 """
+    COPPER_GOLEM_STATUE = "minecraft:copper_golem_statue"
+    """ 铜人雕像。 """
+    EXPOSED_COPPER_GOLEM_STATUE = "minecraft:exposed_copper_golem_statue"
+    """ 斑驳的铜人雕像。 """
+    WEATHERED_COPPER_GOLEM_STATUE = "minecraft:weathered_copper_golem_statue"
+    """ 生锈的铜人雕像。 """
+    OXIDIZED_COPPER_GOLEM_STATUE = "minecraft:oxidized_copper_golem_statue"
+    """ 氧化的铜人雕像。 """
+    WAXED_COPPER_GOLEM_STATUE = "minecraft:waxed_copper_golem_statue"
+    """ 打蜡的铜人雕像。 """
+    WAXED_EXPOSED_COPPER_GOLEM_STATUE = "minecraft:waxed_exposed_copper_golem_statue"
+    """ 打蜡的斑驳铜人雕像。 """
+    WAXED_WEATHERED_COPPER_GOLEM_STATUE = "minecraft:waxed_weathered_copper_golem_statue"
+    """ 打蜡的生锈铜人雕像。 """
+    WAXED_OXIDIZED_COPPER_GOLEM_STATUE = "minecraft:waxed_oxidized_copper_golem_statue"
+    """ 打蜡的氧化铜人雕像。 """
+    OAK_SHELF = "minecraft:oak_shelf"
+    """ 橡木置物架。 """
+    SPRUCE_SHELF = "minecraft:spruce_shelf"
+    """ 杉木置物架。 """
+    BIRCH_SHELF = "minecraft:birch_shelf"
+    """ 桦木置物架。 """
+    JUNGLE_SHELF = "minecraft:jungle_shelf"
+    """ 丛林木置物架。 """
+    ACACIA_SHELF = "minecraft:acacia_shelf"
+    """ 相思木置物架。 """
+    DARK_OAK_SHELF = "minecraft:dark_oak_shelf"
+    """ 黑橡木置物架。 """
+    MANGROVE_SHELF = "minecraft:mangrove_shelf"
+    """ 红树木置物架。 """
+    CHERRY_SHELF = "minecraft:cherry_shelf"
+    """ 樱花木置物架。 """
+    PALE_OAK_SHELF = "minecraft:pale_oak_shelf"
+    """ 苍白橡木置物架。 """
+    BAMBOO_SHELF = "minecraft:bamboo_shelf"
+    """ 竹置物架。 """
+    CRIMSON_SHELF = "minecraft:crimson_shelf"
+    """ 猩红菌木置物架。 """
+    WARPED_SHELF = "minecraft:warped_shelf"
+    """ 迷离菌木置物架。 """
+    EXPOSED_LIGHTNING_ROD = "minecraft:exposed_lightning_rod"
+    """ 斑驳的避雷针。 """
+    WEATHERED_LIGHTNING_ROD = "minecraft:weathered_lightning_rod"
+    """ 生锈的避雷针。 """
+    OXIDIZED_LIGHTNING_ROD = "minecraft:oxidized_lightning_rod"
+    """ 氧化的避雷针。 """
+    WAXED_LIGHTNING_ROD = "minecraft:waxed_lightning_rod"
+    """ 打蜡的避雷针。 """
+    WAXED_EXPOSED_LIGHTNING_ROD = "minecraft:waxed_exposed_lightning_rod"
+    """ 打蜡的斑驳避雷针。 """
+    WAXED_WEATHERED_LIGHTNING_ROD = "minecraft:waxed_weathered_lightning_rod"
+    """ 打蜡的生锈避雷针。 """
+    WAXED_OXIDIZED_LIGHTNING_ROD = "minecraft:waxed_oxidized_lightning_rod"
+    """ 打蜡的氧化避雷针。 """
+    COPPER_BARS = "minecraft:copper_bars"
+    """ 铜栏杆。 """
+    EXPOSED_COPPER_BARS = "minecraft:exposed_copper_bars"
+    """ 斑驳的铜栏杆。 """
+    WEATHERED_COPPER_BARS = "minecraft:weathered_copper_bars"
+    """ 生锈的铜栏杆。 """
+    OXIDIZED_COPPER_BARS = "minecraft:oxidized_copper_bars"
+    """ 氧化的铜栏杆。 """
+    WAXED_COPPER_BARS = "minecraft:waxed_copper_bars"
+    """ 打蜡的铜栏杆。 """
+    WAXED_EXPOSED_COPPER_BARS = "minecraft:waxed_exposed_copper_bars"
+    """ 打蜡的斑驳铜栏杆。 """
+    WAXED_WEATHERED_COPPER_BARS = "minecraft:waxed_weathered_copper_bars"
+    """ 打蜡的生锈铜栏杆。 """
+    WAXED_OXIDIZED_COPPER_BARS = "minecraft:waxed_oxidized_copper_bars"
+    """ 打蜡的氧化铜栏杆。 """
+    COPPER_CHAIN = "minecraft:copper_chain"
+    """ 铜链。 """
+    EXPOSED_COPPER_CHAIN = "minecraft:exposed_copper_chain"
+    """ 斑驳的铜链。 """
+    WEATHERED_COPPER_CHAIN = "minecraft:weathered_copper_chain"
+    """ 生锈的铜链。 """
+    OXIDIZED_COPPER_CHAIN = "minecraft:oxidized_copper_chain"
+    """ 氧化的铜链。 """
+    WAXED_COPPER_CHAIN = "minecraft:waxed_copper_chain"
+    """ 打蜡的铜链。 """
+    WAXED_EXPOSED_COPPER_CHAIN = "minecraft:waxed_exposed_copper_chain"
+    """ 打蜡的斑驳铜链。 """
+    WAXED_WEATHERED_COPPER_CHAIN = "minecraft:waxed_weathered_copper_chain"
+    """ 打蜡的生锈铜链。 """
+    WAXED_OXIDIZED_COPPER_CHAIN = "minecraft:waxed_oxidized_copper_chain"
+    """ 打蜡的氧化铜链。 """
+    COPPER_TORCH = "minecraft:copper_torch"
+    """ 铜火炬。 """
+    COPPER_LANTERN = "minecraft:copper_lantern"
+    """ 铜灯笼。 """
+    EXPOSED_COPPER_LANTERN = "minecraft:exposed_copper_lantern"
+    """ 斑驳的铜灯笼。 """
+    WEATHERED_COPPER_LANTERN = "minecraft:weathered_copper_lantern"
+    """ 生锈的铜灯笼。 """
+    OXIDIZED_COPPER_LANTERN = "minecraft:oxidized_copper_lantern"
+    """ 氧化的铜灯笼。 """
+    WAXED_COPPER_LANTERN = "minecraft:waxed_copper_lantern"
+    """ 打蜡的铜灯笼。 """
+    WAXED_EXPOSED_COPPER_LANTERN = "minecraft:waxed_exposed_copper_lantern"
+    """ 打蜡的斑驳铜灯笼。 """
+    WAXED_WEATHERED_COPPER_LANTERN = "minecraft:waxed_weathered_copper_lantern"
+    """ 打蜡的生锈铜灯笼。 """
+    WAXED_OXIDIZED_COPPER_LANTERN = "minecraft:waxed_oxidized_copper_lantern"
+    """ 打蜡的氧化铜灯笼。 """
+    GOLDEN_DANDELION = "minecraft:golden_dandelion"
+    """ 金蒲公英。 """
+    SULFUR = "minecraft:sulfur"
+    """ 硫磺。 """
+    SULFUR_SLAB = "minecraft:sulfur_slab"
+    """ 硫磺半砖。 """
+    SULFUR_DOUBLE_SLAB = "minecraft:sulfur_double_slab"
+    """ 硫磺双半砖。 """
+    SULFUR_STAIRS = "minecraft:sulfur_stairs"
+    """ 硫磺楼梯。 """
+    SULFUR_WALL = "minecraft:sulfur_wall"
+    """ 硫磺墙。 """
+    POLISHED_SULFUR = "minecraft:polished_sulfur"
+    """ 抛光硫磺。 """
+    POLISHED_SULFUR_SLAB = "minecraft:polished_sulfur_slab"
+    """ 抛光硫磺半砖。 """
+    POLISHED_SULFUR_DOUBLE_SLAB = "minecraft:polished_sulfur_double_slab"
+    """ 抛光硫磺双半砖。 """
+    POLISHED_SULFUR_STAIRS = "minecraft:polished_sulfur_stairs"
+    """ 抛光硫磺楼梯。 """
+    POLISHED_SULFUR_WALL = "minecraft:polished_sulfur_wall"
+    """ 抛光硫磺墙。 """
+    SULFUR_BRICKS = "minecraft:sulfur_bricks"
+    """ 硫磺砖。 """
+    SULFUR_BRICK_SLAB = "minecraft:sulfur_brick_slab"
+    """ 硫磺砖半砖。 """
+    SULFUR_BRICK_DOUBLE_SLAB = "minecraft:sulfur_brick_double_slab"
+    """ 硫磺砖双半砖。 """
+    SULFUR_BRICK_STAIRS = "minecraft:sulfur_brick_stairs"
+    """ 硫磺砖楼梯。 """
+    SULFUR_BRICK_WALL = "minecraft:sulfur_brick_wall"
+    """ 硫磺砖墙。 """
+    CHISELED_SULFUR = "minecraft:chiseled_sulfur"
+    """ 浮雕硫磺。 """
+    POTENT_SULFUR = "minecraft:potent_sulfur"
+    """ 烈性硫磺。 """
+    CINNABAR = "minecraft:cinnabar"
+    """ 朱砂。 """
+    CINNABAR_SLAB = "minecraft:cinnabar_slab"
+    """ 朱砂半砖。 """
+    CINNABAR_DOUBLE_SLAB = "minecraft:cinnabar_double_slab"
+    """ 朱砂双半砖。 """
+    CINNABAR_STAIRS = "minecraft:cinnabar_stairs"
+    """ 朱砂楼梯。 """
+    CINNABAR_WALL = "minecraft:cinnabar_wall"
+    """ 朱砂墙。 """
+    POLISHED_CINNABAR = "minecraft:polished_cinnabar"
+    """ 抛光朱砂。 """
+    POLISHED_CINNABAR_SLAB = "minecraft:polished_cinnabar_slab"
+    """ 抛光朱砂半砖。 """
+    POLISHED_CINNABAR_DOUBLE_SLAB = "minecraft:polished_cinnabar_double_slab"
+    """ 抛光朱砂双半砖。 """
+    POLISHED_CINNABAR_STAIRS = "minecraft:polished_cinnabar_stairs"
+    """ 抛光朱砂楼梯。 """
+    POLISHED_CINNABAR_WALL = "minecraft:polished_cinnabar_wall"
+    """ 抛光朱砂墙。 """
+    CINNABAR_BRICKS = "minecraft:cinnabar_bricks"
+    """ 朱砂砖。 """
+    CINNABAR_BRICK_SLAB = "minecraft:cinnabar_brick_slab"
+    """ 朱砂砖半砖。 """
+    CINNABAR_BRICK_DOUBLE_SLAB = "minecraft:cinnabar_brick_double_slab"
+    """ 朱砂砖双半砖。 """
+    CINNABAR_BRICK_STAIRS = "minecraft:cinnabar_brick_stairs"
+    """ 朱砂砖楼梯。 """
+    CINNABAR_BRICK_WALL = "minecraft:cinnabar_brick_wall"
+    """ 朱砂砖墙。 """
+    CHISELED_CINNABAR = "minecraft:chiseled_cinnabar"
+    """ 浮雕朱砂。 """
+    SULFUR_SPIKE = "minecraft:sulfur_spike"
+    """ 硫磺尖刺。 """
+    POPLAR_BUTTON = "minecraft:poplar_button"
+    """ 杨木按钮。 """
+    POPLAR_DOOR = "minecraft:poplar_door"
+    """ 杨木门。 """
+    POPLAR_FENCE = "minecraft:poplar_fence"
+    """ 杨木栏杆。 """
+    POPLAR_FENCE_GATE = "minecraft:poplar_fence_gate"
+    """ 杨木闸门。 """
+    POPLAR_HANGING_SIGN = "minecraft:poplar_hanging_sign"
+    """ 杨木吊牌。 """
+    STRIPPED_POPLAR_LOG = "minecraft:stripped_poplar_log"
+    """ 剥皮杨木原木。 """
+    POPLAR_LOG = "minecraft:poplar_log"
+    """ 杨木原木。 """
+    POPLAR_PLANKS = "minecraft:poplar_planks"
+    """ 杨木板。 """
+    POPLAR_PRESSURE_PLATE = "minecraft:poplar_pressure_plate"
+    """ 杨木压力板。 """
+    POPLAR_SLAB = "minecraft:poplar_slab"
+    """ 杨木半砖。 """
+    POPLAR_DOUBLE_SLAB = "minecraft:poplar_double_slab"
+    """ 杨木双半砖。 """
+    POPLAR_STAIRS = "minecraft:poplar_stairs"
+    """ 杨木楼梯。 """
+    POPLAR_STANDING_SIGN = "minecraft:poplar_standing_sign"
+    """ 杨木指示牌。 """
+    POPLAR_TRAPDOOR = "minecraft:poplar_trapdoor"
+    """ 杨木地板门。 """
+    POPLAR_WALL_SIGN = "minecraft:poplar_wall_sign"
+    """ 墙上的杨木指示牌。 """
+    STRIPPED_POPLAR_WOOD = "minecraft:stripped_poplar_wood"
+    """ 剥皮杨木。 """
+    POPLAR_WOOD = "minecraft:poplar_wood"
+    """ 杨木。 """
+    POPLAR_SAPLING = "minecraft:poplar_sapling"
+    """ 杨木树苗。 """
+    ORANGE_POPLAR_LEAVES = "minecraft:orange_poplar_leaves"
+    """ 橙色杨木树叶。 """
+    RED_POPLAR_LEAVES = "minecraft:red_poplar_leaves"
+    """ 红色杨木树叶。 """
+    YELLOW_POPLAR_LEAVES = "minecraft:yellow_poplar_leaves"
+    """ 黄色杨木树叶。 """
+    POPLAR_SHELF = "minecraft:poplar_shelf"
+    """ 杨木置物架。 """
+    RED_SHRUB = "minecraft:red_shrub"
+    """ 红灌木。 """
+    RED_WOOL_STAIRS = "minecraft:red_wool_stairs"
+    """ 红色羊毛楼梯。 """
+    WHITE_WOOL_STAIRS = "minecraft:white_wool_stairs"
+    """ 白色羊毛楼梯。 """
+    BLUE_WOOL_STAIRS = "minecraft:blue_wool_stairs"
+    """ 蓝色羊毛楼梯。 """
+    ORANGE_WOOL_STAIRS = "minecraft:orange_wool_stairs"
+    """ 橙色羊毛楼梯。 """
+    MAGENTA_WOOL_STAIRS = "minecraft:magenta_wool_stairs"
+    """ 紫红色羊毛楼梯。 """
+    LIGHT_BLUE_WOOL_STAIRS = "minecraft:light_blue_wool_stairs"
+    """ 浅蓝色羊毛楼梯。 """
+    YELLOW_WOOL_STAIRS = "minecraft:yellow_wool_stairs"
+    """ 黄色羊毛楼梯。 """
+    LIME_WOOL_STAIRS = "minecraft:lime_wool_stairs"
+    """ 浅绿色羊毛楼梯。 """
+    PINK_WOOL_STAIRS = "minecraft:pink_wool_stairs"
+    """ 粉红色羊毛楼梯。 """
+    GRAY_WOOL_STAIRS = "minecraft:gray_wool_stairs"
+    """ 灰色羊毛楼梯。 """
+    LIGHT_GRAY_WOOL_STAIRS = "minecraft:light_gray_wool_stairs"
+    """ 浅灰色羊毛楼梯。 """
+    CYAN_WOOL_STAIRS = "minecraft:cyan_wool_stairs"
+    """ 青蓝色羊毛楼梯。 """
+    PURPLE_WOOL_STAIRS = "minecraft:purple_wool_stairs"
+    """ 紫色羊毛楼梯。 """
+    GREEN_WOOL_STAIRS = "minecraft:green_wool_stairs"
+    """ 绿色羊毛楼梯。 """
+    BROWN_WOOL_STAIRS = "minecraft:brown_wool_stairs"
+    """ 啡色羊毛楼梯。 """
+    BLACK_WOOL_STAIRS = "minecraft:black_wool_stairs"
+    """ 黑色羊毛楼梯。 """
+    WHITE_WOOL_SLAB = "minecraft:white_wool_slab"
+    """ 白色羊毛半砖。 """
+    LIGHT_GRAY_WOOL_SLAB = "minecraft:light_gray_wool_slab"
+    """ 浅灰色羊毛半砖。 """
+    GRAY_WOOL_SLAB = "minecraft:gray_wool_slab"
+    """ 灰色羊毛半砖。 """
+    BLACK_WOOL_SLAB = "minecraft:black_wool_slab"
+    """ 黑色羊毛半砖。 """
+    BROWN_WOOL_SLAB = "minecraft:brown_wool_slab"
+    """ 啡色羊毛半砖。 """
+    RED_WOOL_SLAB = "minecraft:red_wool_slab"
+    """ 红色羊毛半砖。 """
+    ORANGE_WOOL_SLAB = "minecraft:orange_wool_slab"
+    """ 橙色羊毛半砖。 """
+    YELLOW_WOOL_SLAB = "minecraft:yellow_wool_slab"
+    """ 黄色羊毛半砖。 """
+    LIME_WOOL_SLAB = "minecraft:lime_wool_slab"
+    """ 浅绿色羊毛半砖。 """
+    GREEN_WOOL_SLAB = "minecraft:green_wool_slab"
+    """ 绿色羊毛半砖。 """
+    CYAN_WOOL_SLAB = "minecraft:cyan_wool_slab"
+    """ 青蓝色羊毛半砖。 """
+    LIGHT_BLUE_WOOL_SLAB = "minecraft:light_blue_wool_slab"
+    """ 浅蓝色羊毛半砖。 """
+    BLUE_WOOL_SLAB = "minecraft:blue_wool_slab"
+    """ 蓝色羊毛半砖。 """
+    PURPLE_WOOL_SLAB = "minecraft:purple_wool_slab"
+    """ 紫色羊毛半砖。 """
+    MAGENTA_WOOL_SLAB = "minecraft:magenta_wool_slab"
+    """ 紫红色羊毛半砖。 """
+    PINK_WOOL_SLAB = "minecraft:pink_wool_slab"
+    """ 粉红色羊毛半砖。 """
+    WHITE_WOOL_DOUBLE_SLAB = "minecraft:white_wool_double_slab"
+    """ 白色羊毛双半砖。 """
+    LIGHT_GRAY_WOOL_DOUBLE_SLAB = "minecraft:light_gray_wool_double_slab"
+    """ 浅灰色羊毛双半砖。 """
+    GRAY_WOOL_DOUBLE_SLAB = "minecraft:gray_wool_double_slab"
+    """ 灰色羊毛双半砖。 """
+    BLACK_WOOL_DOUBLE_SLAB = "minecraft:black_wool_double_slab"
+    """ 黑色羊毛双半砖。 """
+    BROWN_WOOL_DOUBLE_SLAB = "minecraft:brown_wool_double_slab"
+    """ 啡色羊毛双半砖。 """
+    RED_WOOL_DOUBLE_SLAB = "minecraft:red_wool_double_slab"
+    """ 红色羊毛双半砖。 """
+    ORANGE_WOOL_DOUBLE_SLAB = "minecraft:orange_wool_double_slab"
+    """ 橙色羊毛双半砖。 """
+    YELLOW_WOOL_DOUBLE_SLAB = "minecraft:yellow_wool_double_slab"
+    """ 黄色羊毛双半砖。 """
+    LIME_WOOL_DOUBLE_SLAB = "minecraft:lime_wool_double_slab"
+    """ 浅绿色羊毛双半砖。 """
+    GREEN_WOOL_DOUBLE_SLAB = "minecraft:green_wool_double_slab"
+    """ 绿色羊毛双半砖。 """
+    CYAN_WOOL_DOUBLE_SLAB = "minecraft:cyan_wool_double_slab"
+    """ 青蓝色羊毛双半砖。 """
+    LIGHT_BLUE_WOOL_DOUBLE_SLAB = "minecraft:light_blue_wool_double_slab"
+    """ 浅蓝色羊毛双半砖。 """
+    BLUE_WOOL_DOUBLE_SLAB = "minecraft:blue_wool_double_slab"
+    """ 蓝色羊毛双半砖。 """
+    PURPLE_WOOL_DOUBLE_SLAB = "minecraft:purple_wool_double_slab"
+    """ 紫色羊毛双半砖。 """
+    MAGENTA_WOOL_DOUBLE_SLAB = "minecraft:magenta_wool_double_slab"
+    """ 紫红色羊毛双半砖。 """
+    PINK_WOOL_DOUBLE_SLAB = "minecraft:pink_wool_double_slab"
+    """ 粉红色羊毛双半砖。 """
+    SHELF_MUSHROOM = "minecraft:shelf_mushroom"
+    """ 层架蘑菇。 """
+    STRAW_BED = "minecraft:straw_bed"
+    """ 禾秆床。 """
+    RED_CONCRETE_STAIRS = "minecraft:red_concrete_stairs"
+    """ 红色混凝土楼梯。 """
+    WHITE_CONCRETE_STAIRS = "minecraft:white_concrete_stairs"
+    """ 白色混凝土楼梯。 """
+    BLUE_CONCRETE_STAIRS = "minecraft:blue_concrete_stairs"
+    """ 蓝色混凝土楼梯。 """
+    ORANGE_CONCRETE_STAIRS = "minecraft:orange_concrete_stairs"
+    """ 橙色混凝土楼梯。 """
+    MAGENTA_CONCRETE_STAIRS = "minecraft:magenta_concrete_stairs"
+    """ 紫红色混凝土楼梯。 """
+    LIGHT_BLUE_CONCRETE_STAIRS = "minecraft:light_blue_concrete_stairs"
+    """ 浅蓝色混凝土楼梯。 """
+    YELLOW_CONCRETE_STAIRS = "minecraft:yellow_concrete_stairs"
+    """ 黄色混凝土楼梯。 """
+    LIME_CONCRETE_STAIRS = "minecraft:lime_concrete_stairs"
+    """ 浅绿色混凝土楼梯。 """
+    PINK_CONCRETE_STAIRS = "minecraft:pink_concrete_stairs"
+    """ 粉红色混凝土楼梯。 """
+    GRAY_CONCRETE_STAIRS = "minecraft:gray_concrete_stairs"
+    """ 灰色混凝土楼梯。 """
+    LIGHT_GRAY_CONCRETE_STAIRS = "minecraft:light_gray_concrete_stairs"
+    """ 浅灰色混凝土楼梯。 """
+    CYAN_CONCRETE_STAIRS = "minecraft:cyan_concrete_stairs"
+    """ 青蓝色混凝土楼梯。 """
+    PURPLE_CONCRETE_STAIRS = "minecraft:purple_concrete_stairs"
+    """ 紫色混凝土楼梯。 """
+    GREEN_CONCRETE_STAIRS = "minecraft:green_concrete_stairs"
+    """ 绿色混凝土楼梯。 """
+    BROWN_CONCRETE_STAIRS = "minecraft:brown_concrete_stairs"
+    """ 啡色混凝土楼梯。 """
+    BLACK_CONCRETE_STAIRS = "minecraft:black_concrete_stairs"
+    """ 黑色混凝土楼梯。 """
+    WHITE_CONCRETE_SLAB = "minecraft:white_concrete_slab"
+    """ 白色混凝土半砖。 """
+    LIGHT_GRAY_CONCRETE_SLAB = "minecraft:light_gray_concrete_slab"
+    """ 浅灰色混凝土半砖。 """
+    GRAY_CONCRETE_SLAB = "minecraft:gray_concrete_slab"
+    """ 灰色混凝土半砖。 """
+    BLACK_CONCRETE_SLAB = "minecraft:black_concrete_slab"
+    """ 黑色混凝土半砖。 """
+    BROWN_CONCRETE_SLAB = "minecraft:brown_concrete_slab"
+    """ 啡色混凝土半砖。 """
+    RED_CONCRETE_SLAB = "minecraft:red_concrete_slab"
+    """ 红色混凝土半砖。 """
+    ORANGE_CONCRETE_SLAB = "minecraft:orange_concrete_slab"
+    """ 橙色混凝土半砖。 """
+    YELLOW_CONCRETE_SLAB = "minecraft:yellow_concrete_slab"
+    """ 黄色混凝土半砖。 """
+    LIME_CONCRETE_SLAB = "minecraft:lime_concrete_slab"
+    """ 浅绿色混凝土半砖。 """
+    GREEN_CONCRETE_SLAB = "minecraft:green_concrete_slab"
+    """ 绿色混凝土半砖。 """
+    CYAN_CONCRETE_SLAB = "minecraft:cyan_concrete_slab"
+    """ 青蓝色混凝土半砖。 """
+    LIGHT_BLUE_CONCRETE_SLAB = "minecraft:light_blue_concrete_slab"
+    """ 浅蓝色混凝土半砖。 """
+    BLUE_CONCRETE_SLAB = "minecraft:blue_concrete_slab"
+    """ 蓝色混凝土半砖。 """
+    PURPLE_CONCRETE_SLAB = "minecraft:purple_concrete_slab"
+    """ 紫色混凝土半砖。 """
+    MAGENTA_CONCRETE_SLAB = "minecraft:magenta_concrete_slab"
+    """ 紫红色混凝土半砖。 """
+    PINK_CONCRETE_SLAB = "minecraft:pink_concrete_slab"
+    """ 粉红色混凝土半砖。 """
+    WHITE_CONCRETE_DOUBLE_SLAB = "minecraft:white_concrete_double_slab"
+    """ 白色混凝土双半砖。 """
+    LIGHT_GRAY_CONCRETE_DOUBLE_SLAB = "minecraft:light_gray_concrete_double_slab"
+    """ 浅灰色混凝土双半砖。 """
+    GRAY_CONCRETE_DOUBLE_SLAB = "minecraft:gray_concrete_double_slab"
+    """ 灰色混凝土双半砖。 """
+    BLACK_CONCRETE_DOUBLE_SLAB = "minecraft:black_concrete_double_slab"
+    """ 黑色混凝土双半砖。 """
+    BROWN_CONCRETE_DOUBLE_SLAB = "minecraft:brown_concrete_double_slab"
+    """ 啡色混凝土双半砖。 """
+    RED_CONCRETE_DOUBLE_SLAB = "minecraft:red_concrete_double_slab"
+    """ 红色混凝土双半砖。 """
+    ORANGE_CONCRETE_DOUBLE_SLAB = "minecraft:orange_concrete_double_slab"
+    """ 橙色混凝土双半砖。 """
+    YELLOW_CONCRETE_DOUBLE_SLAB = "minecraft:yellow_concrete_double_slab"
+    """ 黄色混凝土双半砖。 """
+    LIME_CONCRETE_DOUBLE_SLAB = "minecraft:lime_concrete_double_slab"
+    """ 浅绿色混凝土双半砖。 """
+    GREEN_CONCRETE_DOUBLE_SLAB = "minecraft:green_concrete_double_slab"
+    """ 绿色混凝土双半砖。 """
+    CYAN_CONCRETE_DOUBLE_SLAB = "minecraft:cyan_concrete_double_slab"
+    """ 青蓝色混凝土双半砖。 """
+    LIGHT_BLUE_CONCRETE_DOUBLE_SLAB = "minecraft:light_blue_concrete_double_slab"
+    """ 浅蓝色混凝土双半砖。 """
+    BLUE_CONCRETE_DOUBLE_SLAB = "minecraft:blue_concrete_double_slab"
+    """ 蓝色混凝土双半砖。 """
+    PURPLE_CONCRETE_DOUBLE_SLAB = "minecraft:purple_concrete_double_slab"
+    """ 紫色混凝土双半砖。 """
+    MAGENTA_CONCRETE_DOUBLE_SLAB = "minecraft:magenta_concrete_double_slab"
+    """ 紫红色混凝土双半砖。 """
+    PINK_CONCRETE_DOUBLE_SLAB = "minecraft:pink_concrete_double_slab"
+    """ 粉红色混凝土双半砖。 """
+
+
+class Item(LazyEnum):
+    GOLDEN_APPLE = "minecraft:golden_apple"
+    """ 金苹果。 """
+    ENCHANTED_GOLDEN_APPLE = "minecraft:enchanted_golden_apple"
+    """ 附魔金苹果。 """
+    MUSHROOM_STEW = "minecraft:mushroom_stew"
+    """ 蘑菇汤。 """
+    BREAD = "minecraft:bread"
+    """ 面包。 """
+    PORKCHOP = "minecraft:porkchop"
+    """ 生猪扒。 """
+    COOKED_PORKCHOP = "minecraft:cooked_porkchop"
+    """ 熟猪扒。 """
+    COD = "minecraft:cod"
+    """ 生鳕鱼。 """
+    SALMON = "minecraft:salmon"
+    """ 生三文鱼。 """
+    TROPICAL_FISH = "minecraft:tropical_fish"
+    """ 热带鱼。 """
+    PUFFERFISH = "minecraft:pufferfish"
+    """ 河豚。 """
+    COOKED_COD = "minecraft:cooked_cod"
+    """ 熟鳕鱼。 """
+    COOKED_SALMON = "minecraft:cooked_salmon"
+    """ 熟三文鱼。 """
+    DRIED_KELP = "minecraft:dried_kelp"
+    """ 干海带。 """
+    COOKIE = "minecraft:cookie"
+    """ 曲奇。 """
+    MELON_SLICE = "minecraft:melon_slice"
+    """ 西瓜。 """
+    BEEF = "minecraft:beef"
+    """ 生牛肉。 """
+    COOKED_BEEF = "minecraft:cooked_beef"
+    """ 牛扒。 """
+    CHICKEN = "minecraft:chicken"
+    """ 生鸡肉。 """
+    COOKED_CHICKEN = "minecraft:cooked_chicken"
+    """ 熟鸡肉。 """
+    ROTTEN_FLESH = "minecraft:rotten_flesh"
+    """ 腐肉。 """
+    SPIDER_EYE = "minecraft:spider_eye"
+    """ 蜘蛛眼。 """
+    CARROT = "minecraft:carrot"
+    """ 红萝卜。 """
+    POTATO = "minecraft:potato"
+    """ 薯仔。 """
+    BAKED_POTATO = "minecraft:baked_potato"
+    """ 焗薯仔。 """
+    POISONOUS_POTATO = "minecraft:poisonous_potato"
+    """ 毒薯仔。 """
+    GOLDEN_CARROT = "minecraft:golden_carrot"
+    """ 金红萝卜。 """
+    PUMPKIN_PIE = "minecraft:pumpkin_pie"
+    """ 南瓜批。 """
+    BEETROOT = "minecraft:beetroot"
+    """ 红菜头。 """
+    BEETROOT_SOUP = "minecraft:beetroot_soup"
+    """ 红菜头汤。 """
+    SWEET_BERRIES = "minecraft:sweet_berries"
+    """ 甜莓。 """
+    RABBIT = "minecraft:rabbit"
+    """ 生兔肉。 """
+    COOKED_RABBIT = "minecraft:cooked_rabbit"
+    """ 熟兔肉。 """
+    RABBIT_STEW = "minecraft:rabbit_stew"
+    """ 兔肉汤。 """
+    WHEAT_SEEDS = "minecraft:wheat_seeds"
+    """ 种子。 """
+    PUMPKIN_SEEDS = "minecraft:pumpkin_seeds"
+    """ 南瓜种子。 """
+    MELON_SEEDS = "minecraft:melon_seeds"
+    """ 西瓜种子。 """
+    NETHER_WART = "minecraft:nether_wart"
+    """ 地狱孢子。 """
+    BEETROOT_SEEDS = "minecraft:beetroot_seeds"
+    """ 红菜头种子。 """
+    TORCHFLOWER_SEEDS = "minecraft:torchflower_seeds"
+    """ 火炬花种子。 """
+    PITCHER_POD = "minecraft:pitcher_pod"
+    """ 樽草荚果。 """
+    IRON_SHOVEL = "minecraft:iron_shovel"
+    """ 铁铲。 """
+    IRON_PICKAXE = "minecraft:iron_pickaxe"
+    """ 铁镐。 """
+    IRON_AXE = "minecraft:iron_axe"
+    """ 铁斧头。 """
+    FLINT_AND_STEEL = "minecraft:flint_and_steel"
+    """ 打火石。 """
+    BOW = "minecraft:bow"
+    """ 弓。 """
+    ARROW = "minecraft:arrow"
+    """ 箭。 """
+    COAL = "minecraft:coal"
+    """ 煤炭。 """
+    CHARCOAL = "minecraft:charcoal"
+    """ 木炭。 """
+    DIAMOND = "minecraft:diamond"
+    """ 钻石。 """
+    IRON_INGOT = "minecraft:iron_ingot"
+    """ 铁锭。 """
+    GOLD_INGOT = "minecraft:gold_ingot"
+    """ 金锭。 """
+    IRON_SWORD = "minecraft:iron_sword"
+    """ 铁剑。 """
+    WOODEN_SWORD = "minecraft:wooden_sword"
+    """ 木剑。 """
+    WOODEN_SHOVEL = "minecraft:wooden_shovel"
+    """ 木铲。 """
+    WOODEN_PICKAXE = "minecraft:wooden_pickaxe"
+    """ 木镐。 """
+    WOODEN_AXE = "minecraft:wooden_axe"
+    """ 木斧头。 """
+    STONE_SWORD = "minecraft:stone_sword"
+    """ 石剑。 """
+    STONE_SHOVEL = "minecraft:stone_shovel"
+    """ 石铲。 """
+    STONE_PICKAXE = "minecraft:stone_pickaxe"
+    """ 石镐。 """
+    STONE_AXE = "minecraft:stone_axe"
+    """ 石斧头。 """
+    DIAMOND_SWORD = "minecraft:diamond_sword"
+    """ 钻石剑。 """
+    DIAMOND_SHOVEL = "minecraft:diamond_shovel"
+    """ 钻石铲。 """
+    DIAMOND_PICKAXE = "minecraft:diamond_pickaxe"
+    """ 钻石镐。 """
+    DIAMOND_AXE = "minecraft:diamond_axe"
+    """ 钻石斧头。 """
+    MACE = "minecraft:mace"
+    """ 重锤。 """
+    STICK = "minecraft:stick"
+    """ 木棍。 """
+    BOWL = "minecraft:bowl"
+    """ 碗。 """
+    GOLDEN_SWORD = "minecraft:golden_sword"
+    """ 金剑。 """
+    GOLDEN_SHOVEL = "minecraft:golden_shovel"
+    """ 金铲。 """
+    GOLDEN_PICKAXE = "minecraft:golden_pickaxe"
+    """ 金镐。 """
+    GOLDEN_AXE = "minecraft:golden_axe"
+    """ 金斧头。 """
+    STRING = "minecraft:string"
+    """ 线。 """
+    FEATHER = "minecraft:feather"
+    """ 羽毛。 """
+    GUNPOWDER = "minecraft:gunpowder"
+    """ 火药。 """
+    WOODEN_HOE = "minecraft:wooden_hoe"
+    """ 木锄头。 """
+    STONE_HOE = "minecraft:stone_hoe"
+    """ 石锄头。 """
+    IRON_HOE = "minecraft:iron_hoe"
+    """ 铁锄头。 """
+    DIAMOND_HOE = "minecraft:diamond_hoe"
+    """ 钻石锄头。 """
+    GOLDEN_HOE = "minecraft:golden_hoe"
+    """ 金锄头。 """
+    WHEAT = "minecraft:wheat"
+    """ 小麦。 """
+    LEATHER_HELMET = "minecraft:leather_helmet"
+    """ 皮革帽。 """
+    LEATHER_CHESTPLATE = "minecraft:leather_chestplate"
+    """ 皮革衫。 """
+    LEATHER_LEGGINGS = "minecraft:leather_leggings"
+    """ 皮革裤。 """
+    LEATHER_BOOTS = "minecraft:leather_boots"
+    """ 皮革靴。 """
+    CHAINMAIL_HELMET = "minecraft:chainmail_helmet"
+    """ 锁链头盔。 """
+    CHAINMAIL_CHESTPLATE = "minecraft:chainmail_chestplate"
+    """ 锁链胸甲。 """
+    CHAINMAIL_LEGGINGS = "minecraft:chainmail_leggings"
+    """ 锁链护脚。 """
+    CHAINMAIL_BOOTS = "minecraft:chainmail_boots"
+    """ 锁链靴。 """
+    IRON_HELMET = "minecraft:iron_helmet"
+    """ 铁头盔。 """
+    IRON_CHESTPLATE = "minecraft:iron_chestplate"
+    """ 铁胸甲。 """
+    IRON_LEGGINGS = "minecraft:iron_leggings"
+    """ 铁护脚。 """
+    IRON_BOOTS = "minecraft:iron_boots"
+    """ 铁靴。 """
+    DIAMOND_HELMET = "minecraft:diamond_helmet"
+    """ 钻石头盔。 """
+    DIAMOND_CHESTPLATE = "minecraft:diamond_chestplate"
+    """ 钻石胸甲。 """
+    DIAMOND_LEGGINGS = "minecraft:diamond_leggings"
+    """ 钻石护脚。 """
+    DIAMOND_BOOTS = "minecraft:diamond_boots"
+    """ 钻石靴。 """
+    GOLDEN_HELMET = "minecraft:golden_helmet"
+    """ 金头盔。 """
+    GOLDEN_CHESTPLATE = "minecraft:golden_chestplate"
+    """ 金胸甲。 """
+    GOLDEN_LEGGINGS = "minecraft:golden_leggings"
+    """ 金护脚。 """
+    GOLDEN_BOOTS = "minecraft:golden_boots"
+    """ 金靴。 """
+    SHIELD = "minecraft:shield"
+    """ 盾牌。 """
+    FLINT = "minecraft:flint"
+    """ 燧石。 """
+    PAINTING = "minecraft:painting"
+    """ 画。 """
+    OAK_SIGN = "minecraft:oak_sign"
+    """ 橡木指示牌。 """
+    WOODEN_DOOR = "minecraft:wooden_door"
+    """ 橡木门。 """
+    BUCKET = "minecraft:bucket"
+    """ 铁桶。 """
+    MILK_BUCKET = "minecraft:milk_bucket"
+    """ 鲜奶桶。 """
+    WATER_BUCKET = "minecraft:water_bucket"
+    """ 水桶。 """
+    LAVA_BUCKET = "minecraft:lava_bucket"
+    """ 熔岩桶。 """
+    COD_BUCKET = "minecraft:cod_bucket"
+    """ 鳕鱼桶。 """
+    SALMON_BUCKET = "minecraft:salmon_bucket"
+    """ 三文鱼桶。 """
+    TROPICAL_FISH_BUCKET = "minecraft:tropical_fish_bucket"
+    """ 热带鱼桶。 """
+    PUFFERFISH_BUCKET = "minecraft:pufferfish_bucket"
+    """ 河豚桶。 """
+    POWDER_SNOW_BUCKET = "minecraft:powder_snow_bucket"
+    """ 幼雪桶。 """
+    AXOLOTL_BUCKET = "minecraft:axolotl_bucket"
+    """ 墨西哥蝾螈桶。 """
+    MINECART = "minecraft:minecart"
+    """ 矿车。 """
+    SADDLE = "minecraft:saddle"
+    """ 鞍。 """
+    IRON_DOOR = "minecraft:iron_door"
+    """ 铁门。 """
+    REDSTONE = "minecraft:redstone"
+    """ 红石粉。 """
+    SNOWBALL = "minecraft:snowball"
+    """ 雪球。 """
+    OAK_BOAT = "minecraft:oak_boat"
+    """ 橡木船。 """
+    BIRCH_BOAT = "minecraft:birch_boat"
+    """ 桦木船。 """
+    JUNGLE_BOAT = "minecraft:jungle_boat"
+    """ 丛林木船。 """
+    SPRUCE_BOAT = "minecraft:spruce_boat"
+    """ 杉木船。 """
+    ACACIA_BOAT = "minecraft:acacia_boat"
+    """ 相思木船。 """
+    DARK_OAK_BOAT = "minecraft:dark_oak_boat"
+    """ 黑橡木船。 """
+    LEATHER = "minecraft:leather"
+    """ 皮革。 """
+    KELP = "minecraft:kelp"
+    """ 海带。 """
+    BRICK = "minecraft:brick"
+    """ 红砖头。 """
+    CLAY_BALL = "minecraft:clay_ball"
+    """ 黏土。 """
+    SUGAR_CANE = "minecraft:sugar_cane"
+    """ 蔗。 """
+    PAPER = "minecraft:paper"
+    """ 纸。 """
+    BOOK = "minecraft:book"
+    """ 书。 """
+    SLIME_BALL = "minecraft:slime_ball"
+    """ 史莱姆球。 """
+    CHEST_MINECART = "minecraft:chest_minecart"
+    """ 储物箱矿车。 """
+    EGG = "minecraft:egg"
+    """ 鸡蛋。 """
+    COMPASS = "minecraft:compass"
+    """ 指南针。 """
+    FISHING_ROD = "minecraft:fishing_rod"
+    """ 鱼竿。 """
+    CLOCK = "minecraft:clock"
+    """ 时钟。 """
+    GLOWSTONE_DUST = "minecraft:glowstone_dust"
+    """ 荧光石粉。 """
+    BLACK_DYE = "minecraft:black_dye"
+    """ 黑色染料。 """
+    RED_DYE = "minecraft:red_dye"
+    """ 红色染料。 """
+    GREEN_DYE = "minecraft:green_dye"
+    """ 绿色染料。 """
+    BROWN_DYE = "minecraft:brown_dye"
+    """ 啡色染料。 """
+    BLUE_DYE = "minecraft:blue_dye"
+    """ 蓝色染料。 """
+    PURPLE_DYE = "minecraft:purple_dye"
+    """ 紫色染料。 """
+    CYAN_DYE = "minecraft:cyan_dye"
+    """ 青蓝色染料。 """
+    LIGHT_GRAY_DYE = "minecraft:light_gray_dye"
+    """ 浅灰色染料。 """
+    GRAY_DYE = "minecraft:gray_dye"
+    """ 灰色染料。 """
+    PINK_DYE = "minecraft:pink_dye"
+    """ 粉红色染料。 """
+    LIME_DYE = "minecraft:lime_dye"
+    """ 浅绿色染料。 """
+    YELLOW_DYE = "minecraft:yellow_dye"
+    """ 黄色染料。 """
+    LIGHT_BLUE_DYE = "minecraft:light_blue_dye"
+    """ 浅蓝色染料。 """
+    MAGENTA_DYE = "minecraft:magenta_dye"
+    """ 紫红色染料。 """
+    ORANGE_DYE = "minecraft:orange_dye"
+    """ 橙色染料。 """
+    WHITE_DYE = "minecraft:white_dye"
+    """ 白色染料。 """
+    BONE_MEAL = "minecraft:bone_meal"
+    """ 骨粉。 """
+    COCOA_BEANS = "minecraft:cocoa_beans"
+    """ 可可豆。 """
+    INK_SAC = "minecraft:ink_sac"
+    """ 墨囊。 """
+    LAPIS_LAZULI = "minecraft:lapis_lazuli"
+    """ 青金石。 """
+    BONE = "minecraft:bone"
+    """ 骨头。 """
+    SUGAR = "minecraft:sugar"
+    """ 糖。 """
+    CAKE = "minecraft:cake"
+    """ 蛋糕。 """
+    BED = "minecraft:bed"
+    """ 床。 """
+    REPEATER = "minecraft:repeater"
+    """ 红石中继器。 """
+    FILLED_MAP = "minecraft:filled_map"
+    """ 地图。 """
+    SHEARS = "minecraft:shears"
+    """ 剪刀。 """
+    ENDER_PEARL = "minecraft:ender_pearl"
+    """ 终界珍珠。 """
+    BLAZE_ROD = "minecraft:blaze_rod"
+    """ 烈焰棒。 """
+    GHAST_TEAR = "minecraft:ghast_tear"
+    """ 幽灵之泪。 """
+    GOLD_NUGGET = "minecraft:gold_nugget"
+    """ 金粒。 """
+    POTION = "minecraft:potion"
+    """ 药水。 """
+    GLASS_BOTTLE = "minecraft:glass_bottle"
+    """ 玻璃樽。 """
+    FERMENTED_SPIDER_EYE = "minecraft:fermented_spider_eye"
+    """ 发酵蜘蛛眼。 """
+    BLAZE_POWDER = "minecraft:blaze_powder"
+    """ 烈焰粉。 """
+    MAGMA_CREAM = "minecraft:magma_cream"
+    """ 岩浆球。 """
+    BREWING_STAND = "minecraft:brewing_stand"
+    """ 酿造台。 """
+    CAULDRON = "minecraft:cauldron"
+    """ 锅。 """
+    ENDER_EYE = "minecraft:ender_eye"
+    """ 终界之眼。 """
+    GLISTERING_MELON_SLICE = "minecraft:glistering_melon_slice"
+    """ 镶金西瓜片。 """
+    CHICKEN_SPAWN_EGG = "minecraft:chicken_spawn_egg"
+    """ 鸡生成蛋。 """
+    COW_SPAWN_EGG = "minecraft:cow_spawn_egg"
+    """ 牛生成蛋。 """
+    PIG_SPAWN_EGG = "minecraft:pig_spawn_egg"
+    """ 猪生成蛋。 """
+    SHEEP_SPAWN_EGG = "minecraft:sheep_spawn_egg"
+    """ 绵羊生成蛋。 """
+    WOLF_SPAWN_EGG = "minecraft:wolf_spawn_egg"
+    """ 狼生成蛋。 """
+    MOOSHROOM_SPAWN_EGG = "minecraft:mooshroom_spawn_egg"
+    """ 蘑菇牛生成蛋。 """
+    CREEPER_SPAWN_EGG = "minecraft:creeper_spawn_egg"
+    """ Creeper 生成蛋。 """
+    ENDERMAN_SPAWN_EGG = "minecraft:enderman_spawn_egg"
+    """ 终界使者生成蛋。 """
+    SILVERFISH_SPAWN_EGG = "minecraft:silverfish_spawn_egg"
+    """ 蠹鱼生成蛋。 """
+    SKELETON_SPAWN_EGG = "minecraft:skeleton_spawn_egg"
+    """ 骷髅骨生成蛋。 """
+    SLIME_SPAWN_EGG = "minecraft:slime_spawn_egg"
+    """ 史莱姆生成蛋。 """
+    SPIDER_SPAWN_EGG = "minecraft:spider_spawn_egg"
+    """ 蜘蛛生成蛋。 """
+    ZOMBIE_SPAWN_EGG = "minecraft:zombie_spawn_egg"
+    """ 丧尸生成蛋。 """
+    ZOMBIE_PIGMAN_SPAWN_EGG = "minecraft:zombie_pigman_spawn_egg"
+    """ 丧尸猪人生成蛋。 """
+    VILLAGER_SPAWN_EGG = "minecraft:villager_spawn_egg"
+    """ 村民生成蛋。 """
+    SQUID_SPAWN_EGG = "minecraft:squid_spawn_egg"
+    """ 墨鱼生成蛋。 """
+    OCELOT_SPAWN_EGG = "minecraft:ocelot_spawn_egg"
+    """ 豹猫生成蛋。 """
+    WITCH_SPAWN_EGG = "minecraft:witch_spawn_egg"
+    """ 女巫生成蛋。 """
+    BAT_SPAWN_EGG = "minecraft:bat_spawn_egg"
+    """ 蝙蝠生成蛋。 """
+    GHAST_SPAWN_EGG = "minecraft:ghast_spawn_egg"
+    """ 地狱幽灵生成蛋。 """
+    MAGMA_CUBE_SPAWN_EGG = "minecraft:magma_cube_spawn_egg"
+    """ 岩浆史莱姆生成蛋。 """
+    BLAZE_SPAWN_EGG = "minecraft:blaze_spawn_egg"
+    """ 烈焰使者生成蛋。 """
+    CAVE_SPIDER_SPAWN_EGG = "minecraft:cave_spider_spawn_egg"
+    """ 洞穴蜘蛛生成蛋。 """
+    HORSE_SPAWN_EGG = "minecraft:horse_spawn_egg"
+    """ 马生成蛋。 """
+    RABBIT_SPAWN_EGG = "minecraft:rabbit_spawn_egg"
+    """ 兔生成蛋。 """
+    ENDERMITE_SPAWN_EGG = "minecraft:endermite_spawn_egg"
+    """ 终界螨生成蛋。 """
+    GUARDIAN_SPAWN_EGG = "minecraft:guardian_spawn_egg"
+    """ 深海守卫生成蛋。 """
+    STRAY_SPAWN_EGG = "minecraft:stray_spawn_egg"
+    """ 流浪者生成蛋。 """
+    BOGGED_SPAWN_EGG = "minecraft:bogged_spawn_egg"
+    """ 沼骨生成蛋。 """
+    HUSK_SPAWN_EGG = "minecraft:husk_spawn_egg"
+    """ 尸壳生成蛋。 """
+    WITHER_SKELETON_SPAWN_EGG = "minecraft:wither_skeleton_spawn_egg"
+    """ 凋零骷髅骨生成蛋。 """
+    DONKEY_SPAWN_EGG = "minecraft:donkey_spawn_egg"
+    """ 驴生成蛋。 """
+    MULE_SPAWN_EGG = "minecraft:mule_spawn_egg"
+    """ 骡生成蛋。 """
+    SKELETON_HORSE_SPAWN_EGG = "minecraft:skeleton_horse_spawn_egg"
+    """ 骷髅骨马生成蛋。 """
+    ZOMBIE_HORSE_SPAWN_EGG = "minecraft:zombie_horse_spawn_egg"
+    """ 丧尸马生成蛋。 """
+    SHULKER_SPAWN_EGG = "minecraft:shulker_spawn_egg"
+    """ 界伏蚌生成蛋。 """
+    NPC_SPAWN_EGG = "minecraft:npc_spawn_egg"
+    """ NPC生成蛋。 """
+    ELDER_GUARDIAN_SPAWN_EGG = "minecraft:elder_guardian_spawn_egg"
+    """ 远古深海守卫生成蛋。 """
+    POLAR_BEAR_SPAWN_EGG = "minecraft:polar_bear_spawn_egg"
+    """ 北极熊生成蛋。 """
+    LLAMA_SPAWN_EGG = "minecraft:llama_spawn_egg"
+    """ 羊驼生成蛋。 """
+    VINDICATOR_SPAWN_EGG = "minecraft:vindicator_spawn_egg"
+    """ 卫道士生成蛋。 """
+    EVOKER_SPAWN_EGG = "minecraft:evoker_spawn_egg"
+    """ 唤魔者生成蛋。 """
+    VEX_SPAWN_EGG = "minecraft:vex_spawn_egg"
+    """ 恼鬼生成蛋。 """
+    ZOMBIE_VILLAGER_SPAWN_EGG = "minecraft:zombie_villager_spawn_egg"
+    """ 丧尸村民生成蛋。 """
+    PARROT_SPAWN_EGG = "minecraft:parrot_spawn_egg"
+    """ 鹦鹉生成蛋。 """
+    TROPICAL_FISH_SPAWN_EGG = "minecraft:tropical_fish_spawn_egg"
+    """ 热带鱼生成蛋。 """
+    COD_SPAWN_EGG = "minecraft:cod_spawn_egg"
+    """ 鳕鱼生成蛋。 """
+    PUFFERFISH_SPAWN_EGG = "minecraft:pufferfish_spawn_egg"
+    """ 河豚生成蛋。 """
+    SALMON_SPAWN_EGG = "minecraft:salmon_spawn_egg"
+    """ 三文鱼生成蛋。 """
+    DROWNED_SPAWN_EGG = "minecraft:drowned_spawn_egg"
+    """ 沉尸生成蛋。 """
+    DOLPHIN_SPAWN_EGG = "minecraft:dolphin_spawn_egg"
+    """ 海豚生成蛋。 """
+    TURTLE_SPAWN_EGG = "minecraft:turtle_spawn_egg"
+    """ 海龟生成蛋。 """
+    PHANTOM_SPAWN_EGG = "minecraft:phantom_spawn_egg"
+    """ 夜魅生成蛋。 """
+    AGENT_SPAWN_EGG = "minecraft:agent_spawn_egg"
+    """ 智能体生成蛋。 """
+    CAT_SPAWN_EGG = "minecraft:cat_spawn_egg"
+    """ 猫生成蛋。 """
+    PANDA_SPAWN_EGG = "minecraft:panda_spawn_egg"
+    """ 熊猫生成蛋。 """
+    FOX_SPAWN_EGG = "minecraft:fox_spawn_egg"
+    """ 狐狸生成蛋。 """
+    PILLAGER_SPAWN_EGG = "minecraft:pillager_spawn_egg"
+    """ 掠夺者生成蛋。 """
+    WANDERING_TRADER_SPAWN_EGG = "minecraft:wandering_trader_spawn_egg"
+    """ 流浪商人生成蛋。 """
+    RAVAGER_SPAWN_EGG = "minecraft:ravager_spawn_egg"
+    """ 劫毁兽生成蛋。 """
+    BEE_SPAWN_EGG = "minecraft:bee_spawn_egg"
+    """ 蜜蜂生成蛋。 """
+    STRIDER_SPAWN_EGG = "minecraft:strider_spawn_egg"
+    """ 炽足兽生成蛋。 """
+    HOGLIN_SPAWN_EGG = "minecraft:hoglin_spawn_egg"
+    """ 野猪兽生成蛋。 """
+    PIGLIN_SPAWN_EGG = "minecraft:piglin_spawn_egg"
+    """ 猪人生成蛋。 """
+    ZOGLIN_SPAWN_EGG = "minecraft:zoglin_spawn_egg"
+    """ 猪尸兽生成蛋。 """
+    PIGLIN_BRUTE_SPAWN_EGG = "minecraft:piglin_brute_spawn_egg"
+    """ 残暴猪人生成蛋。 """
+    SNIFFER_SPAWN_EGG = "minecraft:sniffer_spawn_egg"
+    """ 嗅探兽生成蛋。 """
+    BREEZE_SPAWN_EGG = "minecraft:breeze_spawn_egg"
+    """ 旋风使者生成蛋。 """
+    AXOLOTL_SPAWN_EGG = "minecraft:axolotl_spawn_egg"
+    """ 墨西哥蝾螈生成蛋。 """
+    GOAT_SPAWN_EGG = "minecraft:goat_spawn_egg"
+    """ 山羊生成蛋。 """
+    GLOW_SQUID_SPAWN_EGG = "minecraft:glow_squid_spawn_egg"
+    """ 荧光墨鱼生成蛋。 """
+    IRON_GOLEM_SPAWN_EGG = "minecraft:iron_golem_spawn_egg"
+    """ 铁人生成蛋。 """
+    SNOW_GOLEM_SPAWN_EGG = "minecraft:snow_golem_spawn_egg"
+    """ 雪人生成蛋。 """
+    ENDER_DRAGON_SPAWN_EGG = "minecraft:ender_dragon_spawn_egg"
+    """ 终界龙生成蛋。 """
+    WITHER_SPAWN_EGG = "minecraft:wither_spawn_egg"
+    """ 凋零怪生成蛋。 """
+    GLOW_INK_SAC = "minecraft:glow_ink_sac"
+    """ 荧光墨囊。 """
+    COPPER_INGOT = "minecraft:copper_ingot"
+    """ 铜锭。 """
+    RAW_IRON = "minecraft:raw_iron"
+    """ 粗铁。 """
+    RAW_GOLD = "minecraft:raw_gold"
+    """ 粗金。 """
+    RAW_COPPER = "minecraft:raw_copper"
+    """ 粗铜。 """
+    EXPERIENCE_BOTTLE = "minecraft:experience_bottle"
+    """ 附魔之瓶。 """
+    FIRE_CHARGE = "minecraft:fire_charge"
+    """ 火焰弹。 """
+    WRITABLE_BOOK = "minecraft:writable_book"
+    """ 书与羽毛笔。 """
+    WRITTEN_BOOK = "minecraft:written_book"
+    """ 写好的书。 """
+    EMERALD = "minecraft:emerald"
+    """ 绿宝石。 """
+    FRAME = "minecraft:frame"
+    """ 物品展示框。 """
+    FLOWER_POT = "minecraft:flower_pot"
+    """ 花盆。 """
+    EMPTY_MAP = "minecraft:empty_map"
+    """ 空白地图。 """
+    CARROT_ON_A_STICK = "minecraft:carrot_on_a_stick"
+    """ 红萝卜鱼竿。 """
+    NETHER_STAR = "minecraft:nether_star"
+    """ 地狱之星。 """
+    FIREWORK_ROCKET = "minecraft:firework_rocket"
+    """ 烟花。 """
+    FIREWORK_STAR = "minecraft:firework_star"
+    """ 烟花球。 """
+    ENCHANTED_BOOK = "minecraft:enchanted_book"
+    """ 附魔书。 """
+    COMPARATOR = "minecraft:comparator"
+    """ 红石比较器。 """
+    NETHERBRICK = "minecraft:netherbrick"
+    """ 地狱砖头。 """
+    QUARTZ = "minecraft:quartz"
+    """ 地狱石英。 """
+    TNT_MINECART = "minecraft:tnt_minecart"
+    """ TNT 矿车。 """
+    HOPPER_MINECART = "minecraft:hopper_minecart"
+    """ 漏斗矿车。 """
+    HOPPER = "minecraft:hopper"
+    """ 漏斗。 """
+    RABBIT_FOOT = "minecraft:rabbit_foot"
+    """ 兔脚。 """
+    RABBIT_HIDE = "minecraft:rabbit_hide"
+    """ 兔皮。 """
+    LEATHER_HORSE_ARMOR = "minecraft:leather_horse_armor"
+    """ 皮革马甲。 """
+    IRON_HORSE_ARMOR = "minecraft:iron_horse_armor"
+    """ 铁马甲。 """
+    GOLD_HORSE_ARMOR = "minecraft:gold_horse_armor"
+    """ 金马甲。 """
+    DIAMOND_HORSE_ARMOR = "minecraft:diamond_horse_armor"
+    """ 钻石马甲。 """
+    MUSIC_DISC_13 = "minecraft:music_disc_13"
+    """ 唱片13。 """
+    MUSIC_DISC_CAT = "minecraft:music_disc_cat"
+    """ 唱片cat。 """
+    MUSIC_DISC_BLOCKS = "minecraft:music_disc_blocks"
+    """ 唱片blocks。 """
+    MUSIC_DISC_CHIRP = "minecraft:music_disc_chirp"
+    """ 唱片chirp。 """
+    MUSIC_DISC_FAR = "minecraft:music_disc_far"
+    """ 唱片far。 """
+    MUSIC_DISC_MALL = "minecraft:music_disc_mall"
+    """ 唱片mall。 """
+    MUSIC_DISC_MELLOHI = "minecraft:music_disc_mellohi"
+    """ 唱片mellohi。 """
+    MUSIC_DISC_STAL = "minecraft:music_disc_stal"
+    """ 唱片stal。 """
+    MUSIC_DISC_STRAD = "minecraft:music_disc_strad"
+    """ 唱片strad。 """
+    MUSIC_DISC_WARD = "minecraft:music_disc_ward"
+    """ 唱片ward。 """
+    MUSIC_DISC_11 = "minecraft:music_disc_11"
+    """ 唱片11。 """
+    MUSIC_DISC_WAIT = "minecraft:music_disc_wait"
+    """ 唱片wait。 """
+    TRIDENT = "minecraft:trident"
+    """ 三叉戟。 """
+    LEAD = "minecraft:lead"
+    """ 牵绳。 """
+    NAME_TAG = "minecraft:name_tag"
+    """ 命名牌。 """
+    PRISMARINE_CRYSTALS = "minecraft:prismarine_crystals"
+    """ 海磷晶体。 """
+    MUTTON = "minecraft:mutton"
+    """ 生羊肉。 """
+    COOKED_MUTTON = "minecraft:cooked_mutton"
+    """ 熟羊肉。 """
+    ARMOR_STAND = "minecraft:armor_stand"
+    """ 盔甲座。 """
+    SPRUCE_DOOR = "minecraft:spruce_door"
+    """ 杉木门。 """
+    BIRCH_DOOR = "minecraft:birch_door"
+    """ 桦木门。 """
+    JUNGLE_DOOR = "minecraft:jungle_door"
+    """ 丛林木门。 """
+    ACACIA_DOOR = "minecraft:acacia_door"
+    """ 相思木门。 """
+    DARK_OAK_DOOR = "minecraft:dark_oak_door"
+    """ 黑橡木门。 """
+    CHORUS_FRUIT = "minecraft:chorus_fruit"
+    """ 歌莱果。 """
+    POPPED_CHORUS_FRUIT = "minecraft:popped_chorus_fruit"
+    """ 爆开的歌莱果。 """
+    DRAGON_BREATH = "minecraft:dragon_breath"
+    """ 龙之吐息。 """
+    SPLASH_POTION = "minecraft:splash_potion"
+    """ 飞溅药水。 """
+    LINGERING_POTION = "minecraft:lingering_potion"
+    """ 滞留药水。 """
+    COMMAND_BLOCK_MINECART = "minecraft:command_block_minecart"
+    """ 命令方块矿车。 """
+    ELYTRA = "minecraft:elytra"
+    """ 鞘翅。 """
+    PRISMARINE_SHARD = "minecraft:prismarine_shard"
+    """ 海磷碎片。 """
+    SHULKER_SHELL = "minecraft:shulker_shell"
+    """ 界伏壳。 """
+    BANNER = "minecraft:banner"
+    """ 横额。 """
+    TOTEM_OF_UNDYING = "minecraft:totem_of_undying"
+    """ 不死图腾。 """
+    IRON_NUGGET = "minecraft:iron_nugget"
+    """ 铁粒。 """
+    NAUTILUS_SHELL = "minecraft:nautilus_shell"
+    """ 鹦鹉螺壳。 """
+    HEART_OF_THE_SEA = "minecraft:heart_of_the_sea"
+    """ 海洋之心。 """
+    SCUTE = "minecraft:scute"
+    """ 海龟鳞甲。 """
+    TURTLE_HELMET = "minecraft:turtle_helmet"
+    """ 海龟壳。 """
+    PHANTOM_MEMBRANE = "minecraft:phantom_membrane"
+    """ 夜魅膜。 """
+    CROSSBOW = "minecraft:crossbow"
+    """ 弩。 """
+    SPRUCE_SIGN = "minecraft:spruce_sign"
+    """ 杉木指示牌。 """
+    BIRCH_SIGN = "minecraft:birch_sign"
+    """ 桦木指示牌。 """
+    JUNGLE_SIGN = "minecraft:jungle_sign"
+    """ 丛林木指示牌。 """
+    ACACIA_SIGN = "minecraft:acacia_sign"
+    """ 相思木指示牌。 """
+    DARK_OAK_SIGN = "minecraft:dark_oak_sign"
+    """ 黑橡木指示牌。 """
+    FLOWER_BANNER_PATTERN = "minecraft:flower_banner_pattern"
+    """ 花朵横额图案。 """
+    CREEPER_BANNER_PATTERN = "minecraft:creeper_banner_pattern"
+    """ Creeper 横额图案。 """
+    SKULL_BANNER_PATTERN = "minecraft:skull_banner_pattern"
+    """ 骷髅骨横额图案。 """
+    MOJANG_BANNER_PATTERN = "minecraft:mojang_banner_pattern"
+    """ Mojang 标志横额图案。 """
+    FIELD_MASONED_BANNER_PATTERN = "minecraft:field_masoned_banner_pattern"
+    """ 砖墙花纹横额图案。 """
+    BORDURE_INDENTED_BANNER_PATTERN = "minecraft:bordure_indented_banner_pattern"
+    """ 锯齿边横额图案。 """
+    PIGLIN_BANNER_PATTERN = "minecraft:piglin_banner_pattern"
+    """ 猪鼻横额图案。 """
+    GLOBE_BANNER_PATTERN = "minecraft:globe_banner_pattern"
+    """ 地球横额图案。 """
+    FLOW_BANNER_PATTERN = "minecraft:flow_banner_pattern"
+    """ 涡流横额图案。 """
+    GUSTER_BANNER_PATTERN = "minecraft:guster_banner_pattern"
+    """ 旋风横额图案。 """
+    CAMPFIRE = "minecraft:campfire"
+    """ 营火。 """
+    SUSPICIOUS_STEW = "minecraft:suspicious_stew"
+    """ 可疑的炖汤。 """
+    HONEYCOMB = "minecraft:honeycomb"
+    """ 蜂巢蜜。 """
+    HONEY_BOTTLE = "minecraft:honey_bottle"
+    """ 蜜糖樽。 """
+    OMINOUS_BOTTLE = "minecraft:ominous_bottle"
+    """ 不祥之瓶。 """
+    BOARD = "minecraft:board"
+    """ 黑板。 """
+    PHOTO_ITEM = "minecraft:photo_item"
+    """ 照片。 """
+    PORTFOLIO = "minecraft:portfolio"
+    """ 相簿。 """
+    CAMERA = "minecraft:camera"
+    """ 摄像机。 """
+    COMPOUND = "minecraft:compound"
+    """ 化合物。 """
+    ICE_BOMB = "minecraft:ice_bomb"
+    """ 冰弹。 """
+    BLEACH = "minecraft:bleach"
+    """ 漂白剂。 """
+    RAPID_FERTILIZER = "minecraft:rapid_fertilizer"
+    """ 超级肥料。 """
+    BALLOON = "minecraft:balloon"
+    """ 气球。 """
+    MEDICINE = "minecraft:medicine"
+    """ 药物。 """
+    SPARKLER = "minecraft:sparkler"
+    """ 烟花棒。 """
+    GLOW_STICK = "minecraft:glow_stick"
+    """ 荧光棒。 """
+    LODESTONE_COMPASS = "minecraft:lodestone_compass"
+    """ 磁石指南针。 """
+    NETHERITE_SWORD = "minecraft:netherite_sword"
+    """ 地狱合金剑。 """
+    NETHERITE_SHOVEL = "minecraft:netherite_shovel"
+    """ 地狱合金铲。 """
+    NETHERITE_PICKAXE = "minecraft:netherite_pickaxe"
+    """ 地狱合金镐。 """
+    NETHERITE_AXE = "minecraft:netherite_axe"
+    """ 地狱合金斧头。 """
+    NETHERITE_HOE = "minecraft:netherite_hoe"
+    """ 地狱合金锄头。 """
+    NETHERITE_INGOT = "minecraft:netherite_ingot"
+    """ 地狱合金锭。 """
+    NETHERITE_HELMET = "minecraft:netherite_helmet"
+    """ 地狱合金头盔。 """
+    NETHERITE_CHESTPLATE = "minecraft:netherite_chestplate"
+    """ 地狱合金胸甲。 """
+    NETHERITE_LEGGINGS = "minecraft:netherite_leggings"
+    """ 地狱合金护脚。 """
+    NETHERITE_BOOTS = "minecraft:netherite_boots"
+    """ 地狱合金靴。 """
+    NETHERITE_SCRAP = "minecraft:netherite_scrap"
+    """ 地狱合金碎片。 """
+    CRIMSON_SIGN = "minecraft:crimson_sign"
+    """ 猩红菌木指示牌。 """
+    WARPED_SIGN = "minecraft:warped_sign"
+    """ 迷离菌木指示牌。 """
+    CRIMSON_DOOR = "minecraft:crimson_door"
+    """ 猩红菌木门。 """
+    WARPED_DOOR = "minecraft:warped_door"
+    """ 迷离菌木门。 """
+    WARPED_FUNGUS_ON_A_STICK = "minecraft:warped_fungus_on_a_stick"
+    """ 迷离菌菇鱼竿。 """
+    MUSIC_DISC_PIGSTEP = "minecraft:music_disc_pigstep"
+    """ 唱片Pigstep。 """
+    NETHER_SPROUTS = "minecraft:nether_sprouts"
+    """ 地狱芽。 """
+    SOUL_CAMPFIRE = "minecraft:soul_campfire"
+    """ 灵魂营火。 """
+    GLOW_FRAME = "minecraft:glow_frame"
+    """ 荧光物品展示框。 """
+    AMETHYST_SHARD = "minecraft:amethyst_shard"
+    """ 紫水晶碎片。 """
+    SPYGLASS = "minecraft:spyglass"
+    """ 望远镜。 """
+    MUSIC_DISC_OTHERSIDE = "minecraft:music_disc_otherside"
+    """ 唱片otherside。 """
+    GOAT_HORN = "minecraft:goat_horn"
+    """ 山羊角。 """
+    FROG_SPAWN_EGG = "minecraft:frog_spawn_egg"
+    """ 青蛙生成蛋。 """
+    TADPOLE_SPAWN_EGG = "minecraft:tadpole_spawn_egg"
+    """ 蝌蚪生成蛋。 """
+    TADPOLE_BUCKET = "minecraft:tadpole_bucket"
+    """ 蝌蚪桶。 """
+    ALLAY_SPAWN_EGG = "minecraft:allay_spawn_egg"
+    """ 悦灵生成蛋。 """
+    WARDEN_SPAWN_EGG = "minecraft:warden_spawn_egg"
+    """ 沉灵守卫生成蛋。 """
+    MANGROVE_DOOR = "minecraft:mangrove_door"
+    """ 红树木门。 """
+    MANGROVE_SIGN = "minecraft:mangrove_sign"
+    """ 红树木指示牌。 """
+    MANGROVE_BOAT = "minecraft:mangrove_boat"
+    """ 红树木船。 """
+    MUSIC_DISC_5 = "minecraft:music_disc_5"
+    """ 唱片5。 """
+    DISC_FRAGMENT_5 = "minecraft:disc_fragment_5"
+    """ 唱片残片（5）。 """
+    OAK_CHEST_BOAT = "minecraft:oak_chest_boat"
+    """ 储物箱橡木船。 """
+    BIRCH_CHEST_BOAT = "minecraft:birch_chest_boat"
+    """ 储物箱桦木船。 """
+    JUNGLE_CHEST_BOAT = "minecraft:jungle_chest_boat"
+    """ 储物箱丛林木船。 """
+    SPRUCE_CHEST_BOAT = "minecraft:spruce_chest_boat"
+    """ 储物箱杉木船。 """
+    ACACIA_CHEST_BOAT = "minecraft:acacia_chest_boat"
+    """ 储物箱相思木船。 """
+    DARK_OAK_CHEST_BOAT = "minecraft:dark_oak_chest_boat"
+    """ 储物箱黑橡木船。 """
+    MANGROVE_CHEST_BOAT = "minecraft:mangrove_chest_boat"
+    """ 储物箱红树木船。 """
+    CHEST_BOAT = "minecraft:chest_boat"
+    """ 储物箱船。 """
+    RECOVERY_COMPASS = "minecraft:recovery_compass"
+    """ 追溯指南针。 """
+    ECHO_SHARD = "minecraft:echo_shard"
+    """ 回响碎片。 """
+    TRADER_LLAMA_SPAWN_EGG = "minecraft:trader_llama_spawn_egg"
+    """ 商队羊驼生成蛋。 """
+    CHERRY_BOAT = "minecraft:cherry_boat"
+    """ 樱花木船。 """
+    CHERRY_CHEST_BOAT = "minecraft:cherry_chest_boat"
+    """ 储物箱樱花木船。 """
+    CHERRY_SIGN = "minecraft:cherry_sign"
+    """ 樱花木指示牌。 """
+    BAMBOO_SIGN = "minecraft:bamboo_sign"
+    """ 竹指示牌。 """
+    BAMBOO_RAFT = "minecraft:bamboo_raft"
+    """ 竹筏。 """
+    BAMBOO_CHEST_RAFT = "minecraft:bamboo_chest_raft"
+    """ 储物箱竹筏。 """
+    CAMEL_SPAWN_EGG = "minecraft:camel_spawn_egg"
+    """ 骆驼生成蛋。 """
+    CAMEL_HUSK_SPAWN_EGG = "minecraft:camel_husk_spawn_egg"
+    """ 骆驼尸壳生成蛋。 """
+    ANGLER_POTTERY_SHERD = "minecraft:angler_pottery_sherd"
+    """ 垂钓陶罐碎片。 """
+    ARCHER_POTTERY_SHERD = "minecraft:archer_pottery_sherd"
+    """ 弓箭陶罐碎片。 """
+    ARMS_UP_POTTERY_SHERD = "minecraft:arms_up_pottery_sherd"
+    """ 举臂陶罐碎片。 """
+    BLADE_POTTERY_SHERD = "minecraft:blade_pottery_sherd"
+    """ 利刃陶罐碎片。 """
+    BREWER_POTTERY_SHERD = "minecraft:brewer_pottery_sherd"
+    """ 佳酿陶罐碎片。 """
+    BURN_POTTERY_SHERD = "minecraft:burn_pottery_sherd"
+    """ 烈焰陶罐碎片。 """
+    DANGER_POTTERY_SHERD = "minecraft:danger_pottery_sherd"
+    """ 危机陶罐碎片。 """
+    EXPLORER_POTTERY_SHERD = "minecraft:explorer_pottery_sherd"
+    """ 探险陶罐碎片。 """
+    FLOW_POTTERY_SHERD = "minecraft:flow_pottery_sherd"
+    """ 涡流陶罐碎片。 """
+    FRIEND_POTTERY_SHERD = "minecraft:friend_pottery_sherd"
+    """ 朋友陶罐碎片。 """
+    GUSTER_POTTERY_SHERD = "minecraft:guster_pottery_sherd"
+    """ 旋风陶罐碎片。 """
+    HEART_POTTERY_SHERD = "minecraft:heart_pottery_sherd"
+    """ 爱心陶罐碎片。 """
+    HEARTBREAK_POTTERY_SHERD = "minecraft:heartbreak_pottery_sherd"
+    """ 心碎陶罐碎片。 """
+    HOWL_POTTERY_SHERD = "minecraft:howl_pottery_sherd"
+    """ 狼嚎陶罐碎片。 """
+    MINER_POTTERY_SHERD = "minecraft:miner_pottery_sherd"
+    """ 采矿陶罐碎片。 """
+    MOURNER_POTTERY_SHERD = "minecraft:mourner_pottery_sherd"
+    """ 悲恸陶罐碎片。 """
+    PLENTY_POTTERY_SHERD = "minecraft:plenty_pottery_sherd"
+    """ 富饶陶罐碎片。 """
+    PRIZE_POTTERY_SHERD = "minecraft:prize_pottery_sherd"
+    """ 珍宝陶罐碎片。 """
+    SCRAPE_POTTERY_SHERD = "minecraft:scrape_pottery_sherd"
+    """ 刮削陶罐碎片。 """
+    SHEAF_POTTERY_SHERD = "minecraft:sheaf_pottery_sherd"
+    """ 麦捆陶罐碎片。 """
+    SHELTER_POTTERY_SHERD = "minecraft:shelter_pottery_sherd"
+    """ 树荫陶罐碎片。 """
+    SKULL_POTTERY_SHERD = "minecraft:skull_pottery_sherd"
+    """ 头颅陶罐碎片。 """
+    SNORT_POTTERY_SHERD = "minecraft:snort_pottery_sherd"
+    """ 嗅探陶罐碎片。 """
+    BRUSH = "minecraft:brush"
+    """ 毛刷。 """
+    NETHERITE_UPGRADE_SMITHING_TEMPLATE = "minecraft:netherite_upgrade_smithing_template"
+    """ 地狱合金升级。 """
+    SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:sentry_armor_trim_smithing_template"
+    """ 哨兵盔甲纹饰。 """
+    DUNE_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:dune_armor_trim_smithing_template"
+    """ 沙丘盔甲纹饰。 """
+    COAST_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:coast_armor_trim_smithing_template"
+    """ 海岸盔甲纹饰。 """
+    WILD_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:wild_armor_trim_smithing_template"
+    """ 荒野盔甲纹饰。 """
+    WARD_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:ward_armor_trim_smithing_template"
+    """ 守卫盔甲纹饰。 """
+    EYE_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:eye_armor_trim_smithing_template"
+    """ 眼眸盔甲纹饰。 """
+    VEX_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:vex_armor_trim_smithing_template"
+    """ 恼鬼盔甲纹饰。 """
+    TIDE_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:tide_armor_trim_smithing_template"
+    """ 潮汐盔甲纹饰。 """
+    SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:snout_armor_trim_smithing_template"
+    """ 猪鼻盔甲纹饰。 """
+    RIB_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:rib_armor_trim_smithing_template"
+    """ 肋骨盔甲纹饰。 """
+    SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:spire_armor_trim_smithing_template"
+    """ 尖塔盔甲纹饰。 """
+    SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:silence_armor_trim_smithing_template"
+    """ 沉静盔甲纹饰。 """
+    WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:wayfinder_armor_trim_smithing_template"
+    """ 向导盔甲纹饰。 """
+    RAISER_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:raiser_armor_trim_smithing_template"
+    """ 牧民盔甲纹饰。 """
+    SHAPER_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:shaper_armor_trim_smithing_template"
+    """ 塑造盔甲纹饰。 """
+    HOST_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:host_armor_trim_smithing_template"
+    """ 雇主盔甲纹饰。 """
+    FLOW_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:flow_armor_trim_smithing_template"
+    """ 涡流盔甲纹饰。 """
+    BOLT_ARMOR_TRIM_SMITHING_TEMPLATE = "minecraft:bolt_armor_trim_smithing_template"
+    """ 紧固盔甲纹饰。 """
+    MUSIC_DISC_RELIC = "minecraft:music_disc_relic"
+    """ 唱片Relic。 """
+    SKULL = "minecraft:skull"
+    """ 生物头颅。 """
+    STAINED_HARDENED_CLAY = "minecraft:stained_hardened_clay"
+    """ 釉陶。 """
+    ARMADILLO_SPAWN_EGG = "minecraft:armadillo_spawn_egg"
+    """ 犰狳生成蛋。 """
+    ARMADILLO_SCUTE = "minecraft:armadillo_scute"
+    """ 犰狳鳞甲。 """
+    WOLF_ARMOR = "minecraft:wolf_armor"
+    """ 狼甲。 """
+    PALE_OAK_BOAT = "minecraft:pale_oak_boat"
+    """ 苍白橡木船。 """
+    PALE_OAK_CHEST_BOAT = "minecraft:pale_oak_chest_boat"
+    """ 储物箱苍白橡木船。 """
+    PALE_OAK_SIGN = "minecraft:pale_oak_sign"
+    """ 苍白橡木指示牌。 """
+    CREAKING_SPAWN_EGG = "minecraft:creaking_spawn_egg"
+    """ 异响树妖生成蛋。 """
+    RESIN_BRICK = "minecraft:resin_brick"
+    """ 树脂砖头。 """
+    BLUE_EGG = "minecraft:blue_egg"
+    """ 蓝色鸡蛋。 """
+    BROWN_EGG = "minecraft:brown_egg"
+    """ 啡色鸡蛋。 """
+    HAPPY_GHAST_SPAWN_EGG = "minecraft:happy_ghast_spawn_egg"
+    """ 快乐幽灵生成蛋。 """
+    BLACK_HARNESS = "minecraft:black_harness"
+    """ 黑色牵引器具。 """
+    BLUE_HARNESS = "minecraft:blue_harness"
+    """ 蓝色牵引器具。 """
+    BROWN_HARNESS = "minecraft:brown_harness"
+    """ 啡色牵引器具。 """
+    CYAN_HARNESS = "minecraft:cyan_harness"
+    """ 青蓝色牵引器具。 """
+    GRAY_HARNESS = "minecraft:gray_harness"
+    """ 灰色牵引器具。 """
+    GREEN_HARNESS = "minecraft:green_harness"
+    """ 绿色牵引器具。 """
+    LIGHT_BLUE_HARNESS = "minecraft:light_blue_harness"
+    """ 浅蓝色牵引器具。 """
+    LIGHT_GRAY_HARNESS = "minecraft:light_gray_harness"
+    """ 浅灰色牵引器具。 """
+    LIME_HARNESS = "minecraft:lime_harness"
+    """ 浅绿色牵引器具。 """
+    MAGENTA_HARNESS = "minecraft:magenta_harness"
+    """ 紫红色牵引器具。 """
+    ORANGE_HARNESS = "minecraft:orange_harness"
+    """ 橙色牵引器具。 """
+    PINK_HARNESS = "minecraft:pink_harness"
+    """ 粉红色牵引器具。 """
+    PURPLE_HARNESS = "minecraft:purple_harness"
+    """ 紫色牵引器具。 """
+    RED_HARNESS = "minecraft:red_harness"
+    """ 红色牵引器具。 """
+    WHITE_HARNESS = "minecraft:white_harness"
+    """ 白色牵引器具。 """
+    YELLOW_HARNESS = "minecraft:yellow_harness"
+    """ 黄色牵引器具。 """
+    COPPER_GOLEM_SPAWN_EGG = "minecraft:copper_golem_spawn_egg"
+    """ 铜人生成蛋。 """
+    COPPER_SWORD = "minecraft:copper_sword"
+    """ 铜剑。 """
+    COPPER_SHOVEL = "minecraft:copper_shovel"
+    """ 铜铲。 """
+    COPPER_PICKAXE = "minecraft:copper_pickaxe"
+    """ 铜镐。 """
+    COPPER_AXE = "minecraft:copper_axe"
+    """ 铜斧头。 """
+    COPPER_HOE = "minecraft:copper_hoe"
+    """ 铜锄头。 """
+    COPPER_HELMET = "minecraft:copper_helmet"
+    """ 铜头盔。 """
+    COPPER_CHESTPLATE = "minecraft:copper_chestplate"
+    """ 铜胸甲。 """
+    COPPER_LEGGINGS = "minecraft:copper_leggings"
+    """ 铜护脚。 """
+    COPPER_BOOTS = "minecraft:copper_boots"
+    """ 铜靴。 """
+    COPPER_NUGGET = "minecraft:copper_nugget"
+    """ 铜粒。 """
+    COPPER_HORSE_ARMOR = "minecraft:copper_horse_armor"
+    """ 铜马甲。 """
+    NAUTILUS_SPAWN_EGG = "minecraft:nautilus_spawn_egg"
+    """ 鹦鹉螺生成蛋。 """
+    ZOMBIE_NAUTILUS_SPAWN_EGG = "minecraft:zombie_nautilus_spawn_egg"
+    """ 丧尸鹦鹉螺生成蛋。 """
+    PARCHED_SPAWN_EGG = "minecraft:parched_spawn_egg"
+    """ 旱骨生成蛋。 """
+    COPPER_NAUTILUS_ARMOR = "minecraft:copper_nautilus_armor"
+    """ 铜鹦鹉螺甲。 """
+    IRON_NAUTILUS_ARMOR = "minecraft:iron_nautilus_armor"
+    """ 铁鹦鹉螺甲。 """
+    GOLDEN_NAUTILUS_ARMOR = "minecraft:golden_nautilus_armor"
+    """ 金鹦鹉螺甲。 """
+    DIAMOND_NAUTILUS_ARMOR = "minecraft:diamond_nautilus_armor"
+    """ 钻石鹦鹉螺甲。 """
+    NETHERITE_NAUTILUS_ARMOR = "minecraft:netherite_nautilus_armor"
+    """ 地狱合金鹦鹉螺甲。 """
+    NETHERITE_HORSE_ARMOR = "minecraft:netherite_horse_armor"
+    """ 地狱合金马甲。 """
+    SULFUR_CUBE_SPAWN_EGG = "minecraft:sulfur_cube_spawn_egg"
+    """ 硫磺史莱姆生成蛋。 """
+    SULFUR_CUBE_BUCKET = "minecraft:sulfur_cube_bucket"
+    """ 硫磺史莱姆桶。 """
+    POPLAR_BOAT = "minecraft:poplar_boat"
+    """ 杨木船。 """
+    POPLAR_CHEST_BOAT = "minecraft:poplar_chest_boat"
+    """ 储物箱杨木船。 """
+    POPLAR_SIGN = "minecraft:poplar_sign"
+    """ 杨木指示牌。 """
+    STRAW_BED = "minecraft:straw_bed"
+    """ 禾秆床。 """
+    BLACK_CUSHION = "minecraft:black_cushion"
+    """ 黑色咕臣。 """
+    BLUE_CUSHION = "minecraft:blue_cushion"
+    """ 蓝色咕臣。 """
+    BROWN_CUSHION = "minecraft:brown_cushion"
+    """ 啡色咕臣。 """
+    CYAN_CUSHION = "minecraft:cyan_cushion"
+    """ 青蓝色咕臣。 """
+    GRAY_CUSHION = "minecraft:gray_cushion"
+    """ 灰色咕臣。 """
+    GREEN_CUSHION = "minecraft:green_cushion"
+    """ 绿色咕臣。 """
+    LIGHT_BLUE_CUSHION = "minecraft:light_blue_cushion"
+    """ 浅蓝色咕臣。 """
+    LIGHT_GRAY_CUSHION = "minecraft:light_gray_cushion"
+    """ 浅灰色咕臣。 """
+    LIME_CUSHION = "minecraft:lime_cushion"
+    """ 浅绿色咕臣。 """
+    MAGENTA_CUSHION = "minecraft:magenta_cushion"
+    """ 紫红色咕臣。 """
+    ORANGE_CUSHION = "minecraft:orange_cushion"
+    """ 橙色咕臣。 """
+    PINK_CUSHION = "minecraft:pink_cushion"
+    """ 粉红色咕臣。 """
+    PURPLE_CUSHION = "minecraft:purple_cushion"
+    """ 紫色咕臣。 """
+    RED_CUSHION = "minecraft:red_cushion"
+    """ 红色咕臣。 """
+    WHITE_CUSHION = "minecraft:white_cushion"
+    """ 白色咕臣。 """
+    YELLOW_CUSHION = "minecraft:yellow_cushion"
+    """ 黄色咕臣。 """
+    WOOL = "minecraft:wool"
+    """ 羊毛。 """
+    CARPET = "minecraft:carpet"
+    """ 地毡。 """
+    LOG = "minecraft:log"
+    """ 原木。 """
+    FENCE = "minecraft:fence"
+    """ 栏杆。 """
+    STONEBRICK = "minecraft:stonebrick"
+    """ 石砖。 """
+    CORAL_BLOCK = "minecraft:coral_block"
+    """ 珊瑚方块。 """
+    STONE_BLOCK_SLAB = "minecraft:stone_block_slab"
+    """ 石半砖。 """
+    STONE_BLOCK_SLAB2 = "minecraft:stone_block_slab2"
+    """ 石半砖2。 """
+    STONE_BLOCK_SLAB3 = "minecraft:stone_block_slab3"
+    """ 石半砖3。 """
+    STONE_BLOCK_SLAB4 = "minecraft:stone_block_slab4"
+    """ 石半砖4。 """
+    DOUBLE_STONE_BLOCK_SLAB = "minecraft:double_stone_block_slab"
+    """ 双石半砖。 """
+    DOUBLE_STONE_BLOCK_SLAB2 = "minecraft:double_stone_block_slab2"
+    """ 双石半砖2。 """
+    DOUBLE_STONE_BLOCK_SLAB3 = "minecraft:double_stone_block_slab3"
+    """ 双石半砖3。 """
+    DOUBLE_STONE_BLOCK_SLAB4 = "minecraft:double_stone_block_slab4"
+    """ 双石半砖4。 """
+    CORAL_FAN = "minecraft:coral_fan"
+    """ 扇状珊瑚。 """
+    CORAL_FAN_DEAD = "minecraft:coral_fan_dead"
+    """ 死亡的扇状珊瑚。 """
+    SAPLING = "minecraft:sapling"
+    """ 树苗。 """
+    LEAVES = "minecraft:leaves"
+    """ 树叶。 """
+    LEAVES2 = "minecraft:leaves2"
+    """ 树叶2。 """
+    WOODEN_SLAB = "minecraft:wooden_slab"
+    """ 木制半砖。 """
+    RED_FLOWER = "minecraft:red_flower"
+    """ 小型花。 """
+    DOUBLE_PLANT = "minecraft:double_plant"
+    """ 大型花。 """
+    PLANKS = "minecraft:planks"
+    """ 木板。 """
+    CORAL = "minecraft:coral"
+    """ 珊瑚。 """
+    TALLGRASS = "minecraft:tallgrass"
+    """ 长草丛。 """
+    LOG2 = "minecraft:log2"
+    """ 原木2。 """
+    MONSTER_EGG = "minecraft:monster_egg"
+    """ 蛀蚀的方块。 """
+    CONCRETE = "minecraft:concrete"
+    """ 混凝土。 """
+    CONCRETE_POWDER = "minecraft:concrete_powder"
+    """ 混凝土粉末。 """
+    STAINED_GLASS = "minecraft:stained_glass"
+    """ 染色玻璃。 """
+    STAINED_GLASS_PANE = "minecraft:stained_glass_pane"
+    """ 染色玻璃片。 """
+    SHULKER_BOX = "minecraft:shulker_box"
+    """ 染色的界伏盒。 """
+    WOOD = "minecraft:wood"
+    """ 木头。 """
+    MUSIC_DISC_CREATOR = "minecraft:music_disc_creator"
+    """ 唱片Creator。 """
+    MUSIC_DISC_CREATOR_MUSIC_BOX = "minecraft:music_disc_creator_music_box"
+    """ 唱片Creator（音乐盒）。 """
+    MUSIC_DISC_PRECIPICE = "minecraft:music_disc_precipice"
+    """ 唱片Precipice。 """
+    MUSIC_DISC_TEARS = "minecraft:music_disc_tears"
+    """ 唱片Tears。 """
+    MUSIC_DISC_LAVA_CHICKEN = "minecraft:music_disc_lava_chicken"
+    """ 唱片Lava Chicken。 """
+    MUSIC_DISC_BOUNCE = "minecraft:music_disc_bounce"
+    """ 唱片Bounce。 """
+    CHEMISTRY_TABLE = "minecraft:chemistry_table"
+    """ 化学装置。 """
+    HARD_STAINED_GLASS = "minecraft:hard_stained_glass"
+    """ 染色强化玻璃。 """
+    HARD_STAINED_GLASS_PANE = "minecraft:hard_stained_glass_pane"
+    """ 染色强化玻璃片。 """
+    COLORED_TORCH_RG = "minecraft:colored_torch_rg"
+    """ 红色和绿色火炬。 """
+    COLORED_TORCH_BP = "minecraft:colored_torch_bp"
+    """ 蓝色和紫色火炬。 """
+    LIGHT_BLOCK = "minecraft:light_block"
+    """ 光。 """
+    BOAT = "minecraft:boat"
+    """ 船。 """
+    DYE = "minecraft:dye"
+    """ 染料。 """
+    BANNER_PATTERN = "minecraft:banner_pattern"
+    """ 横额图案。 """
+    SPAWN_EGG = "minecraft:spawn_egg"
+    """ 生成蛋。 """
+    END_CRYSTAL = "minecraft:end_crystal"
+    """ 终界水晶。 """
+    RED_SHRUB = "minecraft:red_shrub"
+    """ 红灌木。 """
+    SHELF_MUSHROOM = "minecraft:shelf_mushroom"
+    """ 层架蘑菇。 """
+    COPPER_SPEAR = "minecraft:copper_spear"
+    """ 铜矛。 """
+    DIAMOND_SPEAR = "minecraft:diamond_spear"
+    """ 钻石矛。 """
+    GOLDEN_SPEAR = "minecraft:golden_spear"
+    """ 金矛。 """
+    IRON_SPEAR = "minecraft:iron_spear"
+    """ 铁矛。 """
+    NETHERITE_SPEAR = "minecraft:netherite_spear"
+    """ 地狱合金矛。 """
+    STONE_SPEAR = "minecraft:stone_spear"
+    """ 石矛。 """
+    WOODEN_SPEAR = "minecraft:wooden_spear"
+    """ 木矛。 """
+    BLACK_BUNDLE = "minecraft:black_bundle"
+    """ 黑色收纳袋。 """
+    BLUE_BUNDLE = "minecraft:blue_bundle"
+    """ 蓝色收纳袋。 """
+    BROWN_BUNDLE = "minecraft:brown_bundle"
+    """ 啡色收纳袋。 """
+    BUNDLE = "minecraft:bundle"
+    """ 收纳袋。 """
+    CYAN_BUNDLE = "minecraft:cyan_bundle"
+    """ 青蓝色收纳袋。 """
+    GRAY_BUNDLE = "minecraft:gray_bundle"
+    """ 灰色收纳袋。 """
+    GREEN_BUNDLE = "minecraft:green_bundle"
+    """ 绿色收纳袋。 """
+    LIGHT_BLUE_BUNDLE = "minecraft:light_blue_bundle"
+    """ 浅蓝色收纳袋。 """
+    LIGHT_GRAY_BUNDLE = "minecraft:light_gray_bundle"
+    """ 浅灰色收纳袋。 """
+    LIME_BUNDLE = "minecraft:lime_bundle"
+    """ 浅绿色收纳袋。 """
+    MAGENTA_BUNDLE = "minecraft:magenta_bundle"
+    """ 紫红色收纳袋。 """
+    ORANGE_BUNDLE = "minecraft:orange_bundle"
+    """ 橙色收纳袋。 """
+    PINK_BUNDLE = "minecraft:pink_bundle"
+    """ 粉红色收纳袋。 """
+    PURPLE_BUNDLE = "minecraft:purple_bundle"
+    """ 紫色收纳袋。 """
+    RED_BUNDLE = "minecraft:red_bundle"
+    """ 红色收纳袋。 """
+    WHITE_BUNDLE = "minecraft:white_bundle"
+    """ 白色收纳袋。 """
+    YELLOW_BUNDLE = "minecraft:yellow_bundle"
+    """ 黄色收纳袋。 """
+    BREEZE_ROD = "minecraft:breeze_rod"
+    """ 旋风棒。 """
+    OMINOUS_TRIAL_KEY = "minecraft:ominous_trial_key"
+    """ 不祥试炼锁匙。 """
+    TRIAL_KEY = "minecraft:trial_key"
+    """ 试炼锁匙。 """
+    WIND_CHARGE = "minecraft:wind_charge"
+    """ 风弹。 """
+    APPLE = "minecraft:apple"
+    """ 苹果。 """
+    GLOW_BERRIES = "minecraft:glow_berries"
+    """ 荧光莓。 """
+
+
+class Entity(LazyEnum):
+    UNDEFINED_TEST_ONLY = "minecraft:undefined_test_only"
+    """ Undefined Test Only。 """
+    CHICKEN = "minecraft:chicken"
+    """ 鸡。 """
+    COW = "minecraft:cow"
+    """ 牛。 """
+    PIG = "minecraft:pig"
+    """ 猪。 """
+    SHEEP = "minecraft:sheep"
+    """ 绵羊。 """
+    WOLF = "minecraft:wolf"
+    """ 狼。 """
+    VILLAGER = "minecraft:villager"
+    """ 旧版村民。 """
+    MOOSHROOM = "minecraft:mooshroom"
+    """ 蘑菇牛。 """
+    SQUID = "minecraft:squid"
+    """ 墨鱼。 """
+    RABBIT = "minecraft:rabbit"
+    """ 兔。 """
+    BAT = "minecraft:bat"
+    """ 蝙蝠。 """
+    IRON_GOLEM = "minecraft:iron_golem"
+    """ 铁人。 """
+    SNOW_GOLEM = "minecraft:snow_golem"
+    """ 雪人。 """
+    OCELOT = "minecraft:ocelot"
+    """ 豹猫。 """
+    HORSE = "minecraft:horse"
+    """ 马。 """
+    DONKEY = "minecraft:donkey"
+    """ 驴。 """
+    MULE = "minecraft:mule"
+    """ 骡。 """
+    SKELETON_HORSE = "minecraft:skeleton_horse"
+    """ 骷髅骨马。 """
+    ZOMBIE_HORSE = "minecraft:zombie_horse"
+    """ 丧尸马。 """
+    POLAR_BEAR = "minecraft:polar_bear"
+    """ 北极熊。 """
+    LLAMA = "minecraft:llama"
+    """ 羊驼。 """
+    PARROT = "minecraft:parrot"
+    """ 鹦鹉。 """
+    DOLPHIN = "minecraft:dolphin"
+    """ 海豚。 """
+    ZOMBIE = "minecraft:zombie"
+    """ 丧尸。 """
+    CREEPER = "minecraft:creeper"
+    """ Creeper。 """
+    SKELETON = "minecraft:skeleton"
+    """ 骷髅骨。 """
+    SPIDER = "minecraft:spider"
+    """ 蜘蛛。 """
+    ZOMBIE_PIGMAN = "minecraft:zombie_pigman"
+    """ 丧尸猪人。 """
+    SLIME = "minecraft:slime"
+    """ 史莱姆。 """
+    ENDERMAN = "minecraft:enderman"
+    """ 终界使者。 """
+    SILVERFISH = "minecraft:silverfish"
+    """ 蠹鱼。 """
+    CAVE_SPIDER = "minecraft:cave_spider"
+    """ 洞穴蜘蛛。 """
+    GHAST = "minecraft:ghast"
+    """ 地狱幽灵。 """
+    MAGMA_CUBE = "minecraft:magma_cube"
+    """ 岩浆史莱姆。 """
+    BLAZE = "minecraft:blaze"
+    """ 烈焰使者。 """
+    ZOMBIE_VILLAGER = "minecraft:zombie_villager"
+    """ 旧版丧尸村民。 """
+    WITCH = "minecraft:witch"
+    """ 女巫。 """
+    STRAY = "minecraft:stray"
+    """ 流浪者。 """
+    HUSK = "minecraft:husk"
+    """ 尸壳。 """
+    WITHER_SKELETON = "minecraft:wither_skeleton"
+    """ 凋零骷髅骨。 """
+    GUARDIAN = "minecraft:guardian"
+    """ 深海守卫。 """
+    ELDER_GUARDIAN = "minecraft:elder_guardian"
+    """ 远古深海守卫。 """
+    NPC = "minecraft:npc"
+    """ NPC。 """
+    WITHER = "minecraft:wither"
+    """ 凋零怪。 """
+    ENDER_DRAGON = "minecraft:ender_dragon"
+    """ 终界龙。 """
+    SHULKER = "minecraft:shulker"
+    """ 界伏蚌。 """
+    ENDERMITE = "minecraft:endermite"
+    """ 终界螨。 """
+    AGENT = "minecraft:agent"
+    """ 智能体。 """
+    VINDICATOR = "minecraft:vindicator"
+    """ 卫道士。 """
+    PHANTOM = "minecraft:phantom"
+    """ 夜魅。 """
+    RAVAGER = "minecraft:ravager"
+    """ 劫毁兽。 """
+    ARMOR_STAND = "minecraft:armor_stand"
+    """ 盔甲座。 """
+    TRIPOD_CAMERA = "minecraft:tripod_camera"
+    """ 摄像机。 """
+    PLAYER = "minecraft:player"
+    """ 玩家。 """
+    ITEM = "minecraft:item"
+    """ 跌落物。 """
+    TNT = "minecraft:tnt"
+    """ 点燃的TNT。 """
+    FALLING_BLOCK = "minecraft:falling_block"
+    """ 跌落的方块。 """
+    MOVING_BLOCK = "minecraft:moving_block"
+    """ 移动的活塞。 """
+    XP_BOTTLE = "minecraft:xp_bottle"
+    """ 扔出的附魔之瓶。 """
+    XP_ORB = "minecraft:xp_orb"
+    """ 经验球。 """
+    EYE_OF_ENDER_SIGNAL = "minecraft:eye_of_ender_signal"
+    """ 扔出的终界之眼。 """
+    ENDER_CRYSTAL = "minecraft:ender_crystal"
+    """ 终界水晶。 """
+    FIREWORKS_ROCKET = "minecraft:fireworks_rocket"
+    """ 烟花。 """
+    THROWN_TRIDENT = "minecraft:thrown_trident"
+    """ 三叉戟。 """
+    TURTLE = "minecraft:turtle"
+    """ 海龟。 """
+    CAT = "minecraft:cat"
+    """ 流浪猫。 """
+    SHULKER_BULLET = "minecraft:shulker_bullet"
+    """ 界伏蚌导弹。 """
+    FISHING_HOOK = "minecraft:fishing_hook"
+    """ 浮标。 """
+    CHALKBOARD = "minecraft:chalkboard"
+    """ 黑板。 """
+    DRAGON_FIREBALL = "minecraft:dragon_fireball"
+    """ 终界龙火球。 """
+    ARROW = "minecraft:arrow"
+    """ 射出的箭。 """
+    SNOWBALL = "minecraft:snowball"
+    """ 扔出的雪球。 """
+    EGG = "minecraft:egg"
+    """ 扔出的鸡蛋。 """
+    PAINTING = "minecraft:painting"
+    """ 画。 """
+    MINECART = "minecraft:minecart"
+    """ 矿车。 """
+    FIREBALL = "minecraft:fireball"
+    """ 地狱幽灵火球。 """
+    SPLASH_POTION = "minecraft:splash_potion"
+    """ 扔出的飞溅药水。 """
+    ENDER_PEARL = "minecraft:ender_pearl"
+    """ 扔出的终界珍珠。 """
+    LEASH_KNOT = "minecraft:leash_knot"
+    """ 牵绳结。 """
+    WITHER_SKULL = "minecraft:wither_skull"
+    """ 凋零头颅。 """
+    BOAT = "minecraft:boat"
+    """ 船。 """
+    WITHER_SKULL_DANGEROUS = "minecraft:wither_skull_dangerous"
+    """ 蓝色凋零怪之首。 """
+    LIGHTNING_BOLT = "minecraft:lightning_bolt"
+    """ 闪电。 """
+    SMALL_FIREBALL = "minecraft:small_fireball"
+    """ 小火球。 """
+    AREA_EFFECT_CLOUD = "minecraft:area_effect_cloud"
+    """ 药水效果云。 """
+    HOPPER_MINECART = "minecraft:hopper_minecart"
+    """ 漏斗矿车。 """
+    TNT_MINECART = "minecraft:tnt_minecart"
+    """ TNT矿车。 """
+    CHEST_MINECART = "minecraft:chest_minecart"
+    """ 储物箱矿车。 """
+    COMMAND_BLOCK_MINECART = "minecraft:command_block_minecart"
+    """ 命令方块矿车。 """
+    LINGERING_POTION = "minecraft:lingering_potion"
+    """ 扔出的滞留药水。 """
+    LLAMA_SPIT = "minecraft:llama_spit"
+    """ 羊驼口水。 """
+    EVOCATION_FANG = "minecraft:evocation_fang"
+    """ 尖牙。 """
+    EVOCATION_ILLAGER = "minecraft:evocation_illager"
+    """ 唤魔者。 """
+    VEX = "minecraft:vex"
+    """ 恼鬼。 """
+    ICE_BOMB = "minecraft:ice_bomb"
+    """ 冰弹。 """
+    BALLOON = "minecraft:balloon"
+    """ 气球。 """
+    PUFFERFISH = "minecraft:pufferfish"
+    """ 河豚。 """
+    SALMON = "minecraft:salmon"
+    """ 三文鱼。 """
+    DROWNED = "minecraft:drowned"
+    """ 沉尸。 """
+    TROPICALFISH = "minecraft:tropicalfish"
+    """ 热带鱼。 """
+    COD = "minecraft:cod"
+    """ 鳕鱼。 """
+    PANDA = "minecraft:panda"
+    """ 熊猫。 """
+    PILLAGER = "minecraft:pillager"
+    """ 掠夺者。 """
+    VILLAGER_V2 = "minecraft:villager_v2"
+    """ 村民。 """
+    ZOMBIE_VILLAGER_V2 = "minecraft:zombie_villager_v2"
+    """ 丧尸村民。 """
+    SHIELD = "minecraft:shield"
+    """ 盾牌。 """
+    WANDERING_TRADER = "minecraft:wandering_trader"
+    """ 流浪商人。 """
+    ELDER_GUARDIAN_GHOST = "minecraft:elder_guardian_ghost"
+    """ 远古深海守卫幽灵。 """
+    FOX = "minecraft:fox"
+    """ 狐狸。 """
+    BEE = "minecraft:bee"
+    """ 蜜蜂。 """
+    PIGLIN = "minecraft:piglin"
+    """ 猪人。 """
+    HOGLIN = "minecraft:hoglin"
+    """ 野猪兽。 """
+    STRIDER = "minecraft:strider"
+    """ 炽足兽。 """
+    ZOGLIN = "minecraft:zoglin"
+    """ 猪尸兽。 """
+    PIGLIN_BRUTE = "minecraft:piglin_brute"
+    """ 残暴猪人。 """
+    GOAT = "minecraft:goat"
+    """ 山羊。 """
+    GLOW_SQUID = "minecraft:glow_squid"
+    """ 荧光墨鱼。 """
+    AXOLOTL = "minecraft:axolotl"
+    """ 墨西哥蝾螈。 """
+    WARDEN = "minecraft:warden"
+    """ 沉灵守卫。 """
+    FROG = "minecraft:frog"
+    """ 青蛙。 """
+    TADPOLE = "minecraft:tadpole"
+    """ 蝌蚪。 """
+    ALLAY = "minecraft:allay"
+    """ 悦灵。 """
+    FIREFLY = "minecraft:firefly"
+    """ 萤火虫（已移除）。 """
+    CAMEL = "minecraft:camel"
+    """ 骆驼。 """
+    SNIFFER = "minecraft:sniffer"
+    """ 嗅探兽。 """
+    BREEZE = "minecraft:breeze"
+    """ 旋风使者。 """
+    BREEZE_WIND_CHARGE_PROJECTILE = "minecraft:breeze_wind_charge_projectile"
+    """ 旋风使者风弹。 """
+    ARMADILLO = "minecraft:armadillo"
+    """ 犰狳。 """
+    WIND_CHARGE_PROJECTILE = "minecraft:wind_charge_projectile"
+    """ 风弹物品风弹。 """
+    BOGGED = "minecraft:bogged"
+    """ 沼骨。 """
+    OMINOUS_ITEM_SPAWNER = "minecraft:ominous_item_spawner"
+    """ 不祥物品生成器。 """
+    CREAKING = "minecraft:creaking"
+    """ 异响树妖。 """
+    HAPPY_GHAST = "minecraft:happy_ghast"
+    """ 快乐幽灵。 """
+    COPPER_GOLEM = "minecraft:copper_golem"
+    """ 铜人。 """
+    NAUTILUS = "minecraft:nautilus"
+    """ 鹦鹉螺。 """
+    ZOMBIE_NAUTILUS = "minecraft:zombie_nautilus"
+    """ 丧尸鹦鹉螺。 """
+    PARCHED = "minecraft:parched"
+    """ 旱骨。 """
+    CAMEL_HUSK = "minecraft:camel_husk"
+    """ 骆驼尸壳。 """
+    SULFUR_CUBE = "minecraft:sulfur_cube"
+    """ 硫磺史莱姆。 """
+    CUSHION = "minecraft:cushion"
+    """ 咕臣。 """
+    TRADER_LLAMA = "minecraft:trader_llama"
+    """ 商队羊驼。 """
+    CHEST_BOAT = "minecraft:chest_boat"
+    """ 储物箱船。 """
+
+
+class Biome(LazyEnum):
+    OCEAN = "ocean"
+    """ 海洋。 """
+    PLAINS = "plains"
+    """ 平原。 """
+    DESERT = "desert"
+    """ 沙漠。 """
+    EXTREME_HILLS = "extreme_hills"
+    """ 风袭丘陵地。 """
+    FOREST = "forest"
+    """ 森林。 """
+    TAIGA = "taiga"
+    """ 针叶林。 """
+    SWAMPLAND = "swampland"
+    """ 沼泽地。 """
+    RIVER = "river"
+    """ 河流。 """
+    HELL = "hell"
+    """ 地狱荒原。 """
+    THE_END = "the_end"
+    """ 终界。 """
+    LEGACY_FROZEN_OCEAN = "legacy_frozen_ocean"
+    """ 冰洋（旧版）。 """
+    FROZEN_RIVER = "frozen_river"
+    """ 冰河。 """
+    ICE_PLAINS = "ice_plains"
+    """ 雪原。 """
+    ICE_MOUNTAINS = "ice_mountains"
+    """ 雪山。 """
+    MUSHROOM_ISLAND = "mushroom_island"
+    """ 蘑菇地。 """
+    MUSHROOM_ISLAND_SHORE = "mushroom_island_shore"
+    """ 磨菇地海岸。 """
+    BEACH = "beach"
+    """ 沙滩。 """
+    DESERT_HILLS = "desert_hills"
+    """ 沙漠丘陵地。 """
+    FOREST_HILLS = "forest_hills"
+    """ 疏林丘陵地。 """
+    TAIGA_HILLS = "taiga_hills"
+    """ 针叶林丘陵地。 """
+    EXTREME_HILLS_EDGE = "extreme_hills_edge"
+    """ 山地边缘。 """
+    JUNGLE = "jungle"
+    """ 丛林。 """
+    JUNGLE_HILLS = "jungle_hills"
+    """ 丛林丘陵地。 """
+    JUNGLE_EDGE = "jungle_edge"
+    """ 稀疏丛林。 """
+    DEEP_OCEAN = "deep_ocean"
+    """ 深海。 """
+    STONE_BEACH = "stone_beach"
+    """ 石岸。 """
+    COLD_BEACH = "cold_beach"
+    """ 冰雪沙滩。 """
+    BIRCH_FOREST = "birch_forest"
+    """ 桦木森林。 """
+    BIRCH_FOREST_HILLS = "birch_forest_hills"
+    """ 桦木森林丘陵地。 """
+    ROOFED_FOREST = "roofed_forest"
+    """ 黑森林。 """
+    COLD_TAIGA = "cold_taiga"
+    """ 冰雪针叶林。 """
+    COLD_TAIGA_HILLS = "cold_taiga_hills"
+    """ 冰雪针叶林丘陵地。 """
+    MEGA_TAIGA = "mega_taiga"
+    """ 原始松树针叶林。 """
+    MEGA_TAIGA_HILLS = "mega_taiga_hills"
+    """ 巨木针叶林丘陵地。 """
+    EXTREME_HILLS_PLUS_TREES = "extreme_hills_plus_trees"
+    """ 风袭森林。 """
+    SAVANNA = "savanna"
+    """ 热带稀树草原。 """
+    SAVANNA_PLATEAU = "savanna_plateau"
+    """ 热带稀树草原高地。 """
+    MESA = "mesa"
+    """ 恶地。 """
+    MESA_PLATEAU_STONE = "mesa_plateau_stone"
+    """ 繁茂的恶地高地。 """
+    MESA_PLATEAU = "mesa_plateau"
+    """ 恶地高地。 """
+    WARM_OCEAN = "warm_ocean"
+    """ 温暖海洋。 """
+    DEEP_WARM_OCEAN = "deep_warm_ocean"
+    """ 温暖深海。 """
+    LUKEWARM_OCEAN = "lukewarm_ocean"
+    """ 温和海洋。 """
+    DEEP_LUKEWARM_OCEAN = "deep_lukewarm_ocean"
+    """ 温和深海。 """
+    COLD_OCEAN = "cold_ocean"
+    """ 寒冷海洋。 """
+    DEEP_COLD_OCEAN = "deep_cold_ocean"
+    """ 寒冷深海。 """
+    FROZEN_OCEAN = "frozen_ocean"
+    """ 冰洋。 """
+    DEEP_FROZEN_OCEAN = "deep_frozen_ocean"
+    """ 寒冻深海。 """
+    BAMBOO_JUNGLE = "bamboo_jungle"
+    """ 竹林。 """
+    BAMBOO_JUNGLE_HILLS = "bamboo_jungle_hills"
+    """ 竹林丘陵地。 """
+    SUNFLOWER_PLAINS = "sunflower_plains"
+    """ 向日葵平原。 """
+    DESERT_MUTATED = "desert_mutated"
+    """ 沙漠湖泊。 """
+    EXTREME_HILLS_MUTATED = "extreme_hills_mutated"
+    """ 风袭砂砾丘陵地。 """
+    FLOWER_FOREST = "flower_forest"
+    """ 繁花森林。 """
+    TAIGA_MUTATED = "taiga_mutated"
+    """ 针叶林山地。 """
+    SWAMPLAND_MUTATED = "swampland_mutated"
+    """ 沼泽地丘陵地。 """
+    ICE_PLAINS_SPIKES = "ice_plains_spikes"
+    """ 冰刺之地。 """
+    JUNGLE_MUTATED = "jungle_mutated"
+    """ 特化丛林。 """
+    JUNGLE_EDGE_MUTATED = "jungle_edge_mutated"
+    """ 特化丛林边缘。 """
+    BIRCH_FOREST_MUTATED = "birch_forest_mutated"
+    """ 原始桦木森林。 """
+    BIRCH_FOREST_HILLS_MUTATED = "birch_forest_hills_mutated"
+    """ 高桦木丘陵地。 """
+    ROOFED_FOREST_MUTATED = "roofed_forest_mutated"
+    """ 黑森林丘陵地。 """
+    COLD_TAIGA_MUTATED = "cold_taiga_mutated"
+    """ 冰雪针叶林山地。 """
+    REDWOOD_TAIGA_MUTATED = "redwood_taiga_mutated"
+    """ 原始云杉针叶林。 """
+    REDWOOD_TAIGA_HILLS_MUTATED = "redwood_taiga_hills_mutated"
+    """ 巨杉针叶林丘陵地。 """
+    EXTREME_HILLS_PLUS_TREES_MUTATED = "extreme_hills_plus_trees_mutated"
+    """ 砂砾山地+。 """
+    SAVANNA_MUTATED = "savanna_mutated"
+    """ 风袭热带稀树草原。 """
+    SAVANNA_PLATEAU_MUTATED = "savanna_plateau_mutated"
+    """ 零散热带稀树草原高地。 """
+    MESA_BRYCE = "mesa_bryce"
+    """ 侵蚀恶地。 """
+    MESA_PLATEAU_STONE_MUTATED = "mesa_plateau_stone_mutated"
+    """ 特化疏林恶地高地。 """
+    MESA_PLATEAU_MUTATED = "mesa_plateau_mutated"
+    """ 特化恶地高地。 """
+    SOULSAND_VALLEY = "soulsand_valley"
+    """ 灵魂砂谷。 """
+    CRIMSON_FOREST = "crimson_forest"
+    """ 猩红森林。 """
+    WARPED_FOREST = "warped_forest"
+    """ 迷离森林。 """
+    BASALT_DELTAS = "basalt_deltas"
+    """ 玄武岩三角洲。 """
+    JAGGED_PEAKS = "jagged_peaks"
+    """ 尖峰。 """
+    FROZEN_PEAKS = "frozen_peaks"
+    """ 冰峰。 """
+    SNOWY_SLOPES = "snowy_slopes"
+    """ 雪坡。 """
+    GROVE = "grove"
+    """ 雪林。 """
+    MEADOW = "meadow"
+    """ 草甸。 """
+    LUSH_CAVES = "lush_caves"
+    """ 茂盛洞穴。 """
+    DRIPSTONE_CAVES = "dripstone_caves"
+    """ 溶洞。 """
+    STONY_PEAKS = "stony_peaks"
+    """ 石峰。 """
+    DEEP_DARK = "deep_dark"
+    """ 深暗之域。 """
+    MANGROVE_SWAMP = "mangrove_swamp"
+    """ 红树林沼泽地。 """
+    CHERRY_GROVE = "cherry_grove"
+    """ 樱花树林。 """
+    PALE_GARDEN = "pale_garden"
+    """ 苍白之园。 """
+    SULFUR_CAVES = "sulfur_caves"
+    """ 硫磺洞穴。 """
+    DAPPLED_FOREST = "dappled_forest"
+    """ 斑驳森林。 """
+
+
+class Effect(LazyEnum):
+    SPEED = "speed"
+    """ 速度。 """
+    SLOWNESS = "slowness"
+    """ 缓慢。 """
+    HASTE = "haste"
+    """ 挖掘加速。 """
+    MINING_FATIGUE = "mining_fatigue"
+    """ 挖掘疲劳。 """
+    STRENGTH = "strength"
+    """ 力量。 """
+    INSTANT_HEALTH = "instant_health"
+    """ 立即治疗。 """
+    INSTANT_DAMAGE = "instant_damage"
+    """ 立即伤害。 """
+    JUMP_BOOST = "jump_boost"
+    """ 跳跃提升。 """
+    NAUSEA = "nausea"
+    """ 呕心。 """
+    REGENERATION = "regeneration"
+    """ 回复。 """
+    RESISTANCE = "resistance"
+    """ 抗性。 """
+    FIRE_RESISTANCE = "fire_resistance"
+    """ 抗火性。 """
+    WATER_BREATHING = "water_breathing"
+    """ 水中呼吸。 """
+    INVISIBILITY = "invisibility"
+    """ 隐形。 """
+    BLINDNESS = "blindness"
+    """ 失明。 """
+    NIGHT_VISION = "night_vision"
+    """ 夜视。 """
+    HUNGER = "hunger"
+    """ 饥饿。 """
+    WEAKNESS = "weakness"
+    """ 虚弱。 """
+    POISON = "poison"
+    """ 中毒。 """
+    WITHER = "wither"
+    """ 凋零。 """
+    HEALTH_BOOST = "health_boost"
+    """ 生命值提升。 """
+    ABSORPTION = "absorption"
+    """ 伤害吸收。 """
+    SATURATION = "saturation"
+    """ 饱食。 """
+    LEVITATION = "levitation"
+    """ 飘浮。 """
+    FATAL_POISON = "fatal_poison"
+    """ 中毒（致命）。 """
+    CONDUIT_POWER = "conduit_power"
+    """ 海灵能量。 """
+    SLOW_FALLING = "slow_falling"
+    """ 缓降。 """
+    BAD_OMEN = "bad_omen"
+    """ 不祥之兆。 """
+    VILLAGE_HERO = "village_hero"
+    """ 村庄英雄。 """
+    DARKNESS = "darkness"
+    """ 黑暗。 """
+    TRIAL_OMEN = "trial_omen"
+    """ 试炼之兆。 """
+    WIND_CHARGED = "wind_charged"
+    """ 蓄风。 """
+    WEAVING = "weaving"
+    """ 织网。 """
+    OOZING = "oozing"
+    """ 渗浆。 """
+    INFESTED = "infested"
+    """ 寄生。 """
+    RAID_OMEN = "raid_omen"
+    """ 袭击之兆。 """
+    BREATH_OF_THE_NAUTILUS = "breath_of_the_nautilus"
+    """ 鹦鹉螺之息。 """
+
+
+class Enchantment(LazyEnum):
+    PROTECTION = "protection"
+    """ 保护。 """
+    FIRE_PROTECTION = "fire_protection"
+    """ 火焰保护。 """
+    FEATHER_FALLING = "feather_falling"
+    """ 轻盈。 """
+    BLAST_PROTECTION = "blast_protection"
+    """ 爆炸保护。 """
+    PROJECTILE_PROTECTION = "projectile_protection"
+    """ 投射物保护。 """
+    THORNS = "thorns"
+    """ 荆棘。 """
+    RESPIRATION = "respiration"
+    """ 水中呼吸。 """
+    DEPTH_STRIDER = "depth_strider"
+    """ 深海漫游。 """
+    AQUA_AFFINITY = "aqua_affinity"
+    """ 水中挖掘。 """
+    SHARPNESS = "sharpness"
+    """ 锋利。 """
+    SMITE = "smite"
+    """ 不死克星。 """
+    BANE_OF_ARTHROPODS = "bane_of_arthropods"
+    """ 节肢克星。 """
+    KNOCKBACK = "knockback"
+    """ 击退。 """
+    FIRE_ASPECT = "fire_aspect"
+    """ 火焰附加。 """
+    LOOTING = "looting"
+    """ 掠夺。 """
+    EFFICIENCY = "efficiency"
+    """ 效率。 """
+    SILK_TOUCH = "silk_touch"
+    """ 丝绸之触。 """
+    UNBREAKING = "unbreaking"
+    """ 耐久。 """
+    FORTUNE = "fortune"
+    """ 幸运。 """
+    POWER = "power"
+    """ 强力。 """
+    PUNCH = "punch"
+    """ 冲击。 """
+    FLAME = "flame"
+    """ 火焰箭矢。 """
+    INFINITY = "infinity"
+    """ 无限。 """
+    LUCK_OF_THE_SEA = "luck_of_the_sea"
+    """ 海之祝福。 """
+    LURE = "lure"
+    """ 鱼饵。 """
+    FROST_WALKER = "frost_walker"
+    """ 冰霜行者。 """
+    MENDING = "mending"
+    """ 经验修补。 """
+    BINDING_CURSE = "binding_curse"
+    """ 绑定诅咒。 """
+    VANISHING_CURSE = "vanishing_curse"
+    """ 消失诅咒。 """
+    IMPALING = "impaling"
+    """ 穿刺。 """
+    RIPTIDE = "riptide"
+    """ 激流。 """
+    LOYALTY = "loyalty"
+    """ 忠诚。 """
+    CHANNELING = "channeling"
+    """ 唤雷。 """
+    MULTISHOT = "multishot"
+    """ 多重射击。 """
+    PIERCING = "piercing"
+    """ 贯穿。 """
+    QUICK_CHARGE = "quick_charge"
+    """ 快速装填。 """
+    SOUL_SPEED = "soul_speed"
+    """ 灵魂疾走。 """
+    SWIFT_SNEAK = "swift_sneak"
+    """ 迅捷潜行。 """
+    WIND_BURST = "wind_burst"
+    """ 风爆。 """
+    DENSITY = "density"
+    """ 致密。 """
+    BREACH = "breach"
+    """ 破甲。 """
+    LUNGE = "lunge"
+    """ 突进。 """
+
+
+class Mob(LazyEnum):
     ALLAY = ...
     ARMADILLO = ...
     BAT = ...
@@ -6013,7 +5123,7 @@ class Mob(StrEnum):
     WITHER = ...
 
 
-class Feature(StrEnum):
+class Feature(LazyEnum):
     END_CITY = ...
     FORTRESS = ...
     MANSION = ...
@@ -6032,7 +5142,7 @@ class Feature(StrEnum):
     TRIAL_CHAMBERS = ...
 
 
-class UiContainer(StrEnum):
+class UiContainer(LazyEnum):
     CRAFTING_TABLE = ...
     ENCHANTING_TABLE = ...
     BEACON = ...
@@ -6049,7 +5159,7 @@ class UiContainer(StrEnum):
     VILLAGER_V2 = ...
 
 
-class Container(StrEnum):
+class Container(LazyEnum):
     CHEST = ...
     TRAPPED_CHEST = ...
     ENDER_CHEST = ...
@@ -6091,134 +5201,6 @@ class Container(StrEnum):
     CAMEL = ...
     TRADER_LLAMA = ...
     LLAMA = ...
-
-
-class Effect(StrEnum):
-    SPEED = ...
-    HASTE = ...
-    STRENGTH = ...
-    INSTANT_HEALTH = ...
-    JUMP_BOOST = ...
-    REGENERATION = ...
-    RESISTANCE = ...
-    FIRE_RESISTANCE = ...
-    WATER_BREATHING = ...
-    INVISIBILITY = ...
-    NIGHT_VISION = ...
-    HEALTH_BOOST = ...
-    ABSORPTION = ...
-    SATURATION = ...
-    SLOW_FALLING = ...
-    VILLAGE_HERO = ...
-    SLOWDOWN = ...
-    MINING_FATIGUE = ...
-    INSTANT_DAMAGE = ...
-    NAUSEA = ...
-    BLINDNESS = ...
-    HUNGER = ...
-    WEAKNESS = ...
-    POISON = ...
-    WITHER = ...
-    LEVITATION = ...
-    FATAL_POISON = ...
-    DARKNESS = ...
-    WIND_CHARGED = ...
-    WEAVING = ...
-    OOZING = ...
-    INFESTED = ...
-    BAD_OMEN = ...
-    TRIAL_OMEN = ...
-    RAID_OMEN = ...
-
-
-class Biome(StrEnum):
-    OCEAN = ...
-    PLAINS = ...
-    DESERT = ...
-    EXTREME_HILLS = ...
-    FOREST = ...
-    TAIGA = ...
-    SWAMPLAND = ...
-    RIVER = ...
-    HELL = ...
-    THE_END = ...
-    LEGACY_FROZEN_OCEAN = ...
-    FROZEN_RIVER = ...
-    ICE_PLAINS = ...
-    ICE_MOUNTAINS = ...
-    MUSHROOM_ISLAND = ...
-    MUSHROOM_ISLAND_SHORE = ...
-    BEACH = ...
-    DESERT_HILLS = ...
-    FOREST_HILLS = ...
-    TAIGA_HILLS = ...
-    EXTREME_HILLS_EDGE = ...
-    JUNGLE = ...
-    JUNGLE_HILLS = ...
-    JUNGLE_EDGE = ...
-    DEEP_OCEAN = ...
-    STONE_BEACH = ...
-    COLD_BEACH = ...
-    BIRCH_FOREST = ...
-    BIRCH_FOREST_HILLS = ...
-    ROOFED_FOREST = ...
-    COLD_TAIGA = ...
-    COLD_TAIGA_HILLS = ...
-    MEGA_TAIGA = ...
-    MEGA_TAIGA_HILLS = ...
-    EXTREME_HILLS_PLUS_TREES = ...
-    SAVANNA = ...
-    SAVANNA_PLATEAU = ...
-    MESA = ...
-    MESA_PLATEAU_STONE = ...
-    MESA_PLATEAU = ...
-    WARM_OCEAN = ...
-    DEEP_WARM_OCEAN = ...
-    LUKEWARM_OCEAN = ...
-    DEEP_LUKEWARM_OCEAN = ...
-    COLD_OCEAN = ...
-    DEEP_COLD_OCEAN = ...
-    FROZEN_OCEAN = ...
-    DEEP_FROZEN_OCEAN = ...
-    BAMBOO_JUNGLE = ...
-    BAMBOO_JUNGLE_HILLS = ...
-    SUNFLOWER_PLAINS = ...
-    DESERT_MUTATED = ...
-    EXTREME_HILLS_MUTATED = ...
-    FLOWER_FOREST = ...
-    TAIGA_MUTATED = ...
-    SWAMPLAND_MUTATED = ...
-    ICE_PLAINS_SPIKES = ...
-    JUNGLE_MUTATED = ...
-    JUNGLE_EDGE_MUTATED = ...
-    BIRCH_FOREST_MUTATED = ...
-    BIRCH_FOREST_HILLS_MUTATED = ...
-    ROOFED_FOREST_MUTATED = ...
-    COLD_TAIGA_MUTATED = ...
-    REDWOOD_TAIGA_MUTATED = ...
-    REDWOOD_TAIGA_HILLS_MUTATED = ...
-    EXTREME_HILLS_PLUS_TREES_MUTATED = ...
-    SAVANNA_MUTATED = ...
-    SAVANNA_PLATEAU_MUTATED = ...
-    MESA_BRYCE = ...
-    MESA_PLATEAU_STONE_MUTATED = ...
-    MESA_PLATEAU_MUTATED = ...
-    SOULSAND_VALLEY = ...
-    CRIMSON_FOREST = ...
-    WARPED_FOREST = ...
-    BASALT_DELTAS = ...
-    JAGGED_PEAKS = ...
-    FROZEN_PEAKS = ...
-    SNOWY_SLOPES = ...
-    GROVE = ...
-    MEADOW = ...
-    LUSH_CAVES = ...
-    DRIPSTONE_CAVES = ...
-    STONY_PEAKS = ...
-    DEEP_DARK = ...
-    MANGROVE_SWAMP = ...
-    CHERRY_GROVE = ...
-    PALE_GARDEN = ...
 
 
 ENTITY_NAME_MAP: Dict[int, Tuple[int, str, str]]

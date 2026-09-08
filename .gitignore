@@ -3,9 +3,6 @@
 studio.json
 *.psd
 *.log
-/scripts/event_typing/*
-!/scripts/event_typing/all_events.py
-!/scripts/event_typing/main.py
 /docs/source/api/apis/
 /tests/ingame_test/.idea/
 /tests/ingame_test/.mcs/
@@ -20,6 +17,14 @@ studio.json
 .mcdev.json
 .mcdev/
 .vscode/
+
+/scripts/event_typing/*
+!/scripts/event_typing/all_events.py
+!/scripts/event_typing/main.py
+/scripts/wiki_crawler/*
+!/scripts/wiki_crawler/main.py
+/scripts/make_release/*
+!/scripts/make_release/main.py
 
 
 ### Python template

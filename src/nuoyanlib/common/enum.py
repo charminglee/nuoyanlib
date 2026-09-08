@@ -5,14 +5,13 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
 
 from collections import OrderedDict
 import itertools
-from math import pi, sin, cos, sqrt
 from mod.common.minecraftEnum import (
     EntityType,
     StructureFeatureType,
@@ -33,18 +32,14 @@ __all__ = [
     "Enum",
     "IntEnum",
     "StrEnum",
+    "LazyEnumMeta",
+    "LazyEnum",
     "Flag",
     "IntFlag",
     "gen_lower_name",
     "gen_minecraft_lower_name",
     "ClientEvent",
     "ServerEvent",
-    "TimeEaseFunc",
-    "WheelCallbackType",
-    "GridCallbackType",
-    "ComboBoxCallbackType",
-    "ButtonCallbackType",
-    "ControlType",
     "Mob",
     "Feature",
     "UiContainer",
@@ -78,15 +73,14 @@ class auto(object):
     示例
     ----
 
+    >>> from <scripts_root>.nuoyanlib.common.enum import Enum, auto
     >>> class Color(Enum):
     ...     @staticmethod
     ...     def _generate_next_value_(name, count, last_values):
     ...         return count * 10
-    ...
     ...     RED = auto()
     ...     GREEN = auto()
     ...     BLUE = auto()
-    ...
     >>> Color.RED
     <Color.RED: 0>
     >>> Color.GREEN
@@ -145,10 +139,6 @@ def _new_member(member_t, enum_cls, value, name=None):
 
 
 class EnumMeta(type):
-    """
-    ``Enum`` 的元类。
-    """
-
     def __new__(metacls, cls_name=None, bases=None, cls_dict=None): # 给参数加默认值None以绕过机审
         # 往cls_dict添加属性而不是cls.xxx = xxx，避免触发__setattr__
         _member_map_        = cls_dict['_member_map_']        = OrderedDict()
@@ -159,7 +149,7 @@ class EnumMeta(type):
         _ignore_            = cls_dict.setdefault('_ignore_', [])
 
         gnv = cls_dict.get('_generate_next_value_')
-        if gnv and type(gnv) is not staticmethod:
+        if gnv and not isinstance(gnv, staticmethod):
             cls_dict['_generate_next_value_'] = staticmethod(gnv)
 
         # 创建枚举类
@@ -319,11 +309,12 @@ class Enum(object): # noqa
     """
     枚举类，用于实现自定义枚举。
 
-    用法与 Python3 的 ``enum`` 标准库类似，每个枚举成员均为枚举类的实例，可通过 ``.name`` 和 ``.value`` 属性获取成员的名称和值。
+    用法与 Python 3 的 ``enum`` 标准库类似，每个枚举成员均为枚举类的实例，可通过 ``.name`` 和 ``.value`` 属性获取成员的名称和值，其他功能见示例。
 
     示例
     ----
 
+    >>> from <scripts_root>.nuoyanlib.common.enum import Enum
     >>> class Color(Enum):
     ...     RED = 1
     ...     GREEN = 2
@@ -350,7 +341,6 @@ class Enum(object): # noqa
     ...     BLUE = 3
     ...     _YELLOW = 4
     ...     ALL = (1, 2, 3)
-    ...
     >>> Color._YELLOW
     4
     >>> Color.ALL
@@ -371,7 +361,6 @@ class Enum(object): # noqa
     ...     RED = 1
     ...     GREEN = 2
     ...     BLUE = 3
-    ...
     >>> Color(4)
     <Color.RED: 1>
 
@@ -389,35 +378,31 @@ class Enum(object): # noqa
 
     >>> for member in Color:
     ...     print member.name, member.value
-    ...
     'RED' 1
     'GREEN' 2
     'BLUE' 3
 
     >>> for name, member in Color.__members__.items():
     ...     print member.name, member.value
-    ...
     'RED' 1
     'GREEN' 2
     'BLUE' 3
 
-    可通过 ``in`` 关键字判断某个对象是否是枚举成员。
+    可通过 ``in`` 关键字判断某个值是否是枚举值，或某个对象是否是枚举成员。
 
     >>> 1 in Color
     True
     >>> Color.RED in Color
     True
-    >>> 4 in Color
-    False
 
     使用 ``auto()`` 可自动生成枚举值，而无需手动编写。默认情况下，值从 ``1`` 开始递增。
     你也可以自定义 ``auto()`` 的值生成逻辑，详见 ``auto()`` 的说明文档。
 
+    >>> from <scripts_root>.nuoyanlib.common.enum import auto
     >>> class Color(Enum):
     ...     RED = auto()
     ...     GREEN = auto()
     ...     BLUE = auto()
-    ...
     >>> Color.RED
     <Color.RED: 1>
     >>> Color.GREEN
@@ -555,7 +540,6 @@ class IntEnum(int, Enum): # noqa
     ...     VISITOR = 0
     ...     MEMBER = 1
     ...     OPERATOR = 2
-    ...
     >>> Permission.VISITOR
     0
     >>> Permission.VISITOR + 6
@@ -579,7 +563,6 @@ class StrEnum(str, Enum): # noqa
     ...     VISITOR = "visitor"
     ...     MEMBER = "member"
     ...     OPERATOR = "operator"
-    ...
     >>> Permission.VISITOR
     'visitor'
     >>> "I am a %s." % Permission.VISITOR
@@ -591,13 +574,37 @@ class StrEnum(str, Enum): # noqa
     ...     VISITOR = auto()
     ...     MEMBER = auto()
     ...     OPERATOR = auto()
-    ...
     >>> Permission.VISITOR
     'VISITOR'
     """
 
     @staticmethod
     def _generate_next_value_(name, count, last_values):
+        return name
+
+
+class LazyEnumMeta(type):
+    def __new__(metacls, cls_name, bases, cls_dict):
+        gev = cls_dict.get('_gen_enum_value_')
+        if gev and not isinstance(gev, staticmethod):
+            cls_dict['_gen_enum_value_'] = staticmethod(gev)
+        return type.__new__(metacls, cls_name, bases, cls_dict)
+
+    def __getattr__(cls, name):
+        value = cls._gen_enum_value_(name)
+        type.__setattr__(cls, name, value)
+        return value
+
+
+class LazyEnum(object):
+    """
+    按需生成字符串枚举值的枚举类。
+    """
+
+    __metaclass__ = LazyEnumMeta
+
+    @staticmethod
+    def _gen_enum_value_(name):
         return name
 
 
@@ -623,563 +630,106 @@ gen_lower_name = lambda name, _, __: name.lower()
 gen_minecraft_lower_name = lambda name, _, __: "minecraft:" + name.lower()
 
 
+def _expand_enum(namespace, enum):
+    if isinstance(enum, Enum):
+        for member in enum:
+            namespace[member.name] = member.value
+
+
 # endregion
 
 
 # region Preset Enums ==================================================================================================
 
 
-class ClientEvent(StrEnum):
+class ClientEvent(LazyEnum):
     """
     ModSDK 客户端事件名枚举。
     """
 
-    OnSimTickClientEvent = auto()
-    PhysxTriggerClientEvent = auto()
-    LiquidClippedClientEvent = auto()
-    PlayerAddCustomContainerItemClientEvent = auto()
-    PlayerRemoveCustomContainerItemClientEvent = auto()
-    PhysxTouchClientEvent = auto()
-    OnCustomGamepadChangedEvent = auto()
-    OnCustomGamepadPressInGame = auto()
-    OnCustomKeyChangedEvent = auto()
-    OnCustomKeyPressInGame = auto()
-    UIDefReloadSceneStackAfter = auto()
-    UpdatePlayerSkinClientEvent = auto()
-    PlayerTryRemoveCustomContainerItemClientEvent = auto()
-    PlayerTryAddCustomContainerItemClientEvent = auto()
-    PlayerTryPutCustomContainerItemClientEvent = auto()
-    PlayerPermissionChangeClientEvent = auto()
-    HudButtonChangedClientEvent = auto()
-    BlockAnimateRandomTickEvent = auto()
-    PlayerAttackEntityEvent = auto()
-    OnLocalPlayerActionClientEvent = auto()
-    OnLocalPlayerStartJumpClientEvent = auto()
-    GameRenderTickEvent = auto()
-    GyroSensorChangedClientEvent = auto()
-    ModBlockEntityTickClientEvent = auto()
-    ModBlockEntityRemoveClientEvent = auto()
-    AchievementButtonMovedClientEvent = auto()
-    OnKeyboardControllerLayoutChangeClientEvent = auto()
-    OnGamepadControllerLayoutChangeClientEvent = auto()
-    OnGamepadTriggerClientEvent = auto()
-    OnGamepadStickClientEvent = auto()
-    OnGamepadKeyPressClientEvent = auto()
-    ModBlockEntityLoadedClientEvent = auto()
-    CloseNeteaseShopEvent = auto()
-    PopScreenAfterClientEvent = auto()
-    TapOrHoldReleaseClientEvent = auto()
-    TapBeforeClientEvent = auto()
-    RightClickReleaseClientEvent = auto()
-    RightClickBeforeClientEvent = auto()
-    OnMouseMiddleDownClientEvent = auto()
-    OnKeyPressInGame = auto()
-    OnClientPlayerStopMove = auto()
-    OnClientPlayerStartMove = auto()
-    OnBackButtonReleaseClientEvent = auto()
-    MouseWheelClientEvent = auto()
-    LeftClickReleaseClientEvent = auto()
-    LeftClickBeforeClientEvent = auto()
-    HoldBeforeClientEvent = auto()
-    GetEntityByCoordReleaseClientEvent = auto()
-    GetEntityByCoordEvent = auto()
-    ClientJumpButtonReleaseEvent = auto()
-    ClientJumpButtonPressDownEvent = auto()
-    PlaySoundClientEvent = auto()
-    PlayMusicClientEvent = auto()
-    OnMusicStopClientEvent = auto()
-    ScreenSizeChangedClientEvent = auto()
-    PushScreenEvent = auto()
-    PopScreenEvent = auto()
-    PlayerChatButtonClickClientEvent = auto()
-    OnItemSlotButtonClickedEvent = auto()
-    GridComponentSizeChangedClientEvent = auto()
-    ClientPlayerInventoryOpenEvent = auto()
-    ClientPlayerInventoryCloseEvent = auto()
-    ClientChestOpenEvent = auto()
-    ClientChestCloseEvent = auto()
-    WalkAnimEndClientEvent = auto()
-    WalkAnimBeginClientEvent = auto()
-    AttackAnimEndClientEvent = auto()
-    AttackAnimBeginClientEvent = auto()
-    StopUsingItemClientEvent = auto()
-    StartUsingItemClientEvent = auto()
-    PlayerTryDropItemClientEvent = auto()
-    OnCarriedNewItemChangedClientEvent = auto()
-    ItemReleaseUsingClientEvent = auto()
-    InventoryItemChangedClientEvent = auto()
-    GrindStoneRemovedEnchantClientEvent = auto()
-    ClientShapedRecipeTriggeredEvent = auto()
-    ClientItemUseOnEvent = auto()
-    ClientItemTryUseEvent = auto()
-    AnvilCreateResultItemAfterClientEvent = auto()
-    ActorUseItemClientEvent = auto()
-    ActorAcquiredItemClientEvent = auto()
-    StepOnBlockClientEvent = auto()
-    StartDestroyBlockClientEvent = auto()
-    StepOffBlockClientEvent = auto()
-    ShearsDestoryBlockBeforeClientEvent = auto()
-    PlayerTryDestroyBlockClientEvent = auto()
-    OnStandOnBlockClientEvent = auto()
-    OnModBlockNeteaseEffectCreatedClientEvent = auto()
-    OnEntityInsideBlockClientEvent = auto()
-    OnAfterFallOnBlockClientEvent = auto()
-    FallingBlockCauseDamageBeforeClientEvent = auto()
-    ClientBlockUseEvent = auto()
-    PerspChangeClientEvent = auto()
-    OnPlayerHitBlockClientEvent = auto()
-    GameTypeChangedClientEvent = auto()
-    ExtinguishFireClientEvent = auto()
-    DimensionChangeFinishClientEvent = auto()
-    DimensionChangeClientEvent = auto()
-    CameraMotionStopClientEvent = auto()
-    CameraMotionStartClientEvent = auto()
-    LeaveEntityClientEvent = auto()
-    StartRidingClientEvent = auto()
-    OnMobHitMobClientEvent = auto()
-    OnGroundClientEvent = auto()
-    HealthChangeClientEvent = auto()
-    EntityStopRidingEvent = auto()
-    EntityModelChangedClientEvent = auto()
-    ApproachEntityClientEvent = auto()
-    UnLoadClientAddonScriptsBefore = auto()
-    RemovePlayerAOIClientEvent = auto()
-    RemoveEntityClientEvent = auto()
-    OnLocalPlayerStopLoading = auto()
-    OnCommandOutputClientEvent = auto()
-    LoadClientAddonScriptsAfter = auto()
-    ChunkLoadedClientEvent = auto()
-    ChunkAcquireDiscardedClientEvent = auto()
-    AddPlayerCreatedClientEvent = auto()
-    AddPlayerAOIClientEvent = auto()
-    AddEntityClientEvent = auto()
-    OnScriptTickClient = auto()
-    UiInitFinished = auto()
 
-
-class ServerEvent(StrEnum):
+class ServerEvent(LazyEnum):
     """
     ModSDK 服务端事件名枚举。
     """
 
-    OnSimTickServerEvent = auto()
-    PlayerStartFishingServerEvent = auto()
-    PlayerFishingAfterServerEvent = auto()
-    PlayerFishingServerEvent = auto()
-    PhysxTriggerServerEvent = auto()
-    LiquidClippedServerEvent = auto()
-    PlayerAddCustomContainerItemServerEvent = auto()
-    PlayerRemoveCustomContainerItemServerEvent = auto()
-    PhysxTouchServerEvent = auto()
-    ItemPullOutCustomContainerServerEvent = auto()
-    ItemPushInCustomContainerServerEvent = auto()
-    PlayerPermissionChangeServerEvent = auto()
-    PlayerTryRemoveCustomContainerItemServerEvent = auto()
-    PlayerTryAddCustomContainerItemServerEvent = auto()
-    PlayerTryPutCustomContainerItemServerEvent = auto()
-    MountTamingEvent = auto()
-    OnPlayerActionServerEvent = auto()
-    CustomCommandTriggerServerEvent = auto()
-    GlobalCommandServerEvent = auto()
-    PlayerPickupArrowServerEvent = auto()
-    EntityDieLoottableAfterServerEvent = auto()
-    PlayerHungerChangeServerEvent = auto()
-    ItemDurabilityChangedServerEvent = auto()
-    PlaceNeteaseLargeFeatureServerEvent = auto()
-    PlayerNamedEntityServerEvent = auto()
-    PlayerFeedEntityServerEvent = auto()
-    lobbyGoodBuySucServerEvent = auto()
-    UrgeShipEvent = auto()
-    PlayerInventoryOpenScriptServerEvent = auto()
-    WalkAnimEndServerEvent = auto()
-    WalkAnimBeginServerEvent = auto()
-    JumpAnimBeginServerEvent = auto()
-    AttackAnimEndServerEvent = auto()
-    AttackAnimBeginServerEvent = auto()
-    UIContainerItemChangedServerEvent = auto()
-    ShearsUseToBlockBeforeServerEvent = auto()
-    ServerPlayerTryTouchEvent = auto()
-    ServerItemTryUseEvent = auto()
-    PlayerDropItemServerEvent = auto()
-    OnPlayerBlockedByShieldBeforeServerEvent = auto()
-    OnPlayerBlockedByShieldAfterServerEvent = auto()
-    OnPlayerActiveShieldServerEvent = auto()
-    OnOffhandItemChangedServerEvent = auto()
-    OnNewArmorExchangeServerEvent = auto()
-    OnItemPutInEnchantingModelServerEvent = auto()
-    ItemUseOnAfterServerEvent = auto()
-    ItemUseAfterServerEvent = auto()
-    ItemReleaseUsingServerEvent = auto()
-    InventoryItemChangedServerEvent = auto()
-    FurnaceBurnFinishedServerEvent = auto()
-    CraftItemOutputChangeServerEvent = auto()
-    ContainerItemChangedServerEvent = auto()
-    StepOnBlockServerEvent = auto()
-    StepOffBlockServerEvent = auto()
-    StartDestroyBlockServerEvent = auto()
-    ShearsDestoryBlockBeforeServerEvent = auto()
-    ServerPlayerTryDestroyBlockEvent = auto()
-    ServerPlaceBlockEntityEvent = auto()
-    ServerEntityTryPlaceBlockEvent = auto()
-    ServerBlockEntityTickEvent = auto()
-    PistonActionServerEvent = auto()
-    OnStandOnBlockServerEvent = auto()
-    OnBeforeFallOnBlockServerEvent = auto()
-    OnAfterFallOnBlockServerEvent = auto()
-    HopperTryPullOutServerEvent = auto()
-    HopperTryPullInServerEvent = auto()
-    HeavyBlockStartFallingServerEvent = auto()
-    GrassBlockToDirtBlockServerEvent = auto()
-    FarmBlockToDirtBlockServerEvent = auto()
-    FallingBlockReturnHeavyBlockServerEvent = auto()
-    FallingBlockCauseDamageBeforeServerEvent = auto()
-    FallingBlockBreakServerEvent = auto()
-    EntityPlaceBlockAfterServerEvent = auto()
-    DirtBlockToGrassBlockServerEvent = auto()
-    CommandBlockUpdateEvent = auto()
-    CommandBlockContainerOpenEvent = auto()
-    ChestBlockTryPairWithServerEvent = auto()
-    BlockStrengthChangedServerEvent = auto()
-    BlockSnowStateChangeServerEvent = auto()
-    BlockSnowStateChangeAfterServerEvent = auto()
-    BlockRemoveServerEvent = auto()
-    BlockRandomTickServerEvent = auto()
-    BlockNeighborChangedServerEvent = auto()
-    BlockLiquidStateChangeServerEvent = auto()
-    BlockLiquidStateChangeAfterServerEvent = auto()
-    BlockDestroyByLiquidServerEvent = auto()
-    StoreBuySuccServerEvent = auto()
-    ServerPlayerGetExperienceOrbEvent = auto()
-    PlayerTrySleepServerEvent = auto()
-    PlayerTeleportEvent = auto()
-    PlayerStopSleepServerEvent = auto()
-    PlayerSleepServerEvent = auto()
-    PlayerRespawnFinishServerEvent = auto()
-    PlayerRespawnEvent = auto()
-    PlayerHurtEvent = auto()
-    PlayerEatFoodServerEvent = auto()
-    PlayerDieEvent = auto()
-    OnPlayerHitBlockServerEvent = auto()
-    GameTypeChangedServerEvent = auto()
-    ExtinguishFireServerEvent = auto()
-    DimensionChangeServerEvent = auto()
-    ChangeLevelUpCostServerEvent = auto()
-    AddLevelEvent = auto()
-    AddExpEvent = auto()
-    WillTeleportToServerEvent = auto()
-    WillAddEffectServerEvent = auto()
-    StartRidingServerEvent = auto()
-    RemoveEffectServerEvent = auto()
-    RefreshEffectServerEvent = auto()
-    ProjectileCritHitEvent = auto()
-    OnMobHitMobServerEvent = auto()
-    OnKnockBackServerEvent = auto()
-    OnFireHurtEvent = auto()
-    MobGriefingBlockServerEvent = auto()
-    HealthChangeServerEvent = auto()
-    EntityTickServerEvent = auto()
-    EntityPickupItemServerEvent = auto()
-    EntityMotionStopServerEvent = auto()
-    EntityMotionStartServerEvent = auto()
-    EntityLoadScriptEvent = auto()
-    EntityEffectDamageServerEvent = auto()
-    EntityDroppedItemServerEvent = auto()
-    EntityChangeDimensionServerEvent = auto()
-    ChangeSwimStateServerEvent = auto()
-    AddEffectServerEvent = auto()
-    ActorHurtServerEvent = auto()
-    ServerSpawnMobEvent = auto()
-    ServerPreBlockPatternEvent = auto()
-    ServerPostBlockPatternEvent = auto()
-    ServerChatEvent = auto()
-    PlayerLeftMessageServerEvent = auto()
-    PlayerJoinMessageEvent = auto()
-    PlayerIntendLeaveServerEvent = auto()
-    PlaceNeteaseStructureFeatureEvent = auto()
-    OnRainLevelChangeServerEvent = auto()
-    OnLocalRainLevelChangeServerEvent = auto()
-    OnLocalLightningLevelChangeServerEvent = auto()
-    OnLightningLevelChangeServerEvent = auto()
-    OnContainerFillLoottableServerEvent = auto()
-    OnCommandOutputServerEvent = auto()
-    NewOnEntityAreaEvent = auto()
-    LoadServerAddonScriptsAfter = auto()
-    DelServerPlayerEvent = auto()
-    CommandEvent = auto()
-    ClientLoadAddonsFinishServerEvent = auto()
-    ChunkLoadedServerEvent = auto()
-    ChunkGeneratedServerEvent = auto()
-    ChunkAcquireDiscardedServerEvent = auto()
-    AddServerPlayerEvent = auto()
-    AchievementCompleteEvent = auto()
-    PlayerAttackEntityEvent = auto()
-    ServerBlockUseEvent = auto()
-    OnGroundServerEvent = auto()
-    SpawnProjectileServerEvent = auto()
-    EntityDieLoottableServerEvent = auto()
-    ActuallyHurtServerEvent = auto()
-    HealthChangeBeforeServerEvent = auto()
-    DimensionChangeFinishServerEvent = auto()
-    EntityDefinitionsEventServerEvent = auto()
-    PlayerDoInteractServerEvent = auto()
-    PlayerInteractServerEvent = auto()
-    MobDieEvent = auto()
-    AddEntityServerEvent = auto()
-    OnMobHitBlockServerEvent = auto()
-    OnEntityInsideBlockServerEvent = auto()
-    EntityStartRidingEvent = auto()
-    EntityStopRidingEvent = auto()
-    ServerItemUseOnEvent = auto()
-    ActorUseItemServerEvent = auto()
-    ActorAcquiredItemServerEvent = auto()
-    DestroyBlockEvent = auto()
-    DamageEvent = auto()
-    ExplosionServerEvent = auto()
-    ProjectileDoHitEffectEvent = auto()
-    OnCarriedNewItemChangedServerEvent = auto()
-    EntityRemoveEvent = auto()
-    OnScriptTickServer = auto()
-    UiInitFinished = auto()
 
-
-class TimeEaseFunc:
+class Block(LazyEnum):
     """
-    时间缓动函数枚举。
-    """
+    方块 Identifier 枚举。
 
-    LINEAR = staticmethod(lambda x: x)
-    """ 线性缓动，变化速度均匀。 """
-    SPRING = staticmethod(lambda x: 1 - cos(x * pi * (0.2 + 2.5 * x**2)))
-    """ 弹簧缓动，效果通常表现为一个有些反复的波动，随着时间逐渐衰减。 """
-    IN_QUAD = staticmethod(lambda x: x**2)
-    """ 二次加速，在开始时慢，随着时间推进加速，二次方增长。 """
-    OUT_QUAD = staticmethod(lambda x: 1 - (1 - x)**2)
-    """ 二次减速，在开始时快速，随着时间推移减速，二次方衰减。 """
-    IN_OUT_QUAD = staticmethod(lambda x: 2 * x**2 if x < 0.5 else 1 - (-2 * x + 2)**2 / 2.)
-    """ 二次加减速，先加速然后减速，二次方的组合。 """
-    IN_CUBIC = staticmethod(lambda x: x**3)
-    """ 三次加速，在开始时非常慢，然后迅速加速，三次方增长。 """
-    OUT_CUBIC = staticmethod(lambda x: 1 - (1 - x)**3)
-    """ 三次减速，在开始时快速，然后减速，三次方衰减。 """
-    IN_OUT_CUBIC = staticmethod(lambda x: 4 * x**3 if x < 0.5 else 1 - (-2 * x + 2)**3 / 2.)
-    """ 三次加减速，先加速然后减速，三次方的组合。 """
-    IN_QUART = staticmethod(lambda x: x**4)
-    """ 四次加速，在开始时非常慢，然后迅速加速，四次方增长。 """
-    OUT_QUART = staticmethod(lambda x: 1 - (1 - x)**4)
-    """ 四次减速，在开始时非常快，然后逐渐减速，四次方衰减。 """
-    IN_OUT_QUART = staticmethod(lambda x: 8 * x**4 if x < 0.5 else 1 - (-2 * x + 2)**4 / 2.)
-    """ 四次加减速，先加速然后减速，四次方的组合。 """
-    IN_QUINT = staticmethod(lambda x: x**5)
-    """ 五次加速，在开始时非常慢，然后急剧加速，五次方增长。 """
-    OUT_QUINT = staticmethod(lambda x: 1 - (1 - x)**5)
-    """ 五次减速，在开始时非常快，随后减速，五次方衰减。 """
-    IN_OUT_QUINT = staticmethod(lambda x: 16 * x**5 if x < 0.5 else 1 - (-2 * x + 2)**5 / 2.)
-    """ 五次加减速，先加速然后减速，五次方的组合。 """
-    IN_SINE = staticmethod(lambda x: 1 - cos(x * pi / 2))
-    """ 正弦加速，在开始时慢，随着时间加速，遵循正弦函数的形式。 """
-    OUT_SINE = staticmethod(lambda x:  sin(x * pi / 2))
-    """ 正弦减速，在开始时快，随后减速，遵循正弦函数的形式。 """
-    IN_OUT_SINE = staticmethod(lambda x: -0.5 * (cos(pi * x) - 1))
-    """ 正弦加减速，先加速然后减速，遵循正弦函数的形式。 """
-    IN_EXPO = staticmethod(lambda x: 0 if x == 0 else 2**(10 * (x - 1)))
-    """ 指数加速，在开始时非常慢，随后迅速加速，遵循指数函数增长。 """
-    OUT_EXPO = staticmethod(lambda x: 1 if x == 1 else 1 - 2**(-10 * x))
-    """ 指数减速，在开始时非常快，随后减速，遵循指数衰减。 """
+    -----
+
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    """
     @staticmethod
-    def IN_OUT_EXPO(x):
-        """
-        指数加减速，先加速然后减速，遵循指数函数。
-        """
-        if x == 0:
-            return 0.
-        if x == 1:
-            return 1.
-        return 2**(10 * (x * 2 - 1)) / 2. if x < 0.5 else (2 - 2**(-10 * (x * 2 - 1))) / 2.
-    IN_CIRC = staticmethod(lambda x: 1 - sqrt(1 - x**2))
-    """ 圆形加速，在开始时较慢，然后加速，遵循圆形函数的效果。 """
-    OUT_CIRC = staticmethod(lambda x:  sqrt(1 - (x - 1)**2))
-    """ 圆形减速，在开始时较快，然后减速，遵循圆形函数的效果。 """
-    IN_OUT_CIRC = staticmethod(lambda x: 1 - sqrt(1 - (2 * x)**2) if x < 0.5 else sqrt(1 - (-2 * x + 2)**2) / 2.)
-    """ 圆形加减速，先加速然后减速，遵循圆形函数的效果。 """
-    IN_BACK = staticmethod(lambda x: x**3 - x * sin(x * pi) * 1.70158)
-    """ 回退加速，动画先稍微向后回退，然后加速。 """
-    OUT_BACK = staticmethod(lambda x: 1 - ((1 - x)**3 - (1 - x) * sin((1 - x) * pi) * 1.70158))
-    """ 回退减速，动画开始时很快，之后回退并逐渐减速。 """
-    IN_OUT_BACK = staticmethod(
-        lambda x:
-            (2 * x**3 - x * sin(x * pi) * 1.70158) if x < 0.5
-            else (1 - ((2 - 2 * x)**3 - (2 - 2 * x) * sin((2 - 2 * x) * pi) * 1.70158))
-    )
-    """ 回退加减速，先回退后加速，之后回弹并减速。 """
-    IN_ELASTIC = staticmethod(lambda x: 1 - sin(6 * pi * x) * x**2)
-    """ 弹性加速，具有弹性拉伸的效果，初期比较慢，然后加速。 """
-    OUT_ELASTIC = staticmethod(lambda x:  sin(6 * pi * x) * (1 - x)**2)
-    """ 弹性减速，弹性效果，快速运动然后逐渐回弹。 """
-    IN_OUT_ELASTIC = staticmethod(
-        lambda x:
-            (0.5 * (1 - sin(6 * pi * x) * x**2)) if x < 0.5
-            else (0.5 * (sin(6 * pi * (x - 0.5)) * (1 - x)**2 + 1))
-    )
-    """ 弹性加减速，先加速后减速，表现为弹性效果。 """
+    def _gen_enum_value_(name):
+        return "minecraft:" + name.lower()
+
+
+class Item(LazyEnum):
+    """
+    物品 Identifier 枚举。
+
+    -----
+
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    """
     @staticmethod
-    def IN_BOUNCE(x):
-        """
-        弹跳加速，表现为一种反复弹跳的加速效果。
-        """
-        return 1 - TimeEaseFunc.OUT_BOUNCE(1 - x)
+    def _gen_enum_value_(name):
+        return "minecraft:" + name.lower()
+
+
+class Entity(LazyEnum):
+    """
+    实体 Identifier 枚举。
+
+    -----
+
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
+    """
     @staticmethod
-    def OUT_BOUNCE(x):
-        """
-        弹跳减速，表现为一种弹跳的减速效果。
-        """
-        if x < 1 / 2.75:
-            return 7.5625 * x**2
-        elif x < 2 / 2.75:
-            x -= 1.5 / 2.75
-            return 7.5625 * x**2 + 0.75
-        elif x < 2.5 / 2.75:
-            x -= 2.25 / 2.75
-            return 7.5625 * x**2 + 0.9375
-        else:
-            x -= 2.625 / 2.75
-            return 7.5625 * x**2 + 0.984375
-    @staticmethod
-    def IN_OUT_BOUNCE(x):
-        """
-        弹跳加减速，先加速然后减速，表现为弹跳效果。
-        """
-        return 0.5 * TimeEaseFunc.IN_BOUNCE(x * 2) if x < 0.5 else 0.5 * TimeEaseFunc.OUT_BOUNCE(x * 2 - 1) + 0.5
+    def _gen_enum_value_(name):
+        return "minecraft:" + name.lower()
 
 
-class ToggleCallbackType(StrEnum):
+class Biome(LazyEnum):
     """
-    开关回调函数类型枚举。
+    生物群系 Identifier 枚举。
+
+    -----
+
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
-    CHANGED = auto()
-    """ 开关状态变化时触发。 """
 
-
-class WheelCallbackType(StrEnum):
+class Effect(LazyEnum):
     """
-    轮盘回调函数类型枚举。
-    """
+    药水效果 Identifier 枚举。
 
-    CLICK = auto()
-    """ 点击轮盘切片时触发。 """
-    HOVER = auto()
-    """ 选择轮盘切片时触发。 """
+    -----
 
-
-class GridCallbackType(StrEnum):
-    """
-    网格回调函数类型枚举。
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
-    UPDATE = auto()
-    """ 网格元素刷新时触发。 """
-    LOADED = auto()
-    """ 网格初次加载完成时触发。 """
 
-
-class ComboBoxCallbackType(StrEnum):
+class Enchantment(LazyEnum):
     """
-    下拉框回调函数类型枚举。
-    """
+    附魔 Identifier 枚举。
 
-    OPEN = auto()
-    """ 展开下拉框。 """
-    CLOSE = auto()
-    """ 关闭下拉框。 """
-    SELECT = auto()
-    """ 选中下拉框内容。 """
+    -----
 
-
-class ButtonCallbackType(StrEnum):
-    """
-    按钮回调函数类型枚举。
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
-    UP = auto()
-    """ 触控在按钮范围内抬起。 """
-    DOWN = auto()
-    """ 按钮按下。 """
-    CANCEL = auto()
-    """ 触控在按钮范围外抬起。 """
-    MOVE = auto()
-    """ 按下后触控移动。 """
-    MOVE_IN = auto()
-    """ 按下按钮后触控进入按钮。 """
-    MOVE_OUT = auto()
-    """ 按下按钮后触控退出按钮。 """
-    DOUBLE_CLICK = auto()
-    """ 双击按钮。 """
-    LONG_CLICK = auto()
-    """ 长按按钮。 """
-    HOVER_IN = auto()
-    """ 鼠标进入按钮。 """
-    HOVER_OUT = auto()
-    """ 鼠标退出按钮。 """
-    SCREEN_EXIT = auto()
-    """ 按钮所在画布退出，且鼠标仍未抬起时触发。 """
 
-
-class ControlType(StrEnum):
-    """
-    UI控件类型枚举。
-    """
-
-    BASE_CONTROL = "BaseControl"
-    """ 通用控件。 """
-    BUTTON = "Button"
-    """ 按钮控件。 """
-    IMAGE = "Image"
-    """ 图片控件。 """
-    LABEL = "Label"
-    """ 文本控件。 """
-    PANEL = "Panel"
-    """ 面板控件。 """
-    INPUT_PANEL = "InputPanel"
-    """ 输入面板控件。 """
-    STACK_PANEL = "StackPanel"
-    """ 栈面板控件。 """
-    EDIT_BOX = "TextEditBox"
-    """ 文本编辑框控件。 """
-    PAPER_DOLL = "PaperDoll"
-    """ 纸娃娃控件。 """
-    NETEASE_PAPER_DOLL = "NeteasePaperDoll"
-    """ 网易纸娃娃控件。 """
-    ITEM_RENDERER = "ItemRenderer"
-    """ 物品渲染器控件。 """
-    GRADIENT_RENDERER = "GradientRenderer"
-    """ 渐变渲染器控件。 """
-    SCROLL_VIEW = "ScrollView"
-    """ 滚动视图控件。 """
-    GRID = "Grid"
-    """ 网格控件。 """
-    PROGRESS_BAR = "ProgressBar"
-    """ 进度条控件。 """
-    TOGGLE = "SwitchToggle"
-    """ 开关控件。 """
-    SLIDER = "Slider"
-    """ 滑动条控件。 """
-    SELECTION_WHEEL = "SelectionWheel"
-    """ 轮盘控件。 """
-    COMBO_BOX = "NeteaseComboBox"
-    """ 下拉框控件。 """
-    MINI_MAP = "MiniMap"
-    """ 小地图控件。 """
-    _AS_BASE = (BASE_CONTROL, PANEL, PAPER_DOLL, GRADIENT_RENDERER)
-
-
-class Mob(StrEnum):
+class Mob(LazyEnum):
     """
     生物 identifier 枚举。
 
     -----
 
-    | 资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
-    | 截至版本：1.21.100
+    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
     """
 
     _generate_next_value_ = gen_minecraft_lower_name
@@ -1356,7 +906,7 @@ class Mob(StrEnum):
     """ 凋灵。 """
 
 
-class Feature(StrEnum):
+class Feature(LazyEnum):
     """
     原版结构特征ID枚举。
     """
@@ -1397,7 +947,7 @@ class Feature(StrEnum):
     """ 试炼密室。 """
 
 
-class UiContainer(StrEnum):
+class UiContainer(LazyEnum):
     """
     原版UI容器 identifier（即仅存在容器UI，不能真正存储物品的容器）枚举（包括容器方块和容器实体）。
 
@@ -1438,7 +988,7 @@ class UiContainer(StrEnum):
     """ 村民。 """
 
 
-class Container(StrEnum):
+class Container(LazyEnum):
     """
     原版容器 identifier 枚举（包括容器方块和容器实体）。
 
@@ -1531,272 +1081,6 @@ class Container(StrEnum):
     """ 行商羊驼。 """
     LLAMA = auto()
     """ 羊驼。 """
-
-
-class Effect(StrEnum):
-    """
-    药水效果枚举。
-    """
-
-    _generate_next_value_ = gen_lower_name
-
-    SPEED = auto()
-    """ 迅捷。 """
-    HASTE = auto()
-    """ 急迫。 """
-    STRENGTH = auto()
-    """ 力量。 """
-    INSTANT_HEALTH = auto()
-    """ 瞬间治疗。 """
-    JUMP_BOOST = auto()
-    """ 跳跃提升。 """
-    REGENERATION = auto()
-    """ 生命恢复。 """
-    RESISTANCE = auto()
-    """ 抗性提升。 """
-    FIRE_RESISTANCE = auto()
-    """ 抗火。 """
-    WATER_BREATHING = auto()
-    """ 水下呼吸。 """
-    INVISIBILITY = auto()
-    """ 隐身。 """
-    NIGHT_VISION = auto()
-    """ 夜视。 """
-    HEALTH_BOOST = auto()
-    """ 生命提升。 """
-    ABSORPTION = auto()
-    """ 伤害吸收。 """
-    SATURATION = auto()
-    """ 饱和。 """
-    SLOW_FALLING = auto()
-    """ 缓降。 """
-    VILLAGE_HERO = auto()
-    """ 村庄英雄。 """
-    SLOWDOWN = auto()
-    """ 缓慢。 """
-    MINING_FATIGUE = auto()
-    """ 挖掘疲劳。 """
-    INSTANT_DAMAGE = auto()
-    """ 瞬间伤害。 """
-    NAUSEA = auto()
-    """ 反胃。 """
-    BLINDNESS = auto()
-    """ 失明。 """
-    HUNGER = auto()
-    """ 饥饿。 """
-    WEAKNESS = auto()
-    """ 虚弱。 """
-    POISON = auto()
-    """ 中毒。 """
-    WITHER = auto()
-    """ 凋零。 """
-    LEVITATION = auto()
-    """ 飘浮。 """
-    FATAL_POISON = auto()
-    """ 中毒（致命）。 """
-    DARKNESS = auto()
-    """ 黑暗。 """
-    WIND_CHARGED = auto()
-    """ 蓄风。 """
-    WEAVING = auto()
-    """ 盘丝。 """
-    OOZING = auto()
-    """ 渗浆。 """
-    INFESTED = auto()
-    """ 寄生。 """
-    BAD_OMEN = auto()
-    """ 不祥之兆。 """
-    TRIAL_OMEN = auto()
-    """ 试炼之兆。 """
-    RAID_OMEN = auto()
-    """ 袭击之兆。 """
-
-
-class Biome(StrEnum):
-    """
-    生物群系名称枚举。
-
-    -----
-
-    资料来源： `中文 Minecraft Wiki <https://zh.minecraft.wiki/>`_
-    """
-
-    _generate_next_value_ = gen_lower_name
-
-    OCEAN = auto()
-    """ 海洋。 """
-    PLAINS = auto()
-    """ 平原。 """
-    DESERT = auto()
-    """ 沙漠。 """
-    EXTREME_HILLS = auto()
-    """ 山地。 """
-    FOREST = auto()
-    """ 森林。 """
-    TAIGA = auto()
-    """ 针叶林。 """
-    SWAMPLAND = auto()
-    """ 沼泽。 """
-    RIVER = auto()
-    """ 河流。 """
-    HELL = auto()
-    """ 下界荒地。 """
-    THE_END = auto()
-    """ 末地。 """
-    LEGACY_FROZEN_OCEAN = auto()
-    """ 冻洋。 """
-    FROZEN_RIVER = auto()
-    """ 冻河。 """
-    ICE_PLAINS = auto()
-    """ 积雪的冻原。 """
-    ICE_MOUNTAINS = auto()
-    """ 雪山。 """
-    MUSHROOM_ISLAND = auto()
-    """ 蘑菇岛。 """
-    MUSHROOM_ISLAND_SHORE = auto()
-    """ 蘑菇岛岸。 """
-    BEACH = auto()
-    """ 沙滩。 """
-    DESERT_HILLS = auto()
-    """ 沙漠丘陵。 """
-    FOREST_HILLS = auto()
-    """ 繁茂的丘陵。 """
-    TAIGA_HILLS = auto()
-    """ 针叶林丘陵。 """
-    EXTREME_HILLS_EDGE = auto()
-    """ 山地边缘。 """
-    JUNGLE = auto()
-    """ 丛林。 """
-    JUNGLE_HILLS = auto()
-    """ 丛林丘陵。 """
-    JUNGLE_EDGE = auto()
-    """ 丛林边缘。 """
-    DEEP_OCEAN = auto()
-    """ 深海。 """
-    STONE_BEACH = auto()
-    """ 石岸。 """
-    COLD_BEACH = auto()
-    """ 积雪的沙滩。 """
-    BIRCH_FOREST = auto()
-    """ 桦木森林。 """
-    BIRCH_FOREST_HILLS = auto()
-    """ 桦木森林丘陵。 """
-    ROOFED_FOREST = auto()
-    """ 黑森林。 """
-    COLD_TAIGA = auto()
-    """ 积雪的针叶林。 """
-    COLD_TAIGA_HILLS = auto()
-    """ 积雪的针叶林丘陵。 """
-    MEGA_TAIGA = auto()
-    """ 巨型针叶林。 """
-    MEGA_TAIGA_HILLS = auto()
-    """ 巨型针叶林丘陵。 """
-    EXTREME_HILLS_PLUS_TREES = auto()
-    """ 繁茂的山地。 """
-    SAVANNA = auto()
-    """ 热带草原。 """
-    SAVANNA_PLATEAU = auto()
-    """ 热带高原。 """
-    MESA = auto()
-    """ 恶地。 """
-    MESA_PLATEAU_STONE = auto()
-    """ 繁茂的恶地高原。 """
-    MESA_PLATEAU = auto()
-    """ 恶地高原。 """
-    WARM_OCEAN = auto()
-    """ 暖水海洋。 """
-    DEEP_WARM_OCEAN = auto()
-    """ 暖水深海。 """
-    LUKEWARM_OCEAN = auto()
-    """ 温水海洋。 """
-    DEEP_LUKEWARM_OCEAN = auto()
-    """ 温水深海。 """
-    COLD_OCEAN = auto()
-    """ 冷水海洋。 """
-    DEEP_COLD_OCEAN = auto()
-    """ 冷水深海。 """
-    FROZEN_OCEAN = auto()
-    """ 冻洋。 """
-    DEEP_FROZEN_OCEAN = auto()
-    """ 封冻深海。 """
-    BAMBOO_JUNGLE = auto()
-    """ 竹林。 """
-    BAMBOO_JUNGLE_HILLS = auto()
-    """ 竹林丘陵。 """
-    SUNFLOWER_PLAINS = auto()
-    """ 向日葵平原。 """
-    DESERT_MUTATED = auto()
-    """ 沙漠湖泊。 """
-    EXTREME_HILLS_MUTATED = auto()
-    """ 沙砾山地。 """
-    FLOWER_FOREST = auto()
-    """ 繁花森林。 """
-    TAIGA_MUTATED = auto()
-    """ 针叶林山地。 """
-    SWAMPLAND_MUTATED = auto()
-    """ 沼泽山丘。 """
-    ICE_PLAINS_SPIKES = auto()
-    """ 冰刺平原。 """
-    JUNGLE_MUTATED = auto()
-    """ 丛林变种。 """
-    JUNGLE_EDGE_MUTATED = auto()
-    """ 丛林边缘变种。 """
-    BIRCH_FOREST_MUTATED = auto()
-    """ 高大桦木森林。 """
-    BIRCH_FOREST_HILLS_MUTATED = auto()
-    """ 高大桦木丘陵。 """
-    ROOFED_FOREST_MUTATED = auto()
-    """ 黑森林丘陵。 """
-    COLD_TAIGA_MUTATED = auto()
-    """ 积雪的针叶林山地。 """
-    REDWOOD_TAIGA_MUTATED = auto()
-    """ 巨型云杉针叶林。 """
-    REDWOOD_TAIGA_HILLS_MUTATED = auto()
-    """ 巨型云杉针叶林丘陵。 """
-    EXTREME_HILLS_PLUS_TREES_MUTATED = auto()
-    """ 沙砾山地+。 """
-    SAVANNA_MUTATED = auto()
-    """ 破碎的热带草原。 """
-    SAVANNA_PLATEAU_MUTATED = auto()
-    """ 破碎的热带高原。 """
-    MESA_BRYCE = auto()
-    """ 被风蚀的恶地。 """
-    MESA_PLATEAU_STONE_MUTATED = auto()
-    """ 繁茂的恶地高原变种。 """
-    MESA_PLATEAU_MUTATED = auto()
-    """ 恶地高原变种。 """
-    SOULSAND_VALLEY = auto()
-    """ 灵魂沙峡谷。 """
-    CRIMSON_FOREST = auto()
-    """ 绯红森林。 """
-    WARPED_FOREST = auto()
-    """ 诡异森林。 """
-    BASALT_DELTAS = auto()
-    """ 玄武岩三角洲。 """
-    JAGGED_PEAKS = auto()
-    """ 尖峭山峰。 """
-    FROZEN_PEAKS = auto()
-    """ 冰封山峰。 """
-    SNOWY_SLOPES = auto()
-    """ 积雪的山坡。 """
-    GROVE = auto()
-    """ 雪林。 """
-    MEADOW = auto()
-    """ 草甸。 """
-    LUSH_CAVES = auto()
-    """ 繁茂洞穴。 """
-    DRIPSTONE_CAVES = auto()
-    """ 溶洞。 """
-    STONY_PEAKS = auto()
-    """ 裸岩山峰。 """
-    DEEP_DARK = auto()
-    """ 深暗之域。 """
-    MANGROVE_SWAMP = auto()
-    """ 红树林沼泽。 """
-    CHERRY_GROVE = auto()
-    """ 樱花树林。 """
-    PALE_GARDEN = auto()
-    """ 苍白之园。 """
 
 
 # endregion
@@ -2192,155 +1476,6 @@ ENCHANT_NAME_MAP = {
 
 
 # endregion
-
-
-def __test__():
-    from ..core._utils import assert_error
-
-    assert Enum._member_type_ is object
-    assert IntEnum._member_type_ is int
-    assert StrEnum._member_type_ is str
-
-    def test_enum(_IntEnum=IntEnum, _StrEnum=StrEnum):
-        class E(Enum):
-            @classmethod
-            def _missing_(cls, value):
-                if value == 33:
-                    return cls.A
-                if value == 44:
-                    return 44
-
-            A = 0
-            B = "1"
-            C = [2]
-
-        assert isinstance(E.A, E)
-        assert E.A.name == "A"
-        assert E.A.value == 0
-
-        def f():
-            E.A = 1
-        assert_error(f, exc=AttributeError)
-        def f():
-            del E.A
-        assert_error(f, exc=AttributeError)
-
-        assert E(0) is E.A
-        assert E("1") is E.B
-        assert E([2]) is E.C
-        assert E['A'] is E.A
-        assert len(E) == 3
-        assert E(33) is E.A
-        assert_error(E, (44,), exc=TypeError)
-
-        for member in E:
-            assert isinstance(member, E)
-            assert E(member.value) is E[member.name]
-        for name, member in E.__members__.items():
-            assert isinstance(member, E)
-            assert E(member) is E[name]
-
-        assert repr(E) == "<enum 'E'>"
-        assert repr(E.A) == "<E.A: 0>"
-        assert repr(E.B) == "<E.B: '1'>"
-        assert repr(E.C) == "<E.C: [2]>"
-        assert str(E.A) == "E.A"
-        assert str(E.B) == "E.B"
-        assert str(E.C) == "E.C"
-
-        assert 0 in E
-        assert "1" in E
-        assert [2] in E
-        assert E.A in E
-        assert 4 not in E
-
-        class SE(_StrEnum):
-            A = "a"
-            B = "b"
-            C = "c"
-
-        assert isinstance(SE.A, SE)
-        assert SE.A.name == "A"
-        assert SE.A.value == "a"
-        assert SE.A == "a"
-        assert SE.B == "b"
-        assert SE.C == "c"
-        assert SE("a") is SE.A
-        assert SE['A'] is SE.A # noqa
-        assert repr(SE) == "<enum 'SE'>"
-        assert repr(SE.A) == "<SE.A: 'a'>"
-        assert str(SE.A) == "a"
-        assert "a" in SE
-        assert "d" not in SE
-        assert SE.A in SE
-        assert "a" + SE.A == "aa"
-        assert "a%s" % SE.A == "aa"
-
-        class IE(_IntEnum):
-            A = 0
-            B = 1
-            C = 2
-
-        assert isinstance(IE.A, IE)
-        assert IE.A.name == "A"
-        assert IE.A.value == 0
-        assert IE.A == 0
-        assert IE.B == 1
-        assert IE.C == 2
-        assert IE(0) is IE.A
-        assert IE['A'] is IE.A
-        assert repr(IE) == "<enum 'IE'>"
-        assert repr(IE.A) == "<IE.A: 0>"
-        assert str(IE.A) == "0"
-        assert 0 in IE
-        assert 4 not in IE
-        assert IE.A in IE
-        assert 1 + IE.C == 3
-        assert "%d" % IE.A == "0"
-
-        def f():
-            class SE(_StrEnum):
-                A = 0
-        assert_error(f, exc=TypeError)
-        def f():
-            class IE(_IntEnum):
-                A = "0"
-        assert_error(f, exc=TypeError)
-
-        class ASE(_StrEnum):
-            C = auto()
-            B = auto()
-            A = auto()
-        assert ASE._member_names_ == ["C", "B", "A"]
-        assert ASE.C == "C"
-        assert ASE.B == "B"
-
-        class AIE(_IntEnum):
-            C = auto()
-            A = auto()
-            B = auto()
-        assert AIE._member_names_ == ["C", "A", "B"]
-        assert AIE.C == 1
-        assert AIE.B == 3
-
-    test_enum()
-
-    class IntEnum2(Enum, int):
-        pass
-    class StrEnum2(Enum, str):
-        @staticmethod
-        def _generate_next_value_(name, count, last_values): # noqa
-            return name
-
-    test_enum(IntEnum2, StrEnum2) # noqa
-
-    def f():
-        class IntEnum2(Enum, int, str):
-            pass
-    assert_error(f, exc=TypeError)
-
-    assert Mob.WITHER == "minecraft:wither"
-
 
 
 
