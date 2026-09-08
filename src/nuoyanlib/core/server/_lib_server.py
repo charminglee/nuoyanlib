@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -33,7 +33,7 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
         ns, sys_name = s_api.GetEngineNamespace(), s_api.GetEngineSystemName()
         self.native_listen(ns, sys_name, "EntityRemoveEvent", self.EntityRemoveEvent)
 
-        ns, sys_name_c, sys_name_s = _const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_SERVER_NAME
+        ns, sys_name_c, sys_name_s = _env.LIB_NAME, _env.LIB_CLIENT_NAME, _env.LIB_SERVER_NAME
         self.native_listen(ns, sys_name_c, "UiInitFinished", self.UiInitFinished)
         self.native_listen(ns, sys_name_c, "_BroadcastToAllClient", self._BroadcastToAllClient)
         self.native_listen(ns, sys_name_c, "_NotifyToMultiClients", self._NotifyToMultiClients)
@@ -47,7 +47,7 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
     def Destroy(self):
         NuoyanLibBaseSystem.Destroy(self)
         from ..listener import unlisten_all_events
-        for _, system in _const.SERVER_SYSTEMS.items():
+        for _, system in _env.SERVER_SYSTEMS.items():
             unlisten_all_events(system)
 
     # region Events ====================================================================================================
@@ -163,7 +163,7 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
 
 def instance():
     if not NuoyanLibServerSystem._instance:
-        NuoyanLibServerSystem._instance = s_api.GetSystem(_const.LIB_NAME, _const.LIB_SERVER_NAME)
+        NuoyanLibServerSystem._instance = s_api.GetSystem(_env.LIB_NAME, _env.LIB_SERVER_NAME)
     return NuoyanLibServerSystem._instance
 
 

@@ -19,7 +19,7 @@ import bisect
 from types import MethodType, FunctionType
 import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
-from . import _const, error, _env, _logging
+from . import error, _env, _logging
 from ._utils import iter_obj_attrs, DefaultLocal
 from ..config import ENABLED_EVENT_ARGS_WARPPING
 
@@ -39,8 +39,8 @@ __all__ = [
 
 ALL_CLIENT_LIB_EVENTS = {}
 ALL_SERVER_LIB_EVENTS = {
-    # 'ItemGridChangedServerEvent': _const.LIB_CLIENT_NAME,
-    'UiInitFinished': _const.LIB_CLIENT_NAME,
+    # 'ItemGridChangedServerEvent': _env.LIB_CLIENT_NAME,
+    'UiInitFinished': _env.LIB_CLIENT_NAME,
 }
 ALL_CLIENT_ENGINE_EVENTS = {
     "OnSimTickClientEvent",
@@ -350,14 +350,14 @@ ALL_SERVER_ENGINE_EVENTS = {
 def _get_event_source(is_client, event_name):
     if is_client:
         if event_name in ALL_CLIENT_LIB_EVENTS:
-            return _const.LIB_NAME, ALL_CLIENT_LIB_EVENTS[event_name]
+            return _env.LIB_NAME, ALL_CLIENT_LIB_EVENTS[event_name]
         if event_name in ALL_CLIENT_ENGINE_EVENTS:
             return c_api.GetEngineNamespace(), c_api.GetEngineSystemName()
         # if event_name in ALL_SERVER_ENGINE_EVENTS:
         #     return s_api.GetEngineNamespace(), s_api.GetEngineSystemName()
     else:
         if event_name in ALL_SERVER_LIB_EVENTS:
-            return _const.LIB_NAME, ALL_SERVER_LIB_EVENTS[event_name]
+            return _env.LIB_NAME, ALL_SERVER_LIB_EVENTS[event_name]
         if event_name in ALL_SERVER_ENGINE_EVENTS:
             return s_api.GetEngineNamespace(), s_api.GetEngineSystemName()
         # if event_name in ALL_CLIENT_ENGINE_EVENTS:
@@ -370,7 +370,7 @@ def _parse_listen_args(func, event_name, ns, sys_name):
     if ns and sys_name:
         return event_name, ns, sys_name
     elif not ns and sys_name:
-        return event_name, _const.MOD_NAME, sys_name
+        return event_name, _env.MOD_NAME, sys_name
     elif ns and not sys_name:
         raise error.EventSourceError(event_name, ns, sys_name)
     else:
@@ -861,8 +861,8 @@ def _lib_sys_event(name="", from_client=None):
         from_client = not _env.is_client()
     return event(
         name,
-        _const.LIB_NAME,
-        _const.LIB_CLIENT_NAME if from_client else _const.LIB_SERVER_NAME,
+        _env.LIB_NAME,
+        _env.LIB_CLIENT_NAME if from_client else _env.LIB_SERVER_NAME,
     )
 
 

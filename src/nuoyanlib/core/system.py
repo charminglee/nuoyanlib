@@ -14,20 +14,20 @@ from collections import defaultdict
 import mod.client.extraClientApi as c_api
 import mod.server.extraServerApi as s_api
 from .listener import _get_event_source, event
-from ._env import get_cls_path, is_client
-from . import _const
+from . import _env
 
 
 class NySystemMeta(type):
     def __new__(metacls, cls_name, bases, cls_dict):
         if cls_name not in ("NyClientSystem", "NyServerSystem"):
-            ic = is_client()
+            ic = _env.is_client()
             for k, v in cls_dict.items():
                 if not callable(v) or hasattr(v, '_nyl__listen_args'):
                     # 跳过属性和已被@event装饰的方法
                     continue
                 source = _get_event_source(ic, k)
                 if source:
+                    # 对所有名为ModSDK事件名的函数套用event装饰器
                     cls_dict[k] = event(k, *source)(v)
         return type.__new__(metacls, cls_name, bases, cls_dict)
 
@@ -62,27 +62,27 @@ class NuoyanLibBaseSystem(object):
     def __init__(self):
         self.all_sd = defaultdict(list)
         self.unregister_sd_data = {}
-        self.is_client = is_client()
+        self.is_client = _env.is_client()
         if self.is_client:
-            lib_sys_name = _const.LIB_SERVER_NAME
+            lib_sys_name = _env.LIB_SERVER_NAME
         else:
-            lib_sys_name = _const.LIB_CLIENT_NAME
-        self.native_listen(_const.LIB_NAME, lib_sys_name, "_NuoyanLibSyncData", self._NuoyanLibSyncData)
+            lib_sys_name = _env.LIB_CLIENT_NAME
+        self.native_listen(_env.LIB_NAME, lib_sys_name, "_NuoyanLibSyncData", self._NuoyanLibSyncData)
 
     @classmethod
     def run(cls):
-        if is_client():
-            sys_name = _const.LIB_CLIENT_NAME
+        if _env.is_client():
+            sys_name = _env.LIB_CLIENT_NAME
             api = c_api
         else:
-            sys_name = _const.LIB_SERVER_NAME
+            sys_name = _env.LIB_SERVER_NAME
             api = s_api
-        system = api.GetSystem(_const.LIB_NAME, sys_name)
+        system = api.GetSystem(_env.LIB_NAME, sys_name)
         if system:
             res = True
         else:
-            path = get_cls_path(cls)
-            res = bool(api.RegisterSystem(_const.LIB_NAME, sys_name, path))
+            path = _env.get_cls_path(cls)
+            res = bool(api.RegisterSystem(_env.LIB_NAME, sys_name, path))
 
         return res
 

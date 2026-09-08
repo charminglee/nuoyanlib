@@ -10,7 +10,7 @@
 #  ================================================
 
 
-from ..core._const import (
+from ..core._env import (
     MOD_NAME,
     CLIENT_MODULES,
     SERVER_MODULES,

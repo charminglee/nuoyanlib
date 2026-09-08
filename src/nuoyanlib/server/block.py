@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -13,7 +13,7 @@
 from ..core._env import get_lib_system
 from ..core.server.comp import LvComp, CF
 from ..core._utils import kwargs_defaults
-from ..core import _const
+from ..core import _shared
 from ..common.pos_gen import gen_random_even_pos
 from ..common.mc_math.mc_math import pos_floor
 
@@ -71,7 +71,7 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
         if not block or block['name'] != "minecraft:air":
             continue
 
-        entity_id = lib_sys.CreateEngineEntityByTypeStr(_const.GSE_IDENTIFIER, spawn_pos, (0, 0), dim, True)
+        entity_id = lib_sys.CreateEngineEntityByTypeStr(_shared.GSE_IDENTIFIER, spawn_pos, (0, 0), dim, True)
         if not entity_id:
             continue
 
@@ -87,7 +87,7 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
                 }
             }""" % kwargs['time']
         )
-        cf.ModAttr.SetAttr(_const.GSE_ARGS, args, True)
+        cf.ModAttr.SetAttr(_shared.GSE_ARGS, args, True)
 
         eid_list.append(entity_id)
     return eid_list

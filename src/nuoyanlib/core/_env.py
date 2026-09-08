@@ -16,6 +16,28 @@ import threading
 DEBUG = False
 
 
+class __C: pass
+ROOT = __C.__module__.split(".")[0]
+del __C
+
+
+MOD_NAME = None
+CLIENT_MODULES = {}
+SERVER_MODULES = {}
+CLIENT_SYSTEMS = {}
+SERVER_SYSTEMS = {}
+
+
+from .. import __version__
+
+
+LIB_VERSION = __version__.split("-")[0]
+LIB_VERSION_UL = __version__.replace(".", "_").replace("-", "_")
+LIB_NAME = "NuoyanLib_%s" % LIB_VERSION_UL
+LIB_CLIENT_NAME = "NuoyanLibClientSystem_%s" % LIB_VERSION_UL
+LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
+
+
 def get_cls_path(cls):
     return cls.__module__ + "." + cls.__name__
 

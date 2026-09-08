@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -41,7 +41,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
         if config.GSE_USE_RENDER_TICK:
             self.native_listen(ns, sys_name, "GameRenderTickEvent", self.GameRenderTickEvent)
 
-        ns, sys_name_c, sys_name_s = _const.LIB_NAME, _const.LIB_CLIENT_NAME, _const.LIB_SERVER_NAME
+        ns, sys_name_c, sys_name_s = _env.LIB_NAME, _env.LIB_CLIENT_NAME, _env.LIB_SERVER_NAME
         self.native_listen(ns, sys_name_s, "_SetQueryVar", self._SetQueryVar)
         self.native_listen(ns, sys_name_c, "_NuoyanLibCall", self._NuoyanLibCall)
         self.native_listen(ns, sys_name_s, "_NuoyanLibCall", self._NuoyanLibCall)
@@ -56,13 +56,13 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     def Destroy(self):
         NuoyanLibBaseSystem.Destroy(self)
         from ..listener import unlisten_all_events
-        for _, system in _const.CLIENT_SYSTEMS.items():
+        for _, system in _env.CLIENT_SYSTEMS.items():
             unlisten_all_events(system)
 
     # region Events ====================================================================================================
 
     def AddEntityClientEvent(self, args):
-        if args['engineTypeStr'] == _const.GSE_IDENTIFIER:
+        if args['engineTypeStr'] == _shared.GSE_IDENTIFIER:
             entity_id = args['id']
             cf = CF(entity_id)
             self.gse_data[entity_id] = {
@@ -99,8 +99,8 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
             self,
             event_name,
             event_data,
-            ns=_const.LIB_NAME,
-            sys_name=_const.LIB_CLIENT_NAME,
+            ns=_env.LIB_NAME,
+            sys_name=_env.LIB_CLIENT_NAME,
     ):
         self.NotifyToServer("_BroadcastToAllClient", {
             'event_name': event_name,
@@ -114,8 +114,8 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
             player_ids,
             event_name,
             event_data,
-            ns=_const.LIB_NAME,
-            sys_name=_const.LIB_CLIENT_NAME,
+            ns=_env.LIB_NAME,
+            sys_name=_env.LIB_CLIENT_NAME,
     ):
         if not player_ids:
             return
@@ -132,8 +132,8 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
             player_id,
             event_name,
             event_data,
-            ns=_const.LIB_NAME,
-            sys_name=_const.LIB_CLIENT_NAME,
+            ns=_env.LIB_NAME,
+            sys_name=_env.LIB_CLIENT_NAME,
     ):
         self.NotifyToServer("_NotifyToClient", {
             'player_id': player_id,
@@ -210,7 +210,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     # region spawn_ground_shatter_effect ===============================================================================
 
     def spawn_one_gse(self, pos, block, args):
-        entity_id = self.CreateClientEntityByTypeStr(_const.GSE_IDENTIFIER, pos, (0, 0))
+        entity_id = self.CreateClientEntityByTypeStr(_shared.GSE_IDENTIFIER, pos, (0, 0))
         if entity_id:
             cf = CF(entity_id)
             cf.Model.SetEntityShadowShow(False)
@@ -287,7 +287,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
             if data['inited']:
                 self._update_gse_offset(data)
             elif data['attr_comp']:
-                args = data['attr_comp'].GetAttr(_const.GSE_ARGS)
+                args = data['attr_comp'].GetAttr(_shared.GSE_ARGS)
                 if args:
                     data.update(args)
                     self._init_gse(data)
@@ -317,7 +317,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
 
 def instance():
     if not NuoyanLibClientSystem._instance:
-        NuoyanLibClientSystem._instance = c_api.GetSystem(_const.LIB_NAME, _const.LIB_CLIENT_NAME)
+        NuoyanLibClientSystem._instance = c_api.GetSystem(_env.LIB_NAME, _env.LIB_CLIENT_NAME)
     return NuoyanLibClientSystem._instance
 
 

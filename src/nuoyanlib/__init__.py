@@ -31,7 +31,7 @@ __author_email__ = "1279735247@qq.com"
 
 import traceback
 from mod.common.mod import Mod
-from .core import _const, _logging
+from .core import _env, _logging
 
 
 _mod_clients = []
@@ -39,10 +39,10 @@ _mod_servers = []
 
 
 def _load_extensions(is_client):
-    if _const.ROOT == "nuoyanlib":
+    if _env.ROOT == "nuoyanlib":
         ext_module_path = "nuoyanlib.extensions"
     else:
-        ext_module_path = _const.ROOT + ".nuoyanlib.extensions"
+        ext_module_path = _env.ROOT + ".nuoyanlib.extensions"
     try:
         ext_module = __imp(ext_module_path)
         ext_list = ext_module.EXTENSION_LOADING_LIST
@@ -67,10 +67,10 @@ def _load_extensions(is_client):
 def _load_modules(is_client):
     if is_client:
         modules = _mod_clients
-        registered_modules = _const.CLIENT_MODULES
+        registered_modules = _env.CLIENT_MODULES
     else:
         modules = _mod_servers
-        registered_modules = _const.SERVER_MODULES
+        registered_modules = _env.SERVER_MODULES
     if not modules:
         return
 
@@ -91,26 +91,26 @@ def _load_systems(is_client):
     if is_client:
         import mod.client.extraClientApi as api
         system_cls = api.GetClientSystemCls()
-        registered_modules = _const.CLIENT_MODULES
-        registered_systems = _const.CLIENT_SYSTEMS
+        registered_modules = _env.CLIENT_MODULES
+        registered_systems = _env.CLIENT_SYSTEMS
     else:
         import mod.server.extraServerApi as api
         system_cls = api.GetServerSystemCls()
-        registered_modules = _const.SERVER_MODULES
-        registered_systems = _const.SERVER_SYSTEMS
+        registered_modules = _env.SERVER_MODULES
+        registered_systems = _env.SERVER_SYSTEMS
 
     for module in registered_modules.values():
         for k, v in module.__dict__.items():
             if not isinstance(v, type) or not issubclass(v, system_cls):
                 continue
             cls_path = module.__name__ + "." + k
-            if api.GetSystem(_const.MOD_NAME, k):
+            if api.GetSystem(_env.MOD_NAME, k):
                 _logging.warning(
                     "%sSystem already exists; skip registration: (%s) %s",
                     "Client" if is_client else "Server", k, cls_path
                 )
             else:
-                system = api.RegisterSystem(_const.MOD_NAME, k, cls_path)
+                system = api.RegisterSystem(_env.MOD_NAME, k, cls_path)
                 registered_systems[(module.__name__, k)] = system
                 _logging.info(
                     "%sSystem registered: (%s) %s",
@@ -162,14 +162,14 @@ def run(mod_name, **kwargs):
     :raise TypeError: 如果调用了多次 nuoyanlib.run() ，则传入的 mod_name 必须相同，否则抛出此异常
     :raise RuntimeError: 找不到 modMain.py 的 globals 字典时抛出，此时请通过 globals 参数手动传入
     """
-    _logging.info("Start loading, version: %s, script: %s" % (__version__, _const.ROOT), show_env=False)
+    _logging.info("Start loading, version: %s, script: %s" % (__version__, _env.ROOT), show_env=False)
 
-    if _const.MOD_NAME and _const.MOD_NAME != mod_name:
+    if _env.MOD_NAME and _env.MOD_NAME != mod_name:
         raise TypeError(
             "cannot set the same mod_name to two different names '%s' and '%s'"
-            % (_const.MOD_NAME, mod_name)
+            % (_env.MOD_NAME, mod_name)
         )
-    _const.MOD_NAME = mod_name
+    _env.MOD_NAME = mod_name
     if 'clients' in kwargs:
         _mod_clients.extend(kwargs['clients'])
     if 'servers' in kwargs:
@@ -191,12 +191,11 @@ def run(mod_name, **kwargs):
     if 'NuoyanLibMain' in globals_:
         return
 
-    @Mod.Binding(_const.LIB_NAME, _const.LIB_VERSION)
+    @Mod.Binding(_env.LIB_NAME, _env.LIB_VERSION)
     class NuoyanLibMain(object):
         @Mod.InitServer()
         def init_server(self):
-            from .core._env import _THREAD_LOCAL
-            _THREAD_LOCAL.IS_CLIENT = False
+            _env._THREAD_LOCAL.IS_CLIENT = False
             from .core.server._lib_server import NuoyanLibServerSystem
             NuoyanLibServerSystem.run()
             _load_extensions(False)
@@ -207,8 +206,7 @@ def run(mod_name, **kwargs):
 
         @Mod.InitClient()
         def init_client(self):
-            from .core._env import _THREAD_LOCAL
-            _THREAD_LOCAL.IS_CLIENT = True
+            _env._THREAD_LOCAL.IS_CLIENT = True
             from .core.client._lib_client import NuoyanLibClientSystem
             NuoyanLibClientSystem.run()
             _load_extensions(True)
