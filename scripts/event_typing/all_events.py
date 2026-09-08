@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -5703,15 +5703,4 @@ class ServerEvent:
         --------
 
         无
-        """
-    def UiInitFinished(self, args):
-        """
-        [nuoyanlib] [事件]
-
-        客户端玩家UI框架初始化完成时，服务端触发。
-
-        事件参数
-        --------
-
-        - ``__id__`` -- str，玩家的实体ID
         """

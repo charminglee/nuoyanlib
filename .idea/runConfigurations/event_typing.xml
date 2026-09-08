@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="event_typehint_gen" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="event_typing" type="PythonConfigurationType" factoryName="Python">
     <module name="nuoyanlib" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
@@ -16,7 +16,7 @@
     <option name="DEBUG_JUST_MY_CODE" value="true" />
     <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="RUN_TOOL" value="" />
-    <option name="SCRIPT_NAME" value="$ContentRoot$/scripts/event_typehint/main.py" />
+    <option name="SCRIPT_NAME" value="$ContentRoot$/scripts/event_typing/main.py" />
     <option name="PARAMETERS" value="" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />

@@ -3,9 +3,9 @@
 studio.json
 *.psd
 *.log
-/scripts/event_typehint/*
-!/scripts/event_typehint/all_events.py
-!/scripts/event_typehint/main.py
+/scripts/event_typing/*
+!/scripts/event_typing/all_events.py
+!/scripts/event_typing/main.py
 /docs/source/api/apis/
 /tests/ingame_test/.idea/
 /tests/ingame_test/.mcs/
