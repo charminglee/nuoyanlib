@@ -3,8 +3,9 @@
   <component name="PySourceRootDetectionService">
     <option name="sourcePathsSet">
       <set>
-        <option value="$PROJECT_DIR$/src" />
         <option value="$PROJECT_DIR$/src/nuoyanlib" />
+        <option value="$PROJECT_DIR$/src" />
+        <option value="$PROJECT_DIR$/tests/ingame_test/bp/test_scripts" />
       </set>
     </option>
   </component>

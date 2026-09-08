@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -17,9 +17,9 @@ MOD_NAME = "Test"
 MOD_NAME_S = MOD_NAME.lower()
 MOD_VERSION = "0.0.1"
 CLIENT_SYSTEM_NAME = "MainClientSystem"
-CLIENT_SYSTEM_CLASS_PATH = "%s_scripts.main_client.%s" % (MOD_NAME_S, CLIENT_SYSTEM_NAME)
+CLIENT_SYSTEM_PATH = "%s_scripts.main_client" % MOD_NAME_S
 SERVER_SYSTEM_NAME = "MainServerSystem"
-SERVER_SYSTEM_CLASS_PATH = "%s_scripts.main_server.%s" % (MOD_NAME_S, SERVER_SYSTEM_NAME)
+SERVER_SYSTEM_PATH = "%s_scripts.main_server" % MOD_NAME_S
 
 
 UI_NUOYANLIB_TEST = "NuoyanlibTest"

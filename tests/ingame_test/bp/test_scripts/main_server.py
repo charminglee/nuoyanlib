@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -22,6 +22,10 @@ from .nuoyanlib.server import (
 from .benchmark import print_msg, run_benchmark, print_res
 
 
+client_event = event(sys_name=CLIENT_SYSTEM_NAME)
+server_event = event(sys_name=SERVER_SYSTEM_NAME)
+
+
 class MainServerSystem(nyl.NyServerSystem):
     def __init__(self, namespace, systemName):
         super(MainServerSystem, self).__init__(namespace, systemName)
@@ -29,7 +33,7 @@ class MainServerSystem(nyl.NyServerSystem):
         self.comm_time = 0
         self.comm_cost = 0
         self.player_id = None
-        LvComp.Game.AddTimer(6, self.run_benchmark)
+        # LvComp.Game.AddTimer(6, self.run_benchmark)
 
     def run_benchmark(self):
         # from .nuoyanlib.core._doc import get_signature
@@ -48,10 +52,11 @@ class MainServerSystem(nyl.NyServerSystem):
 
     @nyl.event(ns=MOD_NAME, sys_name=CLIENT_SYSTEM_NAME)
     def OnKeyPressInGame(self, args):
-        playerId = args['__id__']
-        screenName = args['screenName']
-        key = int(args['key'])
-        isDown = int(args['isDown'])
+        print(args)
+        playerId = args.__id__
+        screenName = args.screenName
+        key = int(args.keys)
+        isDown = int(args.isDown)
         if screenName != "hud_screen" or not isDown:
             return
         pos = CF(playerId).Pos.GetFootPos()

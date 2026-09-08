@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-8
 #  ⠀
 #  ================================================
 
@@ -24,8 +24,8 @@ from .nuoyanlib.client import (
 from .benchmark import run_benchmark, print_res, print_msg
 
 
-clientEvent = event(ns=MOD_NAME, sys_name=CLIENT_SYSTEM_NAME)
-serverEvent = event(ns=MOD_NAME, sys_name=SERVER_SYSTEM_NAME)
+client_event = event(sys_name=CLIENT_SYSTEM_NAME)
+server_event = event(sys_name=SERVER_SYSTEM_NAME)
 
 
 class MainClientSystem(nyl.NyClientSystem):
@@ -36,16 +36,12 @@ class MainClientSystem(nyl.NyClientSystem):
     def run_benchmark(self):
         # run_benchmark("nuoyanlib.common.filter", PLAYER_ID)
         self.communicate_benchmark()
-        # nyl.push_ui(
-        #     MOD_NAME, UI_NAME_NUOYANLIB_TEST, UI_PATH_NUOYANLIB_TEST, UI_DEF_NUOYANLIB_TEST,
-        #     client_system=self,
-        # )
         print("client benchmark over")
 
     def OnKeyPressInGame(self, args):
-        screenName = args['screenName']
-        key = int(args['key'])
-        isDown = int(args['isDown'])
+        screenName = args.screenName
+        key = int(args['keys'])
+        isDown = int(args.isDown)
         self.NotifyToServer(ClientEvent.OnKeyPressInGame, dict(args))
         if screenName != "hud_screen" or not isDown:
             return
