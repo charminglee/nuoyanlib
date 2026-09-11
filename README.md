@@ -128,8 +128,8 @@
    
     需要注意的是， `nuoyanlib.client` 为客户端工具包，其中的函数只能在客户端环境使用； `nuoyanlib.server` 同理，只能在服务端环境使用； `nuoyanlib.common` 则无环境限制，双端均可使用。
 
-   > [!WARNING]  
-   > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库）。如果你强制这么做，「nuoyanlib」将抛出 `AcrossImportError` 。
+> [!WARNING]  
+> 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库）。如果你强制这么做，「nuoyanlib」将抛出 `AcrossImportError` 。
 
 4. 更多信息详见[入门指南](/docs/source/getting_started.rst)。
 
