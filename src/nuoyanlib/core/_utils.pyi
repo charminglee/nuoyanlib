@@ -5,16 +5,34 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-9
 #  ⠀
 #  ================================================
 
 
 from threading import local
 import sys
-from typing import Generic, Hashable, List, Callable, Any, Type, Union, Tuple, Optional, Generator, overload, Dict
+from typing import TypeVar, Generic, Hashable, List, Callable, Any, Type, Union, Tuple, Optional, Generator, overload, Dict
 from ._types._typing import ITuple, T, F, Args, Kwargs, STuple, T_co
 from ._types._checker import args_type_check
+
+
+__CallableT = TypeVar("__CallableT", bound=Callable)
+
+
+if sys.version_info >= (3, 10):
+    from typing import ParamSpec, Concatenate
+    __P = ParamSpec("__P")
+    __R_co = TypeVar("__R_co", covariant=True)
+    class dualmethod(Generic[T, __P, __R_co]):
+        func: Callable[Concatenate[T, __P], __R_co]
+        def __init__(self, func: Callable[Concatenate[T, __P], __R_co]) -> None: ...
+        def __get__(self, instance: Any, owner: Optional[Type[T]] = None) -> Callable[__P, __R_co]: ...
+else:
+    class dualmethod(object):
+        func: Callable
+        def __init__(self, func: Callable) -> None: ...
+        def __get__(self, instance: T, owner: Optional[Type[T]] = None) -> Callable: ...
 
 
 def get_arg_names(func: Callable) -> STuple: ...
@@ -30,7 +48,6 @@ class DefaultLocal(Generic[T]):
     def __delattr__(self, name: str) -> None: ...
 
 
-def get_file_path(index: int = -2) -> str: ...
 @overload
 def parse_indices(index: slice, length: int, cls: type, op: Callable[[int], T]) -> List[T]: ...
 @overload
@@ -128,11 +145,32 @@ def assert_error(
     exc: Union[Type[Exception], Tuple[Type[Exception], ...]] = (),
 ) -> None: ...
 def join_chr(*seq: int) -> str: ...
+@overload
 def hook_method(
-    org_method: Callable,
-    before_hook: Optional[Callable] = None,
-    after_hook: Optional[Callable] = None,
-) -> None: ...
+    obj: object,
+    func_name: str,
+    before_hook: __CallableT,
+    after_hook: __CallableT,
+) -> __CallableT: ...
+@overload
+def hook_method(
+    obj: object,
+    func_name: str,
+    before_hook: __CallableT,
+    after_hook: None = None,
+) -> __CallableT: ...
+@overload
+def hook_method(
+    obj: object,
+    func_name: str,
+    *,
+    after_hook: __CallableT,
+) -> __CallableT: ...
+@overload
+def hook_method(
+    obj: object,
+    func_name: str,
+) -> Callable: ...
 # def is_inv36_key(k: str) -> bool: ...
 # def is_inv27_key(k: str) -> bool: ...
 # def is_shortcut_key(k: str) -> bool: ...

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-9
 #  ⠀
 #  ================================================
 
@@ -15,269 +15,95 @@ import traceback
 from types import MethodType
 from functools import wraps
 from ._doc import signature, get_signature
-from ._env import is_client, DEBUG
+from . import _env
 
 
-def get_arg_names(func):
-    code = func.__code__ # noqa
-    arg_names = code.co_varnames[:code.co_argcount]
-    return arg_names
+# region Function Utils ================================================================================================
 
 
-def get_module(*args):
-    path = join_chr(*args)
-    try:
-        return __imp(path)
-    except:
-        return None
+class dualmethod(object):
+    def __init__(self, func):
+        self.func = func
+
+    def __get__(self, instance, owner):
+        def wrapper(*args, **kwargs):
+            if instance is None:
+                return self.func(owner, *args, **kwargs)
+            else:
+                return self.func(instance, *args, **kwargs)
+        return wrapper
 
 
-# def get_obj_size(obj, seen=None):
-#     if seen is None:
-#         seen = set()
-#     import sys
-#     size = sys.getsizeof(obj)
-#
-#     obj_id = id(obj)
-#     if obj_id in seen:
-#         return 0
-#     seen.add(obj_id)
-#
-#     if hasattr(obj, 'keys') and type(obj.keys) is MethodType:
-#         size += sum(
-#             get_obj_size(k, seen) + get_obj_size(obj[k], seen)
-#             for k in obj.keys()
-#         )
-#     elif hasattr(obj, '__iter__') and type(obj.__iter__) is MethodType and not isinstance(obj, (str, unicode)):
-#         size += sum(get_obj_size(i, seen) for i in obj)
-#     elif hasattr(obj, '__dict__'):
-#         size += get_obj_size(obj.__dict__, seen)
-#
-#     return size
+def hook_method(obj, func_name, before_hook=None, after_hook=None):
+    func = getattr(obj, func_name)
 
-
-_NOT_FOUND = object()
-
-
-class DefaultLocal(object):
-    def __init__(self, default_factory=lambda: None):
-        object.__setattr__(self, '_default_factory', default_factory)
-        object.__setattr__(self, '_local', threading.local())
-
-    def __getattribute__(self, name):
-        local = object.__getattribute__(self, '_local')
-        value = getattr(local, name, _NOT_FOUND)
-        if value is _NOT_FOUND:
-            factory = object.__getattribute__(self, '_default_factory')
-            value = factory()
-            local.__setattr__(name, value)
-        return value
-
-    def __setattr__(self, name, value):
-        local = object.__getattribute__(self, '_local')
-        return local.__setattr__(name, value)
-
-    def __delattr__(self, name):
-        local = object.__getattribute__(self, '_local')
-        return local.__delattr__(name)
-
-
-def get_file_path(index=-2):
-    stack = traceback.extract_stack()
-    return stack[index][0] if stack else ""
-
-
-def parse_indices(index, length, cls, op=None):
-    if isinstance(index, slice):
-        start, stop, step = index.indices(length)
-        return [
-            (op(i) if op else i)
-            for i in xrange(start, stop, step)
-        ]
-    elif isinstance(index, int):
-        if index < 0:
-            index += length
-        if index < 0 or index >= length:
-            raise IndexError("%s index out of range" % cls.__name__)
-        return op(index) if op else index
-    raise TypeError(
-        "%s indices must be integers or slices, not %s"
-        % (cls.__name__, type(index).__name__)
-    )
-
-
-def parse_indices_generator(index, length, cls, op=None):
-    if isinstance(index, slice):
-        start, stop, step = index.indices(length)
-        for i in xrange(start, stop, step):
-            yield op(i) if op else i
-    elif isinstance(index, int):
-        if index < 0:
-            index += length
-        if index < 0 or index >= length:
-            raise IndexError("%s index out of range" % cls.__name__)
-        yield op(index) if op else index
-    else:
-        raise TypeError(
-            "%s indices must be integers or slices, not %s"
-            % (cls.__name__, type(index).__name__)
-        )
-
-
-def inject_is_client(func):
-    signature(start=1)(func)
-
-    @wraps(func)
-    def c(*args, **kwargs):
-        return func(True, *args, **kwargs)
-
-    @wraps(func)
-    def s(*args, **kwargs):
-        return func(False, *args, **kwargs)
-
-    @wraps(func)
-    def auto(*args, **kwargs):
-        return func(is_client(), *args, **kwargs)
-
-    auto._nyl__inject_is_client = (c, s, func)
-    return auto
-
-
-class SingletonMeta(type):
-    def __new__(metacls, name, bases, dct):
-        cls = type.__new__(metacls, name, bases, dct)
-        cls._instance = None
-        return cls
-
-    def __call__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = type.__call__(cls, *args, **kwargs)
-        return cls._instance
-
-
-class Singleton(object):
-    __metaclass__ = SingletonMeta
-    _instance = None
-
-
-_KWARGS_MARK = (object(),)
-
-
-def _singleton_key(args, kwargs):
-    if not kwargs:
-        return args
-    return args + _KWARGS_MARK + tuple(sorted(kwargs.items()))
-
-
-class ArgsSingletonMeta(type):
-    def __new__(metacls, name, bases, dct):
-        cls = type.__new__(metacls, name, bases, dct)
-        cls._instances = {}
-        cls._unhashable_instances = []
-        return cls
-
-    def __call__(cls, *args, **kwargs):
-        key = _singleton_key(args, kwargs)
+    def invoke(*args, **kwargs):
+        if before_hook:
+            try:
+                before_hook(*args, **kwargs)
+            except:
+                traceback.print_exc()
+        ret = None
         try:
-            inst = cls._instances.get(key)
-        except TypeError:
-            for cached_key, cached_inst in cls._unhashable_instances:
-                if cached_key == key:
-                    return cached_inst
-            inst = type.__call__(cls, *args, **kwargs)
-            cls._unhashable_instances.append((key, inst))
-            return inst
-        if inst is None:
-            inst = type.__call__(cls, *args, **kwargs)
-            cls._instances[key] = inst
-        return inst
+            ret = func(*args, **kwargs)
+        except:
+            traceback.print_exc()
+        if after_hook:
+            try:
+                after_hook(*args, **kwargs)
+            except:
+                traceback.print_exc()
+        return ret
+
+    if isinstance(func, MethodType):
+        @wraps(func.__func__)
+        def wrapper(self, *args, **kwargs):
+            return invoke(*args, **kwargs)
+        wrapper = MethodType(wrapper, obj, obj.__class__) # noqa
+    else:
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return invoke(*args, **kwargs)
+
+    setattr(obj, func_name, wrapper)
+    return wrapper
 
 
-class ArgsSingleton(object):
-    __metaclass__ = ArgsSingletonMeta
-    _instances = {}
-    _unhashable_instances = []
+def kwargs_defaults(**kwargs):
+    def decorator(func):
+        co = func.__code__
+        arg_names = co.co_varnames[:co.co_argcount]
+
+        # 设置完整的函数签名（用于文档生成）
+        sgn = get_signature(func)
+        sgn = sgn[:sgn.rindex(",")] # 去掉末尾**kwargs
+        sgn += ", *"
+        for i in kwargs.items():
+            sgn += ", %s=%s" % i
+        signature(sgn)(func)
+
+        @wraps(func)
+        def wrapper(*f_args, **f_kwargs):
+            for k in f_kwargs:
+                if k not in kwargs and k not in arg_names:
+                    raise TypeError(
+                        "%s() got an unexpected keyword argument '%s'"
+                        % (func.__name__, k)
+                    )
+            for k in kwargs:
+                if k not in f_kwargs:
+                    f_kwargs[k] = kwargs[k]
+            return func(*f_args, **f_kwargs)
+        return wrapper
+    return decorator
 
 
-class __Universal(object):
-    """
-    万用对象，仅用于绕过机审检查。
-
-    对该对象所做的任何操作都将抛出 ``RuntimeError`` 。
-    """
-
-    def __bool__(self):
-        return False
-
-    __nonzero__ = __bool__
-
-    def __raise(self, *args, **kwargs):
-        raise RuntimeError("you can't do anything to the UNIVERSAL_OBJECT")
-
-    if not DEBUG:
-        __getattribute__    = __raise
-        __setattr__         = __raise
-        __delattr__         = __raise
-        __eq__              = __raise
-        __ne__              = __raise
-        __str__             = __raise
-        __repr__            = __raise
-        __hash__            = None
-        __format__          = __raise
-        __reduce__          = __raise
-        __reduce_ex__       = __raise
-        __call__            = __raise
-        __contains__        = __raise
-        __getitem__         = __raise
-        __setitem__         = __raise
-        __delitem__         = __raise
-        __iter__            = __raise
-
-
-UNIVERSAL_OBJECT = __Universal()
-
-
-def client_api(func): # todo
-    return func
-
-
-def server_api(func): # todo
-    return func
-
-
-class MappingProxy(object):
-    def __init__(self, mapping):
-        self.__mapping = mapping
-
-    def __repr__(self):
-        return "MappingProxy(%r)" % self.__mapping
-
-    get             = lambda self, *args: self.__mapping.get(*args)
-    has_key         = lambda self, *args: self.__mapping.has_key(*args)
-    keys            = lambda self, *args: self.__mapping.keys()
-    values          = lambda self, *args: self.__mapping.values()
-    items           = lambda self, *args: self.__mapping.items()
-    viewkeys        = lambda self, *args: self.__mapping.viewkeys()
-    viewvalues      = lambda self, *args: self.__mapping.viewvalues()
-    viewitems       = lambda self, *args: self.__mapping.viewitems()
-    iterkeys        = lambda self, *args: self.__mapping.iterkeys()
-    itervalues      = lambda self, *args: self.__mapping.itervalues()
-    iteritems       = lambda self, *args: self.__mapping.iteritems()
-    __getitem__     = lambda self, *args: self.__mapping.__getitem__(*args)
-    __iter__        = lambda self, *args: self.__mapping.__iter__()
-    __len__         = lambda self, *args: self.__mapping.__len__()
-    __contains__    = lambda self, *args: self.__mapping.__contains__(*args)
-
-    def __raise(self, *args, **kwargs):
-        raise TypeError("MappingProxy object is read-only")
-
-    clear       = __raise
-    pop         = __raise
-    popitem     = __raise
-    setdefault  = __raise
-    update      = __raise
-    __setitem__ = __raise
-    __delitem__ = __raise
+def try_exec(func, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except Exception as e:
+        traceback.print_exc()
+        return e
 
 
 def _lru_key(args, kwargs):
@@ -375,6 +201,9 @@ class lru_cache(object):
             return wrapper
 
 
+_NOT_FOUND = object()
+
+
 class cached_property(object):
     def __init__(self, func):
         self.func = func
@@ -404,86 +233,267 @@ class cached_property(object):
         return val
 
 
-# class cached_property:
-#     def __init__(self, func):
-#         self.func = func
-#         self.attrname = None
-#         self.__doc__ = func.__doc__
-#
-#     def __set_name__(self, owner, name):
-#         if self.attrname is None:
-#             self.attrname = name
-#         elif name != self.attrname:
-#             raise TypeError(
-#                 "Cannot assign the same cached_property to two different names "
-#                 f"({self.attrname!r} and {name!r})."
-#             )
-#
-#     def __get__(self, instance, owner=None):
-#         if instance is None:
-#             return self
-#         if self.attrname is None:
-#             raise TypeError(
-#                 "Cannot use cached_property instance without calling __set_name__ on it.")
-#         try:
-#             cache = instance.__dict__
-#         except AttributeError:  # not all objects have __dict__ (e.g. class defines slots)
-#             msg = (
-#                 f"No '__dict__' attribute on {type(instance).__name__!r} "
-#                 f"instance to cache {self.attrname!r} property."
-#             )
-#             raise TypeError(msg) from None
-#         val = cache.get(self.attrname, _NOT_FOUND)
-#         if val is _NOT_FOUND:
-#             val = self.func(instance)
-#             try:
-#                 cache[self.attrname] = val
-#             except TypeError:
-#                 msg = (
-#                     f"The '__dict__' attribute on {type(instance).__name__!r} instance "
-#                     f"does not support item assignment for caching {self.attrname!r} property."
-#                 )
-#                 raise TypeError(msg) from None
-#         return val
-#
-#     __class_getitem__ = classmethod(GenericAlias)
+def inject_is_client(func):
+    signature(start=1)(func)
+
+    @wraps(func)
+    def c(*args, **kwargs):
+        return func(True, *args, **kwargs)
+
+    @wraps(func)
+    def s(*args, **kwargs):
+        return func(False, *args, **kwargs)
+
+    @wraps(func)
+    def auto(*args, **kwargs):
+        return func(_env.is_client(), *args, **kwargs)
+
+    auto._nyl__inject_is_client = (c, s, func)
+    return auto
 
 
-def kwargs_defaults(**kwargs):
-    def decorator(func):
-        co = func.__code__
-        arg_names = co.co_varnames[:co.co_argcount]
-
-        # 设置完整的函数签名（用于文档生成）
-        sgn = get_signature(func)
-        sgn = sgn[:sgn.rindex(",")] # 去掉末尾**kwargs
-        sgn += ", *"
-        for i in kwargs.items():
-            sgn += ", %s=%s" % i
-        signature(sgn)(func)
-
-        @wraps(func)
-        def wrapper(*f_args, **f_kwargs):
-            for k in f_kwargs:
-                if k not in kwargs and k not in arg_names:
-                    raise TypeError(
-                        "%s() got an unexpected keyword argument '%s'"
-                        % (func.__name__, k)
-                    )
-            for k in kwargs:
-                if k not in f_kwargs:
-                    f_kwargs[k] = kwargs[k]
-            return func(*f_args, **f_kwargs)
-        return wrapper
-    return decorator
+def get_arg_names(func):
+    code = func.__code__ # noqa
+    arg_names = code.co_varnames[:code.co_argcount]
+    return arg_names
 
 
-def try_exec(func, *args, **kwargs):
+def client_api(func): # todo
+    return func
+
+
+def server_api(func): # todo
+    return func
+
+
+# endregion
+
+
+# region Class Utils ===================================================================================================
+
+
+class SingletonMeta(type):
+    def __new__(metacls, name, bases, dct):
+        cls = type.__new__(metacls, name, bases, dct)
+        cls._instance = None
+        return cls
+
+    def __call__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = type.__call__(cls, *args, **kwargs)
+        return cls._instance
+
+
+class Singleton(object):
+    __metaclass__ = SingletonMeta
+    _instance = None
+
+
+_KWARGS_MARK = (object(),)
+
+
+def _singleton_key(args, kwargs):
+    if not kwargs:
+        return args
+    return args + _KWARGS_MARK + tuple(sorted(kwargs.items()))
+
+
+class ArgsSingletonMeta(type):
+    def __new__(metacls, name, bases, dct):
+        cls = type.__new__(metacls, name, bases, dct)
+        cls._instances = {}
+        cls._unhashable_instances = []
+        return cls
+
+    def __call__(cls, *args, **kwargs):
+        key = _singleton_key(args, kwargs)
+        try:
+            inst = cls._instances.get(key)
+        except TypeError:
+            for cached_key, cached_inst in cls._unhashable_instances:
+                if cached_key == key:
+                    return cached_inst
+            inst = type.__call__(cls, *args, **kwargs)
+            cls._unhashable_instances.append((key, inst))
+            return inst
+        if inst is None:
+            inst = type.__call__(cls, *args, **kwargs)
+            cls._instances[key] = inst
+        return inst
+
+
+class ArgsSingleton(object):
+    __metaclass__ = ArgsSingletonMeta
+    _instances = {}
+    _unhashable_instances = []
+
+
+# endregion
+
+
+def get_module(*args):
+    path = join_chr(*args)
     try:
-        return func(*args, **kwargs)
-    except Exception as e:
-        traceback.print_exc()
-        return e
+        return __imp(path)
+    except:
+        return None
+
+
+# def get_obj_size(obj, seen=None):
+#     if seen is None:
+#         seen = set()
+#     import sys
+#     size = sys.getsizeof(obj)
+#
+#     obj_id = id(obj)
+#     if obj_id in seen:
+#         return 0
+#     seen.add(obj_id)
+#
+#     if hasattr(obj, 'keys') and type(obj.keys) is MethodType:
+#         size += sum(
+#             get_obj_size(k, seen) + get_obj_size(obj[k], seen)
+#             for k in obj.keys()
+#         )
+#     elif hasattr(obj, '__iter__') and type(obj.__iter__) is MethodType and not isinstance(obj, (str, unicode)):
+#         size += sum(get_obj_size(i, seen) for i in obj)
+#     elif hasattr(obj, '__dict__'):
+#         size += get_obj_size(obj.__dict__, seen)
+#
+#     return size
+
+
+class DefaultLocal(object):
+    def __init__(self, default_factory=lambda: None):
+        object.__setattr__(self, '_default_factory', default_factory)
+        object.__setattr__(self, '_local', threading.local())
+
+    def __getattribute__(self, name):
+        local = object.__getattribute__(self, '_local')
+        value = getattr(local, name, _NOT_FOUND)
+        if value is _NOT_FOUND:
+            factory = object.__getattribute__(self, '_default_factory')
+            value = factory()
+            local.__setattr__(name, value)
+        return value
+
+    def __setattr__(self, name, value):
+        local = object.__getattribute__(self, '_local')
+        return local.__setattr__(name, value)
+
+    def __delattr__(self, name):
+        local = object.__getattribute__(self, '_local')
+        return local.__delattr__(name)
+
+
+def parse_indices(index, length, cls, op=None):
+    if isinstance(index, slice):
+        start, stop, step = index.indices(length)
+        return [
+            (op(i) if op else i)
+            for i in xrange(start, stop, step)
+        ]
+    elif isinstance(index, int):
+        if index < 0:
+            index += length
+        if index < 0 or index >= length:
+            raise IndexError("%s index out of range" % cls.__name__)
+        return op(index) if op else index
+    raise TypeError(
+        "%s indices must be integers or slices, not %s"
+        % (cls.__name__, type(index).__name__)
+    )
+
+
+def parse_indices_generator(index, length, cls, op=None):
+    if isinstance(index, slice):
+        start, stop, step = index.indices(length)
+        for i in xrange(start, stop, step):
+            yield op(i) if op else i
+    elif isinstance(index, int):
+        if index < 0:
+            index += length
+        if index < 0 or index >= length:
+            raise IndexError("%s index out of range" % cls.__name__)
+        yield op(index) if op else index
+    else:
+        raise TypeError(
+            "%s indices must be integers or slices, not %s"
+            % (cls.__name__, type(index).__name__)
+        )
+
+
+class __Universal(object):
+    """
+    万用对象，仅用于绕过机审检查。
+
+    对该对象所做的任何操作都将抛出 ``RuntimeError`` 。
+    """
+
+    def __bool__(self):
+        return False
+
+    __nonzero__ = __bool__
+
+    def __raise(self, *args, **kwargs):
+        raise RuntimeError("you can't do anything to the UNIVERSAL_OBJECT")
+
+    if not _env.DEBUG:
+        __getattribute__    = __raise
+        __setattr__         = __raise
+        __delattr__         = __raise
+        __eq__              = __raise
+        __ne__              = __raise
+        __str__             = __raise
+        __repr__            = __raise
+        __hash__            = None
+        __format__          = __raise
+        __reduce__          = __raise
+        __reduce_ex__       = __raise
+        __call__            = __raise
+        __contains__        = __raise
+        __getitem__         = __raise
+        __setitem__         = __raise
+        __delitem__         = __raise
+        __iter__            = __raise
+
+
+UNIVERSAL_OBJECT = __Universal()
+
+
+class MappingProxy(object):
+    def __init__(self, mapping):
+        self.__mapping = mapping
+
+    def __repr__(self):
+        return "MappingProxy(%r)" % self.__mapping
+
+    get             = lambda self, *args: self.__mapping.get(*args)
+    has_key         = lambda self, *args: self.__mapping.has_key(*args)
+    keys            = lambda self, *args: self.__mapping.keys()
+    values          = lambda self, *args: self.__mapping.values()
+    items           = lambda self, *args: self.__mapping.items()
+    viewkeys        = lambda self, *args: self.__mapping.viewkeys()
+    viewvalues      = lambda self, *args: self.__mapping.viewvalues()
+    viewitems       = lambda self, *args: self.__mapping.viewitems()
+    iterkeys        = lambda self, *args: self.__mapping.iterkeys()
+    itervalues      = lambda self, *args: self.__mapping.itervalues()
+    iteritems       = lambda self, *args: self.__mapping.iteritems()
+    __getitem__     = lambda self, *args: self.__mapping.__getitem__(*args)
+    __iter__        = lambda self, *args: self.__mapping.__iter__()
+    __len__         = lambda self, *args: self.__mapping.__len__()
+    __contains__    = lambda self, *args: self.__mapping.__contains__(*args)
+
+    def __raise(self, *args, **kwargs):
+        raise TypeError("MappingProxy object is read-only")
+
+    clear       = __raise
+    pop         = __raise
+    popitem     = __raise
+    setdefault  = __raise
+    update      = __raise
+    __setitem__ = __raise
+    __delitem__ = __raise
 
 
 def iter_obj_attrs(obj):
@@ -494,16 +504,6 @@ def iter_obj_attrs(obj):
             # 如果获取的属性是property且getter执行时出错，会抛出AttributeError
             continue
         yield attr
-
-
-def get_func(cls, module, func):
-    g = cls.__init__.__func__.__globals__ # noqa
-    m = join_chr(*module)
-    f = join_chr(*func)
-    try:
-        return getattr(g[m], f)
-    except (AttributeError, KeyError):
-        return
 
 
 def assert_error(func, args=(), kwargs=None, exc=()):
@@ -523,40 +523,18 @@ def assert_error(func, args=(), kwargs=None, exc=()):
         assert False, "no exception was raised, expected %s" % exc_names
 
 
+def get_func(cls, module, func):
+    g = cls.__init__.__func__.__globals__ # noqa
+    m = join_chr(*module)
+    f = join_chr(*func)
+    try:
+        return getattr(g[m], f)
+    except (AttributeError, KeyError):
+        return
+
+
 def join_chr(*seq):
     return "".join(chr(i) for i in seq)
-
-
-def hook_method(org_method, before_hook=None, after_hook=None):
-    @wraps(org_method.__func__) # noqa
-    def wrapper(self, *args, **kwargs):
-        if before_hook:
-            try:
-                before_hook(*args, **kwargs)
-            except:
-                try:
-                    traceback.print_exc()
-                except:
-                    pass
-        try:
-            org_method(*args, **kwargs)
-        except:
-            try:
-                traceback.print_exc()
-            except:
-                pass
-        if after_hook:
-            try:
-                after_hook(*args, **kwargs)
-            except:
-                try:
-                    traceback.print_exc()
-                except:
-                    pass
-
-    ins = org_method.__self__ # noqa
-    wrapper = MethodType(wrapper, ins, ins.__class__) # noqa
-    setattr(ins, org_method.__name__, wrapper)
 
 
 # def is_inv36_key(k):

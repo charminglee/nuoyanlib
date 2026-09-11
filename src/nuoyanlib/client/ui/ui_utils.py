@@ -20,6 +20,7 @@ if bool(0):
     from mod.client.ui.screenNode import ScreenNode
     from mod.client.system.clientSystem import ClientSystem
     from .nyc import NyControl
+    from .screen_node import NyScreenNode, NyScreenProxy
 
 
 __all__ = [
@@ -27,8 +28,6 @@ __all__ = [
     "pop_to_hud",
     "create_ui",
     "push_ui",
-    "to_path",
-    "to_control",
     "get_children_path_by_level",
     "get_children_by_level",
     "get_parent_path",
@@ -39,6 +38,17 @@ __all__ = [
 def is_top_ui(screen_name):
     """
     判断UI界面是否在栈顶。
+
+    示例
+    ----
+
+    >>> if nyl.is_top_ui("my_ui.main"):
+    ...     nyl.pop_to_hud()
+
+    参见
+    ----
+
+    - ``pop_to_hud()`` -- 弹出栈顶UI直到 HUD 界面。
 
     -----
 
@@ -56,6 +66,18 @@ def is_top_ui(screen_name):
 def pop_to_hud():
     """
     依次弹出栈顶UI直到 HUD 界面。
+
+    示例
+    ----
+
+    >>> if nyl.is_top_ui("my_ui.main"):
+    ...     nyl.pop_to_hud()
+
+    参见
+    ----
+
+    - ``is_top_ui()`` -- 判断指定UI界面是否在栈顶。
+    - ``NyScreenBase.hide()`` -- 隐藏UI界面。
 
     -----
 
@@ -103,6 +125,11 @@ class _UIControlType:
     MUL_LINES_EDIT = 30
     AMIN_PROCESS_BAR = 31
     UNKNOWN = 32
+    NETEASE_PAPER_DOLL = 33 # = CUSTOM
+    ITEM_RENDERER = 34      # = CUSTOM
+    PROGRESS_BAR = 35       # = PANEL
+    COMBO_BOX = 36          # = PANEL
+    MINI_MAP = 37           # = CUSTOM
 
 
 def create_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_system=None):
@@ -173,87 +200,35 @@ def push_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_syste
     return node
 
 
-def to_path(control):
-    """
-    获取控件路径。
-
-    说明
-    ----
-
-    若传入的已经是路径，则返回其本身。
-
-    -----
-
-    :param str|BaseUIControl control: 控件实例
-
-    :return: 控件路径
-    :rtype: str
-    """
+def _to_path(control):
     return control if isinstance(control, str) else control.GetPath()
 
 
-def to_control(screen_node, path, control_type=0):
-    """
-    根据路径获取控件实例。
-
-    说明
-    ----
-
-    若传入的已经是实例，则返回其本身。
-
-    -----
-
-    :param ScreenNode screen_node: 控件所在UI类的实例
-    :param str|BaseUIControl path: 控件路径
-    :param int control_type: 控件类型，返回该类型对应的实例，请使用 NyControl 枚举值；默认为 NyControl.BASE_CONTROL
-
-    :return: 控件实例，获取不到时返回 None
-    :rtype: BaseUIControl|None
-    """
-    control = screen_node.GetBaseUIControl(path) if isinstance(path, str) else path
-    if control:
-        from .nyc.control import NyControl
-        if control_type not in NyControl._AS_BASE:
-            control_type_name = {
-                NyControl.BUTTON: "Button",
-                NyControl.IMAGE: "Image",
-                NyControl.LABEL: "Label",
-                NyControl.INPUT_PANEL: "InputPanel",
-                NyControl.STACK_PANEL: "StackPanel",
-                NyControl.EDIT_BOX: "TextEditBox",
-                NyControl.NETEASE_PAPER_DOLL: "NeteasePaperDoll",
-                NyControl.ITEM_RENDERER: "ItemRenderer",
-                NyControl.SCROLL_VIEW: "ScrollView",
-                NyControl.GRID: "Grid",
-                NyControl.PROGRESS_BAR: "ProgressBar",
-                NyControl.TOGGLE: "SwitchToggle",
-                NyControl.SLIDER: "Slider",
-                NyControl.SELECTION_WHEEL: "SelectionWheel",
-                NyControl.COMBO_BOX: "NeteaseComboBox",
-                NyControl.MINI_MAP: "MiniMap",
-            }.get(control_type)
-            if control_type_name is None:
-                raise ValueError("invalid control type: %s" % repr(control_type))
-            control = getattr(control, "as" + control_type_name)()
-    return control
-
-
-def is_out_of_screen(control, screen_node=None):
+def is_out_of_screen(control, ny_screen_node=None):
     """
     判断控件是否超出屏幕范围。
 
+    示例
+    ----
+
+    >>> if nyl.is_out_of_screen(button):
+    ...     button.visible = False
+
     -----
 
-    :param str|BaseUIControl|NyControl control: 控件路径或实例
-    :param ScreenNode|None screen_node: 当 control 参数传入控件路径时，需要指定控件所在UI类的实例；默认为 None
+    :param str|NyControl control: 控件路径或实例
+    :param NyScreenNode|NyScreenProxy|None ny_screen_node: 当 control 参数传入控件路径时，需要指定控件所在UI类的实例；默认为 None
 
     :return: 是否超出屏幕范围
     :rtype: bool
     """
     if isinstance(control, str):
-        control = screen_node.GetBaseUIControl(control)
-    px, py = control.GetGlobalPosition()
-    ctrl_sx, ctrl_sy = control.GetSize()
+        if ny_screen_node is None:
+            raise ValueError("parameter 'ny_screen_node' not specified")
+        from .nyc import NyControl
+        control = NyControl(ny_screen_node, control)
+    px, py = control.global_position
+    ctrl_sx, ctrl_sy = control.size
     scr_sx, scr_sy = LvComp.Game.GetScreenSize()
     return (
         px < 0
@@ -263,14 +238,14 @@ def is_out_of_screen(control, screen_node=None):
     )
 
 
-def get_children_path_by_level(control, screen_node, level=1):
+def get_children_path_by_level(control, ny_screen_node, level=1):
     """
-    获取控件指定层级上的子控件的路径。
+    获取控件指定层次上的子控件的路径。
 
     说明
     ----
 
-    此处的“层级”指的是子控件层级，而非渲染层级（layer），详见示例。
+    此处的“层次”指的是子控件层次，而非渲染层级（layer），详见示例。
 
     示例
     ----
@@ -290,26 +265,32 @@ def get_children_path_by_level(control, screen_node, level=1):
            ├─ hover
            └─ button_label
 
-    >>> nyl.get_children_path_by_level("/panel", screen_node, 1)
+    >>> nyl.get_children_path_by_level("/panel", ny_screen_node, 1)
     ['/panel/button1', '/panel/button2']
 
-    >>> nyl.get_children_path_by_level("/panel", screen_node, 2)
+    >>> nyl.get_children_path_by_level("/panel", ny_screen_node, 2)
     ['/panel/button1/default', '/panel/button1/pressed', '/panel/button1/hover', '/panel/button1/button_label',
      '/panel/button2/default', '/panel/button2/pressed', '/panel/button2/hover', '/panel/button2/button_label']
 
-    >>> nyl.get_children_path_by_level("/panel/button1", screen_node, 1)
+    >>> nyl.get_children_path_by_level("/panel/button1", ny_screen_node, 1)
     ['/panel/button1/default', '/panel/button1/pressed', '/panel/button1/hover', '/panel/button1/button_label']
+
+    参见
+    ----
+
+    - ``get_children_by_level()`` -- 获取指定层次上的子控件实例。
 
     -----
 
-    :param str|BaseUIControl|NyControl control: 控件路径或实例
-    :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层级；默认为 1，传入 0 或负值时，获取所有层级的子控件
+    :param str|NyControl control: 控件路径或实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 控件所在UI类的实例
+    :param int level: 子控件层次；默认为 1，传入 0 或负值时，获取所有层次的子控件
 
-    :return: 指定层级的所有子控件路径的列表，获取不到时返回空列表
+    :return: 指定层次的所有子控件路径的列表，获取不到时返回空列表
     :rtype: list[str]
     """
-    path = to_path(control)
+    path = _to_path(control)
+    screen_node = ny_screen_node._screen_node
     if level == 1:
         return [
             path + "/" + n
@@ -333,27 +314,40 @@ def get_children_path_by_level(control, screen_node, level=1):
         return res
 
 
-def get_children_by_level(control, screen_node, level=1):
+def get_children_by_level(control, ny_screen_node, level=1):
     """
-    获取控件指定层级上的子控件的 ``BaseUIControl`` 实例。
+    获取控件指定层次上的子控件的 ``NyControl`` 实例。
 
     说明
     ----
 
-    此处的“层级”指的是子控件层级，而非渲染层级（layer），详见 ``get_children_path_by_level`` 的文档。
+    此处的“层次”指的是子控件层次，而非渲染层级（layer），详见 ``get_children_path_by_level()`` 。
+
+    示例
+    ----
+
+    >>> buttons = nyl.get_children_by_level("/panel", ny_screen_node, 1)
+    >>> for button in buttons:
+    ...     button.visible = True
+
+    参见
+    ----
+
+    - ``get_children_path_by_level()`` -- 获取指定层次上的子控件路径。
 
     -----
 
-    :param str|BaseUIControl|NyControl control: 控件路径或实例
-    :param ScreenNode screen_node: 控件所在UI类的实例
-    :param int level: 子控件层级；默认为 1，传入 0 或负值时，获取所有层级
+    :param str|NyControl control: 控件路径或实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 控件所在UI类的实例
+    :param int level: 子控件层次；默认为 1，传入 0 或负值时，获取所有层次
 
-    :return: 指定层级上的子控件实例的列表，获取不到时返回空列表
-    :rtype: list[BaseUIControl]
+    :return: 指定层次上的子控件实例的列表，获取不到时返回空列表
+    :rtype: list[NyControl]
     """
+    from .nyc import NyControl
     return [
-        to_control(screen_node, p)
-        for p in get_children_path_by_level(control, screen_node, level)
+        NyControl(ny_screen_node, p)
+        for p in get_children_path_by_level(control, ny_screen_node, level)
     ]
 
 
@@ -361,30 +355,56 @@ def get_parent_path(control):
     """
     获取父控件路径。
 
+    示例
+    ----
+
+    >>> nyl.get_parent_path("/panel/button")
+    '/panel'
+
+    参见
+    ----
+
+    - ``get_parent()`` -- 获取父控件实例。
+
     -----
 
-    :param str|BaseUIControl|NyControl control: 控件路径或实例
+    :param str|NyControl control: 控件路径或实例
 
     :return: 父控件路径，获取不到返回 None
     :rtype: str|None
     """
-    path = to_path(control)
+    path = _to_path(control)
     return path[:path.rindex("/")] if path else None
 
 
-def get_parent(control, screen_node):
+def get_parent(control, ny_screen_node):
     """
-    获取父控件的 ``BaseUIControl`` 实例。
+    获取父控件的 ``NyControl`` 实例。
+
+    示例
+    ----
+
+    >>> panel = nyl.get_parent(button, ny_screen_node)
+    >>> panel.visible = True
+
+    参见
+    ----
+
+    - ``get_parent_path()`` -- 获取父控件路径。
 
     -----
 
-    :param str|BaseUIControl|NyControl control: 控件路径或实例
-    :param ScreenNode screen_node: 控件所在UI类的实例
+    :param str|NyControl control: 控件路径或实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 控件所在UI类的实例
 
     :return: 父控件实例，获取不到返回 None
-    :rtype: BaseUIControl|None
+    :rtype: NyControl|None
     """
-    return screen_node.GetBaseUIControl(get_parent_path(control))
+    from .nyc import NyControl
+    parent_path = get_parent_path(control)
+    if parent_path is None:
+        return
+    return NyControl(ny_screen_node, parent_path)
 
 
 def _is_ui_registered(ui_key):

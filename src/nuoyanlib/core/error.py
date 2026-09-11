@@ -5,12 +5,15 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
 
 __all__ = [
+    "ControlTypeNotMatchedError",
+    "ControlAlreadyExistsError",
+    "ControlNotFoundError",
     "SystemNotFoundError",
     "NuoyanLibServerSystemRegisterError",
     "NuoyanLibClientSystemRegisterError",
@@ -23,6 +26,31 @@ __all__ = [
     "EventSourceError",
     "EventNotFoundError",
 ]
+
+
+class ControlTypeNotMatchedError(RuntimeError):
+    def __init__(self, cls, path):
+        self.cls = cls
+        self.path = path
+
+    def __str__(self):
+        return "this control is not a %s: '%s'" % (self.cls.__name__[2:], self.path)
+
+
+class ControlAlreadyExistsError(RuntimeError):
+    def __init__(self, path):
+        self.path = path
+
+    def __str__(self):
+        return "control already exists: '%s'" % self.path
+
+
+class ControlNotFoundError(RuntimeError):
+    def __init__(self, path):
+        self.path = path
+
+    def __str__(self):
+        return "cannot find control: '%s'" % self.path
 
 
 class SystemNotFoundError(RuntimeError):
@@ -64,21 +92,21 @@ class GetPropertyError(AttributeError):
         self.name = name
 
     def __str__(self):
-        return "can't get property %r, it is write-only" % self.name
+        return "cannot get property %r, it is write-only" % self.name
 
 
 class ScreenNodeNotFoundError(RuntimeError):
     def __str__(self):
-        return "can't find ScreenNode instance, check if your UI class inherits 'ScreenNode' or 'CustomUIScreenProxy'"
+        return "cannot find ScreenNode instance, check if your UI screen class inherits ScreenNode or CustomUIScreenProxy"
 
 
 class EventParameterError(AttributeError):
-    def __init__(self, event_name, param):
-        self.event_name = event_name
+    def __init__(self, event_id, param):
+        self.event_id = event_id
         self.param = param
 
     def __str__(self):
-        return "%s has no parameter %r" % (self.event_name, self.param)
+        return "event '%s' has no parameter %r" % (self.event_id, self.param)
 
 
 class VectorError(Exception):
@@ -90,7 +118,7 @@ class EventSourceError(TypeError):
         self.args = (name, ns, sys_name)
 
     def __str__(self):
-        return "unknown event source (event_name=%r, ns=%r, sys_name=%r)" % self.args
+        return "unknown event source: event_name=%r, ns=%r, sys_name=%r" % self.args
 
 
 class EventNotFoundError(AttributeError):

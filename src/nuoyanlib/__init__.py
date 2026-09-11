@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-9
 #  ⠀
 #  ================================================
 
@@ -162,7 +162,7 @@ def run(mod_name, **kwargs):
     :raise TypeError: 如果调用了多次 nuoyanlib.run() ，则传入的 mod_name 必须相同，否则抛出此异常
     :raise RuntimeError: 找不到 modMain.py 的 globals 字典时抛出，此时请通过 globals 参数手动传入
     """
-    _logging.info("Start loading, version: %s, script: %s" % (__version__, _env.ROOT), show_env=False)
+    _logging.info("Start loading, version: %s, script: %s", __version__, _env.ROOT)
 
     if _env.MOD_NAME and _env.MOD_NAME != mod_name:
         raise TypeError(
@@ -171,11 +171,11 @@ def run(mod_name, **kwargs):
         )
     _env.MOD_NAME = mod_name
     if 'clients' in kwargs:
-        _mod_clients.extend(kwargs['clients'])
+        _mod_clients.extend(kwargs['clients'] or [])
     if 'servers' in kwargs:
-        _mod_servers.extend(kwargs['servers'])
+        _mod_servers.extend(kwargs['servers'] or [])
 
-    if 'globals' in kwargs:
+    if 'globals' in kwargs and isinstance(kwargs['globals'], dict):
         globals_ = kwargs['globals']
     else:
         import builtin_modules._inspect as _inspect # noqa
@@ -197,7 +197,8 @@ def run(mod_name, **kwargs):
         def init_server(self):
             _env._THREAD_LOCAL.IS_CLIENT = False
             from .core.server._lib_server import NuoyanLibServerSystem
-            NuoyanLibServerSystem.run()
+            if not NuoyanLibServerSystem.run():
+                _logging.error("NuoyanLibServerSystem run failed!")
             _load_extensions(False)
             _load_modules(False)
             from .core.listener import _process_event_listen
@@ -208,7 +209,8 @@ def run(mod_name, **kwargs):
         def init_client(self):
             _env._THREAD_LOCAL.IS_CLIENT = True
             from .core.client._lib_client import NuoyanLibClientSystem
-            NuoyanLibClientSystem.run()
+            if not NuoyanLibClientSystem.run():
+                _logging.error("NuoyanLibClientSystem run failed!")
             _load_extensions(True)
             _load_modules(True)
             from .core.listener import _process_event_listen

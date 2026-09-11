@@ -79,12 +79,9 @@ class NuoyanLibBaseSystem(object):
             api = s_api
         system = api.GetSystem(_env.LIB_NAME, sys_name)
         if system:
-            res = True
-        else:
-            path = _env.get_cls_path(cls)
-            res = bool(api.RegisterSystem(_env.LIB_NAME, sys_name, path))
-
-        return res
+            return True
+        path = _env.get_cls_path(cls)
+        return bool(api.RegisterSystem(_env.LIB_NAME, sys_name, path))
 
     def Destroy(self):
         self.UnListenAllEvents() # noqa

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-10
+#    Date  : 2026-9-11
 #  ⠀
 #  ================================================
 
@@ -15,24 +15,8 @@ from typing_extensions import deprecated
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from mod.client.ui.controls.labelUIControl import LabelUIControl
-from mod.client.ui.controls.buttonUIControl import ButtonUIControl
-from mod.client.ui.controls.imageUIControl import ImageUIControl
-from mod.client.ui.controls.gridUIControl import GridUIControl
-from mod.client.ui.controls.scrollViewUIControl import ScrollViewUIControl
-from mod.client.ui.controls.switchToggleUIControl import SwitchToggleUIControl
-from mod.client.ui.controls.textEditBoxUIControl import TextEditBoxUIControl
-from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
-from mod.client.ui.controls.neteasePaperDollUIControl import NeteasePaperDollUIControl
-from mod.client.ui.controls.minimapUIControl import MiniMapUIControl
-from mod.client.ui.controls.sliderUIControl import SliderUIControl
-from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
-from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUIControl
-from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
-from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
-from mod.client.ui.controls.selectionWheelUIControl import SelectionWheelUIControl
 from ...core._types._typing import UiPathOrNyControl
-from .nyc import NyControl
+from .screen_node import NyScreenBase
 
 
 def is_top_ui(screen_name: str) -> bool: ...
@@ -73,6 +57,11 @@ class _UIControlType:
     MUL_LINES_EDIT: int
     AMIN_PROCESS_BAR: int
     UNKNOWN: int
+    NETEASE_PAPER_DOLL: int
+    ITEM_RENDERER: int
+    PROGRESS_BAR: int
+    COMBO_BOX: int
+    MINI_MAP: int
 
 
 def _is_ui_registered(ui_key: str) -> bool: ...
@@ -94,53 +83,17 @@ def push_ui(
     param: Optional[dict] = None,
     client_system: Optional[ClientSystem] = None
 ) -> Union[ScreenNode, Any]: ...
-def to_path(control: UiPathOrNyControl) -> str: ...
-# @overload
-def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: int = NyControl.BASE_CONTROL) -> Optional[BaseUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.BASE_CONTROL, NyControl.PANEL, NyControl.PAPER_DOLL, NyControl.GRADIENT_RENDERER]) -> Optional[BaseUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.LABEL]) -> Optional[LabelUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.BUTTON]) -> Optional[ButtonUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.IMAGE]) -> Optional[ImageUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.GRID]) -> Optional[GridUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.SCROLL_VIEW]) -> Optional[ScrollViewUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.TOGGLE]) -> Optional[SwitchToggleUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.EDIT_BOX]) -> Optional[TextEditBoxUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.PROGRESS_BAR]) -> Optional[ProgressBarUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.NETEASE_PAPER_DOLL]) -> Optional[NeteasePaperDollUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.MINI_MAP]) -> Optional[MiniMapUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.SLIDER]) -> Optional[SliderUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.ITEM_RENDERER]) -> Optional[ItemRendererUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.COMBO_BOX]) -> Optional[NeteaseComboBoxUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.INPUT_PANEL]) -> Optional[InputPanelUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.STACK_PANEL]) -> Optional[StackPanelUIControl]: ...
-# @overload
-# def to_control(screen_node: ScreenNode, path: UiPathOrNyControl, control_type: Literal[NyControl.SELECTION_WHEEL]) -> Optional[SelectionWheelUIControl]: ...
+def _to_path(control: UiPathOrNyControl) -> str: ...
 def get_children_path_by_level(
     control: UiPathOrNyControl,
-    screen_node: ScreenNode,
+    ny_screen_node: NyScreenBase,
     level: int = 1,
 ) -> List[str]: ...
 def get_children_by_level(
     control: UiPathOrNyControl,
-    screen_node: ScreenNode,
+    ny_screen_node: NyScreenBase,
     level: int = 1,
 ) -> List[BaseUIControl]: ...
 def get_parent_path(control: UiPathOrNyControl) -> Optional[str]: ...
-def get_parent(control: UiPathOrNyControl, screen_node: ScreenNode) -> Optional[BaseUIControl]: ...
-def is_out_of_screen(control: UiPathOrNyControl, screen_node: Optional[ScreenNode] = None) -> bool: ...
+def get_parent(control: UiPathOrNyControl, ny_screen_node: NyScreenBase) -> Optional[BaseUIControl]: ...
+def is_out_of_screen(control: UiPathOrNyControl, ny_screen_node: Optional[NyScreenBase] = None) -> bool: ...

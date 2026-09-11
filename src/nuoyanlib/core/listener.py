@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-9
 #  ⠀
 #  ================================================
 
@@ -428,7 +428,7 @@ def _process_event_listen():
                 if hook and not v.__dict__.get('_nyl__event_init_hooked'):
                     v.__init__ = _make_event_init(getattr(v, '__init__', None))
                     v._nyl__event_init_hooked = True
-                    _logging.debug("Hooked __init__() of %s for event listening" % v.__name__)
+                    _logging.debug("Hooked __init__() of %s for event listening", v.__name__)
 
     module_globals.clear()
 

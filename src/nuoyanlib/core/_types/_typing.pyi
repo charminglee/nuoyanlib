@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-9
 #  ⠀
 #  ================================================
 
@@ -14,6 +14,7 @@ import sys
 from typing import ClassVar, Protocol, Iterator, TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
+from ...client.ui.screen_node import NyScreenBase
 from ...client.ui.nyc import (
     NyButton,
     NyComboBox,
@@ -47,6 +48,7 @@ if sys.version_info >= (3, 11):
     Self = Self
 else:
     Self = T
+NyScreenBaseT = TypeVar("NyScreenBaseT", bound=NyScreenBase)
 
 
 PyBasicTypes = Union[str, int, float, list, tuple, dict, None]

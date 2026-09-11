@@ -5,12 +5,13 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-9
 #  ⠀
 #  ================================================
 
 
 import threading
+import traceback
 
 
 DEBUG = False
@@ -40,6 +41,11 @@ LIB_SERVER_NAME = "NuoyanLibServerSystem_%s" % LIB_VERSION_UL
 
 def get_cls_path(cls):
     return cls.__module__ + "." + cls.__name__
+
+
+def get_file_path(index=-2):
+    stack = traceback.extract_stack()
+    return stack[index][0] if stack else ""
 
 
 def get_env():

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-7
 #  ⠀
 #  ================================================
 
@@ -13,6 +13,19 @@
 from typing import Tuple
 
 
+class ControlTypeNotMatchedError(RuntimeError):
+    cls: type
+    path: str
+    def __init__(self, cls: type, path: str) -> None: ...
+    def __str__(self) -> str: ...
+class ControlAlreadyExistsError(RuntimeError):
+    path: str
+    def __init__(self, path: str) -> None: ...
+    def __str__(self) -> str: ...
+class ControlNotFoundError(RuntimeError):
+    path: str
+    def __init__(self, path: str) -> None: ...
+    def __str__(self) -> str: ...
 class SystemNotFoundError(RuntimeError):
     ns: str
     sys_name: str
@@ -35,9 +48,9 @@ class GetPropertyError(AttributeError):
 class ScreenNodeNotFoundError(RuntimeError):
     def __str__(self) -> str: ...
 class EventParameterError(AttributeError):
-    event_name: str
+    event_id: str
     param: str
-    def __init__(self, event_name: str, param: str) -> None: ...
+    def __init__(self, event_id: str, param: str) -> None: ...
     def __str__(self) -> str: ...
 class VectorError(Exception): ...
 class EventSourceError(TypeError):
