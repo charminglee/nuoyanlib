@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-#  =================================================
+#  ================================================
 #  ⠀
 #    Copyright (c) 2026 Nuoyan
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-11
 #  ⠀
-#  =================================================
+#  ================================================
 
 
-import mod.client.extraClientApi as c_api
+import mod.client.extraClientApi as api
 from ...core._utils import get_module
+from ...core import _env
 from ...core.client.comp import LvComp
-from ...common.enum import ControlType
 
 
 if bool(0):
@@ -23,6 +23,7 @@ if bool(0):
 
 
 __all__ = [
+    "is_top_ui",
     "pop_to_hud",
     "create_ui",
     "push_ui",
@@ -35,6 +36,23 @@ __all__ = [
 ]
 
 
+def is_top_ui(screen_name):
+    """
+    判断UI界面是否在栈顶。
+
+    -----
+
+    :param str screen_name: UI名称；对于原生UI，请使用 UICategory 枚举值；对于自定义UI，格式为 <namespace>.<name>
+
+    :return: 是否在栈顶
+    :rtype: bool
+    """
+    if api.GetTopUI() == screen_name:
+        return True
+    top_screen = api.GetTopScreen()
+    return top_screen and top_screen.full_name == screen_name
+
+
 def pop_to_hud():
     """
     依次弹出栈顶UI直到 HUD 界面。
@@ -44,8 +62,10 @@ def pop_to_hud():
     :return: 无
     :rtype: None
     """
-    while not c_api.GetTopUI() != "hud_screen":
-        c_api.PopTopUI()
+    top = api.GetTopUI()
+    while top and top != "hud_screen":
+        api.PopTopUI()
+        top = api.GetTopUI()
 
 
 class _UIControlType:
@@ -85,16 +105,10 @@ class _UIControlType:
     UNKNOWN = 32
 
 
-__ui_mgr = get_module(109, 111, 100, 46, 99, 108, 105, 101, 110, 116, 46, 117, 105, 46, 117, 105, 77, 97, 110, 97, 103, 101, 114)
-
-
-def _is_ui_registered(namespace, ui_key):
-    key = namespace + ":" + ui_key
-    return key in __ui_mgr.instance().screen_def
-
-
 def create_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_system=None):
     """
+    [已废弃]
+
     创建UI界面。
 
     说明
@@ -105,9 +119,9 @@ def create_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_sys
     -----
 
     :param str namespace: 命名空间，建议为 mod 名字
-    :param str ui_key: UI唯一标识，一般为 UI json 中 "namespace" 的值
+    :param str ui_key: UI唯一标识，一般为 UI json 中 "namespace" 字段的值
     :param str cls_path: UI类路径
-    :param str screen_def: UI画布路径，格式为 "<namespace>.<screen_name>"，<namespace> 为 UI json 中 "namespace" 的值，<screen_name> 为想要创建的画布名称；默认为 "<ui_key>.main"
+    :param str screen_def: UI画布路径，格式为 "<namespace>.<screen_name>"，<namespace> 为 UI json 中 "namespace" 字段的值，<screen_name> 为想要创建的画布名称；默认为 "<ui_key>.main"
     :param dict|None param: UI参数字典；默认为 {'isHud': 1}
     :param ClientSystem|None client_system: 客户端类实例；默认为 None；若指定，可在UI类中通过 param 字典的 '__cs__' 键获取该实例
 
@@ -120,13 +134,15 @@ def create_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_sys
         param = {'isHud': 1}
     param['__cs__'] = client_system
     if not _is_ui_registered(namespace, ui_key):
-        c_api.RegisterUI(namespace, ui_key, cls_path, screen_def)
-    node = c_api.CreateUI(namespace, ui_key, param)
+        api.RegisterUI(namespace, ui_key, cls_path, screen_def)
+    node = api.CreateUI(namespace, ui_key, param)
     return node
 
 
 def push_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_system=None):
     """
+    [已废弃]
+
     通过堆栈管理（Push）的方式创建UI界面。
 
     说明
@@ -137,9 +153,9 @@ def push_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_syste
     -----
 
     :param str namespace: 命名空间，建议为 mod 名字
-    :param str ui_key: UI唯一标识，一般为 UI json 中 "namespace" 的值
+    :param str ui_key: UI唯一标识，一般为 UI json 中 "namespace" 字段的值
     :param str cls_path: UI类路径
-    :param str screen_def: UI画布路径，格式为 "<namespace>.<screen_name>"，<namespace> 为 UI json 中 "namespace" 的值，<screen_name> 为想要创建的画布名称；默认为 "<ui_key>.main"
+    :param str screen_def: UI画布路径，格式为 "<namespace>.<screen_name>"，<namespace> 为 UI json 中 "namespace" 字段的值，<screen_name> 为想要创建的画布名称；默认为 "<ui_key>.main"
     :param dict|None param: UI参数字典；默认为空字典
     :param ClientSystem|None client_system: 客户端类实例；默认为 None；若指定，可在UI类中通过 param 字典的 '__cs__' 键获取该实例
 
@@ -152,8 +168,8 @@ def push_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_syste
         param = {}
     param['__cs__'] = client_system
     if not _is_ui_registered(namespace, ui_key):
-        c_api.RegisterUI(namespace, ui_key, cls_path, screen_def)
-    node = c_api.PushScreen(namespace, ui_key, param)
+        api.RegisterUI(namespace, ui_key, cls_path, screen_def)
+    node = api.PushScreen(namespace, ui_key, param)
     return node
 
 
@@ -176,7 +192,7 @@ def to_path(control):
     return control if isinstance(control, str) else control.GetPath()
 
 
-def to_control(screen_node, path, control_type=ControlType.BASE_CONTROL):
+def to_control(screen_node, path, control_type=0):
     """
     根据路径获取控件实例。
 
@@ -189,14 +205,36 @@ def to_control(screen_node, path, control_type=ControlType.BASE_CONTROL):
 
     :param ScreenNode screen_node: 控件所在UI类的实例
     :param str|BaseUIControl path: 控件路径
-    :param ControlType control_type: 控件类型，返回该类型对应的实例，请使用 ControlType 枚举值；默认为 ControlType.BASE_CONTROL
+    :param int control_type: 控件类型，返回该类型对应的实例，请使用 NyControl 枚举值；默认为 NyControl.BASE_CONTROL
 
     :return: 控件实例，获取不到时返回 None
     :rtype: BaseUIControl|None
     """
     control = screen_node.GetBaseUIControl(path) if isinstance(path, str) else path
-    if control and control_type not in ControlType._AS_BASE:
-        control = getattr(control, "as" + control_type)()
+    if control:
+        from .nyc.control import NyControl
+        if control_type not in NyControl._AS_BASE:
+            control_type_name = {
+                NyControl.BUTTON: "Button",
+                NyControl.IMAGE: "Image",
+                NyControl.LABEL: "Label",
+                NyControl.INPUT_PANEL: "InputPanel",
+                NyControl.STACK_PANEL: "StackPanel",
+                NyControl.EDIT_BOX: "TextEditBox",
+                NyControl.NETEASE_PAPER_DOLL: "NeteasePaperDoll",
+                NyControl.ITEM_RENDERER: "ItemRenderer",
+                NyControl.SCROLL_VIEW: "ScrollView",
+                NyControl.GRID: "Grid",
+                NyControl.PROGRESS_BAR: "ProgressBar",
+                NyControl.TOGGLE: "SwitchToggle",
+                NyControl.SLIDER: "Slider",
+                NyControl.SELECTION_WHEEL: "SelectionWheel",
+                NyControl.COMBO_BOX: "NeteaseComboBox",
+                NyControl.MINI_MAP: "MiniMap",
+            }.get(control_type)
+            if control_type_name is None:
+                raise ValueError("invalid control type: %s" % repr(control_type))
+            control = getattr(control, "as" + control_type_name)()
     return control
 
 
@@ -347,3 +385,14 @@ def get_parent(control, screen_node):
     :rtype: BaseUIControl|None
     """
     return screen_node.GetBaseUIControl(get_parent_path(control))
+
+
+def _is_ui_registered(ui_key):
+    mgr = get_module(99, 108, 105, 101, 110, 116, 46, 117, 105, 46, 117, 105, 77, 97, 110, 97, 103, 101, 114)
+    if not mgr:
+        return False
+    key = _env.MOD_NAME + ":" + ui_key
+    try:
+        return key in mgr.instance().screen_def
+    except (TypeError, AttributeError):
+        return False
