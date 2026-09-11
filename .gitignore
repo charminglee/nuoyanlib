@@ -17,6 +17,7 @@ studio.json
 .mcdev.json
 .mcdev/
 .vscode/
+/docs/库设计审查报告.md
 
 /scripts/event_typing/*
 !/scripts/event_typing/all_events.py
@@ -183,4 +184,3 @@ http-client.private.env.json
 /.idea/git_toolbox_prj.xml
 /.idea/copilot.*.xml
 /.idea/copilot*.xml
-/.vscode/
