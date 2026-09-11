@@ -1,5 +1,5 @@
 {
-    "namespace": "nuoyanlib_test",
+    "namespace": "nuoyanlib_test_2",
     "screen@common.base_screen": {
         "$screen_content": "nuoyanlib_test.root_panel"
     },

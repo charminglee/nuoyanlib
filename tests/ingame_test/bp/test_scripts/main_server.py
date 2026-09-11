@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-10
 #  ⠀
 #  ================================================
 
@@ -52,10 +52,9 @@ class MainServerSystem(nyl.NyServerSystem):
 
     @nyl.event(ns=MOD_NAME, sys_name=CLIENT_SYSTEM_NAME)
     def OnKeyPressInGame(self, args):
-        print(args)
         playerId = args.__id__
         screenName = args.screenName
-        key = int(args.keys)
+        key = int(args.key)
         isDown = int(args.isDown)
         if screenName != "hud_screen" or not isDown:
             return

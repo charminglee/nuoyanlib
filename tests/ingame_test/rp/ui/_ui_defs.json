@@ -1,6 +1,7 @@
 {
     "ui_defs": [
         "ui/nuoyanlib/NyItemGrid.json",
-        "ui/nuoyanlib_test.json"
+        "ui/nuoyanlib_test.json",
+        "ui/nuoyanlib_test_2.json"
     ]
 }

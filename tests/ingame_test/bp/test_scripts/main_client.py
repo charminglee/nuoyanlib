@@ -40,7 +40,7 @@ class MainClientSystem(nyl.NyClientSystem):
 
     def OnKeyPressInGame(self, args):
         screenName = args.screenName
-        key = int(args['keys'])
+        key = int(args.key)
         isDown = int(args.isDown)
         self.NotifyToServer(ClientEvent.OnKeyPressInGame, dict(args))
         if screenName != "hud_screen" or not isDown:

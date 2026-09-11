@@ -5,13 +5,15 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-11
 #  ⠀
 #  ================================================
 
 
 import mod.client.extraClientApi as c_api
 from mod.common.minecraftEnum import *
+from mod.client.ui.viewRequest import ViewRequest
+from mod.client.ui.viewBinder import ViewBinder
 from ..common.constant import *
 from ..nuoyanlib import client as nyl
 
@@ -37,7 +39,7 @@ class NuoyanlibTest(nyl.NyScreenNode):
         self.edit_box = (self.stack_panel / "edit_box").to_edit_box()
         self.combo_box = (self.root_panel / "combo_box").to_combo_box()
 
-        self.build_binding(self.label_binding, nyl.ViewBinder.BF_BindString)
+        self.build_binding(self.label_binding, ViewBinder.BF_BindString)
 
         self.button.set_callback(self.on_button_up, nyl.NyButton.UP)
         self.button.set_callback(self.on_button_down, nyl.NyButton.DOWN)
@@ -54,6 +56,12 @@ class NuoyanlibTest(nyl.NyScreenNode):
 
         self.move_parent = False
 
+    def __ui_active__(self):
+        print("__ui_active__")
+
+    def __ui_deactive__(self):
+        print("__ui_deactive__")
+
     def label_binding(self):
         return "动态绑定测试"
 
@@ -61,38 +69,38 @@ class NuoyanlibTest(nyl.NyScreenNode):
         if self.button.has_long_clicked:
             self.button.cancel_movable()
             return
-        print("button_up")
-        c_api.PopScreen()
+        print("on_button_up")
+        # self.hide()
 
     def on_button_down(self, args):
-        print("button_down")
+        print("on_button_down")
 
     def on_button_long_click(self, args):
-        print("button_long_click")
+        print("on_button_long_click")
         self.button.set_movable(self.move_parent, auto_save=True)
 
     def on_button_double_click(self, args):
-        print("button_double_click")
+        print("on_button_double_click")
 
     def on_toggle_changed(self, args):
         print(1, args)
         self.move_parent = args['state']
-        return nyl.ViewRequest.Refresh
+        return ViewRequest.Refresh
 
     def on_toggle_changed_1(self, args):
         print(2, args)
-        return nyl.ViewRequest.Refresh
+        return ViewRequest.Refresh
 
     def on_combo_box_open(self):
-        print("combo_box_open")
+        print("on_combo_box_open")
 
     def on_combo_box_close(self):
-        print("combo_box_close")
+        print("on_combo_box_close")
 
     def on_combo_box_select(self, index, name, user_data):
         if index == -1:
             return
-        print("combo_box_select")
+        print("on_combo_box_select")
         print(index, name, user_data)
         print(self.combo_box[index])
         del self.combo_box[index]

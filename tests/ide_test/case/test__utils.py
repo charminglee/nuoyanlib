@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-9
 #  ⠀
 #  ================================================
 
@@ -21,7 +21,17 @@ from nuoyanlib.core._utils import (
     cached_property,
     kwargs_defaults,
     assert_error,
+    dualmethod,
 )
+
+
+class E(object):
+    @dualmethod
+    def foo(self):
+        return self
+e = E()
+assert e.foo() is e
+assert E.foo() is E
 
 
 dl = DefaultLocal(list)
@@ -42,15 +52,27 @@ class A(object):
     def hook(self, a):
         self.lst.append(a)
 ins = A()
-hook_method(ins.test, ins.hook)
-ins.test(1)
-ins.test(2)
+hook_method(ins, "test", ins.hook)
+assert ins.test(1) == 1
+assert ins.test(2) == 2
 assert ins.lst == [1, 2]
 def hook(a):
     ins.lst.append(a)
-hook_method(ins.test, hook)
-ins.test(3)
+hook_method(ins, "test", hook)
+assert ins.test(3) == 3
 assert ins.lst == [1, 2, 3, 3]
+
+
+# class B(object):
+#     def value(self, a):
+#         return a + 1
+#     def fail(self):
+#         raise ValueError("expected")
+# b = B()
+# l = []
+# hook_method(b, "fail", after_hook=lambda: l.append(1))
+# b.fail()
+# assert l == [1]
 
 
 n = [0]
