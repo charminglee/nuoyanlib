@@ -5,7 +5,7 @@
 
    <h3>基于网易我的世界ModSDK的Mod开发工具库</h3>
 
-   [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.6-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg)  
+   [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.9-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg)  
    ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/charminglee/nuoyanlib) ![GitHub repo size](https://img.shields.io/github/repo-size/charminglee/nuoyanlib) [![github](https://img.shields.io/badge/-GitHub-black?style=flat&logo=github)](https://github.com/charminglee/nuoyanlib) [![gitee](https://img.shields.io/badge/-gitee-red?style=flat&logo=gitee)](https://gitee.com/charming-lee/nuoyanLib)
 
    [入门指南](/docs/source/getting_started.rst) ● [API文档]() ● [QQ群]()
@@ -89,7 +89,7 @@
     )
     ```
    
-   `nuoyanlib.run()` 的第一个参数为模组名称； `clients` / `servers` 参数需通过关键字形式传入，请在这两个参数中列出所有需要加载的客户端/服务端模块的名称（需保证在当前模组中唯一）和路径（注意是模块路径，无需写到类名）。
+   [`nuoyanlib.run()`](https://github.com/charminglee/nuoyanlib/blob/feac9641c9ddeeaee82e7dce8707240d5ab173f7/src/nuoyanlib/__init__.py#L121) 的第一个参数为模组名称； `clients` / `servers` 参数需通过关键字形式传入，请在这两个参数中列出所有需要加载的客户端/服务端模块的名称（需保证在当前模组中唯一）和路径（注意是模块路径，无需写到类名）。
    
    模块按列表顺序加载。一般情况下，不需要列出每一个模块的路径，只需列出客户端/服务端的入口模块和其他需要主动加载的模块。
 
