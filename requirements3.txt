@@ -1,5 +1,0 @@
-typing==3.7.4.3
-typing_extensions
-mc-netease-sdk-nyrev
-zhconv
-pyinstaller

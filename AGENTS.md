@@ -88,7 +88,7 @@
 
   ```powershell
   cd E:\MCMod\nuoyanlib
-  .venv\Scripts\python.exe tests\ide_test\ide_test.py
+  .venv\Scripts\python.exe tests\ide_test\main.py
   ```
 
 ## 提交变更前检查
