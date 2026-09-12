@@ -3,7 +3,15 @@
 studio.json
 *.psd
 *.log
-/docs/source/api/apis/
+.mcdev.json
+
+/.venv*/
+/.mcdev/
+/.vscode/
+/.idea/nuoyanlib.iml
+
+/docs/库设计审查报告.md
+
 /tests/ingame_test/.idea/
 /tests/ingame_test/.mcs/
 /tests/ingame_test/bp/test_scripts/nuoyanlib/
@@ -12,20 +20,21 @@ studio.json
 /tests/ingame_test/.mcdev.json
 /tests/ingame_test/world_behavior_packs.json
 /tests/ingame_test/world_resource_packs.json
+
 /src/nuoyanlib/extensions/*
 !/src/nuoyanlib/extensions/__init__.py
-.mcdev.json
-.mcdev/
-.vscode/
-/docs/库设计审查报告.md
 
 /scripts/event_typing/*
-!/scripts/event_typing/all_events.py
 !/scripts/event_typing/main.py
+!/scripts/event_typing/all_events.py
 /scripts/wiki_crawler/*
 !/scripts/wiki_crawler/main.py
 /scripts/make_release/*
 !/scripts/make_release/main.py
+/scripts/installer/*
+!/scripts/installer/main.py
+!/scripts/installer/installer.py
+!/scripts/installer/ui.py
 
 
 ### Python template

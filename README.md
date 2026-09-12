@@ -20,15 +20,9 @@
 
 ## 📖 简介
 
-「nuoyanlib」是基于网易我的世界（我的世界中国版） [ModSDK](https://mc.163.com/dev/index.html) 的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。  
-您无需对现有的代码结构作任何修改，即可轻松引入「nuoyanlib」。  
+「nuoyanlib」是基于网易我的世界（我的世界中国版） [ModSDK](https://mc.163.com/dev/index.html) 的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。
 
-> ✅ 已支持 **ModSDK 3.9**  
-> 📌 开源协议宽松，可自由用于**商业**或**非商业**用途
-
-<br>
-
-## ✨ 亮点
+「nuoyanlib」 主要包含以下三个工具库：
 
 - [`nuoyanlib.client`](/docs/source/api/client.rst)：客户端工具包，提供了NyUI框架、容器UI框架、特效管理、渲染、运镜工具等实用工具。  
 
@@ -158,17 +152,28 @@
 
 <br>
 
+## 🧾 开源许可
+
+本项目使用 [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) 许可，允许用于商业项目，允许以修改或未修改的形式进行再发布，仅保留以下两个权利：
+
+- 保留许可证的可读副本
+- 保留「nuoyanlib」源代码中的版权声明
+
+<br>
+
 ## 👑 贡献
 
-如果您有更好的算法或修改建议，欢迎通过 Issue 或 PR 的方式提交，为 MC Mod 社区的健康发展助一份力！
+「nuoyanlib」欢迎广大 MC 开发者参与开发，不管你是想提出修改建议、算法建议，还是接口需求，都可通过 Issue 或 PR 的方式提交，共同构建更现代化的 MC Mod 框架！
+
+开发指南详见： [「nuoyanlib」开发指南](/docs/dev/开发指南.md)
 
 <br>
 
 ## 🌹 特别鸣谢
 
-1. [创新工坊-小坊](https://github.com/cxgf666)：发现了 [`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41) 的一个bug；「nuoyanlib」内测用户。
-2. [xiaoweii](https://github.com/645359132)：「nuoyanlib」内测用户。
-3. [幻尘](https://github.com/HuanChen19)：「nuoyanlib」内测用户。
+1. [创新工坊-小坊](https://github.com/cxgf666) ：发现了 [`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41) 的一个bug；「nuoyanlib」内测用户。
+2. [xiaoweii](https://github.com/645359132) ：「nuoyanlib」内测用户。
+3. [幻尘](https://github.com/HuanChen19) ：「nuoyanlib」内测用户。
 
 <br>
 
@@ -177,10 +182,3 @@
 - [网易我的世界 ModSDK 补全库修正版](https://github.com/charminglee/mc-netease-sdk-nyrev)
 
 <br>
-
-## 👴 联系作者
-
-如果在使用过程中遇到问题，可通过以下方式联系作者，作者将尽全力为你解答。
-
-- QQ：[1279735247](https://qm.qq.com/q/BknsDqOdsk)
-- 邮箱：1279735247@qq.com
