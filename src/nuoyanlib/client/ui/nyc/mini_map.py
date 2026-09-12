@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,8 +14,8 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType
 from ....core import error
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -28,19 +28,30 @@ class NyMiniMap(NyControl):
     """
     小地图控件类。
 
+    示例
+    ----
+
+    >>> self.mini_map = nyl.NyMiniMap(self, "/panel/mini_map")
+    >>> self.mini_map.highest_y = 128
+
+    参见
+    ----
+
+    - ``NyMiniMap.highest_y`` -- 设置绘制地图的最大高度。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 小地图所在UI类的实例（需继承 ScreenNodeExtension）
-    :param MiniMapUIControl mini_map_control: 通过 asMiniMap() 等方式获取的 MiniMapUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该小地图控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.MINI_MAP
+    CONTROL_TYPE = _UIControlType.MINI_MAP
 
-    def __init__(self, screen_node_ex, mini_map_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, mini_map_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -53,7 +64,7 @@ class NyMiniMap(NyControl):
 
         :rtype: None
         """
-        raise error.GetPropertyError("texture")
+        raise error.GetPropertyError("highest_y")
 
     @highest_y.setter
     def highest_y(self, val):
@@ -64,15 +75,27 @@ class NyMiniMap(NyControl):
 
         :type val: int
         """
-        self._base_control.SetHighestY(int(val))
+        self._base_control.SetHighestY(val)
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    zoom_in                   = ZoomIn                 = lambda s, *a, **k: s._base_control.ZoomIn(*a, **k)
+    zoom_out                  = ZoomOut                = lambda s, *a, **k: s._base_control.ZoomOut(*a, **k)
+    zoom_reset                = ZoomReset              = lambda s, *a, **k: s._base_control.ZoomReset(*a, **k)
+    set_highest_y             = SetHighestY            = lambda s, *a, **k: s._base_control.SetHighestY(*a, **k)
+    add_entity_marker         = AddEntityMarker        = lambda s, *a, **k: s._base_control.AddEntityMarker(*a, **k)
+    add_entity_text_marker    = AddEntityTextMarker    = lambda s, *a, **k: s._base_control.AddEntityTextMarker(*a, **k)
+    add_static_marker         = AddStaticMarker        = lambda s, *a, **k: s._base_control.AddStaticMarker(*a, **k)
+    add_static_text_marker    = AddStaticTextMarker    = lambda s, *a, **k: s._base_control.AddStaticTextMarker(*a, **k)
+    remove_entity_marker      = RemoveEntityMarker     = lambda s, *a, **k: s._base_control.RemoveEntityMarker(*a, **k)
+    remove_entity_text_marker = RemoveEntityTextMarker = lambda s, *a, **k: s._base_control.RemoveEntityTextMarker(*a, **k)
+    remove_static_marker      = RemoveStaticMarker     = lambda s, *a, **k: s._base_control.RemoveStaticMarker(*a, **k)
+    remove_static_text_marker = RemoveStaticTextMarker = lambda s, *a, **k: s._base_control.RemoveStaticTextMarker(*a, **k)
+    repaint_mini_map          = RepaintMiniMap         = lambda s, *a, **k: s._base_control.RepaintMiniMap(*a, **k)
 
-
-
-
+    # endregion
 
 
 

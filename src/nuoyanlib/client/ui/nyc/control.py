@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-11
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -19,13 +19,33 @@ if bool(0):
 from ....core import error
 from ....core._utils import kwargs_defaults, try_exec, cached_property
 from ....core._types._checker import args_type_check
-from ....client.ui.ui_utils import get_children_path_by_level, get_parent_path, is_out_of_screen
+from ..ui_utils import get_children_path_by_level, get_parent_path, is_out_of_screen, _UIControlType
 
 
 __all__ = [
     "InteractableControl",
     "NyControl",
 ]
+
+
+_CONVERSION_FUNC_MAP = {
+    _UIControlType.BUTTON               : "asButton",
+    _UIControlType.COMBO_BOX            : "asNeteaseComboBox",
+    _UIControlType.EDIT_BOX             : "asTextEditBox",
+    _UIControlType.GRID                 : "asGrid",
+    _UIControlType.IMAGE                : "asImage",
+    _UIControlType.INPUT_PANEL          : "asInputPanel",
+    _UIControlType.ITEM_RENDERER        : "asItemRenderer",
+    _UIControlType.LABEL                : "asLabel",
+    _UIControlType.MINI_MAP             : "asMiniMap",
+    _UIControlType.NETEASE_PAPER_DOLL   : "asNeteasePaperDoll",
+    _UIControlType.PROGRESS_BAR         : "asProgressBar",
+    _UIControlType.SCROLL_VIEW          : "asScrollView",
+    _UIControlType.SELECTION_WHEEL      : "asSelectionWheel",
+    _UIControlType.SLIDER               : "asSlider",
+    _UIControlType.STACK_PANEL          : "asStackPanel",
+    _UIControlType.TOGGLE               : "asSwitchToggle",
+}
 
 
 class InteractableControl(object):
@@ -37,7 +57,7 @@ class InteractableControl(object):
         self._callbacks = None
         self._callback_setters = None
 
-    def _exec_callbacks(self, cb_type, *args):
+    def exec_callbacks(self, cb_type, *args):
         for cb in self._callbacks[cb_type]:
             try_exec(cb, *args)
 
@@ -124,7 +144,8 @@ class NyControl(object):
 
     __metaclass__ = NyControlMeta
 
-    _ALLOWED_APPLY_ATTRS = (
+    CONTROL_TYPE = _UIControlType.ALL
+    ALLOWED_APPLY_ATTRS = (
         'position',
         'anchor_from',
         'anchor_to',
@@ -156,10 +177,15 @@ class NyControl(object):
         screen_node = ny_screen_node._screen_node
         self._screen_node = screen_node
         self.ny_screen_node = ny_screen_node
+
         base_control = screen_node.GetBaseUIControl(path)
         if not base_control:
             raise error.ControlNotFoundError(path)
-        self._base_control = base_control
+        if self.CONTROL_TYPE != _UIControlType.ALL:
+            self._base_control = self._try_convert(base_control)
+        else:
+            self._base_control = base_control
+
         self._kwargs = kwargs
         if self.path not in self.ny_screen_node._ui_default_pos_data:
             self.ny_screen_node._set_ui_default_pos_data(self.path, self.position)
@@ -175,7 +201,11 @@ class NyControl(object):
         self._kwargs = None
 
     def __repr__(self):
-        return "<UI control %s at '%s'>" % (self.name, self.full_path)
+        full_path = self.full_path
+        path_parts = full_path.strip("/").split("/")
+        if len(path_parts) > 4:
+            full_path = "/{0[0]}/{0[1]}/{0[2]}/.../{1}".format(path_parts, path_parts[-1])
+        return "<%s '%s' at '%s'>" % (self.__class__.__name__, self.name, full_path)
 
     # region Properties ================================================================================================
 
@@ -810,7 +840,7 @@ class NyControl(object):
 
         :raise AttributeError: attr 不是允许批量设置的属性时抛出
         """
-        if attr not in NyControl._ALLOWED_APPLY_ATTRS:
+        if attr not in NyControl.ALLOWED_APPLY_ATTRS:
             raise AttributeError("can't apply to attribute '%s'" % attr)
         for c in self.children(level):
             setattr(c, attr, value)
@@ -1044,7 +1074,7 @@ class NyControl(object):
         :return: 指定层次所有子控件的路径列表
         :rtype: list[str]
         """
-        return get_children_path_by_level(self._base_control, self._screen_node, level)
+        return get_children_path_by_level(self._base_control, self.ny_screen_node, level)
 
     def destroy(self):
         """
@@ -1067,6 +1097,43 @@ class NyControl(object):
     # endregion
 
     # region Conversion ================================================================================================
+
+    @classmethod
+    def auto(cls, ny_screen_node, path):
+        """
+        [类方法]
+
+        自动根据控件类型创建对应的控件实例。
+
+        示例
+        ----
+
+        >>> self.button = nyl.NyControl.auto(self, "/panel/button") # 返回NyButton实例
+        >>> def on_button_up(args):
+        ...     pass
+        >>> self.button.set_callback(on_button_up, nyl.NyButton.UP)
+
+        -----
+
+        :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该控件的 NyScreenNode 或 NyScreenProxy 实例
+        :param str path: 控件路径
+
+        :return: 控件实例
+        :rtype: NyControl
+
+        :raise TypeError: 传入的 ny_screen_node 没有继承 NyScreenNode 或 NyScreenProxy 时抛出
+        :raise ControlNotFoundError: 找不到指定路径的控件时抛出
+        """
+        if cls is not NyControl:
+            return cls(ny_screen_node, path)
+        # todo
+
+    def _try_convert(self, base_control):
+        conv_func = _CONVERSION_FUNC_MAP[self.CONTROL_TYPE]
+        c = getattr(base_control, conv_func)()
+        if not c:
+            raise error.ControlTypeNotMatchedError(self.CONTROL_TYPE, self.path)
+        return c
 
     @kwargs_defaults(touch_event_params=None)
     def to_button(self, **kwargs):
@@ -1436,19 +1503,48 @@ class NyControl(object):
 
     # endregion
 
-    set_touch_enable                = lambda self, *args, **kwargs: self._base_control.SetTouchEnable(*args, **kwargs)
-    reset_animation                 = lambda self, *args, **kwargs: self._base_control.resetAnimation(*args, **kwargs)
-    pause_animation                 = lambda self, *args, **kwargs: self._base_control.PauseAnimation(*args, **kwargs)
-    play_animation                  = lambda self, *args, **kwargs: self._base_control.PlayAnimation(*args, **kwargs)
-    stop_animation                  = lambda self, *args, **kwargs: self._base_control.StopAnimation(*args, **kwargs)
-    set_animation                   = lambda self, *args, **kwargs: self._base_control.SetAnimation(*args, **kwargs)
-    remove_animation                = lambda self, *args, **kwargs: self._base_control.RemoveAnimation(*args, **kwargs)
-    set_anim_end_callback           = lambda self, *args, **kwargs: self._base_control.SetAnimEndCallback(*args, **kwargs)
-    remove_anim_end_callback        = lambda self, *args, **kwargs: self._base_control.RemoveAnimEndCallback(*args, **kwargs)
-    is_anim_end_callback_registered = lambda self, *args, **kwargs: self._base_control.IsAnimEndCallbackRegistered(*args, **kwargs)
+    # region Compatibility =============================================================================================
 
-
-
+    set_position                    = SetPosition                 = lambda s, *a, **k: s._base_control.SetPosition(*a, **k)
+    set_full_size                   = SetFullSize                 = lambda s, *a, **k: s._base_control.SetFullSize(*a, **k)
+    get_full_size                   = GetFullSize                 = lambda s, *a, **k: s._base_control.GetFullSize(*a, **k)
+    set_full_position               = SetFullPosition             = lambda s, *a, **k: s._base_control.SetFullPosition(*a, **k)
+    get_full_position               = GetFullPosition             = lambda s, *a, **k: s._base_control.GetFullPosition(*a, **k)
+    set_anchor_from                 = SetAnchorFrom               = lambda s, *a, **k: s._base_control.SetAnchorFrom(*a, **k)
+    get_anchor_from                 = GetAnchorFrom               = lambda s, *a, **k: s._base_control.GetAnchorFrom(*a, **k)
+    set_anchor_to                   = SetAnchorTo                 = lambda s, *a, **k: s._base_control.SetAnchorTo(*a, **k)
+    get_anchor_to                   = GetAnchorTo                 = lambda s, *a, **k: s._base_control.GetAnchorTo(*a, **k)
+    set_clip_offset                 = SetClipOffset               = lambda s, *a, **k: s._base_control.SetClipOffset(*a, **k)
+    get_clip_offset                 = GetClipOffset               = lambda s, *a, **k: s._base_control.GetClipOffset(*a, **k)
+    set_clips_children              = SetClipsChildren            = lambda s, *a, **k: s._base_control.SetClipsChildren(*a, **k)
+    get_clips_children              = GetClipsChildren            = lambda s, *a, **k: s._base_control.GetClipsChildren(*a, **k)
+    set_max_size                    = SetMaxSize                  = lambda s, *a, **k: s._base_control.SetMaxSize(*a, **k)
+    get_max_size                    = GetMaxSize                  = lambda s, *a, **k: s._base_control.GetMaxSize(*a, **k)
+    set_min_size                    = SetMinSize                  = lambda s, *a, **k: s._base_control.SetMinSize(*a, **k)
+    get_min_size                    = GetMinSize                  = lambda s, *a, **k: s._base_control.GetMinSize(*a, **k)
+    get_position                    = GetPosition                 = lambda s, *a, **k: s._base_control.GetPosition(*a, **k)
+    get_global_position             = GetGlobalPosition           = lambda s, *a, **k: s._base_control.GetGlobalPosition(*a, **k)
+    set_size                        = SetSize                     = lambda s, *a, **k: s._base_control.SetSize(*a, **k)
+    get_size                        = GetSize                     = lambda s, *a, **k: s._base_control.GetSize(*a, **k)
+    set_visible                     = SetVisible                  = lambda s, *a, **k: s._base_control.SetVisible(*a, **k)
+    get_visible                     = GetVisible                  = lambda s, *a, **k: s._base_control.GetVisible(*a, **k)
+    set_touch_enable                = SetTouchEnable              = lambda s, *a, **k: s._base_control.SetTouchEnable(*a, **k)
+    set_alpha                       = SetAlpha                    = lambda s, *a, **k: s._base_control.SetAlpha(*a, **k)
+    set_layer                       = SetLayer                    = lambda s, *a, **k: s._base_control.SetLayer(*a, **k)
+    get_path                        = GetPath                     = lambda s, *a, **k: s._base_control.GetPath(*a, **k)
+    get_child_by_name               = GetChildByName              = lambda s, *a, **k: s._base_control.GetChildByName(*a, **k)
+    get_child_by_path               = GetChildByPath              = lambda s, *a, **k: s._base_control.GetChildByPath(*a, **k)
+    reset_animation                 = resetAnimation              = lambda s, *a, **k: s._base_control.resetAnimation(*a, **k)
+    pause_animation                 = PauseAnimation              = lambda s, *a, **k: s._base_control.PauseAnimation(*a, **k)
+    play_animation                  = PlayAnimation               = lambda s, *a, **k: s._base_control.PlayAnimation(*a, **k)
+    stop_animation                  = StopAnimation               = lambda s, *a, **k: s._base_control.StopAnimation(*a, **k)
+    set_animation                   = SetAnimation                = lambda s, *a, **k: s._base_control.SetAnimation(*a, **k)
+    remove_animation                = RemoveAnimation             = lambda s, *a, **k: s._base_control.RemoveAnimation(*a, **k)
+    set_anim_end_callback           = SetAnimEndCallback          = lambda s, *a, **k: s._base_control.SetAnimEndCallback(*a, **k)
+    remove_anim_end_callback        = RemoveAnimEndCallback       = lambda s, *a, **k: s._base_control.RemoveAnimEndCallback(*a, **k)
+    is_anim_end_callback_registered = IsAnimEndCallbackRegistered = lambda s, *a, **k: s._base_control.IsAnimEndCallbackRegistered(*a, **k)
+    get_property_bag                = GetPropertyBag              = lambda s, *a, **k: s._base_control.GetPropertyBag(*a, **k)
+    set_property_bag                = SetPropertyBag              = lambda s, *a, **k: s._base_control.SetPropertyBag(*a, **k)
 
 
 

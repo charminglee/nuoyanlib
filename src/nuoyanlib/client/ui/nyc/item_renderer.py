@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -15,7 +15,7 @@ if bool(0):
 
 
 from ....core import error
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -30,17 +30,17 @@ class NyItemRenderer(NyControl):
 
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 物品渲染器所在UI类的实例（需继承 ScreenNodeExtension）
-    :param ItemRendererUIControl item_renderer_control: 通过 asItemRenderer() 等方式获取的 ItemRendererUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该物品渲染器控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.ITEM_RENDERER
+    CONTROL_TYPE = _UIControlType.ITEM_RENDERER
 
-    def __init__(self, screen_node_ex, item_renderer_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, item_renderer_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -93,7 +93,7 @@ class NyItemRenderer(NyControl):
         """
         [可读写属性]
 
-        ItemRenderer 显示的物品是否附魔。
+        物品渲染器显示的物品是否附魔。
 
         :rtype: bool
         """
@@ -104,7 +104,7 @@ class NyItemRenderer(NyControl):
         """
         [可读写属性]
 
-        ItemRenderer 显示的物品是否附魔。
+        物品渲染器显示的物品是否附魔。
 
         :type val: bool
         """
@@ -115,7 +115,7 @@ class NyItemRenderer(NyControl):
         """
         [只写属性]
 
-        设置 ItemRenderer 显示的物品的 UserData。
+        设置物品渲染器显示的物品的 UserData 。
 
         :rtype: None
         """
@@ -126,7 +126,7 @@ class NyItemRenderer(NyControl):
         """
         [只写属性]
 
-        设置 ItemRenderer 显示的物品的 UserData。
+        设置物品渲染器显示的物品的 UserData 。
 
         :type val: dict|None
         """
@@ -134,11 +134,12 @@ class NyItemRenderer(NyControl):
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    set_ui_item = SetUiItem = lambda s, *a, **k: s._base_control.SetUiItem(*a, **k)
+    get_ui_item = GetUiItem = lambda s, *a, **k: s._base_control.GetUiItem(*a, **k)
 
-
-
-
+    # endregion
 
 
 

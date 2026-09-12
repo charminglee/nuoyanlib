@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,7 +14,7 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType, WheelCallbackType
+from ..ui_utils import _UIControlType
 from .control import NyControl, InteractableControl
 
 
@@ -27,28 +27,45 @@ class NySelectionWheel(InteractableControl, NyControl):
     """
     轮盘控件类。
 
+    示例
+    ----
+
+    >>> self.wheel = nyl.NySelectionWheel(self, "/panel/selection_wheel")
+    >>> def on_slice_click(args):
+    ...     print(args)
+    >>> self.wheel.set_callback(on_slice_click, nyl.NySelectionWheel.CLICK)
+    >>> self.wheel.curr_slice_index = 0
+
+    参见
+    ----
+
+    - ``NySelectionWheel.set_callback()`` -- 设置轮盘回调函数。
+    - ``NySelectionWheel.curr_slice_index`` -- 获取/设置轮盘当前选择的切片的索引。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 轮盘所在UI类的实例（需继承 ScreenNodeExtension）
-    :param SelectionWheelUIControl selection_wheel_control: 通过 asSelectionWheel() 等方式获取的 SelectionWheelUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该轮盘控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.SELECTION_WHEEL
-    CALLBACK_TYPE = WheelCallbackType
+    CONTROL_TYPE = _UIControlType.SELECTION_WHEEL
 
-    def __init__(self, screen_node_ex, selection_wheel_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, selection_wheel_control)
+    CLICK = 1 << 0
+    HOVER = 1 << 1
+
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
         InteractableControl.__init__(
             self,
             {
-                WheelCallbackType.CLICK: (selection_wheel_control.SetTouchUpCallback, self._on_click),
-                WheelCallbackType.HOVER: (selection_wheel_control.SetHoverCallback, self._on_hover),
-            },
+                NySelectionWheel.CLICK: (self._base_control.SetTouchUpCallback, self._on_click),
+                NySelectionWheel.HOVER: (self._base_control.SetHoverCallback, self._on_hover),
+            }
         )
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
-        InteractableControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
+        InteractableControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -89,57 +106,63 @@ class NySelectionWheel(InteractableControl, NyControl):
 
     # region Callback ==================================================================================================
 
-    def set_callback(self, func, cb_type=WheelCallbackType.CLICK):
+    def set_callback(self, func, *cb_types):
         """
         设置轮盘回调函数。
 
         说明
         ----
 
-        支持同时设置多个同类型的回调，按设置顺序依次触发。
+        支持同时设置多个同类型的回调，例如同时设置两个点击轮盘切片回调，按设置顺序依次触发。
 
-        调用本方法后请勿再调用 ModSDK 的设置轮盘回调的接口（如 ``.SetTouchUpCallback()``），
-        否则所有通过本方法设置的回调函数将无效。
+        示例
+        ----
 
-        -----
-
-        :param function func: 回调函数
-        :param WheelCallbackType cb_type: 回调类型，请使用 WheelCallbackType 枚举值；默认为 WheelCallbackType.CLICK
-
-        :return: 是否成功
-        :rtype: bool
-
-        :raise ValueError: 回调类型无效
-        """
-        return InteractableControl.set_callback(self, func, cb_type)
-
-    def remove_callback(self, func, cb_type=WheelCallbackType.CLICK):
-        """
-        移除通过 ``.set_callback()`` 设置的下拉框回调函数。
+        >>> def on_slice_click(args):
+        ...     print(args)
+        >>> self.wheel.set_callback(on_slice_click, NySelectionWheel.CLICK)
 
         -----
 
         :param function func: 回调函数
-        :param WheelCallbackType cb_type: 回调类型，请使用 WheelCallbackType 枚举值；默认为 WheelCallbackType.CLICK
+        :param int cb_types: [变长位置参数] 回调类型，请使用 NySelectionWheel 枚举值；可同时传入多个类型
 
         :return: 是否成功
         :rtype: bool
 
-        :raise ValueError: 回调类型无效
+        :raise ValueError: 回调类型错误时抛出
         """
-        return InteractableControl.remove_callback(self, func, cb_type)
+        InteractableControl.set_callback(self, func, *cb_types)
 
-    _on_click = lambda self, *args: self._exec_callbacks(WheelCallbackType.CLICK, *args)
-    _on_hover = lambda self, *args: self._exec_callbacks(WheelCallbackType.HOVER, *args)
+    def remove_callback(self, func, *cb_types):
+        """
+        移除通过 ``.set_callback()`` 设置的轮盘回调函数。
+
+        -----
+
+        :param function func: 回调函数
+        :param int cb_types: [变长位置参数] 回调类型，请使用 NySelectionWheel 枚举值；可同时传入多个类型
+
+        :return: 是否成功
+        :rtype: bool
+
+        :raise ValueError: 回调类型错误时抛出
+        """
+        InteractableControl.remove_callback(self, func, *cb_types)
+
+    _on_click = lambda s, *a: s.exec_callbacks(NySelectionWheel.CLICK, *a)
+    _on_hover = lambda s, *a: s.exec_callbacks(NySelectionWheel.HOVER, *a)
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    get_slice_count         = GetSliceCount        = lambda s, *a, **k: s._base_control.GetSliceCount(*a, **k)
+    get_current_slice_index = GetCurrentSliceIndex = lambda s, *a, **k: s._base_control.GetCurrentSliceIndex(*a, **k)
+    set_current_slice_index = SetCurrentSliceIndex = lambda s, *a, **k: s._base_control.SetCurrentSliceIndex(*a, **k)
+    set_touch_up_callback   = SetTouchUpCallback   = lambda s, *a, **k: s._base_control.SetTouchUpCallback(*a, **k)
+    set_hover_callback      = SetHoverCallback     = lambda s, *a, **k: s._base_control.SetHoverCallback(*a, **k)
 
-
-
-
-
-
+    # endregion
 
 

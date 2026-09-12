@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -29,12 +29,30 @@ __all__ = [
 
 
 class ControlTypeNotMatchedError(RuntimeError):
-    def __init__(self, cls, path):
-        self.cls = cls
+    def __init__(self, t, path):
         self.path = path
+        from ..client.ui.ui_utils import _UIControlType
+        self.t_name = {
+            _UIControlType.BUTTON: "Button",
+            _UIControlType.COMBO_BOX: "NeteaseComboBox",
+            _UIControlType.EDIT_BOX: "TextEditBox",
+            _UIControlType.GRID: "Grid",
+            _UIControlType.IMAGE: "Image",
+            _UIControlType.INPUT_PANEL: "InputPanel",
+            _UIControlType.ITEM_RENDERER: "ItemRenderer",
+            _UIControlType.LABEL: "Label",
+            _UIControlType.MINI_MAP: "MiniMap",
+            _UIControlType.NETEASE_PAPER_DOLL: "NeteasePaperDoll",
+            _UIControlType.PROGRESS_BAR: "ProgressBar",
+            _UIControlType.SCROLL_VIEW: "ScrollView",
+            _UIControlType.SELECTION_WHEEL: "SelectionWheel",
+            _UIControlType.SLIDER: "Slider",
+            _UIControlType.STACK_PANEL: "StackPanel",
+            _UIControlType.TOGGLE: "SwitchToggle",
+        }[t]
 
     def __str__(self):
-        return "this control is not a %s: '%s'" % (self.cls.__name__[2:], self.path)
+        return "this control is not a %s: '%s'" % (self.t_name, self.path)
 
 
 class ControlAlreadyExistsError(RuntimeError):

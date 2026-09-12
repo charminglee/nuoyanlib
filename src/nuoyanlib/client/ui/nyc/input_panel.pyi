@@ -5,15 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
 
-from typing import Union
 from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
 from .control import NyControl
-from ..screen_node import ScreenNodeExtension
+from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
 from ....core._types._typing import FTuple2
 
@@ -21,9 +20,9 @@ from ....core._types._typing import FTuple2
 class NyInputPanel(NyControl):
     _base_control: InputPanelUIControl
     def __init__(
-        screen_node_ex: ScreenNodeExtension,
-        input_panel_control: InputPanelUIControl,
         self,
+        ny_screen_node: NyScreenBase,
+        path: str,
     ) -> None: ...
     @args_type_check(str)
     def __truediv__(self, other: str) -> NyControl: ...
@@ -40,9 +39,9 @@ class NyInputPanel(NyControl):
     def offset_delta(self) -> FTuple2: ...
     @offset_delta.setter
     def offset_delta(self, val: FTuple2) -> None: ...
-    SetIsModal = InputPanelUIControl.SetIsModal
-    GetIsModal = InputPanelUIControl.GetIsModal
-    SetIsSwallow = InputPanelUIControl.SetIsSwallow
-    GetIsSwallow = InputPanelUIControl.GetIsSwallow
-    SetOffsetDelta = InputPanelUIControl.SetOffsetDelta
-    GetOffsetDelta = InputPanelUIControl.GetOffsetDelta
+    set_is_modal = SetIsModal = InputPanelUIControl.SetIsModal
+    get_is_modal = GetIsModal = InputPanelUIControl.GetIsModal
+    set_is_swallow = SetIsSwallow = InputPanelUIControl.SetIsSwallow
+    get_is_swallow = GetIsSwallow = InputPanelUIControl.GetIsSwallow
+    set_offset_delta = SetOffsetDelta = InputPanelUIControl.SetOffsetDelta
+    get_offset_delta = GetOffsetDelta = InputPanelUIControl.GetOffsetDelta

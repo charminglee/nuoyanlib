@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -13,16 +13,16 @@
 from typing import NoReturn, Union
 from mod.client.ui.controls.textEditBoxUIControl import TextEditBoxUIControl
 from .control import NyControl
-from ..screen_node import ScreenNodeExtension
+from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
 
 
 class NyEditBox(NyControl):
     _base_control: TextEditBoxUIControl
     def __init__(
-        screen_node_ex: ScreenNodeExtension,
-        edit_box_control: TextEditBoxUIControl,
         self,
+        ny_screen_node: NyScreenBase,
+        path: str,
     ) -> None: ...
     @args_type_check(str)
     def __truediv__(self, other: str) -> NyControl: ...
@@ -35,6 +35,6 @@ class NyEditBox(NyControl):
     def max_length(self) -> NoReturn: ...
     @max_length.setter
     def max_length(self, val: int) -> None: ...
-    GetEditText = TextEditBoxUIControl.GetEditText
-    SetEditText = TextEditBoxUIControl.SetEditText
-    SetEditTextMaxLength = TextEditBoxUIControl.SetEditTextMaxLength
+    get_edit_text = GetEditText = TextEditBoxUIControl.GetEditText
+    set_edit_text = SetEditText = TextEditBoxUIControl.SetEditText
+    set_edit_text_max_length = SetEditTextMaxLength = TextEditBoxUIControl.SetEditTextMaxLength

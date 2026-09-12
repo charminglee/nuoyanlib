@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,9 +14,9 @@ from typing import Tuple
 
 
 class ControlTypeNotMatchedError(RuntimeError):
-    cls: type
+    t_name: str
     path: str
-    def __init__(self, cls: type, path: str) -> None: ...
+    def __init__(self, t: int, path: str) -> None: ...
     def __str__(self) -> str: ...
 class ControlAlreadyExistsError(RuntimeError):
     path: str

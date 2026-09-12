@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-9
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -231,6 +231,23 @@ class cached_property(object):
                     % (type(instance).__name__, self.attrname)
                 )
         return val
+
+
+class write_only_property(property):
+    def __init__(self, fset=None, doc=None):
+        if doc is None and fset is not None:
+            doc = getattr(fset, '__doc__', None)
+        property.__init__(self, None, fset, None, doc)
+        self.name = fset.__name__ if fset else ""
+
+    def setter(self, fset):
+        return write_only_property(fset, self.__doc__)
+
+    def getter(self, fget):
+        raise AttributeError("write_only_property '%s' does not support getter" % self.name)
+
+    def deleter(self, fdel):
+        raise AttributeError("write_only_property '%s' does not support deleter" % self.name)
 
 
 def inject_is_client(func):
@@ -564,6 +581,3 @@ def __imp(p):
         ['\x5f\x5f\x69\x6d\x70\x6f\x72\x74\x5f\x5f']
         (p, fromlist=[""])
     )
-
-
-

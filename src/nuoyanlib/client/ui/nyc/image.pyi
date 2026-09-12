@@ -5,15 +5,15 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
 
-from typing import Callable, Optional, Tuple, NoReturn, Literal, Union
+from typing import Callable, Optional, Tuple, NoReturn, Literal
 from mod.client.ui.controls.imageUIControl import ImageUIControl
 from .control import NyControl
-from ..screen_node import ScreenNodeExtension
+from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
 from ....core._types._typing import FTuple2, FTuple3, Args, Kwargs
 
@@ -36,9 +36,9 @@ __ImageAdaption = Literal[
 class NyImage(NyControl):
     _base_control: ImageUIControl
     def __init__(
-        screen_node_ex: ScreenNodeExtension,
-        image_control: ImageUIControl,
         self,
+        ny_screen_node: NyScreenBase,
+        path: str,
     ) -> None: ...
     @args_type_check(str)
     def __truediv__(self, other: str) -> NyControl: ...
@@ -51,6 +51,10 @@ class NyImage(NyControl):
     def color(self) -> NoReturn: ...
     @color.setter
     def color(self, val: FTuple3) -> None: ...
+    @property
+    def gray(self) -> NoReturn: ...
+    @gray.setter
+    def gray(self, val: bool) -> None: ...
     @property
     def uv(self) -> NoReturn: ...
     @uv.setter
@@ -106,25 +110,22 @@ class NyImage(NyControl):
     ) -> None: ...
     def pause_frame_anim(self) -> None: ...
     def stop_frame_anim(self) -> None: ...
-    SetSprite = ImageUIControl.SetSprite
-    SetSpriteColor = ImageUIControl.SetSpriteColor
-    SetSpriteGray = ImageUIControl.SetSpriteGray
-    SetSpriteUV = ImageUIControl.SetSpriteUV
-    SetSpriteUVSize = ImageUIControl.SetSpriteUVSize
-    SetSpriteClipRatio = ImageUIControl.SetSpriteClipRatio
-    SetSpritePlatformHead = ImageUIControl.SetSpritePlatformHead
-    SetSpritePlatformFrame = ImageUIControl.SetSpritePlatformFrame
-    SetClipDirection = ImageUIControl.SetClipDirection
-    GetClipDirection = ImageUIControl.GetClipDirection
-    SetImageAdaptionType = ImageUIControl.SetImageAdaptionType
-    Rotate = ImageUIControl.Rotate
-    RotateAround = ImageUIControl.RotateAround
-    SetRotatePivot = ImageUIControl.SetRotatePivot
-    GetRotatePivot = ImageUIControl.GetRotatePivot
-    GetRotateAngle = ImageUIControl.GetRotateAngle
-    GetGlobalRotateAngle = ImageUIControl.GetGlobalRotateAngle
-    GetGlobalRotatePoint = ImageUIControl.GetGlobalRotatePoint
-    GetRotateRect = ImageUIControl.GetRotateRect
-    set_sprite_platform_head = ImageUIControl.SetSpritePlatformHead
-    set_sprite_platform_frame = ImageUIControl.SetSpritePlatformFrame
-    set_image_adaption_type = ImageUIControl.SetImageAdaptionType
+    set_sprite = SetSprite = ImageUIControl.SetSprite
+    set_sprite_color = SetSpriteColor = ImageUIControl.SetSpriteColor
+    set_sprite_gray = SetSpriteGray = ImageUIControl.SetSpriteGray
+    set_sprite_uv = SetSpriteUV = ImageUIControl.SetSpriteUV
+    set_sprite_uvsize = SetSpriteUVSize = ImageUIControl.SetSpriteUVSize
+    set_sprite_clip_ratio = SetSpriteClipRatio = ImageUIControl.SetSpriteClipRatio
+    set_sprite_platform_head = SetSpritePlatformHead = ImageUIControl.SetSpritePlatformHead
+    set_sprite_platform_frame = SetSpritePlatformFrame = ImageUIControl.SetSpritePlatformFrame
+    set_clip_direction = SetClipDirection = ImageUIControl.SetClipDirection
+    get_clip_direction = GetClipDirection = ImageUIControl.GetClipDirection
+    set_image_adaption_type = SetImageAdaptionType = ImageUIControl.SetImageAdaptionType
+    rotate = Rotate = ImageUIControl.Rotate
+    rotate_around = RotateAround = ImageUIControl.RotateAround
+    set_rotate_pivot = SetRotatePivot = ImageUIControl.SetRotatePivot
+    get_rotate_pivot = GetRotatePivot = ImageUIControl.GetRotatePivot
+    get_rotate_angle = GetRotateAngle = ImageUIControl.GetRotateAngle
+    get_global_rotate_angle = GetGlobalRotateAngle = ImageUIControl.GetGlobalRotateAngle
+    get_global_rotate_point = GetGlobalRotatePoint = ImageUIControl.GetGlobalRotatePoint
+    get_rotate_rect = GetRotateRect = ImageUIControl.GetRotateRect

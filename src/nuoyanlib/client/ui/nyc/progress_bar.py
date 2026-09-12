@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,9 +14,9 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType
-from .control import NyControl
 from ....core import error
+from ..ui_utils import _UIControlType
+from .control import NyControl
 
 
 __all__ = [
@@ -28,19 +28,30 @@ class NyProgressBar(NyControl):
     """
     进度条控件类。
 
+    示例
+    ----
+
+    >>> self.progress_bar = nyl.NyProgressBar(self, "/panel/progress")
+    >>> self.progress_bar.progress = 0.5
+
+    参见
+    ----
+
+    - ``NyProgressBar.progress`` -- 获取/设置进度条的进度值。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 进度条所在UI类的实例（需继承 ScreenNodeExtension）
-    :param ProgressBarUIControl progress_bar_control: 通过 asProgressBar() 等方式获取的 ProgressBarUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该进度条控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.PROGRESS_BAR
+    CONTROL_TYPE = _UIControlType.PROGRESS_BAR
 
-    def __init__(self, screen_node_ex, progress_bar_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, progress_bar_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -68,11 +79,11 @@ class NyProgressBar(NyControl):
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    set_value = SetValue = lambda s, *a, **k: s._base_control.SetValue(*a, **k)
 
-
-
-
+    # endregion
 
 
 

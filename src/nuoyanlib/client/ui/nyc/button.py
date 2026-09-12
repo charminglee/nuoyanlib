@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-11
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -20,8 +20,7 @@ import time
 from ....core.client.comp import LvComp
 from ....core.listener import listen_event, unlisten_event, is_listened
 from ....core._utils import kwargs_defaults, cached_property
-from ....core import error
-from ..ui_utils import is_out_of_screen
+from ..ui_utils import is_out_of_screen, _UIControlType
 from .control import NyControl, InteractableControl
 
 
@@ -43,8 +42,6 @@ class NyButton(InteractableControl, NyControl):
 
     按钮控件通常包含 ``/default`` ``/hover`` ``/pressed`` 和 ``/button_label`` 四个子控件，分别对应默认、悬浮、按下状态的图片以及按钮文本。
     可通过 ``.default_image`` ``.hover_image`` ``.pressed_image`` ``.button_label`` 属性访问这些子控件，若控件不存在则返回 ``None`` 。
-
-    设置按钮回调建议优先使用 ``.set_callback()`` 而非官方接口。
 
     示例
     ----
@@ -73,17 +70,19 @@ class NyButton(InteractableControl, NyControl):
     :raise ControlTypeNotMatchedError: 指定路径的控件非按钮类型时抛出
     """
 
-    UP = 1 << 0
-    DOWN = 1 << 1
-    CANCEL = 1 << 2
-    MOVE = 1 << 3
-    MOVE_IN = 1 << 4
-    MOVE_OUT = 1 << 5
+    CONTROL_TYPE = _UIControlType.BUTTON
+
+    UP           = 1 << 0
+    DOWN         = 1 << 1
+    CANCEL       = 1 << 2
+    MOVE         = 1 << 3
+    MOVE_IN      = 1 << 4
+    MOVE_OUT     = 1 << 5
     DOUBLE_CLICK = 1 << 6
-    LONG_CLICK = 1 << 7
-    HOVER_IN = 1 << 8
-    HOVER_OUT = 1 << 9
-    SCREEN_EXIT = 1 << 10
+    LONG_CLICK   = 1 << 7
+    HOVER_IN     = 1 << 8
+    HOVER_OUT    = 1 << 9
+    SCREEN_EXIT  = 1 << 10
 
     DEFAULT_IMAGE_PATH = "/default"
     HOVER_IMAGE_PATH = "/hover"
@@ -93,22 +92,18 @@ class NyButton(InteractableControl, NyControl):
     @kwargs_defaults(touch_event_params=None)
     def __init__(self, ny_screen_node, path, **kwargs):
         NyControl.__init__(self, ny_screen_node, path)
-        c = self._base_control.asButton()
-        if not c:
-            raise error.ControlTypeNotMatchedError(self.__class__, path)
-        self._base_control = c
         InteractableControl.__init__(
             self,
             {
-                NyButton.UP           : (c.SetButtonTouchUpCallback, self._on_up),
-                NyButton.DOWN         : (c.SetButtonTouchDownCallback, self._on_down),
-                NyButton.CANCEL       : (c.SetButtonTouchCancelCallback, self._on_cancel),
-                NyButton.MOVE         : (c.SetButtonTouchMoveCallback, self._on_move),
-                NyButton.MOVE_IN      : (c.SetButtonTouchMoveInCallback, self._on_move_in),
-                NyButton.MOVE_OUT     : (c.SetButtonTouchMoveOutCallback, self._on_move_out),
-                NyButton.HOVER_IN     : (c.SetButtonHoverInCallback, self._on_hover_in),
-                NyButton.HOVER_OUT    : (c.SetButtonHoverOutCallback, self._on_hover_out),
-                NyButton.SCREEN_EXIT  : (c.SetButtonScreenExitCallback, self._on_screen_exit),
+                NyButton.UP           : (self._base_control.SetButtonTouchUpCallback, self._on_up),
+                NyButton.DOWN         : (self._base_control.SetButtonTouchDownCallback, self._on_down),
+                NyButton.CANCEL       : (self._base_control.SetButtonTouchCancelCallback, self._on_cancel),
+                NyButton.MOVE         : (self._base_control.SetButtonTouchMoveCallback, self._on_move),
+                NyButton.MOVE_IN      : (self._base_control.SetButtonTouchMoveInCallback, self._on_move_in),
+                NyButton.MOVE_OUT     : (self._base_control.SetButtonTouchMoveOutCallback, self._on_move_out),
+                NyButton.HOVER_IN     : (self._base_control.SetButtonHoverInCallback, self._on_hover_in),
+                NyButton.HOVER_OUT    : (self._base_control.SetButtonHoverOutCallback, self._on_hover_out),
+                NyButton.SCREEN_EXIT  : (self._base_control.SetButtonScreenExitCallback, self._on_screen_exit),
                 NyButton.LONG_CLICK   : self._register_long_click_callback,
                 NyButton.DOUBLE_CLICK : self._register_double_click_callback,
             }
@@ -337,7 +332,7 @@ class NyButton(InteractableControl, NyControl):
         说明
         ----
 
-        调用本方法后请勿再调用 ModSDK 原生按钮回调的接口（如 ``.SetButtonTouchUpCallback()`` ），否则所有通过本方法设置的回调函数将失效。
+        支持同时设置多个同类型的回调，例如同时设置两个按钮抬起回调，按设置顺序依次触发。
 
         示例
         ----
@@ -398,17 +393,17 @@ class NyButton(InteractableControl, NyControl):
     def _register_double_click_callback(self):
         self.set_callback(self._on_touch_up_dc, NyButton.UP)
 
-    _on_up              = lambda self, *args: self._exec_callbacks(NyButton.UP, *args)
-    _on_down            = lambda self, *args: self._exec_callbacks(NyButton.DOWN, *args)
-    _on_cancel          = lambda self, *args: self._exec_callbacks(NyButton.CANCEL, *args)
-    _on_move            = lambda self, *args: self._exec_callbacks(NyButton.MOVE, *args)
-    _on_move_in         = lambda self, *args: self._exec_callbacks(NyButton.MOVE_IN, *args)
-    _on_move_out        = lambda self, *args: self._exec_callbacks(NyButton.MOVE_OUT, *args)
-    _on_double_click    = lambda self, *args: self._exec_callbacks(NyButton.DOUBLE_CLICK, *args)
-    _on_long_click      = lambda self, *args: self._exec_callbacks(NyButton.LONG_CLICK, *args)
-    _on_hover_in        = lambda self, *args: self._exec_callbacks(NyButton.HOVER_IN, *args)
-    _on_hover_out       = lambda self, *args: self._exec_callbacks(NyButton.HOVER_OUT, *args)
-    _on_screen_exit     = lambda self, *args: self._exec_callbacks(NyButton.SCREEN_EXIT, *args)
+    _on_up              = lambda s, *a: s.exec_callbacks(NyButton.UP, *a)
+    _on_down            = lambda s, *a: s.exec_callbacks(NyButton.DOWN, *a)
+    _on_cancel          = lambda s, *a: s.exec_callbacks(NyButton.CANCEL, *a)
+    _on_move            = lambda s, *a: s.exec_callbacks(NyButton.MOVE, *a)
+    _on_move_in         = lambda s, *a: s.exec_callbacks(NyButton.MOVE_IN, *a)
+    _on_move_out        = lambda s, *a: s.exec_callbacks(NyButton.MOVE_OUT, *a)
+    _on_double_click    = lambda s, *a: s.exec_callbacks(NyButton.DOUBLE_CLICK, *a)
+    _on_long_click      = lambda s, *a: s.exec_callbacks(NyButton.LONG_CLICK, *a)
+    _on_hover_in        = lambda s, *a: s.exec_callbacks(NyButton.HOVER_IN, *a)
+    _on_hover_out       = lambda s, *a: s.exec_callbacks(NyButton.HOVER_OUT, *a)
+    _on_screen_exit     = lambda s, *a: s.exec_callbacks(NyButton.SCREEN_EXIT, *a)
 
     def _on_touch_up_dc(self, args):
         if self.has_long_clicked:
@@ -670,13 +665,21 @@ class NyButton(InteractableControl, NyControl):
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    add_touch_event_params             = AddTouchEventParams           = lambda s, *a, **k: s._base_control.AddTouchEventParams(*a, **k)
+    add_hover_event_params             = AddHoverEventParams           = lambda s, *a, **k: s._base_control.AddHoverEventParams(*a, **k)
+    set_button_touch_down_callback     = SetButtonTouchDownCallback    = lambda s, *a, **k: s._base_control.SetButtonTouchDownCallback(*a, **k)
+    set_button_hover_in_callback       = SetButtonHoverInCallback      = lambda s, *a, **k: s._base_control.SetButtonHoverInCallback(*a, **k)
+    set_button_hover_out_callback      = SetButtonHoverOutCallback     = lambda s, *a, **k: s._base_control.SetButtonHoverOutCallback(*a, **k)
+    set_button_touch_up_callback       = SetButtonTouchUpCallback      = lambda s, *a, **k: s._base_control.SetButtonTouchUpCallback(*a, **k)
+    set_button_touch_cancel_callback   = SetButtonTouchCancelCallback  = lambda s, *a, **k: s._base_control.SetButtonTouchCancelCallback(*a, **k)
+    set_button_touch_move_callback     = SetButtonTouchMoveCallback    = lambda s, *a, **k: s._base_control.SetButtonTouchMoveCallback(*a, **k)
+    set_button_touch_move_in_callback  = SetButtonTouchMoveInCallback  = lambda s, *a, **k: s._base_control.SetButtonTouchMoveInCallback(*a, **k)
+    set_button_touch_move_out_callback = SetButtonTouchMoveOutCallback = lambda s, *a, **k: s._base_control.SetButtonTouchMoveOutCallback(*a, **k)
+    set_button_screen_exit_callback    = SetButtonScreenExitCallback   = lambda s, *a, **k: s._base_control.SetButtonScreenExitCallback(*a, **k)
 
-
-
-
-
-
+    # endregion
 
 
 

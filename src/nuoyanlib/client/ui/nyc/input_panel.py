@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,7 +14,7 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -27,19 +27,32 @@ class NyInputPanel(NyControl):
     """
     输入面板控件类。
 
+    示例
+    ----
+
+    >>> self.input_panel = nyl.NyInputPanel(self, "/panel/input_panel")
+    >>> self.input_panel.is_modal = True
+    >>> self.input_panel.is_swallow = True
+
+    参见
+    ----
+
+    - ``NyInputPanel.is_modal`` -- 获取/设置当前面板是否为模态框。
+    - ``NyInputPanel.is_swallow`` -- 获取/设置当前面板输入是否会吞噬事件。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 输入面板所在UI类的实例（需继承 ScreenNodeExtension）
-    :param InputPanelUIControl input_panel_control: 通过 asInputPanel() 等方式获取的 InputPanelUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该输入面板控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.INPUT_PANEL
+    CONTROL_TYPE = _UIControlType.INPUT_PANEL
 
-    def __init__(self, screen_node_ex, input_panel_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, input_panel_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -121,15 +134,20 @@ class NyInputPanel(NyControl):
 
         :type val: tuple[float,float]
         """
-        self._base_control.SetOffsetDelta(tuple(val))
+        self._base_control.SetOffsetDelta(val)
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    set_is_modal     = SetIsModal     = lambda s, *a, **k: s._base_control.SetIsModal(*a, **k)
+    get_is_modal     = GetIsModal     = lambda s, *a, **k: s._base_control.GetIsModal(*a, **k)
+    set_is_swallow   = SetIsSwallow   = lambda s, *a, **k: s._base_control.SetIsSwallow(*a, **k)
+    get_is_swallow   = GetIsSwallow   = lambda s, *a, **k: s._base_control.GetIsSwallow(*a, **k)
+    set_offset_delta = SetOffsetDelta = lambda s, *a, **k: s._base_control.SetOffsetDelta(*a, **k)
+    get_offset_delta = GetOffsetDelta = lambda s, *a, **k: s._base_control.GetOffsetDelta(*a, **k)
 
-
-
-
+    # endregion
 
 
 

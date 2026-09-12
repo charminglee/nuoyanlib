@@ -5,24 +5,23 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
 
-from typing import Union
 from mod.client.ui.controls.scrollViewUIControl import ScrollViewUIControl
 from .control import NyControl
-from ..screen_node import ScreenNodeExtension
+from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
 
 
 class NyScrollView(NyControl):
     _base_control: ScrollViewUIControl
     def __init__(
-        screen_node_ex: ScreenNodeExtension,
-        scroll_view_control: ScrollViewUIControl,
         self,
+        ny_screen_node: NyScreenBase,
+        path: str,
     ) -> None: ...
     @args_type_check(str)
     def __truediv__(self, other: str) -> NyControl: ...
@@ -39,9 +38,9 @@ class NyScrollView(NyControl):
     def scroll_content_path(self) -> str: ...
     @property
     def scroll_content(self) -> NyControl: ...
-    SetScrollViewPos = ScrollViewUIControl.SetScrollViewPos
-    GetScrollViewPos = ScrollViewUIControl.GetScrollViewPos
-    SetScrollViewPercentValue = ScrollViewUIControl.SetScrollViewPercentValue
-    GetScrollViewPercentValue = ScrollViewUIControl.GetScrollViewPercentValue
-    GetScrollViewContentPath = ScrollViewUIControl.GetScrollViewContentPath
-    GetScrollViewContentControl = ScrollViewUIControl.GetScrollViewContentControl
+    set_scroll_view_pos = SetScrollViewPos = ScrollViewUIControl.SetScrollViewPos
+    get_scroll_view_pos = GetScrollViewPos = ScrollViewUIControl.GetScrollViewPos
+    set_scroll_view_percent_value = SetScrollViewPercentValue = ScrollViewUIControl.SetScrollViewPercentValue
+    get_scroll_view_percent_value = GetScrollViewPercentValue = ScrollViewUIControl.GetScrollViewPercentValue
+    get_scroll_view_content_path = GetScrollViewContentPath = ScrollViewUIControl.GetScrollViewContentPath
+    get_scroll_view_content_control = GetScrollViewContentControl = ScrollViewUIControl.GetScrollViewContentControl

@@ -5,18 +5,18 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
 
 if bool(0):
     from typing import Any
-    from ..screen_node import ScreenNodeExtension
+    from ..screen_node import NyScreenNode, NyScreenProxy
 
 
 from ....core import error
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -29,18 +29,33 @@ class NyImage(NyControl):
     """
     图片控件类。
 
+    示例
+    ----
+
+    >>> self.image = nyl.NyImage(self, "/panel/image")
+    >>> self.image.texture = "textures/ui/my_icon"
+    >>> self.image.color = (1.0, 1.0, 1.0)
+
+    参见
+    ----
+
+    - ``NyImage.texture`` -- 设置图片路径。
+    - ``NyImage.color`` -- 设置图片颜色。
+    - ``NyImage.play_frame_anim()`` -- 播放由多张图片组成的序列帧动画。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 图片所在UI类的实例（需继承 ScreenNodeExtension）
-    :param ImageUIControl image_control: 通过 asImage() 等方式获取的 ImageUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该图片控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.IMAGE
-    def __init__(self, screen_node_ex, image_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, image_control)
+    CONTROL_TYPE = _UIControlType.IMAGE
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
+
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -49,7 +64,7 @@ class NyImage(NyControl):
         """
         [只写属性]
 
-        贴图路径。
+        图片路径。
 
         :rtype: None
         """
@@ -60,7 +75,7 @@ class NyImage(NyControl):
         """
         [只写属性]
 
-        贴图路径。
+        图片路径。
 
         :type val: str
         """
@@ -86,7 +101,29 @@ class NyImage(NyControl):
 
         :type val: tuple[float,float,float]
         """
-        self._base_control.SetSpriteColor(tuple(val))
+        self._base_control.SetSpriteColor(val)
+
+    @property
+    def gray(self):
+        """
+        [只写属性]
+
+        图片置灰。
+
+        :rtype: None
+        """
+        raise error.GetPropertyError("gray")
+
+    @gray.setter
+    def gray(self, val):
+        """
+        [只写属性]
+
+        图片置灰。
+
+        :type val: bool
+        """
+        self._base_control.SetSpriteGray(val)
 
     @property
     def uv(self):
@@ -112,7 +149,7 @@ class NyImage(NyControl):
 
         :type val: tuple[float,float]
         """
-        self._base_control.SetSpriteUV(tuple(val))
+        self._base_control.SetSpriteUV(val)
 
     @property
     def uv_size(self):
@@ -138,7 +175,7 @@ class NyImage(NyControl):
 
         :type val: tuple[float,float]
         """
-        self._base_control.SetSpriteUVSize(tuple(val))
+        self._base_control.SetSpriteUVSize(val)
 
     @property
     def clip_ratio(self):
@@ -276,7 +313,7 @@ class NyImage(NyControl):
 
         :type val: tuple[float,float]
         """
-        self._base_control.SetRotatePivot(tuple(val))
+        self._base_control.SetRotatePivot(val)
 
     @property
     def global_rotate_point(self):
@@ -298,7 +335,7 @@ class NyImage(NyControl):
 
         :type val: tuple[float,float]
         """
-        self._base_control.RotateAround(tuple(val), self.global_rotate_angle)
+        self._base_control.RotateAround(val, self.global_rotate_angle)
 
     @property
     def rect(self):
@@ -375,6 +412,21 @@ class NyImage(NyControl):
         """
         播放由多张图片组成的序列帧动画。
 
+        示例
+        ----
+
+        >>> self.image.play_frame_anim(
+        ...     "textures/ui/skill_%d",
+        ...     frame_count=8,
+        ...     frame_rate=12,
+        ... )
+
+        参见
+        ----
+
+        - ``NyImage.pause_frame_anim()`` -- 暂停当前序列帧动画。
+        - ``NyImage.stop_frame_anim()`` -- 停止当前序列帧动画。
+
         -----
 
         :param str tex_path: 序列帧贴图路径，请使用%d作为数字占位符，该接口将会按顺序播放 tex_path % 0 到 tex_path % (frame_count - 1) 的贴图
@@ -399,7 +451,7 @@ class NyImage(NyControl):
             raise ValueError("'frame_rate' must be greater than 0")
         if not (-frame_count <= stop_frame < frame_count):
             raise ValueError("'stop_frame' must satisfy: -frame_count <= stop_frame < frame_count")
-        self.ui_node._play_frame_anim(
+        self.ny_screen_node._play_frame_anim(
             self, tex_path, frame_count, frame_rate, stop_frame, loop, callback, args, kwargs
         )
 
@@ -412,7 +464,7 @@ class NyImage(NyControl):
         :return: 无
         :rtype: None
         """
-        self.ui_node._pause_frame_anim(self)
+        self.ny_screen_node._pause_frame_anim(self)
 
     def stop_frame_anim(self):
         """
@@ -423,19 +475,32 @@ class NyImage(NyControl):
         :return: 无
         :rtype: None
         """
-        self.ui_node._stop_frame_anim(self)
+        self.ny_screen_node._stop_frame_anim(self)
 
     # endregion
 
-    set_sprite_platform_head  = lambda self, *args, **kwargs: self._base_control.SetSpritePlatformHead(*args, **kwargs)
-    set_sprite_platform_frame = lambda self, *args, **kwargs: self._base_control.SetSpritePlatformFrame(*args, **kwargs)
-    set_image_adaption_type   = lambda self, *args, **kwargs: self._base_control.SetImageAdaptionType(*args, **kwargs)
+    # region Compatibility =============================================================================================
 
+    set_sprite                = SetSprite              = lambda s, *a, **k: s._base_control.SetSprite(*a, **k)
+    set_sprite_color          = SetSpriteColor         = lambda s, *a, **k: s._base_control.SetSpriteColor(*a, **k)
+    set_sprite_gray           = SetSpriteGray          = lambda s, *a, **k: s._base_control.SetSpriteGray(*a, **k)
+    set_sprite_uv             = SetSpriteUV            = lambda s, *a, **k: s._base_control.SetSpriteUV(*a, **k)
+    set_sprite_uvsize         = SetSpriteUVSize        = lambda s, *a, **k: s._base_control.SetSpriteUVSize(*a, **k)
+    set_sprite_clip_ratio     = SetSpriteClipRatio     = lambda s, *a, **k: s._base_control.SetSpriteClipRatio(*a, **k)
+    set_sprite_platform_head  = SetSpritePlatformHead  = lambda s, *a, **k: s._base_control.SetSpritePlatformHead(*a, **k)
+    set_sprite_platform_frame = SetSpritePlatformFrame = lambda s, *a, **k: s._base_control.SetSpritePlatformFrame(*a, **k)
+    set_clip_direction        = SetClipDirection       = lambda s, *a, **k: s._base_control.SetClipDirection(*a, **k)
+    get_clip_direction        = GetClipDirection       = lambda s, *a, **k: s._base_control.GetClipDirection(*a, **k)
+    set_image_adaption_type   = SetImageAdaptionType   = lambda s, *a, **k: s._base_control.SetImageAdaptionType(*a, **k)
+    rotate                    = Rotate                 = lambda s, *a, **k: s._base_control.Rotate(*a, **k)
+    rotate_around             = RotateAround           = lambda s, *a, **k: s._base_control.RotateAround(*a, **k)
+    set_rotate_pivot          = SetRotatePivot         = lambda s, *a, **k: s._base_control.SetRotatePivot(*a, **k)
+    get_rotate_pivot          = GetRotatePivot         = lambda s, *a, **k: s._base_control.GetRotatePivot(*a, **k)
+    get_rotate_angle          = GetRotateAngle         = lambda s, *a, **k: s._base_control.GetRotateAngle(*a, **k)
+    get_global_rotate_angle   = GetGlobalRotateAngle   = lambda s, *a, **k: s._base_control.GetGlobalRotateAngle(*a, **k)
+    get_global_rotate_point   = GetGlobalRotatePoint   = lambda s, *a, **k: s._base_control.GetGlobalRotatePoint(*a, **k)
+    get_rotate_rect           = GetRotateRect          = lambda s, *a, **k: s._base_control.GetRotateRect(*a, **k)
 
-
-
-
-
-
+    # endregion
 
 

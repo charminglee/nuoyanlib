@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,7 +14,7 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -27,19 +27,31 @@ class NyScrollView(NyControl):
     """
     滚动视图控件类。
 
+    示例
+    ----
+
+    >>> self.scroll_view = nyl.NyScrollView(self, "/panel/scroll_view")
+    >>> self.scroll_view.scroll_pct = 100
+
+    参见
+    ----
+
+    - ``NyScrollView.scroll_content`` -- 获取滚动内容控件的 NyControl 实例。
+    - ``NyScrollView.scroll_pct`` -- 获取/设置当前内容的百分比位置。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 滚动视图所在UI类的实例（需继承 ScreenNodeExtension）
-    :param ScrollViewUIControl scroll_view_control: 通过 asScrollView() 等方式获取的 ScrollViewUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该滚动视图控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.SCROLL_VIEW
+    CONTROL_TYPE = _UIControlType.SCROLL_VIEW
 
-    def __init__(self, screen_node_ex, scroll_view_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, scroll_view_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -48,7 +60,7 @@ class NyScrollView(NyControl):
         """
         [可读写属性]
 
-        当前 ScrollView 最上方内容的位置。
+        当前滚动视图最上方内容的位置。
 
         :rtype: float
         """
@@ -59,7 +71,7 @@ class NyScrollView(NyControl):
         """
         [可读写属性]
 
-        当前 ScrollView 最上方内容的位置。
+        当前滚动视图最上方内容的位置。
 
         :type val: float
         """
@@ -70,7 +82,7 @@ class NyScrollView(NyControl):
         """
         [可读写属性]
 
-        当前 ScrollView 内容的百分比位置。
+        当前滚动视图内容的百分比位置。
 
         :rtype: int
         """
@@ -81,18 +93,18 @@ class NyScrollView(NyControl):
         """
         [可读写属性]
 
-        当前 ScrollView 内容的百分比位置。
+        当前滚动视图内容的百分比位置。
 
         :type val: int
         """
-        self._base_control.SetScrollViewPercentValue(int(val))
+        self._base_control.SetScrollViewPercentValue(val)
 
     @property
     def scroll_content_path(self):
         """
         [只读属性]
 
-        ScrollView 内容控件的路径。
+        滚动视图内容控件的路径。
 
         :rtype: str
         """
@@ -103,19 +115,24 @@ class NyScrollView(NyControl):
         """
         [只读属性]
 
-        ScrollView 内容控件的 ``NyControl`` 实例。
+        滚动视图内容控件的 ``NyControl`` 实例。
 
         :rtype: NyControl
         """
-        return NyControl.from_path(self.ui_node, self.scroll_content_path)
+        return NyControl(self.ny_screen_node, self.scroll_content_path)
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    set_scroll_view_pos             = SetScrollViewPos            = lambda s, *a, **k: s._base_control.SetScrollViewPos(*a, **k)
+    get_scroll_view_pos             = GetScrollViewPos            = lambda s, *a, **k: s._base_control.GetScrollViewPos(*a, **k)
+    set_scroll_view_percent_value   = SetScrollViewPercentValue   = lambda s, *a, **k: s._base_control.SetScrollViewPercentValue(*a, **k)
+    get_scroll_view_percent_value   = GetScrollViewPercentValue   = lambda s, *a, **k: s._base_control.GetScrollViewPercentValue(*a, **k)
+    get_scroll_view_content_path    = GetScrollViewContentPath    = lambda s, *a, **k: s._base_control.GetScrollViewContentPath(*a, **k)
+    get_scroll_view_content_control = GetScrollViewContentControl = lambda s, *a, **k: s._base_control.GetScrollViewContentControl(*a, **k)
 
-
-
-
+    # endregion
 
 
 

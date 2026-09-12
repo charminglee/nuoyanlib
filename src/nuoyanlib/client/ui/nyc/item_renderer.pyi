@@ -5,15 +5,15 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
 
-from typing import Optional, TypedDict, NoReturn, Union
+from typing import Optional, Tuple, TypedDict, NoReturn
 from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
 from .control import NyControl
-from ..screen_node import ScreenNodeExtension
+from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
 from ....core._types._typing import UserData
 
@@ -27,9 +27,9 @@ class __UiItemDict(TypedDict):
 class NyItemRenderer(NyControl):
     _base_control: ItemRendererUIControl
     def __init__(
-        screen_node_ex: ScreenNodeExtension,
-        item_renderer_control: ItemRendererUIControl,
         self,
+        ny_screen_node: NyScreenBase,
+        path: str,
     ) -> None: ...
     @args_type_check(str)
     def __truediv__(self, other: str) -> NyControl: ...
@@ -50,5 +50,5 @@ class NyItemRenderer(NyControl):
     def user_data(self) -> NoReturn: ...
     @user_data.setter
     def user_data(self, val: Optional[UserData]) -> None: ...
-    SetUiItem = ItemRendererUIControl.SetUiItem
-    GetUiItem = ItemRendererUIControl.GetUiItem
+    set_ui_item = SetUiItem = ItemRendererUIControl.SetUiItem
+    get_ui_item = GetUiItem = ItemRendererUIControl.GetUiItem

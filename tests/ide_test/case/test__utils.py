@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-9
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -19,6 +19,7 @@ from nuoyanlib.core._utils import (
     Singleton,
     ArgsSingleton,
     cached_property,
+    write_only_property,
     kwargs_defaults,
     assert_error,
     dualmethod,
@@ -138,6 +139,36 @@ assert t.prop1 == "ab"
 assert t.prop2 == "cd"
 assert t.prop2 == "cd"
 assert a[0] == 2
+
+
+values = []
+class WriteOnlyPropertyTest(object):
+    value = write_only_property()
+
+    @value.setter
+    def value(self, val):
+        values.append(val)
+
+
+write_only = WriteOnlyPropertyTest()
+write_only.value = 1
+assert values == [1]
+assert_error(lambda: write_only.value, exc=AttributeError)
+assert_error(lambda: delattr(write_only, "value"), exc=AttributeError)
+
+
+values = []
+class WriteOnlyPropertyTest2(object):
+    @write_only_property
+    def value(self, val):
+        values.append(val)
+
+
+write_only = WriteOnlyPropertyTest2()
+write_only.value = 1
+assert values == [1]
+assert_error(lambda: write_only.value, exc=AttributeError)
+assert_error(lambda: delattr(write_only, "value"), exc=AttributeError)
 
 
 @kwargs_defaults(c=3, d=4)

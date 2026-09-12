@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -15,7 +15,7 @@ if bool(0):
 
 
 from ....core import error
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -28,19 +28,32 @@ class NyEditBox(NyControl):
     """
     文本编辑框控件类。
 
+    示例
+    ----
+
+    >>> self.edit_box = nyl.NyEditBox(self, "/panel/edit_box")
+    >>> self.edit_box.max_length = 32
+    >>> self.edit_box.edit_text = "请输入名称"
+
+    参见
+    ----
+
+    - ``NyEditBox.edit_text`` -- 获取/设置编辑框文本。
+    - ``NyEditBox.max_length`` -- 设置编辑框的最大输入长度。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 文本编辑框所在UI类的实例（需继承 ScreenNodeExtension）
-    :param TextEditBoxUIControl edit_box_control: 通过 asTextEditBox() 等方式获取的 NyEditBox 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该文本编辑框控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.EDIT_BOX
+    CONTROL_TYPE = _UIControlType.EDIT_BOX
 
-    def __init__(self, screen_node_ex, edit_box_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, edit_box_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -64,7 +77,7 @@ class NyEditBox(NyControl):
 
         :type val: str
         """
-        self._base_control.SetEditText(str(val))
+        self._base_control.SetEditText(val)
 
     @property
     def max_length(self):
@@ -90,11 +103,13 @@ class NyEditBox(NyControl):
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    get_edit_text            = GetEditText          = lambda s, *a, **k: s._base_control.GetEditText(*a, **k)
+    set_edit_text            = SetEditText          = lambda s, *a, **k: s._base_control.SetEditText(*a, **k)
+    set_edit_text_max_length = SetEditTextMaxLength = lambda s, *a, **k: s._base_control.SetEditTextMaxLength(*a, **k)
 
-
-
-
+    # endregion
 
 
 

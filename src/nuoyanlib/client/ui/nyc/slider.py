@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,7 +14,7 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -27,19 +27,30 @@ class NySlider(NyControl):
     """
     滑动条控件类。
 
+    示例
+    ----
+
+    >>> self.slider = nyl.NySlider(self, "/panel/slider")
+    >>> self.slider.value = 0.75
+
+    参见
+    ----
+
+    - ``NySlider.value`` -- 获取/设置滑动条的值。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 滑动条所在UI类的实例（需继承 ScreenNodeExtension）
-    :param SliderUIControl slider_control: 通过 asSlider() 等方式获取的 SliderUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该滑动条控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.SLIDER
+    CONTROL_TYPE = _UIControlType.SLIDER
 
-    def __init__(self, screen_node_ex, slider_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, slider_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -67,11 +78,12 @@ class NySlider(NyControl):
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    get_slider_value = GetSliderValue = lambda s, *a, **k: s._base_control.GetSliderValue(*a, **k)
+    set_slider_value = SetSliderValue = lambda s, *a, **k: s._base_control.SetSliderValue(*a, **k)
 
-
-
-
+    # endregion
 
 
 

@@ -5,24 +5,24 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
 
-from typing import NoReturn, Union
+from typing import NoReturn
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from .control import NyControl
-from ..screen_node import ScreenNodeExtension
+from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
 
 
 class NyProgressBar(NyControl):
     _base_control: ProgressBarUIControl
     def __init__(
-        screen_node_ex: ScreenNodeExtension,
-        progress_bar_control: ProgressBarUIControl,
         self,
+        ny_screen_node: NyScreenBase,
+        path: str,
     ) -> None: ...
     @args_type_check(str)
     def __truediv__(self, other: str) -> NyControl: ...
@@ -31,4 +31,4 @@ class NyProgressBar(NyControl):
     def progress(self) -> NoReturn: ...
     @progress.setter
     def progress(self, val: float) -> None: ...
-    SetValue = ProgressBarUIControl.SetValue
+    set_value = SetValue = ProgressBarUIControl.SetValue

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -15,7 +15,7 @@ if bool(0):
 
 
 from ....core.client.comp import ViewBinder
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -28,19 +28,35 @@ class NyToggle(NyControl):
     """
     开关控件类。
 
+    示例
+    ----
+
+    >>> def on_toggle_changed(args):
+    ...     print(args)
+    >>> self.toggle = nyl.NyToggle(self, "/panel/toggle")
+    >>> self.toggle.set_callback(on_toggle_changed)
+    >>> self.toggle.state = True
+
+    参见
+    ----
+
+    - ``NyToggle.set_callback()`` -- 设置开关状态变化回调。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 开关所在UI类的实例（需继承 ScreenNodeExtension）
-    :param SwitchToggleUIControl toggle_control: 通过 asSwitchToggle() 等方式获取的 SwitchToggleUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该开关控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.TOGGLE
+    CONTROL_TYPE = _UIControlType.TOGGLE
 
-    def __init__(self, screen_node_ex, toggle_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, toggle_control)
+    CHANGED = 1 << 0
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
+
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -62,7 +78,7 @@ class NyToggle(NyControl):
 
         开关状态。
 
-        :type val: bool
+        :type val: bool|int
         """
         if isinstance(val, int):
             val = bool(val)
@@ -79,37 +95,51 @@ class NyToggle(NyControl):
         说明
         ----
 
-        需要将 UI json 中开关的 ``"$toggle_name"`` 字段的值设置为 ``"#<namespace>.<func_name>"`` 方可生效，
-        ``<namespace>`` 即为 UI json 中 ``"namespace"`` 对应的值， ``<func_name>`` 为回调函数名。
+        由于开关回调依赖绑定，请将 UI json 中开关控件的 ``"$toggle_name"`` 字段的值设置为 ``"#<namespace>.<func_name>"`` 。
+        ``<namespace>`` 为 UI json 中 ``"namespace"`` 字段的值， ``<func_name>`` 为回调函数名。
+
+        示例
+        ----
+
+        >>> def on_toggle_changed(args):
+        ...     print(args)
+        >>> self.toggle.set_callback(on_toggle_changed)
 
         -----
 
-        :param function func: 回调函数，参数为一个字典：{'state': bool, 'index': int}
+        :param function func: 回调函数，参数为一个字典： {'state': bool, 'index': int}
 
-        :return: 是否成功
-        :rtype: bool
+        :return: 无
+        :rtype: None
         """
-        return self.ui_node.build_binding(func, ViewBinder.BF_ToggleChanged)
+        self.ny_screen_node.build_binding(func, ViewBinder.BF_ToggleChanged)
 
     def remove_callback(self, func):
         """
         移除通过 ``.set_callback()`` 设置的开关回调函数。
 
+        示例
+        ----
+
+        >>> self.toggle.remove_callback(on_toggle_changed)
+
         -----
 
         :param function func: 回调函数
 
-        :return: 是否成功
-        :rtype: bool
+        :return: 无
+        :rtype: None
         """
-        return self.ui_node.unbuild_binding(func)
+        self.ny_screen_node.unbuild_binding(func)
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    set_toggle_state = SetToggleState = lambda s, *a, **k: s._base_control.SetToggleState(*a, **k)
+    get_toggle_state = GetToggleState = lambda s, *a, **k: s._base_control.GetToggleState(*a, **k)
 
-
-
+    # endregion
 
 
 

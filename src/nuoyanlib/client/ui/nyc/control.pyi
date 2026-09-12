@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-10
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -91,7 +91,7 @@ class InteractableControl(object):
     _callback_setters: Dict[int, Union[tuple, Callable]]
     def __init__(self, callback_setters: Dict[int, Union[tuple, Callable]]) -> None: ...
     def __ui_destroy__(self) -> None: ...
-    def _exec_callbacks(self, cb_type: int, *args: Any) -> None: ...
+    def exec_callbacks(self, cb_type: int, *args: Any) -> None: ...
     def set_callback(self, func: Callable, *cb_types: int) -> None: ...
     def remove_callback(self, func: Callable, *cb_types: int) -> None: ...
 
@@ -101,7 +101,8 @@ class NyControlMeta(type):
 
 
 class NyControl(object):
-    _ALLOWED_APPLY_ATTRS: ClassVar[STuple]
+    CONTROL_TYPE: ClassVar[int]
+    ALLOWED_APPLY_ATTRS: ClassVar[STuple]
     _screen_node: ScreenNode
     _base_control: BaseUIControl
     _kwargs: Dict[str, Any]
@@ -220,6 +221,7 @@ class NyControl(object):
     def children(self, level: int = 1) -> List[NyControl]: ...
     def children_path(self, level: int = 1) -> List[str]: ...
     def destroy(self) -> None: ...
+    def _try_convert(self, base_control: BaseUIControl) -> BaseUIControl: ...
     def to_button(self, *, touch_event_params: Optional[dict] = None) -> NyButton: ...
     def to_image(self) -> NyImage: ...
     def to_label(self) -> NyLabel: ...
@@ -243,56 +245,46 @@ class NyControl(object):
     def to_selection_wheel(self) -> NySelectionWheel: ...
     def to_combo_box(self) -> NyComboBox: ...
     def to_mini_map(self) -> NyMiniMap: ...
-    SetPosition = BaseUIControl.SetPosition
-    SetFullSize = BaseUIControl.SetFullSize
-    GetFullSize = BaseUIControl.GetFullSize
-    SetFullPosition = BaseUIControl.SetFullPosition
-    GetFullPosition = BaseUIControl.GetFullPosition
-    SetAnchorFrom = BaseUIControl.SetAnchorFrom
-    GetAnchorFrom = BaseUIControl.GetAnchorFrom
-    SetAnchorTo = BaseUIControl.SetAnchorTo
-    GetAnchorTo = BaseUIControl.GetAnchorTo
-    SetClipOffset = BaseUIControl.SetClipOffset
-    GetClipOffset = BaseUIControl.GetClipOffset
-    SetClipsChildren = BaseUIControl.SetClipsChildren
-    GetClipsChildren = BaseUIControl.GetClipsChildren
-    SetMaxSize = BaseUIControl.SetMaxSize
-    GetMaxSize = BaseUIControl.GetMaxSize
-    SetMinSize = BaseUIControl.SetMinSize
-    GetMinSize = BaseUIControl.GetMinSize
-    GetPosition = BaseUIControl.GetPosition
-    GetGlobalPosition = BaseUIControl.GetGlobalPosition
-    SetSize = BaseUIControl.SetSize
-    GetSize = BaseUIControl.GetSize
-    SetVisible = BaseUIControl.SetVisible
-    GetVisible = BaseUIControl.GetVisible
-    SetTouchEnable = BaseUIControl.SetTouchEnable
-    SetAlpha = BaseUIControl.SetAlpha
-    SetLayer = BaseUIControl.SetLayer
-    GetPath = BaseUIControl.GetPath
-    GetChildByName = BaseUIControl.GetChildByName
-    GetChildByPath = BaseUIControl.GetChildByPath
-    resetAnimation = BaseUIControl.resetAnimation
-    PauseAnimation = BaseUIControl.PauseAnimation
-    PlayAnimation = BaseUIControl.PlayAnimation
-    StopAnimation = BaseUIControl.StopAnimation
-    SetAnimation = BaseUIControl.SetAnimation
-    RemoveAnimation = BaseUIControl.RemoveAnimation
-    SetAnimEndCallback = BaseUIControl.SetAnimEndCallback
-    RemoveAnimEndCallback = BaseUIControl.RemoveAnimEndCallback
-    IsAnimEndCallbackRegistered = BaseUIControl.IsAnimEndCallbackRegistered
-    GetPropertyBag = BaseUIControl.GetPropertyBag
-    SetPropertyBag = BaseUIControl.SetPropertyBag
-    set_touch_enable = BaseUIControl.SetTouchEnable
-    reset_animation = BaseUIControl.resetAnimation
-    pause_animation = BaseUIControl.PauseAnimation
-    play_animation = BaseUIControl.PlayAnimation
-    stop_animation = BaseUIControl.StopAnimation
-    set_animation = BaseUIControl.SetAnimation
-    remove_animation = BaseUIControl.RemoveAnimation
-    set_anim_end_callback = BaseUIControl.SetAnimEndCallback
-    remove_anim_end_callback = BaseUIControl.RemoveAnimEndCallback
-    is_anim_end_callback_registered = BaseUIControl.IsAnimEndCallbackRegistered
+    set_position = SetPosition = BaseUIControl.SetPosition
+    set_full_size = SetFullSize = BaseUIControl.SetFullSize
+    get_full_size = GetFullSize = BaseUIControl.GetFullSize
+    set_full_position = SetFullPosition = BaseUIControl.SetFullPosition
+    get_full_position = GetFullPosition = BaseUIControl.GetFullPosition
+    set_anchor_from = SetAnchorFrom = BaseUIControl.SetAnchorFrom
+    get_anchor_from = GetAnchorFrom = BaseUIControl.GetAnchorFrom
+    set_anchor_to = SetAnchorTo = BaseUIControl.SetAnchorTo
+    get_anchor_to = GetAnchorTo = BaseUIControl.GetAnchorTo
+    set_clip_offset = SetClipOffset = BaseUIControl.SetClipOffset
+    get_clip_offset = GetClipOffset = BaseUIControl.GetClipOffset
+    set_clips_children = SetClipsChildren = BaseUIControl.SetClipsChildren
+    get_clips_children = GetClipsChildren = BaseUIControl.GetClipsChildren
+    set_max_size = SetMaxSize = BaseUIControl.SetMaxSize
+    get_max_size = GetMaxSize = BaseUIControl.GetMaxSize
+    set_min_size = SetMinSize = BaseUIControl.SetMinSize
+    get_min_size = GetMinSize = BaseUIControl.GetMinSize
+    get_position = GetPosition = BaseUIControl.GetPosition
+    get_global_position = GetGlobalPosition = BaseUIControl.GetGlobalPosition
+    set_size = SetSize = BaseUIControl.SetSize
+    get_size = GetSize = BaseUIControl.GetSize
+    set_visible = SetVisible = BaseUIControl.SetVisible
+    get_visible = GetVisible = BaseUIControl.GetVisible
+    set_touch_enable = SetTouchEnable = BaseUIControl.SetTouchEnable
+    set_alpha = SetAlpha = BaseUIControl.SetAlpha
+    set_layer = SetLayer = BaseUIControl.SetLayer
+    get_path = GetPath = BaseUIControl.GetPath
+    get_child_by_name = GetChildByName = BaseUIControl.GetChildByName
+    get_child_by_path = GetChildByPath = BaseUIControl.GetChildByPath
+    reset_animation = resetAnimation = BaseUIControl.resetAnimation
+    pause_animation = PauseAnimation = BaseUIControl.PauseAnimation
+    play_animation = PlayAnimation = BaseUIControl.PlayAnimation
+    stop_animation = StopAnimation = BaseUIControl.StopAnimation
+    set_animation = SetAnimation = BaseUIControl.SetAnimation
+    remove_animation = RemoveAnimation = BaseUIControl.RemoveAnimation
+    set_anim_end_callback = SetAnimEndCallback = BaseUIControl.SetAnimEndCallback
+    remove_anim_end_callback = RemoveAnimEndCallback = BaseUIControl.RemoveAnimEndCallback
+    is_anim_end_callback_registered = IsAnimEndCallbackRegistered = BaseUIControl.IsAnimEndCallbackRegistered
+    get_property_bag = GetPropertyBag = BaseUIControl.GetPropertyBag
+    set_property_bag = SetPropertyBag = BaseUIControl.SetPropertyBag
 
 
 if sys.version_info <= (2, 7):

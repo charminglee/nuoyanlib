@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,9 +14,8 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
-from ....core import error
 
 
 __all__ = [
@@ -28,19 +27,32 @@ class NyLabel(NyControl):
     """
     文本控件类。
 
+    示例
+    ----
+
+    >>> self.label = nyl.NyLabel(self, "/panel/label")
+    >>> self.label.text = "准备就绪"
+    >>> self.label.text_alignment = "center"
+
+    参见
+    ----
+
+    - ``NyControl`` -- 通用控件接口。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 文本所在UI类的实例（需继承 ScreenNodeExtension）
-    :param LabelUIControl label_control: 通过 asLabel() 获取等方式的 LabelUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该文本控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.LABEL
+    CONTROL_TYPE = _UIControlType.LABEL
 
-    def __init__(self, screen_node_ex, label_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, label_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
+        self.__font_scale = 1.0
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -64,7 +76,7 @@ class NyLabel(NyControl):
 
         :type val: str
         """
-        self._base_control.SetText(str(val), True)
+        self._base_control.SetText(val, True)
 
     @property
     def text_alignment(self):
@@ -120,7 +132,7 @@ class NyLabel(NyControl):
 
         :type val: tuple[float,float,float]
         """
-        self._base_control.SetTextColor(tuple(val))
+        self._base_control.SetTextColor(val)
 
     @property
     def line_padding(self):
@@ -147,7 +159,7 @@ class NyLabel(NyControl):
     @property
     def font_scale(self):
         """
-        [只写属性]
+        [可读写属性]
 
         文本字体大小缩放值。
 
@@ -157,14 +169,14 @@ class NyLabel(NyControl):
         默认字体大小，取值有限为 ``"small"`` 、``"normal"`` 、``"large"`` ，
         ``font_scale`` 是在这个默认字体的基础上进行字体大小缩放；默认为 ``1.0`` 。
 
-        :rtype: None
+        :rtype: float
         """
-        raise error.GetPropertyError("font_scale")
+        return self.__font_scale
 
     @font_scale.setter
     def font_scale(self, val):
         """
-        [只写属性]
+        [可读写属性]
 
         文本字体大小缩放值。
 
@@ -176,6 +188,7 @@ class NyLabel(NyControl):
 
         :type val: float
         """
+        self.__font_scale = val
         self._base_control.SetTextFontSize(val)
 
     @property
@@ -203,49 +216,51 @@ class NyLabel(NyControl):
         else:
             self._base_control.DisableTextShadow()
 
-    @property
-    def text_font(self):
-        """
-        [只写属性]
-
-        文本字体。
-
-        可选值：
-
-        - ``"rune"`` -- 符文字体
-        - ``"unicode"`` -- 统一字体
-        - ``"smooth"`` -- 平滑字体
-        - ``"default"`` -- 默认字体
-
-        :rtype: None
-        """
-        raise error.GetPropertyError("text_font")
-
-    @text_font.setter
-    def text_font(self, val):
-        """
-        [只写属性]
-
-        文本字体。
-
-        可选值：
-
-        - ``"rune"`` -- 符文字体
-        - ``"unicode"`` -- 统一字体
-        - ``"smooth"`` -- 平滑字体
-        - ``"default"`` -- 默认字体
-
-        :type val: str
-        """
-        self._base_control.SetTextFont(val) # noqa
-
     # endregion
 
+    def set_text_font(self, font):
+        """
+        [只写属性]
 
+        设置文本字体。
 
+        可选值：
 
+        - ``"rune"`` -- 符文字体
+        - ``"unicode"`` -- 统一字体
+        - ``"smooth"`` -- 平滑字体
+        - ``"default"`` -- 默认字体
 
+        示例
+        ----
 
+        >>> self.label.set_text_font("unicode")
+
+        -----
+
+        :param str font: 文本字体
+
+        :return: 无
+        :rtype: None
+        """
+        self._base_control.SetTextFont(font) # noqa
+
+    # region Compatibility =============================================================================================
+
+    disable_text_shadow    = DisableTextShadow   = lambda s, *a, **k: s._base_control.DisableTextShadow(*a, **k)
+    enable_text_shadow     = EnableTextShadow    = lambda s, *a, **k: s._base_control.EnableTextShadow(*a, **k)
+    is_text_shadow_enabled = IsTextShadowEnabled = lambda s, *a, **k: s._base_control.IsTextShadowEnabled(*a, **k)
+    set_text               = SetText             = lambda s, *a, **k: s._base_control.SetText(*a, **k)
+    get_text               = GetText             = lambda s, *a, **k: s._base_control.GetText(*a, **k)
+    set_text_color         = SetTextColor        = lambda s, *a, **k: s._base_control.SetTextColor(*a, **k)
+    get_text_color         = GetTextColor        = lambda s, *a, **k: s._base_control.GetTextColor(*a, **k)
+    set_text_font_size     = SetTextFontSize     = lambda s, *a, **k: s._base_control.SetTextFontSize(*a, **k)
+    set_text_alignment     = SetTextAlignment    = lambda s, *a, **k: s._base_control.SetTextAlignment(*a, **k)
+    get_text_alignment     = GetTextAlignment    = lambda s, *a, **k: s._base_control.GetTextAlignment(*a, **k)
+    set_text_line_padding  = SetTextLinePadding  = lambda s, *a, **k: s._base_control.SetTextLinePadding(*a, **k)
+    get_text_line_padding  = GetTextLinePadding  = lambda s, *a, **k: s._base_control.GetTextLinePadding(*a, **k)
+
+    # endregion
 
 
 

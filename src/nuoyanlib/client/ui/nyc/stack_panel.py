@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,7 +14,7 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -27,19 +27,30 @@ class NyStackPanel(NyControl):
     """
     栈面板控件类。
 
+    示例
+    ----
+
+    >>> self.stack_panel = nyl.NyStackPanel(self, "/panel/stack_panel")
+    >>> self.stack_panel.orientation = "horizontal"
+
+    参见
+    ----
+
+    - ``NyStackPanel.orientation`` -- 获取/设置栈面板排列方向。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 栈面板所在UI类的实例（需继承 ScreenNodeExtension）
-    :param StackPanelUIControl stack_panel_control: 通过 asStackPanel() 等方式获取的 StackPanelUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该栈面板控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.STACK_PANEL
+    CONTROL_TYPE = _UIControlType.STACK_PANEL
 
-    def __init__(self, screen_node_ex, stack_panel_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, stack_panel_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -67,10 +78,12 @@ class NyStackPanel(NyControl):
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    set_orientation = SetOrientation = lambda s, *a, **k: s._base_control.SetOrientation(*a, **k)
+    get_orientation = GetOrientation = lambda s, *a, **k: s._base_control.GetOrientation(*a, **k)
 
-
-
+    # endregion
 
 
 

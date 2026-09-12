@@ -5,14 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-9
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
 
 from threading import local
 import sys
-from typing import TypeVar, Generic, Hashable, List, Callable, Any, Type, Union, Tuple, Optional, Generator, overload, Dict
+from typing import NoReturn, TypeVar, Generic, Hashable, List, Callable, Any, Type, Union, Tuple, Optional, Generator, overload, Dict
 from ._types._typing import ITuple, T, F, Args, Kwargs, STuple, T_co
 from ._types._checker import args_type_check
 
@@ -132,6 +132,18 @@ else:
         @overload
         def __get__(self, instance: object, owner: Optional[type] = None) -> T_co: ...
         def __set__(self, instance: object, value: T_co) -> None: ...
+
+
+class write_only_property(property):
+    name: str
+    def __init__(
+        self,
+        fset: Optional[Callable] = None,
+        doc: Optional[str] = None,
+    ) -> None: ...
+    def setter(self, fset: Callable) -> "write_only_property": ...
+    def getter(self, fget: Callable) -> NoReturn: ...
+    def deleter(self, fdel: Callable) -> NoReturn: ...
 
 
 def kwargs_defaults(**kwargs: Any) -> Callable[[F], F]: ...

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -14,7 +14,7 @@ if bool(0):
     from ..screen_node import NyScreenNode, NyScreenProxy
 
 
-from ....common.enum import ControlType
+from ..ui_utils import _UIControlType
 from .control import NyControl
 
 
@@ -27,19 +27,24 @@ class NyPaperDoll(NyControl):
     """
     纸娃娃控件类。
 
+    示例
+    ----
+
+    >>> self.paper_doll = nyl.NyPaperDoll(self, "/panel/paper_doll")
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 纸娃娃所在UI类的实例（需继承 ScreenNodeExtension）
-    :param NeteasePaperDollUIControl paper_doll_control: 通过 asNeteasePaperDoll() 等方式获取的 NeteasePaperDollUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该纸娃娃控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     """
 
-    CONTROL_TYPE = ControlType.NETEASE_PAPER_DOLL
+    CONTROL_TYPE = _UIControlType.NETEASE_PAPER_DOLL
 
-    def __init__(self, screen_node_ex, paper_doll_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, paper_doll_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
 
-    def __destroy__(self):
-        NyControl.__destroy__(self)
+    def __ui_destroy__(self):
+        NyControl.__ui_destroy__(self)
 
     # region Properties ================================================================================================
 
@@ -56,11 +61,14 @@ class NyPaperDoll(NyControl):
 
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    get_model_id                = GetModelId               = lambda s, *a, **k: s._base_control.GetModelId(*a, **k)
+    render_entity               = RenderEntity             = lambda s, *a, **k: s._base_control.RenderEntity(*a, **k)
+    render_skeleton_model       = RenderSkeletonModel      = lambda s, *a, **k: s._base_control.RenderSkeletonModel(*a, **k)
+    render_block_geometry_model = RenderBlockGeometryModel = lambda s, *a, **k: s._base_control.RenderBlockGeometryModel(*a, **k)
 
-
-
-
+    # endregion
 
 
 

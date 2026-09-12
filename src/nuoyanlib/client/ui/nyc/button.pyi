@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-11
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
@@ -129,14 +129,14 @@ class NyButton(InteractableControl, NyControl):
     def _on_touch_down_mov(self, args: ArgsDict) -> None: ...
     def clear_pos_data(self, with_associated: bool = True) -> bool: ...
     def save_pos(self, with_associated: bool = True) -> bool: ...
-    AddTouchEventParams = ButtonUIControl.AddTouchEventParams
-    AddHoverEventParams = ButtonUIControl.AddHoverEventParams
-    SetButtonTouchDownCallback = ButtonUIControl.SetButtonTouchDownCallback
-    SetButtonHoverInCallback = ButtonUIControl.SetButtonHoverInCallback
-    SetButtonHoverOutCallback = ButtonUIControl.SetButtonHoverOutCallback
-    SetButtonTouchUpCallback = ButtonUIControl.SetButtonTouchUpCallback
-    SetButtonTouchCancelCallback = ButtonUIControl.SetButtonTouchCancelCallback
-    SetButtonTouchMoveCallback = ButtonUIControl.SetButtonTouchMoveCallback
-    SetButtonTouchMoveInCallback = ButtonUIControl.SetButtonTouchMoveInCallback
-    SetButtonTouchMoveOutCallback = ButtonUIControl.SetButtonTouchMoveOutCallback
-    SetButtonScreenExitCallback = ButtonUIControl.SetButtonScreenExitCallback
+    add_touch_event_params = AddTouchEventParams = ButtonUIControl.AddTouchEventParams
+    add_hover_event_params = AddHoverEventParams = ButtonUIControl.AddHoverEventParams
+    set_button_touch_down_callback = SetButtonTouchDownCallback = ButtonUIControl.SetButtonTouchDownCallback
+    set_button_hover_in_callback = SetButtonHoverInCallback = ButtonUIControl.SetButtonHoverInCallback
+    set_button_hover_out_callback = SetButtonHoverOutCallback = ButtonUIControl.SetButtonHoverOutCallback
+    set_button_touch_up_callback = SetButtonTouchUpCallback = ButtonUIControl.SetButtonTouchUpCallback
+    set_button_touch_cancel_callback = SetButtonTouchCancelCallback = ButtonUIControl.SetButtonTouchCancelCallback
+    set_button_touch_move_callback = SetButtonTouchMoveCallback = ButtonUIControl.SetButtonTouchMoveCallback
+    set_button_touch_move_in_callback = SetButtonTouchMoveInCallback = ButtonUIControl.SetButtonTouchMoveInCallback
+    set_button_touch_move_out_callback = SetButtonTouchMoveOutCallback = ButtonUIControl.SetButtonTouchMoveOutCallback
+    set_button_screen_exit_callback = SetButtonScreenExitCallback = ButtonUIControl.SetButtonScreenExitCallback
