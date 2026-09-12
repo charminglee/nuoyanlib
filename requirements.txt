@@ -3,3 +3,4 @@ typing_extensions
 mc-netease-sdk-nyrev
 zhconv
 pyinstaller
+pillow

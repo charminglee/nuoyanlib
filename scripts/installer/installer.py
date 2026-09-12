@@ -18,8 +18,8 @@ import sys
 from typing import Iterable
 
 
-SOURCE_DIRECTORY = Path(__file__).resolve().parents[2] / "src" / "nuoyanlib"
 PACKAGE_DIRECTORY_NAME = "nuoyanlib"
+EXTENSIONS_DIRECTORY_NAME = "extensions"
 IGNORED_DIRECTORY_NAMES = [
     "__pycache__"
 ]
@@ -31,34 +31,58 @@ COPY_BUFFER_SIZE = 1024 * 1024
 PROGRESS_BAR_WIDTH = 30
 
 
-def is_ignored_name(name: str, copy_pyi: bool = True) -> bool:
+def get_source_directory() -> Path:
+    bundle_directory = getattr(sys, "_MEIPASS", None)
+    if bundle_directory is not None:
+        return Path(bundle_directory) / PACKAGE_DIRECTORY_NAME
+    return Path(__file__).resolve().parents[2] / "src" / PACKAGE_DIRECTORY_NAME
+
+
+SOURCE_DIRECTORY = get_source_directory()
+
+
+def is_ignored_name(
+    name: str,
+    copy_pyi: bool = True,
+    copy_extensions: bool = False,
+) -> bool:
     suffix = Path(name).suffix.lower()
     return (
         name in IGNORED_DIRECTORY_NAMES
         or suffix in IGNORED_FILE_SUFFIXES
         or (not copy_pyi and suffix == ".pyi")
+        or (not copy_extensions and name == EXTENSIONS_DIRECTORY_NAME)
     )
 
 
-def ignore_files(path: str, names: Iterable[str], copy_pyi: bool = True) -> list[str]:
+def ignore_files(
+    path: str,
+    names: Iterable[str],
+    copy_pyi: bool = True,
+    copy_extensions: bool = False,
+) -> list[str]:
     return [
         name
         for name in names
-        if is_ignored_name(name, copy_pyi)
+        if is_ignored_name(name, copy_pyi, copy_extensions)
     ]
 
 
-def calculate_total_size(source: Path, copy_pyi: bool = True) -> int:
+def calculate_total_size(
+    source: Path,
+    copy_pyi: bool = True,
+    copy_extensions: bool = False,
+) -> int:
     total_size = 0
     for root, directories, files in os.walk(source):
         root = Path(root)
         directories[:] = [
             name
             for name in directories
-            if not is_ignored_name(name, copy_pyi)
+            if not is_ignored_name(name, copy_pyi, copy_extensions)
         ]
         for name in files:
-            if not is_ignored_name(name, copy_pyi):
+            if not is_ignored_name(name, copy_pyi, copy_extensions):
                 total_size += (root / name).stat().st_size
     return total_size
 
@@ -114,7 +138,11 @@ class CopyProgress:
         return target_path
 
 
-def install(destination: str, copy_pyi: bool = True) -> Path:
+def install(
+    destination: str,
+    copy_pyi: bool = True,
+    copy_extensions: bool = False,
+) -> Path:
     destination = Path(destination)
     source = SOURCE_DIRECTORY.resolve()
     destination = destination.expanduser().resolve()
@@ -128,22 +156,27 @@ def install(destination: str, copy_pyi: bool = True) -> Path:
         raise ValueError("destination must not be inside the source directory")
 
     if SHOW_PROGRESS:
-        total_size = calculate_total_size(source, copy_pyi)
+        total_size = calculate_total_size(source, copy_pyi, copy_extensions)
         progress = CopyProgress(total_size)
         copy_function = progress.copy_file
     else:
         progress = None
         copy_function = shutil.copy2
     try:
-        if target.exists() and target.is_dir():
+        if target.exists():
+            if not target.is_dir():
+                raise ValueError("target is not a directory: {}".format(target))
             shutil.rmtree(target)
-            shutil.copytree(
-                source,
-                target,
-                ignore=partial(ignore_files, copy_pyi=copy_pyi),
-                copy_function=copy_function,
-                dirs_exist_ok=True,
-            )
+        shutil.copytree(
+            source,
+            target,
+            ignore=partial(
+                ignore_files,
+                copy_pyi=copy_pyi,
+                copy_extensions=copy_extensions,
+            ),
+            copy_function=copy_function,
+        )
     finally:
         if progress:
             progress.finish()
