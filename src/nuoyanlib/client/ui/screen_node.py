@@ -38,6 +38,7 @@ NativeScreenManager = api.GetNativeScreenManagerCls().instance()
 _is_ui_init_finished = False
 _auto_show_screens = []
 _proxy_screens = []
+_registered_classes = set()
 
 
 # @event
@@ -122,11 +123,15 @@ def screen(namespace, name="main", **kwargs):
         cls.full_name = namespace + "." + name
         for k, v in kwargs.items():
             setattr(cls, k, v)
-        auto_show = kwargs['auto_show']
-        if auto_show:
-            _auto_show_screens.append(cls)
-            if _is_ui_init_finished:
-                cls.show()
+
+        if cls.__module__ not in _registered_classes:
+            auto_show = kwargs['auto_show']
+            if auto_show:
+                _auto_show_screens.append(cls)
+                if _is_ui_init_finished:
+                    cls.show()
+            _registered_classes.add(cls.__module__)
+
         return cls
     return decorator
 
@@ -176,10 +181,14 @@ def screen_proxy(namespace, name, **kwargs):
         cls.full_name = namespace + "." + name
         for k, v in kwargs.items():
             setattr(cls, k, v)
-        if (namespace == "hud" and name == "hud_screen") or _is_ui_init_finished:
-            cls.register_proxy()
-        else:
-            _proxy_screens.append(cls)
+
+        if cls.__module__ not in _registered_classes:
+            if (namespace == "hud" and name == "hud_screen") or _is_ui_init_finished:
+                cls.register_proxy()
+            else:
+                _proxy_screens.append(cls)
+            _registered_classes.add(cls.__module__)
+
         return cls
     return decorator
 
