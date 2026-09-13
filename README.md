@@ -3,7 +3,7 @@
 
    ---
 
-   <h3>基于网易我的世界ModSDK的Mod开发工具库</h3>
+   <h3>基于网易我的世界 [ModSDK](https://mc.163.com/dev/index.html) 的 Mod 开发工具库</h3>
 
    [![license](https://img.shields.io/github/license/charminglee/nuoyanlib.svg)](LICENSE) [![modsdk](https://img.shields.io/badge/ModSDK-3.9-green)](https://mc.163.com/dev/index.html) ![release](https://img.shields.io/github/release/charminglee/nuoyanlib.svg)  
    ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/charminglee/nuoyanlib) ![GitHub repo size](https://img.shields.io/github/repo-size/charminglee/nuoyanlib) [![github](https://img.shields.io/badge/-GitHub-black?style=flat&logo=github)](https://github.com/charminglee/nuoyanlib) [![gitee](https://img.shields.io/badge/-gitee-red?style=flat&logo=gitee)](https://gitee.com/charming-lee/nuoyanLib)
@@ -16,21 +16,21 @@
 <br>
 
 > [!NOTE]  
-> 目前该项目仍处于开发和测试阶段，一些功能仍未开发完善或存在未知bug，且其中的函数命名、具体实现等随时可能发生变化，请谨慎使用。
+> 目前该项目仍处于开发和测试阶段，一些功能仍未开发完善或存在未知 bug ，且其中的函数命名、具体实现等随时可能发生变化，请谨慎使用。
 
 ## 📖 简介
 
-「nuoyanlib」是基于网易我的世界（我的世界中国版） [ModSDK](https://mc.163.com/dev/index.html) 的开发工具库，封装了许多常用的客户端/服务端工具和通用算法，帮助开发者更高效地实现复杂功能。
+「nuoyanlib」是基于网易我的世界（我的世界中国版） [ModSDK](https://mc.163.com/dev/index.html) 的开发工具库，封装了许多常用的客户端 / 服务端工具和通用算法，帮助开发者更高效地实现复杂功能。
 
-「nuoyanlib」 主要包含以下三个工具库：
+「nuoyanlib」主要包含以下三个工具库：
 
-- [`nuoyanlib.client`](/docs/source/api/client.rst)：客户端工具包，提供了NyUI框架、容器UI框架、特效管理、渲染、运镜工具等实用工具。  
-
-
-- [`nuoyanlib.server`](/docs/source/api/server.rst)：服务端工具包，提供了实体工具、伤害工具等实用工具。
+- [`nuoyanlib.client`](/docs/source/api/client.rst) ：客户端工具包，提供了 NyUI 声明式 UI 框架、容器 UI 框架、特效管理、渲染、运镜工具等实用工具。  
 
 
-- [`nuoyanlib.common`](/docs/source/api/utils.rst)：通用工具包，提供了事件监听框架、多种与MC密切相关的数学计算函数、向量工具、双端通信工具、随机数工具等实用工具。
+- [`nuoyanlib.server`](/docs/source/api/server.rst) ：服务端工具包，提供了实体工具、伤害工具等实用工具。
+
+
+- [`nuoyanlib.common`](/docs/source/api/utils.rst) ：通用工具包，提供了事件监听框架、多种与MC密切相关的数学计算函数、向量工具、双端通信工具、随机数工具等实用工具。
 
 <br>
 
@@ -43,7 +43,7 @@
 
 ## 🚀 快速上手
 
-1. 解压下载的压缩包，将 `nuoyanlib` 文件夹放至行为包 Python 脚本根目录下（即 `modMain.py` 文件所在位置）。安装好后，你的行为包结构应为： 
+1. 解压下载的压缩包，将 `nuoyanlib` 文件夹复制到行为包 Python 脚本根目录下（即 `modMain.py` 所在位置）。安装好后，你的行为包结构应与下方类似： 
 
     ```
     行为包/  
@@ -88,19 +88,41 @@
    
    模块按列表顺序加载。一般情况下，不需要列出每一个模块的路径，只需列出客户端/服务端的入口模块和其他需要主动加载的模块（如 UI 模块）。
 
-3. 「nuoyanlib」导入和调用示例， `<scripts_root>` 替换成你具体的 Python 脚本根目录名称：
+> [!NOTE]
+> 如果你还使用了其他带有类似启动逻辑的框架（如 [QuModLibs](https://qumod.cc/) ），也需保留该框架的启动逻辑。
+
+3. 「nuoyanlib」导入和调用示例：
+
     #### 导入客户端库
 
     ```python
+    # 写法一
+    # 将 <scripts_root> 替换成你具体的 Python 脚本根目录名称
     import <scripts_root>.nuoyanlib.client as nyl
+    ```
+    
+    ```python
+    # 写法二
+    # 使用相对导入，具体写法需根据模块实际路径而定，如不熟悉相对导入建议使用第一种写法
+    # 例如模块： my_scripts/ui/my_screen.py
+    from ..nuoyanlib import client as nyl
     ```
 
     #### 导入服务端库
+   
+    写法同上。
 
     ```python
     import <scripts_root>.nuoyanlib.server as nyl
     ```
-   
+    
+    ```python
+    from ..nuoyanlib import server as nyl
+    ```
+
+> [!NOTE]
+> `client` / `server` 库已包含 `common` 库，因此无需单独导入 `nuoyanlib.common` 。
+
     #### 调用示例
    
     假设你已经按照以上方法导入了「nuoyanlib」，对于所有「nuoyanlib」中的公开接口，都可通过 `nyl.<func_name>` 进行调用，例如：
@@ -112,13 +134,7 @@
    如果你不想每次都编写 `nyl.` 前缀，也可以直接导入你需要的接口：
    
     ```python
-   from <scripts_root>.nuoyanlib.client import (
-        PLAYER_ID,   
-        CF,          
-        PlrComp,     
-        LvComp,      
-        event,       
-    )
+    from <scripts_root>.nuoyanlib.client import get_all_entities
     ```
    
     需要注意的是， `nuoyanlib.client` 为客户端工具包，其中的函数只能在客户端环境使用； `nuoyanlib.server` 同理，只能在服务端环境使用； `nuoyanlib.common` 则无环境限制，双端均可使用。
