@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -38,8 +38,7 @@ class NyItemRenderer(NyControl):
     参见
     ----
 
-    - ``NyItemRenderer.item`` -- 获取/设置物品渲染器显示的物品的 identifier 和特殊值。
-    - ``NyItemRenderer.is_enchanted`` -- 获取/设置物品渲染器显示的物品是否附魔。
+    - ``NyControl.to_item_renderer()`` -- 将通用控件实例转换为物品渲染器控件实例。
 
     -----
 

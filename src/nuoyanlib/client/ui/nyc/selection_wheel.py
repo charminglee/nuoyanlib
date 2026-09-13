@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -39,8 +39,7 @@ class NySelectionWheel(InteractableControl, NyControl):
     参见
     ----
 
-    - ``NySelectionWheel.set_callback()`` -- 设置轮盘回调函数。
-    - ``NySelectionWheel.curr_slice_index`` -- 获取/设置轮盘当前选择的切片的索引。
+    - ``NyControl.to_selection_wheel()`` -- 将通用控件实例转换为轮盘控件实例。
 
     -----
 

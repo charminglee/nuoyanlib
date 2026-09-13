@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -37,7 +37,7 @@ class NyLabel(NyControl):
     参见
     ----
 
-    - ``NyControl`` -- 通用控件接口。
+    - ``NyControl.to_label()`` -- 将通用控件实例转换为文本控件实例。
 
     -----
 

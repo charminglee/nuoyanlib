@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -36,7 +36,7 @@ class NySlider(NyControl):
     参见
     ----
 
-    - ``NySlider.value`` -- 获取/设置滑动条的值。
+    - ``NyControl.to_slider()`` -- 将通用控件实例转换为滑动条控件实例。
 
     -----
 

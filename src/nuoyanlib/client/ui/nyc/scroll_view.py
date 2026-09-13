@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -36,8 +36,7 @@ class NyScrollView(NyControl):
     参见
     ----
 
-    - ``NyScrollView.scroll_content`` -- 获取滚动内容控件的 NyControl 实例。
-    - ``NyScrollView.scroll_pct`` -- 获取/设置当前内容的百分比位置。
+    - ``NyControl.to_scroll_view()`` -- 将通用控件实例转换为滚动视图控件实例。
 
     -----
 

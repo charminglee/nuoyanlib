@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -36,7 +36,7 @@ class NyStackPanel(NyControl):
     参见
     ----
 
-    - ``NyStackPanel.orientation`` -- 获取/设置栈面板排列方向。
+    - ``NyControl.to_stack_panel()`` -- 将通用控件实例转换为栈面板控件实例。
 
     -----
 

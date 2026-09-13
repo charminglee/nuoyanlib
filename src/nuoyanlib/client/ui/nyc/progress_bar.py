@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -37,7 +37,7 @@ class NyProgressBar(NyControl):
     参见
     ----
 
-    - ``NyProgressBar.progress`` -- 获取/设置进度条的进度值。
+    - ``NyControl.to_progress_bar()`` -- 将通用控件实例转换为进度条控件实例。
 
     -----
 

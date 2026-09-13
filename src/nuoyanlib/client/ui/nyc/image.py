@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -39,9 +39,7 @@ class NyImage(NyControl):
     参见
     ----
 
-    - ``NyImage.texture`` -- 设置图片路径。
-    - ``NyImage.color`` -- 设置图片颜色。
-    - ``NyImage.play_frame_anim()`` -- 播放由多张图片组成的序列帧动画。
+    - ``NyControl.to_image()`` -- 将通用控件实例转换为图片控件实例。
 
     -----
 

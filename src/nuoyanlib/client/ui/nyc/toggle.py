@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -40,7 +40,7 @@ class NyToggle(NyControl):
     参见
     ----
 
-    - ``NyToggle.set_callback()`` -- 设置开关状态变化回调。
+    - ``NyControl.to_toggle()`` -- 将通用控件实例转换为开关控件实例。
 
     -----
 

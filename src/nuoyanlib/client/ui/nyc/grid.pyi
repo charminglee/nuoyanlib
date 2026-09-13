@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -52,7 +52,7 @@ def _coord_2_index(x: int, y: int, dx: int) -> int: ...
 
 
 class ElemGroup(Iterable[__NyControlT]):
-    __slots__: SlotsType
+    __slots__ = ('grid', 'cell_list', '_len')
     _ALLOWED_SET_ATTRS: ClassVar[STuple]
     _ALLOWED_GET_ATTRS: ClassVar[STuple]
     _ALLOWED_METHODS: ClassVar[STuple]
@@ -72,7 +72,9 @@ class ElemGroup(Iterable[__NyControlT]):
 
 class NyGrid(NyControl[NyScreenBaseT]):
     UPDATE: ClassVar[int]
+    """ 网格元素刷新时触发。 """
     LOADED: ClassVar[int]
+    """ 网格初次加载完成时触发。 """
     _base_control: GridUIControl
     __grid_size: int
     __template_name: str

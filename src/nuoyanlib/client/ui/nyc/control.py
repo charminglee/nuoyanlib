@@ -758,36 +758,6 @@ class NyControl(object):
             return True
         return False
 
-    @classmethod
-    def auto(cls, ny_screen_node, path):
-        """
-        [类方法]
-
-        自动根据控件类型创建对应的控件实例。
-
-        示例
-        ----
-
-        >>> self.button = nyl.NyControl.auto(self, "/panel/button") # 返回NyButton实例
-        >>> def on_button_up(args):
-        ...     pass
-        >>> self.button.set_callback(on_button_up, nyl.NyButton.UP)
-
-        -----
-
-        :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该控件的 NyScreenNode 或 NyScreenProxy 实例
-        :param str path: 控件路径
-
-        :return: 控件实例
-        :rtype: NyControl
-
-        :raise TypeError: 传入的 ny_screen_node 没有继承 NyScreenNode 或 NyScreenProxy 时抛出
-        :raise ControlNotFoundError: 找不到指定路径的控件时抛出
-        """
-        if cls is not NyControl:
-            return cls(ny_screen_node, path)
-        # todo
-
     @args_type_check(str)
     def __truediv__(self, other):
         """
@@ -1108,7 +1078,10 @@ class NyControl(object):
         示例
         ----
 
-        >>> self.button = nyl.NyControl.auto(self, "/panel/button") # 返回NyButton实例
+        在缓存未命中的情况下，调用 ``NyControl()`` 将始终返回 ``NyControl`` 实例，而 ``NyControl.auto()`` 将根据 UI json 中定义的控件类型自动选择对应的实例创建。
+        如下方的示例将创建 ``NyButton`` 实例：
+
+        >>> self.button = nyl.NyControl.auto(self, "/panel/button")
         >>> def on_button_up(args):
         ...     pass
         >>> self.button.set_callback(on_button_up, nyl.NyButton.UP)

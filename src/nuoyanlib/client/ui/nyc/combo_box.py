@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -42,8 +42,7 @@ class NyComboBox(InteractableControl, NyControl):
     参见
     ----
 
-    - ``NyComboBox.bind_data()`` -- 绑定下拉框选项数据。
-    - ``NyComboBox.set_callback()`` -- 设置下拉框回调函数。
+    - ``NyControl.to_combo_box()`` -- 将通用控件实例转换为下拉框控件实例。
 
     -----
 

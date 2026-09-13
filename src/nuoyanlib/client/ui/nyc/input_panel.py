@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -37,8 +37,7 @@ class NyInputPanel(NyControl):
     参见
     ----
 
-    - ``NyInputPanel.is_modal`` -- 获取/设置当前面板是否为模态框。
-    - ``NyInputPanel.is_swallow`` -- 获取/设置当前面板输入是否会吞噬事件。
+    - ``NyControl.to_input_panel()`` -- 将通用控件实例转换为输入面板控件实例。
 
     -----
 

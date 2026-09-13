@@ -5,23 +5,24 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
 
 if bool(0):
     from typing import Any
-    from ..screen_node import ScreenNodeExtension
+    from ..screen_node import NyScreenNode, NyScreenProxy
 
 
 import math
 from ....core._utils import get_func, kwargs_defaults, try_exec, cached_property
 from ....core._types._checker import args_type_check
 from ....core.client.comp import ScreenNode, ViewBinder
-from ....common.enum import ControlType, GridCallbackType
+from ....core.listener import listen_event, unlisten_event
+from ....common.enum import ClientEvent
+from ..ui_utils import _UIControlType
 from .control import NyControl
-from ..ui_utils import to_path
 
 
 __all__ = [
@@ -42,6 +43,19 @@ class GridData(list):
 
     网格数据对象继承于列表，因此，你可以像操作列表一样操作网格数据对象。
 
+    示例
+    ----
+
+    >>> def update_cell(index, cell, data):
+    ...     cell.text = data or ""
+    >>> data = nyl.GridData(["第一项", "第二项"], update_cell)
+    >>> grid.bind_data(data)
+
+    参见
+    ----
+
+    - ``NyGrid.bind_data()`` -- 将网格数据对象绑定到网格。
+
     -----
 
     :param list src: 网格数据源
@@ -60,6 +74,16 @@ class GridData(list):
         """
         绑定当前网格数据对象到网格。
 
+        示例
+        ----
+
+        >>> data.bind_grid(grid)
+
+        参见
+        ----
+
+        - ``NyGrid.bind_data()`` -- 从网格侧绑定数据。
+
         -----
 
         :param NyGrid grid: 网格 NyGrid 实例
@@ -76,6 +100,17 @@ class GridData(list):
     def bind(self):
         """
         立即将数据绑定给各个元素，并刷新显示。
+
+        示例
+        ----
+
+        >>> data.append("第三项")
+        >>> data.bind()
+
+        参见
+        ----
+
+        - ``GridData.bind_grid()`` -- 绑定数据对象和网格。
 
         -----
 
@@ -278,17 +313,33 @@ class NyGrid(NyControl):
         ]
     - 最后，将 **网格** json 中的 ``"collection_name"`` 字段的值设置给 ``collection_name`` 参数即可。
 
+    示例
+    ----
+
+    >>> self.grid = nyl.NyGrid(self, "/panel/grid")
+    >>> self.grid.dimension = (3, 2)
+    >>> self.first_cell = self.grid[0]
+
+    参见
+    ----
+
+    - ``GridData`` -- 网格数据对象，用于实现网格元素与数据的自动管理。
+    - ``NyControl.to_gird()`` -- 将通用控件实例转换为网格控件实例。
+
     -----
 
-    :param ScreenNodeExtension screen_node_ex: 网格所在UI类的实例（需继承 ScreenNodeExtension）
-    :param GridUIControl grid_control: 通过 asGrid() 等方式获取的 GridUIControl 实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 持有该网格控件的 NyScreenNode 或 NyScreenProxy 实例
+    :param str path: 控件路径
     :param bool is_stack_grid: [仅关键字参数] 是否是 StackGrid；默认为 False
     :param str template_name: [仅关键字参数] 网格模板控件名称，即 "grid_item_template" 字段或UI编辑器中的网格“内容”所使用的控件；仅模板控件名称以数字结尾时需要传入该参数
     :param str cell_visible_binding: [仅关键字参数] 用于控制网格元素 visible 的绑定名称，详见上方说明
     :param str collection_name: [仅关键字参数] 网格集合名称，详见上方说明
     """
 
-    CONTROL_TYPE = ControlType.GRID
+    CONTROL_TYPE = _UIControlType.GRID
+
+    UPDATE = 1 << 0
+    LOADED = 1 << 1
 
     @kwargs_defaults(
         is_stack_grid=False,
@@ -296,40 +347,56 @@ class NyGrid(NyControl):
         cell_visible_binding="",
         collection_name="",
     )
-    def __init__(self, screen_node_ex, grid_control, **kwargs):
-        NyControl.__init__(self, screen_node_ex, grid_control)
+    def __init__(self, ny_screen_node, path, **kwargs):
+        NyControl.__init__(self, ny_screen_node, path)
+
         self.__grid_size = -1
         self._callback_map = {
-            GridCallbackType.UPDATE: [],
-            GridCallbackType.LOADED: [],
+            NyGrid.UPDATE: [],
+            NyGrid.LOADED: [],
         }
         self._loaded = False
         self.is_stack_grid = kwargs['is_stack_grid']
+        self.gd_obj = None
+
         template_name = kwargs['template_name']
         if template_name and "." in template_name:
             template_name = template_name.split(".")[-1]
         self.__template_name = template_name
+
         self.cell_visible_binding = kwargs['cell_visible_binding']
         self.collection_name_ = kwargs['collection_name']
-        self.gd_obj = None
         if self.cell_visible_binding and self.collection_name_:
-            self.ui_node.build_binding(
+            self.ny_screen_node.build_binding(
                 self._return_cell_visible, ViewBinder.BF_BindBool, self.cell_visible_binding, self.collection_name_
             )
 
-    def __destroy__(self):
-        self._callback_map.clear()
-        self.ui_node.unbuild_binding(self._return_cell_visible)
-        NyControl.__destroy__(self)
+        listen_event(self.__grid_update__, ClientEvent.GridComponentSizeChangedClientEvent)
 
-    def __grid_update__(self):
+    def __ui_destroy__(self):
+        unlisten_event(self.__grid_update__, ClientEvent.GridComponentSizeChangedClientEvent)
+        self.ny_screen_node.unbuild_binding(self._return_cell_visible)
+        self._callback_map = None
+        self.gd_obj = None
+        NyControl.__ui_destroy__(self)
+
+    def __grid_update__(self, args):
+        path = args['path']
+        idx = path.index("/", 1)
+        root_name = path[1: idx]
+        if root_name != self._screen_node.name:
+            return
+        path = path[idx:]
+        if path != self.path:
+            return
+
         if self.gd_obj:
             try_exec(self.gd_obj.bind)
         if not self._loaded:
             self._loaded = True
-            for func in self._callback_map[GridCallbackType.LOADED]:
+            for func in self._callback_map[NyGrid.LOADED]:
                 try_exec(func)
-        for func in self._callback_map[GridCallbackType.UPDATE]:
+        for func in self._callback_map[NyGrid.UPDATE]:
             try_exec(func)
 
     # region Properties ================================================================================================
@@ -474,6 +541,13 @@ class NyGrid(NyControl):
         - ``grid[start:stop,⠀y]`` -- 获取指定y坐标上，x坐标为 start 到 stop 的元素。
         - ``grid[start1:stop1,⠀start2:stop2]`` -- 获取x坐标为 start1 到 stop1，y坐标为 start2 到 stop2 的元素。
 
+        示例
+        ----
+
+        >>> first = self.grid[0]
+        >>> top_row = self.grid[:, 0]
+        >>> selected = self.grid[0:2]
+
         -----
 
         :param int|slice|tuple[int|slice,int|slice] item: 详见上方说明
@@ -506,22 +580,36 @@ class NyGrid(NyControl):
 
         -----
 
-        :param str|BaseUIControl|NyControl cell: 网格元素的路径或实例
+        :param str|NyControl cell: 网格元素的路径或实例
 
         :return: 元素索引
         :rtype: int
         """
-        path = to_path(cell)
+        path = cell if isinstance(cell, str) else cell.path
         return int(path.split(self.template_name)[-1]) - 1
 
     def update_grid_data(self):
         if not self.gd_obj:
             return
+        # todo
 
     @args_type_check(GridData)
     def bind_data(self, gd):
         """
         绑定网格数据。
+
+        示例
+        ----
+
+        >>> def on_update_cell(index, control, data):
+        ...     control.visible = (index < 20)
+        >>> data = nyl.GridData(["A", "B"], on_update_cell)
+        >>> self.grid.bind_data(data)
+
+        参见
+        ----
+
+        - ``GridData`` -- 网格数据对象。
 
         -----
 
@@ -535,7 +623,18 @@ class NyGrid(NyControl):
 
     def get_cell(self, index):
         """
-        获取索引为 ``index`` 的元素。
+        获取索引为 ``index`` 的元素的 ``NyControl`` 实例。
+
+        示例
+        ----
+
+        >>> cell = self.grid.get_cell(0)
+        >>> cell.visible = True
+
+        参见
+        ----
+
+        - ``NyGrid.get_all_cells()`` -- 获取网格所有元素的 NyControl 实例。
 
         -----
 
@@ -550,6 +649,17 @@ class NyGrid(NyControl):
         """
         获取网格所有元素的 ``NyControl`` 实例。
 
+        示例
+        ----
+
+        >>> for cell in self.grid.get_all_cells():
+        ...     cell.visible = True
+
+        参见
+        ----
+
+        - ``get_cell()`` -- 获取指定索引的网格元素。
+
         -----
 
         :return: 网格所有元素的 NyControl 实例列表
@@ -557,62 +667,90 @@ class NyGrid(NyControl):
         """
         return [self.get_cell(i) for i in xrange(self.grid_size)]
 
-    def set_callback(self, func, cb_type=GridCallbackType.UPDATE):
+    def set_callback(self, func, *cb_types):
         """
         设置网格回调函数。
 
+        说明
+        ----
+
+        支持同时设置多个同类型的回调，例如同时设置两个按钮抬起回调，按设置顺序依次触发。
+
+        示例
+        ----
+
+        >>> def on_grid_update(args):
+        ...     print(args)
+        >>> self.grid.set_callback(on_grid_update, nyl.NyGrid.UPDATE)
+
+        参见
+        ----
+
+        - ``NyGrid.remove_callback()`` -- 移除网格回调函数。
+
         -----
 
         :param function func: 回调函数
-        :param GridCallbackType cb_type: 回调类型，请使用 GridCallbackType 枚举值；默认为 GridCallbackType.UPDATE
+        :param int cb_types: [变长位置参数] 回调类型，请使用 NyGrid 枚举值；可同时传入多个类型
 
-        :return: 是否成功
-        :rtype: bool
+        :return: 无
+        :rtype: None
         """
-        if cb_type not in GridCallbackType:
-            raise ValueError("invalid callback type: %s, use 'GridCallbackType' instead" % repr(cb_type))
-        lst = self._callback_map[cb_type]
-        if func in lst:
-            return False
-        lst.append(func)
-        return True
+        for t in cb_types:
+            lst = self._callback_map[t]
+            if func not in lst:
+                lst.append(func)
 
-    def remove_callback(self, func, cb_type=GridCallbackType.UPDATE):
+    def remove_callback(self, func, *cb_types):
         """
         移除网格回调函数。
 
+        示例
+        ----
+
+        >>> self.grid.remove_callback(on_grid_update, nyl.NyGrid.UPDATE)
+
+        参见
+        ----
+
+        - ``NyGrid.set_callback()`` -- 设置网格回调函数。
+
         -----
 
         :param function func: 回调函数
-        :param GridCallbackType cb_type: 回调类型，请使用 GridCallbackType 枚举值；默认为 GridCallbackType.UPDATE
+        :param int cb_types: [变长位置参数] 回调类型，请使用 NyGrid 枚举值；可同时传入多个类型
 
-        :return: 是否成功
-        :rtype: bool
+        :return: 无
+        :rtype: None
         """
-        if cb_type not in GridCallbackType:
-            raise ValueError("invalid callback type: %s, use 'GridCallbackType' instead" % repr(cb_type))
-        lst = self._callback_map[cb_type]
-        if func not in lst:
-            return False
-        lst.remove(func)
-        return True
+        for t in cb_types:
+            lst = self._callback_map[t]
+            if func in lst:
+                lst.remove(func)
 
     # endregion
 
     # region Internal ==================================================================================================
 
-    __get_dim = staticmethod(get_func(ScreenNode, (103, 117, 105), (103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)))
-
     def _return_cell_visible(self, index):
         return self.visible and (self.__grid_size < 0 or index < self.__grid_size)
 
+    __get_dim = staticmethod(
+        get_func( # noqa
+            ScreenNode,
+            (103, 117, 105),
+            (103, 101, 116, 95, 103, 114, 105, 100, 95, 100, 105, 109, 101, 110, 115, 105, 111, 110)
+        )
+    )
+
     # endregion
 
+    # region Compatibility =============================================================================================
 
+    set_grid_dimension = SetGridDimension = lambda s, *a, **k: s._base_control.SetGridDimension(*a, **k)
+    get_gridd_item     = GetGriddItem     = lambda s, *a, **k: s._base_control.GetGridItem(*a, **k)
 
-
-
-
+    # endregion
 
 
 

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -38,8 +38,7 @@ class NyEditBox(NyControl):
     参见
     ----
 
-    - ``NyEditBox.edit_text`` -- 获取/设置编辑框文本。
-    - ``NyEditBox.max_length`` -- 设置编辑框的最大输入长度。
+    - ``NyControl.to_edit_box()`` -- 将通用控件实例转换为文本编辑框控件实例。
 
     -----
 

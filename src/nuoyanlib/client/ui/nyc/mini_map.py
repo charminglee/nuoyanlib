@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -37,7 +37,7 @@ class NyMiniMap(NyControl):
     参见
     ----
 
-    - ``NyMiniMap.highest_y`` -- 设置绘制地图的最大高度。
+    - ``NyControl.to_mini_map()`` -- 将通用控件实例转换为小地图控件实例。
 
     -----
 
