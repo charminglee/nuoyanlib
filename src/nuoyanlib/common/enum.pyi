@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -146,307 +146,307 @@ def _expand_enum(namespace: Dict[str, Any], enum: Enum) -> None: ...
 
 
 class ClientEvent(LazyEnum):
-    OnSimTickClientEvent = EventArgs0
-    PhysxTriggerClientEvent = EventArgs1
-    LiquidClippedClientEvent = EventArgs2
-    PlayerAddCustomContainerItemClientEvent = EventArgs3
-    PlayerRemoveCustomContainerItemClientEvent = EventArgs4
-    PhysxTouchClientEvent = EventArgs5
-    OnCustomGamepadChangedEvent = EventArgs6
-    OnCustomGamepadPressInGame = EventArgs7
-    OnCustomKeyChangedEvent = EventArgs8
-    OnCustomKeyPressInGame = EventArgs9
-    UIDefReloadSceneStackAfter = EventArgs10
-    UpdatePlayerSkinClientEvent = EventArgs11
-    PlayerTryRemoveCustomContainerItemClientEvent = EventArgs12
-    PlayerTryAddCustomContainerItemClientEvent = EventArgs13
-    PlayerTryPutCustomContainerItemClientEvent = EventArgs14
-    PlayerPermissionChangeClientEvent = EventArgs15
-    HudButtonChangedClientEvent = EventArgs16
-    BlockAnimateRandomTickEvent = EventArgs17
-    PlayerAttackEntityEvent = EventArgs18
-    OnLocalPlayerActionClientEvent = EventArgs19
-    OnLocalPlayerStartJumpClientEvent = EventArgs20
-    GameRenderTickEvent = EventArgs21
-    GyroSensorChangedClientEvent = EventArgs22
-    ModBlockEntityTickClientEvent = EventArgs23
-    ModBlockEntityRemoveClientEvent = EventArgs24
-    AchievementButtonMovedClientEvent = EventArgs25
-    OnKeyboardControllerLayoutChangeClientEvent = EventArgs26
-    OnGamepadControllerLayoutChangeClientEvent = EventArgs27
-    OnGamepadTriggerClientEvent = EventArgs28
-    OnGamepadStickClientEvent = EventArgs29
-    OnGamepadKeyPressClientEvent = EventArgs30
-    ModBlockEntityLoadedClientEvent = EventArgs31
-    CloseNeteaseShopEvent = EventArgs32
-    PopScreenAfterClientEvent = EventArgs33
-    TapOrHoldReleaseClientEvent = EventArgs34
-    TapBeforeClientEvent = EventArgs35
-    RightClickReleaseClientEvent = EventArgs36
-    RightClickBeforeClientEvent = EventArgs37
-    OnMouseMiddleDownClientEvent = EventArgs38
-    OnKeyPressInGame = EventArgs39
-    OnClientPlayerStopMove = EventArgs40
-    OnClientPlayerStartMove = EventArgs41
-    OnBackButtonReleaseClientEvent = EventArgs42
-    MouseWheelClientEvent = EventArgs43
-    LeftClickReleaseClientEvent = EventArgs44
-    LeftClickBeforeClientEvent = EventArgs45
-    HoldBeforeClientEvent = EventArgs46
-    GetEntityByCoordReleaseClientEvent = EventArgs47
-    GetEntityByCoordEvent = EventArgs48
-    ClientJumpButtonReleaseEvent = EventArgs49
-    ClientJumpButtonPressDownEvent = EventArgs50
-    PlaySoundClientEvent = EventArgs51
-    PlayMusicClientEvent = EventArgs52
-    OnMusicStopClientEvent = EventArgs53
-    ScreenSizeChangedClientEvent = EventArgs54
-    PushScreenEvent = EventArgs55
-    PopScreenEvent = EventArgs56
-    PlayerChatButtonClickClientEvent = EventArgs57
-    OnItemSlotButtonClickedEvent = EventArgs58
-    GridComponentSizeChangedClientEvent = EventArgs59
-    ClientPlayerInventoryOpenEvent = EventArgs60
-    ClientPlayerInventoryCloseEvent = EventArgs61
-    ClientChestOpenEvent = EventArgs62
-    ClientChestCloseEvent = EventArgs63
-    WalkAnimEndClientEvent = EventArgs64
-    WalkAnimBeginClientEvent = EventArgs65
-    AttackAnimEndClientEvent = EventArgs66
-    AttackAnimBeginClientEvent = EventArgs67
-    StopUsingItemClientEvent = EventArgs68
-    StartUsingItemClientEvent = EventArgs69
-    PlayerTryDropItemClientEvent = EventArgs70
-    OnCarriedNewItemChangedClientEvent = EventArgs71
-    ItemReleaseUsingClientEvent = EventArgs72
-    InventoryItemChangedClientEvent = EventArgs73
-    GrindStoneRemovedEnchantClientEvent = EventArgs74
-    ClientShapedRecipeTriggeredEvent = EventArgs75
-    ClientItemUseOnEvent = EventArgs76
-    ClientItemTryUseEvent = EventArgs77
-    AnvilCreateResultItemAfterClientEvent = EventArgs78
-    ActorUseItemClientEvent = EventArgs79
-    ActorAcquiredItemClientEvent = EventArgs80
-    StepOnBlockClientEvent = EventArgs81
-    StartDestroyBlockClientEvent = EventArgs82
-    StepOffBlockClientEvent = EventArgs83
-    ShearsDestoryBlockBeforeClientEvent = EventArgs84
-    PlayerTryDestroyBlockClientEvent = EventArgs85
-    OnStandOnBlockClientEvent = EventArgs86
-    OnModBlockNeteaseEffectCreatedClientEvent = EventArgs87
-    OnEntityInsideBlockClientEvent = EventArgs88
-    OnAfterFallOnBlockClientEvent = EventArgs89
-    FallingBlockCauseDamageBeforeClientEvent = EventArgs90
-    ClientBlockUseEvent = EventArgs91
-    PerspChangeClientEvent = EventArgs92
-    OnPlayerHitBlockClientEvent = EventArgs93
-    GameTypeChangedClientEvent = EventArgs94
-    ExtinguishFireClientEvent = EventArgs95
-    DimensionChangeFinishClientEvent = EventArgs96
-    DimensionChangeClientEvent = EventArgs97
-    CameraMotionStopClientEvent = EventArgs98
-    CameraMotionStartClientEvent = EventArgs99
-    LeaveEntityClientEvent = EventArgs100
-    StartRidingClientEvent = EventArgs101
-    OnMobHitMobClientEvent = EventArgs102
-    OnGroundClientEvent = EventArgs103
-    HealthChangeClientEvent = EventArgs104
-    EntityStopRidingEvent = EventArgs105
-    EntityModelChangedClientEvent = EventArgs106
-    ApproachEntityClientEvent = EventArgs107
-    UnLoadClientAddonScriptsBefore = EventArgs108
-    RemovePlayerAOIClientEvent = EventArgs109
-    RemoveEntityClientEvent = EventArgs110
-    OnLocalPlayerStopLoading = EventArgs111
-    OnCommandOutputClientEvent = EventArgs112
-    LoadClientAddonScriptsAfter = EventArgs113
-    ChunkLoadedClientEvent = EventArgs114
-    ChunkAcquireDiscardedClientEvent = EventArgs115
-    AddPlayerCreatedClientEvent = EventArgs116
-    AddPlayerAOIClientEvent = EventArgs117
-    AddEntityClientEvent = EventArgs118
-    OnScriptTickClient = EventArgs119
-    UiInitFinished = EventArgs120
+    OnSimTickClientEvent: EventArgs0
+    PhysxTriggerClientEvent: EventArgs1
+    LiquidClippedClientEvent: EventArgs2
+    PlayerAddCustomContainerItemClientEvent: EventArgs3
+    PlayerRemoveCustomContainerItemClientEvent: EventArgs4
+    PhysxTouchClientEvent: EventArgs5
+    OnCustomGamepadChangedEvent: EventArgs6
+    OnCustomGamepadPressInGame: EventArgs7
+    OnCustomKeyChangedEvent: EventArgs8
+    OnCustomKeyPressInGame: EventArgs9
+    UIDefReloadSceneStackAfter: EventArgs10
+    UpdatePlayerSkinClientEvent: EventArgs11
+    PlayerTryRemoveCustomContainerItemClientEvent: EventArgs12
+    PlayerTryAddCustomContainerItemClientEvent: EventArgs13
+    PlayerTryPutCustomContainerItemClientEvent: EventArgs14
+    PlayerPermissionChangeClientEvent: EventArgs15
+    HudButtonChangedClientEvent: EventArgs16
+    BlockAnimateRandomTickEvent: EventArgs17
+    PlayerAttackEntityEvent: EventArgs18
+    OnLocalPlayerActionClientEvent: EventArgs19
+    OnLocalPlayerStartJumpClientEvent: EventArgs20
+    GameRenderTickEvent: EventArgs21
+    GyroSensorChangedClientEvent: EventArgs22
+    ModBlockEntityTickClientEvent: EventArgs23
+    ModBlockEntityRemoveClientEvent: EventArgs24
+    AchievementButtonMovedClientEvent: EventArgs25
+    OnKeyboardControllerLayoutChangeClientEvent: EventArgs26
+    OnGamepadControllerLayoutChangeClientEvent: EventArgs27
+    OnGamepadTriggerClientEvent: EventArgs28
+    OnGamepadStickClientEvent: EventArgs29
+    OnGamepadKeyPressClientEvent: EventArgs30
+    ModBlockEntityLoadedClientEvent: EventArgs31
+    CloseNeteaseShopEvent: EventArgs32
+    PopScreenAfterClientEvent: EventArgs33
+    TapOrHoldReleaseClientEvent: EventArgs34
+    TapBeforeClientEvent: EventArgs35
+    RightClickReleaseClientEvent: EventArgs36
+    RightClickBeforeClientEvent: EventArgs37
+    OnMouseMiddleDownClientEvent: EventArgs38
+    OnKeyPressInGame: EventArgs39
+    OnClientPlayerStopMove: EventArgs40
+    OnClientPlayerStartMove: EventArgs41
+    OnBackButtonReleaseClientEvent: EventArgs42
+    MouseWheelClientEvent: EventArgs43
+    LeftClickReleaseClientEvent: EventArgs44
+    LeftClickBeforeClientEvent: EventArgs45
+    HoldBeforeClientEvent: EventArgs46
+    GetEntityByCoordReleaseClientEvent: EventArgs47
+    GetEntityByCoordEvent: EventArgs48
+    ClientJumpButtonReleaseEvent: EventArgs49
+    ClientJumpButtonPressDownEvent: EventArgs50
+    PlaySoundClientEvent: EventArgs51
+    PlayMusicClientEvent: EventArgs52
+    OnMusicStopClientEvent: EventArgs53
+    ScreenSizeChangedClientEvent: EventArgs54
+    PushScreenEvent: EventArgs55
+    PopScreenEvent: EventArgs56
+    PlayerChatButtonClickClientEvent: EventArgs57
+    OnItemSlotButtonClickedEvent: EventArgs58
+    GridComponentSizeChangedClientEvent: EventArgs59
+    ClientPlayerInventoryOpenEvent: EventArgs60
+    ClientPlayerInventoryCloseEvent: EventArgs61
+    ClientChestOpenEvent: EventArgs62
+    ClientChestCloseEvent: EventArgs63
+    WalkAnimEndClientEvent: EventArgs64
+    WalkAnimBeginClientEvent: EventArgs65
+    AttackAnimEndClientEvent: EventArgs66
+    AttackAnimBeginClientEvent: EventArgs67
+    StopUsingItemClientEvent: EventArgs68
+    StartUsingItemClientEvent: EventArgs69
+    PlayerTryDropItemClientEvent: EventArgs70
+    OnCarriedNewItemChangedClientEvent: EventArgs71
+    ItemReleaseUsingClientEvent: EventArgs72
+    InventoryItemChangedClientEvent: EventArgs73
+    GrindStoneRemovedEnchantClientEvent: EventArgs74
+    ClientShapedRecipeTriggeredEvent: EventArgs75
+    ClientItemUseOnEvent: EventArgs76
+    ClientItemTryUseEvent: EventArgs77
+    AnvilCreateResultItemAfterClientEvent: EventArgs78
+    ActorUseItemClientEvent: EventArgs79
+    ActorAcquiredItemClientEvent: EventArgs80
+    StepOnBlockClientEvent: EventArgs81
+    StartDestroyBlockClientEvent: EventArgs82
+    StepOffBlockClientEvent: EventArgs83
+    ShearsDestoryBlockBeforeClientEvent: EventArgs84
+    PlayerTryDestroyBlockClientEvent: EventArgs85
+    OnStandOnBlockClientEvent: EventArgs86
+    OnModBlockNeteaseEffectCreatedClientEvent: EventArgs87
+    OnEntityInsideBlockClientEvent: EventArgs88
+    OnAfterFallOnBlockClientEvent: EventArgs89
+    FallingBlockCauseDamageBeforeClientEvent: EventArgs90
+    ClientBlockUseEvent: EventArgs91
+    PerspChangeClientEvent: EventArgs92
+    OnPlayerHitBlockClientEvent: EventArgs93
+    GameTypeChangedClientEvent: EventArgs94
+    ExtinguishFireClientEvent: EventArgs95
+    DimensionChangeFinishClientEvent: EventArgs96
+    DimensionChangeClientEvent: EventArgs97
+    CameraMotionStopClientEvent: EventArgs98
+    CameraMotionStartClientEvent: EventArgs99
+    LeaveEntityClientEvent: EventArgs100
+    StartRidingClientEvent: EventArgs101
+    OnMobHitMobClientEvent: EventArgs102
+    OnGroundClientEvent: EventArgs103
+    HealthChangeClientEvent: EventArgs104
+    EntityStopRidingEvent: EventArgs105
+    EntityModelChangedClientEvent: EventArgs106
+    ApproachEntityClientEvent: EventArgs107
+    UnLoadClientAddonScriptsBefore: EventArgs108
+    RemovePlayerAOIClientEvent: EventArgs109
+    RemoveEntityClientEvent: EventArgs110
+    OnLocalPlayerStopLoading: EventArgs111
+    OnCommandOutputClientEvent: EventArgs112
+    LoadClientAddonScriptsAfter: EventArgs113
+    ChunkLoadedClientEvent: EventArgs114
+    ChunkAcquireDiscardedClientEvent: EventArgs115
+    AddPlayerCreatedClientEvent: EventArgs116
+    AddPlayerAOIClientEvent: EventArgs117
+    AddEntityClientEvent: EventArgs118
+    OnScriptTickClient: EventArgs119
+    UiInitFinished: EventArgs120
 
 
 class ServerEvent(LazyEnum):
-    OnSimTickServerEvent = EventArgs121
-    PlayerStartFishingServerEvent = EventArgs122
-    PlayerFishingAfterServerEvent = EventArgs123
-    PlayerFishingServerEvent = EventArgs124
-    PhysxTriggerServerEvent = EventArgs125
-    LiquidClippedServerEvent = EventArgs126
-    PlayerAddCustomContainerItemServerEvent = EventArgs127
-    PlayerRemoveCustomContainerItemServerEvent = EventArgs128
-    PhysxTouchServerEvent = EventArgs129
-    ItemPullOutCustomContainerServerEvent = EventArgs130
-    ItemPushInCustomContainerServerEvent = EventArgs131
-    PlayerPermissionChangeServerEvent = EventArgs132
-    PlayerTryRemoveCustomContainerItemServerEvent = EventArgs133
-    PlayerTryAddCustomContainerItemServerEvent = EventArgs134
-    PlayerTryPutCustomContainerItemServerEvent = EventArgs135
-    MountTamingEvent = EventArgs136
-    OnPlayerActionServerEvent = EventArgs137
-    CustomCommandTriggerServerEvent = EventArgs138
-    GlobalCommandServerEvent = EventArgs139
-    PlayerPickupArrowServerEvent = EventArgs140
-    EntityDieLoottableAfterServerEvent = EventArgs141
-    PlayerHungerChangeServerEvent = EventArgs142
-    ItemDurabilityChangedServerEvent = EventArgs143
-    PlaceNeteaseLargeFeatureServerEvent = EventArgs144
-    PlayerNamedEntityServerEvent = EventArgs145
-    PlayerFeedEntityServerEvent = EventArgs146
-    lobbyGoodBuySucServerEvent = EventArgs147
-    UrgeShipEvent = EventArgs148
-    PlayerInventoryOpenScriptServerEvent = EventArgs149
-    WalkAnimEndServerEvent = EventArgs150
-    WalkAnimBeginServerEvent = EventArgs151
-    JumpAnimBeginServerEvent = EventArgs152
-    AttackAnimEndServerEvent = EventArgs153
-    AttackAnimBeginServerEvent = EventArgs154
-    UIContainerItemChangedServerEvent = EventArgs155
-    ShearsUseToBlockBeforeServerEvent = EventArgs156
-    ServerPlayerTryTouchEvent = EventArgs157
-    ServerItemTryUseEvent = EventArgs158
-    PlayerDropItemServerEvent = EventArgs159
-    OnPlayerBlockedByShieldBeforeServerEvent = EventArgs160
-    OnPlayerBlockedByShieldAfterServerEvent = EventArgs161
-    OnPlayerActiveShieldServerEvent = EventArgs162
-    OnOffhandItemChangedServerEvent = EventArgs163
-    OnNewArmorExchangeServerEvent = EventArgs164
-    OnItemPutInEnchantingModelServerEvent = EventArgs165
-    ItemUseOnAfterServerEvent = EventArgs166
-    ItemUseAfterServerEvent = EventArgs167
-    ItemReleaseUsingServerEvent = EventArgs168
-    InventoryItemChangedServerEvent = EventArgs169
-    FurnaceBurnFinishedServerEvent = EventArgs170
-    CraftItemOutputChangeServerEvent = EventArgs171
-    ContainerItemChangedServerEvent = EventArgs172
-    StepOnBlockServerEvent = EventArgs173
-    StepOffBlockServerEvent = EventArgs174
-    StartDestroyBlockServerEvent = EventArgs175
-    ShearsDestoryBlockBeforeServerEvent = EventArgs176
-    ServerPlayerTryDestroyBlockEvent = EventArgs177
-    ServerPlaceBlockEntityEvent = EventArgs178
-    ServerEntityTryPlaceBlockEvent = EventArgs179
-    ServerBlockEntityTickEvent = EventArgs180
-    PistonActionServerEvent = EventArgs181
-    OnStandOnBlockServerEvent = EventArgs182
-    OnBeforeFallOnBlockServerEvent = EventArgs183
-    OnAfterFallOnBlockServerEvent = EventArgs184
-    HopperTryPullOutServerEvent = EventArgs185
-    HopperTryPullInServerEvent = EventArgs186
-    HeavyBlockStartFallingServerEvent = EventArgs187
-    GrassBlockToDirtBlockServerEvent = EventArgs188
-    FarmBlockToDirtBlockServerEvent = EventArgs189
-    FallingBlockReturnHeavyBlockServerEvent = EventArgs190
-    FallingBlockCauseDamageBeforeServerEvent = EventArgs191
-    FallingBlockBreakServerEvent = EventArgs192
-    EntityPlaceBlockAfterServerEvent = EventArgs193
-    DirtBlockToGrassBlockServerEvent = EventArgs194
-    CommandBlockUpdateEvent = EventArgs195
-    CommandBlockContainerOpenEvent = EventArgs196
-    ChestBlockTryPairWithServerEvent = EventArgs197
-    BlockStrengthChangedServerEvent = EventArgs198
-    BlockSnowStateChangeServerEvent = EventArgs199
-    BlockSnowStateChangeAfterServerEvent = EventArgs200
-    BlockRemoveServerEvent = EventArgs201
-    BlockRandomTickServerEvent = EventArgs202
-    BlockNeighborChangedServerEvent = EventArgs203
-    BlockLiquidStateChangeServerEvent = EventArgs204
-    BlockLiquidStateChangeAfterServerEvent = EventArgs205
-    BlockDestroyByLiquidServerEvent = EventArgs206
-    StoreBuySuccServerEvent = EventArgs207
-    ServerPlayerGetExperienceOrbEvent = EventArgs208
-    PlayerTrySleepServerEvent = EventArgs209
-    PlayerTeleportEvent = EventArgs210
-    PlayerStopSleepServerEvent = EventArgs211
-    PlayerSleepServerEvent = EventArgs212
-    PlayerRespawnFinishServerEvent = EventArgs213
-    PlayerRespawnEvent = EventArgs214
-    PlayerHurtEvent = EventArgs215
-    PlayerEatFoodServerEvent = EventArgs216
-    PlayerDieEvent = EventArgs217
-    OnPlayerHitBlockServerEvent = EventArgs218
-    GameTypeChangedServerEvent = EventArgs219
-    ExtinguishFireServerEvent = EventArgs220
-    DimensionChangeServerEvent = EventArgs221
-    ChangeLevelUpCostServerEvent = EventArgs222
-    AddLevelEvent = EventArgs223
-    AddExpEvent = EventArgs224
-    WillTeleportToServerEvent = EventArgs225
-    WillAddEffectServerEvent = EventArgs226
-    StartRidingServerEvent = EventArgs227
-    RemoveEffectServerEvent = EventArgs228
-    RefreshEffectServerEvent = EventArgs229
-    ProjectileCritHitEvent = EventArgs230
-    OnMobHitMobServerEvent = EventArgs231
-    OnKnockBackServerEvent = EventArgs232
-    OnFireHurtEvent = EventArgs233
-    MobGriefingBlockServerEvent = EventArgs234
-    HealthChangeServerEvent = EventArgs235
-    EntityTickServerEvent = EventArgs236
-    EntityPickupItemServerEvent = EventArgs237
-    EntityMotionStopServerEvent = EventArgs238
-    EntityMotionStartServerEvent = EventArgs239
-    EntityLoadScriptEvent = EventArgs240
-    EntityEffectDamageServerEvent = EventArgs241
-    EntityDroppedItemServerEvent = EventArgs242
-    EntityChangeDimensionServerEvent = EventArgs243
-    ChangeSwimStateServerEvent = EventArgs244
-    AddEffectServerEvent = EventArgs245
-    ActorHurtServerEvent = EventArgs246
-    ServerSpawnMobEvent = EventArgs247
-    ServerPreBlockPatternEvent = EventArgs248
-    ServerPostBlockPatternEvent = EventArgs249
-    ServerChatEvent = EventArgs250
-    PlayerLeftMessageServerEvent = EventArgs251
-    PlayerJoinMessageEvent = EventArgs252
-    PlayerIntendLeaveServerEvent = EventArgs253
-    PlaceNeteaseStructureFeatureEvent = EventArgs254
-    OnRainLevelChangeServerEvent = EventArgs255
-    OnLocalRainLevelChangeServerEvent = EventArgs256
-    OnLocalLightningLevelChangeServerEvent = EventArgs257
-    OnLightningLevelChangeServerEvent = EventArgs258
-    OnContainerFillLoottableServerEvent = EventArgs259
-    OnCommandOutputServerEvent = EventArgs260
-    NewOnEntityAreaEvent = EventArgs261
-    LoadServerAddonScriptsAfter = EventArgs262
-    DelServerPlayerEvent = EventArgs263
-    CommandEvent = EventArgs264
-    ClientLoadAddonsFinishServerEvent = EventArgs265
-    ChunkLoadedServerEvent = EventArgs266
-    ChunkGeneratedServerEvent = EventArgs267
-    ChunkAcquireDiscardedServerEvent = EventArgs268
-    AddServerPlayerEvent = EventArgs269
-    AchievementCompleteEvent = EventArgs270
-    PlayerAttackEntityEvent = EventArgs271
-    ServerBlockUseEvent = EventArgs272
-    OnGroundServerEvent = EventArgs273
-    SpawnProjectileServerEvent = EventArgs274
-    EntityDieLoottableServerEvent = EventArgs275
-    ActuallyHurtServerEvent = EventArgs276
-    HealthChangeBeforeServerEvent = EventArgs277
-    DimensionChangeFinishServerEvent = EventArgs278
-    EntityDefinitionsEventServerEvent = EventArgs279
-    PlayerDoInteractServerEvent = EventArgs280
-    PlayerInteractServerEvent = EventArgs281
-    MobDieEvent = EventArgs282
-    AddEntityServerEvent = EventArgs283
-    OnMobHitBlockServerEvent = EventArgs284
-    OnEntityInsideBlockServerEvent = EventArgs285
-    EntityStartRidingEvent = EventArgs286
-    EntityStopRidingEvent = EventArgs287
-    ServerItemUseOnEvent = EventArgs288
-    ActorUseItemServerEvent = EventArgs289
-    ActorAcquiredItemServerEvent = EventArgs290
-    DestroyBlockEvent = EventArgs291
-    DamageEvent = EventArgs292
-    ExplosionServerEvent = EventArgs293
-    ProjectileDoHitEffectEvent = EventArgs294
-    OnCarriedNewItemChangedServerEvent = EventArgs295
-    EntityRemoveEvent = EventArgs296
-    OnScriptTickServer = EventArgs297
+    OnSimTickServerEvent: EventArgs121
+    PlayerStartFishingServerEvent: EventArgs122
+    PlayerFishingAfterServerEvent: EventArgs123
+    PlayerFishingServerEvent: EventArgs124
+    PhysxTriggerServerEvent: EventArgs125
+    LiquidClippedServerEvent: EventArgs126
+    PlayerAddCustomContainerItemServerEvent: EventArgs127
+    PlayerRemoveCustomContainerItemServerEvent: EventArgs128
+    PhysxTouchServerEvent: EventArgs129
+    ItemPullOutCustomContainerServerEvent: EventArgs130
+    ItemPushInCustomContainerServerEvent: EventArgs131
+    PlayerPermissionChangeServerEvent: EventArgs132
+    PlayerTryRemoveCustomContainerItemServerEvent: EventArgs133
+    PlayerTryAddCustomContainerItemServerEvent: EventArgs134
+    PlayerTryPutCustomContainerItemServerEvent: EventArgs135
+    MountTamingEvent: EventArgs136
+    OnPlayerActionServerEvent: EventArgs137
+    CustomCommandTriggerServerEvent: EventArgs138
+    GlobalCommandServerEvent: EventArgs139
+    PlayerPickupArrowServerEvent: EventArgs140
+    EntityDieLoottableAfterServerEvent: EventArgs141
+    PlayerHungerChangeServerEvent: EventArgs142
+    ItemDurabilityChangedServerEvent: EventArgs143
+    PlaceNeteaseLargeFeatureServerEvent: EventArgs144
+    PlayerNamedEntityServerEvent: EventArgs145
+    PlayerFeedEntityServerEvent: EventArgs146
+    lobbyGoodBuySucServerEvent: EventArgs147
+    UrgeShipEvent: EventArgs148
+    PlayerInventoryOpenScriptServerEvent: EventArgs149
+    WalkAnimEndServerEvent: EventArgs150
+    WalkAnimBeginServerEvent: EventArgs151
+    JumpAnimBeginServerEvent: EventArgs152
+    AttackAnimEndServerEvent: EventArgs153
+    AttackAnimBeginServerEvent: EventArgs154
+    UIContainerItemChangedServerEvent: EventArgs155
+    ShearsUseToBlockBeforeServerEvent: EventArgs156
+    ServerPlayerTryTouchEvent: EventArgs157
+    ServerItemTryUseEvent: EventArgs158
+    PlayerDropItemServerEvent: EventArgs159
+    OnPlayerBlockedByShieldBeforeServerEvent: EventArgs160
+    OnPlayerBlockedByShieldAfterServerEvent: EventArgs161
+    OnPlayerActiveShieldServerEvent: EventArgs162
+    OnOffhandItemChangedServerEvent: EventArgs163
+    OnNewArmorExchangeServerEvent: EventArgs164
+    OnItemPutInEnchantingModelServerEvent: EventArgs165
+    ItemUseOnAfterServerEvent: EventArgs166
+    ItemUseAfterServerEvent: EventArgs167
+    ItemReleaseUsingServerEvent: EventArgs168
+    InventoryItemChangedServerEvent: EventArgs169
+    FurnaceBurnFinishedServerEvent: EventArgs170
+    CraftItemOutputChangeServerEvent: EventArgs171
+    ContainerItemChangedServerEvent: EventArgs172
+    StepOnBlockServerEvent: EventArgs173
+    StepOffBlockServerEvent: EventArgs174
+    StartDestroyBlockServerEvent: EventArgs175
+    ShearsDestoryBlockBeforeServerEvent: EventArgs176
+    ServerPlayerTryDestroyBlockEvent: EventArgs177
+    ServerPlaceBlockEntityEvent: EventArgs178
+    ServerEntityTryPlaceBlockEvent: EventArgs179
+    ServerBlockEntityTickEvent: EventArgs180
+    PistonActionServerEvent: EventArgs181
+    OnStandOnBlockServerEvent: EventArgs182
+    OnBeforeFallOnBlockServerEvent: EventArgs183
+    OnAfterFallOnBlockServerEvent: EventArgs184
+    HopperTryPullOutServerEvent: EventArgs185
+    HopperTryPullInServerEvent: EventArgs186
+    HeavyBlockStartFallingServerEvent: EventArgs187
+    GrassBlockToDirtBlockServerEvent: EventArgs188
+    FarmBlockToDirtBlockServerEvent: EventArgs189
+    FallingBlockReturnHeavyBlockServerEvent: EventArgs190
+    FallingBlockCauseDamageBeforeServerEvent: EventArgs191
+    FallingBlockBreakServerEvent: EventArgs192
+    EntityPlaceBlockAfterServerEvent: EventArgs193
+    DirtBlockToGrassBlockServerEvent: EventArgs194
+    CommandBlockUpdateEvent: EventArgs195
+    CommandBlockContainerOpenEvent: EventArgs196
+    ChestBlockTryPairWithServerEvent: EventArgs197
+    BlockStrengthChangedServerEvent: EventArgs198
+    BlockSnowStateChangeServerEvent: EventArgs199
+    BlockSnowStateChangeAfterServerEvent: EventArgs200
+    BlockRemoveServerEvent: EventArgs201
+    BlockRandomTickServerEvent: EventArgs202
+    BlockNeighborChangedServerEvent: EventArgs203
+    BlockLiquidStateChangeServerEvent: EventArgs204
+    BlockLiquidStateChangeAfterServerEvent: EventArgs205
+    BlockDestroyByLiquidServerEvent: EventArgs206
+    StoreBuySuccServerEvent: EventArgs207
+    ServerPlayerGetExperienceOrbEvent: EventArgs208
+    PlayerTrySleepServerEvent: EventArgs209
+    PlayerTeleportEvent: EventArgs210
+    PlayerStopSleepServerEvent: EventArgs211
+    PlayerSleepServerEvent: EventArgs212
+    PlayerRespawnFinishServerEvent: EventArgs213
+    PlayerRespawnEvent: EventArgs214
+    PlayerHurtEvent: EventArgs215
+    PlayerEatFoodServerEvent: EventArgs216
+    PlayerDieEvent: EventArgs217
+    OnPlayerHitBlockServerEvent: EventArgs218
+    GameTypeChangedServerEvent: EventArgs219
+    ExtinguishFireServerEvent: EventArgs220
+    DimensionChangeServerEvent: EventArgs221
+    ChangeLevelUpCostServerEvent: EventArgs222
+    AddLevelEvent: EventArgs223
+    AddExpEvent: EventArgs224
+    WillTeleportToServerEvent: EventArgs225
+    WillAddEffectServerEvent: EventArgs226
+    StartRidingServerEvent: EventArgs227
+    RemoveEffectServerEvent: EventArgs228
+    RefreshEffectServerEvent: EventArgs229
+    ProjectileCritHitEvent: EventArgs230
+    OnMobHitMobServerEvent: EventArgs231
+    OnKnockBackServerEvent: EventArgs232
+    OnFireHurtEvent: EventArgs233
+    MobGriefingBlockServerEvent: EventArgs234
+    HealthChangeServerEvent: EventArgs235
+    EntityTickServerEvent: EventArgs236
+    EntityPickupItemServerEvent: EventArgs237
+    EntityMotionStopServerEvent: EventArgs238
+    EntityMotionStartServerEvent: EventArgs239
+    EntityLoadScriptEvent: EventArgs240
+    EntityEffectDamageServerEvent: EventArgs241
+    EntityDroppedItemServerEvent: EventArgs242
+    EntityChangeDimensionServerEvent: EventArgs243
+    ChangeSwimStateServerEvent: EventArgs244
+    AddEffectServerEvent: EventArgs245
+    ActorHurtServerEvent: EventArgs246
+    ServerSpawnMobEvent: EventArgs247
+    ServerPreBlockPatternEvent: EventArgs248
+    ServerPostBlockPatternEvent: EventArgs249
+    ServerChatEvent: EventArgs250
+    PlayerLeftMessageServerEvent: EventArgs251
+    PlayerJoinMessageEvent: EventArgs252
+    PlayerIntendLeaveServerEvent: EventArgs253
+    PlaceNeteaseStructureFeatureEvent: EventArgs254
+    OnRainLevelChangeServerEvent: EventArgs255
+    OnLocalRainLevelChangeServerEvent: EventArgs256
+    OnLocalLightningLevelChangeServerEvent: EventArgs257
+    OnLightningLevelChangeServerEvent: EventArgs258
+    OnContainerFillLoottableServerEvent: EventArgs259
+    OnCommandOutputServerEvent: EventArgs260
+    NewOnEntityAreaEvent: EventArgs261
+    LoadServerAddonScriptsAfter: EventArgs262
+    DelServerPlayerEvent: EventArgs263
+    CommandEvent: EventArgs264
+    ClientLoadAddonsFinishServerEvent: EventArgs265
+    ChunkLoadedServerEvent: EventArgs266
+    ChunkGeneratedServerEvent: EventArgs267
+    ChunkAcquireDiscardedServerEvent: EventArgs268
+    AddServerPlayerEvent: EventArgs269
+    AchievementCompleteEvent: EventArgs270
+    PlayerAttackEntityEvent: EventArgs271
+    ServerBlockUseEvent: EventArgs272
+    OnGroundServerEvent: EventArgs273
+    SpawnProjectileServerEvent: EventArgs274
+    EntityDieLoottableServerEvent: EventArgs275
+    ActuallyHurtServerEvent: EventArgs276
+    HealthChangeBeforeServerEvent: EventArgs277
+    DimensionChangeFinishServerEvent: EventArgs278
+    EntityDefinitionsEventServerEvent: EventArgs279
+    PlayerDoInteractServerEvent: EventArgs280
+    PlayerInteractServerEvent: EventArgs281
+    MobDieEvent: EventArgs282
+    AddEntityServerEvent: EventArgs283
+    OnMobHitBlockServerEvent: EventArgs284
+    OnEntityInsideBlockServerEvent: EventArgs285
+    EntityStartRidingEvent: EventArgs286
+    EntityStopRidingEvent: EventArgs287
+    ServerItemUseOnEvent: EventArgs288
+    ActorUseItemServerEvent: EventArgs289
+    ActorAcquiredItemServerEvent: EventArgs290
+    DestroyBlockEvent: EventArgs291
+    DamageEvent: EventArgs292
+    ExplosionServerEvent: EventArgs293
+    ProjectileDoHitEffectEvent: EventArgs294
+    OnCarriedNewItemChangedServerEvent: EventArgs295
+    EntityRemoveEvent: EventArgs296
+    OnScriptTickServer: EventArgs297
 
 
 class Block(LazyEnum):

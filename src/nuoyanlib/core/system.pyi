@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-7
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -16,7 +16,7 @@ from collections import defaultdict
 from types import MethodType
 from mod.client.system.clientSystem import ClientSystem
 from mod.server.system.serverSystem import ServerSystem
-from ..core._types._event_typing import ClientEvent, ServerEvent
+from ..core._types._event_typing import ClientEventCompletion, ServerEventCompletion
 from ..core._types._typing import T
 from ..common.communicate import SyncData
 
@@ -25,9 +25,9 @@ class NySystemMeta(type):
     def __new__(metacls: Type[T], cls_name: str, bases: Tuple[type, ...], cls_dict: Dict[str, Any]) -> T: ...
 
 
-class __NyClientSystem(ClientEvent, ClientSystem, metaclass=NySystemMeta):
+class __NyClientSystem(ClientEventCompletion, ClientSystem, metaclass=NySystemMeta):
     __metaclass__ = NySystemMeta
-class __NyServerSystem(ServerEvent, ServerSystem, metaclass=NySystemMeta):
+class __NyServerSystem(ServerEventCompletion, ServerSystem, metaclass=NySystemMeta):
     __metaclass__ = NySystemMeta
 
 

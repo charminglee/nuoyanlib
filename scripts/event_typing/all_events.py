@@ -5,12 +5,12 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
 
-class ClientEvent:
+class ClientEventCompletion:
     def OnSimTickClientEvent(self, args):
         """
         [事件]
@@ -2115,7 +2115,7 @@ class ClientEvent:
         """
 
 
-class ServerEvent:
+class ServerEventCompletion:
     def OnSimTickServerEvent(self, args):
         """
         [事件]

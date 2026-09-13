@@ -14,7 +14,7 @@ from pathlib import Path
 import re
 import shutil
 
-from all_events import ClientEvent, ServerEvent
+from all_events import ClientEventCompletion, ServerEventCompletion
 
 
 COMMON_ENUM_PYI = Path("src/nuoyanlib/common/enum.pyi")
@@ -100,7 +100,7 @@ def render_event_typing(event_groups):
     for group_index, (group_name, events) in enumerate(event_groups):
         if group_index:
             content.append("\n\n\n")
-        content.append(f"class {group_name}:\n")
+        content.append(f"class {group_name}Completion:\n")
         for event_index, (event_name, _, doc) in enumerate(events):
             index = sum(len(group[1]) for group in event_groups[:group_index]) + event_index
             content.append(f"    def {event_name}(self, args):\n")
@@ -114,7 +114,7 @@ def render_event_typing(event_groups):
         nonlocal index
         for event_name, arguments, _ in events:
             content.append(f"# {event_name}\n")
-            content.append(f"class EventArgs{index}(EventArgsWrapper):\n")
+            content.append(f"class EventArgs{index}(EventArgsWrapper, str):\n")
             if arguments:
                 for argument_name, argument_type, argument_doc in arguments:
                     if argument_name == "from":
@@ -149,7 +149,7 @@ def update_event_enum(enum_content, event_groups):
         block = [f"class {group_name}(LazyEnum):\n"]
         start_index = 0 if group_name == "ClientEvent" else len(groups["ClientEvent"])
         for event_offset, (event_name, _, _) in enumerate(events):
-            block.append(f"    {event_name} = EventArgs{start_index + event_offset}\n")
+            block.append(f"    {event_name}: EventArgs{start_index + event_offset}\n")
         block.append("\n\n")
         return "".join(block)
 
@@ -159,8 +159,8 @@ def update_event_enum(enum_content, event_groups):
 def main():
     shutil.copyfile(COMMON_ENUM_PYI, SCRIPTS_ENUM_PYI)
 
-    client_events = extract_events(ClientEvent)
-    server_events = extract_events(ServerEvent)
+    client_events = extract_events(ClientEventCompletion)
+    server_events = extract_events(ServerEventCompletion)
     event_groups = [
         ("ClientEvent", client_events),
         ("ServerEvent", server_events),

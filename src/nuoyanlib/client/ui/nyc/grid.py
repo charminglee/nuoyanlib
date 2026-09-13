@@ -49,7 +49,7 @@ class GridData(list):
     >>> def update_cell(index, cell, data):
     ...     cell.text = data or ""
     >>> data = nyl.GridData(["第一项", "第二项"], update_cell)
-    >>> grid.bind_data(data)
+    >>> self.grid.bind_data(data)
 
     参见
     ----
