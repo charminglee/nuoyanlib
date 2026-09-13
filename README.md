@@ -124,9 +124,6 @@
     from ..nuoyanlib import server as nyl
     ```
 
-> [!NOTE]
-> `client` / `server` 库已包含 `common` 库，因此无需单独导入 `nuoyanlib.common` 。
-
     #### 调用示例
    
     假设你已经按照以上方法导入了「nuoyanlib」，对于所有「nuoyanlib」中的公开接口，都可通过 `nyl.<func_name>` 进行调用，例如：
@@ -134,17 +131,18 @@
     ```python
     entity_list = nyl.get_all_entities()
     ```
+
+> [!NOTE]
+> 如果你不想每次都编写 `nyl.` 前缀，也可以直接导入你需要的接口：
+>  ```python
+>  from <scripts_root>.nuoyanlib.client import get_all_entities
+>  ```
    
-   如果你不想每次都编写 `nyl.` 前缀，也可以直接导入你需要的接口：
-   
-    ```python
-    from <scripts_root>.nuoyanlib.client import get_all_entities
-    ```
-   
-    需要注意的是， `nuoyanlib.client` 为客户端工具包，其中的函数只能在客户端环境使用； `nuoyanlib.server` 同理，只能在服务端环境使用； `nuoyanlib.common` 则无环境限制，双端均可使用。
+> [!TIP]
+> `client` / `server` 库已包含 `common` 库，无需再单独导入 `nuoyanlib.common` 。
 
 > [!WARNING]  
-> 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库）。如果你强制这么做，「nuoyanlib」将抛出 `AcrossImportError` 。
+> 为确保环境安全，请勿将客户端和服务端代码写在同一 py 文件内，且 **禁止** 跨端导入（如在客户端导入服务端库，在服务端导入客户端库）。当「nuoyanlib」检测到这种不安全的导入时，将抛出 `AcrossImportError` 。
 
 3. 更多信息详见[入门指南](/docs/source/getting_started.rst)。
 
