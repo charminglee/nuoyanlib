@@ -10,22 +10,22 @@
 #  ================================================
 
 
-from typing import NoReturn, Union
+from typing import NoReturn
 from mod.client.ui.controls.textEditBoxUIControl import TextEditBoxUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
+from ....core._types._typing import NyScreenBaseT
+from .control import NyControl
 
 
-class NyEditBox(NyControl):
+class NyEditBox(NyControl[NyScreenBaseT]):
     _base_control: TextEditBoxUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def edit_text(self) -> str: ...

@@ -11,20 +11,20 @@
 
 
 from mod.client.ui.controls.scrollViewUIControl import ScrollViewUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
+from ....core._types._typing import NyScreenBaseT
+from .control import NyControl
 
 
-class NyScrollView(NyControl):
+class NyScrollView(NyControl[NyScreenBaseT]):
     _base_control: ScrollViewUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def scroll_pos(self) -> float: ...
@@ -37,7 +37,7 @@ class NyScrollView(NyControl):
     @property
     def scroll_content_path(self) -> str: ...
     @property
-    def scroll_content(self) -> NyControl: ...
+    def scroll_content(self) -> NyControl[NyScreenBaseT]: ...
     set_scroll_view_pos = SetScrollViewPos = ScrollViewUIControl.SetScrollViewPos
     get_scroll_view_pos = GetScrollViewPos = ScrollViewUIControl.GetScrollViewPos
     set_scroll_view_percent_value = SetScrollViewPercentValue = ScrollViewUIControl.SetScrollViewPercentValue

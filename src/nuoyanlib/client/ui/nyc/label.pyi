@@ -12,10 +12,9 @@
 
 from typing import Optional, Literal
 from mod.client.ui.controls.labelUIControl import LabelUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
-from ....core._types._typing import FTuple3
+from ....core._types._typing import FTuple3, NyScreenBaseT
+from .control import NyControl
 
 
 __TextFont = Literal[
@@ -31,16 +30,16 @@ __TextAlignment = Literal[
 ]
 
 
-class NyLabel(NyControl):
+class NyLabel(NyControl[NyScreenBaseT]):
     __font_scale: float
     _base_control: LabelUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def text(self) -> Optional[str]: ...

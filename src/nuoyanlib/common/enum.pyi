@@ -78,7 +78,7 @@ if sys.version_info >= (3, 4):
         @classmethod
         def _missing_(cls: Type[T], value: Any) -> Optional[T]: ...
 else:
-    class Enum(metaclass=EnumMeta):
+    class Enum(object, metaclass=EnumMeta):
         __metaclass__ = EnumMeta
         _name_: str
         _value_: Any
@@ -127,15 +127,11 @@ class LazyEnumMeta(type):
     def __getattr__(cls, name: str) -> Any: ...
 
 
-if sys.version_info <= (2, 7):
-    class LazyEnum(object):
-        __metaclass__ = LazyEnumMeta
-        @staticmethod
-        def _gen_enum_value_(name: str) -> Any: ...
-else:
-    class LazyEnum(metaclass=LazyEnumMeta):
-        @staticmethod
-        def _gen_enum_value_(name: str) -> Any: ...
+
+class LazyEnum(object, metaclass=LazyEnumMeta):
+    __metaclass__ = LazyEnumMeta
+    @staticmethod
+    def _gen_enum_value_(name: str) -> Any: ...
 
 
 class Flag(Enum):

@@ -12,9 +12,9 @@
 
 from typing import Any, Optional, Callable, Tuple, Union, List, ClassVar, Iterable
 from mod.client.ui.controls.neteaseComboBoxUIControl import NeteaseComboBoxUIControl
-from .control import NyControl, InteractableControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
+from ....core._types._typing import NyScreenBaseT
+from .control import NyControl, InteractableControl
 
 
 __OnOpenOrCloseCallbackType = Callable[[], Any]
@@ -22,7 +22,7 @@ __OnSelectCallbackType = Callable[[int, str, Any], Any]
 __ComboBoxCallbackType = Union[__OnOpenOrCloseCallbackType, __OnSelectCallbackType]
 
 
-class NyComboBox(InteractableControl, NyControl):
+class NyComboBox(InteractableControl, NyControl[NyScreenBaseT]):
     OPEN: ClassVar[int]
     """ 展开下拉框。 """
     CLOSE: ClassVar[int]
@@ -34,11 +34,11 @@ class NyComboBox(InteractableControl, NyControl):
     """ 下拉框项数据。 """
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def opt_count(self) -> int: ...
@@ -53,7 +53,7 @@ class NyComboBox(InteractableControl, NyControl):
     def _item_to_indices(self, item: Union[int, str, slice]) -> List[int]: ...
     def _get_opt_path(self, index: int) -> str: ...
     @args_type_check((int, str, slice))
-    def __getitem__(self, item: Union[int, str, slice]) -> Union[NyControl, List[NyControl]]: ...
+    def __getitem__(self, item: Union[int, str, slice]) -> Union[NyControl[NyScreenBaseT], List[NyControl[NyScreenBaseT]]]: ...
     @args_type_check((int, str, slice))
     def __delitem__(self, item: Union[int, str, slice]) -> None: ...
     def bind_data(self, data: Iterable[Tuple[str, Optional[str], Any]]) -> None: ...

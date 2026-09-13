@@ -5,18 +5,16 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-12
 #  ⠀
 #  ================================================
 
 
 from typing import Dict, Union, Tuple, Callable, TypeVar, Optional, Any, List, Iterator, overload, Iterable, Generic, ClassVar
 from mod.client.ui.controls.gridUIControl import GridUIControl
-from ....core._types._typing import ITuple2, STuple, UiPathOrNyControl, T, T2, SlotsType, ArgsDict
+from ....core._types._typing import ITuple2, STuple, T, T2, SlotsType, ArgsDict, NyScreenBaseT
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
-from ....common.enum import GridCallbackType
-from ..screen_node import ScreenNodeExtension
 from .control import NyControl
 
 
@@ -72,12 +70,14 @@ class ElemGroup(Iterable[__NyControlT]):
     def __getattr__(self, key: str) -> Union[List[Any], Callable[[...], List[Any]]]: ...
 
 
-class NyGrid(NyControl):
+class NyGrid(NyControl[NyScreenBaseT]):
+    UPDATE: ClassVar[int]
+    LOADED: ClassVar[int]
+    _base_control: GridUIControl
     __grid_size: int
     __template_name: str
-    _callback_map: Dict[str, List[__GridCallbackType]]
+    _callback_map: Dict[int, List[__GridCallbackType]]
     _loaded: bool
-    _base_control: GridUIControl
     is_stack_grid: bool
     """ 是否是 StackGrid 。 """
     cell_visible_binding: str
@@ -87,9 +87,9 @@ class NyGrid(NyControl):
     gd_obj: Optional[GridData]
     """ 绑定到当前网格的网格数据对象。 """
     def __init__(
-        screen_node_ex: ScreenNodeExtension,
-        grid_control: GridUIControl,
         self,
+        ny_screen_node: NyScreenBaseT,
+        path: str,
         *,
         is_stack_grid: bool = False,
         template_name: str = "",
@@ -97,15 +97,15 @@ class NyGrid(NyControl):
         collection_name: str = "",
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
-    def __grid_update__(self) -> None: ...
+    def __grid_update__(self, args: ArgsDict) -> None: ...
     @cached_property
     def template_name(self) -> str: ...
     @property
-    def rows(self) -> List[List[NyControl]]: ...
+    def rows(self) -> List[List[NyControl[NyScreenBaseT]]]: ...
     @property
-    def columns(self) -> List[List[NyControl]]: ...
+    def columns(self) -> List[List[NyControl[NyScreenBaseT]]]: ...
     @property
     def grid_size(self) -> int: ...
     @grid_size.setter
@@ -118,23 +118,23 @@ class NyGrid(NyControl):
     def __getitem__(
         self,
         item: Union[int, slice, Tuple[Union[int, slice], Union[int, slice]]]
-    ) -> Union[NyControl, ElemGroup, None]: ...
-    def get_cell_index(self, cell: UiPathOrNyControl) -> int: ...
+    ) -> Union[NyControl[NyScreenBaseT], ElemGroup, None]: ...
+    def get_cell_index(self, cell: Union[str, NyControl[NyScreenBaseT]]) -> int: ...
     def update_grid_data(self) -> None: ...
     @args_type_check(GridData)
     def bind_data(self, gd: GridData) -> None: ...
-    def get_cell(self, index: int) -> Optional[NyControl]: ...
-    def get_all_cells(self) -> List[NyControl]: ...
+    def get_cell(self, index: int) -> Optional[NyControl[NyScreenBaseT]]: ...
+    def get_all_cells(self) -> List[NyControl[NyScreenBaseT]]: ...
     def set_callback(
         self,
         func: __GridCallbackType,
-        cb_type: GridCallbackType = GridCallbackType.UPDATE,
+        cb_type: int = NyGrid.UPDATE,
     ) -> bool: ...
     def remove_callback(
         self,
         func: __GridCallbackType,
-        cb_type: GridCallbackType = GridCallbackType.UPDATE,
+        cb_type: int = NyGrid.UPDATE,
     ) -> bool: ...
     def _return_cell_visible(self, index: int) -> bool: ...
-    SetGridDimension = GridUIControl.SetGridDimension
-    GetGridItem = GridUIControl.GetGridItem
+    set_grid_dimension = SetGridDimension = GridUIControl.SetGridDimension
+    get_gridd_item = GetGriddItem = GridUIControl.GetGridItem

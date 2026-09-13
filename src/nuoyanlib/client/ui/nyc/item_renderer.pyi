@@ -12,10 +12,9 @@
 
 from typing import Optional, Tuple, TypedDict, NoReturn
 from mod.client.ui.controls.itemRendererUIControl import ItemRendererUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
-from ....core._types._typing import UserData
+from ....core._types._typing import UserData, NyScreenBaseT
+from .control import NyControl
 
 
 class __UiItemDict(TypedDict):
@@ -24,15 +23,15 @@ class __UiItemDict(TypedDict):
     isEnchanted: bool
 
 
-class NyItemRenderer(NyControl):
+class NyItemRenderer(NyControl[NyScreenBaseT]):
     _base_control: ItemRendererUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def item(self) -> Tuple[str, int]: ...

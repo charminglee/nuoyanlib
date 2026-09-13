@@ -12,10 +12,9 @@
 
 from typing import Callable, Optional, Tuple, NoReturn, Literal
 from mod.client.ui.controls.imageUIControl import ImageUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
-from ....core._types._typing import FTuple2, FTuple3, Args, Kwargs
+from ....core._types._typing import FTuple2, FTuple3, Args, Kwargs, NyScreenBaseT
+from .control import NyControl
 
 
 __ClipDirection = Literal[
@@ -33,15 +32,15 @@ __ImageAdaption = Literal[
 ]
 
 
-class NyImage(NyControl):
+class NyImage(NyControl[NyScreenBaseT]):
     _base_control: ImageUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def texture(self) -> NoReturn: ...

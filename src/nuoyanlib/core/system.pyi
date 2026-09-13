@@ -25,14 +25,10 @@ class NySystemMeta(type):
     def __new__(metacls: Type[T], cls_name: str, bases: Tuple[type, ...], cls_dict: Dict[str, Any]) -> T: ...
 
 
-if sys.version_info <= (2, 7):
-    class __NyClientSystem(ClientEvent, ClientSystem):
-        __metaclass__ = NySystemMeta
-    class __NyServerSystem(ServerEvent, ServerSystem):
-        __metaclass__ = NySystemMeta
-else:
-    class __NyClientSystem(ClientEvent, ClientSystem, metaclass=NySystemMeta): ...
-    class __NyServerSystem(ServerEvent, ServerSystem, metaclass=NySystemMeta): ...
+class __NyClientSystem(ClientEvent, ClientSystem, metaclass=NySystemMeta):
+    __metaclass__ = NySystemMeta
+class __NyServerSystem(ServerEvent, ServerSystem, metaclass=NySystemMeta):
+    __metaclass__ = NySystemMeta
 
 
 def _get_ncs_cls() -> Type[__NyClientSystem]: ...

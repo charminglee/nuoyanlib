@@ -12,20 +12,20 @@
 
 from typing import Literal
 from mod.client.ui.controls.stackPanelUIControl import StackPanelUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
+from ....core._types._typing import NyScreenBaseT
+from .control import NyControl
 
 
-class NyStackPanel(NyControl):
+class NyStackPanel(NyControl[NyScreenBaseT]):
     _base_control: StackPanelUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def orientation(self) -> Literal["horizontal", "vertical"]: ...

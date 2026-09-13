@@ -96,26 +96,17 @@ class SingletonMeta(type):
     _instance: Optional[Any]
     def __new__(metacls: Type[T], name: str, bases: Tuple[type, ...], dct: Dict[str, Any]) -> T: ...
     def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T: ...
-if sys.version_info <= (2, 7):
-    class Singleton(object):
-        __metaclass__ = SingletonMeta
-        _instance: Optional[Any]
-else:
-    class Singleton(metaclass=SingletonMeta):
-        _instance: Optional[Any]
+class Singleton(object, metaclass=SingletonMeta):
+    __metaclass__ = SingletonMeta
+    _instance: Optional[Any]
 class ArgsSingletonMeta(type):
     _instances: Dict[tuple, Any]
     _unhashable_instances: List[Tuple[tuple, Any]]
     def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T: ...
-if sys.version_info <= (2, 7):
-    class ArgsSingleton(object):
-        __metaclass__ = ArgsSingletonMeta
-        _instances: Dict[tuple, Any]
-        _unhashable_instances: List[Tuple[tuple, Any]]
-else:
-    class ArgsSingleton(metaclass=ArgsSingletonMeta):
-        _instances: Dict[tuple, Any]
-        _unhashable_instances: List[Tuple[tuple, Any]]
+class ArgsSingleton(object, metaclass=ArgsSingletonMeta):
+    __metaclass__ = ArgsSingletonMeta
+    _instances: Dict[tuple, Any]
+    _unhashable_instances: List[Tuple[tuple, Any]]
 
 
 if sys.version_info >= (3, 8):

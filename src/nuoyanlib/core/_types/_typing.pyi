@@ -43,11 +43,6 @@ T2 = TypeVar("T2")
 P = ParamSpec("P")
 F = TypeVar("F", bound=Callable[..., Any])
 TypeT = TypeVar("TypeT", bound=type)
-if sys.version_info >= (3, 11):
-    from typing_extensions import Self
-    Self = Self
-else:
-    Self = T
 NyScreenBaseT = TypeVar("NyScreenBaseT", bound=NyScreenBase)
 
 

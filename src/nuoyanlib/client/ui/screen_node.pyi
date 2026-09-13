@@ -5,17 +5,18 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-11
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
 
-from typing import List, Tuple, ClassVar, Optional, Any, Dict, Generator, Callable, Union, Type
+from typing import List, Tuple, ClassVar, Optional, Any, Dict, Generator, Callable, Union, Type, Self
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.CustomUIScreenProxy import CustomUIScreenProxy
 from ...core._types._typing import FTuple3, FTuple2, Args, Kwargs, NyControlTypes, F, TypeT, NyScreenBaseT
-from .nyc import NyControl, NyImage
 from ...core._utils import dualmethod
+from .nyc.control import NyControl
+from .nyc.image import NyImage
 
 
 def screen(
@@ -82,7 +83,7 @@ class NyScreenBase(object):
     _binging_data: Dict[Union[Callable, Tuple[Callable, object]], Tuple[Callable, bool]]
     _tick: int
     _is_dirty: bool
-    root_panel: NyControl
+    root_panel: NyControl[Self]
     """
     当前界面根面板的 ``NyControl`` 实例。
     
@@ -127,7 +128,7 @@ class NyScreenBase(object):
         binding_name: str = "",
         collection_name: str = "",
     ) -> Callable: ...
-    def _destroy_nyc(self, nyc: NyControl) -> None: ...
+    def _destroy_nyc(self, nyc: NyControl[Self]) -> None: ...
     @staticmethod
     def button_callback(
         btn_path: str,
@@ -146,7 +147,7 @@ class NyScreenBase(object):
     def _update_all_ui_pos(self) -> None: ...
     def _play_frame_anim(
         self,
-        ny_image: NyImage,
+        ny_image: NyImage[Self],
         tex_path: str,
         frame_count: int,
         frame_rate: int,
@@ -156,8 +157,8 @@ class NyScreenBase(object):
         args: Optional[Args] = None,
         kwargs: Optional[Kwargs] = None,
     ) -> None: ...
-    def _pause_frame_anim(self, ny_image: NyImage) -> None: ...
-    def _stop_frame_anim(self, ny_image: NyImage) -> None: ...
+    def _pause_frame_anim(self, ny_image: NyImage[Self]) -> None: ...
+    def _stop_frame_anim(self, ny_image: NyImage[Self]) -> None: ...
     def is_control_exist(self, path: str) -> bool: ...
     set_bind_world_position = ScreenNode.SetBindWorldPosition
     set_screen_visible = ScreenNode.SetScreenVisible

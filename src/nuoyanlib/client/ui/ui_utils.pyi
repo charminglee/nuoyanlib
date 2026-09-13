@@ -5,18 +5,19 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-11
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
 
-from typing import Dict, Optional, Union, List, Any
+from typing import Dict, Optional, Union, List, Any, overload
 from typing_extensions import deprecated
 from mod.client.system.clientSystem import ClientSystem
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
-from ...core._types._typing import UiPathOrNyControl
+from ...core._types._typing import UiPathOrNyControl, NyScreenBaseT
 from .screen_node import NyScreenBase
+from .nyc.control import NyControl
 
 
 def is_top_ui(screen_name: str) -> bool: ...
@@ -84,16 +85,30 @@ def push_ui(
     client_system: Optional[ClientSystem] = None
 ) -> Union[ScreenNode, Any]: ...
 def _to_path(control: UiPathOrNyControl) -> str: ...
+@overload
 def get_children_path_by_level(
-    control: UiPathOrNyControl,
+    control: str,
     ny_screen_node: NyScreenBase,
     level: int = 1,
 ) -> List[str]: ...
-def get_children_by_level(
-    control: UiPathOrNyControl,
-    ny_screen_node: NyScreenBase,
+@overload
+def get_children_path_by_level(
+    control: NyControl[NyScreenBaseT],
+    ny_screen_node: Optional[NyScreenBaseT] = None,
     level: int = 1,
-) -> List[BaseUIControl]: ...
+) -> List[str]: ...
+@overload
+def get_children_by_level(
+    control: str,
+    ny_screen_node: NyScreenBaseT,
+    level: int = 1,
+) -> List[NyControl[NyScreenBaseT]]: ...
+@overload
+def get_children_by_level(
+    control: NyControl[NyScreenBaseT],
+    ny_screen_node: Optional[NyScreenBaseT] = None,
+    level: int = 1,
+) -> List[NyControl[NyScreenBaseT]]: ...
 def get_parent_path(control: UiPathOrNyControl) -> Optional[str]: ...
 def get_parent(control: UiPathOrNyControl, ny_screen_node: NyScreenBase) -> Optional[BaseUIControl]: ...
 def is_out_of_screen(control: UiPathOrNyControl, ny_screen_node: Optional[NyScreenBase] = None) -> bool: ...

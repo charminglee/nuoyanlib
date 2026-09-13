@@ -12,25 +12,25 @@
 
 from typing import Callable, ClassVar, Union
 from mod.client.ui.controls.switchToggleUIControl import SwitchToggleUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
+from ....core._types._typing import NyScreenBaseT
+from .control import NyControl
 
 
 __ToggleChangedCallback = Callable[[dict], int]
 
 
-class NyToggle(NyControl):
+class NyToggle(NyControl[NyScreenBaseT]):
     CHANGED: ClassVar[int]
     """ 开关状态变化时触发。 """
     _base_control: SwitchToggleUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def state(self) -> bool: ...

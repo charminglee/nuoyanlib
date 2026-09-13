@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -13,13 +13,12 @@
 from typing import Callable, ClassVar, Optional, Union, List, Any
 from mod.client.ui.controls.buttonUIControl import ButtonUIControl
 from mod.common.utils.timer import CallLater
-from ....core._types._typing import ArgsDict, FTuple2, UiPathOrNyControl
+from ....core._types._typing import ArgsDict, FTuple2, NyScreenBaseT
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from .control import NyControl, InteractableControl
 from .image import NyImage
 from .label import NyLabel
-from ..screen_node import NyScreenBase
 
 
 __BtnCallbackType = Callable[[dict], Any]
@@ -28,7 +27,7 @@ __BtnCallbackType = Callable[[dict], Any]
 def _vibrate(t: int) -> bool: ...
 
 
-class NyButton(InteractableControl, NyControl):
+class NyButton(InteractableControl, NyControl[NyScreenBaseT]):
     UP: ClassVar[int]
     """ 触控在按钮范围内抬起。 """
     DOWN: ClassVar[int]
@@ -63,7 +62,7 @@ class NyButton(InteractableControl, NyControl):
     _vibrate_time: int
     _double_click_time: float
     _long_click_timer: Optional[CallLater]
-    _movable_controls: List[NyControl]
+    _movable_controls: List[NyControl[NyScreenBaseT]]
     _finger_pos: Optional[FTuple2]
     is_movable: bool
     """ 按钮是否可拖动。 """
@@ -75,22 +74,22 @@ class NyButton(InteractableControl, NyControl):
     """ 创建按钮时传入的 TouchEvent 参数。 """
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
         *,
         touch_event_params: Optional[dict] = None,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @cached_property
-    def default_image(self) -> Optional[NyImage]: ...
+    def default_image(self) -> Optional[NyImage[NyScreenBaseT]]: ...
     @cached_property
-    def hover_image(self) -> Optional[NyImage]: ...
+    def hover_image(self) -> Optional[NyImage[NyScreenBaseT]]: ...
     @cached_property
-    def pressed_image(self) -> Optional[NyImage]: ...
+    def pressed_image(self) -> Optional[NyImage[NyScreenBaseT]]: ...
     @cached_property
-    def button_label(self) -> Optional[NyLabel]: ...
+    def button_label(self) -> Optional[NyLabel[NyScreenBaseT]]: ...
     @property
     def vibrate_time(self) -> int: ...
     @vibrate_time.setter
@@ -120,7 +119,7 @@ class NyButton(InteractableControl, NyControl):
     def set_movable(
         self,
         move_parent: bool = False,
-        associated: Union[UiPathOrNyControl, List[UiPathOrNyControl], None] = None,
+        associated: Union[Union[str, NyControl[NyScreenBaseT]], List[Union[str, NyControl[NyScreenBaseT]]], None] = None,
         auto_save: bool = False,
     ) -> None: ...
     def cancel_movable(self) -> None: ...

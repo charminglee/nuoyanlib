@@ -12,20 +12,20 @@
 
 from typing import NoReturn
 from mod.client.ui.controls.minimapUIControl import MiniMapUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
+from ....core._types._typing import NyScreenBaseT
+from .control import NyControl
 
 
-class NyMiniMap(NyControl):
+class NyMiniMap(NyControl[NyScreenBaseT]):
     _base_control: MiniMapUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def highest_y(self) -> NoReturn: ...

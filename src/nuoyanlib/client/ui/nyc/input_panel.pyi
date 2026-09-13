@@ -11,21 +11,20 @@
 
 
 from mod.client.ui.controls.inputPanelUIControl import InputPanelUIControl
-from .control import NyControl
-from ..screen_node import NyScreenBase
 from ....core._types._checker import args_type_check
-from ....core._types._typing import FTuple2
+from ....core._types._typing import FTuple2, NyScreenBaseT
+from .control import NyControl
 
 
-class NyInputPanel(NyControl):
+class NyInputPanel(NyControl[NyScreenBaseT]):
     _base_control: InputPanelUIControl
     def __init__(
         self,
-        ny_screen_node: NyScreenBase,
+        ny_screen_node: NyScreenBaseT,
         path: str,
     ) -> None: ...
     @args_type_check(str)
-    def __truediv__(self, other: str) -> NyControl: ...
+    def __truediv__(self, other: str) -> NyControl[NyScreenBaseT]: ...
     __div__ = __truediv__
     @property
     def is_modal(self) -> bool: ...

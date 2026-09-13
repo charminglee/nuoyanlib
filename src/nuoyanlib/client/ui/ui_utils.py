@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-11
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -238,7 +238,7 @@ def is_out_of_screen(control, ny_screen_node=None):
     )
 
 
-def get_children_path_by_level(control, ny_screen_node, level=1):
+def get_children_path_by_level(control, ny_screen_node=None, level=1):
     """
     获取控件指定层次上的子控件的路径。
 
@@ -283,14 +283,19 @@ def get_children_path_by_level(control, ny_screen_node, level=1):
     -----
 
     :param str|NyControl control: 控件路径或实例
-    :param NyScreenNode|NyScreenProxy ny_screen_node: 控件所在UI类的实例
+    :param NyScreenNode|NyScreenProxy|None ny_screen_node: 当 control 传入路径时，需指定控件所在UI类的实例；默认为 None
     :param int level: 子控件层次；默认为 1，传入 0 或负值时，获取所有层次的子控件
 
     :return: 指定层次的所有子控件路径的列表，获取不到时返回空列表
     :rtype: list[str]
     """
-    path = _to_path(control)
-    screen_node = ny_screen_node._screen_node
+    if isinstance(control, str):
+        path = _to_path(control)
+        screen_node = ny_screen_node._screen_node
+    else:
+        path = control.path
+        screen_node = control._screen_node
+
     if level == 1:
         return [
             path + "/" + n
@@ -314,7 +319,7 @@ def get_children_path_by_level(control, ny_screen_node, level=1):
         return res
 
 
-def get_children_by_level(control, ny_screen_node, level=1):
+def get_children_by_level(control, ny_screen_node=None, level=1):
     """
     获取控件指定层次上的子控件的 ``NyControl`` 实例。
 
@@ -338,13 +343,13 @@ def get_children_by_level(control, ny_screen_node, level=1):
     -----
 
     :param str|NyControl control: 控件路径或实例
-    :param NyScreenNode|NyScreenProxy ny_screen_node: 控件所在UI类的实例
+    :param NyScreenNode|NyScreenProxy ny_screen_node: 当 control 传入路径时，需指定控件所在UI类的实例；默认为 None
     :param int level: 子控件层次；默认为 1，传入 0 或负值时，获取所有层次
 
     :return: 指定层次上的子控件实例的列表，获取不到时返回空列表
     :rtype: list[NyControl]
     """
-    from .nyc import NyControl
+    from .nyc.control import NyControl
     return [
         NyControl(ny_screen_node, p)
         for p in get_children_path_by_level(control, ny_screen_node, level)
