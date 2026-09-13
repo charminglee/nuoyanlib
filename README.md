@@ -32,18 +32,20 @@
 
 - [`nuoyanlib.common`](/docs/source/api/utils.rst) ：通用工具包，提供了事件监听框架、多种与MC密切相关的数学计算函数、向量工具、双端通信工具、随机数工具等实用工具。
 
-<br>
+## 🛠️ 安装
 
-## ⬇️ 下载
+### 使用 nuoyanlib-installer 一键安装
 
-- ~~[1.0.0-beta.1]()~~
-- [开发版](https://codeload.github.com/charminglee/nuoyanlib/zip/refs/heads/master)
+下载 [nuoyanlib-installer]() ，选择要安装的脚本文件夹后点击安装即可。
 
-<br>
+### 手动安装
 
-## 🚀 快速上手
+1. 下载「nuoyanlib」压缩包：
 
-1. 解压下载的压缩包，将 `nuoyanlib` 文件夹复制到行为包 Python 脚本根目录下（即 `modMain.py` 所在位置）。安装好后，你的行为包结构应与下方类似： 
+   - ~~[1.0.0-beta.1]()~~
+   - [开发版](https://codeload.github.com/charminglee/nuoyanlib/zip/refs/heads/master)
+
+2. 解压后将 `nuoyanlib` 文件夹复制到行为包 Python 脚本根目录下（即 `modMain.py` 所在位置）。安装好后，你的行为包结构应与下方类似： 
 
     ```
     行为包/  
@@ -63,7 +65,9 @@
     ...
     ```
 
-2. 在 `modMain.py` 中添加模组启动逻辑：
+## 🚀 快速上手
+
+1. 在 `modMain.py` 中添加模组启动逻辑：
 
     ```python
     from mod.common.mod import Mod
@@ -91,7 +95,7 @@
 > [!NOTE]
 > 如果你还使用了其他带有类似启动逻辑的框架（如 [QuModLibs](https://qumod.cc/) ），也需保留该框架的启动逻辑。
 
-3. 「nuoyanlib」导入和调用示例：
+2. 「nuoyanlib」导入和调用示例：
 
     #### 导入客户端库
 
@@ -142,15 +146,11 @@
 > [!WARNING]  
 > 为确保环境安全，请勿将客户端和服务端代码写在同一个py文件内，且**禁止**跨端导入（如在客户端导入服务端库，在服务端导入客户端库）。如果你强制这么做，「nuoyanlib」将抛出 `AcrossImportError` 。
 
-4. 更多信息详见[入门指南](/docs/source/getting_started.rst)。
-
-<br>
+3. 更多信息详见[入门指南](/docs/source/getting_started.rst)。
 
 ## 🔍 参考文档
 
 作者正在熬夜编写中......
-
-<br>
 
 ## 🌞 未来计划
 
@@ -161,16 +161,12 @@
 - [ ] 搭建项目网站
 - [ ] ...
 
-<br>
-
 ## 🧾 开源许可
 
 本项目使用 [BSD-3-Clause](https://opensource.org/license/bsd-3-clause) 许可，允许用于商业项目，允许以修改或未修改的形式进行再发布，仅保留以下两个权利：
 
 - 保留许可证的可读副本
 - 保留「nuoyanlib」源代码中的版权声明
-
-<br>
 
 ## 👑 贡献
 
@@ -180,18 +176,12 @@
 
 如果你可以给本项目点个 Star ，那将是对作者最大的鼓励，也不失为一种贡献！
 
-<br>
-
 ## 🌹 特别鸣谢
 
 1. [创新工坊-小坊](https://github.com/cxgf666) ：发现了 [`spawn_ground_shatter_effect()`](https://github.com/charminglee/nuoyanlib/blob/03d9efb26a3f3cf4f93f786ae1779dc6f8e26b7c/src/nuoyanlib/server/block.py#L41) 的一个bug；「nuoyanlib」内测用户。
 2. [xiaoweii](https://github.com/645359132) ：「nuoyanlib」内测用户。
 3. [幻尘](https://github.com/HuanChen19) ：「nuoyanlib」内测用户。
 
-<br>
-
 ## 🔗 作者的其他项目
 
 - [网易我的世界 ModSDK 补全库修正版](https://github.com/charminglee/mc-netease-sdk-nyrev)
-
-<br>
