@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-9
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
@@ -32,6 +32,7 @@ __author_email__ = "1279735247@qq.com"
 import traceback
 from mod.common.mod import Mod
 from .core import _env, _logging
+from . import config
 
 
 _mod_clients = []
@@ -128,10 +129,12 @@ def run(mod_name, **kwargs):
     请在 ``modMain.py`` 中调用本函数。
 
     客户端/服务端将按列表顺序加载。
-    默认情况下，「nuoyanlib」会扫描各模块中的下列类，将其注册到运行环境并初始化。
+    默认情况下，「nuoyanlib」会扫描各模块中的符合以下条件之一的类，将其注册到运行环境并初始化。
 
     - 继承了 ``ClientSystem`` 或 ``NyClientSystem`` 的客户端类
     - 继承了 ``ServerSystem`` 或 ``NyServerSystem`` 的服务端类
+
+    可在全局配置中关闭这一行为。
 
     示例
     ----
@@ -203,7 +206,8 @@ def run(mod_name, **kwargs):
             _load_modules(False)
             from .core.listener import _process_event_listen
             _process_event_listen()
-            _load_systems(False)
+            if config.ENABLED_CLASS_AUTO_LOADING:
+                _load_systems(False)
 
         @Mod.InitClient()
         def init_client(self):
@@ -215,7 +219,8 @@ def run(mod_name, **kwargs):
             _load_modules(True)
             from .core.listener import _process_event_listen
             _process_event_listen()
-            _load_systems(True)
+            if config.ENABLED_CLASS_AUTO_LOADING:
+                _load_systems(True)
 
     globals_['NuoyanLibMain'] = NuoyanLibMain
 
