@@ -26,13 +26,27 @@ from nuoyanlib.core._utils import (
 )
 
 
+t = []
 class E(object):
     @dualmethod
     def foo(self):
+        t.append(self)
         return self
 e = E()
 assert e.foo() is e
 assert E.foo() is E
+assert t == [e, E]
+
+
+class E2(E):
+    @dualmethod
+    def foo(self):
+        super(E2, self).foo()
+        return self
+e2 = E2()
+assert e2.foo() is e2
+assert E2.foo() is E2
+assert t == [e, E, e2, E2]
 
 
 dl = DefaultLocal(list)
