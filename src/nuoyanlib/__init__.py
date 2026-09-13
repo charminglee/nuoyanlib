@@ -23,6 +23,15 @@
 # todo：event_filter
 
 
+__all__ = [
+    "__version__",
+    "__author__",
+    "__author_qq__",
+    "__author_email__",
+    "run",
+]
+
+
 __version__ = "1.0.0-beta.1"
 __author__ = "Nuoyan"
 __author_qq__ = "1279735247"
@@ -198,7 +207,7 @@ def run(mod_name, **kwargs):
     class NuoyanLibMain(object):
         @Mod.InitServer()
         def init_server(self):
-            _env._THREAD_LOCAL.IS_CLIENT = False
+            _env._L.IS_CLIENT = False
             from .core.server._lib_server import NuoyanLibServerSystem
             if not NuoyanLibServerSystem.run():
                 _logging.error("NuoyanLibServerSystem run failed!")
@@ -211,7 +220,7 @@ def run(mod_name, **kwargs):
 
         @Mod.InitClient()
         def init_client(self):
-            _env._THREAD_LOCAL.IS_CLIENT = True
+            _env._L.IS_CLIENT = True
             from .core.client._lib_client import NuoyanLibClientSystem
             if not NuoyanLibClientSystem.run():
                 _logging.error("NuoyanLibClientSystem run failed!")

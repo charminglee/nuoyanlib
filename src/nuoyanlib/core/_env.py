@@ -5,13 +5,34 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-9
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
 
 import threading
 import traceback
+
+
+__all__ = [
+    "MOD_NAME",
+    "CLIENT_MODULES",
+    "SERVER_MODULES",
+    "CLIENT_SYSTEMS",
+    "SERVER_SYSTEMS",
+    "get_system",
+    "LIB_VERSION",
+    "LIB_NAME",
+    "LIB_CLIENT_NAME",
+    "LIB_SERVER_NAME",
+    "get_cls_path",
+    "get_file_path",
+    "is_client",
+    "get_api",
+    "get_lv_comp",
+    "get_cf",
+    "LEVEL_ID",
+]
 
 
 DEBUG = False
@@ -27,6 +48,16 @@ CLIENT_MODULES = {}
 SERVER_MODULES = {}
 CLIENT_SYSTEMS = {}
 SERVER_SYSTEMS = {}
+
+
+def get_system(system_name, mod_name=None):
+    if not mod_name or mod_name == MOD_NAME:
+        if is_client():
+            return CLIENT_SYSTEMS.get(system_name)
+        else:
+            return SERVER_SYSTEMS.get(system_name)
+    else:
+        get_api().GetSystem(MOD_NAME, system_name)
 
 
 from .. import __version__
@@ -58,18 +89,18 @@ def check_env(target):
         raise error.AcrossImportError
 
 
-_THREAD_LOCAL = threading.local()
+_L = threading.local()
 
 
 def get_lib_system():
     try:
-        return _THREAD_LOCAL.LIB_SYS
+        return _L.LIB_SYS
     except AttributeError:
         if is_client():
             from .client._lib_client import instance
         else:
             from .server._lib_server import instance
-        inst = _THREAD_LOCAL.LIB_SYS = instance()
+        inst = _L.LIB_SYS = instance()
         return inst
 
 
@@ -83,45 +114,45 @@ def is_client():
     :rtype: bool
     """
     try:
-        return _THREAD_LOCAL.IS_CLIENT
+        return _L.IS_CLIENT
     except AttributeError:
-        ic = _THREAD_LOCAL.IS_CLIENT = (threading.current_thread().name == "MainThread")
+        ic = _L.IS_CLIENT = (threading.current_thread().name == "MainThread")
         return ic
 
 
 def get_api():
     try:
-        return _THREAD_LOCAL.API
+        return _L.API
     except AttributeError:
         if is_client():
             import mod.client.extraClientApi as api
         else:
             import mod.server.extraServerApi as api
-        _THREAD_LOCAL.API = api
+        _L.API = api
         return api
 
 
 def get_lv_comp():
     try:
-        return _THREAD_LOCAL.LV_COMP
+        return _L.LV_COMP
     except AttributeError:
         if is_client():
             from .client.comp import LvComp
         else:
             from .server.comp import LvComp
-        _THREAD_LOCAL.LV_COMP = LvComp
+        _L.LV_COMP = LvComp
         return LvComp
 
 
 def get_cf(entity_id):
     try:
-        return _THREAD_LOCAL.CF(entity_id)
+        return _L.CF(entity_id)
     except AttributeError:
         if is_client():
             from .client.comp import CF
         else:
             from .server.comp import CF
-        _THREAD_LOCAL.CF = CF
+        _L.CF = CF
         return CF(entity_id)
 
 

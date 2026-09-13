@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
@@ -28,10 +28,10 @@ if not _NuoyanLibServerSystem.run():
 from ..core.server.comp import *
 
 
+from .block import *
 from .entity import *
 from .hurt import *
 from .inv import *
-from .block import *
 from .lobby import *
 from .motion import *
 

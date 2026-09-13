@@ -5,29 +5,18 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
 
 from typing import Literal, TypeVar, Union, Callable, Tuple, Optional, overload
 from ..core._types._typing import FTuple2, ITuple3, FTuple3, Args, Kwargs
-from ..core._utils import DefaultLocal, dualmethod, Singleton, ArgsSingleton, lru_cache, cached_property, try_exec, iter_obj_attrs
 
 
 __DictT = TypeVar("__DictT", bound=dict)
 class __Callable(Callable):
     reset_call_time: Callable[[], None]
-
-
-DefaultLocal = DefaultLocal
-dualmethod = dualmethod
-Singleton = Singleton
-ArgsSingleton = ArgsSingleton
-lru_cache = lru_cache
-cached_property = cached_property
-try_exec = try_exec
-iter_obj_attrs = iter_obj_attrs
 
 
 def is_on_ground(entity_id: str) -> bool: ...

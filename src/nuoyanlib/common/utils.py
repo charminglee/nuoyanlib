@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
@@ -15,18 +15,7 @@ from functools import wraps
 import time
 import re
 from ..core._env import get_lv_comp, is_client, get_cf
-from ..core._utils import (
-    DefaultLocal,
-    dualmethod,
-    Singleton,
-    ArgsSingleton,
-    lru_cache,
-    cached_property,
-    try_exec,
-    iter_obj_attrs,
-    inject_is_client,
-    UNIVERSAL_OBJECT,
-)
+from ..core._utils import inject_is_client, UNIVERSAL_OBJECT
 
 
 if bool(0):
@@ -47,15 +36,6 @@ __all__ = [
     "convert_dict_value_to_tuple",
     "convert_list_to_tuple",
     "translate_time",
-
-    "DefaultLocal",
-    "dualmethod",
-    "Singleton",
-    "ArgsSingleton",
-    "lru_cache",
-    "cached_property",
-    "try_exec",
-    "iter_obj_attrs",
 ]
 
 
