@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-13
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
@@ -999,23 +999,22 @@ class NyScreenBase(object):
 
         :raise PathMatchError: 按钮路径存在错误时抛出
         """
-        touch_event_params = kwargs['touch_event_params']
         def decorator(func):
-            func._nyl__callback_types = callback_types
-            func._nyl__btn_path = btn_path
-            func._nyl__touch_event_params = touch_event_params
+            touch_event_params = kwargs['touch_event_params']
+            if not hasattr(func, '_nyl__button_callback_args'):
+                func._nyl__button_callback_args = []
+            func._nyl__button_callback_args.append((btn_path, callback_types, touch_event_params))
             return func
         return decorator
 
     def _process_button_callback(self):
         for attr in iter_obj_attrs(self):
-            if not hasattr(attr, "_nyl__callback_types"):
+            if not hasattr(attr, '_nyl__button_callback_args'):
                 continue
-            path = attr._nyl__btn_path
-            path_lst = self._expend_path(path)
-            for p in path_lst:
-                nyb = NyButton(self, p, touch_event_params=attr._nyl__touch_event_params)
-                nyb.set_callback(attr, *attr._nyl__callback_types)
+            for (btn_path, callback_types, touch_event_params) in attr._nyl__button_callback_args:
+                for p in self._expend_path(btn_path):
+                    nyb = NyButton(self, p, touch_event_params=touch_event_params)
+                    nyb.set_callback(attr, *callback_types)
 
     def _expend_path(self, path):
         if "*" not in path:
