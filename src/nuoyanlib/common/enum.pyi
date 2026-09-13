@@ -19,10 +19,18 @@ from ..core._types._event_typing import *
 from ..core._utils import MappingProxy
 
 
-class auto(object):
-    _counter: ClassVar[count]
-    _order: int
-    def __init__(self) -> None: ...
+if sys.version_info >= (3, 4):
+    from enum import auto as _auto
+    auto = _auto
+    # class auto(_auto):
+    #     _counter: ClassVar[count]
+    #     _order: int
+    #     def __init__(self) -> None: ...
+else:
+    class auto(object):
+        _counter: ClassVar[count]
+        _order: int
+        def __init__(self) -> None: ...
 
 
 def _get_member_type(cls_name: str, bases: Tuple[type, ...]) -> type: ...
