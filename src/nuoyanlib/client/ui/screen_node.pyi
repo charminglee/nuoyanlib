@@ -29,7 +29,7 @@ def screen(
     bind_world_position: Optional[Tuple[int, FTuple3]] = None,
     auto_scale: bool = True,
     mini_map_root_path: str = "",
-    auto_show: bool = True,
+    auto_show: bool = False,
     push_to_ui_stack: bool = False,
     enabled_deferred_init: bool = False,
 ) -> Callable[[TypeT], TypeT]: ...

@@ -5,12 +5,12 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
 
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict, Any
 
 
 __version__: str
@@ -24,5 +24,5 @@ def run(
     *,
     clients: Optional[List[Tuple[str, str]]] = None,
     servers: Optional[List[Tuple[str, str]]] = None,
-    globals: Optional[dict] = None,
+    globals: Optional[Dict[str, Any]] = None,
 ) -> None: ...

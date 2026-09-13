@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-11
+#    Date  : 2026-9-13
 #  ⠀
 #  ================================================
 
@@ -62,7 +62,7 @@ def UiInitFinished(args):
     bind_entity_id=None,
     bind_offset=(0, 1, 0),
     bind_world_position=None,
-    auto_scale=True,
+    auto_scale=False,
     mini_map_root_path="",
     auto_show=True,
     push_to_ui_stack=False,
@@ -112,7 +112,7 @@ def screen(namespace, name="main", **kwargs):
     :param tuple[int,tuple[float,float,float]]|None bind_world_position: 第一个元素为绑定的维度，第二个为世界坐标，默认为 None；若传入这个参数， auto_scale 默认为 True ， is_hud 强制为 True ，其他参数无效
     :param bool auto_scale: 绑定实体或世界坐标时是否会自动根据目标与本地玩家的距离动态缩放UI大小，默认为 True
     :param str mini_map_root_path: 小地图控件根路径，默认为空字符串
-    :param bool auto_show: 是否在 UiInitFinished 事件触发后自动创建并显示UI，默认为 True
+    :param bool auto_show: 是否在 UiInitFinished 事件触发后自动创建并显示UI，默认为 False
     :param bool push_to_ui_stack: 是否使用堆栈管理的方式（Push）创建UI，默认为 False
     :param bool enabled_deferred_init: 是否启用延迟初始化，默认为 False ；开启后UI类的 __init__() 方法将推迟到UI创建完毕后触发，此时可以在 __init__() 方法内正常执行各种UI控件接口，从而不必写在 __ui_create__() 方法里。
     """
@@ -215,7 +215,7 @@ class NyScreenBase(object):
     bind_world_position = None
     auto_scale = True
     mini_map_root_path = ""
-    auto_show = True
+    auto_show = False
     push_to_ui_stack = False
     enabled_deferred_init = False
 
@@ -500,6 +500,7 @@ class NyScreenBase(object):
         if inst.push_to_ui_stack:
             return inst
         inst._screen_node.SetScreenVisible(True)
+        inst._screen_node.SetIsHud(int(inst.is_hud))
         return inst
 
     @dualmethod
@@ -551,6 +552,7 @@ class NyScreenBase(object):
                 return False
         else:
             inst._screen_node.SetScreenVisible(False)
+            inst._screen_node.SetIsHud(1)
             return True
 
     @classmethod
