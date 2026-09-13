@@ -65,7 +65,7 @@ def UiInitFinished(args):
     bind_world_position=None,
     auto_scale=False,
     mini_map_root_path="",
-    auto_show=True,
+    auto_show=False,
     push_to_ui_stack=False,
     enabled_deferred_init=False,
 )
@@ -1210,7 +1210,7 @@ class NyScreenNode(NyScreenBase, ScreenNode):
     ...     # "main", # 画布名称为main时可省略该参数
     ...     is_hud=True,
     ...     enabled_deferred_init=True,
-    ...     auto_show=True,
+    ...     auto_show=False,
     ... )
     ... class MyScreen(nyl.NyScreenNode):
     ...     def __init__(self, namespace, name, param):
