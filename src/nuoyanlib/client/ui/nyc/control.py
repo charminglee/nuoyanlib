@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-13
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
@@ -1044,7 +1044,7 @@ class NyControl(object):
         :return: 指定层次所有子控件的路径列表
         :rtype: list[str]
         """
-        return get_children_path_by_level(self._base_control, self.ny_screen_node, level)
+        return get_children_path_by_level(self, level=level)
 
     def destroy(self):
         """
