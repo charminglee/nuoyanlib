@@ -83,7 +83,7 @@ def screen(namespace, name="main", **kwargs):
     ----
 
     >>> @nyl.screen(
-    ...     "my_ui",
+    ...     "my_screen",
     ...     "main",
     ...     is_hud=True,
     ...     enabled_deferred_init=True
@@ -460,7 +460,6 @@ class NyScreenBase(object):
 
         >>> @nyl.screen(
         ...     "my_screen",
-        ...     "main",
         ...     is_hud=False,
         ...     push_to_ui_stack=True,
         ...     auto_show=False,
@@ -468,6 +467,12 @@ class NyScreenBase(object):
         ... class MyScreen(nyl.NyScreenNode):
         ...     def __init__(self, namespace, name, param):
         ...         super(MyScreen, self).__init__(namespace, name, param)
+        ...
+        ...     # 重写显示逻辑
+        ...     @nyl.dualmethod
+        ...     def show(self):
+        ...         super(MyScreen, self).show()
+        ...         print("界面已显示")
         ...
         >>> @nyl.event
         ... def UiInitFinished(args):
@@ -521,8 +526,25 @@ class NyScreenBase(object):
         示例
         ----
 
-        >>> for screen in MyScreen.all_instances():
+        >>> screen = MyScreen.instance():
+        >>> if screen:
         ...     screen.hide()
+
+        重写界面隐藏逻辑：
+
+        >>> @nyl.screen(
+        ...     "my_screen",
+        ...     is_hud=True,
+        ...     enabled_deferred_init=True
+        ... )
+        ... class MyScreen(nyl.NyScreenNode):
+        ...     def __init__(self, namespace, name, param):
+        ...         super(MyScreen, self).__init__(namespace, name, param)
+        ...
+        ...     @nyl.dualmethod
+        ...     def hide(self):
+        ...         super(MyScreen, self).hide()
+        ...         print("界面已隐藏")
 
         参见
         ----

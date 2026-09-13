@@ -16,6 +16,8 @@ import time
 import re
 from ..core._env import get_lv_comp, is_client, get_cf
 from ..core._utils import (
+    DefaultLocal,
+    dualmethod,
     Singleton,
     ArgsSingleton,
     lru_cache,
@@ -45,6 +47,9 @@ __all__ = [
     "convert_dict_value_to_tuple",
     "convert_list_to_tuple",
     "translate_time",
+
+    "DefaultLocal",
+    "dualmethod",
     "Singleton",
     "ArgsSingleton",
     "lru_cache",

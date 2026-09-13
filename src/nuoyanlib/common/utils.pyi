@@ -12,7 +12,7 @@
 
 from typing import Literal, TypeVar, Union, Callable, Tuple, Optional, overload
 from ..core._types._typing import FTuple2, ITuple3, FTuple3, Args, Kwargs
-from ..core._utils import Singleton, ArgsSingleton, lru_cache, cached_property, try_exec, iter_obj_attrs
+from ..core._utils import DefaultLocal, dualmethod, Singleton, ArgsSingleton, lru_cache, cached_property, try_exec, iter_obj_attrs
 
 
 __DictT = TypeVar("__DictT", bound=dict)
@@ -20,6 +20,8 @@ class __Callable(Callable):
     reset_call_time: Callable[[], None]
 
 
+DefaultLocal = DefaultLocal
+dualmethod = dualmethod
 Singleton = Singleton
 ArgsSingleton = ArgsSingleton
 lru_cache = lru_cache

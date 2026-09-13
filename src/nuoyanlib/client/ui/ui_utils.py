@@ -42,7 +42,7 @@ def is_top_ui(screen_name):
     示例
     ----
 
-    >>> if nyl.is_top_ui("my_ui.main"):
+    >>> if nyl.is_top_ui("my_screen.main"):
     ...     nyl.pop_to_hud()
 
     参见
@@ -70,7 +70,7 @@ def pop_to_hud():
     示例
     ----
 
-    >>> if nyl.is_top_ui("my_ui.main"):
+    >>> if nyl.is_top_ui("my_screen.main"):
     ...     nyl.pop_to_hud()
 
     参见
