@@ -75,17 +75,18 @@
     nuoyanlib.run(
         "MyMod"
         clients=[
-            ("MyClientSystem", "myScripts.myClientSystem"),
+            ("MyClientSystem", "my_scripts.my_client_system"),
+            ("MyScreen", "my_scripts.ui.my_screen"),
         ],
         servers=[
-            ("MyServerSystem", "myScripts.myServerSystem"),
+            ("MyServerSystem", "my_scripts.my_server_system"),
         ]
     )
     ```
    
    [`nuoyanlib.run()`](https://github.com/charminglee/nuoyanlib/blob/feac9641c9ddeeaee82e7dce8707240d5ab173f7/src/nuoyanlib/__init__.py#L121) 的第一个参数为模组名称； `clients` / `servers` 参数需通过关键字形式传入，请在这两个参数中列出所有需要加载的客户端/服务端模块的名称（需保证在当前模组中唯一）和路径（注意是模块路径，无需写到类名）。
    
-   模块按列表顺序加载。一般情况下，不需要列出每一个模块的路径，只需列出客户端/服务端的入口模块和其他需要主动加载的模块。
+   模块按列表顺序加载。一般情况下，不需要列出每一个模块的路径，只需列出客户端/服务端的入口模块和其他需要主动加载的模块（如 UI 模块）。
 
 3. 「nuoyanlib」导入和调用示例， `<scripts_root>` 替换成你具体的 Python 脚本根目录名称：
     #### 导入客户端库
