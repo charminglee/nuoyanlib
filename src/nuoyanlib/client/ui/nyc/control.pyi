@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-13
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
@@ -124,7 +124,6 @@ class NyControl(Generic[NyScreenBaseT], metaclass=NyControlMeta):
     ny_screen_node: NyScreenBaseT
     """ 持有该控件的 ``NyScreenNode`` 或 ``NyScreenProxy`` 实例。 """
     def __init__(self, ny_screen_node: NyScreenBaseT, path: str) -> None: ...
-    def __getattr__(self, name: str) -> Any: ...
     def __ui_destroy__(self) -> None: ...
     def __repr__(self) -> str: ...
     @cached_property

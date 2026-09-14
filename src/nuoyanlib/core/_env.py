@@ -57,7 +57,7 @@ def get_system(system_name, mod_name=None):
         else:
             return SERVER_SYSTEMS.get(system_name)
     else:
-        get_api().GetSystem(MOD_NAME, system_name)
+        get_api().GetSystem(mod_name, system_name)
 
 
 from .. import __version__

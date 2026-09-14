@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-14
 #  ⠀
 #  ================================================
 
@@ -142,7 +142,9 @@ class NyButton(InteractableControl, NyControl):
 
         :rtype: NyImage|None
         """
-        return self.get_child(NyButton.DEFAULT_IMAGE_PATH)
+        child = self.get_child(NyButton.DEFAULT_IMAGE_PATH)
+        if child:
+            return child.to_image()
 
     @cached_property
     def hover_image(self):
@@ -153,7 +155,9 @@ class NyButton(InteractableControl, NyControl):
 
         :rtype: NyImage|None
         """
-        return self.get_child(NyButton.HOVER_IMAGE_PATH)
+        child = self.get_child(NyButton.HOVER_IMAGE_PATH)
+        if child:
+            return child.to_image()
 
     @cached_property
     def pressed_image(self):
@@ -164,7 +168,9 @@ class NyButton(InteractableControl, NyControl):
 
         :rtype: NyImage|None
         """
-        return self.get_child(NyButton.PRESSED_IMAGE_PATH)
+        child = self.get_child(NyButton.PRESSED_IMAGE_PATH)
+        if child:
+            return child.to_image()
 
     @cached_property
     def button_label(self):
@@ -175,7 +181,9 @@ class NyButton(InteractableControl, NyControl):
 
         :rtype: NyLabel|None
         """
-        return self.get_child(NyButton.BUTTON_LABEL_PATH)
+        child = self.get_child(NyButton.BUTTON_LABEL_PATH)
+        if child:
+            return child.to_label()
 
     @property
     def vibrate_time(self):

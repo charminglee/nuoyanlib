@@ -190,10 +190,6 @@ class NyControl(object):
         if self.path not in self.ny_screen_node._ui_default_pos_data:
             self.ny_screen_node._set_ui_default_pos_data(self.path, self.position)
 
-    def __getattr__(self, name):
-        # 尝试调用ModSDK原生方法
-        return getattr(self._base_control, name)
-
     def __ui_destroy__(self):
         self._screen_node = None
         self._base_control = None

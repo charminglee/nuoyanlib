@@ -114,14 +114,14 @@ def _load_systems(is_client):
             if not isinstance(v, type) or not issubclass(v, system_cls):
                 continue
             cls_path = module.__name__ + "." + k
-            if api.GetSystem(_env.MOD_NAME, k):
+            if k in registered_systems:
                 _logging.warning(
                     "%sSystem already exists; skip registration: (%s) %s",
                     "Client" if is_client else "Server", k, cls_path
                 )
             else:
                 system = api.RegisterSystem(_env.MOD_NAME, k, cls_path)
-                registered_systems[(module.__name__, k)] = system
+                registered_systems[k] = system
                 _logging.info(
                     "%sSystem registered: (%s) %s",
                     "Client" if is_client else "Server", k, cls_path

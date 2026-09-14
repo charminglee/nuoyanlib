@@ -114,7 +114,7 @@ def render_event_typing(event_groups):
         nonlocal index
         for event_name, arguments, _ in events:
             content.append(f"# {event_name}\n")
-            content.append(f"class EventArgs{index}(EventArgsWrapper, str):\n")
+            content.append(f"class EventArgs{index}(EventArgsWrapper):\n")
             if arguments:
                 for argument_name, argument_type, argument_doc in arguments:
                     if argument_name == "from":
