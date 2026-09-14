@@ -103,8 +103,8 @@ def render_event_typing(event_groups):
         content.append(f"class {group_name}Completion:\n")
         for event_index, (event_name, _, doc) in enumerate(events):
             index = sum(len(group[1]) for group in event_groups[:group_index]) + event_index
-            content.append(f"    def {event_name}(self, args):\n")
-            content.append(f"        # type: (EventArgs{index}) -> None\n")
+            content.append(f"    def {event_name}(self, args: EventArgs{index}):\n")
+            # content.append(f"        # type: (EventArgs{index}) -> None\n")
             content.append(render_docstring("        ", doc))
 
     content.append("\n\n# region Client EventArgs\n\n\n")
