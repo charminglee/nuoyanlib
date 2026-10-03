@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-13
+#    Date  : 2026-9-19
 #  ⠀
 #  ================================================
 
@@ -51,6 +51,12 @@ class NyImage(NyControl):
 
     def __init__(self, ny_screen_node, path, **kwargs):
         NyControl.__init__(self, ny_screen_node, path)
+        self._color = (1.0, 1.0, 1.0)
+        self._clip_ratio = 0.0
+        self._uv_size = (0.0, 0.0)
+        self._uv = (0.0, 0.0)
+        self._texture = ""
+        self._gray = False
 
     def __ui_destroy__(self):
         NyControl.__ui_destroy__(self)
@@ -60,86 +66,106 @@ class NyImage(NyControl):
     @property
     def texture(self):
         """
-        [只写属性]
+        [可读写属性]
 
         图片路径。
 
+        说明
+        ----
+
+        如果没有设置过 ``texture`` ，则始终返回空字符串。
+
         :rtype: None
         """
-        raise error.GetPropertyError("texture")
+        return self._texture
 
     @texture.setter
     def texture(self, val):
         """
-        [只写属性]
+        [可读写属性]
 
         图片路径。
 
         :type val: str
         """
-        self._base_control.SetSprite(val)
+        self.set_sprite(val)
 
     @property
     def color(self):
         """
-        [只写属性]
+        [可读写属性]
 
         图片颜色 rgb，取值 [0, 1]。
 
+        说明
+        ----
+
+        如果没有设置过 ``color`` ，则始终返回 ``(1.0,⠀1.0,⠀1.0)`` 。
+
         :rtype: None
         """
-        raise error.GetPropertyError("color")
+        return self._color
 
     @color.setter
     def color(self, val):
         """
-        [只写属性]
+        [可读写属性]
 
         图片颜色 rgb，取值 [0, 1]。
 
         :type val: tuple[float,float,float]
         """
-        self._base_control.SetSpriteColor(val)
+        self.set_sprite_color(val)
 
     @property
     def gray(self):
         """
-        [只写属性]
+        [可读写属性]
 
-        图片置灰。
+        图片是否置灰。
+
+        说明
+        ----
+
+        如果没有设置过 ``gray`` ，则始终返回 ``False`` 。
 
         :rtype: None
         """
-        raise error.GetPropertyError("gray")
+        return self._gray
 
     @gray.setter
     def gray(self, val):
         """
-        [只写属性]
+        [可读写属性]
 
-        图片置灰。
+        图片是否置灰。
 
         :type val: bool
         """
-        self._base_control.SetSpriteGray(val)
+        self.set_sprite_gray(val)
 
     @property
     def uv(self):
         """
-        [只写属性]
+        [可读写属性]
 
         图片的起始 uv。
 
         与 json 中的 ``"uv"`` 属性作用一致。
 
+        说明
+        ----
+
+        如果没有设置过 ``uv`` ，则始终返回 ``(0.0,⠀0.0)`` 。
+
         :rtype: None
         """
-        raise error.GetPropertyError("uv")
+        return self._uv
 
     @uv.setter
     def uv(self, val):
         """
-        [只写属性]
+        [可读写属性]
 
         图片的起始 uv。
 
@@ -147,25 +173,30 @@ class NyImage(NyControl):
 
         :type val: tuple[float,float]
         """
-        self._base_control.SetSpriteUV(val)
+        self.set_sprite_uv(val)
 
     @property
     def uv_size(self):
         """
-        [只写属性]
+        [可读写属性]
 
         图片的 uv 大小。
 
         与 json 中的 ``"uv_size"`` 属性作用一致。
 
+        说明
+        ----
+
+        如果没有设置过 ``uv_size`` ，则始终返回 ``(0.0,⠀0.0)`` 。
+
         :rtype: None
         """
-        raise error.GetPropertyError("uv_size")
+        return self._uv_size
 
     @uv_size.setter
     def uv_size(self, val):
         """
-        [只写属性]
+        [可读写属性]
 
         图片的 uv 大小。
 
@@ -173,29 +204,34 @@ class NyImage(NyControl):
 
         :type val: tuple[float,float]
         """
-        self._base_control.SetSpriteUVSize(val)
+        self.set_sprite_uvsize(val)
 
     @property
     def clip_ratio(self):
         """
-        [只写属性]
+        [可读写属性]
 
         图片的裁剪区域比例（不改变控件尺寸）。
 
-        :rtype: None
+        说明
+        ----
+
+        如果没有设置过 ``clip_ratio`` ，则始终返回 ``0.0`` 。
+
+        :rtype: float
         """
-        raise error.GetPropertyError("clip_ratio")
+        return self._clip_ratio
 
     @clip_ratio.setter
     def clip_ratio(self, val):
         """
-        [只写属性]
+        [可读写属性]
 
         图片的裁剪区域比例（不改变控件尺寸）。
 
         :type val: float
         """
-        self._base_control.SetSpriteClipRatio(val)
+        self.set_sprite_clip_ratio(val)
 
     @property
     def clip_direction(self):
@@ -479,12 +515,42 @@ class NyImage(NyControl):
 
     # region Compatibility =============================================================================================
 
-    set_sprite                = SetSprite              = lambda s, *a, **k: s._base_control.SetSprite(*a, **k)
-    set_sprite_color          = SetSpriteColor         = lambda s, *a, **k: s._base_control.SetSpriteColor(*a, **k)
-    set_sprite_gray           = SetSpriteGray          = lambda s, *a, **k: s._base_control.SetSpriteGray(*a, **k)
-    set_sprite_uv             = SetSpriteUV            = lambda s, *a, **k: s._base_control.SetSpriteUV(*a, **k)
-    set_sprite_uvsize         = SetSpriteUVSize        = lambda s, *a, **k: s._base_control.SetSpriteUVSize(*a, **k)
-    set_sprite_clip_ratio     = SetSpriteClipRatio     = lambda s, *a, **k: s._base_control.SetSpriteClipRatio(*a, **k)
+    def set_sprite_color(self, color):
+        self._base_control.SetSpriteColor(color)
+        self._color = color
+
+    SetSpriteColor = set_sprite_color
+
+    def set_sprite_clip_ratio(self, clip_ratio):
+        self._base_control.SetSpriteClipRatio(clip_ratio)
+        self._clip_ratio = clip_ratio
+
+    SetSpriteClipRatio = set_sprite_clip_ratio
+
+    def set_sprite_uvsize(self, uv_size):
+        self._base_control.SetSpriteUVSize(uv_size)
+        self._uv_size = uv_size
+
+    SetSpriteUVSize = set_sprite_uvsize
+
+    def set_sprite_uv(self, uv):
+        self._base_control.SetSpriteUV(uv)
+        self._uv = uv
+
+    SetSpriteUV = set_sprite_uv
+
+    def set_sprite(self, sprite):
+        self._base_control.SetSprite(sprite)
+        self._texture = sprite
+
+    SetSprite = set_sprite
+
+    def set_sprite_gray(self, gray):
+        self._base_control.SetSpriteGray(gray)
+        self._gray = gray
+
+    SetSpriteGray = set_sprite_gray
+
     set_sprite_platform_head  = SetSpritePlatformHead  = lambda s, *a, **k: s._base_control.SetSpritePlatformHead(*a, **k)
     set_sprite_platform_frame = SetSpritePlatformFrame = lambda s, *a, **k: s._base_control.SetSpritePlatformFrame(*a, **k)
     set_clip_direction        = SetClipDirection       = lambda s, *a, **k: s._base_control.SetClipDirection(*a, **k)

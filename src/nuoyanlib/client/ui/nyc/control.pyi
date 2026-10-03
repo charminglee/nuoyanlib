@@ -5,18 +5,19 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-14
+#    Date  : 2026-9-18
 #  ⠀
 #  ================================================
 
 
-from typing import Generic, Type, Callable, ClassVar, TypedDict, Any, Literal, NoReturn, Dict, Optional, List, Union
+from typing import Generic, Type, Callable, ClassVar, TypedDict, Any, Literal, Dict, Optional, List, Union
 from mod.client.ui.screenNode import ScreenNode
 from mod.client.ui.controls.baseUIControl import BaseUIControl
 from ....core._types._typing import FTuple2, STuple, T, NyScreenBaseT
 from ....core._types._checker import args_type_check
 from ....core._utils import cached_property
 from ..screen_node import NyScreenBase
+from ..animation import PropertyAnimation
 from .button import NyButton
 from .combo_box import NyComboBox
 from .edit_box import NyEditBox
@@ -121,6 +122,8 @@ class NyControl(Generic[NyScreenBaseT], metaclass=NyControlMeta):
     _screen_node: ScreenNode
     _base_control: BaseUIControl
     _kwargs: Dict[str, Any]
+    _alpha: float
+    _touch_enable: bool
     ny_screen_node: NyScreenBaseT
     """ 持有该控件的 ``NyScreenNode`` 或 ``NyScreenProxy`` 实例。 """
     def __init__(self, ny_screen_node: NyScreenBaseT, path: str) -> None: ...
@@ -193,7 +196,7 @@ class NyControl(Generic[NyScreenBaseT], metaclass=NyControlMeta):
     @visible.setter
     def visible(self, val: bool) -> None: ...
     @property
-    def alpha(self) -> NoReturn: ...
+    def alpha(self) -> float: ...
     @alpha.setter
     def alpha(self, val: float) -> None: ...
     @property
@@ -201,7 +204,7 @@ class NyControl(Generic[NyScreenBaseT], metaclass=NyControlMeta):
     @layer.setter
     def layer(self, val: int) -> None: ...
     @property
-    def touch_enable(self) -> NoReturn: ...
+    def touch_enable(self) -> bool: ...
     @touch_enable.setter
     def touch_enable(self, val: bool) -> None: ...
     @property

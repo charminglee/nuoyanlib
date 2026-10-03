@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-14
+#    Date  : 2026-9-18
 #  ⠀
 #  ================================================
 
@@ -189,6 +189,9 @@ class NyControl(object):
         self._kwargs = kwargs
         if self.path not in self.ny_screen_node._ui_default_pos_data:
             self.ny_screen_node._set_ui_default_pos_data(self.path, self.position)
+
+        self._alpha = 1.0
+        self._touch_enable = True
 
     def __ui_destroy__(self):
         self._screen_node = None
@@ -571,24 +574,30 @@ class NyControl(object):
     @property
     def alpha(self):
         """
-        [只写属性]
+        [可读写属性]
 
         控件不透明度。
 
-        :rtype: None
+        说明
+        ----
+
+        如果没有设置过 ``alpha`` ，则始终返回 ``1.0`` 。
+
+        :rtype: float
         """
-        raise error.GetPropertyError("alpha")
+        return self._alpha
 
     @alpha.setter
     def alpha(self, val):
         """
-        [只写属性]
+        [可读写属性]
 
         控件不透明度。
 
         :type val: float
         """
         self._base_control.SetAlpha(val)
+        self._alpha = val
 
     @property
     def layer(self):
@@ -619,9 +628,14 @@ class NyControl(object):
 
         控件是否可点击交互。
 
-        :rtype: None
+        说明
+        ----
+
+        如果没有设置过 ``touch_enable`` ，则始终返回 ``True`` 。
+
+        :rtype: bool
         """
-        raise error.GetPropertyError("touch_enable")
+        return self._touch_enable
 
     @touch_enable.setter
     def touch_enable(self, val):
@@ -633,6 +647,7 @@ class NyControl(object):
         :type val: bool
         """
         self._base_control.SetTouchEnable(val)
+        self._touch_enable = val
 
     @property
     def property_bag(self):
@@ -1515,13 +1530,7 @@ class NyControl(object):
     get_property_bag                = GetPropertyBag              = lambda s, *a, **k: s._base_control.GetPropertyBag(*a, **k)
     set_property_bag                = SetPropertyBag              = lambda s, *a, **k: s._base_control.SetPropertyBag(*a, **k)
 
-
-
-
-
-
-
-
+    # endregion
 
 
 
