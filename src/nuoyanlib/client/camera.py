@@ -39,11 +39,33 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=math.pi 
 
     返回实体ID列表，按与准星的屏幕距离（screen_dist）从小到大排序。
 
+    说明
+    ----
+
+    只有同时满足世界距离、视野角度和射线无遮挡条件的实体才会被返回。
+    ``ent_filter`` 会在射线检测前调用，可用于进一步限制实体类型。
+
+    示例
+    ----
+
+    >>> targets = nyl.get_entities_within_view(
+    ...     world_dist=20,
+    ...     ent_filter=lambda eid: eid != player_id,
+    ... )
+    >>> for target in targets:
+    ...     print(target)
+
+    参见
+    ----
+
+    - ``nuoyanlib.server.entity.get_entities_by_ray()`` -- 服务端射线实体查询接口。
+
     -----
 
     :param float world_dist: 世界中实体距离准星的最大距离，超出该距离的实体不会被获取；默认为 50
     :param float screen_dist: 屏幕上实体距离准星的最大距离，超出该距离的实体不会被获取；默认为 100
-    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
+    :param float angle_dist: 实体与摄像机朝向的最大夹角，单位为弧度；默认为 math.pi / 5
+    :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，返回 False 时不会返回该实体；默认为 None
 
     :return: 实体ID列表
     :rtype: list[str]
@@ -80,9 +102,6 @@ def get_entities_within_view(world_dist=50, screen_dist=100, angle_dist=math.pi 
     res.sort(key=lambda x: x[1]) # todo: 改成按与准星的屏幕距离排序
     res = [x[0] for x in res]
     return res
-
-
-
 
 
 

@@ -35,6 +35,20 @@ class LobbyDataMgr(object):
     - 便捷管理联机大厅云端数据，自动完成数据更新上传/数据获取/数据冲突等情况的处理。
     - 设置订单发货。
     - 在单机环境中模拟联机大厅环境。
+
+    示例
+    ----
+
+    >>> lobby = nyl.LobbyDataMgr()
+    >>> lobby.register("score", lambda: 0)
+    >>> lobby.update("score", lambda value: value + 1, player_id)
+    >>> lobby.fetch(player_id, "score", callback=on_fetch)
+
+    参见
+    ----
+
+    - ``register()`` -- 注册可读写的云端数据。
+    - ``fetch()`` -- 从云端读取数据。
     """
 
     def __init__(self):
@@ -62,10 +76,22 @@ class LobbyDataMgr(object):
         """
         注册云端数据。
 
+        示例
+        ----
+
+        >>> lobby.register("score", lambda: 0)
+        >>> lobby.register("server_name", lambda: "Lobby", is_global=True)
+
+        参见
+        ----
+
+        - ``fetch()`` -- 获取已注册的数据。
+        - ``get()`` -- 从本地缓存读取数据。
+
         -----
 
         :param str key: 数据键
-        :param str|int|float|bool|list|dict|None default: 数据默认值；需传入一个函数，无参数，返回值即为数据默认值；默认为 None
+        :param function|None default: 数据默认值工厂；需传入一个无参数函数，返回值即为数据默认值；默认为 None
         :param bool is_global: 是否为全局数据（即不依赖玩家 uid）；默认为 False
 
         :return: 无
@@ -122,7 +148,22 @@ class LobbyDataMgr(object):
         说明
         ----
 
-        请先用 ``.register()`` 注册数据再调用本调接口。
+        请先用 ``.register()`` 注册数据再调用本接口。
+
+        示例
+        ----
+
+        >>> lobby.fetch(
+        ...     player_id,
+        ...     "score",
+        ...     callback=lambda response: print(response),
+        ... )
+
+        参见
+        ----
+
+        - ``register()`` -- 注册数据及其默认值。
+        - ``get()`` -- 从本地缓存读取最近一次获取的数据。
 
         -----
 
@@ -189,6 +230,21 @@ class LobbyDataMgr(object):
         """
         更新云端数据。
 
+        示例
+        ----
+
+        >>> lobby.update(
+        ...     "score",
+        ...     lambda value: value + 1,
+        ...     player_id,
+        ... )
+
+        参见
+        ----
+
+        - ``set()`` -- 强制设置数据值。
+        - ``get()`` -- 获取当前缓存值。
+
         -----
 
         :param str key: 数据键
@@ -227,6 +283,16 @@ class LobbyDataMgr(object):
 
         若出现数据冲突，本接口将 **强制** 覆盖数据的值，请谨慎使用。
 
+        示例
+        ----
+
+        >>> lobby.set("score", 100, player_id)
+
+        参见
+        ----
+
+        - ``update()`` -- 根据当前值计算并更新数据。
+
         -----
 
         :param str key: 数据键
@@ -261,7 +327,18 @@ class LobbyDataMgr(object):
         说明
         ----
 
-        请先用 ``.register()`` 注册数据再调用本调接口。
+        请先用 ``.register()`` 注册数据再调用本接口。
+
+        示例
+        ----
+
+        >>> score = lobby.get("score", player_id)
+
+        参见
+        ----
+
+        - ``register()`` -- 注册数据及其默认值。
+        - ``fetch()`` -- 从云端刷新本地缓存。
 
         -----
 
@@ -284,6 +361,17 @@ class LobbyDataMgr(object):
         ----
 
         如需同时设置数据和发货，建议使用 ``.update()`` 或 ``.set()`` 接口。
+
+        示例
+        ----
+
+        >>> lobby.ship(order_id, player_id, callback=on_ship)
+
+        参见
+        ----
+
+        - ``query()`` -- 查询未发货订单。
+        - ``update()`` -- 更新数据并可同时标记订单发货。
 
         -----
 
@@ -314,6 +402,16 @@ class LobbyDataMgr(object):
         """
         查询还未发货的订单。
 
+        示例
+        ----
+
+        >>> lobby.query(player_id, callback=on_orders)
+
+        参见
+        ----
+
+        - ``ship()`` -- 设置订单发货。
+
         -----
 
         :param int|str player: 玩家 UID 或实体ID
@@ -343,8 +441,6 @@ class LobbyDataMgr(object):
                     v['order_id'] = k
                     d.append(v)
             cb({'entity': {'orders': d}})
-
-
 
 
 

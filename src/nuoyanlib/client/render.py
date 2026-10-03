@@ -55,6 +55,11 @@ def add_entity_render_resources(entity_id, *res_tuple, **kwargs):
     ... )
     (True, True, True, True, True, True)
 
+    参见
+    ----
+
+    - ``NeteaseParticle`` -- 创建和控制需要渲染资源的粒子特效。
+
     -----
 
     :param str entity_id: 实体ID
@@ -112,7 +117,6 @@ def add_entity_render_resources(entity_id, *res_tuple, **kwargs):
             comp.RebuildActorRender(etype)
 
     return tuple(res)
-
 
 
 

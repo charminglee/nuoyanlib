@@ -89,6 +89,19 @@ def clear_items(player_id, item_pos_type, pos=0):
     """
     清空玩家指定位置的物品，并返回该位置被清除前的物品信息字典。
 
+    示例
+    ----
+
+    >>> old_item = nyl.clear_items(player_id, ItemPosType.CARRIED)
+    >>> if old_item:
+    ...     print(old_item["newItemName"], old_item["count"])
+
+    参见
+    ----
+
+    - ``change_item_count()`` -- 改变指定槽位的物品数量。
+    - ``deduct_inv_item()`` -- 按物品ID从背包中扣除物品。
+
     -----
 
     :param str player_id: 玩家的实体ID
@@ -110,6 +123,24 @@ _ITEM_POS_SIZE = (36, 1, 1, 4)
 def get_item_pos(entity_id, pos_type, item_id, item_aux=-1, count=1):
     """
     获取物品所在槽位。
+
+    示例
+    ----
+
+    >>> slots = nyl.get_item_pos(
+    ...     player_id,
+    ...     ItemPosType.INVENTORY,
+    ...     "minecraft:diamond",
+    ...     count=3,
+    ... )
+    >>> if slots:
+    ...     print(slots[0])
+
+    参见
+    ----
+
+    - ``clear_items()`` -- 清空指定槽位的物品。
+    - ``deduct_inv_item()`` -- 不指定槽位地扣除物品。
 
     -----
 
@@ -145,6 +176,21 @@ def change_item_count(player_id, pos_type=ItemPosType.CARRIED, pos=0, change=-1)
     """
     改变玩家指定槽位物品的数量。（创造模式下不生效）
 
+    示例
+    ----
+
+    >>> nyl.change_item_count(
+    ...     player_id,
+    ...     ItemPosType.CARRIED,
+    ...     change=-1,
+    ... )
+
+    参见
+    ----
+
+    - ``clear_items()`` -- 清空指定槽位的物品。
+    - ``get_item_pos()`` -- 查找指定物品所在的槽位。
+
     -----
 
     :param str player_id: 玩家实体ID
@@ -173,6 +219,18 @@ def deduct_inv_item(player_id, name, aux=-1, count=1, include_creative=False):
     ----
 
     该函数无需传入物品所在位置，而是自动从背包中寻找指定物品，找到了则扣除指定数量。
+
+    示例
+    ----
+
+    >>> if not nyl.deduct_inv_item(player_id, "minecraft:diamond", count=3):
+    ...     print("not enough diamonds")
+
+    参见
+    ----
+
+    - ``get_item_pos()`` -- 获取指定物品所在的槽位。
+    - ``change_item_count()`` -- 改变指定槽位的物品数量。
 
     -----
 
@@ -211,8 +269,6 @@ def deduct_inv_item(player_id, name, aux=-1, count=1, include_creative=False):
         comp.SetPlayerAllItems(items_dict_map)
         return True
     return False
-
-
 
 
 

@@ -49,6 +49,18 @@ def spawn_ground_shatter_effect(pos, r, num, **kwargs):
     该版本使用 **客户端实体** 实现，与旧版本（使用普通实体）相比性能更好。
     裂地效果仅本地玩家可见。
 
+    示例
+    ----
+
+    >>> ids = nyl.spawn_ground_shatter_effect((0, 64, 0), 3, 12)
+    >>> isinstance(ids, list)
+    True
+
+    参见
+    ----
+
+    - ``spawn_particle()`` -- 在指定位置生成并播放微软粒子。
+
     -----
 
     :param tuple[float,float,float] pos: 生成位置
@@ -62,8 +74,8 @@ def spawn_ground_shatter_effect(pos, r, num, **kwargs):
     :param float out_time: [仅关键字参数] 下沉动画持续时间；默认为 0.5
     :param float in_dist: [仅关键字参数] 上浮距离；默认为 0.5
     :param float out_dist: [仅关键字参数] 下沉距离；默认为 0.5
-    :param function in_ease: [仅关键字参数] 上浮动画使用的缓动函数；默认为 TimeEaseFunc.OUT_EXPO
-    :param function out_ease: [仅关键字参数] 下沉动画使用的缓动函数；默认为 TimeEaseFunc.IN_SINE
+    :param function in_ease: [仅关键字参数] 上浮动画使用的缓动函数；默认为 Curve.Easing.OUT_EXPO
+    :param function out_ease: [仅关键字参数] 下沉动画使用的缓动函数；默认为 Curve.Easing.IN_SINE
 
     :return: 生成的裂地方块的实体ID（客户端实体）列表
     :rtype: list[str]
@@ -95,6 +107,20 @@ def spawn_ground_shatter_effect(pos, r, num, **kwargs):
 def spawn_particle(name, pos, rot=(0, 0, 0), var_dict=None, rm_delay=0):
     """
     在指定位置生成微软粒子发射器，创建后立即播放。
+
+    示例
+    ----
+
+    >>> particle_id = nyl.spawn_particle(
+    ...     "minecraft:basic_smoke_particle",
+    ...     (0, 64, 0),
+    ...     rm_delay=2,
+    ... )
+
+    参见
+    ----
+
+    - ``NeteaseParticle`` -- 管理可持续控制的网易粒子特效。
 
     -----
 
@@ -128,6 +154,23 @@ class NeteaseParticle(object):
     切换维度后会自动隐藏非本维度创建的而且没有绑定实体的粒子，回到该维度后会自动重新显示。
 
     粒子创建之后需要调用 ``.Play()`` 方法才会播放，如果播放非本维度创建的粒子，会同时修改该粒子的创建维度为当前维度。
+
+    示例
+    ----
+
+    >>> particle = nyl.NeteaseParticle("effects/my_particle.json", pos=(0, 64, 0))
+    >>> particle.BindEntity(entity_id, offset=(0, 1, 0))
+    True
+    >>> particle.Play()
+    True
+    >>> particle.Destroy()
+    True
+
+    参见
+    ----
+
+    - ``NeteaseFrameAnim`` -- 管理网易序列帧特效。
+    - ``spawn_particle()`` -- 创建后立即播放一次微软粒子。
 
     -----
 
@@ -582,6 +625,17 @@ class NeteaseParticle(object):
         """
         绑定粒子到实体上。
 
+        示例
+        ----
+
+        >>> particle.BindEntity(entity_id, offset=(0, 1, 0))
+        True
+
+        参见
+        ----
+
+        - ``BindSkeleton()`` -- 绑定粒子到骨骼模型。
+
         -----
 
         :param str ent_id: 特效绑定的实体ID
@@ -608,6 +662,17 @@ class NeteaseParticle(object):
         """
         绑定粒子到骨骼模型上。
 
+        示例
+        ----
+
+        >>> particle.BindSkeleton(model_id, "head")
+        True
+
+        参见
+        ----
+
+        - ``BindEntity()`` -- 绑定粒子到实体。
+
         -----
 
         :param int model_id: 绑定的骨骼模型的ID（使用 Model 组件的 GetModelId 获取）
@@ -633,6 +698,18 @@ class NeteaseParticle(object):
     def Play(self):
         """
         播放粒子特效。
+
+        示例
+        ----
+
+        >>> particle.Play()
+        True
+
+        参见
+        ----
+
+        - ``Pause()`` -- 暂停粒子特效。
+        - ``Destroy()`` -- 销毁粒子特效。
 
         -----
 
@@ -661,6 +738,17 @@ class NeteaseParticle(object):
     def Destroy(self):
         """
         销毁粒子特效。
+
+        说明
+        ----
+
+        销毁后不能再调用本对象的播放、暂停或属性设置接口。
+
+        示例
+        ----
+
+        >>> particle.Destroy()
+        True
 
         -----
 
@@ -765,6 +853,25 @@ class NeteaseFrameAnim(object):
     切换维度后会自动隐藏非本维度创建的而且没有绑定实体的序列帧，回到该维度后会自动重新显示。
 
     需要注意，序列帧创建之后需要调用 ``.Play()`` 方法才会播放，如果播放非本维度创建的序列帧，会同时修改该序列帧的创建维度为当前维度。
+
+    示例
+    ----
+
+    >>> animation = nyl.NeteaseFrameAnim(
+    ...     tex_path="textures/effects/slash",
+    ...     pos=(0, 64, 0),
+    ... )
+    >>> animation.SetLoop(False)
+    True
+    >>> animation.Play()
+    True
+    >>> animation.Destroy()
+    True
+
+    参见
+    ----
+
+    - ``NeteaseParticle`` -- 管理网易粒子特效。
 
     -----
 
@@ -1103,6 +1210,17 @@ class NeteaseFrameAnim(object):
         """
         绑定序列帧到实体上。
 
+        示例
+        ----
+
+        >>> animation.BindEntity(entity_id, offset=(0, 1, 0))
+        True
+
+        参见
+        ----
+
+        - ``BindSkeleton()`` -- 绑定序列帧到骨骼模型。
+
         -----
 
         :param str bind_entity_id: 特效绑定的实体ID
@@ -1126,6 +1244,17 @@ class NeteaseFrameAnim(object):
     def BindSkeleton(self, model_id, bone_name, offset=(0, 0, 0), rot=(0, 0, 0)):
         """
         绑定序列帧到骨骼模型上。
+
+        示例
+        ----
+
+        >>> animation.BindSkeleton(model_id, "head")
+        True
+
+        参见
+        ----
+
+        - ``BindEntity()`` -- 绑定序列帧到实体。
 
         -----
 
@@ -1151,6 +1280,18 @@ class NeteaseFrameAnim(object):
     def Play(self):
         """
         播放序列帧特效。
+
+        示例
+        ----
+
+        >>> animation.Play()
+        True
+
+        参见
+        ----
+
+        - ``Pause()`` -- 暂停序列帧特效。
+        - ``Destroy()`` -- 销毁序列帧特效。
 
         -----
 
@@ -1179,6 +1320,17 @@ class NeteaseFrameAnim(object):
     def Destroy(self):
         """
         销毁序列帧特效。
+
+        说明
+        ----
+
+        销毁后不能再调用本对象的播放、暂停或属性设置接口。
+
+        示例
+        ----
+
+        >>> animation.Destroy()
+        True
 
         -----
 
@@ -1309,8 +1461,6 @@ class NeteaseFrameAnim(object):
         :rtype: bool
         """
         return self._ctrl.SetGlobal(isGlobal)
-
-
 
 
 

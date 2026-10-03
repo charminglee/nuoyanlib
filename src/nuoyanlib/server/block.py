@@ -39,6 +39,23 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
 
     在指定位置生成裂地效果。
 
+    说明
+    ----
+
+    本接口使用服务端普通实体实现，建议改用
+    ``nuoyanlib.client.effect.spawn_ground_shatter_effect()``，以获得更好的性能。
+
+    参见
+    ----
+
+    - ``nuoyanlib.client.effect.spawn_ground_shatter_effect()`` -- 客户端裂地效果实现。
+
+    示例
+    ----
+
+    >>> # 旧代码仍可调用，但新代码应使用客户端版本。
+    >>> ids = nyl.spawn_ground_shatter_effect((0, 64, 0), 0, 3, 12)
+
     -----
 
     :param tuple[float,float,float] pos: 生成位置
@@ -91,9 +108,6 @@ def spawn_ground_shatter_effect(pos, dim, r, num, **kwargs):
 
         eid_list.append(entity_id)
     return eid_list
-
-
-
 
 
 

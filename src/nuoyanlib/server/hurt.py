@@ -53,6 +53,11 @@ def ignore_dmg_cd(restore_cd=10):
     ...     comp.Hurt(10, ActorDamageCause.EntityAttack)
     ... # 退出上下文管理器
 
+    参见
+    ----
+
+    - ``hurt()`` -- 对实体造成伤害，并可选择强制忽略伤害免疫时间。
+
     -----
 
     :param int restore_cd: 上下文管理器退出后恢复的伤害免疫时间（单位为游戏刻）；默认为 10
@@ -153,6 +158,23 @@ def hurt(
     """
     对指定生物造成伤害。
 
+    示例
+    ----
+
+    >>> nyl.hurt(
+    ...     target_id,
+    ...     10,
+    ...     attacker=attacker_id,
+    ...     knocked=False,
+    ... )
+    True
+
+    参见
+    ----
+
+    - ``hurt_mobs()`` -- 对多个实体批量造成伤害。
+    - ``percent_damage()`` -- 按属性值百分比造成伤害。
+
     -----
 
     :param str entity_id: 生物ID
@@ -197,6 +219,23 @@ def hurt_mobs(
     """
     对多个实体造成伤害。
 
+    示例
+    ----
+
+    >>> entities = nyl.get_entities_in_area((0, 64, 0), 5, filter_abiotic=True)
+    >>> hurt_entities = nyl.hurt_mobs(
+    ...     entities,
+    ...     5,
+    ...     attacker_id=attacker_id,
+    ...     ent_filter=lambda eid: eid != attacker_id,
+    ... )
+
+    参见
+    ----
+
+    - ``hurt()`` -- 对单个实体造成伤害。
+    - ``get_entities_in_area()`` -- 获取区域内实体。
+
     -----
 
     :param list[str] entities: 实体ID列表
@@ -210,7 +249,7 @@ def hurt_mobs(
     :param bool hurt_child: 是否对子实体造成伤害；默认为 False
     :param function|None ent_filter: 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为即将受伤的实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；若无返回值，则不转移伤害；若返回字符串 "-1"，则本次伤害跳过该实体；默认为 None
-    :param function|None on_hurt_after: 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
+    :param function|None on_hurt_after: 对实体造成伤害之后调用的函数，该函数需接受一个参数，值为受伤实体ID；默认为 None
 
     :return: 最终成功受到伤害的实体ID列表
     :rtype: list[str]
@@ -259,7 +298,23 @@ def explode_damage(
 ):
     """
     造成爆炸伤害。
-    
+
+    示例
+    ----
+
+    >>> nyl.explode_damage(
+    ...     r=3,
+    ...     pos=(0, 64, 0),
+    ...     source_id=source_id,
+    ...     dim=0,
+    ...     breaks=False,
+    ... )
+
+    参见
+    ----
+
+    - ``sphere_damage()`` -- 只造成范围伤害而不触发爆炸。
+
     -----
 
     :param int r: 爆炸强度
@@ -334,7 +389,24 @@ __damage_kwargs_defaults = kwargs_defaults(
 def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     """
     对圆柱体区域内所有实体造成伤害。
-    
+
+    示例
+    ----
+
+    >>> hit_entities = nyl.cylinder_damage(
+    ...     damage=6,
+    ...     r=3,
+    ...     pos1=(0, 64, 0),
+    ...     pos2=(0, 68, 0),
+    ...     dim=0,
+    ... )
+
+    参见
+    ----
+
+    - ``sphere_damage()`` -- 对球形区域造成伤害。
+    - ``hurt_mobs()`` -- 使用自定义实体列表造成伤害。
+
     -----
 
     :param float damage: 伤害
@@ -351,9 +423,9 @@ def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害；默认为 False
     :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为 None
-    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
+    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受一个参数，值为受伤实体ID；默认为 None
     :param bool visualize: [仅关键字参数] 是否可视化伤害区域；默认为 False
-    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos" 表示使用实体脚底坐标，"center" 表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用 "center" 效果更佳，但也更消耗性能；默认为 "foot_pos"
+    :param str basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos" 表示使用实体脚底坐标，"center" 表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用 "center" 效果更佳，但也更消耗性能；默认为 "foot_pos"
 
     :return: 最终成功受到伤害的实体ID列表
     :rtype: list[str]
@@ -386,7 +458,24 @@ def cylinder_damage(damage, r, pos1, pos2, dim, **kwargs):
 def sphere_damage(damage, r, pos, dim, **kwargs):
     """
     对球体区域内所有实体造成伤害。
-    
+
+    示例
+    ----
+
+    >>> hit_entities = nyl.sphere_damage(
+    ...     damage=8,
+    ...     r=4,
+    ...     pos=(0, 64, 0),
+    ...     dim=0,
+    ...     filter_abiotic=True,
+    ... )
+
+    参见
+    ----
+
+    - ``cylinder_damage()`` -- 对圆柱体区域造成伤害。
+    - ``sector_damage()`` -- 对扇形区域造成伤害。
+
     -----
 
     :param float damage: 伤害
@@ -402,9 +491,9 @@ def sphere_damage(damage, r, pos, dim, **kwargs):
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害；默认为 False
     :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为 None
-    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
+    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受一个参数，值为受伤实体ID；默认为 None
     :param bool visualize: [仅关键字参数] 是否可视化伤害区域；默认为 False
-    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos" 表示使用实体脚底坐标，"center" 表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用 "center" 效果更佳，但也更消耗性能；默认为 "foot_pos"
+    :param str basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos" 表示使用实体脚底坐标，"center" 表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用 "center" 效果更佳，但也更消耗性能；默认为 "foot_pos"
 
     :return: 最终成功受到伤害的实体ID列表
     :rtype: list[str]
@@ -438,8 +527,26 @@ def sphere_damage(damage, r, pos, dim, **kwargs):
 @__damage_kwargs_defaults
 def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
     """
-    朝攻击者视线前方造成扇形范围伤害。
-    
+    朝指定方向造成扇形范围伤害。
+
+    示例
+    ----
+
+    >>> hit_entities = nyl.sector_damage(
+    ...     damage=10,
+    ...     r=6,
+    ...     angle=1.57,
+    ...     center=(0, 64, 0),
+    ...     direction=(0, 0, 1),
+    ...     dim=0,
+    ... )
+
+    参见
+    ----
+
+    - ``sphere_damage()`` -- 对球形区域造成伤害。
+    - ``rectangle_damage()`` -- 对矩形区域造成伤害。
+
     -----
 
     :param float damage: 伤害
@@ -457,9 +564,9 @@ def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害；默认为 False
     :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为 None
-    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
+    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受一个参数，值为受伤实体ID；默认为 None
     :param bool visualize: [仅关键字参数] 是否可视化伤害区域；默认为 False
-    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos"表示使用实体脚底坐标，"center" 表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用 "center" 效果更佳，但更消耗性能；默认为 "foot_pos"
+    :param str basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos"表示使用实体脚底坐标，"center" 表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用 "center" 效果更佳，但更消耗性能；默认为 "foot_pos"
 
     :return: 最终成功受到伤害的实体ID列表
     :rtype: list[str]
@@ -492,7 +599,23 @@ def sector_damage(damage, r, angle, center, direction, dim, **kwargs):
 def rectangle_damage(damage, pos1, pos2, dim, **kwargs):
     """
     对指定矩形区域内所有实体造成伤害。
-    
+
+    示例
+    ----
+
+    >>> hit_entities = nyl.rectangle_damage(
+    ...     damage=4,
+    ...     pos1=(-2, 63, -2),
+    ...     pos2=(2, 66, 2),
+    ...     dim=0,
+    ... )
+
+    参见
+    ----
+
+    - ``cylinder_damage()`` -- 对圆柱体区域造成伤害。
+    - ``hurt_mobs()`` -- 使用自定义实体列表造成伤害。
+
     -----
 
     :param float damage: 伤害
@@ -508,9 +631,9 @@ def rectangle_damage(damage, pos1, pos2, dim, **kwargs):
     :param bool hurt_child: [仅关键字参数] 是否对子实体造成伤害；默认为 False
     :param function|None ent_filter: [仅关键字参数] 实体过滤器，接受一个实体ID作为参数，需要返回一个 bool 值，表示是否对该实体造成伤害，返回 False 时不会对该实体造成伤害；默认为 None
     :param function|None on_hurt_before: [仅关键字参数] 对实体造成伤害之前调用的函数，该函数需接受一个参数，值为受伤实体ID；若该函数返回一个新的实体ID，对原实体造成的伤害将会转移给该实体；默认为 None
-    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受两个参数，第一个参数为受伤实体ID，第二个参数为是否成功造成伤害；默认为 None
+    :param function|None on_hurt_after: [仅关键字参数] 对实体造成伤害之后调用的函数，该函数需接受一个参数，值为受伤实体ID；默认为 None
     :param bool visualize: [仅关键字参数] 是否可视化伤害区域；默认为 False
-    :param int basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos" 表示使用实体脚底坐标，"center" 表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用 "center" 效果更佳，但也更消耗性能；默认为 "foot_pos"
+    :param str basic_pos: [仅关键字参数] 实体位置判定基准，"foot_pos" 表示使用实体脚底坐标，"center" 表示使用实体中心坐标（脚底坐标向上偏移半个碰撞箱高度）；对于大型实体，使用 "center" 效果更佳，但也更消耗性能；默认为 "foot_pos"
 
     :return: 最终成功受到伤害的实体ID列表
     :rtype: list[str]
@@ -551,11 +674,31 @@ def percent_damage(
 ):
     """
     对生物造成百分比伤害。
-    
+
+    说明
+    ----
+
+    ``percent`` 使用小数表示比例，例如 ``0.5`` 表示基准属性的 50%。
+
+    示例
+    ----
+
+    >>> nyl.percent_damage(
+    ...     target_id,
+    ...     percent=0.1,
+    ...     type_name="max_health",
+    ...     attacker=attacker_id,
+    ... )
+
+    参见
+    ----
+
+    - ``hurt()`` -- 直接指定伤害数值。
+
     -----
 
     :param str entity_id: 生物ID
-    :param float percent: 百分比
+    :param float percent: 百分比（小数形式，如 0.5 表示 50%）
     :param str type_name: 伤害基准（可选值为 "max_health"、"health"、"hunger"、"attacker_damage"）
     :param str cause: 伤害来源， `ActorDamageCause <https://mc.163.com/dev/mcmanual/mc-dev/mcdocs/1-ModAPI/%E6%9E%9A%E4%B8%BE%E5%80%BC/ActorDamageCause.html?key=ActorDamageCause&docindex=1&type=0>`_ 枚举，支持自定义；默认为 ActorDamageCause.EntityAttack
     :param str|None attacker: 攻击者实体ID，默认为 None
@@ -583,17 +726,6 @@ def percent_damage(
         elif damage < 0:
             damage = 0
         hurt(entity_id, damage, cause, attacker, child_id, knocked, force)
-
-
-
-
-
-
-
-
-
-
-
 
 
 

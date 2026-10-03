@@ -26,13 +26,26 @@ __all__ = [
 def save_setting(name, data, is_global=True):
     """
     保存设置数据。
-    
+
+    示例
+    ----
+
+    >>> nyl.save_setting("ui_scale", 1.25)
+    True
+    >>> nyl.save_setting("key_bindings", {"skill": "key.mouse.left"})
+    True
+
+    参见
+    ----
+
+    - ``read_setting()`` -- 读取已保存的设置数据。
+
     -----
-    
+
     :param str name: 数据名，只能包含字母、数字和下划线字符
     :param Any data: 数据
     :param bool is_global: 是否为全局数据；默认为 True
-    
+
     :return: 是否保存成功
     :rtype: bool
     """
@@ -46,13 +59,28 @@ def save_setting(name, data, is_global=True):
 def read_setting(name, default=None, is_global=True):
     """
     读取设置数据。
-    
+
+    示例
+    ----
+
+    >>> nyl.save_setting("ui_scale", 1.25)
+    True
+    >>> nyl.read_setting("ui_scale", default=1.0)
+    1.25
+    >>> nyl.read_setting("missing", default=False)
+    False
+
+    参见
+    ----
+
+    - ``save_setting()`` -- 保存设置数据。
+
     -----
 
     :param str name: 数据名，只能包含字母、数字和下划线字符
     :param Any|None default: 数据默认值；默认为 None
     :param bool is_global: 是否为全局数据；默认为 True
-    
+
     :return: 数据字典
     :rtype: dict
     """
@@ -66,8 +94,6 @@ def read_setting(name, default=None, is_global=True):
             for k, v in data.items()
         }
     return data
-
-
 
 
 
