@@ -5,12 +5,59 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-13
+#    Date  : 2026-9-26
 #  ⠀
 #  ================================================
 
 
 class ClientEventCompletion:
+    def PhysXPostSimulateClientEvent(self, args):
+        """
+        [事件]
+
+        客户端本地玩家当前维度完成 PhysX fetchResults 后触发，可通过 PhysX 组件读取当前帧最新线速度、角速度和四元数旋转。
+
+        说明
+        ----
+
+        仅在本地玩家当前维度实际执行物理模拟时触发。
+        该事件为同步高频事件，回调中不要执行耗时IO，也不要销毁实体、维度或物理场景。
+
+        该事件触发时 PhysX 刚体状态已更新，但普通实体的位置与旋转组件可能尚未完成本游戏刻回写。需要读取当帧结果时应使用 PhysX 组件的速度或四元数接口
+
+        事件名大小写敏感，名称中的 ``PhysX`` 必须使用大写 ``X`` ；不要写成 ``PhysxPostSimulateClientEvent`` 。
+        旧事件 ``PhysxTouchClientEvent`` 与 ``PhysxTriggerClientEvent`` 的命名不同。
+
+        事件参数
+        --------
+
+        - ``dimensionId`` -- int，当前即将执行物理模拟的维度ID
+        - ``deltaTime`` -- float，本次物理模拟的固定时间步长，固定为0.05秒
+        """
+    def PhysXPreSimulateClientEvent(self, args):
+        """
+        [事件]
+
+        客户端本地玩家当前维度执行 PhysX simulate 前触发，可用于轻量的视觉预测准备。
+
+        说明
+        ----
+
+        仅在本地玩家当前维度实际执行物理模拟时触发。
+        该事件为同步高频事件，回调中不要执行耗时IO，也不要销毁实体、维度或物理场景。
+
+        当前客户端 PhysX 组件未提供 ``AddForce`` 或 ``AddTorque`` 接口，不能通过本事件向本地刚体施加力或扭矩；
+        客户端可写接口的用途仅限本地视觉预测。
+
+        事件名大小写敏感，名称中的 ``PhysX`` 必须使用大写 ``X`` ；不要写成 ``PhysxPreSimulateClientEvent`` 。
+        旧事件 ``PhysxTouchClientEvent`` 与 ``PhysxTriggerClientEvent`` 的命名不同。
+
+        事件参数
+        --------
+
+        - ``dimensionId`` -- int，当前即将执行物理模拟的维度ID
+        - ``deltaTime`` -- float，本次物理模拟的固定时间步长，固定为0.05秒
+        """
     def OnSimTickClientEvent(self, args):
         """
         [事件]
@@ -2116,6 +2163,99 @@ class ClientEventCompletion:
 
 
 class ServerEventCompletion:
+    def PhysXJointBreakServerEvent(self, args):
+        """
+        [事件]
+
+        脚本创建的PhysX关节受力超过 ``SetJointBreakForce`` 设置的阈值并断裂后触发。
+
+        说明
+        ----
+
+        事件在PhysX模拟完成后同步触发。同一关节最多触发一次；
+        事件触发后关节仍可通过 ``IsJointBroken`` 查询，并应使用 ``DestroyJoint`` 显式释放。
+
+        事件参数
+        --------
+
+        - ``jointId`` -- int，已断裂关节的ID
+        - ``entityId0`` -- str | None，关节第0端实体ID；该端连接世界时为None
+        - ``entityId1`` -- str | None，关节第1端实体ID；该端连接世界时为None
+        - ``jointType`` -- int，关节类型：0固定关节，1距离关节，2球关节，3铰链关节，4滑动关节
+        - ``breakForce`` -- float，断裂当次模拟中关节承受的线性约束力大小
+        - ``breakTorque`` -- float，断裂当次模拟中关节承受的角约束力矩大小
+        - ``dimensionId`` -- int，关节所在维度ID
+        """
+    def RoomHostChangedServerEvent(self, args):
+        """
+        [事件]
+
+        联机大厅房主实际改变后触发。
+
+        非联机大厅不触发；房主uid未变化不触发。
+
+        说明
+        ----
+
+        仅联机大厅触发。
+
+        ``newEntityId`` / ``oldEntityId`` 依赖对应玩家是否在线，离线时为 ``None`` ； ``uid`` 字段则始终有效。
+
+        事件参数
+        --------
+
+        - ``newUid`` -- int，新房主uid
+        - ``newEntityId`` -- str | None，新房主entityId，不在线则为None
+        - ``oldUid`` -- int，原房主uid；首次设置房主时为0
+        - ``oldEntityId`` -- str | None，原房主entityId，不在线或首次设置时为None
+        """
+    def PhysXPostSimulateServerEvent(self, args):
+        """
+        [事件]
+
+        服务端每个参与物理模拟的维度完成 PhysX fetchResults 后触发，可读取当次模拟产生的最新 PhysX 线速度、角速度和旋转状态。
+
+        说明
+        ----
+
+        该事件触发时PhysX刚体状态已更新，但普通实体位置与旋转组件可能尚未完成本游戏刻回写。
+        需要读取当帧结果时应使用PhysX组件的速度或状态接口。
+
+        该事件为同步高频事件，每个参与模拟的维度每游戏刻触发一次。
+        回调中应只执行轻量的物理状态读写，不要执行耗时IO，也不要销毁实体、维度或物理场景。
+
+        事件名大小写敏感，名称中的 ``PhysX`` 必须使用大写 ``X`` ；不要写成 ``PhysxPostSimulateServerEvent`` 。
+        旧事件 ``PhysxTouchServerEvent`` 与 ``PhysxTriggerServerEvent`` 的命名不同。
+
+        事件参数
+        --------
+
+        - ``dimensionId`` -- int，当前即将执行物理模拟的维度ID
+        - ``deltaTime`` -- float，本次物理模拟的固定时间步长，固定为0.05秒
+        """
+    def PhysXPreSimulateServerEvent(self, args):
+        """
+        [事件]
+
+        服务端每个参与物理模拟的维度执行 PhysX simulate 前触发。
+
+        在本事件中对当前维度刚体施加的力或扭矩会参与当次模拟。
+
+        说明
+        ----
+
+        该事件为同步高频事件，每个参与模拟的维度每游戏刻触发一次。
+        回调中应只执行轻量的物理状态读写，不要执行耗时IO，也不要销毁实体、维度或物理场景。
+
+        事件名大小写敏感，名称中的 ``PhysX`` 必须使用大写 ``X`` ；不要写成 ``PhysxPreSimulateServerEvent`` 。
+        旧事件 ``PhysxTouchServerEvent`` 与 ``PhysxTriggerServerEvent`` 的命名不同。
+
+        事件参数
+        --------
+
+        - ``dimensionId`` -- int，当前即将执行物理模拟的维度ID
+        - ``deltaTime`` -- float，本次物理模拟的固定时间步长，固定为0.05秒
+        """
     def OnSimTickServerEvent(self, args):
         """
         [事件]
