@@ -5,12 +5,11 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-9
+#    Date  : 2026-9-17
 #  ⠀
 #  ================================================
 
 
-import sys
 from typing import ClassVar, Protocol, Iterator, TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
 from mod.client.ui.controls.baseUIControl import BaseUIControl
@@ -43,7 +42,11 @@ T2 = TypeVar("T2")
 P = ParamSpec("P")
 F = TypeVar("F", bound=Callable[..., Any])
 TypeT = TypeVar("TypeT", bound=type)
+
+
 NyScreenBaseT = TypeVar("NyScreenBaseT", bound=NyScreenBase)
+NyControlT = TypeVar("NyControlT", bound=NyControl)
+NyControlT_co = TypeVar("NyControlT_co", bound=NyControl, covariant=True)
 
 
 PyBasicTypes = Union[str, int, float, list, tuple, dict, None]
@@ -64,30 +67,25 @@ SlotsType = ClassVar[STuple]
 
 ArgsDict = Dict[str, PyBasicTypes]
 EntFilter = Optional[Callable[[str], bool]]
-TimeEaseFuncType = Callable[[float], float]
+EasingFuncType = Callable[[float], float]
 
 
-if sys.version_info <= (2, 7):
-    Number = Union[float, int, long]
-else:
-    Number = Union[float, int]
-NumberT = TypeVar("NumberT", bound=Number)
+Number = Union[float, int]
+Scalar = Union[float, int]
+NumberT = TypeVar("NumberT", bound=Number, covariant=True)
 
 
 Pos = Union[FTuple3, FTuple2]
 PosT = TypeVar("PosT", bound=Pos)
 
 
-if sys.version_info <= (2, 7):
-    Scalar = Union[float, int, long]
-else:
-    Scalar = Union[float, int]
 class VectorLike(Protocol):
-    def __iter__(self) -> Iterator[float]: ...
-    def __getitem__(self, i: int) -> float: ...
+    def __getitem__(self, i: int, /) -> Number: ...
+    def __iter__(self) -> Iterator[Number]: ...
     def __len__(self) -> int: ...
+
+
 GeneralVector = Union[FTuple3, FTuple2]
-VectorLikeT = TypeVar("VectorLikeT", bound=VectorLike)
 
 
 class ItemDict(TypedDict, total=False):
@@ -141,5 +139,3 @@ NyControlTypes = Union[
     NyStackPanel,
     NyToggle,
 ]
-
-

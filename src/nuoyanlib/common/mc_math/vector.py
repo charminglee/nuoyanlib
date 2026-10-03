@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-28
 #  ⠀
 #  ================================================
 
@@ -457,8 +457,10 @@ class Vector(object):
 
         :rtype: float
         """
+        if self.is_zero():
+            return 0.0
         l = self._x**2 + self._y**2 + self._z**2
-        return 0.0 if abs(l) < _ZERO_EPS else l
+        return l
 
     @property
     def length(self):
@@ -1171,6 +1173,20 @@ class Vector(object):
         else:
             return Vector(x, y, z)
 
+    def clear(self):
+        """
+        将向量各分量置零。
+
+        -----
+
+        :return: 返回向量自身
+        :rtype: Vector
+        """
+        self._x = 0.0
+        self._y = 0.0
+        self._z = 0.0
+        return self
+
 
 # endregion
 
@@ -1280,8 +1296,9 @@ def vec_length2(vec):
     :return: 向量长度
     :rtype: float
     """
-    l = sum(v**2 for v in vec)
-    return 0.0 if abs(l) < _ZERO_EPS else l
+    if is_zero_vec(vec):
+        return 0.0
+    return sum(v**2 for v in vec)
 
 
 def vec_length(vec):
