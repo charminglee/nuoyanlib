@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-10-3
 #  ⠀
 #  ================================================
 
@@ -57,6 +57,49 @@ __all__ = [
 
 
 Enum = IntEnum = StrEnum = Flag = IntFlag = None # noqa
+
+
+class ordered(object):
+    """
+    用于创建有序枚举值。
+
+    说明
+    ----
+
+    由于 Python 2 特性，遍历枚举成员时的顺序可能与定义顺序不一致。使用 ``ordered()`` 可以确保枚举成员按照定义顺序进行遍历。
+
+    示例
+    ----
+
+    >>> from <scripts_root>.nuoyanlib.common.enum import Enum, ordered
+    >>> class Color(Enum):
+    ...     RED = ordered(1)
+    ...     GREEN = ordered(2)
+    ...     BLUE = ordered(3)
+
+    >>> Color.RED
+    <Color.RED: 1>
+    >>> Color.GREEN
+    <Color.GREEN: 2>
+    >>> Color.BLUE
+    <Color.BLUE: 3>
+
+    >>> for color in Color:
+    ...     print(color.value)
+    1
+    2
+    3
+
+    -----
+
+    :param Any value: 枚举值；省略该参数时沿用 auto() 逻辑
+    """
+
+    _counter = itertools.count()
+
+    def __init__(self, value=None):
+        self._order = next(ordered._counter)
+        self._value = value if value is not None else auto()
 
 
 class auto(object):
@@ -180,16 +223,21 @@ class EnumMeta(type):
             _set_enum_attr(cls, '__new__', __new__, cls_dict)
 
         cls_dict_items = cls_dict.items()
-        # 如果使用了auto()，按照定义顺序排序
-        cls_dict_items.sort(key=lambda x: x[1]._order if isinstance(x[1], auto) else -1)
+        # 如果使用了auto()或ordered()，按照定义顺序排序
+        cls_dict_items.sort(
+            key=lambda x: x[1]._order if isinstance(x[1], (auto, ordered)) else -1
+        )
         count = 0
         last_values = []
 
         for k, v in cls_dict_items:
             if k[0] == "_" or k in _ignore_:
                 continue
+            if isinstance(v, ordered):
+                # 处理ordered()值
+                v = v._value
             if isinstance(v, auto):
-                # 生成auto()值
+                # 处理auto()值
                 v = cls._generate_next_value_(k, count, last_values)
             if not isinstance(v, _member_type_):
                 raise TypeError(

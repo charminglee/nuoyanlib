@@ -13,10 +13,17 @@
 from collections import OrderedDict
 from itertools import count
 import sys
-from typing import Optional, ClassVar, Dict, Hashable, Sequence, Tuple, Any, Iterator, Type, List, NoReturn
+from typing import Optional, ClassVar, Dict, Hashable, Sequence, Tuple, Any, Iterator, Type, List, NoReturn, Generic
 from ..core._types._typing import T
 from ..core._types._event_typing import *
 from ..core._utils import MappingProxy
+
+
+class ordered(Generic[T]):
+    _counter: ClassVar[count]
+    _order: int
+    _value: T
+    def __init__(self, value: Optional[T] = None) -> None: ...
 
 
 if sys.version_info >= (3, 4):
