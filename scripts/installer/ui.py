@@ -141,7 +141,7 @@ def run_installer_ui() -> int:
     copy_pyi_row.grid(sticky="w")
     ttk.Checkbutton(
         copy_pyi_row,
-        text="复制 .pyi 文件",
+        text="包含 .pyi 文件",
         variable=copy_pyi_var,
     ).grid(row=0, column=0)
     copy_pyi_help = tk.Canvas(
@@ -173,7 +173,7 @@ def run_installer_ui() -> int:
     only_pyi_row = ttk.Frame(options_frame)
     ttk.Checkbutton(
         only_pyi_row,
-        text="仅复制 .pyi",
+        text="仅安装 .pyi",
         variable=only_pyi_var,
     ).grid(row=0, column=0)
     only_pyi_help = tk.Canvas(
