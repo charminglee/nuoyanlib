@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-14
+#    Date  : 2026-9-18
 #  ⠀
 #  ================================================
 
@@ -14,6 +14,7 @@ if bool(0):
     from typing import Any
 
 
+from functools import wraps
 import traceback
 import bisect
 from types import MethodType, FunctionType
@@ -391,10 +392,11 @@ def _get_listen_args(func):
 _L = DefaultLocal(dict)
 
 
-def _make_event_init(org_init):
+def _make_event_init():
     def init(self, *args, **kwargs):
+        org_init = getattr(self, '_nyl__org_init', None)
         if org_init:
-            org_init(self, *args, **kwargs)
+            org_init(*args, **kwargs)
         if not hasattr(self, '_nyl__is_listened'):
             listen_all_events(self)
             self._nyl__is_listened = True
@@ -426,7 +428,12 @@ def _process_event_listen():
                         hook = True
                         break
                 if hook and not v.__dict__.get('_nyl__event_init_hooked'):
-                    v.__init__ = _make_event_init(getattr(v, '__init__', None))
+                    org_init = getattr(v, '__init__', None)
+                    v._nyl__org_init = org_init
+                    if org_init:
+                        v.__init__ = wraps(org_init)(_make_event_init())
+                    else:
+                        v.__init__ = _make_event_init()
                     v._nyl__event_init_hooked = True
                     _logging.debug("Hooked %s.__init__() for event listening", v.__name__)
 

@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-29
 #  ⠀
 #  ================================================
 
@@ -64,12 +64,12 @@ class async_sleep(object):
     """
     异步等待指定时间。
 
-    只能在被 ``@nyl.async_`` 装饰的异步函数中使用。
+    只能在被 ``@async_`` 装饰的异步函数中使用。
 
     示例
     ----
 
-    详见 ``@nyl.async_`` 。
+    详见 ``@async_`` 。
 
     -----
 

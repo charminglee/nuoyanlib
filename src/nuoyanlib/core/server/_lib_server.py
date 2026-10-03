@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-10-1
 #  ⠀
 #  ================================================
 
@@ -26,7 +26,7 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
         NuoyanLibBaseSystem.__init__(self)
         NuoyanLibServerSystem._instance = self
         self.query_cache = defaultdict(dict)
-        self.unsync_query = []
+        self.unsync_query = {}
         self.callback_data = {}
         self.move_entity_data = {}
 
@@ -47,7 +47,7 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
     def Destroy(self):
         NuoyanLibBaseSystem.Destroy(self)
         from ..listener import unlisten_all_events
-        for _, system in _env.SERVER_SYSTEMS.items():
+        for system in _env.SERVER_SYSTEMS.values():
             unlisten_all_events(system)
 
     # region Events ====================================================================================================
@@ -117,14 +117,14 @@ class NuoyanLibServerSystem(NuoyanLibBaseSystem, ServerSystem):
         self.NotifyToMultiClients(players, "_SetQueryVar", args)
 
     def set_query_mod_var(self, entity_id, name, value, sync):
-        self.unsync_query.append((entity_id, name, value))
+        self.unsync_query[(entity_id, name)] = value
         if sync:
             self.sync_query_mod_var()
 
     def sync_query_mod_var(self):
         args = defaultdict(list)
         while self.unsync_query:
-            entity_id, name, value = self.unsync_query.pop()
+            (entity_id, name), value = self.unsync_query.popitem()
             args[entity_id].append((name, value))
             self.query_cache[entity_id][name] = value
         if args:

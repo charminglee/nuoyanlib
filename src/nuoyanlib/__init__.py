@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-14
+#    Date  : 2026-9-18
 #  ⠀
 #  ================================================
 
@@ -13,7 +13,6 @@
 # todo：库函数精简
 # todo：完善接口的异常处理
 # todo：完善Ny控件
-# todo：UI动画框架
 # todo：Entity类、Player类，对事件返回的entityId、playerId进行封装（可编写一个装饰器，仅对使用该装饰器的事件启用该功能，节约性能）
 # todo：event热更新
 # todo：nbt
@@ -91,6 +90,7 @@ def _load_modules(is_client):
 
         try:
             module = __imp(path)
+            module._nyl__module_path = path
             registered_modules[name] = module
             _logging.info("Module loaded: (%s) %s", name, path)
         except:
@@ -112,6 +112,9 @@ def _load_systems(is_client):
     for module in registered_modules.values():
         for k, v in module.__dict__.items():
             if not isinstance(v, type) or not issubclass(v, system_cls):
+                continue
+            if hasattr(v, "__module__") and v.__module__ != module._nyl__module_path:
+                # 跳过非本模块变量
                 continue
             cls_path = module.__name__ + "." + k
             if k in registered_systems:
@@ -190,7 +193,7 @@ def run(mod_name, **kwargs):
     if 'globals' in kwargs and isinstance(kwargs['globals'], dict):
         globals_ = kwargs['globals']
     else:
-        import builtin_modules._inspect as _inspect # noqa
+        _inspect = __imp("\x62\x75\x69\x6c\x74\x69\x6e\x5f\x6d\x6f\x64\x75\x6c\x65\x73\x2e\x5f\x69\x6e\x73\x70\x65\x63\x74")
         for stack in _inspect.stack():
             if stack[1].endswith((".modMain", "modMain.py")):
                 globals_ = stack[0].f_globals
@@ -241,7 +244,6 @@ def __imp(p):
         ['\x5f\x5f\x69\x6d\x70\x6f\x72\x74\x5f\x5f']
         (p, fromlist=[""])
     )
-
 
 
 

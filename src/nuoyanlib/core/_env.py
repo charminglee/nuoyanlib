@@ -5,13 +5,14 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-14
+#    Date  : 2026-9-18
 #  ⠀
 #  ================================================
 
 
 import threading
 import traceback
+from collections import OrderedDict
 
 
 __all__ = [
@@ -44,10 +45,10 @@ del __C
 
 
 MOD_NAME = None
-CLIENT_MODULES = {}
-SERVER_MODULES = {}
-CLIENT_SYSTEMS = {}
-SERVER_SYSTEMS = {}
+CLIENT_MODULES = OrderedDict()
+SERVER_MODULES = OrderedDict()
+CLIENT_SYSTEMS = OrderedDict()
+SERVER_SYSTEMS = OrderedDict()
 
 
 def get_system(system_name, mod_name=None):
@@ -57,7 +58,7 @@ def get_system(system_name, mod_name=None):
         else:
             return SERVER_SYSTEMS.get(system_name)
     else:
-        get_api().GetSystem(mod_name, system_name)
+        return get_api().GetSystem(mod_name, system_name)
 
 
 from .. import __version__

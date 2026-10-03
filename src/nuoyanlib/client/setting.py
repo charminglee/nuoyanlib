@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-6
+#    Date  : 2026-9-23
 #  ⠀
 #  ================================================
 
@@ -85,7 +85,7 @@ def read_setting(name, default=None, is_global=True):
     :rtype: dict
     """
     data_dict = LvComp.ConfigClient.GetConfigData(name, is_global)
-    if data_dict is None:
+    if not data_dict:
         return default
     data = data_dict.get('__nyl_setting_data__', data_dict)
     if isinstance(data, dict):

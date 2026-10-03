@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-8
+#    Date  : 2026-10-1
 #  ⠀
 #  ================================================
 
@@ -29,7 +29,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
         ClientSystem.__init__(self, namespace, system_name)
         NuoyanLibBaseSystem.__init__(self)
         NuoyanLibClientSystem._instance = self
-        self.unsync_query = []
+        self.unsync_query = {}
         self.callback_data = {}
         self.gse_data = {}
         self.gse_counter = itertools.count()
@@ -56,7 +56,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     def Destroy(self):
         NuoyanLibBaseSystem.Destroy(self)
         from ..listener import unlisten_all_events
-        for _, system in _env.CLIENT_SYSTEMS.items():
+        for system in _env.CLIENT_SYSTEMS.values():
             unlisten_all_events(system)
 
     # region Events ====================================================================================================
@@ -156,7 +156,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
                 comp.Set(name, value)
 
     def set_query_mod_var(self, entity_id, name, value, sync):
-        self.unsync_query.append((entity_id, name, value))
+        self.unsync_query[(entity_id, name)] = value
 
         comp = CF(entity_id).QueryVariable
         if comp.Get(name) == -1.0:
@@ -169,7 +169,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
     def sync_query_mod_var(self):
         args = defaultdict(list)
         while self.unsync_query:
-            entity_id, name, value = self.unsync_query.pop()
+            (entity_id, name), value = self.unsync_query.popitem()
             args[entity_id].append((name, value))
         if args:
             self.NotifyToServer("_SetQueryVar", args)
@@ -256,20 +256,21 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
             final_height,
             final_height - data['out_dist'],
             data['out_time'],
-            hold_on_last_frame=True,
-            ease_func=data.get('out_ease', config.GSE_OUT_FUNC),
+            post_infinity=Curve.Extrapolation.CONSTANT,
+            easing=data.get('out_ease', config.GSE_OUT_FUNC),
         )
-        static_te = TimeEase.static(
+        static_te = Curve(
+            final_height,
             final_height,
             data['time'] - data['in_time'] - data['out_time'],
-            next_te=out_te,
+            next=out_te,
         )
         in_te = TimeEase(
             final_height - data['in_dist'],
             final_height,
             data['in_time'],
-            ease_func=data.get('in_ease', config.GSE_IN_FUNC),
-            next_te=static_te,
+            easing=data.get('in_ease', config.GSE_IN_FUNC),
+            next=static_te,
         )
         data['te'] = in_te
 
@@ -319,7 +320,6 @@ def instance():
     if not NuoyanLibClientSystem._instance:
         NuoyanLibClientSystem._instance = c_api.GetSystem(_env.LIB_NAME, _env.LIB_CLIENT_NAME)
     return NuoyanLibClientSystem._instance
-
 
 
 

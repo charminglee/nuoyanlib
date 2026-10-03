@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-13
+#    Date  : 2026-9-15
 #  ⠀
 #  ================================================
 
@@ -160,7 +160,7 @@ def create_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_sys
     if param is None:
         param = {'isHud': 1}
     param['__cs__'] = client_system
-    if not _is_ui_registered(namespace, ui_key):
+    if not _is_ui_registered(ui_key):
         api.RegisterUI(namespace, ui_key, cls_path, screen_def)
     node = api.CreateUI(namespace, ui_key, param)
     return node
@@ -194,7 +194,7 @@ def push_ui(namespace, ui_key, cls_path, screen_def="", param=None, client_syste
     if param is None:
         param = {}
     param['__cs__'] = client_system
-    if not _is_ui_registered(namespace, ui_key):
+    if not _is_ui_registered(ui_key):
         api.RegisterUI(namespace, ui_key, cls_path, screen_def)
     node = api.PushScreen(namespace, ui_key, param)
     return node

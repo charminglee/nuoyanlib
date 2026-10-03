@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-14
+#    Date  : 2026-9-18
 #  ⠀
 #  ================================================
 
@@ -29,7 +29,7 @@ ENABLED_LOG = True
 """
 
 
-LOG_LEVEL = "DEBUG"
+LOG_LEVEL = "INFO"
 """
 「nuoyanlib」输出的日志等级，可选值为 ``DEBUG`` 、 ``INFO`` 、 ``WARNING`` 、 ``ERROR`` 。
 

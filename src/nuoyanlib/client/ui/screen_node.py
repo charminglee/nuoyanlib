@@ -5,11 +5,12 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-14
+#    Date  : 2026-9-23
 #  ⠀
 #  ================================================
 
 
+from functools import wraps
 from types import MethodType
 import time
 import itertools
@@ -375,6 +376,25 @@ class NyScreenBase(object):
         :rtype: None
         """
 
+    def GameRenderTickEvent(self, args):
+        if self.is_destroyed:
+            return
+        for path, data in self._frame_anim_data.items():
+            if data['is_pausing']:
+                continue
+            now = time.time()
+            if now - data['last_time'] >= data['frame_time']:
+                try:
+                    index = next(data['indexes'])
+                except StopIteration:
+                    del self._frame_anim_data[path]
+                    data['control'].texture = data['tex_path'] % data['stop_frame']
+                    if data['callback']:
+                        data['callback'](*data['args'], **data['kwargs'])
+                else:
+                    data['control'].texture = data['tex_path'] % index
+                    data['last_time'] = now
+
     # region Common APIs ===============================================================================================
 
     @property
@@ -451,8 +471,8 @@ class NyScreenBase(object):
             return []
         return cls._nyl__instances
 
-    @dualmethod
-    def show(self):
+    @classmethod
+    def show(cls):
         """
         显示UI界面。
 
@@ -499,12 +519,9 @@ class NyScreenBase(object):
         :return: 返回显示的UI界面实例
         :rtype: NyScreenNode|NyScreenProxy|None
         """
-        if isinstance(self, type):
-            inst = self.instance()
-            if not inst:
-                inst = self.create_new()
-        else:
-            inst = self
+        inst = cls.instance()
+        if not inst:
+            inst = cls.create_new()
 
         if not inst:
             return
@@ -517,8 +534,8 @@ class NyScreenBase(object):
         inst._screen_node.SetIsHud(int(inst.is_hud))
         return inst
 
-    @dualmethod
-    def hide(self):
+    @classmethod
+    def hide(cls):
         """
         隐藏UI界面。
 
@@ -566,13 +583,9 @@ class NyScreenBase(object):
         :return: 是否成功
         :rtype: bool
         """
-        if isinstance(self, type):
-            inst = self.instance()
-            if not inst:
-                return False
-        else:
-            inst = self
-
+        inst = cls.instance()
+        if not inst:
+            return False
         if inst.is_destroyed:
             return False
 
@@ -644,8 +657,8 @@ class NyScreenBase(object):
             node = api.CreateUI(_env.MOD_NAME, ui_key, _param)
         return node
 
-    @dualmethod
-    def destroy(self):
+    @classmethod
+    def destroy(cls):
         """
         销毁UI界面。
 
@@ -675,13 +688,7 @@ class NyScreenBase(object):
         :return: 是否成功
         :rtype: bool
         """
-        if isinstance(self, type):
-            inst = self.instance()
-            if not inst:
-                return False
-        else:
-            inst = self
-
+        inst = cls.instance()
         if not inst:
             return False
         if inst.is_destroyed:
@@ -1057,25 +1064,6 @@ class NyScreenBase(object):
 
     # region Image APIs ================================================================================================
 
-    def GameRenderTickEvent(self, args):
-        if self.is_destroyed:
-            return
-        for path, data in self._frame_anim_data.items():
-            if data['is_pausing']:
-                continue
-            now = time.time()
-            if now - data['last_time'] >= data['frame_time']:
-                try:
-                    index = next(data['indexes'])
-                except StopIteration:
-                    del self._frame_anim_data[path]
-                    data['control'].texture = data['tex_path'] % data['stop_frame']
-                    if data['callback']:
-                        data['callback'](*data['args'], **data['kwargs'])
-                else:
-                    data['control'].texture = data['tex_path'] % index
-                    data['last_time'] = now
-
     def _play_frame_anim(
             self,
             ny_image,
@@ -1248,7 +1236,7 @@ class NyScreenNode(NyScreenBase, ScreenNode):
     """
 
     __user_init = None
-    __user_init_args = None
+    __user_init_args = ()
     __inited = False
 
     def __new__(cls, namespace, name, param=None):
@@ -1256,6 +1244,7 @@ class NyScreenNode(NyScreenBase, ScreenNode):
             # 延迟初始化，先备份用户的init方法，然后将其覆盖
             cls.__user_init = cls.__init__ # noqa
 
+            @wraps(cls.__init__)
             def init(self, *args):
                 # 正常初始化内部逻辑
                 NyScreenNode.__init__(self, *args)
@@ -1357,13 +1346,14 @@ class NyScreenProxy(NyScreenBase, CustomUIScreenProxy):
     """
 
     __user_init = None
-    __user_init_args = None
+    __user_init_args = ()
     __inited = False
 
     def __new__(cls, screen_name, screen_node):
         if cls.enabled_deferred_init and not cls.__user_init and cls.__init__ is not NyScreenProxy.__init__:
             cls.__user_init = cls.__init__ # noqa
 
+            @wraps(cls.__init__)
             def init(self, *args):
                 NyScreenProxy.__init__(self, *args)
                 self.__user_init_args = args
