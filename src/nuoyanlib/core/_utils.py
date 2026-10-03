@@ -145,13 +145,13 @@ def kwargs_defaults(**kwargs):
         co = func.__code__
         arg_names = co.co_varnames[:co.co_argcount]
 
-        # # 设置完整的函数签名（用于文档生成）
-        # sgn = get_signature(func)
-        # sgn = sgn[:sgn.rindex(",")] # 去掉末尾**kwargs
-        # sgn += ", *"
-        # for i in kwargs.items():
-        #     sgn += ", %s=%s" % i
-        # signature(sgn)(func)
+        # 设置完整的函数签名（用于文档生成）
+        sgn = get_signature(func)
+        sgn = sgn[:sgn.rindex(",")] # 去掉末尾**kwargs
+        sgn += ", *"
+        for i in kwargs.items():
+            sgn += ", %s=%s" % i
+        signature(sgn)(func)
 
         @wraps(func)
         def wrapper(*f_args, **f_kwargs):
