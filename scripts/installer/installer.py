@@ -45,12 +45,20 @@ def is_ignored_name(
     name: str,
     copy_pyi: bool = True,
     copy_extensions: bool = False,
+    only_pyi: bool = False,
+    is_directory: bool = False,
 ) -> bool:
     suffix = Path(name).suffix.lower()
     return (
         name in IGNORED_DIRECTORY_NAMES
-        or suffix in IGNORED_FILE_SUFFIXES
-        or (not copy_pyi and suffix == ".pyi")
+        or (not is_directory and suffix in IGNORED_FILE_SUFFIXES)
+        or (not is_directory and not copy_pyi and suffix == ".pyi")
+        or (
+            not is_directory
+            and copy_pyi
+            and only_pyi
+            and suffix != ".pyi"
+        )
         or (not copy_extensions and name == EXTENSIONS_DIRECTORY_NAME)
     )
 
@@ -60,11 +68,18 @@ def ignore_files(
     names: Iterable[str],
     copy_pyi: bool = True,
     copy_extensions: bool = False,
+    only_pyi: bool = False,
 ) -> list[str]:
     return [
         name
         for name in names
-        if is_ignored_name(name, copy_pyi, copy_extensions)
+        if is_ignored_name(
+            name,
+            copy_pyi,
+            copy_extensions,
+            only_pyi=only_pyi,
+            is_directory=(Path(path) / name).is_dir(),
+        )
     ]
 
 
@@ -72,6 +87,7 @@ def calculate_total_size(
     source: Path,
     copy_pyi: bool = True,
     copy_extensions: bool = False,
+    only_pyi: bool = False,
 ) -> int:
     total_size = 0
     for root, directories, files in os.walk(source):
@@ -79,10 +95,21 @@ def calculate_total_size(
         directories[:] = [
             name
             for name in directories
-            if not is_ignored_name(name, copy_pyi, copy_extensions)
+            if not is_ignored_name(
+                name,
+                copy_pyi,
+                copy_extensions,
+                only_pyi=only_pyi,
+                is_directory=True,
+            )
         ]
         for name in files:
-            if not is_ignored_name(name, copy_pyi, copy_extensions):
+            if not is_ignored_name(
+                name,
+                copy_pyi,
+                copy_extensions,
+                only_pyi=only_pyi,
+            ):
                 total_size += (root / name).stat().st_size
     return total_size
 
@@ -142,6 +169,7 @@ def install(
     destination: str,
     copy_pyi: bool = True,
     copy_extensions: bool = False,
+    only_pyi: bool = False,
 ) -> Path:
     destination = Path(destination)
     source = SOURCE_DIRECTORY.resolve()
@@ -156,7 +184,12 @@ def install(
         raise ValueError("destination must not be inside the source directory")
 
     if SHOW_PROGRESS:
-        total_size = calculate_total_size(source, copy_pyi, copy_extensions)
+        total_size = calculate_total_size(
+            source,
+            copy_pyi,
+            copy_extensions,
+            only_pyi,
+        )
         progress = CopyProgress(total_size)
         copy_function = progress.copy_file
     else:
@@ -174,6 +207,7 @@ def install(
                 ignore_files,
                 copy_pyi=copy_pyi,
                 copy_extensions=copy_extensions,
+                only_pyi=only_pyi,
             ),
             copy_function=copy_function,
         )

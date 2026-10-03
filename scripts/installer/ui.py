@@ -43,6 +43,7 @@ def run_installer_ui() -> int:
 
     destination_var = tk.StringVar()
     copy_pyi_var = tk.BooleanVar(value=True)
+    only_pyi_var = tk.BooleanVar(value=False)
     slim_install_var = tk.BooleanVar(value=False)
     install_ext_modules_var = tk.BooleanVar(value=False)
     open_after_install_var = tk.BooleanVar(value=True)
@@ -102,11 +103,114 @@ def run_installer_ui() -> int:
     options_frame = ttk.LabelFrame(container, text="安装选项", padding=8)
     options_frame.grid(sticky="ew", pady=(12, 0))
 
+    tooltip_window = None
+
+    def show_option_tooltip(event, text):
+        nonlocal tooltip_window
+        if tooltip_window is not None:
+            tooltip_window.destroy()
+
+        tooltip_window = tk.Toplevel(root)
+        tooltip_window.wm_overrideredirect(True)
+        tooltip_window.attributes("-topmost", True)
+        tk.Label(
+            tooltip_window,
+            text=text,
+            background="#fffbe6",
+            foreground="#1f2937",
+            relief="solid",
+            borderwidth=1,
+            padx=8,
+            pady=4,
+        ).pack()
+        tooltip_window.update_idletasks()
+        tooltip_window.geometry(
+            "+{}+{}".format(
+                event.widget.winfo_rootx() + event.widget.winfo_width() + 6,
+                event.widget.winfo_rooty() + event.widget.winfo_height() + 4,
+            )
+        )
+
+    def hide_option_tooltip(_event):
+        nonlocal tooltip_window
+        if tooltip_window is not None:
+            tooltip_window.destroy()
+            tooltip_window = None
+
+    copy_pyi_row = ttk.Frame(options_frame)
+    copy_pyi_row.grid(sticky="w")
     ttk.Checkbutton(
-        options_frame,
+        copy_pyi_row,
         text="复制 .pyi 文件",
         variable=copy_pyi_var,
-    ).grid(sticky="w")
+    ).grid(row=0, column=0)
+    copy_pyi_help = tk.Canvas(
+        copy_pyi_row,
+        width=18,
+        height=18,
+        highlightthickness=0,
+        background=style.lookup("TFrame", "background"),
+        cursor="question_arrow",
+    )
+    copy_pyi_help.create_oval(0, 0, 12, 12, outline="#64748b")
+    copy_pyi_help.create_text(
+        6,
+        6,
+        text="?",
+        fill="#000000",
+        font=("Segoe UI", 8, "bold"),
+    )
+    copy_pyi_help.grid(row=0, column=1, padx=(2, 0))
+    copy_pyi_help.bind(
+        "<Enter>",
+        lambda event: show_option_tooltip(
+            event,
+            "提供更精确更详细的补全和类型检查，不影响机审和定价。",
+        ),
+    )
+    copy_pyi_help.bind("<Leave>", hide_option_tooltip)
+
+    only_pyi_row = ttk.Frame(options_frame)
+    ttk.Checkbutton(
+        only_pyi_row,
+        text="仅复制 .pyi",
+        variable=only_pyi_var,
+    ).grid(row=0, column=0)
+    only_pyi_help = tk.Canvas(
+        only_pyi_row,
+        width=18,
+        height=18,
+        highlightthickness=0,
+        background=style.lookup("TFrame", "background"),
+        cursor="question_arrow",
+    )
+    only_pyi_help.create_oval(0, 0, 12, 12, outline="#64748b")
+    only_pyi_help.create_text(
+        6,
+        6,
+        text="?",
+        fill="#000000",
+        font=("Segoe UI", 8, "bold"),
+    )
+    only_pyi_help.grid(row=0, column=1, padx=(2, 0))
+    only_pyi_help.bind(
+        "<Enter>",
+        lambda event: show_option_tooltip(
+            event,
+            "仅为 IDE 提供代码补全能力，不提供具体实现，具体实现可安装至前置包。",
+        ),
+    )
+    only_pyi_help.bind("<Leave>", hide_option_tooltip)
+
+    def update_only_pyi_visibility(*_args):
+        if copy_pyi_var.get():
+            only_pyi_row.grid(sticky="w", padx=(20, 0))
+        else:
+            only_pyi_row.grid_remove()
+
+    update_only_pyi_visibility()
+    copy_pyi_var.trace_add("write", update_only_pyi_visibility)
+
     ttk.Checkbutton(
         options_frame,
         text="安装扩展模块",
@@ -185,6 +289,7 @@ def run_installer_ui() -> int:
         source_directory: Path,
         copy_pyi: bool,
         copy_extensions: bool,
+        only_pyi: bool,
     ) -> list[Path]:
         return [
             child_path
@@ -193,6 +298,8 @@ def run_installer_ui() -> int:
                 child_path.name,
                 copy_pyi=copy_pyi,
                 copy_extensions=copy_extensions,
+                only_pyi=only_pyi,
+                is_directory=child_path.is_dir(),
             )
         ]
 
@@ -201,6 +308,7 @@ def run_installer_ui() -> int:
         source_path: Path,
         copy_pyi: bool,
         copy_extensions: bool,
+        only_pyi: bool,
         expanded: bool = False,
     ) -> None:
         is_directory = source_path.is_dir() and not source_path.is_symlink()
@@ -219,12 +327,14 @@ def run_installer_ui() -> int:
             source_path,
             copy_pyi,
             copy_extensions,
+            only_pyi,
         ):
             add_preview_node(
                 node_id,
                 child_path,
                 copy_pyi,
                 copy_extensions,
+                only_pyi,
             )
 
     def add_existing_node(
@@ -259,17 +369,20 @@ def run_installer_ui() -> int:
         source_directory: Path,
         copy_pyi: bool,
         copy_extensions: bool,
+        only_pyi: bool,
     ) -> None:
         for child_path in get_preview_children(
             source_directory,
             copy_pyi,
             copy_extensions,
+            only_pyi,
         ):
             add_preview_node(
                 parent_id,
                 child_path,
                 copy_pyi,
                 copy_extensions,
+                only_pyi,
             )
 
     def add_installation_node(
@@ -277,6 +390,7 @@ def run_installer_ui() -> int:
         target_path: Path,
         copy_pyi: bool,
         copy_extensions: bool,
+        only_pyi: bool,
     ) -> None:
         target_id = preview_tree.insert(
             parent_id,
@@ -301,6 +415,7 @@ def run_installer_ui() -> int:
             SOURCE_DIRECTORY,
             copy_pyi,
             copy_extensions,
+            only_pyi,
         )
 
     def add_destination_children(
@@ -308,6 +423,7 @@ def run_installer_ui() -> int:
         destination_path: Path,
         copy_pyi: bool,
         copy_extensions: bool,
+        only_pyi: bool,
     ) -> None:
         target_name = PACKAGE_DIRECTORY_NAME.lower()
         existing_target = None
@@ -336,6 +452,7 @@ def run_installer_ui() -> int:
                     child_path,
                     copy_pyi,
                     copy_extensions,
+                    only_pyi,
                 )
             else:
                 add_existing_node(parent_id, child_path)
@@ -370,10 +487,12 @@ def run_installer_ui() -> int:
             destination_path,
             copy_pyi_var.get(),
             install_ext_modules_var.get(),
+            only_pyi_var.get(),
         )
 
     destination_var.trace_add("write", refresh_preview)
     copy_pyi_var.trace_add("write", refresh_preview)
+    only_pyi_var.trace_add("write", refresh_preview)
     install_ext_modules_var.trace_add("write", refresh_preview)
 
     def install_package():
@@ -396,6 +515,7 @@ def run_installer_ui() -> int:
                 destination_text,
                 copy_pyi=copy_pyi_var.get(),
                 copy_extensions=install_ext_modules_var.get(),
+                only_pyi=only_pyi_var.get(),
             )
         except (OSError, ValueError, shutil.Error) as error:
             messagebox.showerror("安装失败", "安装「nuoyanlib」时发生错误：\n{}".format(error), parent=root)
