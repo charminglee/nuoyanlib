@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-9-16
 #  ⠀
 #  ================================================
 
@@ -137,6 +137,7 @@ class write_only_property(property):
     def deleter(self, fdel: Callable) -> NoReturn: ...
 
 
+def args_defaults(*args: Union[str, Tuple[str, Any]]) -> Callable[[F], F]: ...
 def kwargs_defaults(**kwargs: Any) -> Callable[[F], F]: ...
 def try_exec(func: Callable, *args: Any, **kwargs: Any) -> Union[Any, Exception]: ...
 def iter_obj_attrs(obj: Any) -> Generator[Any]: ...

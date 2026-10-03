@@ -23,4 +23,5 @@ from ...core.client.comp import (
 
 from .screen_node import *
 from .ui_utils import *
+from .animation import *
 from .nyc import *

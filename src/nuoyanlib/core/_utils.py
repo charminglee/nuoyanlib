@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-14
+#    Date  : 2026-9-16
 #  ⠀
 #  ================================================
 
@@ -81,18 +81,77 @@ def hook_method(obj, func_name, before_hook=None, after_hook=None):
     return wrapper
 
 
+_NOT_SET = object()
+
+
+def args_defaults(*args):
+    def decorator(func):
+        co = func.__code__
+        _args = co.co_varnames[:co.co_argcount] + args
+
+        args_num = len(_args)
+        required_num = 0
+        defaults = []
+        names = []
+        for arg in _args:
+            if isinstance(arg, str):
+                name, value = arg, _NOT_SET
+                required_num += 1
+            else:
+                name, value = arg
+            defaults.append(value)
+            names.append(name)
+
+        @wraps(func)
+        def wrapper(*f_args, **f_kwargs):
+            f_args_num = len(f_args)
+            if f_args_num < required_num:
+                missing_num = required_num - f_args_num
+                missing_names = ", ".join(names[f_args_num: required_num])
+                raise TypeError(
+                    "%s() missing %s required positional arguments: '%s'"
+                    % (func.__name__, missing_num, missing_names)
+                )
+            if f_args_num > args_num:
+                raise TypeError(
+                    "%s() takes %s positional arguments but %s were given"
+                    % (func.__name__, args_num, len(f_args))
+                )
+
+            err_kwargs = [k for k in f_kwargs if k in names]
+            if err_kwargs:
+                raise TypeError(
+                    "%s() got some positional-only arguments passed as keyword arguments: '%s'"
+                    % (func.__name__, ", ".join(err_kwargs))
+                )
+
+            if f_args_num < args_num:
+                return func(
+                    *(
+                        ii
+                        for i in (f_args, defaults[f_args_num:])
+                        for ii in i
+                    ),
+                    **f_kwargs
+                )
+            else:
+                return func(*f_args, **f_kwargs)
+        return wrapper
+    return decorator
+
+
 def kwargs_defaults(**kwargs):
     def decorator(func):
         co = func.__code__
         arg_names = co.co_varnames[:co.co_argcount]
 
-        # 设置完整的函数签名（用于文档生成）
-        sgn = get_signature(func)
-        sgn = sgn[:sgn.rindex(",")] # 去掉末尾**kwargs
-        sgn += ", *"
-        for i in kwargs.items():
-            sgn += ", %s=%s" % i
-        signature(sgn)(func)
+        # # 设置完整的函数签名（用于文档生成）
+        # sgn = get_signature(func)
+        # sgn = sgn[:sgn.rindex(",")] # 去掉末尾**kwargs
+        # sgn += ", *"
+        # for i in kwargs.items():
+        #     sgn += ", %s=%s" % i
+        # signature(sgn)(func)
 
         @wraps(func)
         def wrapper(*f_args, **f_kwargs):
@@ -452,7 +511,7 @@ def parse_indices_generator(index, length, cls, op=None):
         )
 
 
-class __Universal(object):
+class __Universal(Singleton):
     """
     万用对象，仅用于绕过机审检查。
 
