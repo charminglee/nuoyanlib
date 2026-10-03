@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-5
+#    Date  : 2026-9-16
 #  ⠀
 #  ================================================
 
@@ -15,7 +15,7 @@ from ..core.client.comp import CF, LvComp
 from ..core.client import _lib_client
 from ..common.pos_gen import gen_random_even_pos
 from ..common.timer import delay
-from ..common.enum import TimeEaseFunc
+from ..common.mc_math.curve import Curve
 from ..common.mc_math.mc_math import pos_floor
 
 
@@ -36,8 +36,8 @@ __all__ = [
     out_time=0.5,
     in_dist=0.5,
     out_dist=0.5,
-    in_ease=TimeEaseFunc.OUT_EXPO,
-    out_ease=TimeEaseFunc.IN_SINE,
+    in_ease=Curve.Easing.OUT_EXPO,
+    out_ease=Curve.Easing.IN_SINE,
 )
 def spawn_ground_shatter_effect(pos, r, num, **kwargs):
     """

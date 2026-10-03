@@ -16,8 +16,8 @@ import random
 import mod.client.extraClientApi as c_api
 from mod.client.system.clientSystem import ClientSystem
 from ... import config
-from ...common.time_ease import TimeEase
-from .. import _const, _logging
+from ...common.mc_math.curve import Curve
+from .. import _shared, _logging, _env
 from ..system import NuoyanLibBaseSystem
 from .comp import CF, LvComp
 
@@ -252,7 +252,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
         data['geo_name'] = geo_name
 
         final_height = random.uniform(data['min_height'], data['max_height'])
-        out_te = TimeEase(
+        out_te = Curve(
             final_height,
             final_height - data['out_dist'],
             data['out_time'],
@@ -265,7 +265,7 @@ class NuoyanLibClientSystem(NuoyanLibBaseSystem, ClientSystem):
             data['time'] - data['in_time'] - data['out_time'],
             next=out_te,
         )
-        in_te = TimeEase(
+        in_te = Curve(
             final_height - data['in_dist'],
             final_height,
             data['in_time'],

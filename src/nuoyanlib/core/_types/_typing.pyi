@@ -12,27 +12,24 @@
 
 from typing import ClassVar, Protocol, Iterator, TypeVar, Tuple, Dict, Optional, Union, TypedDict, List, Callable, Any, ParamSpec
 from mod.client.ui.controls.progressBarUIControl import ProgressBarUIControl
-from mod.client.ui.controls.baseUIControl import BaseUIControl
 from ...client.ui.screen_node import NyScreenBase
-from ...client.ui.nyc import (
-    NyButton,
-    NyComboBox,
-    NyControl,
-    NyEditBox,
-    NyGrid,
-    NyImage,
-    NyInputPanel,
-    NyItemRenderer,
-    NyLabel,
-    NyMiniMap,
-    NyPaperDoll,
-    NyProgressBar,
-    NyScrollView,
-    NySelectionWheel,
-    NySlider,
-    NyStackPanel,
-    NyToggle,
-)
+from ...client.ui.nyc.control import NyControl
+from ...client.ui.nyc.button import NyButton
+from ...client.ui.nyc.combo_box import NyComboBox
+from ...client.ui.nyc.edit_box import NyEditBox
+from ...client.ui.nyc.grid import NyGrid
+from ...client.ui.nyc.image import NyImage
+from ...client.ui.nyc.input_panel import NyInputPanel
+from ...client.ui.nyc.item_renderer import NyItemRenderer
+from ...client.ui.nyc.label import NyLabel
+from ...client.ui.nyc.mini_map import NyMiniMap
+from ...client.ui.nyc.paper_doll import NyPaperDoll
+from ...client.ui.nyc.progress_bar import NyProgressBar
+from ...client.ui.nyc.scroll_view import NyScrollView
+from ...client.ui.nyc.selection_wheel import NySelectionWheel
+from ...client.ui.nyc.slider import NySlider
+from ...client.ui.nyc.stack_panel import NyStackPanel
+from ...client.ui.nyc.toggle import NyToggle
 
 
 T = TypeVar("T")
@@ -119,7 +116,6 @@ UserData = Dict[str, Any]
 
 
 UiPathOrNyControl = Union[str, NyControl]
-UiControl = Union[BaseUIControl, NyControl]
 NyControlTypes = Union[
     NyButton,
     NyComboBox,

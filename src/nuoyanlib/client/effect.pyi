@@ -20,8 +20,8 @@ from mod.client.component.frameAniTransComp import FrameAniTransComp
 from mod.client.component.frameAniEntityBindComp import FrameAniEntityBindComp
 from mod.client.component.frameAniSkeletonBindComp import FrameAniSkeletonBindComp
 from ..core.client._lib_client import NuoyanLibClientSystem
-from ..common.enum import TimeEaseFunc
-from ..core._types._typing import FTuple3, FTuple2, CurveFuncType
+from ..core._types._typing import FTuple3, FTuple2, EasingFuncType
+from ..common.mc_math.curve import Curve
 
 
 def spawn_ground_shatter_effect(
@@ -37,8 +37,8 @@ def spawn_ground_shatter_effect(
     out_time: float = 0.5,
     in_dist: float = 0.5,
     out_dist: float = 0.5,
-    in_ease: TimeEaseFuncType = TimeEaseFunc.OUT_EXPO,
-    out_ease: TimeEaseFuncType = TimeEaseFunc.IN_SINE,
+    in_ease: EasingFuncType = Curve.Easing.OUT_EXPO,
+    out_ease: EasingFuncType = Curve.Easing.IN_SINE,
 ) -> List[str]: ...
 def spawn_particle(
     name: str,
