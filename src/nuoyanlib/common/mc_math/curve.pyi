@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 #  ================================================
-#  ⠀
+#
 #    Copyright (c) 2026 Nuoyan
-#  ⠀
+#
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
 #    Date  : 2026-10-2
-#  ⠀
+#
 #  ================================================
 
 
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, List, Optional, Sequence, Tuple, Union
 from ...core._types._typing import EasingFuncType
 
 
-__CurveKeyInput = Union["CurveKey", Tuple[float, float], List[Any], Dict[str, Any]]
+__CurveKeyInput = Union["CurveKey", Tuple[float, float], List[Any]]
 
 
 class CurveKey(object):
@@ -24,10 +24,6 @@ class CurveKey(object):
     leave_tangent: float
     interp_mode: Any
     tangent_mode: Any
-    arrive_weight: float
-    leave_weight: float
-    weighted_mode: Any
-    handle: int
     def __init__(
         self,
         time: float,
@@ -36,9 +32,6 @@ class CurveKey(object):
         leave_tangent: float = 0.0,
         interp_mode: Any = Curve.InterpMode.CUBIC,
         tangent_mode: Any = Curve.TangentMode.AUTO,
-        arrive_weight: float = 1.0,
-        leave_weight: float = 1.0,
-        weighted_mode: Any = Curve.WeightedMode.NONE,
     ) -> None: ...
     def copy(self) -> CurveKey: ...
 
@@ -117,13 +110,6 @@ class Curve(object):
         NONE: str
         AUTO: str
         USER: str
-        BREAK: str
-        AUTO_CLAMPED: str
-    class WeightedMode:
-        NONE: str
-        ARRIVE: str
-        LEAVE: str
-        BOTH: str
     class Extrapolation:
         CONSTANT: str
         LINEAR: str
@@ -138,7 +124,6 @@ class Curve(object):
     next_curve: Optional[Curve]
     on_start: Optional[Callable[[], Any]]
     on_end: Optional[Callable[[], Any]]
-    default_value: float
     pre_infinity: str
     post_infinity: str
     _keys: List[CurveKey]
@@ -163,7 +148,6 @@ class Curve(object):
         keys: Optional[Sequence[__CurveKeyInput]] = None,
         pre_infinity: Any = Extrapolation.CONSTANT,
         post_infinity: Any = Extrapolation.CONSTANT,
-        default_value: float = 0.0,
     ) -> None: ...
     @classmethod
     def from_keys(
@@ -171,7 +155,6 @@ class Curve(object):
         keys: Sequence[__CurveKeyInput],
         pre_infinity: Any = Extrapolation.CONSTANT,
         post_infinity: Any = Extrapolation.CONSTANT,
-        default_value: float = 0.0,
     ) -> Curve: ...
     @classmethod
     def static(
@@ -202,14 +185,8 @@ class Curve(object):
         leave_tangent: float = 0.0,
         interp_mode: Any = InterpMode.CUBIC,
         tangent_mode: Any = TangentMode.AUTO,
-        arrive_weight: float = 1.0,
-        leave_weight: float = 1.0,
-        weighted_mode: Any = WeightedMode.NONE,
     ) -> CurveKey: ...
-    def update_or_add_key(self, key_time: float, value: float, **kwargs: Any) -> CurveKey: ...
-    def find_key(self, key_time: Union[CurveKey, float], tolerance: float = 1e-6) -> Optional[CurveKey]: ...
-    def get_key(self, key: Union[CurveKey, int, float]) -> Optional[CurveKey]: ...
-    def get_keys(self) -> List[CurveKey]: ...
+    def find_key(self, key_time: float, tolerance: float = 1e-6) -> Optional[CurveKey]: ...
     def update_key(
         self,
         key: Union[CurveKey, int, float],
@@ -219,26 +196,11 @@ class Curve(object):
         leave_tangent: Any = ...,
         interp_mode: Any = ...,
         tangent_mode: Any = ...,
-        arrive_weight: Any = ...,
-        leave_weight: Any = ...,
-        weighted_mode: Any = ...,
-    ) -> Optional[CurveKey]: ...
-    def set_key_tangents(
-        self,
-        key: Union[CurveKey, int, float],
-        arrive_tangent: float,
-        leave_tangent: Optional[float] = None,
     ) -> Optional[CurveKey]: ...
     def delete_key(self, key: Union[CurveKey, int, float]) -> bool: ...
     def clear(self) -> None: ...
-    def is_empty(self) -> bool: ...
-    def is_constant(self) -> bool: ...
-    def get_time_range(self) -> Tuple[float, float]: ...
-    def get_value_range(self) -> Tuple[float, float]: ...
-    def set_pre_infinity(self, mode: Any) -> Curve: ...
-    def set_post_infinity(self, mode: Any) -> Curve: ...
-    def eval_(self, at_time: float, default_value: Optional[float] = None) -> float: ...
-    get_value = __call__ = eval_
+    def eval_(self, at_time: float) -> float: ...
+    __call__ = eval_
     def __iter__(self) -> Curve: ...
     def __next__(self) -> float: ...
     next = __next__

@@ -28,6 +28,7 @@ TESTS = [
     ("common.utils"          , "case.test_utils"),
     ("common.mc_math.vector" , "case.test_vector"),
     ("common.mc_math.mc_math", "case.test_mc_math"),
+    ("common.mc_math.curve"  , "case.test_curve"),
     ("common.item"           , "case.test_item"),
 
     ("client.ui.screen_node" , "case.test_screen_node"),
