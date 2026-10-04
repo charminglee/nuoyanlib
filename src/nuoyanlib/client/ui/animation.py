@@ -224,6 +224,7 @@ class AnimationBase(object):
         self._elapsed = 0.0
         self._cycle_index = 0
         self._progress = 0.0
+        self._owner = None
         self.duration = duration
         self.delay = 0.0
         self.repeat = 0
@@ -480,6 +481,9 @@ class AnimationBase(object):
 
         动画处于非活跃状态（空闲、完成、取消）时再次调用即可重新播放。
 
+        已被 ``AnimationSequence`` 或 ``AnimationParallel`` 接管的子动画不能单独调用该方法启动，
+        否则将抛出 ``TypeError`` ，应通过其所属的复合动画进行播放和控制。
+
         -----
 
         :param bool restart: 若当前动画正在播放，是否从头开始播放；默认为 False
@@ -487,6 +491,11 @@ class AnimationBase(object):
         :return: 当前动画实例
         :rtype: PropertyAnimation
         """
+        if _add_to_mgr and self._owner is not None:
+            raise TypeError(
+                "cannot individually start a sub-animation owned by %s"
+                % type(self._owner).__name__
+            )
         if self.is_active() and not restart:
             return self
         self._prepare()
@@ -810,37 +819,193 @@ class PropertyAnimation(AnimationBase):
         return MappingProxy(self._curr_frame)
 
 
-# todo
 class AnimationSequence(AnimationBase, list):
+    """
+    UI动画序列类。
+
+    说明
+    ----
+
+    将多个动画按传入顺序轮流播放：序列开始后依次播放其中的每个动画，前一个动画结束后自动开始下一个动画，
+    所有动画播放完毕后序列结束。
+
+    构造 AnimationSequence 对象
+    ===========================
+
+    构造函数：
+
+    - ``AnimationSequence(⠀*animations)``
+
+    按传入顺序传入任意多个动画实例，即可构造一个按顺序轮流播放它们的动画序列。
+
+    序列中的每个动画仍是独立的动画，可单独使用 ``set_delay`` 、 ``set_repeat`` 等方法进行配置：
+    动画的延迟时间将在其开始播放前生效，重复次数也只作用于该动画自身。
+    序列的总时长为所有动画的总时长（包含各自的延迟时间和重复时间）之和。
+
+    注意：序列不支持反向播放，调用 ``set_yoyo`` 将抛出 ``TypeError`` 。
+
+    注意：序列中的动画由序列接管驱动，不能单独调用 ``start`` 启动，否则将抛出 ``TypeError`` 。
+
+    动画控制
+    ========
+
+    - ``.set_callback()`` -- 设置序列的回调函数。
+    - ``.set_delay()`` -- 设置序列开始前的延迟时间，单位为秒。
+    - ``.set_repeat()`` -- 设置序列重复次数，设为 ``-1`` 表示无限重复；每次重复都会从头开始播放序列中的所有动画。
+    - ``.start()`` -- 开始播放序列。
+    - ``.pause()`` -- 暂停序列。
+    - ``.resume()`` -- 恢复已暂停的序列。
+    - ``.finish()`` -- 立即完成序列，跳过剩余延迟和重复周期；尚未播放的动画将直接跳至结束状态。
+    - ``.complete()`` -- 立即完成当前周期。
+    - ``.cancel()`` -- 取消序列。
+
+    示例
+    ----
+
+    构造一个先播放不透明度动画，再播放尺寸动画的动画序列：
+
+    >>> from <scripts_root>.nuoyanlib.client import PropertyAnimation, Property, AnimationSequence
+    >>> alpha_anim = PropertyAnimation(control, 1, alpha=Property(0, 1))
+    >>> size_anim = PropertyAnimation(control, 1, size=Property((30, 30), (100, 100)))
+    >>> AnimationSequence(alpha_anim, size_anim).start()
+
+    -----
+
+    :param AnimationBase animations: [变长位置参数] 要按顺序轮流播放的动画实例
+    """
+
     def __init__(self, *animations):
         list.__init__(self, animations)
-        duration = sum(anim.duration for anim in animations)
+        for anim in self:
+            anim._owner = self
+        duration = 0.0
+        for anim in animations:
+            total_duration = anim.total_duration
+            if total_duration < 0:
+                duration = -1.0
+                break
+            duration += total_duration
         AnimationBase.__init__(self, duration)
+        self._current_index = 0
 
-    def start(self):
-        AnimationBase.start(self)
-        return self
+    @property
+    def total_duration(self):
+        if self.duration < 0 or self.repeat < 0:
+            return -1.0
+        return self.delay + self.duration * (self.repeat + 1)
+
+    def set_yoyo(self, yoyo):
+        raise TypeError("AnimationSequence object does not support '.set_yoyo()'")
+
+    def start(self, restart=False, _add_to_mgr=True):
+        if self.is_active() and not restart:
+            return self
+        return AnimationBase.start(self, restart, _add_to_mgr) # noqa
 
     def pause(self):
-        AnimationBase.pause(self)
-        return self
+        if not self.is_waiting() and not self.is_playing():
+            return
+        for anim in self:
+            anim.pause()
+        return AnimationBase.pause(self)
 
     def resume(self):
-        AnimationBase.resume(self)
-        return self
+        if not self.is_paused():
+            return
+        for anim in self:
+            anim.resume()
+        return AnimationBase.resume(self)
 
     def finish(self):
-        AnimationBase.finish(self)
+        if not self.is_active():
+            return self
+        self._finish_all()
+        return AnimationBase.finish(self)
+
+    def complete(self):
+        if not self.is_active():
+            return self
+        self._finish_all()
+        if 0 <= self.repeat <= self._cycle_index:
+            return self.finish()
+        self._reset_anims()
+        self._current_index = 0
+        self._set_progress(1.0)
+        self._cycle_index += 1
+        self._elapsed = self.delay + self.duration * self._cycle_index
         return self
 
     def cancel(self, stay=False, call_on_end=True):
-        AnimationBase.cancel(self, stay, call_on_end)
-        return self
+        if not self.is_active():
+            return self
+        for anim in self:
+            anim.cancel(stay, call_on_end)
+        return AnimationBase.cancel(self, stay, call_on_end)
+
+    def update(self, delta_time):
+        state = self._state
+        if state == self.PAUSED:
+            return
+        if state != self.WAITING and state != self.PLAYING:
+            return
+
+        self._elapsed += delta_time
+        if state == self.WAITING:
+            if self._elapsed < self.delay:
+                return
+            AnimationBase._begin(self)
+            if self._state != self.PLAYING:
+                return
+
+        self._update_current(delta_time)
+        if self._state != self.PLAYING:
+            return
+
+        if self.duration > 0:
+            progress_delta = delta_time / self.duration
+            if self._progress >= 1.0:
+                progress = progress_delta
+            else:
+                progress = self._progress + progress_delta
+            AnimationBase._set_progress(self, progress)
+
+    def _prepare(self):
+        for anim in self:
+            if anim.is_active():
+                anim.cancel(call_on_end=False)
+        self._reset_anims()
+        self._current_index = 0
+        AnimationBase._prepare(self)
+
+    def _reset_anims(self):
+        for anim in self:
+            anim._state = AnimationBase.IDLE
+            anim._paused_state = AnimationBase.NONE
+
+    def _finish_all(self):
+        for anim in self:
+            if anim.is_ended():
+                continue
+            if not anim.is_active():
+                anim.start(_add_to_mgr=False) # noqa
+            anim.finish()
+
+    def _update_current(self, delta_time):
+        current = self[self._current_index]
+        if current.is_idle():
+            current.start(_add_to_mgr=False) # noqa
+        current.update(delta_time)
+        if current.is_ended():
+            self._current_index += 1
+            if self._current_index >= len(self):
+                self.complete()
 
 
 class AnimationParallel(AnimationBase, list):
     def __init__(self, *animations):
         list.__init__(self, animations)
+        for anim in self:
+            anim._owner = self
         duration = 0.0
         for anim in animations:
             anim.delay = 0
@@ -961,7 +1126,7 @@ class _AnimationManager(Singleton):
     def is_active(self):
         return bool(self._animations)
 
-    @args_type_check((PropertyAnimation, AnimationParallel))
+    @args_type_check((PropertyAnimation, AnimationSequence, AnimationParallel))
     def add(self, anim):
         if not self._animations:
             self._last_time = None

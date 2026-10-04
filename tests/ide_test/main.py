@@ -31,6 +31,7 @@ TESTS = [
     ("common.mc_math.curve"  , "case.test_curve"),
     ("common.item"           , "case.test_item"),
 
+    ("client.ui.animation"   , "case.test_animation"),
     ("client.ui.screen_node" , "case.test_screen_node"),
     ("client.ui.nyc.control" , "case.test_control"),
 ]
