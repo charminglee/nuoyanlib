@@ -425,13 +425,13 @@ class Enum(object): # noqa
     可通过 ``for`` 循环等方式遍历枚举成员，或通过枚举类的 ``.__members__`` 属性获取成员字典，该字典的键值对应成员名称和成员对象。
 
     >>> for member in Color:
-    ...     print member.name, member.value
+    ...     print(member.name, member.value)
     'RED' 1
     'GREEN' 2
     'BLUE' 3
 
     >>> for name, member in Color.__members__.items():
-    ...     print member.name, member.value
+    ...     print(member.name, member.value)
     'RED' 1
     'GREEN' 2
     'BLUE' 3
@@ -492,9 +492,15 @@ class Enum(object): # noqa
         pass
 
     def __str__(self):
+        if self._name_ is None:
+            # 无名称成员（如空标志）直接显示值
+            return "%s(%r)" % (self.__class__.__name__, self._value_)
         return "%s.%s" % (self.__class__.__name__, self._name_)
 
     def __repr__(self):
+        if self._name_ is None:
+            # 无名称成员（如空标志）直接显示值
+            return "<%s: %r>" % (self.__class__.__name__, self._value_)
         return "<%s.%s: %r>" % (self.__class__.__name__, self._name_, self._value_)
 
     def __hash__(self):
@@ -656,22 +662,208 @@ class LazyEnum(object):
         return name
 
 
-# todo
 class Flag(Enum): # noqa
     """
     标志枚举类。
+
+    ``Flag`` 拥有 ``Enum`` 的全部特性，用于实现可按位组合的标志。
+
+    成员之间支持位运算： ``|`` （或）、 ``&`` （与）、 ``^`` （异或）、 ``~`` （取反），
+    运算结果为一个新的标志成员，其 ``name`` 为所含成员名称按 ``|`` 连接的结果，且相同组合总是得到同一个成员。
+
+    通过值查找时支持组合值： ``Color(3)`` 返回值为 ``1⠀|⠀2`` 的成员组合；若值中包含未定义的位，则抛出 ``ValueError``。
+
+    说明
+    ----
+
+    使用 ``auto()`` 自动生成的枚举值为 ``2`` 的 n 次幂。
+
+    若在 ``Flag`` 的子类中重写 ``_missing_()`` 方法，将失去组合值查找功能。
+
+    示例
+    ----
+
+    >>> from <scripts_root>.nuoyanlib.common.enum import Flag, auto
+    >>> class Permission(Flag):
+    ...     READ = auto()
+    ...     WRITE = auto()
+    ...     EXECUTE = auto()
+    >>> Permission.READ
+    <Permission.READ: 1>
+    >>> Permission.WRITE
+    <Permission.WRITE: 2>
+    >>> Permission.EXECUTE
+    <Permission.EXECUTE: 4>
+
+    成员组合：
+
+    >>> rw = Permission.READ | Permission.WRITE
+    >>> rw
+    <Permission.READ|WRITE: 3>
+    >>> rw.name
+    'READ|WRITE'
+    >>> rw.value
+    3
+    >>> Permission(3) is rw
+    True
+    >>> for flag in rw:
+    ...     print(flag.name)
+    READ
+    WRITE
+    >>> len(rw)
+    2
+
+    位运算：
+
+    >>> Permission.READ in rw
+    True
+    >>> rw & Permission.WRITE
+    <Permission.WRITE: 2>
+    >>> rw ^ Permission.WRITE
+    <Permission.READ: 1>
+    >>> ~Permission.READ
+    <Permission.WRITE|EXECUTE: 6>
+
+    运算后不包含任何位的标志为空标志，其 ``name`` 为 ``None`` ，布尔值为 ``False`` 。
+
+    >>> empty = rw & Permission.EXECUTE
+    >>> empty
+    <Permission: 0>
+    >>> empty.name is None
+    True
+    >>> bool(empty)
+    False
     """
 
     @staticmethod
     def _generate_next_value_(name, count, last_values):
-        return 1 << count
+        # 取比现有最大值更高一位的 2 的幂，避免与显式定义的值冲突
+        if not last_values:
+            return 1
+        return 1 << max(last_values).bit_length()
+
+    @classmethod
+    def _missing_(cls, value):
+        # 将值分解为已定义的单一位标志成员，若包含未定义的位则查找失败
+        if isinstance(value, Enum):
+            value = value._value_
+        if not isinstance(value, (int, long)): # noqa
+            return None
+        members = []
+        unknown = value
+        for member in cls._member_map_.values():
+            v = member._value_
+            if v and v & (v - 1) == 0 and v & value == v:
+                members.append(member)
+                unknown &= ~v
+        if unknown:
+            return None
+        name = "|".join([member._name_ for member in members]) or None
+        member = _new_member(cls._member_type_, cls, value, name)
+        return cls._value2member_map_.setdefault(value, member)
+
+    def __or__(self, other):
+        if isinstance(other, self.__class__):
+            other = other._value_
+        elif self._member_type_ is not object and isinstance(other, self._member_type_):
+            pass
+        else:
+            return NotImplemented
+        return self.__class__(self._value_ | other)
+
+    __ror__ = __or__
+
+    def __and__(self, other):
+        if isinstance(other, self.__class__):
+            other = other._value_
+        elif self._member_type_ is not object and isinstance(other, self._member_type_):
+            pass
+        else:
+            return NotImplemented
+        return self.__class__(self._value_ & other)
+
+    __rand__ = __and__
+
+    def __xor__(self, other):
+        if isinstance(other, self.__class__):
+            other = other._value_
+        elif self._member_type_ is not object and isinstance(other, self._member_type_):
+            pass
+        else:
+            return NotImplemented
+        return self.__class__(self._value_ ^ other)
+
+    __rxor__ = __xor__
+
+    def __invert__(self):
+        # 取反结果为所有已定义位中未被包含的部分
+        all_bits = 0
+        for member in self.__class__._member_map_.values():
+            all_bits |= member._value_
+        return self.__class__(all_bits ^ self._value_)
+
+    def __iter__(self):
+        # 按定义顺序遍历所包含的单一位标志成员
+        value = self._value_
+        for member in self.__class__._member_map_.values():
+            v = member._value_
+            if v and v & (v - 1) == 0 and v & value == v:
+                yield member
+
+    def __len__(self):
+        return sum(1 for _ in self)
+
+    def __nonzero__(self):
+        return bool(self._value_)
+
+    def __contains__(self, other):
+        if isinstance(other, Enum):
+            other = other._value_
+        return other & self._value_ == other
 
 
-# todo
 class IntFlag(int, Flag): # noqa
     """
     整数类型标志枚举类。
+
+    ``IntFlag`` 拥有 ``Flag`` 的全部特性，且其枚举成员同时也是 ``int`` 类型，支持所有整数运算。
+
+    说明
+    ----
+
+    成员与整数之间的位运算结果仍为 ``IntFlag`` 成员，其他整数运算（如加法）的结果为普通 ``int`` 。
+
+    示例
+    ----
+
+    >>> from <scripts_root>.nuoyanlib.common.enum import IntFlag, auto
+    >>> class Permission(IntFlag):
+    ...     READ = auto()
+    ...     WRITE = auto()
+    ...     EXECUTE = auto()
+    >>> Permission.READ
+    <Permission.READ: 1>
+    >>> rw = Permission.READ | Permission.WRITE
+    >>> rw
+    <Permission.READ|WRITE: 3>
+    >>> rw == 3
+    True
+    >>> rw | 4
+    <Permission.READ|WRITE|EXECUTE: 7>
+    >>> str(rw)
+    '3'
+    >>> rw + 1
+    4
     """
+
+    # int 在 MRO 中先于 Flag，其内建的位运算槽位会遮蔽 Flag 的实现，需显式恢复
+    __or__ = Flag.__or__
+    __ror__ = Flag.__ror__
+    __and__ = Flag.__and__
+    __rand__ = Flag.__rand__
+    __xor__ = Flag.__xor__
+    __rxor__ = Flag.__rxor__
+    __invert__ = Flag.__invert__
 
 
 gen_lower_name = lambda name, _, __: name.lower()
