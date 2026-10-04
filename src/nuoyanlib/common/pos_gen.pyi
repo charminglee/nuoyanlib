@@ -12,7 +12,7 @@
 
 from typing import Tuple, Any, Dict, Generic, Iterator, Generator, List, Literal, Optional, overload
 from random import Random
-from ..core._types._typing import FTuple3, ITuple3, SlotsType, PosT, ITuple2, FTuple2
+from ..core._types._typing import FTuple3, SlotsType, PosT
 
 
 class _PosGenerator(Generic[PosT]):
@@ -107,42 +107,36 @@ class gen_sphere_pos(_PosGenerator[FTuple3]):
     def __gen_pos__(self, i: int) -> FTuple3: ...
 
 
-@overload
-def _calc_axis_counts(min_pos: FTuple3, max_pos: FTuple3, count: int) -> ITuple3: ...
-@overload
-def _calc_axis_counts(min_pos: FTuple2, max_pos: FTuple2, count: int) -> ITuple2: ...
-
-
 class gen_box_pos(_PosGenerator[PosT]):
     __slots__: SlotsType
     _min_pos: PosT
-    _count_x: int
-    _count_y: int
     _x_step: float
     _y_step: float
     _z_step: float
-    pos1: PosT
-    pos2: PosT
-    interval: float
-    count: int
-    def __init__(self, pos1: PosT, pos2: PosT, interval: float) -> None: ...
-    def __gen_pos__(self, i: int) -> PosT: ...
-
-
-class gen_box_surface_pos(_PosGenerator[PosT]):
-    __slots__: SlotsType
-    _min_pos: PosT
-    _step_x: float
-    _step_y: float
-    _step_z: float
     pos1: PosT
     pos2: PosT
     count_x: int
     count_y: int
     count_z: int
     count: int
-    def __init__(self, pos1: PosT, pos2: PosT, count_x: int, count_y: int, count_z: int) -> None: ...
+    def __init__(self, pos1: PosT, pos2: PosT, count_x: int = 2, count_y: int = 2, count_z: int = 2) -> None: ...
     def __gen_pos__(self, i: int) -> PosT: ...
+
+
+class gen_box_surface_pos(_PosGenerator[FTuple3]):
+    __slots__: SlotsType
+    _min_pos: FTuple3
+    _step_x: float
+    _step_y: float
+    _step_z: float
+    pos1: FTuple3
+    pos2: FTuple3
+    count_x: int
+    count_y: int
+    count_z: int
+    count: int
+    def __init__(self, pos1: FTuple3, pos2: FTuple3, count_x: int, count_y: int, count_z: int) -> None: ...
+    def __gen_pos__(self, i: int) -> FTuple3: ...
 
 
 class gen_box_frame_pos(_PosGenerator[PosT]):

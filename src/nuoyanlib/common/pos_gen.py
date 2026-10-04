@@ -26,8 +26,8 @@ __all__ = [
     "gen_line_pos",
     "gen_ring_pos",
     "gen_sphere_pos",
-    # "gen_box_pos",
-    # "gen_box_surface_pos",
+    "gen_box_pos",
+    "gen_box_surface_pos",
     "gen_box_frame_pos",
 ]
 
@@ -313,44 +313,6 @@ class gen_sphere_pos(_PosGenerator):
             return cartesian_coord((radius, theta, phi), True, (cx, cy, cz))
 
 
-def _calc_axis_counts(min_pos, max_pos, count):
-    dx = max_pos[0] - min_pos[0]
-    dy = max_pos[1] - min_pos[1]
-
-    if len(min_pos) == 2:
-        ratio = dx / dy if dy > 0 else 1.0
-        count_y = max(1, int(round((count / ratio)**0.5)))
-        count_x = max(1, int(round(count / count_y)))
-        while count_x * count_y < count:
-            if count_x / dx < count_y / dy:
-                count_x += 1
-            else:
-                count_y += 1
-        return count_x, count_y
-
-    else:
-        dz = max_pos[2] - min_pos[2]
-        total = dx + dy + dz
-        if total == 0:
-            return 1, 1, 1
-        cube_root = count ** (1/3)
-        count_x = max(1, int(round(cube_root * dx / total)))
-        count_y = max(1, int(round(cube_root * dy / total)))
-        count_z = max(1, int(round(cube_root * dz / total)))
-        while count_x * count_y * count_z < count:
-            density_x = count_x / dx if dx > 0 else float('inf')
-            density_y = count_y / dy if dy > 0 else float('inf')
-            density_z = count_z / dz if dz > 0 else float('inf')
-            if density_x <= density_y and density_x <= density_z:
-                count_x += 1
-            elif density_y <= density_z:
-                count_y += 1
-            else:
-                count_z += 1
-        return count_x, count_y, count_z
-
-
-# todo
 class gen_box_pos(_PosGenerator):
     """
     生成包围盒（立方体/矩形）内各点的坐标，每个坐标均匀分布。
@@ -364,45 +326,50 @@ class gen_box_pos(_PosGenerator):
 
     :param tuple[float,float,float]|tuple[float,float] pos1: 包围盒对角坐标1
     :param tuple[float,float,float]|tuple[float,float] pos2: 包围盒对角坐标2
-    :param int count: 生成的坐标数量
-    :param bool allow_exceed: 是否允许实际生成的坐标数量超过 count；默认为 True
+    :param int count_x: x轴方向上的坐标数量，需大于等于 1；默认为 2
+    :param int count_y: y轴方向上的坐标数量，需大于等于 1；默认为 2
+    :param int count_z: z轴方向上的坐标数量，需大于等于 1，使用二维坐标时可忽略该参数；默认为 2
     """
 
     __slots__ = (
         '_min_pos',
-        '_count_x',
-        '_count_y',
         '_x_step',
         '_y_step',
         '_z_step',
         'pos1',
         'pos2',
+        'count_x',
+        'count_y',
+        'count_z',
         'count',
-        'allow_exceed',
     )
 
-    def __init__(self, pos1, pos2, count, allow_exceed=True): # noqa
-        min_pos, max_pos = box_min_max(pos1, pos2)
-        self._min_pos = min_pos
-        if len(pos1) == 2:
-            count_x, count_y = _calc_axis_counts(min_pos, max_pos, count)
-            count_z = 0
-            self._count_x, self._count_y = count_x, count_y
-        else:
-            count_x, count_y, count_z = _calc_axis_counts(min_pos, max_pos, count)
-            self._count_x, self._count_y = count_x, count_y
-        self._x_step = ((max_pos[0] - min_pos[0]) / (count_x - 1)) if count_x > 1 else 0.0
-        self._y_step = ((max_pos[1] - min_pos[1]) / (count_y - 1)) if count_y > 1 else 0.0
-        self._z_step = ((max_pos[2] - min_pos[2]) / (count_z - 1)) if count_z > 1 else 0.0
+    def __init__(self, pos1, pos2, count_x=2, count_y=2, count_z=2): # noqa
+        if count_x < 1:
+            raise ValueError("'count_x' must be >=1")
+        if count_y < 1:
+            raise ValueError("'count_y' must be >=1")
+        if count_z < 1:
+            raise ValueError("'count_z' must be >=1")
         self.pos1 = pos1
         self.pos2 = pos2
-        self.count = count_x * count_y * count_z if allow_exceed else count
-        self.allow_exceed = allow_exceed
+        self.count_x = count_x
+        self.count_y = count_y
+        self.count_z = count_z
+        min_pos, max_pos = box_min_max(pos1, pos2)
+        self._min_pos = min_pos
+        self._x_step = ((max_pos[0] - min_pos[0]) / (count_x - 1)) if count_x > 1 else 0.0
+        self._y_step = ((max_pos[1] - min_pos[1]) / (count_y - 1)) if count_y > 1 else 0.0
+        if len(pos1) == 2:
+            self._z_step = 0.0
+            self.count = count_x * count_y
+        else:
+            self._z_step = ((max_pos[2] - min_pos[2]) / (count_z - 1)) if count_z > 1 else 0.0
+            self.count = count_x * count_y * count_z
 
     def __gen_pos__(self, i):
         min_pos = self._min_pos
-        count_x = self._count_x
-        count_y = self._count_y
+        count_x = self.count_x
 
         if len(self.pos1) == 2:
             ix = i % count_x
@@ -413,6 +380,7 @@ class gen_box_pos(_PosGenerator):
             )
 
         else:
+            count_y = self.count_y
             ix = i % count_x
             iy = (i // count_x) % count_y
             iz = i // (count_x * count_y)
@@ -437,9 +405,9 @@ class gen_box_surface_pos(_PosGenerator):
 
     :param tuple[float,float,float] pos1: 包围盒对角坐标1
     :param tuple[float,float,float] pos2: 包围盒对角坐标2
-    :param int count_x: x轴方向上单条边的坐标数量
-    :param int count_y: y轴方向上单条边的坐标数量
-    :param int count_z: z轴方向上单条边的坐标数量
+    :param int count_x: x轴方向上单条边的坐标数量，需大于 1
+    :param int count_y: y轴方向上单条边的坐标数量，需大于 1
+    :param int count_z: z轴方向上单条边的坐标数量，需大于 1
     """
 
     __slots__ = (
@@ -462,26 +430,93 @@ class gen_box_surface_pos(_PosGenerator):
             raise ValueError("'count_y' must be >1")
         if count_z <= 1:
             raise ValueError("'count_z' must be >1")
-        self._min_pos = box_min_max(pos1, pos2)[0]
-        dx = abs(pos1[0] - pos2[0])
-        dy = abs(pos1[1] - pos2[1])
-        dz = abs(pos1[2] - pos2[2])
-        self._step_x = dx / (count_x - 1) if count_x > 1 else 0.0
-        self._step_y = dy / (count_y - 1) if count_y > 1 else 0.0
-        self._step_z = dz / (count_z - 1) if count_z > 1 else 0.0
         self.pos1 = pos1
         self.pos2 = pos2
         self.count_x = count_x
         self.count_y = count_y
         self.count_z = count_z
-        if len(pos1) == 2:
-            self.count = count_x * 2 + (count_y * 2 - 4)
-        else:
-            self.count = count_x * 4 + (count_y * 4 - 8) + (count_z * 4 - 8)
+        min_pos, max_pos = box_min_max(pos1, pos2)
+        self._min_pos = min_pos
+        self._step_x = (max_pos[0] - min_pos[0]) / (count_x - 1)
+        self._step_y = (max_pos[1] - min_pos[1]) / (count_y - 1)
+        self._step_z = (max_pos[2] - min_pos[2]) / (count_z - 1)
+        # 表面点数 = 总点数 - 内部点数
+        self.count = count_x * count_y * count_z - (count_x - 2) * (count_y - 2) * (count_z - 2)
 
     def __gen_pos__(self, i):
-        # todo
-        pass
+        # 按底面、顶面、四个侧面的顺序生成，侧面跳过与底面/顶面重合的点
+        min_x, min_y, min_z = self._min_pos
+        count_x = self.count_x
+        count_y = self.count_y
+        count_z = self.count_z
+        face = count_x * count_z
+
+        if i < face:
+            # 底面
+            ix = i % count_x
+            iz = i // count_x
+            return (
+                min_x + ix * self._step_x,
+                min_y,
+                min_z + iz * self._step_z,
+            )
+        i -= face
+
+        if i < face:
+            # 顶面
+            ix = i % count_x
+            iz = i // count_x
+            return (
+                min_x + ix * self._step_x,
+                min_y + (count_y - 1) * self._step_y,
+                min_z + iz * self._step_z,
+            )
+        i -= face
+
+        side = count_x * (count_y - 2)
+        if i < side:
+            # z最小侧面
+            ix = i % count_x
+            iy = i // count_x + 1
+            return (
+                min_x + ix * self._step_x,
+                min_y + iy * self._step_y,
+                min_z,
+            )
+        i -= side
+
+        if i < side:
+            # z最大侧面
+            ix = i % count_x
+            iy = i // count_x + 1
+            return (
+                min_x + ix * self._step_x,
+                min_y + iy * self._step_y,
+                min_z + (count_z - 1) * self._step_z,
+            )
+        i -= side
+
+        inner = (count_y - 2) * (count_z - 2)
+        if i < inner:
+            # x最小侧面
+            iy = i // (count_z - 2) + 1
+            iz = i % (count_z - 2) + 1
+            return (
+                min_x,
+                min_y + iy * self._step_y,
+                min_z + iz * self._step_z,
+            )
+        i -= inner
+
+        if i < inner:
+            # x最大侧面
+            iy = i // (count_z - 2) + 1
+            iz = i % (count_z - 2) + 1
+            return (
+                min_x + (count_x - 1) * self._step_x,
+                min_y + iy * self._step_y,
+                min_z + iz * self._step_z,
+            )
 
 
 class gen_box_frame_pos(_PosGenerator):

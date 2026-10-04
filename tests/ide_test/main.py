@@ -23,12 +23,14 @@ TESTS = [
     ("core._utils"           , "case.test__utils"),
     ("core.listener"         , "case.test_listener"),
     ("core.server.comp"      , "case.test_comp"),
+    ("core.server._lib_server", "case.test__lib_server"),
 
     ("common.enum"           , "case.test_enum"),
     ("common.utils"          , "case.test_utils"),
     ("common.mc_math.vector" , "case.test_vector"),
     ("common.mc_math.mc_math", "case.test_mc_math"),
     ("common.mc_math.curve"  , "case.test_curve"),
+    ("common.pos_gen"        , "case.test_pos_gen"),
     ("common.item"           , "case.test_item"),
 
     ("client.ui.animation"   , "case.test_animation"),

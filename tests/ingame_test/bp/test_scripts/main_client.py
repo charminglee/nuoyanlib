@@ -56,7 +56,8 @@ class MainClientSystem(nyl.NyClientSystem):
             # pos2 = (pos[0] + 1.5, pos[2] + 1.5)
             # for p in nyl.gen_sphere_pos(center, 1.75, 500, fixed_x=False, fixed_y=False, fixed_z=False):
             # for p in nyl.gen_ring_pos(center, 1.75, 100, "y"):
-            # for p in nyl.gen_box_pos(pos1, pos2, 200, True):
+            # for p in nyl.gen_box_pos(pos1, pos2, 8, 4, 8):
+            # for p in nyl.gen_box_surface_pos(pos1, pos2, 8, 4, 8):
             # for p in nyl.gen_box_frame_pos((pos[0] - 1.5, pos[2] - 1.5), (pos[0] + 1.5, pos[2] - 1.5), 10, 4, 10):
             for p in nyl.gen_box_frame_pos(pos1, pos2, 8, 4, 8):
                 if not p:
