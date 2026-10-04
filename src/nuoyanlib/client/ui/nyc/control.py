@@ -5,7 +5,7 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-18
+#    Date  : 2026-10-4
 #  ⠀
 #  ================================================
 
@@ -16,9 +16,10 @@ if bool(0):
     from . import *
 
 
-from ....core import error
-from ....core._utils import kwargs_defaults, try_exec, cached_property
+from ....core import error, _env
+from ....core._utils import kwargs_defaults, try_exec, cached_property, get_func
 from ....core._types._checker import args_type_check
+from ....core.client.comp import ScreenNode
 from ..ui_utils import get_children_path_by_level, get_parent_path, is_out_of_screen, _UIControlType
 
 
@@ -45,6 +46,23 @@ _CONVERSION_FUNC_MAP = {
     _UIControlType.SLIDER               : "asSlider",
     _UIControlType.STACK_PANEL          : "asStackPanel",
     _UIControlType.TOGGLE               : "asSwitchToggle",
+}
+
+
+# NETEASE_PAPER_DOLL/ITEM_RENDERER/MINI_MAP 控件获取到的类型均为 CUSTOM(1)，
+# PROGRESS_BAR/COMBO_BOX 控件获取到的类型均为 PANEL(10)，这五类控件无法区分具体类型，暂不纳入自动转换
+_AUTO_FUNC_MAP = {
+    _UIControlType.BUTTON          : "to_button",
+    _UIControlType.EDIT_BOX        : "to_edit_box",
+    _UIControlType.GRID            : "to_grid",
+    _UIControlType.IMAGE           : "to_image",
+    _UIControlType.INPUT_PANEL     : "to_input_panel",
+    _UIControlType.LABEL           : "to_label",
+    _UIControlType.SCROLL_VIEW     : "to_scroll_view",
+    _UIControlType.SELECTION_WHEEL : "to_selection_wheel",
+    _UIControlType.SLIDER          : "to_slider",
+    _UIControlType.STACK_PANEL     : "to_stack_panel",
+    _UIControlType.TOGGLE          : "to_toggle",
 }
 
 
@@ -1086,6 +1104,13 @@ class NyControl(object):
 
         自动根据控件类型创建对应的控件实例。
 
+        说明
+        ----
+
+        目前纸娃娃、物品渲染器、小地图控件获取到的类型均为 CUSTOM，进度条、下拉框控件获取到的类型均为 PANEL，无法与其他类型区分，因此这五类控件暂时统一返回 ``NyControl`` 实例。
+
+        在IDE环境下无法获取控件类型，将始终返回 ``NyControl`` 实例。
+
         示例
         ----
 
@@ -1110,7 +1135,15 @@ class NyControl(object):
         """
         if cls is not NyControl:
             return cls(ny_screen_node, path)
-        # todo
+        if _env.DEBUG:
+            return NyControl(ny_screen_node, path)
+        screen_node = ny_screen_node._screen_node
+        control_type = NyControl.__get_control_type(screen_node.screen_name, screen_node.component_path + path)
+        func_name = _AUTO_FUNC_MAP.get(control_type)
+        if not func_name:
+            return NyControl(ny_screen_node, path)
+        nyc = NyControl(ny_screen_node, path)
+        return getattr(nyc, func_name)()
 
     def _try_convert(self, base_control):
         conv_func = _CONVERSION_FUNC_MAP[self.CONTROL_TYPE]
@@ -1532,8 +1565,13 @@ class NyControl(object):
 
     # endregion
 
-
-
+    __get_control_type = staticmethod(
+        get_func( # noqa
+            ScreenNode,
+            (103, 117, 105),
+            (103, 101, 116, 95, 99, 111, 110, 116, 114, 111, 108, 95, 100, 101, 102, 95, 116, 121, 112, 101)
+        )
+    )
 
 
 

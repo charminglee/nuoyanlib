@@ -11,12 +11,10 @@
 
 
 # todo：库函数精简
-# todo：完善接口的异常处理
 # todo：完善Ny控件
 # todo：Entity类、Player类，对事件返回的entityId、playerId进行封装（可编写一个装饰器，仅对使用该装饰器的事件启用该功能，节约性能）
 # todo：event热更新
 # todo：nbt
-# todo：@async
 # todo：运镜框架
 # todo：容器UI
 # todo：event_filter

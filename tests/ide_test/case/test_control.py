@@ -5,12 +5,12 @@
 #  ⠀
 #    Author: Nuoyan <https://github.com/charminglee>
 #    Email : 1279735247@qq.com
-#    Date  : 2026-9-12
+#    Date  : 2026-10-4
 #  ⠀
 #  ================================================
 
 
-from nuoyanlib.client.ui.nyc.control import NyControl
+from nuoyanlib.client.ui.nyc.control import NyControl, _AUTO_FUNC_MAP
 from nuoyanlib.client.ui.nyc import (
     NyButton,
     NyComboBox,
@@ -101,3 +101,17 @@ ch = abc / "child"
 assert ch.GetPath() == ch.path == "/abc/child"
 abc.destroy()
 assert "/abc" not in sn._nyc_cache_map
+
+
+# NyControl.auto
+for method_name in _AUTO_FUNC_MAP.values():
+    assert callable(getattr(NyControl, method_name))
+assert _AUTO_FUNC_MAP.get(_UIControlType.CUSTOM) is None
+assert _AUTO_FUNC_MAP.get(_UIControlType.PANEL) is None
+
+auto_c = NyControl.auto(sn, "/auto")
+assert type(auto_c) is NyControl
+assert NyControl.auto(sn, "/auto") is auto_c
+assert NC.auto(sn, "/auto") is not auto_c
+assert n[0] == 3
+assert NyControl.auto(sn, "/auto") is not auto_c
