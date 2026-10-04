@@ -276,7 +276,7 @@ def chunk_pos(pos):
     return int(pos[0] // 16), int(pos[2] // 16)
 
 
-def polar_coord(coord, rad=False, origin=(0, 0)):
+def polar_coord(coord, rad=False, origin=None):
     """
     将直角坐标转换为极坐标。
 
@@ -284,11 +284,15 @@ def polar_coord(coord, rad=False, origin=(0, 0)):
 
     :param tuple[float,float,float]|tuple[float,float] coord: 直角坐标
     :param bool rad: 是否使用弧度制；默认为 False
-    :param tuple[float,float,float]|tuple[float,float] origin: 坐标原点；默认为 (0, 0, 0) 或 (0, 0)，根据 coord 的维度确定
+    :param tuple[float,float,float]|tuple[float,float]|None origin: 坐标原点；默认为 None，表示 (0, 0, 0) 或 (0, 0)，根据 coord 的维度确定
 
     :return: 极坐标；传入的直角坐标坐标为 None 时，返回 None
-    :rtype: tuple[float,float,float]|tuple[float,float]
+    :rtype: tuple[float,float,float]|tuple[float,float]|None
     """
+    if not coord:
+        return
+    if origin is None:
+        origin = (0, ) * len(coord)
     if len(coord) == 2:
         x, y = coord # noqa
         x -= origin[0]
@@ -320,11 +324,15 @@ def cartesian_coord(coord, rad=False, origin=None):
 
     :param tuple[float,float,float]|tuple[float,float] coord: 极坐标
     :param bool rad: 是否使用弧度制；默认为 False
-    :param tuple[float,float,float]|tuple[float,float] origin: 坐标原点；默认为 (0, 0, 0) 或 (0, 0)，根据 coord 的维度确定
+    :param tuple[float,float,float]|tuple[float,float]|None origin: 坐标原点；默认为 None，表示 (0, 0, 0) 或 (0, 0)，根据 coord 的维度确定
 
     :return: 直角坐标；传入的极坐标为 None 时，返回 None
-    :rtype: tuple[float,float,float]|tuple[float,float]
+    :rtype: tuple[float,float,float]|tuple[float,float]|None
     """
+    if not coord:
+        return
+    if origin is None:
+        origin = (0, ) * len(coord)
     if len(coord) == 2:
         r, theta = coord # noqa
         if not rad:
