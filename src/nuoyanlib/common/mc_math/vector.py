@@ -1044,10 +1044,10 @@ class Vector(object):
             raise VectorError("the dimensions of two vectors are mismatched")
         if dim == 2:
             bx, by = basis
-            proj_len = (self._x*bx + self._y*by) / (bx**2 + by**2)
+            proj_len = (self._x*bx + self._y*by) / sqrt(bx**2 + by**2)
         else:
             bx, by, bz = basis
-            proj_len = (self._x*bx + self._y*by + self._z*bz) / (bx**2 + by**2 + bz**2)
+            proj_len = (self._x*bx + self._y*by + self._z*bz) / sqrt(bx**2 + by**2 + bz**2)
         return proj_len
 
     def angle_between(self, vec, ret_cos=False, rad=False):
@@ -1525,7 +1525,7 @@ def vec_project_length(vec, basis):
     :return: 投影长度
     :rtype: float
     """
-    return vec_dot(vec, basis) / vec_length2(basis)
+    return vec_dot(vec, basis) / vec_length(basis)
 
 
 def vec_angle_between(vec1, vec2, ret_cos=False, rad=False):
@@ -1651,6 +1651,11 @@ def vec_entity_up(entity_id, ignore_rot_x=False):
     """
     获取实体局部坐标系中朝上的单位向量。
 
+    说明
+    ----
+
+    当实体俯仰角为±90°时，将基于其水平朝向计算上方向。
+
     -----
 
     :param str entity_id: 实体ID
@@ -1665,7 +1670,14 @@ def vec_entity_up(entity_id, ignore_rot_x=False):
         f = vec_entity_forward(entity_id)
         if not f:
             return
-        l = vec_normalize(vec_cross(VEC_UP, f))
+        c = vec_cross(VEC_UP, f)
+        if is_zero_vec(c):
+            # 俯仰角为±90°时前向量与UP平行，cross结果为零向量，此时基于水平朝向计算左方向
+            hf = vec_entity_forward(entity_id, True)
+            if not hf:
+                return
+            c = vec_cross(VEC_UP, hf)
+        l = vec_normalize(c)
         u = vec_cross(f, l)
     return u
 
@@ -1696,6 +1708,11 @@ def vec_entity_left(entity_id):
     """
     获取实体局部坐标系中朝左的单位向量。
 
+    说明
+    ----
+
+    当实体俯仰角为±90°时，将基于其水平朝向计算左方向。
+
     -----
 
     :param str entity_id: 实体ID
@@ -1706,8 +1723,14 @@ def vec_entity_left(entity_id):
     f = vec_entity_forward(entity_id)
     if not f:
         return
-    l = vec_normalize(vec_cross(VEC_UP, f))
-    return l
+    l = vec_cross(VEC_UP, f)
+    if is_zero_vec(l):
+        # 俯仰角为±90°时前向量与UP平行，cross结果为零向量，此时基于水平朝向计算左方向
+        hf = vec_entity_forward(entity_id, True)
+        if not hf:
+            return
+        l = vec_cross(VEC_UP, hf)
+    return vec_normalize(l)
 
 
 def vec_entity_right(entity_id):
